@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
+import { z } from "zod";
 
 export const appRouter = router({
   system: systemRouter,
@@ -17,12 +18,129 @@ export const appRouter = router({
     }),
   }),
 
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
+  // Gestor PAV routers
+  dashboard: router({
+    stats: publicProcedure.query(async () => {
+      const { getDashboardStats } = await import('./db');
+      return getDashboardStats();
+    }),
+  }),
+
+  mercados: router({
+    list: publicProcedure
+      .input(z.object({
+        search: z.string().optional(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const { getMercados } = await import('./db');
+        return getMercados(input);
+      }),
+    
+    byId: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { getMercadoById } = await import('./db');
+        return getMercadoById(input);
+      }),
+  }),
+
+  clientes: router({
+    list: publicProcedure
+      .input(z.object({
+        validationStatus: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getAllClientes } = await import('./db');
+        return getAllClientes(input.validationStatus);
+      }),
+    
+    byMercado: publicProcedure
+      .input(z.object({
+        mercadoId: z.number(),
+        validationStatus: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getClientesByMercado } = await import('./db');
+        return getClientesByMercado(input.mercadoId, input.validationStatus);
+      }),
+    
+    updateValidation: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.string(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { updateClienteValidation } = await import('./db');
+        return updateClienteValidation(input.id, input.status, input.notes, ctx.user?.id);
+      }),
+  }),
+
+  concorrentes: router({
+    list: publicProcedure
+      .input(z.object({
+        validationStatus: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getAllConcorrentes } = await import('./db');
+        return getAllConcorrentes(input.validationStatus);
+      }),
+    
+    byMercado: publicProcedure
+      .input(z.object({
+        mercadoId: z.number(),
+        validationStatus: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getConcorrentesByMercado } = await import('./db');
+        return getConcorrentesByMercado(input.mercadoId, input.validationStatus);
+      }),
+    
+    updateValidation: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.string(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { updateConcorrenteValidation } = await import('./db');
+        return updateConcorrenteValidation(input.id, input.status, input.notes, ctx.user?.id);
+      }),
+  }),
+
+  leads: router({
+    list: publicProcedure
+      .input(z.object({
+        validationStatus: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getAllLeads } = await import('./db');
+        return getAllLeads(input.validationStatus);
+      }),
+    
+    byMercado: publicProcedure
+      .input(z.object({
+        mercadoId: z.number(),
+        validationStatus: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getLeadsByMercado } = await import('./db');
+        return getLeadsByMercado(input.mercadoId, input.validationStatus);
+      }),
+    
+    updateValidation: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.string(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { updateLeadValidation } = await import('./db');
+        return updateLeadValidation(input.id, input.status, input.notes, ctx.user?.id);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -43,8 +43,8 @@
 }
 
 :root {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
+  --primary: oklch(0.55 0.25 260); /* Deep purple */
+  --primary-foreground: oklch(0.98 0 0);
   --sidebar-primary: var(--color-blue-600);
   --sidebar-primary-foreground: var(--color-blue-50);
   --chart-1: var(--color-blue-300);
@@ -130,6 +130,30 @@
   input[type="checkbox"]:not(:disabled),
   input[type="radio"]:not(:disabled) {
     @apply cursor-pointer;
+  }
+}
+
+@layer utilities {
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1;
+  }
+  
+  /* Status badges */
+  .badge-pending {
+    @apply bg-muted text-muted-foreground border border-border;
+  }
+  
+  .badge-rich {
+    @apply bg-green-100 text-green-800 border border-green-200;
+  }
+  
+  .badge-needs-adjustment {
+    @apply bg-yellow-100 text-yellow-800 border border-yellow-200;
+  }
+  
+  .badge-discarded {
+    @apply bg-red-100 text-red-800 border border-red-200;
   }
 }
 

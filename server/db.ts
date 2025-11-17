@@ -1,6 +1,11 @@
-import { eq } from "drizzle-orm";
+import { eq, sql, and, or, like, count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { 
+  InsertUser, users, 
+  mercadosUnicos, clientes, clientesMercados, 
+  concorrentes, leads,
+  MercadoUnico, Cliente, Concorrente, Lead
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -17,6 +22,10 @@ export async function getDb() {
   }
   return _db;
 }
+
+// ============================================
+// USER HELPERS
+// ============================================
 
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.id) {
@@ -85,4 +94,277 @@ export async function getUser(id: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ============================================
+// DASHBOARD HELPERS
+// ============================================
+
+export async function getDashboardStats() {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [mercadosCount] = await db.select({ count: count() }).from(mercadosUnicos);
+  const [clientesCount] = await db.select({ count: count() }).from(clientes);
+  const [concorrentesCount] = await db.select({ count: count() }).from(concorrentes);
+  const [leadsCount] = await db.select({ count: count() }).from(leads);
+
+  // Contagem por status de validação
+  const clientesStatus = await db
+    .select({ 
+      status: clientes.validationStatus, 
+      count: count() 
+    })
+    .from(clientes)
+    .groupBy(clientes.validationStatus);
+
+  const concorrentesStatus = await db
+    .select({ 
+      status: concorrentes.validationStatus, 
+      count: count() 
+    })
+    .from(concorrentes)
+    .groupBy(concorrentes.validationStatus);
+
+  const leadsStatus = await db
+    .select({ 
+      status: leads.validationStatus, 
+      count: count() 
+    })
+    .from(leads)
+    .groupBy(leads.validationStatus);
+
+  return {
+    totals: {
+      mercados: mercadosCount.count,
+      clientes: clientesCount.count,
+      concorrentes: concorrentesCount.count,
+      leads: leadsCount.count,
+    },
+    validation: {
+      clientes: clientesStatus,
+      concorrentes: concorrentesStatus,
+      leads: leadsStatus,
+    }
+  };
+}
+
+// ============================================
+// MERCADO HELPERS
+// ============================================
+
+export async function getMercados(params?: {
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db.select().from(mercadosUnicos);
+
+  if (params?.search) {
+    query = query.where(
+      or(
+        like(mercadosUnicos.nome, `%${params.search}%`),
+        like(mercadosUnicos.categoria, `%${params.search}%`)
+      )
+    ) as any;
+  }
+
+  if (params?.limit) {
+    query = query.limit(params.limit) as any;
+  }
+
+  if (params?.offset) {
+    query = query.offset(params.offset) as any;
+  }
+
+  return query;
+}
+
+export async function getMercadoById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(mercadosUnicos)
+    .where(eq(mercadosUnicos.id, id))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
+// ============================================
+// CLIENTE HELPERS
+// ============================================
+
+export async function getAllClientes(validationStatus?: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  if (validationStatus) {
+    return await db.select().from(clientes).where(eq(clientes.validationStatus, validationStatus as any));
+  }
+
+  return await db.select().from(clientes);
+}
+
+export async function getClientesByMercado(mercadoId: number, validationStatus?: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const conditions = [eq(clientesMercados.mercadoId, mercadoId)];
+  
+  if (validationStatus) {
+    conditions.push(eq(clientes.validationStatus, validationStatus as any));
+  }
+
+  return db
+    .select({
+      id: clientes.id,
+      nome: clientes.nome,
+      cnpj: clientes.cnpj,
+      siteOficial: clientes.siteOficial,
+      produtoPrincipal: clientes.produtoPrincipal,
+      segmentacaoB2bB2c: clientes.segmentacaoB2bB2c,
+      email: clientes.email,
+      telefone: clientes.telefone,
+      cidade: clientes.cidade,
+      uf: clientes.uf,
+      validationStatus: clientes.validationStatus,
+      validationNotes: clientes.validationNotes,
+      validatedAt: clientes.validatedAt,
+    })
+    .from(clientes)
+    .innerJoin(clientesMercados, eq(clientes.id, clientesMercados.clienteId))
+    .where(and(...conditions));
+}
+
+export async function updateClienteValidation(
+  id: number, 
+  status: string, 
+  notes?: string,
+  userId?: string
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  await db
+    .update(clientes)
+    .set({
+      validationStatus: status as any,
+      validationNotes: notes,
+      validatedBy: userId,
+      validatedAt: new Date(),
+    })
+    .where(eq(clientes.id, id));
+
+  return { success: true };
+}
+
+// ============================================
+// CONCORRENTE HELPERS
+// ============================================
+
+export async function getAllConcorrentes(validationStatus?: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  if (validationStatus) {
+    return await db.select().from(concorrentes).where(eq(concorrentes.validationStatus, validationStatus as any));
+  }
+
+  return await db.select().from(concorrentes);
+}
+
+export async function getConcorrentesByMercado(mercadoId: number, validationStatus?: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const conditions = [eq(concorrentes.mercadoId, mercadoId)];
+  
+  if (validationStatus) {
+    conditions.push(eq(concorrentes.validationStatus, validationStatus as any));
+  }
+
+  return db
+    .select()
+    .from(concorrentes)
+    .where(and(...conditions));
+}
+
+export async function updateConcorrenteValidation(
+  id: number, 
+  status: string, 
+  notes?: string,
+  userId?: string
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  await db
+    .update(concorrentes)
+    .set({
+      validationStatus: status as any,
+      validationNotes: notes,
+      validatedBy: userId,
+      validatedAt: new Date(),
+    })
+    .where(eq(concorrentes.id, id));
+
+  return { success: true };
+}
+
+// ============================================
+// LEAD HELPERS
+// ============================================
+
+export async function getAllLeads(validationStatus?: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  if (validationStatus) {
+    return await db.select().from(leads).where(eq(leads.validationStatus, validationStatus as any));
+  }
+
+  return await db.select().from(leads);
+}
+
+export async function getLeadsByMercado(mercadoId: number, validationStatus?: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const conditions = [eq(leads.mercadoId, mercadoId)];
+  
+  if (validationStatus) {
+    conditions.push(eq(leads.validationStatus, validationStatus as any));
+  }
+
+  return db
+    .select()
+    .from(leads)
+    .where(and(...conditions));
+}
+
+export async function updateLeadValidation(
+  id: number, 
+  status: string, 
+  notes?: string,
+  userId?: string
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  await db
+    .update(leads)
+    .set({
+      validationStatus: status as any,
+      validationNotes: notes,
+      validatedBy: userId,
+      validatedAt: new Date(),
+    })
+    .where(eq(leads.id, id));
+
+  return { success: true };
+}
+

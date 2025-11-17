@@ -1,5 +1,27 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1763329650712,
+      "tag": "0000_mighty_brood",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1763329720318,
+      "tag": "0001_jittery_sprite",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1763338424625,
+      "tag": "0002_daily_silhouette",
+      "breakpoints": true
+    }
+  ]
 }
