@@ -57,6 +57,13 @@
       "when": 1763501516973,
       "tag": "0007_loud_power_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1763508459387,
+      "tag": "0008_stormy_power_pack",
+      "breakpoints": true
     }
   ]
 }

@@ -248,3 +248,18 @@ export const notifications = mysqlTable("notifications", {
 
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
+
+
+/**
+ * Cache de Enriquecimento - Armazena dados enriquecidos para evitar chamadas repetidas
+ */
+export const enrichmentCache = mysqlTable("enrichment_cache", {
+  cnpj: varchar("cnpj", { length: 14 }).primaryKey(),
+  dadosJson: text("dadosJson").notNull(), // JSON stringified dos dados enriquecidos
+  fonte: varchar("fonte", { length: 50 }), // "receitaws", "google_places", "hunter", etc
+  dataAtualizacao: timestamp("dataAtualizacao").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type EnrichmentCache = typeof enrichmentCache.$inferSelect;
+export type InsertEnrichmentCache = typeof enrichmentCache.$inferInsert;

@@ -1,0 +1,18 @@
+{
+  "query": "SELECT \n  p.id AS projeto_id,\n  p.nome AS projeto_nome,\n  COUNT(DISTINCT c.id) AS total_clientes,\n  COUNT(DISTINCT m.id) AS total_mercados,\n  COUNT(DISTINCT co.id) AS total_concorrentes,\n  COUNT(DISTINCT l.id) AS total_leads\nFROM projects p\nLEFT JOIN clientes c ON c.projectId = p.id\nLEFT JOIN mercados_unicos m ON m.projectId = p.id\nLEFT JOIN concorrentes co ON co.projectId = p.id\nLEFT JOIN leads l ON l.projectId = p.id\nWHERE p.nome LIKE '%Jeep%'\nGROUP BY p.id\nORDER BY p.id DESC\nLIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  p.id AS projeto_id,\n  p.nome AS projeto_nome,\n  COUNT(DISTINCT c.id) AS total_clientes,\n  COUNT(DISTINCT m.id) AS total_mercados,\n  COUNT(DISTINCT co.id) AS total_concorrentes,\n  COUNT(DISTINCT l.id) AS total_leads\nFROM projects p\nLEFT JOIN clientes c ON c.projectId = p.id\nLEFT JOIN mercados_unicos m ON m.projectId = p.id\nLEFT JOIN concorrentes co ON co.projectId = p.id\nLEFT JOIN leads l ON l.projectId = p.id\nWHERE p.nome LIKE '%Jeep%'\nGROUP BY p.id\nORDER BY p.id DESC\nLIMIT 1;",
+  "rows": [
+    {
+      "projeto_id": "60007",
+      "projeto_nome": "Teste Jeep API Corrigida",
+      "total_clientes": "1",
+      "total_mercados": "1",
+      "total_concorrentes": "3",
+      "total_leads": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "projeto_id\tprojeto_nome\ttotal_clientes\ttotal_mercados\ttotal_concorrentes\ttotal_leads\n60007\tTeste Jeep API Corrigida\t1\t1\t3\t3\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

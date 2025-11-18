@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS enrichment_cache (\n  cnpj VARCHAR(14) PRIMARY KEY,\n  dadosJson TEXT NOT NULL,\n  fonte VARCHAR(50),\n  dataAtualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_data_atualizacao (dataAtualizacao)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute CREATE TABLE IF NOT EXISTS enrichment_cache (\n  cnpj VARCHAR(14) PRIMARY KEY,\n  dadosJson TEXT NOT NULL,\n  fonte VARCHAR(50),\n  dataAtualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_data_atualizacao (dataAtualizacao)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 219
+}

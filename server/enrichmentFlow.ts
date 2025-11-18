@@ -302,10 +302,19 @@ async function enrichClientes(
 ) {
   const { createCliente, associateClienteToMercado } = await import('./db');
   const { invokeLLM } = await import('./_core/llm');
+  const { getCachedEnrichment, setCachedEnrichment } = await import('./_core/enrichmentCache');
 
   const enriched = [];
 
   for (const cliente of clientes) {
+    // Tentar buscar dados do cache primeiro
+    let dadosEnriquecidos: any = null;
+    if (cliente.cnpj) {
+      const cnpjLimpo = cliente.cnpj.replace(/\D/g, '');
+      if (cnpjLimpo.length === 14) {
+        dadosEnriquecidos = await getCachedEnrichment(cnpjLimpo);
+      }
+    }
     // Identificar mercado do cliente
     let mercadoId: number | null = null;
 
@@ -343,17 +352,36 @@ async function enrichClientes(
             ? 'Regular'
             : 'Ruim';
 
+    // Aplicar dados do cache se disponível
+    const dadosCliente = dadosEnriquecidos || cliente;
+    
     // Criar cliente
     const novoCliente = await createCliente({
       projectId,
-      nome: cliente.nome,
+      nome: dadosEnriquecidos?.nome || cliente.nome,
       cnpj: cliente.cnpj || null,
-      siteOficial: cliente.site || null,
+      siteOficial: dadosEnriquecidos?.site || cliente.site || null,
+      email: dadosEnriquecidos?.email || null,
+      telefone: dadosEnriquecidos?.telefone || null,
+      cidade: dadosEnriquecidos?.cidade || null,
+      uf: dadosEnriquecidos?.uf || null,
       produtoPrincipal: cliente.produto || null,
       qualidadeScore,
       qualidadeClassificacao,
       validationStatus: 'pending',
     });
+    
+    // Salvar no cache se não estava em cache
+    if (!dadosEnriquecidos && cliente.cnpj) {
+      const cnpjLimpo = cliente.cnpj.replace(/\D/g, '');
+      if (cnpjLimpo.length === 14) {
+        await setCachedEnrichment(cnpjLimpo, {
+          nome: cliente.nome,
+          site: cliente.site,
+          produto: cliente.produto,
+        }, 'input');
+      }
+    }
 
     if (novoCliente && mercadoId) {
       await associateClienteToMercado(novoCliente.id, mercadoId);
