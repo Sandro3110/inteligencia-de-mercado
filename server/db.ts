@@ -1042,3 +1042,213 @@ export async function deleteProject(id: number): Promise<boolean> {
     return false;
   }
 }
+
+
+// ============================================
+// CRUD - MERCADOS
+// ============================================
+
+export async function createMercado(data: {
+  projectId: number;
+  nome: string;
+  categoria?: string | null;
+  segmentacao?: 'B2B' | 'B2C' | 'B2B2C' | null;
+  tamanhoMercado?: string | null;
+  crescimentoAnual?: string | null;
+  tendencias?: string | null;
+  principaisPlayers?: string | null;
+  quantidadeClientes?: number | null;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const mercadoHash = `${data.nome}-${data.projectId}`.toLowerCase().replace(/\s+/g, '-');
+
+  const [result] = await db.insert(mercadosUnicos).values({
+    projectId: data.projectId,
+    mercadoHash,
+    nome: data.nome,
+    categoria: data.categoria || null,
+    segmentacao: data.segmentacao || null,
+    tamanhoMercado: data.tamanhoMercado || null,
+    crescimentoAnual: data.crescimentoAnual || null,
+    tendencias: data.tendencias || null,
+    principaisPlayers: data.principaisPlayers || null,
+    quantidadeClientes: data.quantidadeClientes || 0,
+  });
+
+  if (!result.insertId) return null;
+
+  return await getMercadoById(Number(result.insertId));
+}
+
+// ============================================
+// CRUD - CLIENTES
+// ============================================
+
+export async function createCliente(data: {
+  projectId: number;
+  nome: string;
+  cnpj?: string | null;
+  siteOficial?: string | null;
+  produtoPrincipal?: string | null;
+  segmentacaoB2bB2c?: 'B2B' | 'B2C' | 'B2B2C' | null;
+  email?: string | null;
+  telefone?: string | null;
+  linkedin?: string | null;
+  instagram?: string | null;
+  cidade?: string | null;
+  uf?: string | null;
+  cnae?: string | null;
+  porte?: 'MEI' | 'Pequena' | 'Média' | 'Grande' | null;
+  qualidadeScore?: number | null;
+  qualidadeClassificacao?: string | null;
+  validationStatus?: 'pending' | 'rich' | 'needs_adjustment' | 'discarded' | null;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const clienteHash = `${data.nome}-${data.cnpj || Date.now()}`.toLowerCase().replace(/\s+/g, '-');
+
+  const [result] = await db.insert(clientes).values({
+    projectId: data.projectId,
+    clienteHash,
+    nome: data.nome,
+    cnpj: data.cnpj || null,
+    siteOficial: data.siteOficial || null,
+    produtoPrincipal: data.produtoPrincipal || null,
+    segmentacaoB2bB2c: data.segmentacaoB2bB2c || null,
+    email: data.email || null,
+    telefone: data.telefone || null,
+    linkedin: data.linkedin || null,
+    instagram: data.instagram || null,
+    cidade: data.cidade || null,
+    uf: data.uf || null,
+    cnae: data.cnae || null,
+    porte: data.porte || null,
+    qualidadeScore: data.qualidadeScore || 0,
+    qualidadeClassificacao: data.qualidadeClassificacao || 'Ruim',
+    validationStatus: data.validationStatus || 'pending',
+  });
+
+  if (!result.insertId) return null;
+
+  const [cliente] = await db.select().from(clientes).where(eq(clientes.id, Number(result.insertId)));
+  return cliente;
+}
+
+export async function associateClienteToMercado(clienteId: number, mercadoId: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.insert(clientesMercados).values({
+      clienteId,
+      mercadoId,
+    });
+
+    // Atualizar contagem de clientes no mercado
+    await db.execute(sql`
+      UPDATE mercados_unicos 
+      SET quantidadeClientes = (
+        SELECT COUNT(*) FROM clientes_mercados WHERE mercadoId = ${mercadoId}
+      )
+      WHERE id = ${mercadoId}
+    `);
+
+    return true;
+  } catch (error) {
+    console.error('[DB] Erro ao associar cliente a mercado:', error);
+    return false;
+  }
+}
+
+// ============================================
+// CRUD - CONCORRENTES
+// ============================================
+
+export async function createConcorrente(data: {
+  projectId: number;
+  mercadoId: number;
+  nome: string;
+  cnpj?: string | null;
+  site?: string | null;
+  produto?: string | null;
+  porte?: 'MEI' | 'Pequena' | 'Média' | 'Grande' | null;
+  faturamentoEstimado?: string | null;
+  qualidadeScore?: number | null;
+  qualidadeClassificacao?: string | null;
+  validationStatus?: 'pending' | 'rich' | 'needs_adjustment' | 'discarded' | null;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const concorrenteHash = `${data.nome}-${data.mercadoId}-${Date.now()}`.toLowerCase().replace(/\s+/g, '-');
+
+  const [result] = await db.insert(concorrentes).values({
+    projectId: data.projectId,
+    mercadoId: data.mercadoId,
+    concorrenteHash,
+    nome: data.nome,
+    cnpj: data.cnpj || null,
+    site: data.site || null,
+    produto: data.produto || null,
+    porte: data.porte || null,
+    faturamentoEstimado: data.faturamentoEstimado || null,
+    qualidadeScore: data.qualidadeScore || 0,
+    qualidadeClassificacao: data.qualidadeClassificacao || 'Ruim',
+    validationStatus: data.validationStatus || 'pending',
+  });
+
+  if (!result.insertId) return null;
+
+  const [concorrente] = await db.select().from(concorrentes).where(eq(concorrentes.id, Number(result.insertId)));
+  return concorrente;
+}
+
+// ============================================
+// CRUD - LEADS
+// ============================================
+
+export async function createLead(data: {
+  projectId: number;
+  mercadoId: number;
+  nome: string;
+  cnpj?: string | null;
+  site?: string | null;
+  email?: string | null;
+  telefone?: string | null;
+  tipo?: 'inbound' | 'outbound' | 'referral' | null;
+  porte?: 'MEI' | 'Pequena' | 'Média' | 'Grande' | null;
+  regiao?: string | null;
+  setor?: string | null;
+  qualidadeScore?: number | null;
+  qualidadeClassificacao?: string | null;
+  validationStatus?: 'pending' | 'rich' | 'needs_adjustment' | 'discarded' | null;
+  stage?: 'novo' | 'em_contato' | 'negociacao' | 'fechado' | 'perdido' | null;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const leadHash = `${data.nome}-${data.mercadoId}-${Date.now()}`.toLowerCase().replace(/\s+/g, '-');
+
+  // Usar SQL raw para evitar problemas de tipos do Drizzle
+  const result = await db.execute(sql`
+    INSERT INTO leads (
+      projectId, mercadoId, leadHash, nome, cnpj, site, email, telefone,
+      tipo, porte, regiao, setor, qualidadeScore, qualidadeClassificacao,
+      validationStatus, stage
+    ) VALUES (
+      ${data.projectId}, ${data.mercadoId}, ${leadHash}, ${data.nome},
+      ${data.cnpj || null}, ${data.site || null}, ${data.email || null}, ${data.telefone || null},
+      ${data.tipo || null}, ${data.porte || null}, ${data.regiao || null}, ${data.setor || null},
+      ${data.qualidadeScore || 0}, ${data.qualidadeClassificacao || 'Ruim'},
+      ${data.validationStatus || 'pending'}, ${data.stage || 'novo'}
+    )
+  `) as any;
+
+  if (!result.insertId) return null;
+
+  const [lead] = await db.select().from(leads).where(eq(leads.id, Number(result.insertId)));
+  return lead;
+}

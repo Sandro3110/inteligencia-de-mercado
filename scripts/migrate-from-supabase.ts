@@ -150,7 +150,7 @@ async function migrate() {
         qualidadeScore: lead.qualidade_score,
         qualidadeClassificacao: lead.qualidade_classificacao,
         validationStatus: 'pending',
-      }).onDuplicateKeyUpdate({ set: { nome: lead.nome } });
+      } as any).onDuplicateKeyUpdate({ set: { nome: lead.nome } });
     }
     console.log('   ✅ Leads migrados!');
 

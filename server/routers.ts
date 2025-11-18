@@ -373,6 +373,32 @@ export const appRouter = router({
         return deleteProject(input);
       }),
   }),
+
+  enrichment: router({
+    execute: publicProcedure
+      .input(z.object({
+        clientes: z.array(z.object({
+          nome: z.string(),
+          cnpj: z.string().optional(),
+          site: z.string().optional(),
+          produto: z.string().optional(),
+        })),
+        projectName: z.string().min(1).max(255),
+      }))
+      .mutation(async ({ input }) => {
+        const { executeEnrichmentFlow } = await import('./enrichmentFlow');
+        
+        // Executar fluxo e retornar resultado final
+        return new Promise((resolve) => {
+          executeEnrichmentFlow(input, (progress) => {
+            // Em uma implementação real, usaríamos WebSockets ou SSE para enviar progresso em tempo real
+            if (progress.status === 'completed' || progress.status === 'error') {
+              resolve(progress);
+            }
+          });
+        });
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

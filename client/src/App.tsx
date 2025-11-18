@@ -9,6 +9,7 @@ import DashboardPage from "./pages/DashboardPage";
 import Mercados from "./pages/Mercados";
 import MercadoDetalhes from "./pages/MercadoDetalhes";
 import CascadeView from "./pages/CascadeView";
+import EnrichmentFlow from "./pages/EnrichmentFlow";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/dashboard-avancado" component={DashboardPage} />
       <Route path="/mercados" component={Mercados} />
       <Route path="/mercado/:id" component={MercadoDetalhes} />
+      <Route path="/enrichment" component={EnrichmentFlow} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
