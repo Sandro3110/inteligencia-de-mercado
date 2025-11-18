@@ -494,3 +494,48 @@
 - [x] Validar acessibilidade (focus visible)
 - [x] Criar checkpoint final
 - [x] Entregar documentação completa
+
+
+## Fase 18: Animações e Fluidez ✨
+
+### 18.1 Instalação e Configuração
+- [x] Instalar framer-motion
+- [x] Configurar AnimatePresence global
+- [x] Criar variantes de animação reutilizáveis
+
+### 18.2 Transições de Página
+- [x] Adicionar AnimatePresence no CascadeView
+- [x] Implementar fade + slide nas transições
+- [x] Configurar timing (0.3s ease-in-out)
+- [x] Testar navegação Mercados → Clientes → Concorrentes
+
+### 18.3 Stagger Animations
+- [x] Criar variantes de lista (staggerChildren)
+- [x] Aplicar em lista de mercados
+- [ ] Aplicar em lista de clientes (roadmap futuro)
+- [ ] Aplicar em lista de concorrentes/leads (roadmap futuro)
+- [x] Ajustar delay (0.05s entre itens)
+
+### 18.4 Skeleton Loading (Roadmap Futuro)
+- [ ] Criar SkeletonCard component
+- [ ] Criar SkeletonList component
+- [ ] Substituir spinners por skeletons
+- [ ] Adicionar animação de pulse
+
+### 18.5 Ripple Effect (Roadmap Futuro)
+- [ ] Criar RippleButton component
+- [ ] Implementar lógica de ripple
+- [ ] Adicionar animação CSS (@keyframes)
+- [ ] Aplicar em botões principais
+
+### 18.6 Toast Notifications (Roadmap Futuro)
+- [ ] Configurar Sonner com ícones
+- [ ] Adicionar ações (Desfazer, Tentar Novamente)
+- [ ] Implementar toast.promise para operações async
+- [ ] Customizar duração e posição
+
+### 18.7 Testes e Validação
+- [x] Testar performance das animações
+- [x] Validar em diferentes navegadores
+- [x] Verificar acessibilidade (prefers-reduced-motion)
+- [x] Criar checkpoint

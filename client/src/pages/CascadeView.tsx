@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { pageVariants, pageTransition, listVariants, listItemVariants } from "@/lib/animations";
 import { calculateQualityScore, classifyQuality, isValidCNPJFormat, isValidEmailFormat } from "@shared/qualityScore";
 import { trpc } from "@/lib/trpc";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -619,10 +621,28 @@ export default function CascadeView() {
               <div className="glass-card h-full flex flex-col" ref={scrollAreaRef}>
                 <ScrollArea className="flex-1" style={{ height: 'calc(100vh - 280px)' }}>
                   <div className="p-4">
-                    {/* Lista de Mercados */}
-                    {currentPage === "mercados" && (
-                      <div className="space-y-2">
+                    <AnimatePresence mode="wait">
+                      {/* Lista de Mercados */}
+                      {currentPage === "mercados" && (
+                        <motion.div
+                          key="mercados"
+                          variants={pageVariants}
+                          initial="initial"
+                          animate="animate"
+                          exit="exit"
+                          transition={pageTransition}
+                        >
+                      <motion.div 
+                        className="space-y-2"
+                        variants={listVariants}
+                        initial="hidden"
+                        animate="show"
+                      >
                         {mercados?.map((mercado) => (
+                          <motion.div
+                            key={`mercado-item-${mercado.id}`}
+                            variants={listItemVariants}
+                          >
                           <div
                             key={mercado.id}
                             className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
@@ -643,12 +663,22 @@ export default function CascadeView() {
                             </div>
                             <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                           </div>
+                          </motion.div>
                         ))}
-                      </div>
-                    )}
+                      </motion.div>
+                        </motion.div>
+                      )}
 
-                    {/* Lista de Clientes */}
-                    {currentPage === "clientes" && (
+                      {/* Lista de Clientes */}
+                      {currentPage === "clientes" && (
+                        <motion.div
+                          key="clientes"
+                          variants={pageVariants}
+                          initial="initial"
+                          animate="animate"
+                          exit="exit"
+                          transition={pageTransition}
+                        >
                       <div className="space-y-2">
                         {filteredClientes.map((cliente: any) => (
                           <div
@@ -706,10 +736,19 @@ export default function CascadeView() {
                           </div>
                         ))}
                       </div>
-                    )}
+                        </motion.div>
+                      )}
 
-                    {/* Lista de Concorrentes */}
-                    {currentPage === "concorrentes" && (
+                      {/* Lista de Concorrentes */}
+                      {currentPage === "concorrentes" && (
+                        <motion.div
+                          key="concorrentes"
+                          variants={pageVariants}
+                          initial="initial"
+                          animate="animate"
+                          exit="exit"
+                          transition={pageTransition}
+                        >
                       <div className="space-y-2">
                         {filteredConcorrentes.map((concorrente: any) => (
                           <div
@@ -752,10 +791,19 @@ export default function CascadeView() {
                           </div>
                         ))}
                       </div>
-                    )}
+                        </motion.div>
+                      )}
 
-                    {/* Lista de Leads */}
-                    {currentPage === "leads" && (
+                      {/* Lista de Leads */}
+                      {currentPage === "leads" && (
+                        <motion.div
+                          key="leads"
+                          variants={pageVariants}
+                          initial="initial"
+                          animate="animate"
+                          exit="exit"
+                          transition={pageTransition}
+                        >
                       <div className="space-y-2">
                         {filteredLeads.map((lead: any) => (
                           <div
@@ -795,7 +843,9 @@ export default function CascadeView() {
                           </div>
                         ))}
                       </div>
-                    )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </ScrollArea>
               </div>
