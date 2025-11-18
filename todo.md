@@ -1020,4 +1020,32 @@
 - [x] Testar queries de analytics (6/6 testes passando)
 - [x] Testar renderização de gráficos (validado visualmente)
 - [x] Testar responsividade (grid layout adaptativo)
+- [x] Criar checkpoint
+
+
+## Fase 39: Exportação Avançada 📄 (Sprint 3)
+
+### 39.1 Instalação de Dependências ✅ CONCLUÍDO
+- [x] Instalar xlsx (SheetJS) para exportação Excel
+- [x] Instalar jspdf e jspdf-autotable para exportação PDF
+
+### 39.2 Funções de Exportação ✅ CONCLUÍDO
+- [x] Criar função exportToExcel (formatação, largura de colunas, metadados)
+- [x] Criar função exportToPDF (cabeçalho, tabelas formatadas com autoTable)
+- [x] Criar função exportToCSV (manter compatibilidade)
+- [x] Adicionar metadados (data de geração, filtros aplicados, total de registros)
+- [x] Criar arquivo exportUtils.ts com 3 funções
+
+### 39.3 Interface de Usuário ✅ CONCLUÍDO
+- [x] Substituir botão "Exportar Filtrados" por DropdownMenu
+- [x] Adicionar 3 opções: CSV, Excel (.xlsx), PDF
+- [x] Adicionar ícones para cada formato (FileText, FileSpreadsheet, FileDown)
+- [x] Refatorar handleExportFiltered para aceitar parâmetro format
+- [x] Criar função prepareExportData para serializar dados
+- [x] Manter funcionalidade de respeitar filtros ativos
+
+### 39.4 Testes ✅ CONCLUÍDO
+- [x] Testar exportação Excel com dados reais (73 mercados exportados com sucesso)
+- [x] Testar dropdown com 3 opções visíveis
+- [x] Testar toast de confirmação
 - [ ] Criar checkpoint

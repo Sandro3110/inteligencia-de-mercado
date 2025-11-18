@@ -44,7 +44,17 @@ import {
   Briefcase,
   Package,
   Save,
+  FileText,
+  FileSpreadsheet,
+  FileDown,
 } from "lucide-react";
+import { exportToCSV, exportToExcel, exportToPDF, ExportData } from "@/lib/exportUtils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
 type Page = "mercados" | "clientes" | "concorrentes" | "leads";
@@ -537,7 +547,7 @@ export default function CascadeView() {
   };
 
   // Exportação de dados filtrados
-  const handleExportFiltered = () => {
+  const prepareExportData = (): ExportData | null => {
     let data: any[] = [];
     let headers: string[] = [];
     let totalData = 0;
@@ -566,20 +576,18 @@ export default function CascadeView() {
       headers = ["ID", "Nome", "CNPJ", "Tipo", "Porte", "Região", "Status"];
     } else {
       toast.error("Selecione uma página com dados para exportar");
-      return;
+      return null;
     }
 
     if (data.length === 0) {
       toast.error("Nenhum dado para exportar. Ajuste os filtros.");
-      return;
+      return null;
     }
 
-    const filename = `${entityType}_${timestamp}.csv`;
+    const filename = `${entityType}_${timestamp}`;
 
-    // Gerar CSV
-    const csvContent = [
-      headers.join(","),
-      ...data.map((item) => {
+    // Preparar linhas
+    const rows = data.map((item): (string | number)[] => {
         if (currentPage === "mercados") {
           return [
             item.id,
@@ -589,7 +597,7 @@ export default function CascadeView() {
             item.tamanhoMercado || "",
             item.crescimentoAnual || "",
             item.validationStatus || "pending",
-          ].join(",");
+          ];
         } else if (currentPage === "clientes") {
           return [
             item.id,
@@ -600,7 +608,7 @@ export default function CascadeView() {
             item.cidade || "",
             item.uf || "",
             item.validationStatus || "pending",
-          ].join(",");
+          ];
         } else if (currentPage === "concorrentes") {
           return [
             item.id,
@@ -610,7 +618,7 @@ export default function CascadeView() {
             item.porte || "",
             item.qualidadeScore || "",
             item.validationStatus || "pending",
-          ].join(",");
+          ];
         } else {
           return [
             item.id,
@@ -620,30 +628,46 @@ export default function CascadeView() {
             item.porte || "",
             item.regiao || "",
             item.validationStatus || "pending",
-          ].join(",");
+          ];
         }
-      }),
-    ].join("\n");
+      });
 
-    // Download
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    link.click();
-
-    // Toast com informação sobre filtros
-    const filtersActive = searchQuery || selectedTagIds.length > 0 || 
+    const hasFiltersActive = searchQuery || selectedTagIds.length > 0 || 
       statusFilter !== "all" || 
       Object.values(mercadoFilters).some(arr => arr.length > 0) ||
       Object.values(clienteFilters).some(arr => arr.length > 0) ||
       Object.values(concorrenteFilters).some(arr => arr.length > 0) ||
       Object.values(leadFilters).some(arr => arr.length > 0);
-    
-    if (filtersActive) {
-      toast.success(`Exportando ${data.length} de ${totalData} ${entityType} (filtros aplicados)`);
-    } else {
-      toast.success(`${data.length} ${entityType} exportados com sucesso!`);
+
+    return {
+      headers,
+      rows,
+      filename,
+      title: `Relatório de ${entityType.charAt(0).toUpperCase() + entityType.slice(1)}`,
+      metadata: {
+        "Data de Geração": new Date().toLocaleString("pt-BR"),
+        "Total de Registros": `${data.length} de ${totalData}`,
+        "Filtros Aplicados": hasFiltersActive ? "Sim" : "Não",
+      },
+    };
+  };
+
+  const handleExportFiltered = (format: "csv" | "excel" | "pdf") => {
+    const exportData = prepareExportData();
+    if (!exportData) return;
+
+    try {
+      if (format === "csv") {
+        exportToCSV(exportData);
+      } else if (format === "excel") {
+        exportToExcel(exportData);
+      } else if (format === "pdf") {
+        exportToPDF(exportData);
+      }
+      toast.success(`Exportado com sucesso em formato ${format.toUpperCase()}!`);
+    } catch (error) {
+      console.error("Erro ao exportar:", error);
+      toast.error("Erro ao exportar dados");
     }
   };
 
@@ -676,10 +700,28 @@ export default function CascadeView() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={handleExportFiltered}>
-            <Download className="w-4 h-4 mr-2" />
-            Exportar Filtrados
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Download className="w-4 h-4 mr-2" />
+                Exportar Filtrados
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExportFiltered("csv")}>
+                <FileText className="w-4 h-4 mr-2" />
+                CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExportFiltered("excel")}>
+                <FileSpreadsheet className="w-4 h-4 mr-2" />
+                Excel (.xlsx)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExportFiltered("pdf")}>
+                <FileDown className="w-4 h-4 mr-2" />
+                PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <TagManager />
           <ThemeToggle />
         </div>
