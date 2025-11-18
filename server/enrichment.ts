@@ -299,8 +299,7 @@ Priorize empresas que sejam bons prospects para este mercado.`;
       porte: l.porte as any,
       regiao: l.regiao,
       setor: l.setor,
-      validationStatus: 'pending' as any,
-      stage: 'new' as any
+      validationStatus: 'pending' as any
     }));
   } catch (error) {
     console.error('[Enrichment] Erro ao gerar leads:', error);
@@ -498,7 +497,6 @@ export async function processEnrichmentFlow(
           qualidadeScore,
           qualidadeClassificacao,
           validationStatus: 'pending',
-          stage: 'novo',
         });
 
         if (lead) {

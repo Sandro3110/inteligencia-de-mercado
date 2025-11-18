@@ -1,0 +1,15 @@
+{
+  "query": "SELECT \n  AVG(qualidadeScore) as score_medio,\n  MIN(qualidadeScore) as score_minimo,\n  MAX(qualidadeScore) as score_maximo\nFROM leads\nWHERE projectId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  AVG(qualidadeScore) as score_medio,\n  MIN(qualidadeScore) as score_minimo,\n  MAX(qualidadeScore) as score_maximo\nFROM leads\nWHERE projectId = 1;",
+  "rows": [
+    {
+      "score_medio": "79.2297",
+      "score_minimo": "45",
+      "score_maximo": "100"
+    }
+  ],
+  "messages": [],
+  "stdout": "score_medio\tscore_minimo\tscore_maximo\n79.2297\t45\t100\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

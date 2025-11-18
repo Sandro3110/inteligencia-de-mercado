@@ -1356,7 +1356,6 @@ export async function createLead(data: {
   qualidadeScore?: number | null;
   qualidadeClassificacao?: string | null;
   validationStatus?: 'pending' | 'rich' | 'needs_adjustment' | 'discarded' | null;
-  stage?: 'novo' | 'em_contato' | 'negociacao' | 'fechado' | 'perdido' | null;
 }) {
   const db = await getDb();
   if (!db) return null;
@@ -1368,13 +1367,13 @@ export async function createLead(data: {
     INSERT INTO leads (
       projectId, mercadoId, leadHash, nome, cnpj, site, email, telefone,
       tipo, porte, regiao, setor, qualidadeScore, qualidadeClassificacao,
-      validationStatus, stage
+      validationStatus
     ) VALUES (
       ${data.projectId}, ${data.mercadoId}, ${leadHash}, ${data.nome},
       ${data.cnpj || null}, ${data.site || null}, ${data.email || null}, ${data.telefone || null},
       ${data.tipo || null}, ${data.porte || null}, ${data.regiao || null}, ${data.setor || null},
       ${data.qualidadeScore || 0}, ${data.qualidadeClassificacao || 'Ruim'},
-      ${data.validationStatus || 'pending'}, ${data.stage || 'novo'}
+      ${data.validationStatus || 'pending'}
     )
   `) as any;
 

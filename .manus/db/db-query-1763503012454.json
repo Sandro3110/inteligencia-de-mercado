@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, nome, categoria, segmentacao\nFROM mercados_unicos\nWHERE projectId = 1\nORDER BY id\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, categoria, segmentacao\nFROM mercados_unicos\nWHERE projectId = 1\nORDER BY id\nLIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Indústria de Móveis e Produtos de Madeira Profissional",
+      "categoria": "madeira",
+      "segmentacao": "B2B"
+    },
+    {
+      "id": "2",
+      "nome": "Indústria de Produtos Metálicos e Complementares para o Varejo",
+      "categoria": "metalúrgica",
+      "segmentacao": "B2C"
+    },
+    {
+      "id": "3",
+      "nome": "Indústria e Comércio de Papel e Embalagens Profissionais",
+      "categoria": "papel",
+      "segmentacao": "B2B"
+    },
+    {
+      "id": "4",
+      "nome": "Setor de Indústria Metalúrgica e Metalomecânica",
+      "categoria": "metalúrgica",
+      "segmentacao": "B2B"
+    },
+    {
+      "id": "5",
+      "nome": "Comércio Varejista de Materiais de Construção e Ferragens",
+      "categoria": "construção",
+      "segmentacao": "B2C"
+    },
+    {
+      "id": "6",
+      "nome": "Comércio Atacadista de Máquinas, Peças e Equipamentos Industriais",
+      "categoria": "automotivo",
+      "segmentacao": "B2B"
+    },
+    {
+      "id": "7",
+      "nome": "Indústria e Comércio de Alimentos e Bebidas Integrados",
+      "categoria": "alimentos",
+      "segmentacao": "B2B2C"
+    },
+    {
+      "id": "8",
+      "nome": "Indústria Química e Metalúrgica B2B",
+      "categoria": "químicos",
+      "segmentacao": "B2B"
+    },
+    {
+      "id": "9",
+      "nome": "Fornecimento B2B de Produtos de Higiene, Limpeza e Cosméticos",
+      "categoria": "cosméticos",
+      "segmentacao": "B2B"
+    },
+    {
+      "id": "10",
+      "nome": "Soluções em Embalagens Plásticas para Indústrias e Consumidores",
+      "categoria": "embalagens",
+      "segmentacao": "B2B2C"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcategoria\tsegmentacao\n1\tIndústria de Móveis e Produtos de Madeira Profissional\tmadeira\tB2B\n2\tIndústria de Produtos Metálicos e Complementares para o Varejo\tmetalúrgica\tB2C\n3\tIndústria e Comércio de Papel e Embalagens Profissionais\tpapel\tB2B\n4\tSetor de Indústria Metalúrgica e Metalomecânica\tmetalúrgica\tB2B\n5\tComércio Varejista de Materiais de Construção e Ferragens\tconstrução\tB2C\n6\tComércio Atacadista de Máquinas, Peças e Equipamentos Industriais\tautomotivo\tB2B\n7\tIndústria e Comércio de Alimentos e Bebidas Integrados\talimentos\tB2B2C\n8\tIndústria Química e Metalúrgica B2B\tquímicos\tB2B\n9\tFornecimento B2B de Produtos de Higiene, Limpeza e Cosméticos\tcosméticos\tB2B\n10\tSoluções em Embalagens Plásticas para Indústrias e Consumidores\tembalagens\tB2B2C\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

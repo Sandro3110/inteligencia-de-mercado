@@ -1,0 +1,100 @@
+{
+  "query": "SELECT id, nome, cnpj, site, produto, porte, qualidadeScore\nFROM concorrentes\nWHERE projectId = 1\nORDER BY qualidadeScore DESC\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, cnpj, site, produto, porte, qualidadeScore\nFROM concorrentes\nWHERE projectId = 1\nORDER BY qualidadeScore DESC\nLIMIT 10;",
+  "rows": [
+    {
+      "id": "2",
+      "nome": "Papirus Industria de Papel SA",
+      "cnpj": "NULL",
+      "site": "Não disponível",
+      "produto": "NULL",
+      "porte": "NULL",
+      "qualidadeScore": "NULL"
+    },
+    {
+      "id": "3",
+      "nome": "Cibrapel SA",
+      "cnpj": "NULL",
+      "site": "Não disponível",
+      "produto": "NULL",
+      "porte": "NULL",
+      "qualidadeScore": "NULL"
+    },
+    {
+      "id": "4",
+      "nome": "Wyda Embalagens",
+      "cnpj": "NULL",
+      "site": "https://www.wyda.com.br/",
+      "produto": "NULL",
+      "porte": "NULL",
+      "qualidadeScore": "NULL"
+    },
+    {
+      "id": "5",
+      "nome": "Abbaspel Indústria e Comércio de Papéis Ltda",
+      "cnpj": "NULL",
+      "site": "https://www.sinpacel.org.br/empresas-associadas/",
+      "produto": "NULL",
+      "porte": "NULL",
+      "qualidadeScore": "NULL"
+    },
+    {
+      "id": "6",
+      "nome": "Adami S/A Madeiras",
+      "cnpj": "NULL",
+      "site": "https://www.sinpacel.org.br/empresas-associadas/",
+      "produto": "NULL",
+      "porte": "NULL",
+      "qualidadeScore": "NULL"
+    },
+    {
+      "id": "7",
+      "nome": "Irani Papel e Embalagem S.A.",
+      "cnpj": "NULL",
+      "site": "https://irani.com.br/irani/gestao-de-pessoas/",
+      "produto": "NULL",
+      "porte": "NULL",
+      "qualidadeScore": "NULL"
+    },
+    {
+      "id": "8",
+      "nome": "JBS",
+      "cnpj": "NULL",
+      "site": "https://www.jbs.com.br",
+      "produto": "NULL",
+      "porte": "NULL",
+      "qualidadeScore": "NULL"
+    },
+    {
+      "id": "9",
+      "nome": "Marfrig",
+      "cnpj": "NULL",
+      "site": "https://www.marfrig.com.br",
+      "produto": "NULL",
+      "porte": "NULL",
+      "qualidadeScore": "NULL"
+    },
+    {
+      "id": "10",
+      "nome": "Danone",
+      "cnpj": "NULL",
+      "site": "https://www.danone.com.br",
+      "produto": "NULL",
+      "porte": "NULL",
+      "qualidadeScore": "NULL"
+    },
+    {
+      "id": "1",
+      "nome": "Klabin",
+      "cnpj": "NULL",
+      "site": "https://klabin.com.br/",
+      "produto": "NULL",
+      "porte": "NULL",
+      "qualidadeScore": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcnpj\tsite\tproduto\tporte\tqualidadeScore\n2\tPapirus Industria de Papel SA\tNULL\tNão disponível\tNULL\tNULL\tNULL\n3\tCibrapel SA\tNULL\tNão disponível\tNULL\tNULL\tNULL\n4\tWyda Embalagens\tNULL\thttps://www.wyda.com.br/\tNULL\tNULL\tNULL\n5\tAbbaspel Indústria e Comércio de Papéis Ltda\tNULL\thttps://www.sinpacel.org.br/empresas-associadas/\tNULL\tNULL\tNULL\n6\tAdami S/A Madeiras\tNULL\thttps://www.sinpacel.org.br/empresas-associadas/\tNULL\tNULL\tNULL\n7\tIrani Papel e Embalagem S.A.\tNULL\thttps://irani.com.br/irani/gestao-de-pessoas/\tNULL\tNULL\tNULL\n8\tJBS\tNULL\thttps://www.jbs.com.br\tNULL\tNULL\tNULL\n9\tMarfrig\tNULL\thttps://www.marfrig.com.br\tNULL\tNULL\tNULL\n10\tDanone\tNULL\thttps://www.danone.com.br\tNULL\tNULL\tNULL\n1\tKlabin\tNULL\thttps://klabin.com.br/\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

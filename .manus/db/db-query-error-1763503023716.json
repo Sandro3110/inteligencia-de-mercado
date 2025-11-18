@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, nome, cnpj, site, email, telefone, qualityScore, qualityClassification\nFROM leads\nWHERE projectId = 1\nORDER BY qualityScore DESC\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, cnpj, site, email, telefone, qualityScore, qualityClassification\nFROM leads\nWHERE projectId = 1\nORDER BY qualityScore DESC\nLIMIT 10;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'qualityscore' in 'field list'"
+  ]
+}

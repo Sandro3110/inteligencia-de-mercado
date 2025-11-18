@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE leads DROP COLUMN stage;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute ALTER TABLE leads DROP COLUMN stage;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1091 (42000) at line 1: Can't DROP 'stage'; check that column/key exists"
+  ]
+}

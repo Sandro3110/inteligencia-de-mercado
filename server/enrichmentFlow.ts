@@ -30,6 +30,19 @@ export type EnrichmentProgress = {
   totalSteps: number;
   data?: {
     projectId?: number;
+    projectName?: string;
+    clientes?: any[];
+    mercados?: any[];
+    concorrentes?: any[];
+    leads?: any[];
+    stats?: {
+      mercadosCount?: number;
+      clientesCount?: number;
+      concorrentesCount?: number;
+      leadsCount?: number;
+      avgQualityScore?: number;
+    };
+    // Backward compatibility
     mercadosCount?: number;
     clientesCount?: number;
     concorrentesCount?: number;
@@ -160,6 +173,18 @@ export async function executeEnrichmentFlow(
       },
     });
 
+    // Buscar dados completos do banco para retornar
+    const db = await (await import('./db')).getDb();
+    if (!db) throw new Error('Database not available');
+    
+    const { clientes: clientesTable, mercadosUnicos, concorrentes: concorrentesTable, leads: leadsTable } = await import('../drizzle/schema');
+    const { eq } = await import('drizzle-orm');
+    
+    const clientesCompletos = await db.select().from(clientesTable).where(eq(clientesTable.projectId, project.id));
+    const mercadosCompletos = await db.select().from(mercadosUnicos).where(eq(mercadosUnicos.projectId, project.id));
+    const concorrentesCompletos = await db.select().from(concorrentesTable).where(eq(concorrentesTable.projectId, project.id));
+    const leadsCompletos = await db.select().from(leadsTable).where(eq(leadsTable.projectId, project.id));
+
     return {
       status: 'completed',
       message: 'Processamento concluído!',
@@ -167,11 +192,18 @@ export async function executeEnrichmentFlow(
       totalSteps,
       data: {
         projectId: project.id,
-        mercadosCount: mercadosMap.size,
-        clientesCount: clientesEnriquecidos.length,
-        concorrentesCount: concorrentes.length,
-        leadsCount: leadsEncontrados.length,
-        avgQualityScore,
+        projectName: project.nome,
+        clientes: clientesEnriquecidos,
+        mercados: mercadosCompletos,
+        concorrentes: concorrentesCompletos,
+        leads: leadsCompletos,
+        stats: {
+          mercadosCount: mercadosMap.size,
+          clientesCount: clientesEnriquecidos.length,
+          concorrentesCount: concorrentes.length,
+          leadsCount: leadsEncontrados.length,
+          avgQualityScore,
+        },
       },
     };
   } catch (error) {
@@ -573,7 +605,6 @@ async function findLeadsForMarkets(
             tipo: lead.tipo, // Aceita qualquer string
             regiao: lead.regiao,
             setor: null,
-            stage: 'novo',
             qualidadeScore,
             qualidadeClassificacao,
             validationStatus: 'pending',

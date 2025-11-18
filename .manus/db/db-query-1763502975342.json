@@ -1,0 +1,25 @@
+{
+  "query": "SELECT p.id, p.nome as projeto_nome, COUNT(c.id) as total_clientes \nFROM projects p \nLEFT JOIN clientes c ON c.projectId = p.id \nGROUP BY p.id, p.nome \nORDER BY p.createdAt DESC \nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT p.id, p.nome as projeto_nome, COUNT(c.id) as total_clientes \nFROM projects p \nLEFT JOIN clientes c ON c.projectId = p.id \nGROUP BY p.id, p.nome \nORDER BY p.createdAt DESC \nLIMIT 5;",
+  "rows": [
+    {
+      "id": "30001",
+      "projeto_nome": "Teste Jeep do Brasil",
+      "total_clientes": "0"
+    },
+    {
+      "id": "2",
+      "projeto_nome": "Projeto Teste Atualizado",
+      "total_clientes": "0"
+    },
+    {
+      "id": "1",
+      "projeto_nome": "Embalagens",
+      "total_clientes": "800"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tprojeto_nome\ttotal_clientes\n30001\tTeste Jeep do Brasil\t0\n2\tProjeto Teste Atualizado\t0\n1\tEmbalagens\t800\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

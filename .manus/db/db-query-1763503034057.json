@@ -1,0 +1,26 @@
+{
+  "query": "SELECT qualidadeClassificacao, COUNT(*) as quantidade\nFROM leads\nWHERE projectId = 1\nGROUP BY qualidadeClassificacao\nORDER BY quantidade DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT qualidadeClassificacao, COUNT(*) as quantidade\nFROM leads\nWHERE projectId = 1\nGROUP BY qualidadeClassificacao\nORDER BY quantidade DESC;",
+  "rows": [
+    {
+      "qualidadeClassificacao": "Excelente",
+      "quantidade": "232"
+    },
+    {
+      "qualidadeClassificacao": "Bom",
+      "quantidade": "202"
+    },
+    {
+      "qualidadeClassificacao": "Regular",
+      "quantidade": "197"
+    },
+    {
+      "qualidadeClassificacao": "Baixo",
+      "quantidade": "96"
+    }
+  ],
+  "messages": [],
+  "stdout": "qualidadeClassificacao\tquantidade\nExcelente\t232\nBom\t202\nRegular\t197\nBaixo\t96\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

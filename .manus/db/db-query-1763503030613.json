@@ -1,0 +1,90 @@
+{
+  "query": "SELECT id, nome, cnpj, site, email, telefone\nFROM leads\nWHERE projectId = 1\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, cnpj, site, email, telefone\nFROM leads\nWHERE projectId = 1\nLIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Indústrias Artefama : Móveis e",
+      "cnpj": "NULL",
+      "site": "https://artefama.com.br",
+      "email": "NULL",
+      "telefone": "NULL"
+    },
+    {
+      "id": "2",
+      "nome": "Lista de Empres de Fabricação",
+      "cnpj": "43.996.693/0001-27",
+      "site": "https://www.econodata.com.br",
+      "email": "NULL",
+      "telefone": "NULL"
+    },
+    {
+      "id": "3",
+      "nome": "Madearte Indústria e Comércio entregando",
+      "cnpj": "61.275.921/0001-51",
+      "site": "https://madearte.com",
+      "email": "NULL",
+      "telefone": "NULL"
+    },
+    {
+      "id": "4",
+      "nome": "Empre",
+      "cnpj": "NULL",
+      "site": "https://www.artemadeiras.com.br",
+      "email": "NULL",
+      "telefone": "NULL"
+    },
+    {
+      "id": "5",
+      "nome": "a empre",
+      "cnpj": "33.488.393/0001-83",
+      "site": "https://www.smirna.net.br",
+      "email": "NULL",
+      "telefone": "NULL"
+    },
+    {
+      "id": "6",
+      "nome": "Masi Brasil é eleita empre",
+      "cnpj": "18.079.615/0001-10",
+      "site": "https://br.fsc.org",
+      "email": "NULL",
+      "telefone": "NULL"
+    },
+    {
+      "id": "7",
+      "nome": "Leo Madeiras Marketplace",
+      "cnpj": "61.069.373/0001-03",
+      "site": "https://www.leomadeiras.com.br",
+      "email": "NULL",
+      "telefone": "NULL"
+    },
+    {
+      "id": "8",
+      "nome": "Grupo M Referência em móveis",
+      "cnpj": "27.653.340/0002-59",
+      "site": "https://grupomsa.com.br",
+      "email": "NULL",
+      "telefone": "NULL"
+    },
+    {
+      "id": "9",
+      "nome": "Empres de Fabricação de Móveis",
+      "cnpj": "76.655.737/0001-04",
+      "site": "https://www.econodata.com.br",
+      "email": "NULL",
+      "telefone": "NULL"
+    },
+    {
+      "id": "10",
+      "nome": "Montana Química Inovando o futuro",
+      "cnpj": "60.884.459/0001-27",
+      "site": "https://montana.com.br",
+      "email": "NULL",
+      "telefone": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcnpj\tsite\temail\ttelefone\n1\tIndústrias Artefama : Móveis e\tNULL\thttps://artefama.com.br\tNULL\tNULL\n2\tLista de Empres de Fabricação\t43.996.693/0001-27\thttps://www.econodata.com.br\tNULL\tNULL\n3\tMadearte Indústria e Comércio entregando\t61.275.921/0001-51\thttps://madearte.com\tNULL\tNULL\n4\tEmpre\tNULL\thttps://www.artemadeiras.com.br\tNULL\tNULL\n5\ta empre\t33.488.393/0001-83\thttps://www.smirna.net.br\tNULL\tNULL\n6\tMasi Brasil é eleita empre\t18.079.615/0001-10\thttps://br.fsc.org\tNULL\tNULL\n7\tLeo Madeiras Marketplace\t61.069.373/0001-03\thttps://www.leomadeiras.com.br\tNULL\tNULL\n8\tGrupo M Referência em móveis\t27.653.340/0002-59\thttps://grupomsa.com.br\tNULL\tNULL\n9\tEmpres de Fabricação de Móveis\t76.655.737/0001-04\thttps://www.econodata.com.br\tNULL\tNULL\n10\tMontana Química Inovando o futuro\t60.884.459/0001-27\thttps://montana.com.br\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}
