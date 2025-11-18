@@ -19,6 +19,13 @@ export const appRouter = router({
   }),
 
   // Gestor PAV routers
+  analytics: router({  
+    getProgress: publicProcedure.query(async () => {
+      const { getAnalyticsProgress } = await import('./db');
+      return getAnalyticsProgress();
+    }),
+  }),
+
   dashboard: router({
     stats: publicProcedure.query(async () => {
       const { getDashboardStats } = await import('./db');

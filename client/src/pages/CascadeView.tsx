@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { motion, AnimatePresence } from "framer-motion";
 import { pageVariants, pageTransition, listVariants, listItemVariants } from "@/lib/animations";
 import { calculateQualityScore, classifyQuality, isValidCNPJFormat, isValidEmailFormat } from "@shared/qualityScore";
@@ -56,6 +57,7 @@ export default function CascadeView() {
   // Estados para scroll tracking
   const [showScrollTop, setShowScrollTop] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   
   // Estados para paginação
   const [currentPageNum, setCurrentPageNum] = useState(1);
@@ -79,6 +81,37 @@ export default function CascadeView() {
   const clientes = clientesResponse?.data || [];
   const concorrentes = concorrentesResponse?.data || [];
   const leads = leadsResponse?.data || [];
+
+  // Atalhos de teclado
+  useKeyboardShortcuts([
+    {
+      key: 'k',
+      ctrl: true,
+      handler: () => {
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      },
+      description: 'Focar no campo de busca',
+    },
+    {
+      key: '/',
+      handler: () => {
+        searchInputRef.current?.focus();
+      },
+      description: 'Focar no campo de busca',
+    },
+    {
+      key: 'Escape',
+      handler: () => {
+        if (detailPopupOpen) {
+          setDetailPopupOpen(false);
+        } else if (batchModalOpen) {
+          setBatchModalOpen(false);
+        }
+      },
+      description: 'Fechar modals',
+    },
+  ]);
   
   // Metadata de paginação
   const clientesMeta = clientesResponse || { total: 0, page: 1, totalPages: 0 };
@@ -457,7 +490,8 @@ export default function CascadeView() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Nome, CNPJ, produto..."
+                ref={searchInputRef}
+                placeholder="Nome, CNPJ, produto... (Ctrl+K ou /)" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"

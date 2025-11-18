@@ -492,3 +492,128 @@ export async function updateLeadValidation(
   return { success: true };
 }
 
+
+
+// ============================================
+// ANALYTICS HELPERS
+// ============================================
+
+export async function getAnalyticsProgress() {
+  const db = await getDb();
+  if (!db) {
+    return {
+      totalMercados: 0,
+      totalClientes: 0,
+      totalConcorrentes: 0,
+      totalLeads: 0,
+      validados: 0,
+      pendentes: 0,
+      invalidados: 0,
+      progressoPorMercado: [],
+      statusDistribution: {
+        validado: 0,
+        pendente: 0,
+        invalidado: 0,
+      },
+    };
+  }
+
+  try {
+    // Contar totais
+    const [mercadosCount] = await db.select({ count: sql<number>`COUNT(*)` }).from(mercadosUnicos);
+    const [clientesCount] = await db.select({ count: sql<number>`COUNT(*)` }).from(clientes);
+    const [concorrentesCount] = await db.select({ count: sql<number>`COUNT(*)` }).from(concorrentes);
+    const [leadsCount] = await db.select({ count: sql<number>`COUNT(*)` }).from(leads);
+
+    // Contar por status (clientes + concorrentes + leads)
+    const [clientesRich] = await db.select({ count: sql<number>`COUNT(*)` })
+      .from(clientes)
+      .where(eq(clientes.validationStatus, 'rich'));
+    
+    const [clientesPendentes] = await db.select({ count: sql<number>`COUNT(*)` })
+      .from(clientes)
+      .where(eq(clientes.validationStatus, 'pending'));
+    
+    const [clientesDiscarded] = await db.select({ count: sql<number>`COUNT(*)` })
+      .from(clientes)
+      .where(eq(clientes.validationStatus, 'discarded'));
+
+    const [concorrentesRich] = await db.select({ count: sql<number>`COUNT(*)` })
+      .from(concorrentes)
+      .where(eq(concorrentes.validationStatus, 'rich'));
+    
+    const [concorrentesPendentes] = await db.select({ count: sql<number>`COUNT(*)` })
+      .from(concorrentes)
+      .where(eq(concorrentes.validationStatus, 'pending'));
+    
+    const [concorrentesDiscarded] = await db.select({ count: sql<number>`COUNT(*)` })
+      .from(concorrentes)
+      .where(eq(concorrentes.validationStatus, 'discarded'));
+
+    const [leadsRich] = await db.select({ count: sql<number>`COUNT(*)` })
+      .from(leads)
+      .where(eq(leads.validationStatus, 'rich'));
+    
+    const [leadsPendentes] = await db.select({ count: sql<number>`COUNT(*)` })
+      .from(leads)
+      .where(eq(leads.validationStatus, 'pending'));
+    
+    const [leadsDiscarded] = await db.select({ count: sql<number>`COUNT(*)` })
+      .from(leads)
+      .where(eq(leads.validationStatus, 'discarded'));
+
+    const totalRich = 
+      (clientesRich?.count || 0) + 
+      (concorrentesRich?.count || 0) + 
+      (leadsRich?.count || 0);
+    
+    const totalPendentes = 
+      (clientesPendentes?.count || 0) + 
+      (concorrentesPendentes?.count || 0) + 
+      (leadsPendentes?.count || 0);
+    
+    const totalDiscarded = 
+      (clientesDiscarded?.count || 0) + 
+      (concorrentesDiscarded?.count || 0) + 
+      (leadsDiscarded?.count || 0);
+
+    // Progresso por mercado (top 10)
+    const progressoPorMercado = await db
+      .select({
+        mercadoNome: mercadosUnicos.nome,
+        total: sql<number>`COUNT(DISTINCT ${clientes.id})`,
+        validados: sql<number>`SUM(CASE WHEN ${clientes.validationStatus} = 'validado' THEN 1 ELSE 0 END)`,
+      })
+      .from(mercadosUnicos)
+      .leftJoin(clientesMercados, eq(mercadosUnicos.id, clientesMercados.mercadoId))
+      .leftJoin(clientes, eq(clientesMercados.clienteId, clientes.id))
+      .groupBy(mercadosUnicos.id, mercadosUnicos.nome)
+      .orderBy(sql`COUNT(DISTINCT ${clientes.id}) DESC`)
+      .limit(10);
+
+    return {
+      totalMercados: mercadosCount?.count || 0,
+      totalClientes: clientesCount?.count || 0,
+      totalConcorrentes: concorrentesCount?.count || 0,
+      totalLeads: leadsCount?.count || 0,
+      rich: totalRich,
+      pending: totalPendentes,
+      discarded: totalDiscarded,
+      progressoPorMercado: progressoPorMercado.map(p => ({
+        mercado: p.mercadoNome,
+        total: Number(p.total),
+        validados: Number(p.validados),
+        percentual: Number(p.total) > 0 ? Math.round((Number(p.validados) / Number(p.total)) * 100) : 0,
+      })),
+      statusDistribution: {
+        rich: totalRich,
+        pending: totalPendentes,
+        discarded: totalDiscarded,
+        needs_adjustment: 0, // TODO: implementar contagem
+      },
+    };
+  } catch (error) {
+    console.error("[Database] Failed to get analytics progress:", error);
+    throw error;
+  }
+}

@@ -14,6 +14,7 @@ import {
   XCircle,
   Clock
 } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
 export default function Dashboard() {
   const { data: stats, isLoading } = trpc.dashboard.stats.useQuery();
@@ -227,6 +228,72 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Charts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Pie Chart - Status Distribution */}
+          <Card className="glass-card-subtle">
+            <CardHeader>
+              <CardTitle className="section-title">Distribuição por Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={[
+                      { name: 'Validados (Rich)', value: totalValidated, color: '#10b981' },
+                      { name: 'Pendentes', value: totalPending, color: '#f59e0b' },
+                      { name: 'Precisa Ajuste', value: clientesNeedsAdjustment, color: '#3b82f6' },
+                      { name: 'Descartados', value: clientesDiscarded, color: '#ef4444' },
+                    ].filter(item => item.value > 0)}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {[
+                      { name: 'Validados (Rich)', value: totalValidated, color: '#10b981' },
+                      { name: 'Pendentes', value: totalPending, color: '#f59e0b' },
+                      { name: 'Precisa Ajuste', value: clientesNeedsAdjustment, color: '#3b82f6' },
+                      { name: 'Descartados', value: clientesDiscarded, color: '#ef4444' },
+                    ].filter(item => item.value > 0).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Bar Chart - Entity Types */}
+          <Card className="glass-card-subtle">
+            <CardHeader>
+              <CardTitle className="section-title">Entidades por Tipo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={[
+                  { tipo: 'Clientes', total: stats.totals.clientes, validados: clientesRich },
+                  { tipo: 'Concorrentes', total: stats.totals.concorrentes, validados: concorrentesRich },
+                  { tipo: 'Leads', total: stats.totals.leads, validados: leadsRich },
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="tipo" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="total" fill="#3b82f6" name="Total" />
+                  <Bar dataKey="validados" fill="#10b981" name="Validados" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Quick Actions */}
         <Card className="glass-card-subtle">
