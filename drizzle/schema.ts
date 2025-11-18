@@ -166,3 +166,17 @@ export const entityTags = mysqlTable("entity_tags", {
 
 export type EntityTag = typeof entityTags.$inferSelect;
 export type InsertEntityTag = typeof entityTags.$inferInsert;
+
+/**
+ * Saved_Filters - User-saved filter combinations
+ */
+export const savedFilters = mysqlTable("saved_filters", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: varchar("userId", { length: 64 }).notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 100 }).notNull(),
+  filtersJson: text("filtersJson").notNull(), // JSON string with filter state
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type SavedFilter = typeof savedFilters.$inferSelect;
+export type InsertSavedFilter = typeof savedFilters.$inferInsert;

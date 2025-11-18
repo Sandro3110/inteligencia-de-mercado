@@ -952,4 +952,37 @@
 - [x] Ajustar espaçamento entre filtros (gap-4)
 - [x] Usar flex-wrap para responsividade
 - [x] Testar com múltiplos filtros ativos
+- [x] Criar checkpoint
+
+
+## Fase 36: Filtros Salvos 💾 (Sprint 2)
+
+### 36.1 Backend - Schema e Database ✅ CONCLUÍDO
+- [x] Criar tabela `saved_filters` no schema (id, userId, name, filtersJson, createdAt)
+- [x] Adicionar FK para users com cascade delete
+- [x] Executar db:push
+
+### 36.2 Backend - Routers e Funções ✅ CONCLUÍDO
+- [x] Criar router savedFilters.list (listar filtros do usuário)
+- [x] Criar router savedFilters.create (salvar novo filtro)
+- [x] Criar router savedFilters.delete (deletar filtro)
+- [x] Adicionar funções no db.ts (getSavedFilters, createSavedFilter, deleteSavedFilter)
+
+### 36.3 Frontend - Componentes ✅ CONCLUÍDO
+- [x] Criar componente SavedFilters.tsx (dropdown com lista)
+- [x] Criar componente SaveFilterDialog.tsx (modal para salvar)
+- [x] Adicionar botão "Salvar Filtros" na barra de filtros
+- [x] Adicionar dropdown "Filtros Salvos" na barra de filtros
+
+### 36.4 Frontend - Lógica ✅ CONCLUÍDO
+- [x] Serializar estado de filtros (searchQuery, searchFields, selectedTagIds, filtros avançados, statusFilter)
+- [x] Implementar função applyFilter (deserializar e aplicar todos os filtros)
+- [x] Implementar toast de confirmação
+
+### 36.5 Testes ✅ CONCLUÍDO
+- [x] Testar salvar filtro com múltiplos critérios
+- [x] Testar listar filtros salvos
+- [x] Testar parsear filtersJson corretamente
+- [x] Testar deletar filtro
+- [x] Testar retornar array vazio para usuário sem filtros
 - [ ] Criar checkpoint

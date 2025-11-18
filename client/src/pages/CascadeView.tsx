@@ -12,6 +12,8 @@ import { EntityTagPicker } from "@/components/EntityTagPicker";
 import { TagFilter } from "@/components/TagFilter";
 import { MultiSelectFilter } from "@/components/MultiSelectFilter";
 import { SearchFieldSelector, SearchField } from "@/components/SearchFieldSelector";
+import { SaveFilterDialog } from "@/components/SaveFilterDialog";
+import { SavedFilters } from "@/components/SavedFilters";
 import { SkeletonMercado, SkeletonCliente, SkeletonConcorrente, SkeletonLead } from "@/components/SkeletonLoading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +43,7 @@ import {
   MapPin,
   Briefcase,
   Package,
+  Save,
 } from "lucide-react";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
@@ -96,6 +99,9 @@ export default function CascadeView() {
   const [batchModalOpen, setBatchModalOpen] = useState(false);
   const [batchStatus, setBatchStatus] = useState<ValidationStatus>("rich");
   const [batchNotes, setBatchNotes] = useState("");
+  
+  // Estado para salvar filtros
+  const [saveFilterDialogOpen, setSaveFilterDialogOpen] = useState(false);
   
   // Estados para scroll tracking
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -192,6 +198,16 @@ export default function CascadeView() {
     onSuccess: () => {
       utils.leads.byMercado.invalidate();
       utils.mercados.list.invalidate();
+    },
+  });
+  
+  const saveFilterMutation = trpc.savedFilters.create.useMutation({
+    onSuccess: () => {
+      utils.savedFilters.list.invalidate();
+      toast.success("Filtro salvo com sucesso!");
+    },
+    onError: () => {
+      toast.error("Erro ao salvar filtro");
     },
   });
 
@@ -809,6 +825,37 @@ export default function CascadeView() {
           </div>
 
           {/* Filtro de Status */}
+          <div className="flex items-center gap-2 ml-auto">
+            {/* Filtros Salvos */}
+            <SavedFilters
+              onApply={(filtersJson) => {
+                try {
+                  const filters = JSON.parse(filtersJson);
+                  setSearchQuery(filters.searchQuery || "");
+                  setSearchFields(filters.searchFields || ["nome", "cnpj", "produto"]);
+                  setSelectedTagIds(filters.selectedTagIds || []);
+                  setStatusFilter(filters.statusFilter || "all");
+                  setMercadoFilters(filters.mercadoFilters || { segmentacao: [], categoria: [] });
+                  setClienteFilters(filters.clienteFilters || { segmentacao: [], cidade: [], uf: [] });
+                  setConcorrenteFilters(filters.concorrenteFilters || { porte: [] });
+                  setLeadFilters(filters.leadFilters || { tipo: [], porte: [] });
+                } catch (e) {
+                  toast.error("Erro ao aplicar filtro");
+                }
+              }}
+            />
+            
+            {/* Botão Salvar Filtros */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSaveFilterDialogOpen(true)}
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Salvar Filtros
+            </Button>
+          </div>
+          
           <div className="flex items-center gap-2">
             <Button
               variant={statusFilter === "all" ? "default" : "outline"}
@@ -1260,6 +1307,25 @@ export default function CascadeView() {
           </div>
         </div>
       </div>
+
+      {/* Dialog para Salvar Filtros */}
+      <SaveFilterDialog
+        open={saveFilterDialogOpen}
+        onOpenChange={setSaveFilterDialogOpen}
+        onSave={(name) => {
+          const filtersJson = JSON.stringify({
+            searchQuery,
+            searchFields,
+            selectedTagIds,
+            statusFilter,
+            mercadoFilters,
+            clienteFilters,
+            concorrenteFilters,
+            leadFilters,
+          });
+          saveFilterMutation.mutate({ name, filtersJson });
+        }}
+      />
 
       {/* Modal de Validação em Lote */}
       <Dialog open={batchModalOpen} onOpenChange={setBatchModalOpen}>

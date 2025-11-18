@@ -746,3 +746,37 @@ export async function getEntitiesByTag(tagId: number, entityType: string) {
   
   return results.map(r => r.entityId);
 }
+
+
+// ============================================
+// Saved Filters Functions
+// ============================================
+
+export async function getSavedFilters(userId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { savedFilters } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+  
+  return await db.select().from(savedFilters).where(eq(savedFilters.userId, userId));
+}
+
+export async function createSavedFilter(data: { userId: string; name: string; filtersJson: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { savedFilters } = await import("../drizzle/schema");
+  
+  await db.insert(savedFilters).values(data);
+}
+
+export async function deleteSavedFilter(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { savedFilters } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+  
+  await db.delete(savedFilters).where(eq(savedFilters.id, id));
+}

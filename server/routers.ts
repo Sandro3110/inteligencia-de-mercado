@@ -235,6 +235,38 @@ export const appRouter = router({
         return updateLeadValidation(input.id, input.status, input.notes, ctx.user?.id);
       }),
   }),
+
+  savedFilters: router({
+    list: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user) return [];
+      const { getSavedFilters } = await import('./db');
+      return getSavedFilters(ctx.user.id);
+    }),
+
+    create: publicProcedure
+      .input(z.object({
+        name: z.string().min(1).max(100),
+        filtersJson: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error('Not authenticated');
+        const { createSavedFilter } = await import('./db');
+        await createSavedFilter({
+          userId: ctx.user.id,
+          name: input.name,
+          filtersJson: input.filtersJson,
+        });
+        return { success: true };
+      }),
+
+    delete: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { deleteSavedFilter } = await import('./db');
+        await deleteSavedFilter(input);
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
