@@ -539,3 +539,77 @@
 - [x] Validar em diferentes navegadores
 - [x] Verificar acessibilidade (prefers-reduced-motion)
 - [x] Criar checkpoint
+
+
+## Fase 19: Skeleton Loading 💀
+
+### 19.1 Componentes
+- [x] Criar SkeletonCard component
+- [x] Criar SkeletonList component
+- [x] Adicionar animação pulse
+- [x] Criar variantes por tipo (mercado, cliente, concorrente, lead)
+
+### 19.2 Integração
+- [x] Substituir spinner em mercados por skeleton
+- [ ] Substituir spinner em clientes por skeleton (não aplicável - dados em cache)
+- [ ] Substituir spinner em concorrentes por skeleton (não aplicável - dados em cache)
+- [ ] Substituir spinner em leads por skeleton (não aplicável - dados em cache)
+
+## Fase 20: Atalhos de Teclado ⌨️
+
+### 20.1 Atalhos Globais
+- [ ] Implementar Ctrl+K para busca rápida (roadmap futuro)
+- [ ] Implementar Esc para fechar modals/popups (roadmap futuro)
+- [ ] Implementar / para focar na busca (roadmap futuro)
+- [x] Criar hook useKeyboardShortcuts
+
+### 20.2 Navegação por Lista
+- [ ] Setas ↑↓ para navegar entre itens
+- [ ] Enter para abrir detalhes
+- [ ] Espaço para marcar checkbox
+- [ ] Setas ←→ para mudar de página
+
+### 20.3 Indicadores Visuais
+- [ ] Adicionar tooltips com atalhos
+- [ ] Criar modal de ajuda (? ou Ctrl+/)
+- [ ] Highlight do item selecionado por teclado
+
+## Fase 21: Dashboard de Progresso 📊
+
+### 21.1 Backend
+- [ ] Criar rota analytics.getProgress
+- [ ] Calcular % validação por mercado
+- [ ] Calcular timeline de trabalho
+- [ ] Calcular metas diárias
+
+### 21.2 Frontend
+- [ ] Criar página Dashboard
+- [ ] Gráfico de pizza (status de validação)
+- [ ] Gráfico de barras (validação por mercado)
+- [ ] Timeline de progresso
+- [ ] Cards de KPIs principais
+
+### 21.3 Navegação
+- [ ] Adicionar link no sidebar
+- [ ] Adicionar rota /dashboard
+- [ ] Breadcrumbs
+
+## Fase 22: Acessibilidade (Fase 3 do Roadmap) ♿
+
+### 22.1 ARIA Labels e Roles
+- [ ] Adicionar role="navigation" no sidebar
+- [ ] Adicionar aria-label em botões sem texto
+- [ ] Adicionar aria-current em navegação ativa
+- [ ] Adicionar aria-live para notificações
+
+### 22.2 Focus Management
+- [ ] Garantir focus visible em todos os elementos
+- [ ] Implementar focus trap em modals
+- [ ] Skip to content link
+- [ ] Restaurar focus ao fechar modals
+
+### 22.3 Testes
+- [ ] Testar com screen reader (NVDA/JAWS)
+- [ ] Validar contraste de cores (WCAG AA)
+- [ ] Testar navegação apenas por teclado
+- [ ] Criar checkpoint final

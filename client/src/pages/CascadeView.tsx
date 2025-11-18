@@ -6,6 +6,7 @@ import { trpc } from "@/lib/trpc";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DetailPopup } from "@/components/DetailPopup";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { SkeletonMercado, SkeletonCliente, SkeletonConcorrente, SkeletonLead } from "@/components/SkeletonLoading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -632,6 +633,13 @@ export default function CascadeView() {
                           exit="exit"
                           transition={pageTransition}
                         >
+                      {isLoading ? (
+                        <div className="space-y-2">
+                          {Array.from({ length: 10 }).map((_, i) => (
+                            <SkeletonMercado key={i} />
+                          ))}
+                        </div>
+                      ) : (
                       <motion.div 
                         className="space-y-2"
                         variants={listVariants}
@@ -666,6 +674,7 @@ export default function CascadeView() {
                           </motion.div>
                         ))}
                       </motion.div>
+                      )}
                         </motion.div>
                       )}
 
