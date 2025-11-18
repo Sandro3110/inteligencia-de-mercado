@@ -212,7 +212,31 @@
 ### 11.3 Finalização
 - [x] Testar navegação completa (ida e volta)
 - [x] Validar responsividade
-- [ ] Criar checkpoint da navegação sequencial
+- [x] Criar checkpoint da navegação sequencial
+- [x] Atualizar documentação
+
+---
+
+
+
+## Fase 12: Lista Compacta com Caixa Fixa 🚧
+
+### 12.1 Lista Compacta
+- [x] Mudar de cards para linhas de lista (table-like)
+- [x] Reduzir altura das linhas (40-50px)
+- [x] Adicionar hover effect nas linhas
+- [x] Manter ícone de status e informações principais
+
+### 12.2 Caixa Fixa com Rolagem Interna
+- [x] Criar container fixo com altura definida (calc(100vh - header - footer))
+- [x] Implementar ScrollArea interno (sem scroll da página)
+- [x] Centralizar visualização em uma única tela
+- [x] Remover scroll externo da página
+
+### 12.3 Finalização
+- [x] Testar visualização centralizada
+- [x] Validar quantidade de itens visíveis
+- [ ] Criar checkpoint da lista compacta
 - [x] Atualizar documentação
 
 ---
