@@ -1,0 +1,19 @@
+{
+  "query": "SELECT * FROM projects",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT * FROM projects",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Embalagens",
+      "descricao": "Projeto de pesquisa de mercado para o setor de embalagens",
+      "cor": "#10b981",
+      "ativo": "1",
+      "createdAt": "2025-11-18 18:29:46",
+      "updatedAt": "2025-11-18 18:29:46"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tdescricao\tcor\tativo\tcreatedAt\tupdatedAt\n1\tEmbalagens\tProjeto de pesquisa de mercado para o setor de embalagens\t#10b981\t1\t2025-11-18 18:29:46\t2025-11-18 18:29:46\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

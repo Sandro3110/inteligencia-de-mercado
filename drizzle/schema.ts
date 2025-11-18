@@ -17,6 +17,22 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
 /**
+ * Projects - Separate workspaces for different business units
+ */
+export const projects = mysqlTable("projects", {
+  id: int("id").primaryKey().autoincrement(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  cor: varchar("cor", { length: 7 }).default("#3b82f6"), // hex color
+  ativo: int("ativo").default(1).notNull(), // 1 = ativo, 0 = inativo
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = typeof projects.$inferInsert;
+
+/**
  * Validation status enum for all validatable entities
  */
 export const validationStatusEnum = mysqlEnum("validationStatus", [
@@ -31,6 +47,7 @@ export const validationStatusEnum = mysqlEnum("validationStatus", [
  */
 export const mercadosUnicos = mysqlTable("mercados_unicos", {
   id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
   mercadoHash: varchar("mercadoHash", { length: 64 }),
   nome: varchar("nome", { length: 255 }).notNull(),
   segmentacao: varchar("segmentacao", { length: 50 }),
@@ -51,6 +68,7 @@ export type InsertMercadoUnico = typeof mercadosUnicos.$inferInsert;
  */
 export const clientes = mysqlTable("clientes", {
   id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
   clienteHash: varchar("clienteHash", { length: 64 }),
   nome: varchar("nome", { length: 255 }).notNull(),
   cnpj: varchar("cnpj", { length: 20 }),
@@ -92,6 +110,7 @@ export type InsertClienteMercado = typeof clientesMercados.$inferInsert;
  */
 export const concorrentes = mysqlTable("concorrentes", {
   id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
   concorrenteHash: varchar("concorrenteHash", { length: 64 }),
   mercadoId: int("mercadoId").notNull(),
   nome: varchar("nome", { length: 255 }).notNull(),
@@ -125,6 +144,7 @@ export const leadStageEnum = mysqlEnum("leadStage", [
 
 export const leads = mysqlTable("leads", {
   id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
   leadHash: varchar("leadHash", { length: 64 }),
   mercadoId: int("mercadoId").notNull(),
   nome: varchar("nome", { length: 255 }).notNull(),

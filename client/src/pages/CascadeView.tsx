@@ -59,6 +59,8 @@ import KanbanBoard from "@/components/KanbanBoard";
 import { LayoutList, LayoutGrid, BarChart3, FilterX } from "lucide-react";
 import { Link } from "wouter";
 import SearchHistory, { addToSearchHistory } from "@/components/SearchHistory";
+import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { ProjectSelector } from "@/components/ProjectSelector";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
 type Page = "mercados" | "clientes" | "concorrentes" | "leads";
@@ -66,6 +68,7 @@ type ValidationStatus = "pending" | "rich" | "needs_adjustment" | "discarded";
 type ViewMode = "list" | "kanban";
 
 export default function CascadeView() {
+  const { selectedProjectId } = useSelectedProject();
   const [currentPage, setCurrentPage] = useState<Page>("mercados");
   const [selectedMercadoId, setSelectedMercadoId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -128,7 +131,10 @@ export default function CascadeView() {
   const [currentPageNum, setCurrentPageNum] = useState(1);
   const pageSize = 20;
 
-  const { data: mercados, isLoading } = trpc.mercados.list.useQuery({ search: "" });
+  const { data: mercados, isLoading } = trpc.mercados.list.useQuery(
+    { projectId: selectedProjectId!, search: "" },
+    { enabled: !!selectedProjectId }
+  );
   const { data: clientesResponse } = trpc.clientes.byMercado.useQuery(
     { mercadoId: selectedMercadoId!, page: currentPageNum, pageSize },
     { enabled: !!selectedMercadoId }
@@ -681,9 +687,12 @@ export default function CascadeView() {
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-2 border-b border-border/40">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">GESTOR PAV</h1>
-          <p className="text-sm text-muted-foreground">Pesquisa de Mercado</p>
+        <div className="flex items-center gap-6">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">GESTOR PAV</h1>
+            <p className="text-sm text-muted-foreground">Pesquisa de Mercado</p>
+          </div>
+          <ProjectSelector />
           <div className="mt-2">
             <Breadcrumbs
               items={[

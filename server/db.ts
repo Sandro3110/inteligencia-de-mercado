@@ -2,6 +2,7 @@ import { eq, sql, and, or, like, count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users, 
+  projects, Project, InsertProject,
   mercadosUnicos, clientes, clientesMercados, 
   concorrentes, leads,
   MercadoUnico, Cliente, Concorrente, Lead
@@ -152,6 +153,7 @@ export async function getDashboardStats() {
 // ============================================
 
 export async function getMercados(params?: {
+  projectId?: number;
   search?: string;
   limit?: number;
   offset?: number;
@@ -161,13 +163,22 @@ export async function getMercados(params?: {
 
   let query = db.select().from(mercadosUnicos);
 
+  // Filtrar por projeto se fornecido
+  const conditions = [];
+  if (params?.projectId) {
+    conditions.push(eq(mercadosUnicos.projectId, params.projectId));
+  }
   if (params?.search) {
-    query = query.where(
+    conditions.push(
       or(
         like(mercadosUnicos.nome, `%${params.search}%`),
         like(mercadosUnicos.categoria, `%${params.search}%`)
-      )
-    ) as any;
+      )!
+    );
+  }
+
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)!) as any;
   }
 
   if (params?.limit) {
@@ -198,12 +209,20 @@ export async function getMercadoById(id: number) {
 // CLIENTE HELPERS
 // ============================================
 
-export async function getAllClientes(validationStatus?: string) {
+export async function getAllClientes(params?: { projectId?: number; validationStatus?: string }) {
   const db = await getDb();
   if (!db) return [];
 
-  if (validationStatus) {
-    return await db.select().from(clientes).where(eq(clientes.validationStatus, validationStatus as any));
+  const conditions = [];
+  if (params?.projectId) {
+    conditions.push(eq(clientes.projectId, params.projectId));
+  }
+  if (params?.validationStatus) {
+    conditions.push(eq(clientes.validationStatus, params.validationStatus as any));
+  }
+
+  if (conditions.length > 0) {
+    return await db.select().from(clientes).where(and(...conditions)!);
   }
 
   return await db.select().from(clientes);
@@ -318,12 +337,20 @@ export async function updateClienteValidation(
 // CONCORRENTE HELPERS
 // ============================================
 
-export async function getAllConcorrentes(validationStatus?: string) {
+export async function getAllConcorrentes(params?: { projectId?: number; validationStatus?: string }) {
   const db = await getDb();
   if (!db) return [];
 
-  if (validationStatus) {
-    return await db.select().from(concorrentes).where(eq(concorrentes.validationStatus, validationStatus as any));
+  const conditions = [];
+  if (params?.projectId) {
+    conditions.push(eq(concorrentes.projectId, params.projectId));
+  }
+  if (params?.validationStatus) {
+    conditions.push(eq(concorrentes.validationStatus, params.validationStatus as any));
+  }
+
+  if (conditions.length > 0) {
+    return await db.select().from(concorrentes).where(and(...conditions)!);
   }
 
   return await db.select().from(concorrentes);
@@ -407,12 +434,20 @@ export async function updateConcorrenteValidation(
 // LEAD HELPERS
 // ============================================
 
-export async function getAllLeads(validationStatus?: string) {
+export async function getAllLeads(params?: { projectId?: number; validationStatus?: string }) {
   const db = await getDb();
   if (!db) return [];
 
-  if (validationStatus) {
-    return await db.select().from(leads).where(eq(leads.validationStatus, validationStatus as any));
+  const conditions = [];
+  if (params?.projectId) {
+    conditions.push(eq(leads.projectId, params.projectId));
+  }
+  if (params?.validationStatus) {
+    conditions.push(eq(leads.validationStatus, params.validationStatus as any));
+  }
+
+  if (conditions.length > 0) {
+    return await db.select().from(leads).where(and(...conditions)!);
   }
 
   return await db.select().from(leads);
@@ -920,4 +955,90 @@ export async function getLeadsByStage(mercadoId: number) {
     .where(eq(leads.mercadoId, mercadoId));
 
   return result;
+}
+
+
+// ============================================
+// PROJECT HELPERS
+// ============================================
+
+export async function getProjects(): Promise<Project[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  try {
+    const result = await db
+      .select()
+      .from(projects)
+      .where(eq(projects.ativo, 1))
+      .orderBy(projects.nome);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get projects:", error);
+    return [];
+  }
+}
+
+export async function getProjectById(id: number): Promise<Project | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  try {
+    const result = await db
+      .select()
+      .from(projects)
+      .where(eq(projects.id, id))
+      .limit(1);
+    return result[0];
+  } catch (error) {
+    console.error("[Database] Failed to get project:", error);
+    return undefined;
+  }
+}
+
+export async function createProject(data: InsertProject): Promise<Project | null> {
+  const db = await getDb();
+  if (!db) return null;
+  
+  try {
+    const result = await db.insert(projects).values(data);
+    const insertId = Number(result[0].insertId);
+    return await getProjectById(insertId) || null;
+  } catch (error) {
+    console.error("[Database] Failed to create project:", error);
+    return null;
+  }
+}
+
+export async function updateProject(id: number, data: Partial<InsertProject>): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  try {
+    await db
+      .update(projects)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(projects.id, id));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to update project:", error);
+    return false;
+  }
+}
+
+export async function deleteProject(id: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  try {
+    // Soft delete - apenas marca como inativo
+    await db
+      .update(projects)
+      .set({ ativo: 0, updatedAt: new Date() })
+      .where(eq(projects.id, id));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete project:", error);
+    return false;
+  }
 }

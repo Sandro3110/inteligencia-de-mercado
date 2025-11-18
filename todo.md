@@ -1117,3 +1117,51 @@
 ### 42.4 Checkpoint
 - [x] Testar todas as melhorias
 - [x] Criar checkpoint
+
+
+---
+
+## Fase 42: Sistema Multi-Projetos 🏢
+
+### 42.1 Schema e Migração
+- [x] Adicionar tabela `projects` no schema
+- [x] Adicionar coluna `projectId` em mercados_unicos
+- [x] Adicionar coluna `projectId` em clientes
+- [x] Adicionar coluna `projectId` em concorrentes
+- [x] Adicionar coluna `projectId` em leads
+- [x] Aplicar migração no banco de dados
+- [x] Criar projeto "Embalagens" no banco
+- [x] Associionar todos os dados existentes ao projeto "Embalagens"
+
+### 42.2 Backend - Database
+- [x] Criar funções CRUD para projetos (createProject, getProjects, etc.)
+- [x] Atualizar getMercados para filtrar por projectId
+- [x] Atualizar getAllClientes para filtrar por projectId
+- [x] Atualizar getAllConcorrentes para filtrar por projectId
+- [x] Atualizar getAllLeads para filtrar por projectId
+
+### 42.3 Backend - Routers
+- [x] Criar router projects (list, create, update, delete)
+- [x] Atualizar mercados.list para aceitar projectId
+- [x] Atualizar clientes.list para aceitar projectId
+- [x] Atualizar concorrentes.list para aceitar projectId
+- [x] Atualizar leads.list para aceitar projectId
+
+### 42.4 Frontend - Componentes
+- [x] Criar componente ProjectSelector
+- [x] Criar hook useSelectedProject
+- [ ] Criar modal de gerenciamento de projetos (futuro)
+- [x] Adicionar ProjectSelector no header
+
+### 42.5 Frontend - Integração
+- [x] Atualizar CascadeView para usar projectId
+- [x] Atualizar todas as queries para passar projectId
+- [x] Implementar persistência do projeto selecionado (localStorage)
+- [x] Adicionar feedback visual do projeto atual
+
+### 42.6 Testes e Finalização
+- [x] Escrever testes unitários
+- [x] Testar troca entre projetos
+- [x] Testar isolamento de dados entre projetos
+- [x] Validar que dados "Embalagens" aparecem corretamente
+- [ ] Criar checkpoint final

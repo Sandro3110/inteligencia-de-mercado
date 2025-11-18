@@ -63,6 +63,7 @@ export const appRouter = router({
   mercados: router({
     list: publicProcedure
       .input(z.object({
+        projectId: z.number().optional(),
         search: z.string().optional(),
         limit: z.number().optional(),
         offset: z.number().optional(),
@@ -83,11 +84,15 @@ export const appRouter = router({
   clientes: router({
     list: publicProcedure
       .input(z.object({
+        projectId: z.number().optional(),
         validationStatus: z.string().optional(),
       }))
       .query(async ({ input }) => {
         const { getAllClientes } = await import('./db');
-        return getAllClientes(input.validationStatus);
+        return getAllClientes({ 
+          projectId: input.projectId,
+          validationStatus: input.validationStatus 
+        });
       }),
     
     byMercado: publicProcedure
@@ -122,11 +127,15 @@ export const appRouter = router({
   concorrentes: router({
     list: publicProcedure
       .input(z.object({
+        projectId: z.number().optional(),
         validationStatus: z.string().optional(),
       }))
       .query(async ({ input }) => {
         const { getAllConcorrentes } = await import('./db');
-        return getAllConcorrentes(input.validationStatus);
+        return getAllConcorrentes({ 
+          projectId: input.projectId,
+          validationStatus: input.validationStatus 
+        });
       }),
     
     byMercado: publicProcedure
@@ -227,11 +236,15 @@ export const appRouter = router({
   leads: router({
     list: publicProcedure
       .input(z.object({
+        projectId: z.number().optional(),
         validationStatus: z.string().optional(),
       }))
       .query(async ({ input }) => {
         const { getAllLeads } = await import('./db');
-        return getAllLeads(input.validationStatus);
+        return getAllLeads({ 
+          projectId: input.projectId,
+          validationStatus: input.validationStatus 
+        });
       }),
     
     byMercado: publicProcedure
@@ -312,6 +325,52 @@ export const appRouter = router({
         const { deleteSavedFilter } = await import('./db');
         await deleteSavedFilter(input);
         return { success: true };
+      }),
+  }),
+
+  projects: router({
+    list: publicProcedure
+      .query(async () => {
+        const { getProjects } = await import('./db');
+        return getProjects();
+      }),
+
+    byId: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { getProjectById } = await import('./db');
+        return getProjectById(input);
+      }),
+
+    create: publicProcedure
+      .input(z.object({
+        nome: z.string().min(1).max(255),
+        descricao: z.string().optional(),
+        cor: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { createProject } = await import('./db');
+        return createProject(input);
+      }),
+
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        nome: z.string().min(1).max(255).optional(),
+        descricao: z.string().optional(),
+        cor: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateProject } = await import('./db');
+        const { id, ...data } = input;
+        return updateProject(id, data);
+      }),
+
+    delete: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { deleteProject } = await import('./db');
+        return deleteProject(input);
       }),
   }),
 });
