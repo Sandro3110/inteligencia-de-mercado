@@ -43,6 +43,13 @@
       "when": 1763499344366,
       "tag": "0005_freezing_johnny_blaze",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1763500757464,
+      "tag": "0006_rainy_speed",
+      "breakpoints": true
     }
   ]
 }

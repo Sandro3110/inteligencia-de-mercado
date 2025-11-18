@@ -213,3 +213,19 @@ export const savedFilters = mysqlTable("saved_filters", {
 
 export type SavedFilter = typeof savedFilters.$inferSelect;
 export type InsertSavedFilter = typeof savedFilters.$inferInsert;
+
+/**
+ * Project_Templates - Reusable project configurations
+ */
+export const projectTemplates = mysqlTable("project_templates", {
+  id: int("id").primaryKey().autoincrement(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  config: text("config").notNull(), // JSON string with template configuration
+  isDefault: int("isDefault").default(0).notNull(), // 1 = default template, 0 = custom
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type ProjectTemplate = typeof projectTemplates.$inferSelect;
+export type InsertProjectTemplate = typeof projectTemplates.$inferInsert;

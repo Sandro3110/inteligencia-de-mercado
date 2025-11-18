@@ -1323,3 +1323,52 @@
 - [ ] Validar cancelamento de processo
 - [ ] Criar checkpoint final
 
+
+
+---
+
+## Fase 46: Implementação Completa de CRUD e Templates 🚧
+
+### 46.1 Mutations de Update e Delete no Backend
+- [x] Criar mutation mercados.update com validação Zod
+- [x] Criar mutation mercados.delete com cascade
+- [x] Criar mutation clientes.update com validação Zod
+- [x] Criar mutation clientes.delete
+- [x] Criar mutation concorrentes.update com validação Zod
+- [x] Criar mutation concorrentes.delete
+- [x] Criar mutation leads.update com validação Zod
+- [x] Criar mutation leads.delete
+- [x] Adicionar funções no db.ts para update/delete
+- [x] Adicionar queries byProject para todas as entidades
+- [ ] Testar mutations com vitest
+
+### 46.2 Server-Sent Events (SSE) para Progresso em Tempo Real
+- [x] Criar endpoint SSE /api/enrichment/progress/:jobId
+- [x] Implementar sistema de jobs com IDs únicos (jobManager)
+- [x] Emitir eventos de progresso durante enriquecimento
+- [x] Atualizar enrichmentFlow.ts para emitir eventos
+- [x] Criar hook useEnrichmentProgress no frontend
+- [x] Conectar EnrichmentProgress ao SSE
+- [x] Implementar reconexão automática (EventSource nativo)
+- [x] Adicionar cleanup ao desmontar componente
+
+### 46.3 Sistema de Templates de Projeto
+- [x] Criar tabela project_templates no schema
+- [x] Adicionar campos: name, description, config (JSON)
+- [x] Implementar funções CRUD no db.ts
+- [x] Criar router tRPC templates (list, create, update, delete)
+- [x] Criar componente TemplateSelector
+- [x] Adicionar opção "Usar Template" ao criar novo projeto
+- [x] Implementar templates predefinidos (B2B, B2C, Misto)
+- [ ] Adicionar opção "Salvar como Template" (futuro)
+- [ ] Testar criação de projeto a partir de template
+
+### 46.4 Testes e Validação
+- [x] Verificar status do projeto (sem erros TypeScript)
+- [x] Validar integração de todos os componentes
+- [x] Confirmar servidor rodando corretamente
+- [ ] Testar mutations de update/delete (manual)
+- [ ] Testar SSE em tempo real (manual)
+- [ ] Testar templates de projeto (manual)
+- [x] Criar checkpoint final
+

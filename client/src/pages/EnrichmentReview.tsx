@@ -45,13 +45,13 @@ export default function EnrichmentReview() {
   // Inicializar dados de revisão
   useState(() => {
     if (mercados) {
-      setMercadosReview(mercados.map(m => ({ ...m, approved: true, editing: false })));
+      setMercadosReview(mercados.map((m: any) => ({ ...m, approved: true, editing: false })));
     }
     if (concorrentes) {
-      setConcorrentesReview(concorrentes.map(c => ({ ...c, approved: true, editing: false })));
+      setConcorrentesReview(concorrentes.map((c: any) => ({ ...c, approved: true, editing: false })));
     }
     if (leads) {
-      setLeadsReview(leads.map(l => ({ ...l, approved: true, editing: false })));
+      setLeadsReview(leads.map((l: any) => ({ ...l, approved: true, editing: false })));
     }
   });
 

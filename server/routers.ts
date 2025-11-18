@@ -79,6 +79,38 @@ export const appRouter = router({
         const { getMercadoById } = await import('./db');
         return getMercadoById(input);
       }),
+    
+    byProject: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getMercados } = await import('./db');
+        return getMercados({ projectId: input.projectId });
+      }),
+    
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        data: z.object({
+          nome: z.string().optional(),
+          segmentacao: z.string().optional(),
+          categoria: z.string().optional(),
+          tamanhoMercado: z.string().optional(),
+          crescimentoAnual: z.string().optional(),
+          tendencias: z.string().optional(),
+          principaisPlayers: z.string().optional(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateMercado } = await import('./db');
+        return updateMercado(input.id, input.data);
+      }),
+    
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteMercado } = await import('./db');
+        return deleteMercado(input.id);
+      }),
   }),
 
   clientes: router({
@@ -122,6 +154,44 @@ export const appRouter = router({
         const { updateClienteValidation } = await import('./db');
         return updateClienteValidation(input.id, input.status, input.notes, ctx.user?.id);
       }),
+    
+    byProject: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getAllClientes } = await import('./db');
+        return getAllClientes({ projectId: input.projectId });
+      }),
+    
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        data: z.object({
+          nome: z.string().optional(),
+          cnpj: z.string().optional(),
+          siteOficial: z.string().optional(),
+          produtoPrincipal: z.string().optional(),
+          segmentacaoB2bB2c: z.string().optional(),
+          email: z.string().optional(),
+          telefone: z.string().optional(),
+          linkedin: z.string().optional(),
+          instagram: z.string().optional(),
+          cidade: z.string().optional(),
+          uf: z.string().optional(),
+          cnae: z.string().optional(),
+          porte: z.string().optional(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateCliente } = await import('./db');
+        return updateCliente(input.id, input.data);
+      }),
+    
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteCliente } = await import('./db');
+        return deleteCliente(input.id);
+      }),
   }),
 
   concorrentes: router({
@@ -164,6 +234,36 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         const { updateConcorrenteValidation } = await import('./db');
         return updateConcorrenteValidation(input.id, input.status, input.notes, ctx.user?.id);
+      }),
+    
+    byProject: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getAllConcorrentes } = await import('./db');
+        return getAllConcorrentes({ projectId: input.projectId });
+      }),
+    
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        data: z.object({
+          nome: z.string().optional(),
+          cnpj: z.string().optional(),
+          site: z.string().optional(),
+          produto: z.string().optional(),
+          porte: z.string().optional(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateConcorrente } = await import('./db');
+        return updateConcorrente(input.id, input.data);
+      }),
+    
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteConcorrente } = await import('./db');
+        return deleteConcorrente(input.id);
       }),
   }),
 
@@ -294,6 +394,36 @@ export const appRouter = router({
         const { getLeadsByStage } = await import('./db');
         return getLeadsByStage(input.mercadoId);
       }),
+    
+    byProject: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getAllLeads } = await import('./db');
+        return getAllLeads({ projectId: input.projectId });
+      }),
+    
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        data: z.object({
+          nome: z.string().optional(),
+          tipo: z.string().optional(),
+          porte: z.string().optional(),
+          regiao: z.string().optional(),
+          setor: z.string().optional(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateLead } = await import('./db');
+        return updateLead(input.id, input.data);
+      }),
+    
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteLead } = await import('./db');
+        return deleteLead(input.id);
+      }),
   }),
 
   savedFilters: router({
@@ -374,6 +504,52 @@ export const appRouter = router({
       }),
   }),
 
+  templates: router({
+    list: publicProcedure.query(async () => {
+      const { getAllTemplates } = await import('./db');
+      return getAllTemplates();
+    }),
+    
+    byId: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { getTemplateById } = await import('./db');
+        return getTemplateById(input);
+      }),
+    
+    create: publicProcedure
+      .input(z.object({
+        name: z.string().min(1).max(100),
+        description: z.string().optional(),
+        config: z.string(), // JSON string
+      }))
+      .mutation(async ({ input }) => {
+        const { createTemplate } = await import('./db');
+        return createTemplate(input);
+      }),
+    
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        data: z.object({
+          name: z.string().optional(),
+          description: z.string().optional(),
+          config: z.string().optional(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateTemplate } = await import('./db');
+        return updateTemplate(input.id, input.data);
+      }),
+    
+    delete: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { deleteTemplate } = await import('./db');
+        return deleteTemplate(input);
+      }),
+  }),
+
   enrichment: router({
     execute: publicProcedure
       .input(z.object({
@@ -387,15 +563,18 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { executeEnrichmentFlow } = await import('./enrichmentFlow');
+        const { randomUUID } = await import('crypto');
         
-        // Executar fluxo e retornar resultado final
+        // Gerar jobId único para tracking via SSE
+        const jobId = randomUUID();
+        
+        // Executar fluxo e retornar jobId + resultado final
         return new Promise((resolve) => {
           executeEnrichmentFlow(input, (progress) => {
-            // Em uma implementação real, usaríamos WebSockets ou SSE para enviar progresso em tempo real
             if (progress.status === 'completed' || progress.status === 'error') {
-              resolve(progress);
+              resolve({ ...progress, jobId });
             }
-          });
+          }, jobId);
         });
       }),
   }),

@@ -5,6 +5,7 @@ import {
   projects, Project, InsertProject,
   mercadosUnicos, clientes, clientesMercados, 
   concorrentes, leads,
+  projectTemplates, ProjectTemplate, InsertProjectTemplate,
   MercadoUnico, Cliente, Concorrente, Lead
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -1082,6 +1083,49 @@ export async function createMercado(data: {
   return await getMercadoById(Number(result.insertId));
 }
 
+export async function updateMercado(id: number, data: {
+  nome?: string;
+  categoria?: string;
+  segmentacao?: string;
+  tamanhoMercado?: string;
+  crescimentoAnual?: string;
+  tendencias?: string;
+  principaisPlayers?: string;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const updateData: any = {};
+  if (data.nome !== undefined) updateData.nome = data.nome;
+  if (data.categoria !== undefined) updateData.categoria = data.categoria;
+  if (data.segmentacao !== undefined) updateData.segmentacao = data.segmentacao;
+  if (data.tamanhoMercado !== undefined) updateData.tamanhoMercado = data.tamanhoMercado;
+  if (data.crescimentoAnual !== undefined) updateData.crescimentoAnual = data.crescimentoAnual;
+  if (data.tendencias !== undefined) updateData.tendencias = data.tendencias;
+  if (data.principaisPlayers !== undefined) updateData.principaisPlayers = data.principaisPlayers;
+
+  await db.update(mercadosUnicos)
+    .set(updateData)
+    .where(eq(mercadosUnicos.id, id));
+
+  return await getMercadoById(id);
+}
+
+export async function deleteMercado(id: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  // Delete associated records first (cascade)
+  await db.delete(clientesMercados).where(eq(clientesMercados.mercadoId, id));
+  await db.delete(concorrentes).where(eq(concorrentes.mercadoId, id));
+  await db.delete(leads).where(eq(leads.mercadoId, id));
+  
+  // Delete the mercado itself
+  await db.delete(mercadosUnicos).where(eq(mercadosUnicos.id, id));
+  
+  return true;
+}
+
 // ============================================
 // CRUD - CLIENTES
 // ============================================
@@ -1158,9 +1202,58 @@ export async function associateClienteToMercado(clienteId: number, mercadoId: nu
 
     return true;
   } catch (error) {
-    console.error('[DB] Erro ao associar cliente a mercado:', error);
+    console.error('Error associating cliente to mercado:', error);
     return false;
   }
+}
+
+export async function updateCliente(id: number, data: Partial<{
+  nome: string;
+  cnpj: string;
+  siteOficial: string;
+  produtoPrincipal: string;
+  segmentacaoB2bB2c: string;
+  email: string;
+  telefone: string;
+  linkedin: string;
+  instagram: string;
+  cidade: string;
+  uf: string;
+  cnae: string;
+  porte: string;
+  qualidadeScore: number;
+  qualidadeClassificacao: string;
+  validationStatus: string;
+}>) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const updateData: any = {};
+  Object.keys(data).forEach(key => {
+    if (data[key as keyof typeof data] !== undefined) {
+      updateData[key] = data[key as keyof typeof data];
+    }
+  });
+
+  await db.update(clientes)
+    .set(updateData)
+    .where(eq(clientes.id, id));
+
+  const [cliente] = await db.select().from(clientes).where(eq(clientes.id, id));
+  return cliente;
+}
+
+export async function deleteCliente(id: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  // Delete associations first
+  await db.delete(clientesMercados).where(eq(clientesMercados.clienteId, id));
+  
+  // Delete the cliente itself
+  await db.delete(clientes).where(eq(clientes.id, id));
+  
+  return true;
 }
 
 // ============================================
@@ -1204,6 +1297,43 @@ export async function createConcorrente(data: {
 
   const [concorrente] = await db.select().from(concorrentes).where(eq(concorrentes.id, Number(result.insertId)));
   return concorrente;
+}
+
+export async function updateConcorrente(id: number, data: Partial<{
+  nome: string;
+  cnpj: string;
+  site: string;
+  produto: string;
+  porte: string;
+  faturamentoEstimado: string;
+  qualidadeScore: number;
+  qualidadeClassificacao: string;
+  validationStatus: string;
+}>) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const updateData: any = {};
+  Object.keys(data).forEach(key => {
+    if (data[key as keyof typeof data] !== undefined) {
+      updateData[key] = data[key as keyof typeof data];
+    }
+  });
+
+  await db.update(concorrentes)
+    .set(updateData)
+    .where(eq(concorrentes.id, id));
+
+  const [concorrente] = await db.select().from(concorrentes).where(eq(concorrentes.id, id));
+  return concorrente;
+}
+
+export async function deleteConcorrente(id: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  await db.delete(concorrentes).where(eq(concorrentes.id, id));
+  return true;
 }
 
 // ============================================
@@ -1251,4 +1381,125 @@ export async function createLead(data: {
 
   const [lead] = await db.select().from(leads).where(eq(leads.id, Number(result.insertId)));
   return lead;
+}
+
+export async function updateLead(id: number, data: Partial<{
+  nome: string;
+  cnpj: string;
+  site: string;
+  email: string;
+  telefone: string;
+  tipo: string;
+  porte: string;
+  regiao: string;
+  setor: string;
+  qualidadeScore: number;
+  qualidadeClassificacao: string;
+  validationStatus: string;
+  stage: string;
+}>) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const updateData: any = {};
+  Object.keys(data).forEach(key => {
+    if (data[key as keyof typeof data] !== undefined) {
+      updateData[key] = data[key as keyof typeof data];
+    }
+  });
+
+  await db.update(leads)
+    .set(updateData)
+    .where(eq(leads.id, id));
+
+  const [lead] = await db.select().from(leads).where(eq(leads.id, id));
+  return lead;
+}
+
+export async function deleteLead(id: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  await db.delete(leads).where(eq(leads.id, id));
+  return true;
+}
+
+
+// ============================================
+// CRUD - PROJECT TEMPLATES
+// ============================================
+
+export async function getAllTemplates() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(projectTemplates).orderBy(projectTemplates.isDefault, projectTemplates.name);
+}
+
+export async function getTemplateById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [template] = await db.select().from(projectTemplates).where(eq(projectTemplates.id, id));
+  return template || null;
+}
+
+export async function createTemplate(data: {
+  name: string;
+  description?: string;
+  config: string;
+  isDefault?: number;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [result] = await db.insert(projectTemplates).values({
+    name: data.name,
+    description: data.description || null,
+    config: data.config,
+    isDefault: data.isDefault || 0,
+  });
+
+  if (!result.insertId) return null;
+
+  return await getTemplateById(Number(result.insertId));
+}
+
+export async function updateTemplate(id: number, data: Partial<{
+  name: string;
+  description: string;
+  config: string;
+  isDefault: number;
+}>) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const updateData: any = {};
+  Object.keys(data).forEach(key => {
+    if (data[key as keyof typeof data] !== undefined) {
+      updateData[key] = data[key as keyof typeof data];
+    }
+  });
+
+  if (Object.keys(updateData).length > 0) {
+    await db.update(projectTemplates)
+      .set(updateData)
+      .where(eq(projectTemplates.id, id));
+  }
+
+  return await getTemplateById(id);
+}
+
+export async function deleteTemplate(id: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  // Não permitir deletar templates padrão
+  const template = await getTemplateById(id);
+  if (template?.isDefault === 1) {
+    throw new Error('Não é possível deletar templates padrão');
+  }
+
+  await db.delete(projectTemplates).where(eq(projectTemplates.id, id));
+  return true;
 }

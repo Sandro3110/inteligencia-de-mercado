@@ -11,6 +11,7 @@
  */
 
 import { calculateQualityScore } from '../shared/qualityScore';
+import { jobManager } from './_core/jobManager';
 
 export type EnrichmentInput = {
   clientes: Array<{
@@ -44,19 +45,34 @@ type ProgressCallback = (progress: EnrichmentProgress) => void;
  */
 export async function executeEnrichmentFlow(
   input: EnrichmentInput,
-  onProgress: ProgressCallback
+  onProgress: ProgressCallback,
+  jobId?: string
 ): Promise<EnrichmentProgress> {
   try {
     const totalSteps = 7;
     let currentStep = 0;
+    
+    // Criar job no manager se jobId fornecido
+    if (jobId) {
+      jobManager.createJob(jobId, totalSteps);
+    }
 
     // Passo 1: Criar projeto
-    onProgress({
-      status: 'processing',
+    const step1 = {
+      status: 'processing' as const,
       message: `Criando projeto "${input.projectName}"...`,
       currentStep: ++currentStep,
       totalSteps,
-    });
+    };
+    onProgress(step1);
+    if (jobId) {
+      jobManager.updateJob(jobId, {
+        step: currentStep,
+        currentStepName: 'Criando projeto',
+        message: step1.message,
+        progress: 0,
+      });
+    }
 
     const { createProject } = await import('./db');
     const project = await createProject({

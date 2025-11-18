@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, CheckCircle2, XCircle, Upload, FileSpreadsheet } from 'lucide-react';
 import { EnrichmentProgress, EnrichmentStep } from '@/components/EnrichmentProgress';
+import { useEnrichmentProgress } from '@/hooks/useEnrichmentProgress';
+import { TemplateSelector } from '@/components/TemplateSelector';
 import { useLocation } from 'wouter';
 import * as XLSX from 'xlsx';
 
@@ -16,17 +18,10 @@ export default function EnrichmentFlow() {
   const [clientesText, setClientesText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<any>(null);
-  const [enrichmentSteps, setEnrichmentSteps] = useState<EnrichmentStep[]>([
-    { id: '1', label: 'Criando projeto', status: 'pending' },
-    { id: '2', label: 'Identificando mercados via LLM', status: 'pending' },
-    { id: '3', label: 'Enriquecendo clientes via Data API', status: 'pending' },
-    { id: '4', label: 'Buscando concorrentes', status: 'pending' },
-    { id: '5', label: 'Identificando leads', status: 'pending' },
-    { id: '6', label: 'Calculando scores de qualidade', status: 'pending' },
-    { id: '7', label: 'Finalizando projeto', status: 'pending' },
-  ]);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [totalProgress, setTotalProgress] = useState(0);
+  const [jobId, setJobId] = useState<string | null>(null);
+  const { steps: enrichmentSteps, currentStep, totalProgress, isComplete, error: sseError } = useEnrichmentProgress(jobId);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | undefined>();
+  const [templateConfig, setTemplateConfig] = useState<any>(null);
   const [uploadMode, setUploadMode] = useState<'text' | 'file'>('text');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,11 +31,7 @@ export default function EnrichmentFlow() {
     e.preventDefault();
     setIsProcessing(true);
     setResult(null);
-    setCurrentStep(0);
-    setTotalProgress(0);
-    
-    // Resetar steps
-    setEnrichmentSteps(steps => steps.map(s => ({ ...s, status: 'pending', message: undefined, progress: undefined })));
+    setJobId(null);
 
     try {
       // Parsear texto de clientes (formato: nome|cnpj|site|produto por linha)
@@ -52,58 +43,15 @@ export default function EnrichmentFlow() {
           return { nome, cnpj, site, produto };
         });
 
-      // Simular progresso (em produção, isso viria do backend via WebSocket/SSE)
-      const simulateProgress = async () => {
-        const stepMessages = [
-          'Criando estrutura do projeto...',
-          'Analisando clientes com IA para identificar mercados...',
-          'Enriquecendo dados via APIs públicas (CNPJ)...',
-          'Buscando concorrentes similares via LLM...',
-          'Identificando leads potenciais...',
-          'Calculando scores de qualidade dos dados...',
-          'Salvando dados no banco...',
-        ];
-
-        for (let i = 0; i < enrichmentSteps.length; i++) {
-          setCurrentStep(i);
-          setEnrichmentSteps(steps => 
-            steps.map((s, idx) => 
-              idx === i 
-                ? { ...s, status: 'in_progress', message: stepMessages[i], progress: 0 }
-                : idx < i
-                ? { ...s, status: 'completed' }
-                : s
-            )
-          );
-
-          // Simular progresso da etapa
-          for (let p = 0; p <= 100; p += 20) {
-            await new Promise(resolve => setTimeout(resolve, 200));
-            setEnrichmentSteps(steps => 
-              steps.map((s, idx) => 
-                idx === i ? { ...s, progress: p } : s
-              )
-            );
-          }
-
-          setEnrichmentSteps(steps => 
-            steps.map((s, idx) => 
-              idx === i ? { ...s, status: 'completed', progress: 100 } : s
-            )
-          );
-          setTotalProgress(((i + 1) / enrichmentSteps.length) * 100);
-        }
-      };
-
-      // Executar progresso e processamento em paralelo
-      const [response] = await Promise.all([
-        enrichmentMutation.mutateAsync({ projectName, clientes }),
-        simulateProgress(),
-      ]);
+      // Executar enriquecimento (progresso via SSE)
+      const response = await enrichmentMutation.mutateAsync({ projectName, clientes });
+      
+      // Extrair jobId da resposta
+      if ((response as any).jobId) {
+        setJobId((response as any).jobId);
+      }
 
       setResult(response);
-      setCurrentStep(enrichmentSteps.length);
-      setTotalProgress(100);
     } catch (error) {
       setResult({
         status: 'error',
@@ -160,6 +108,24 @@ export default function EnrichmentFlow() {
             Insira uma lista de clientes e crie automaticamente um novo projeto com dados enriquecidos
           </p>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Escolha um Template</CardTitle>
+            <CardDescription>
+              Selecione um template pré-configurado para otimizar o processamento
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TemplateSelector
+              selectedTemplateId={selectedTemplateId}
+              onSelect={(templateId, config) => {
+                setSelectedTemplateId(templateId);
+                setTemplateConfig(config);
+              }}
+            />
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
