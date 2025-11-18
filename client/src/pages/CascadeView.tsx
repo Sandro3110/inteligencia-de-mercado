@@ -17,17 +17,23 @@ import {
   XCircle,
   AlertCircle,
   ChevronRight,
-  BarChart3,
+  ChevronLeft,
+  Home,
+  Menu,
+  X,
 } from "lucide-react";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
+type NavigationLevel = "mercados" | "itens" | "detalhes";
 
 export default function CascadeView() {
+  const [currentLevel, setCurrentLevel] = useState<NavigationLevel>("mercados");
   const [selectedMercadoId, setSelectedMercadoId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [detailPopupOpen, setDetailPopupOpen] = useState(false);
   const [detailPopupItem, setDetailPopupItem] = useState<any>(null);
   const [detailPopupType, setDetailPopupType] = useState<"cliente" | "concorrente" | "lead">("cliente");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const { data: mercados, isLoading } = trpc.mercados.list.useQuery({ search: "" });
   const { data: clientes } = trpc.clientes.byMercado.useQuery(
@@ -45,22 +51,28 @@ export default function CascadeView() {
 
   const mercadoSelecionado = mercados?.find((m) => m.id === selectedMercadoId);
 
-  // Calcular totais gerais (usaremos queries separadas para totais precisos)
+  // Calcular totais gerais
   const totalMercados = mercados?.length || 0;
   const totalClientes = mercados?.reduce((sum, m) => sum + (m.quantidadeClientes || 0), 0) || 0;
-  
-  // Para totais de concorrentes e leads, vamos usar estimativas baseadas nos dados carregados
-  const totalConcorrentes = 591; // Total conhecido do banco
-  const totalLeads = 727; // Total conhecido do banco
+  const totalConcorrentes = 591;
+  const totalLeads = 727;
 
   const handleSelectMercado = (mercadoId: number) => {
     setSelectedMercadoId(mercadoId);
+    setCurrentLevel("itens");
   };
 
   const handleOpenDetail = (item: any, type: "cliente" | "concorrente" | "lead") => {
     setDetailPopupItem(item);
     setDetailPopupType(type);
     setDetailPopupOpen(true);
+  };
+
+  const handleVoltar = () => {
+    if (currentLevel === "itens") {
+      setCurrentLevel("mercados");
+      setSelectedMercadoId(null);
+    }
   };
 
   const getStatusIcon = (status: string) => {
@@ -76,369 +88,351 @@ export default function CascadeView() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "rich":
-        return <Badge className="badge-rich text-xs">Rico</Badge>;
-      case "needs_adjustment":
-        return <Badge className="badge-needs-adjustment text-xs">Ajuste</Badge>;
-      case "discarded":
-        return <Badge className="badge-discarded text-xs">Descartado</Badge>;
-      default:
-        return <Badge className="badge-pending text-xs">Pendente</Badge>;
-    }
-  };
-
   const filterByStatus = (items: any[]) => {
     if (statusFilter === "all") return items;
     return items.filter((item) => item.validationStatus === statusFilter);
   };
 
-  // Calcular progresso de validação
-  const calculateProgress = (items: any[]) => {
-    if (!items || items.length === 0) return 0;
-    const validated = items.filter((i) => i.validationStatus && i.validationStatus !== "pending").length;
-    return Math.round((validated / items.length) * 100);
-  };
-
   return (
-    <div className="min-h-screen p-4 md:p-6">
-      {/* Header */}
-      <div className="max-w-[1320px] mx-auto mb-6">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">GESTOR PAV</h1>
-            <p className="text-sm text-muted-foreground mt-1">Pesquisa de Mercado · Navegação em Cascata</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="pill-badge">
-              <span className="status-dot success"></span>
-              {totalMercados} Mercados
-            </span>
+    <div className="min-h-screen flex">
+      {/* Sidebar Fixo */}
+      <aside
+        className={`
+          ${sidebarOpen ? "w-72" : "w-0"}
+          transition-all duration-300 overflow-hidden
+          border-r border-border bg-card/50 backdrop-blur-sm
+          flex flex-col
+        `}
+      >
+        <div className="p-4 border-b border-border">
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-lg font-semibold">GESTOR PAV</h1>
             <ThemeToggle />
           </div>
+          <p className="text-xs text-muted-foreground">Pesquisa de Mercado</p>
         </div>
-      </div>
 
-      {/* KPIs Topo */}
-      <div className="max-w-[1320px] mx-auto mb-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="glass-card p-3">
-            <div className="flex items-center justify-between mb-1">
-              <span className="section-title">Mercados</span>
-              <Building2 className="h-4 w-4 text-primary" />
+        <ScrollArea className="flex-1">
+          <div className="p-4 space-y-6">
+            {/* KPIs */}
+            <div>
+              <h3 className="section-title mb-3">Estatísticas</h3>
+              <div className="space-y-2">
+                <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Building2 className="h-4 w-4 text-primary" />
+                    <span className="text-xs text-muted-foreground">Mercados</span>
+                  </div>
+                  <p className="text-2xl font-bold">{totalMercados}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-info/10 border border-info/20">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Users className="h-4 w-4 text-info" />
+                    <span className="text-xs text-muted-foreground">Clientes</span>
+                  </div>
+                  <p className="text-2xl font-bold">{totalClientes}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-warning/10 border border-warning/20">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Target className="h-4 w-4 text-warning" />
+                    <span className="text-xs text-muted-foreground">Concorrentes</span>
+                  </div>
+                  <p className="text-2xl font-bold">{totalConcorrentes}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-success/10 border border-success/20">
+                  <div className="flex items-center gap-2 mb-1">
+                    <TrendingUp className="h-4 w-4 text-success" />
+                    <span className="text-xs text-muted-foreground">Leads</span>
+                  </div>
+                  <p className="text-2xl font-bold">{totalLeads}</p>
+                </div>
+              </div>
             </div>
-            <p className="text-xl font-semibold">{totalMercados}</p>
-            <p className="text-xs text-muted-foreground">Únicos</p>
+
+            {/* Filtros */}
+            <div>
+              <h3 className="section-title mb-3">Filtros</h3>
+              <div className="space-y-2">
+                <Button
+                  variant={statusFilter === "all" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("all")}
+                  className="w-full justify-start text-sm"
+                >
+                  Todos
+                </Button>
+                <Button
+                  variant={statusFilter === "pending" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("pending")}
+                  className="w-full justify-start text-sm"
+                >
+                  <Clock className="h-4 w-4 mr-2" />
+                  Pendentes
+                </Button>
+                <Button
+                  variant={statusFilter === "rich" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("rich")}
+                  className="w-full justify-start text-sm"
+                >
+                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                  Validados
+                </Button>
+                <Button
+                  variant={statusFilter === "discarded" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("discarded")}
+                  className="w-full justify-start text-sm"
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Descartados
+                </Button>
+              </div>
+            </div>
+
+            {/* Navegação Hierárquica */}
+            {selectedMercadoId && mercadoSelecionado && (
+              <div>
+                <h3 className="section-title mb-3">Navegação</h3>
+                <div className="p-3 rounded-lg bg-muted/50 border border-border">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                    <Home className="h-3 w-3" />
+                    <ChevronRight className="h-3 w-3" />
+                    <span className="truncate">{mercadoSelecionado.nome}</span>
+                  </div>
+                  <div className="space-y-1 mt-3">
+                    <div className="text-xs">
+                      <span className="text-muted-foreground">Clientes:</span>
+                      <span className="ml-2 font-semibold">{clientes?.length || 0}</span>
+                    </div>
+                    <div className="text-xs">
+                      <span className="text-muted-foreground">Concorrentes:</span>
+                      <span className="ml-2 font-semibold">{concorrentes?.length || 0}</span>
+                    </div>
+                    <div className="text-xs">
+                      <span className="text-muted-foreground">Leads:</span>
+                      <span className="ml-2 font-semibold">{leads?.length || 0}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="glass-card p-3">
-            <div className="flex items-center justify-between mb-1">
-              <span className="section-title">Clientes</span>
-              <Users className="h-4 w-4 text-info" />
+        </ScrollArea>
+      </aside>
+
+      {/* Botão Toggle Sidebar (Mobile) */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-card border border-border shadow-lg md:hidden"
+      >
+        {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+      </button>
+
+      {/* Área Principal */}
+      <main className="flex-1 p-6 overflow-auto">
+        {/* Breadcrumbs + Botão Voltar */}
+        <div className="max-w-7xl mx-auto mb-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Home className="h-4 w-4" />
+              {currentLevel === "mercados" && <span>Mercados</span>}
+              {currentLevel === "itens" && mercadoSelecionado && (
+                <>
+                  <ChevronRight className="h-4 w-4" />
+                  <span className="text-foreground font-medium">{mercadoSelecionado.nome}</span>
+                </>
+              )}
             </div>
-            <p className="text-xl font-semibold">{totalClientes}</p>
-            <p className="text-xs text-muted-foreground">Associados</p>
-          </div>
-          <div className="glass-card p-3">
-            <div className="flex items-center justify-between mb-1">
-              <span className="section-title">Concorrentes</span>
-              <Target className="h-4 w-4 text-warning" />
-            </div>
-            <p className="text-xl font-semibold">{totalConcorrentes}</p>
-            <p className="text-xs text-muted-foreground">Mapeados</p>
-          </div>
-          <div className="glass-card p-3">
-            <div className="flex items-center justify-between mb-1">
-              <span className="section-title">Leads</span>
-              <TrendingUp className="h-4 w-4 text-success" />
-            </div>
-            <p className="text-xl font-semibold">{totalLeads}</p>
-            <p className="text-xs text-muted-foreground">Qualificados</p>
+            {currentLevel === "itens" && (
+              <Button variant="outline" size="sm" onClick={handleVoltar}>
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Voltar
+              </Button>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Layout Horizontal: 2 Colunas */}
-      <div className="max-w-[1320px] mx-auto">
-        <div className="glass-card-subtle p-4">
-          {/* Filtros */}
-          <div className="flex items-center gap-2 mb-4 flex-wrap">
-            <span className="text-xs text-muted-foreground">Filtrar:</span>
-            <Button
-              variant={statusFilter === "all" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setStatusFilter("all")}
-              className="text-xs"
-            >
-              Todos
-            </Button>
-            <Button
-              variant={statusFilter === "pending" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setStatusFilter("pending")}
-              className="text-xs"
-            >
-              <Clock className="h-3 w-3 mr-1" />
-              Pendentes
-            </Button>
-            <Button
-              variant={statusFilter === "rich" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setStatusFilter("rich")}
-              className="text-xs"
-            >
-              <CheckCircle2 className="h-3 w-3 mr-1" />
-              Validados
-            </Button>
-            <Button
-              variant={statusFilter === "discarded" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setStatusFilter("discarded")}
-              className="text-xs"
-            >
-              <XCircle className="h-3 w-3 mr-1" />
-              Descartados
-            </Button>
-          </div>
-
-          {/* Grid: Coluna Esquerda (30%) + Coluna Direita (70%) */}
-          <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1.8fr)] gap-3">
-            {/* Coluna Esquerda: Lista de Mercados */}
-            <div className="section-card p-3">
-              <h3 className="section-title mb-3">Mercados</h3>
-              <ScrollArea className="h-[calc(100vh-400px)]">
-                <div className="space-y-2">
-                  {isLoading && <p className="text-sm text-muted-foreground">Carregando...</p>}
-                  {mercados?.map((mercado) => (
-                    <div
-                      key={mercado.id}
-                      onClick={() => handleSelectMercado(mercado.id)}
-                      className={`
-                        flex items-center justify-between p-2 rounded-full border cursor-pointer
-                        transition-all duration-150 text-sm
-                        ${
-                          selectedMercadoId === mercado.id
-                            ? "bg-primary/20 border-primary text-foreground"
-                            : "border-border/50 hover:bg-accent/10 hover:border-accent"
-                        }
-                      `}
-                    >
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className="status-dot info flex-shrink-0"></span>
-                        <span className="truncate">{mercado.nome}</span>
+        {/* Conteúdo Principal */}
+        <div className="max-w-7xl mx-auto">
+          {/* Nível 1: Lista de Mercados */}
+          {currentLevel === "mercados" && (
+            <div>
+              <h2 className="text-2xl font-semibold mb-6">Selecione um Mercado</h2>
+              {isLoading && <p className="text-muted-foreground">Carregando...</p>}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {mercados?.map((mercado) => (
+                  <div
+                    key={mercado.id}
+                    onClick={() => handleSelectMercado(mercado.id)}
+                    className="glass-card p-5 cursor-pointer group"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-base mb-1 group-hover:text-primary transition-colors">
+                          {mercado.nome}
+                        </h3>
+                        {mercado.segmentacao && (
+                          <Badge variant="outline" className="text-xs">
+                            {mercado.segmentacao}
+                          </Badge>
+                        )}
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="text-xs text-muted-foreground">
-                          {mercado.quantidadeClientes || 0}
-                        </span>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>{mercado.quantidadeClientes || 0} clientes</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Nível 2: Clientes, Concorrentes e Leads */}
+          {currentLevel === "itens" && selectedMercadoId && mercadoSelecionado && (
+            <div className="space-y-8">
+              {/* Clientes */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold flex items-center gap-2">
+                    <Users className="h-5 w-5 text-info" />
+                    Clientes
+                  </h2>
+                  <Badge variant="outline">{filterByStatus(clientes || []).length} registros</Badge>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filterByStatus(clientes || []).map((cliente) => (
+                    <div
+                      key={cliente.id}
+                      onClick={() => handleOpenDetail(cliente, "cliente")}
+                      className="glass-card p-4 cursor-pointer group"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-sm flex-1 group-hover:text-primary transition-colors">
+                          {cliente.empresa}
+                        </h3>
+                        {getStatusIcon(cliente.validationStatus || "pending")}
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                        {cliente.produtoPrincipal || "N/A"}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs">
+                        {cliente.cidade && (
+                          <span className="text-muted-foreground">{cliente.cidade}</span>
+                        )}
+                        {cliente.segmentacaoB2bB2c && (
+                          <Badge variant="outline" className="text-[10px]">
+                            {cliente.segmentacaoB2bB2c}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   ))}
+                  {filterByStatus(clientes || []).length === 0 && (
+                    <p className="text-sm text-muted-foreground col-span-full text-center py-8">
+                      Nenhum cliente encontrado
+                    </p>
+                  )}
                 </div>
-              </ScrollArea>
+              </div>
+
+              {/* Concorrentes */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold flex items-center gap-2">
+                    <Target className="h-5 w-5 text-warning" />
+                    Concorrentes
+                  </h2>
+                  <Badge variant="outline">{filterByStatus(concorrentes || []).length} registros</Badge>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filterByStatus(concorrentes || []).map((concorrente) => (
+                    <div
+                      key={concorrente.id}
+                      onClick={() => handleOpenDetail(concorrente, "concorrente")}
+                      className="glass-card p-4 cursor-pointer group"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-sm flex-1 group-hover:text-primary transition-colors">
+                          {concorrente.nome}
+                        </h3>
+                        {getStatusIcon(concorrente.validationStatus || "pending")}
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                        {concorrente.produto || "N/A"}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs">
+                        {concorrente.porte && (
+                          <Badge variant="outline" className="text-[10px]">
+                            {concorrente.porte}
+                          </Badge>
+                        )}
+                        {concorrente.qualidadeScore && (
+                          <span className="text-muted-foreground">
+                            Score: {concorrente.qualidadeScore}%
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {filterByStatus(concorrentes || []).length === 0 && (
+                    <p className="text-sm text-muted-foreground col-span-full text-center py-8">
+                      Nenhum concorrente encontrado
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Leads */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-success" />
+                    Leads
+                  </h2>
+                  <Badge variant="outline">{filterByStatus(leads || []).length} registros</Badge>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filterByStatus(leads || []).map((lead) => (
+                    <div
+                      key={lead.id}
+                      onClick={() => handleOpenDetail(lead, "lead")}
+                      className="glass-card p-4 cursor-pointer group"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-sm flex-1 group-hover:text-primary transition-colors">
+                          {lead.nome}
+                        </h3>
+                        {getStatusIcon(lead.validationStatus || "pending")}
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {lead.regiao || "N/A"}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs">
+                        {lead.tipo && (
+                          <Badge variant="outline" className="text-[10px]">
+                            {lead.tipo}
+                          </Badge>
+                        )}
+                        {lead.porte && (
+                          <span className="text-muted-foreground">{lead.porte}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {filterByStatus(leads || []).length === 0 && (
+                    <p className="text-sm text-muted-foreground col-span-full text-center py-8">
+                      Nenhum lead encontrado
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
-
-            {/* Coluna Direita: Detalhes do Mercado Selecionado */}
-            <div className="section-card p-3">
-              {!selectedMercadoId && (
-                <div className="flex items-center justify-center h-[calc(100vh-400px)] text-muted-foreground">
-                  <div className="text-center">
-                    <Building2 className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p className="text-sm">Selecione um mercado para ver os detalhes</p>
-                  </div>
-                </div>
-              )}
-
-              {selectedMercadoId && mercadoSelecionado && (
-                <div className="space-y-4">
-                  {/* Header do Mercado */}
-                  <div>
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <div className="flex-1">
-                        <h2 className="page-title mb-1">Mercado</h2>
-                        <h3 className="text-lg font-semibold">{mercadoSelecionado.nome}</h3>
-                      </div>
-                      <span className="pill-badge">
-                        <span className="status-dot info"></span>
-                        {mercadoSelecionado.segmentacao || "N/A"}
-                      </span>
-                    </div>
-
-                    {/* Mini KPIs do Mercado */}
-                    <div className="grid grid-cols-3 gap-2 mt-3">
-                      <div className="section-card p-2">
-                        <p className="text-xs text-muted-foreground">Clientes</p>
-                        <p className="text-sm font-semibold">{clientes?.length || 0}</p>
-                        {/* Gráfico de Proporção */}
-                        <div className="mt-1 h-1 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-info transition-all"
-                            style={{
-                              width: `${totalClientes > 0 ? ((clientes?.length || 0) / totalClientes) * 100 : 0}%`,
-                            }}
-                          />
-                        </div>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">
-                          {totalClientes > 0
-                            ? `${(((clientes?.length || 0) / totalClientes) * 100).toFixed(1)}% do total`
-                            : "0%"}
-                        </p>
-                      </div>
-                      <div className="section-card p-2">
-                        <p className="text-xs text-muted-foreground">Concorrentes</p>
-                        <p className="text-sm font-semibold">{concorrentes?.length || 0}</p>
-                        {/* Gráfico de Proporção */}
-                        <div className="mt-1 h-1 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-warning transition-all"
-                            style={{
-                              width: `${totalConcorrentes > 0 ? ((concorrentes?.length || 0) / totalConcorrentes) * 100 : 0}%`,
-                            }}
-                          />
-                        </div>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">
-                          {totalConcorrentes > 0
-                            ? `${(((concorrentes?.length || 0) / totalConcorrentes) * 100).toFixed(1)}% do total`
-                            : "0%"}
-                        </p>
-                      </div>
-                      <div className="section-card p-2">
-                        <p className="text-xs text-muted-foreground">Leads</p>
-                        <p className="text-sm font-semibold">{leads?.length || 0}</p>
-                        {/* Gráfico de Proporção */}
-                        <div className="mt-1 h-1 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-success transition-all"
-                            style={{
-                              width: `${totalLeads > 0 ? ((leads?.length || 0) / totalLeads) * 100 : 0}%`,
-                            }}
-                          />
-                        </div>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">
-                          {totalLeads > 0
-                            ? `${(((leads?.length || 0) / totalLeads) * 100).toFixed(1)}% do total`
-                            : "0%"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 3 Sub-colunas: Clientes | Concorrentes | Leads */}
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                    {/* Clientes */}
-                    <div className="section-card p-2">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="section-title">Clientes</h4>
-                        <Badge variant="outline" className="text-[10px]">
-                          {clientes?.length || 0}
-                        </Badge>
-                      </div>
-                      <ScrollArea className="h-[300px]">
-                        <div className="space-y-1.5">
-                          {filterByStatus(clientes || []).map((cliente) => (
-                            <div
-                              key={cliente.id}
-                              onClick={() => handleOpenDetail(cliente, "cliente")}
-                              className="p-2 rounded-lg border border-border/50 hover:bg-accent/10 cursor-pointer transition-all text-xs"
-                            >
-                              <div className="flex items-start justify-between gap-2 mb-1">
-                                <span className="font-medium truncate flex-1">{cliente.empresa}</span>
-                                {getStatusIcon(cliente.validationStatus || "pending")}
-                              </div>
-                              <p className="text-[10px] text-muted-foreground truncate">
-                                {cliente.produtoPrincipal || "N/A"}
-                              </p>
-                            </div>
-                          ))}
-                          {filterByStatus(clientes || []).length === 0 && (
-                            <p className="text-xs text-muted-foreground text-center py-4">
-                              Nenhum cliente encontrado
-                            </p>
-                          )}
-                        </div>
-                      </ScrollArea>
-                    </div>
-
-                    {/* Concorrentes */}
-                    <div className="section-card p-2">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="section-title">Concorrentes</h4>
-                        <Badge variant="outline" className="text-[10px]">
-                          {concorrentes?.length || 0}
-                        </Badge>
-                      </div>
-                      <ScrollArea className="h-[300px]">
-                        <div className="space-y-1.5">
-                          {filterByStatus(concorrentes || []).map((concorrente) => (
-                            <div
-                              key={concorrente.id}
-                              onClick={() => handleOpenDetail(concorrente, "concorrente")}
-                              className="p-2 rounded-lg border border-border/50 hover:bg-accent/10 cursor-pointer transition-all text-xs"
-                            >
-                              <div className="flex items-start justify-between gap-2 mb-1">
-                                <span className="font-medium truncate flex-1">{concorrente.nome}</span>
-                                {getStatusIcon(concorrente.validationStatus || "pending")}
-                              </div>
-                              <p className="text-[10px] text-muted-foreground truncate">
-                                {concorrente.porte || "N/A"}
-                              </p>
-                            </div>
-                          ))}
-                          {filterByStatus(concorrentes || []).length === 0 && (
-                            <p className="text-xs text-muted-foreground text-center py-4">
-                              Nenhum concorrente encontrado
-                            </p>
-                          )}
-                        </div>
-                      </ScrollArea>
-                    </div>
-
-                    {/* Leads */}
-                    <div className="section-card p-2">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="section-title">Leads</h4>
-                        <Badge variant="outline" className="text-[10px]">
-                          {leads?.length || 0}
-                        </Badge>
-                      </div>
-                      <ScrollArea className="h-[300px]">
-                        <div className="space-y-1.5">
-                          {filterByStatus(leads || []).map((lead) => (
-                            <div
-                              key={lead.id}
-                              onClick={() => handleOpenDetail(lead, "lead")}
-                              className="p-2 rounded-lg border border-border/50 hover:bg-accent/10 cursor-pointer transition-all text-xs"
-                            >
-                              <div className="flex items-start justify-between gap-2 mb-1">
-                                <span className="font-medium truncate flex-1">{lead.nome}</span>
-                                {getStatusIcon(lead.validationStatus || "pending")}
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <Badge variant="outline" className="text-[9px]">
-                                  {lead.tipo}
-                                </Badge>
-                                <span className="text-[10px] text-muted-foreground truncate">
-                                  {lead.regiao || "N/A"}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                          {filterByStatus(leads || []).length === 0 && (
-                            <p className="text-xs text-muted-foreground text-center py-4">
-                              Nenhum lead encontrado
-                            </p>
-                          )}
-                        </div>
-                      </ScrollArea>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          )}
         </div>
-      </div>
+      </main>
 
       {/* Detail Popup */}
       <DetailPopup
