@@ -743,6 +743,12 @@ export default function CascadeView() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Link href="/enrichment">
+            <Button variant="default" size="sm" className="gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Novo Projeto
+            </Button>
+          </Link>
           <TagManager />
           <ThemeToggle />
         </div>
@@ -751,10 +757,15 @@ export default function CascadeView() {
       {/* Barra de Filtros Horizontal */}
       <div className="border-b border-border/40 px-6 py-3 bg-slate-900/50">
         <div className="flex items-center gap-4 flex-wrap">
-          {/* Busca Global */}
-          <div className="flex items-center gap-2">
-            <SearchHistory
-              onSelectSearch={(query) => {
+          {/* Busca Global *        <div className="flex items-center gap-2">
+          <Link href="/enrichment">
+            <Button variant="default" size="sm" className="gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Novo Projeto (Enriquecimento)
+            </Button>
+          </Link>
+          <ThemeToggle />
+        </div>      onSelectSearch={(query) => {
                 setSearchQuery(query);
                 toast.success(`Busca aplicada: "${query}"`);
               }}

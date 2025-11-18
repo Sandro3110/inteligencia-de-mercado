@@ -323,10 +323,123 @@ async function findCompetitorsForMarkets(
   mercadosMap: Map<string, number>,
   projectId: number
 ) {
+  const { invokeLLM } = await import('./_core/llm');
+  const { callDataApi } = await import('./_core/dataApi');
+  const { createConcorrente } = await import('./db');
   const concorrentes: any[] = [];
 
-  // Implementação simplificada - retorna array vazio
-  // Na versão completa, usaria LLM + Data API para buscar concorrentes reais
+  for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
+    try {
+      // Usar LLM para gerar lista de concorrentes
+      const response = await invokeLLM({
+        messages: [
+          {
+            role: 'system',
+            content: 'Você é um especialista em análise de mercado. Liste empresas concorrentes no mercado especificado.',
+          },
+          {
+            role: 'user',
+            content: `Mercado: ${mercadoNome}\n\nListe 5 principais empresas concorrentes neste mercado no Brasil. Retorne JSON com: { "concorrentes": [{ "nome": "Nome da empresa", "produto": "Produto principal" }] }`,
+          },
+        ],
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: 'competitors_list',
+            strict: true,
+            schema: {
+              type: 'object',
+              properties: {
+                concorrentes: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      nome: { type: 'string' },
+                      produto: { type: 'string' },
+                    },
+                    required: ['nome', 'produto'],
+                    additionalProperties: false,
+                  },
+                },
+              },
+              required: ['concorrentes'],
+              additionalProperties: false,
+            },
+          },
+        },
+      });
+
+      const content = response.choices[0]?.message?.content;
+      if (!content || typeof content !== 'string') continue;
+
+      const data = JSON.parse(content);
+
+      // Processar cada concorrente
+      for (const comp of data.concorrentes.slice(0, 3)) { // Limitar a 3 por mercado
+        try {
+          // Tentar enriquecer via Data API (busca por nome)
+          let enrichedData: any = {};
+          try {
+            const apiResult = await callDataApi(comp.nome);
+            if (apiResult) {
+              enrichedData = apiResult;
+            }
+          } catch (e) {
+            // Ignorar erro de API e usar apenas dados do LLM
+          }
+
+          // Calcular score de qualidade
+          const qualidadeScore = calculateQualityScore({
+            cnpj: enrichedData.cnpj,
+            email: null,
+            telefone: null,
+            site: enrichedData.site,
+            siteOficial: null,
+            linkedin: null,
+            instagram: null,
+            produto: comp.produto,
+            produtoPrincipal: comp.produto,
+            cidade: null,
+            uf: null,
+            cnae: null,
+            porte: null,
+            faturamentoEstimado: null,
+          });
+
+          const qualidadeClassificacao =
+            qualidadeScore >= 80
+              ? 'Excelente'
+              : qualidadeScore >= 60
+                ? 'Bom'
+                : qualidadeScore >= 40
+                  ? 'Regular'
+                  : 'Ruim';
+
+          // Criar concorrente
+          const novoConcorrente = await createConcorrente({
+            projectId,
+            mercadoId,
+            nome: comp.nome,
+            cnpj: enrichedData.cnpj || null,
+            site: enrichedData.site || null,
+            produto: comp.produto,
+            qualidadeScore,
+            qualidadeClassificacao,
+            validationStatus: 'pending',
+          });
+
+          if (novoConcorrente) {
+            concorrentes.push(novoConcorrente);
+          }
+        } catch (error) {
+          console.error(`Erro ao criar concorrente ${comp.nome}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error(`Erro ao buscar concorrentes para ${mercadoNome}:`, error);
+    }
+  }
 
   return concorrentes;
 }
@@ -338,10 +451,129 @@ async function findLeadsForMarkets(
   mercadosMap: Map<string, number>,
   projectId: number
 ) {
+  const { invokeLLM } = await import('./_core/llm');
+  const { callDataApi } = await import('./_core/dataApi');
+  const { createLead } = await import('./db');
   const leads: any[] = [];
 
-  // Implementação simplificada - retorna array vazio
-  // Na versão completa, usaria LLM + Data API para buscar leads reais
+  for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
+    try {
+      // Usar LLM para gerar lista de leads potenciais
+      const response = await invokeLLM({
+        messages: [
+          {
+            role: 'system',
+            content: 'Você é um especialista em geração de leads B2B. Identifique empresas que podem ser leads qualificados.',
+          },
+          {
+            role: 'user',
+            content: `Mercado: ${mercadoNome}\n\nListe 5 empresas que seriam leads qualificados para este mercado no Brasil. Retorne JSON com: { "leads": [{ "nome": "Nome da empresa", "tipo": "B2B ou B2C", "regiao": "Região" }] }`,
+          },
+        ],
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: 'leads_list',
+            strict: true,
+            schema: {
+              type: 'object',
+              properties: {
+                leads: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      nome: { type: 'string' },
+                      tipo: { type: 'string' },
+                      regiao: { type: 'string' },
+                    },
+                    required: ['nome', 'tipo', 'regiao'],
+                    additionalProperties: false,
+                  },
+                },
+              },
+              required: ['leads'],
+              additionalProperties: false,
+            },
+          },
+        },
+      });
+
+      const content = response.choices[0]?.message?.content;
+      if (!content || typeof content !== 'string') continue;
+
+      const data = JSON.parse(content);
+
+      // Processar cada lead
+      for (const lead of data.leads.slice(0, 3)) { // Limitar a 3 por mercado
+        try {
+          // Tentar enriquecer via Data API
+          let enrichedData: any = {};
+          try {
+            const apiResult = await callDataApi(lead.nome);
+            if (apiResult) {
+              enrichedData = apiResult;
+            }
+          } catch (e) {
+            // Ignorar erro de API
+          }
+
+          // Calcular score de qualidade
+          const qualidadeScore = calculateQualityScore({
+            cnpj: enrichedData.cnpj,
+            email: enrichedData.email,
+            telefone: enrichedData.telefone,
+            site: enrichedData.site,
+            siteOficial: null,
+            linkedin: null,
+            instagram: null,
+            produto: null,
+            produtoPrincipal: null,
+            cidade: enrichedData.cidade,
+            uf: enrichedData.uf,
+            cnae: null,
+            porte: enrichedData.porte,
+            faturamentoEstimado: null,
+          });
+
+          const qualidadeClassificacao =
+            qualidadeScore >= 80
+              ? 'Excelente'
+              : qualidadeScore >= 60
+                ? 'Bom'
+                : qualidadeScore >= 40
+                  ? 'Regular'
+                  : 'Ruim';
+
+          // Criar lead
+          const novoLead = await createLead({
+            projectId,
+            mercadoId,
+            nome: lead.nome,
+            cnpj: enrichedData.cnpj || null,
+            email: enrichedData.email || null,
+            telefone: enrichedData.telefone || null,
+            site: enrichedData.site || null,
+            tipo: lead.tipo, // Aceita qualquer string
+            regiao: lead.regiao,
+            setor: null,
+            stage: 'novo',
+            qualidadeScore,
+            qualidadeClassificacao,
+            validationStatus: 'pending',
+          });
+
+          if (novoLead) {
+            leads.push(novoLead);
+          }
+        } catch (error) {
+          console.error(`Erro ao criar lead ${lead.nome}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error(`Erro ao buscar leads para ${mercadoNome}:`, error);
+    }
+  }
 
   return leads;
 }

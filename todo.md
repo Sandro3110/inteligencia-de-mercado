@@ -1241,3 +1241,34 @@
 - [ ] Adicionar progresso em tempo real (WebSockets/SSE)
 - [ ] Adicionar upload de planilha Excel/CSV
 - [ ] Criar checkpoint final
+
+
+---
+
+## Fase 44: Melhorias do Fluxo de Enriquecimento 🚀
+
+### 44.1 Busca Real de Concorrentes e Leads
+- [x] Implementar findCompetitorsForMarkets com LLM
+- [x] Integrar Data API para enriquecer concorrentes
+- [x] Implementar findLeadsForMarkets com LLM
+- [x] Integrar Data API para enriquecer leads
+- [x] Adicionar validação e cálculo de ### 44.2 Upload de Planilha Excel/CSV
+- [x] Adicionar biblioteca de leitura de Excel (xlsx)
+- [x] Criar componente de upload de arquivo
+- [x] Implementar mapeamento automático de colunas
+- [x] Adicionar prévia dos dados importados
+- [x] Validar formato do arquivoessamento
+
+### 44.3 Progresso em Tempo Real
+- [ ] Implementar Server-Sent Events (SSE)
+- [ ] Criar endpoint /api/enrichment/stream
+- [ ] Atualizar frontend para consumir SSE
+- [ ] Adicionar barra de progresso detalhada
+- [ ] Mostrar cada etapa sendo executada
+
+### 44.4 Botão na Página Principal
+- [ ] Adicionar botão "Novo Projeto" no CascadeView
+- [ ] Estilizar botão consistentemente
+- [ ] Implementar navegação para /enrichment
+- [ ] Testar fluxo completo
+- [ ] Criar checkpoint final
