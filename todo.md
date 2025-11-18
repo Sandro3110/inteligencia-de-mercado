@@ -1085,6 +1085,35 @@
 - [x] Integrar KanbanBoard na página de Leads (renderização condicional)
 - [x] Adicionar estado viewMode e botão de alternância
 - [x] Passar filteredLeads para KanbanBoard (filtros funcionando)
-- [ ] Testar drag & drop entre colunas
-- [ ] Testar persistência de stage no banco
-- [ ] Criar checkpoint
+- [x] Testar drag & drop entre colunas
+- [x] Testar persistência de stage no banco
+- [x] Criar checkpoint
+
+
+## Fase 42: Melhorias de UX 🎨
+
+### 42.1 Link para Dashboard ✅ CONCLUÍDO
+- [x] Adicionar botão "Dashboard" no header principal
+- [x] Adicionar ícone BarChart3
+- [x] Usar Link do wouter para navegação
+
+### 42.2 Botão Limpar Todos os Filtros ✅ CONCLUÍDO
+- [x] Adicionar botão "Limpar Filtros" na barra de filtros (ao lado de Salvar Filtros)
+- [x] Implementar função inline com onClick
+- [x] Resetar: searchQuery, searchFields (padrão), selectedTagIds, filtros avançados, statusFilter ("all")
+- [x] Adicionar toast de confirmação ("Todos os filtros foram limpos")
+- [x] Adicionar ícone FilterX
+
+### 42.3 Histórico de Buscas ✅ CONCLUÍDO
+- [x] Adicionar localStorage para salvar últimas 10 buscas (STORAGE_KEY)
+- [x] Criar componente SearchHistory dropdown com DropdownMenu
+- [x] Adicionar botão de histórico ao lado do campo de busca (ícone History)
+- [x] Implementar clique para aplicar busca salva (onSelectSearch)
+- [x] Adicionar botão "Limpar Histórico" (com ícone Trash2)
+- [x] Implementar função addToSearchHistory (salva ao pressionar Enter)
+- [x] Adicionar toast de confirmação ao aplicar busca
+- [x] Remover duplicatas automaticamente
+
+### 42.4 Checkpoint
+- [x] Testar todas as melhorias
+- [x] Criar checkpoint

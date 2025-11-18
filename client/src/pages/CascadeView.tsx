@@ -56,7 +56,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import KanbanBoard from "@/components/KanbanBoard";
-import { LayoutList, LayoutGrid } from "lucide-react";
+import { LayoutList, LayoutGrid, BarChart3, FilterX } from "lucide-react";
+import { Link } from "wouter";
+import SearchHistory, { addToSearchHistory } from "@/components/SearchHistory";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
 type Page = "mercados" | "clientes" | "concorrentes" | "leads";
@@ -704,6 +706,12 @@ export default function CascadeView() {
           </div>
         </div>
         <div className="flex items-center gap-4">
+          <Link href="/dashboard-avancado">
+            <Button variant="outline" size="sm">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
+          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -736,6 +744,12 @@ export default function CascadeView() {
         <div className="flex items-center gap-4 flex-wrap">
           {/* Busca Global */}
           <div className="flex items-center gap-2">
+            <SearchHistory
+              onSelectSearch={(query) => {
+                setSearchQuery(query);
+                toast.success(`Busca aplicada: "${query}"`);
+              }}
+            />
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -743,6 +757,11 @@ export default function CascadeView() {
                 placeholder="Buscar..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchQuery.trim()) {
+                    addToSearchHistory(searchQuery);
+                  }
+                }}
                 className="pl-10 w-[250px] h-9"
               />
             </div>
@@ -899,6 +918,26 @@ export default function CascadeView() {
             >
               <Save className="w-4 h-4 mr-2" />
               Salvar Filtros
+            </Button>
+            
+            {/* Botão Limpar Filtros */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSearchQuery("");
+                setSearchFields(["nome", "cnpj", "produto"]);
+                setSelectedTagIds([]);
+                setStatusFilter("all");
+                setMercadoFilters({ segmentacao: [], categoria: [] });
+                setClienteFilters({ segmentacao: [], cidade: [], uf: [] });
+                setConcorrenteFilters({ porte: [] });
+                setLeadFilters({ tipo: [], porte: [] });
+                toast.success("Todos os filtros foram limpos");
+              }}
+            >
+              <FilterX className="w-4 h-4 mr-2" />
+              Limpar Filtros
             </Button>
           </div>
           
