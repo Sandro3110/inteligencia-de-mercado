@@ -7,20 +7,8 @@ import superjson from "superjson";
 import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
-import { CompactModeProvider } from "./contexts/CompactModeContext";
-import { ZoomProvider } from "./contexts/ZoomContext";
 
-// Quick Win 2: Configurar cache para melhorar performance de navegação
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutos - dados considerados "frescos"
-      gcTime: 10 * 60 * 1000, // 10 minutos - tempo de retenção em cache (antes chamado cacheTime)
-      refetchOnWindowFocus: false, // Não refetch ao voltar para a aba
-      retry: 1, // Tentar apenas 1 vez em caso de erro
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
@@ -67,11 +55,7 @@ const trpcClient = trpc.createClient({
 createRoot(document.getElementById("root")!).render(
   <trpc.Provider client={trpcClient} queryClient={queryClient}>
     <QueryClientProvider client={queryClient}>
-      <ZoomProvider>
-        <CompactModeProvider>
-          <App />
-        </CompactModeProvider>
-      </ZoomProvider>
+      <App />
     </QueryClientProvider>
   </trpc.Provider>
 );

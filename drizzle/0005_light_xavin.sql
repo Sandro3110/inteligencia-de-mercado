@@ -1,2 +1,0 @@
-ALTER TABLE `leads` ADD `leadStage` enum('novo','em_contato','negociacao','fechado','perdido') DEFAULT 'novo';--> statement-breakpoint
-ALTER TABLE `leads` ADD `stageUpdatedAt` timestamp DEFAULT (now());
