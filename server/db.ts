@@ -240,6 +240,58 @@ export async function getClientesByMercado(mercadoId: number, validationStatus?:
     .where(and(...conditions));
 }
 
+export async function getClientesByMercadoPaginated(
+  mercadoId: number,
+  validationStatus?: string,
+  page: number = 1,
+  pageSize: number = 20
+) {
+  const db = await getDb();
+  if (!db) return { data: [], total: 0, page, pageSize, totalPages: 0 };
+
+  const conditions = [eq(clientesMercados.mercadoId, mercadoId)];
+  
+  if (validationStatus) {
+    conditions.push(eq(clientes.validationStatus, validationStatus as any));
+  }
+
+  // Get total count
+  const countResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(clientes)
+    .innerJoin(clientesMercados, eq(clientes.id, clientesMercados.clienteId))
+    .where(and(...conditions));
+  
+  const total = Number(countResult[0]?.count || 0);
+  const totalPages = Math.ceil(total / pageSize);
+  const offset = (page - 1) * pageSize;
+
+  // Get paginated data
+  const data = await db
+    .select({
+      id: clientes.id,
+      nome: clientes.nome,
+      cnpj: clientes.cnpj,
+      siteOficial: clientes.siteOficial,
+      produtoPrincipal: clientes.produtoPrincipal,
+      segmentacaoB2bB2c: clientes.segmentacaoB2bB2c,
+      email: clientes.email,
+      telefone: clientes.telefone,
+      cidade: clientes.cidade,
+      uf: clientes.uf,
+      validationStatus: clientes.validationStatus,
+      validationNotes: clientes.validationNotes,
+      validatedAt: clientes.validatedAt,
+    })
+    .from(clientes)
+    .innerJoin(clientesMercados, eq(clientes.id, clientesMercados.clienteId))
+    .where(and(...conditions))
+    .limit(pageSize)
+    .offset(offset);
+
+  return { data, total, page, pageSize, totalPages };
+}
+
 export async function updateClienteValidation(
   id: number, 
   status: string, 
@@ -293,6 +345,42 @@ export async function getConcorrentesByMercado(mercadoId: number, validationStat
     .where(and(...conditions));
 }
 
+export async function getConcorrentesByMercadoPaginated(
+  mercadoId: number,
+  validationStatus?: string,
+  page: number = 1,
+  pageSize: number = 20
+) {
+  const db = await getDb();
+  if (!db) return { data: [], total: 0, page, pageSize, totalPages: 0 };
+
+  const conditions = [eq(concorrentes.mercadoId, mercadoId)];
+  
+  if (validationStatus) {
+    conditions.push(eq(concorrentes.validationStatus, validationStatus as any));
+  }
+
+  // Get total count
+  const countResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(concorrentes)
+    .where(and(...conditions));
+  
+  const total = Number(countResult[0]?.count || 0);
+  const totalPages = Math.ceil(total / pageSize);
+  const offset = (page - 1) * pageSize;
+
+  // Get paginated data
+  const data = await db
+    .select()
+    .from(concorrentes)
+    .where(and(...conditions))
+    .limit(pageSize)
+    .offset(offset);
+
+  return { data, total, page, pageSize, totalPages };
+}
+
 export async function updateConcorrenteValidation(
   id: number, 
   status: string, 
@@ -344,6 +432,42 @@ export async function getLeadsByMercado(mercadoId: number, validationStatus?: st
     .select()
     .from(leads)
     .where(and(...conditions));
+}
+
+export async function getLeadsByMercadoPaginated(
+  mercadoId: number,
+  validationStatus?: string,
+  page: number = 1,
+  pageSize: number = 20
+) {
+  const db = await getDb();
+  if (!db) return { data: [], total: 0, page, pageSize, totalPages: 0 };
+
+  const conditions = [eq(leads.mercadoId, mercadoId)];
+  
+  if (validationStatus) {
+    conditions.push(eq(leads.validationStatus, validationStatus as any));
+  }
+
+  // Get total count
+  const countResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(leads)
+    .where(and(...conditions));
+  
+  const total = Number(countResult[0]?.count || 0);
+  const totalPages = Math.ceil(total / pageSize);
+  const offset = (page - 1) * pageSize;
+
+  // Get paginated data
+  const data = await db
+    .select()
+    .from(leads)
+    .where(and(...conditions))
+    .limit(pageSize)
+    .offset(offset);
+
+  return { data, total, page, pageSize, totalPages };
 }
 
 export async function updateLeadValidation(

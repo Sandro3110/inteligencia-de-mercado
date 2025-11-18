@@ -60,10 +60,17 @@ export const appRouter = router({
       .input(z.object({
         mercadoId: z.number(),
         validationStatus: z.string().optional(),
+        page: z.number().optional().default(1),
+        pageSize: z.number().optional().default(20),
       }))
       .query(async ({ input }) => {
-        const { getClientesByMercado } = await import('./db');
-        return getClientesByMercado(input.mercadoId, input.validationStatus);
+        const { getClientesByMercadoPaginated } = await import('./db');
+        return getClientesByMercadoPaginated(
+          input.mercadoId,
+          input.validationStatus,
+          input.page,
+          input.pageSize
+        );
       }),
     
     updateValidation: publicProcedure
@@ -92,10 +99,17 @@ export const appRouter = router({
       .input(z.object({
         mercadoId: z.number(),
         validationStatus: z.string().optional(),
+        page: z.number().optional().default(1),
+        pageSize: z.number().optional().default(20),
       }))
       .query(async ({ input }) => {
-        const { getConcorrentesByMercado } = await import('./db');
-        return getConcorrentesByMercado(input.mercadoId, input.validationStatus);
+        const { getConcorrentesByMercadoPaginated } = await import('./db');
+        return getConcorrentesByMercadoPaginated(
+          input.mercadoId,
+          input.validationStatus,
+          input.page,
+          input.pageSize
+        );
       }),
     
     updateValidation: publicProcedure
@@ -124,10 +138,17 @@ export const appRouter = router({
       .input(z.object({
         mercadoId: z.number(),
         validationStatus: z.string().optional(),
+        page: z.number().optional().default(1),
+        pageSize: z.number().optional().default(20),
       }))
       .query(async ({ input }) => {
-        const { getLeadsByMercado } = await import('./db');
-        return getLeadsByMercado(input.mercadoId, input.validationStatus);
+        const { getLeadsByMercadoPaginated } = await import('./db');
+        return getLeadsByMercadoPaginated(
+          input.mercadoId,
+          input.validationStatus,
+          input.page,
+          input.pageSize
+        );
       }),
     
     updateValidation: publicProcedure

@@ -206,7 +206,7 @@ export default function MercadoDetalhes() {
                   <Users className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{clientes?.length || 0}</p>
+                  <p className="text-2xl font-bold">{Array.isArray(clientes) ? clientes.length : 0}</p>
                   <p className="text-sm text-muted-foreground">Clientes</p>
                 </div>
               </CardContent>
@@ -218,7 +218,7 @@ export default function MercadoDetalhes() {
                   <Target className="h-5 w-5 text-orange-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{concorrentes?.length || 0}</p>
+                  <p className="text-2xl font-bold">{Array.isArray(concorrentes) ? concorrentes.length : 0}</p>
                   <p className="text-sm text-muted-foreground">Concorrentes</p>
                 </div>
               </CardContent>
@@ -230,7 +230,7 @@ export default function MercadoDetalhes() {
                   <TrendingUp className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{leads?.length || 0}</p>
+                  <p className="text-2xl font-bold">{Array.isArray(leads) ? leads.length : 0}</p>
                   <p className="text-sm text-muted-foreground">Leads</p>
                 </div>
               </CardContent>
@@ -261,7 +261,7 @@ export default function MercadoDetalhes() {
           <TabsContent value="clientes" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Clientes ({clientes?.length || 0})</CardTitle>
+                <CardTitle>Clientes ({Array.isArray(clientes) ? clientes.length : 0})</CardTitle>
               </CardHeader>
               <CardContent>
                 {loadingClientes ? (
@@ -283,7 +283,7 @@ export default function MercadoDetalhes() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {clientes?.map((cliente) => (
+                        {Array.isArray(clientes) && clientes.map((cliente: any) => (
                           <TableRow key={cliente.id}>
                             <TableCell className="font-medium">
                               <div>
@@ -361,7 +361,7 @@ export default function MercadoDetalhes() {
           <TabsContent value="concorrentes" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Concorrentes ({concorrentes?.length || 0})</CardTitle>
+                <CardTitle>Concorrentes ({Array.isArray(concorrentes) ? concorrentes.length : 0})</CardTitle>
               </CardHeader>
               <CardContent>
                 {loadingConcorrentes ? (
@@ -383,7 +383,7 @@ export default function MercadoDetalhes() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {concorrentes?.map((conc) => (
+                        {Array.isArray(concorrentes) && concorrentes.map((conc: any) => (
                           <TableRow key={conc.id}>
                             <TableCell className="font-medium">
                               <div>
@@ -448,7 +448,7 @@ export default function MercadoDetalhes() {
           <TabsContent value="leads" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Leads ({leads?.length || 0})</CardTitle>
+                <CardTitle>Leads ({Array.isArray(leads) ? leads.length : 0})</CardTitle>
               </CardHeader>
               <CardContent>
                 {loadingLeads ? (
@@ -471,7 +471,7 @@ export default function MercadoDetalhes() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {leads?.map((lead) => (
+                        {Array.isArray(leads) && leads.map((lead: any) => (
                           <TableRow key={lead.id}>
                             <TableCell className="font-medium">
                               <div>

@@ -43,6 +43,30 @@
 }
 
 :root {
+  /* Escala Tipográfica (Ratio 1.25) */
+  --text-xs: 0.64rem;    /* 10.24px */
+  --text-sm: 0.8rem;     /* 12.8px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.25rem;    /* 20px */
+  --text-xl: 1.563rem;   /* 25px */
+  --text-2xl: 1.953rem;  /* 31.25px */
+  --text-3xl: 2.441rem;  /* 39px */
+  --text-4xl: 3.052rem;  /* 48.83px */
+  
+  /* Sistema de Espaçamento (Base 4px) */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+  --space-20: 5rem;    /* 80px */
+  --space-24: 6rem;    /* 96px */
+  
   /* Light Theme */
   --primary: oklch(0.55 0.25 260);
   --primary-foreground: oklch(0.98 0 0);
@@ -153,9 +177,37 @@
     background: radial-gradient(circle at top, oklch(0.17 0.01 250) 0%, oklch(0.145 0 0) 40%, oklch(0.145 0 0) 100%);
   }
   
-  /* Typography */
+  /* Typography Refinada */
+  body {
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+  }
+  
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
+    @apply font-semibold;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  
+  h1 { font-size: var(--text-4xl); }
+  h2 { font-size: var(--text-3xl); }
+  h3 { font-size: var(--text-2xl); }
+  h4 { font-size: var(--text-xl); }
+  h5 { font-size: var(--text-lg); }
+  h6 { font-size: var(--text-base); }
+  
+  /* Focus Visible Aprimorado */
+  *:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
   }
   
   .section-title {
@@ -267,13 +319,44 @@
     background: rgb(156 163 175);
   }
   
-  /* Hover Lift Effect */
+  /* Hover Lift Effect Aprimorado */
   .hover-lift {
-    transition: background 0.12s ease, transform 0.08s ease, border-color 0.12s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
   }
   
   .hover-lift:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 
+      0 10px 30px -10px rgba(59, 130, 246, 0.3),
+      0 0 0 1px rgba(59, 130, 246, 0.1);
+  }
+  
+  .hover-lift:active {
+    transform: translateY(0) scale(0.99);
+    transition-duration: 0.1s;
+  }
+  
+  /* Card Hover States Aprimorados */
+  .card-interactive {
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    cursor: pointer;
+  }
+  
+  .card-interactive:hover {
+    transform: translateY(-2px) scale(1.005);
+    box-shadow: 
+      0 10px 30px -10px rgba(59, 130, 246, 0.25),
+      0 0 0 1px rgba(59, 130, 246, 0.08);
+  }
+  
+  .dark .card-interactive:hover {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+  
+  .card-interactive:active {
+    transform: translateY(0) scale(0.995);
+    transition-duration: 0.1s;
   }
   
   /* Mini KPI Card */

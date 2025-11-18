@@ -359,3 +359,138 @@
 - [x] Validar funcionamento
 - [x] Criar checkpoint dos Quick Wins
 - [x] Documentar resultados
+
+
+## Fase 17: Paginação Server-Side 📄
+
+### 17.1 Backend - Routers
+- [ ] Adicionar parâmetros page e pageSize aos routers de clientes
+- [ ] Adicionar parâmetros page e pageSize aos routers de concorrentes
+- [ ] Adicionar parâmetros page e pageSize aos routers de leads
+- [ ] Retornar metadata (total, totalPages, currentPage)
+
+### 17.2 Backend - Database
+- [ ] Criar função getClientesByMercadoPaginated()
+- [ ] Criar função getConcorrentesByMercadoPaginated()
+- [ ] Criar função getLeadsByMercadoPaginated()
+- [ ] Otimizar queries com LIMIT e OFFSET
+
+### 17.3 Frontend - UI
+- [ ] Criar componente Pagination
+- [ ] Adicionar controles de paginação no CascadeView
+- [ ] Implementar navegação entre páginas
+- [ ] Mostrar "Exibindo X-Y de Z itens"
+
+### 17.4 Testes
+- [ ] Testar paginação com datasets grandes
+- [ ] Validar performance
+- [ ] Criar checkpoint
+
+---
+
+## Fase 18: Sistema de Favoritos ⭐
+
+### 18.1 Database Schema
+- [ ] Criar tabela favoritos
+- [ ] Adicionar índices (userId, entityType, entityId)
+- [ ] Executar migration
+
+### 18.2 Backend
+- [ ] Criar router favoritos.add
+- [ ] Criar router favoritos.remove
+- [ ] Criar router favoritos.list
+- [ ] Criar router favoritos.updateTags
+- [ ] Criar funções no db.ts
+
+### 18.3 Frontend
+- [ ] Criar componente FavoriteButton
+- [ ] Adicionar botão de estrela nos cards
+- [ ] Criar modal de tags
+- [ ] Implementar filtro "Apenas Favoritos"
+- [ ] Criar página "Meus Favoritos"
+
+### 18.4 Testes
+- [ ] Testar adicionar/remover favoritos
+- [ ] Testar tags customizáveis
+- [ ] Validar persistência
+- [ ] Criar checkpoint
+
+---
+
+## Fase 19: Enriquecimento Automático 🤖
+
+### 19.1 API Integration
+- [ ] Pesquisar API pública da Receita Federal
+- [ ] Criar função fetchReceitaFederal()
+- [ ] Implementar rate limiting
+- [ ] Tratamento de erros
+
+### 19.2 Backend
+- [ ] Criar router enriquecimento.enrichCliente
+- [ ] Criar router enriquecimento.enrichBatch
+- [ ] Validar e normalizar dados retornados
+- [ ] Atualizar registro no banco
+
+### 19.3 Frontend
+- [ ] Criar botão "Enriquecer Dados" nos cards
+- [ ] Criar modal de confirmação
+- [ ] Mostrar loading durante enriquecimento
+- [ ] Exibir diff (antes/depois)
+- [ ] Implementar enriquecimento em lote
+
+### 19.4 Testes
+- [ ] Testar enriquecimento individual
+- [ ] Testar enriquecimento em lote
+- [ ] Validar dados retornados
+- [ ] Criar checkpoint
+
+---
+
+## Fase 20: Polimento Visual e UX Moderna 🎨
+
+### 20.1 Proposta de Polimento
+- [ ] Analisar tendências de design moderno
+- [ ] Criar documento de proposta detalhado
+- [ ] Definir paleta de cores refinada
+- [ ] Especificar animações e transições
+- [ ] Listar melhorias de micro-interações
+
+### 20.2 Implementação Prioritária
+- [ ] Aplicar melhorias de maior impacto
+- [ ] Refinar tipografia e espaçamento
+- [ ] Adicionar animações suaves
+- [ ] Melhorar feedback visual
+- [ ] Polir responsividade mobile
+
+### 20.3 Testes e Validação
+- [ ] Testar em diferentes resoluções
+- [ ] Validar acessibilidade
+- [ ] Verificar performance de animações
+- [ ] Criar checkpoint final
+
+
+## Fase 17: Polimento Visual e UX Moderna 🎨
+
+### 17.1 Proposta Criada
+- [x] Analisar estado atual e oportunidades
+- [x] Documentar 9 níveis de melhorias
+- [x] Criar roadmap de implementação
+- [x] Definir métricas de sucesso
+
+### 17.2 Quick Wins Implementados
+- [x] Escala tipográfica refinada (ratio 1.25)
+- [x] Sistema de espaçamento consistente (base 4px)
+- [x] Focus visible aprimorado (outline + offset)
+- [x] Hover states aprimorados (transform + box-shadow)
+- [x] Componente EmptyState criado
+
+### 17.3 Correções Técnicas
+- [x] Corrigir erros de TypeScript em MercadoDetalhes
+- [x] Adicionar verificações Array.isArray()
+- [x] Garantir compatibilidade com dados paginados
+
+### 17.4 Finalização
+- [x] Testar melhorias visuais no navegador
+- [x] Validar acessibilidade (focus visible)
+- [x] Criar checkpoint final
+- [x] Entregar documentação completa

@@ -53,20 +53,34 @@ export default function CascadeView() {
   // Estados para scroll tracking
   const [showScrollTop, setShowScrollTop] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  
+  // Estados para paginação
+  const [currentPageNum, setCurrentPageNum] = useState(1);
+  const pageSize = 20;
 
   const { data: mercados, isLoading } = trpc.mercados.list.useQuery({ search: "" });
-  const { data: clientes } = trpc.clientes.byMercado.useQuery(
-    { mercadoId: selectedMercadoId! },
+  const { data: clientesResponse } = trpc.clientes.byMercado.useQuery(
+    { mercadoId: selectedMercadoId!, page: currentPageNum, pageSize },
     { enabled: !!selectedMercadoId }
   );
-  const { data: concorrentes } = trpc.concorrentes.byMercado.useQuery(
-    { mercadoId: selectedMercadoId! },
+  const { data: concorrentesResponse } = trpc.concorrentes.byMercado.useQuery(
+    { mercadoId: selectedMercadoId!, page: currentPageNum, pageSize },
     { enabled: !!selectedMercadoId }
   );
-  const { data: leads } = trpc.leads.byMercado.useQuery(
-    { mercadoId: selectedMercadoId! },
+  const { data: leadsResponse } = trpc.leads.byMercado.useQuery(
+    { mercadoId: selectedMercadoId!, page: currentPageNum, pageSize },
     { enabled: !!selectedMercadoId }
   );
+  
+  // Extrair dados da resposta paginada
+  const clientes = clientesResponse?.data || [];
+  const concorrentes = concorrentesResponse?.data || [];
+  const leads = leadsResponse?.data || [];
+  
+  // Metadata de paginação
+  const clientesMeta = clientesResponse || { total: 0, page: 1, totalPages: 0 };
+  const concorrentesMeta = concorrentesResponse || { total: 0, page: 1, totalPages: 0 };
+  const leadsMeta = leadsResponse || { total: 0, page: 1, totalPages: 0 };
 
   const utils = trpc.useUtils();
   const updateClienteMutation = trpc.clientes.updateValidation.useMutation({
