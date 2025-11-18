@@ -929,9 +929,27 @@
 - [x] Remover condição que ocultava botão na página de mercados
 
 ### 34.2 Testes e Validação
-- [ ] Testar exportação com busca ativa
-- [ ] Testar exportação com tags selecionadas
-- [ ] Testar exportação com filtros avançados ativos
-- [ ] Testar exportação com status filter ativo
-- [ ] Testar exportação com múltiplos filtros combinados
+- [x] Testar exportação com busca ativa
+- [x] Testar exportação com tags selecionadas
+- [x] Testar exportação com filtros avançados ativos
+- [x] Testar exportação com status filter ativo
+- [x] Testar exportação com múltiplos filtros combinados
+- [x] Criar checkpoint
+
+
+## Fase 34.5: Reorganização de Layout - Filtros Horizontais 🎨
+
+### 34.5.1 Reestruturação ✅ CONCLUÍDO
+- [x] Mover Busca Global do sidebar para header horizontal
+- [x] Mover Filtro de Tags do sidebar para header horizontal
+- [x] Mover Filtros Avançados do sidebar para header horizontal
+- [x] Mover Filtro de Status para header horizontal
+- [x] Organizar em linha única abaixo do título
+- [x] Criar barra de filtros com fundo bg-slate-900/50
+
+### 34.5.2 Ajustes de Layout
+- [x] Manter sidebar apenas com Estatísticas e Mercado Atual
+- [x] Ajustar espaçamento entre filtros (gap-4)
+- [x] Usar flex-wrap para responsividade
+- [x] Testar com múltiplos filtros ativos
 - [ ] Criar checkpoint

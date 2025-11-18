@@ -669,75 +669,35 @@ export default function CascadeView() {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-[280px] border-r border-border/40 p-6 flex flex-col gap-6">
+      {/* Barra de Filtros Horizontal */}
+      <div className="border-b border-border/40 px-6 py-3 bg-slate-900/50">
+        <div className="flex items-center gap-4 flex-wrap">
           {/* Busca Global */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-                Busca Global
-              </Label>
-              <SearchFieldSelector
-                selectedFields={searchFields}
-                onFieldsChange={setSearchFields}
-              />
-            </div>
+          <div className="flex items-center gap-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 ref={searchInputRef}
-                placeholder="Digite sua busca..." 
+                placeholder="Buscar..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 w-[250px] h-9"
               />
             </div>
-            {searchFields.length > 0 && (
-              <div className="mt-2">
-                <p className="text-[10px] text-muted-foreground mb-1">Buscando em:</p>
-                <div className="flex flex-wrap gap-1">
-                  {searchFields.map((field) => {
-                    const labels: Record<SearchField, string> = {
-                      nome: "Nome",
-                      cnpj: "CNPJ",
-                      produto: "Produto",
-                      cidade: "Cidade",
-                      uf: "UF",
-                      email: "Email",
-                      telefone: "Telefone",
-                      observacoes: "Obs",
-                    };
-                    return (
-                      <Badge key={field} variant="outline" className="text-[9px] px-1.5 py-0">
-                        {labels[field]}
-                      </Badge>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-            {searchResultsCount && (
-              <p className="text-xs text-muted-foreground mt-2">
-                {searchResultsCount.clientes} clientes, {searchResultsCount.concorrentes} concorrentes,{" "}
-                {searchResultsCount.leads} leads
-              </p>
-            )}
-          </div>
-
-          {/* Filtro por Tags */}
-          <div>
-            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Tags</h3>
-            <TagFilter
-              selectedTags={selectedTagIds}
-              onTagsChange={setSelectedTagIds}
+            <SearchFieldSelector
+              selectedFields={searchFields}
+              onFieldsChange={setSearchFields}
             />
           </div>
 
+          {/* Filtro por Tags */}
+          <TagFilter
+            selectedTags={selectedTagIds}
+            onTagsChange={setSelectedTagIds}
+          />
+
           {/* Filtros Avançados */}
-          <div>
-            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Filtros Avançados</h3>
-            <div className="space-y-2">
+          <div className="flex items-center gap-2">
               {/* Filtros de Mercados */}
               {currentPage === "mercados" && (
                 <>
@@ -846,9 +806,48 @@ export default function CascadeView() {
                   />
                 </>
               )}
-            </div>
           </div>
 
+          {/* Filtro de Status */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant={statusFilter === "all" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setStatusFilter("all")}
+            >
+              Todos
+            </Button>
+            <Button
+              variant={statusFilter === "pending" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setStatusFilter("pending")}
+            >
+              <Clock className="w-4 h-4 mr-2" />
+              Pendentes
+            </Button>
+            <Button
+              variant={statusFilter === "rich" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setStatusFilter("rich")}
+            >
+              <CheckCircle2 className="w-4 h-4 mr-2" />
+              Validados
+            </Button>
+            <Button
+              variant={statusFilter === "discarded" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setStatusFilter("discarded")}
+            >
+              <XCircle className="w-4 h-4 mr-2" />
+              Descartados
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <div className="w-[280px] border-r border-border/40 p-6 flex flex-col gap-6">
           {/* Estatísticas */}
           <div>
             <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Estatísticas</h3>
@@ -894,45 +893,6 @@ export default function CascadeView() {
               </div>
             </div>
           </div>
-
-          {/* Filtros */}
-          <div>
-            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Filtros</h3>
-            <div className="space-y-2">
-              <Button
-                variant={statusFilter === "all" ? "default" : "ghost"}
-                className="w-full justify-start"
-                onClick={() => setStatusFilter("all")}
-              >
-                Todos
-              </Button>
-              <Button
-                variant={statusFilter === "pending" ? "default" : "ghost"}
-                className="w-full justify-start"
-                onClick={() => setStatusFilter("pending")}
-              >
-                <Clock className="w-4 h-4 mr-2" />
-                Pendentes
-              </Button>
-              <Button
-                variant={statusFilter === "rich" ? "default" : "ghost"}
-                className="w-full justify-start"
-                onClick={() => setStatusFilter("rich")}
-              >
-                <CheckCircle2 className="w-4 h-4 mr-2" />
-                Validados
-              </Button>
-              <Button
-                variant={statusFilter === "discarded" ? "default" : "ghost"}
-                className="w-full justify-start"
-                onClick={() => setStatusFilter("discarded")}
-              >
-                <XCircle className="w-4 h-4 mr-2" />
-                Descartados
-              </Button>
-            </div>
-          </div>
-
 
 
           {/* Mercado Atual */}
