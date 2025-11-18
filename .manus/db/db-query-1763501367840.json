@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS notifications (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  userId VARCHAR(64),\n  projectId INT,\n  type ENUM('lead_quality', 'lead_closed', 'new_competitor', 'market_threshold', 'data_incomplete') NOT NULL,\n  title VARCHAR(255) NOT NULL,\n  message TEXT NOT NULL,\n  entityType ENUM('mercado', 'cliente', 'concorrente', 'lead'),\n  entityId INT,\n  isRead INT DEFAULT 0 NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,\n  FOREIGN KEY (projectId) REFERENCES projects(id) ON DELETE CASCADE\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute CREATE TABLE IF NOT EXISTS notifications (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  userId VARCHAR(64),\n  projectId INT,\n  type ENUM('lead_quality', 'lead_closed', 'new_competitor', 'market_threshold', 'data_incomplete') NOT NULL,\n  title VARCHAR(255) NOT NULL,\n  message TEXT NOT NULL,\n  entityType ENUM('mercado', 'cliente', 'concorrente', 'lead'),\n  entityId INT,\n  isRead INT DEFAULT 0 NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,\n  FOREIGN KEY (projectId) REFERENCES projects(id) ON DELETE CASCADE\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 316
+}

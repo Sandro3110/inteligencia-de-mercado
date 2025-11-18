@@ -6,6 +6,7 @@ import {
   mercadosUnicos, clientes, clientesMercados, 
   concorrentes, leads,
   projectTemplates, ProjectTemplate, InsertProjectTemplate,
+  notifications, Notification, InsertNotification,
   MercadoUnico, Cliente, Concorrente, Lead
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -1502,4 +1503,323 @@ export async function deleteTemplate(id: number) {
 
   await db.delete(projectTemplates).where(eq(projectTemplates.id, id));
   return true;
+}
+
+
+// ============================================
+// ADVANCED SEARCH - LEADS
+// ============================================
+
+export async function searchLeadsAdvanced(
+  projectId: number,
+  filter: any,
+  page: number = 1,
+  pageSize: number = 20
+) {
+  const db = await getDb();
+  if (!db) return { data: [], total: 0, page, pageSize };
+
+  const { buildDynamicQuery, validateFilter } = await import('./queryBuilder');
+  
+  // Validar filtro
+  const validation = validateFilter(filter);
+  if (!validation.valid) {
+    throw new Error(validation.error || 'Filtro inválido');
+  }
+
+  // Construir query dinâmica
+  const whereClause = buildDynamicQuery(leads, filter);
+  
+  // Combinar filtro de projeto com filtros dinâmicos
+  const finalWhere = whereClause 
+    ? and(eq(leads.projectId, projectId), whereClause)
+    : eq(leads.projectId, projectId);
+  
+  // Base query
+  const query = db.select().from(leads).where(finalWhere as any);
+
+  // Contar total
+  const countQuery = db.select({ count: count() }).from(leads).where(
+    whereClause 
+      ? and(eq(leads.projectId, projectId), whereClause) as any
+      : eq(leads.projectId, projectId)
+  );
+  
+  const [{ count: total }] = await countQuery as any;
+
+  // Aplicar paginação
+  const offset = (page - 1) * pageSize;
+  const data = await query.limit(pageSize).offset(offset);
+
+  return {
+    data,
+    total: Number(total),
+    page,
+    pageSize,
+    totalPages: Math.ceil(Number(total) / pageSize),
+  };
+}
+
+
+// ============================================
+// ANALYTICS - DASHBOARD
+// ============================================
+
+export async function getLeadsByStageStats(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db.execute(sql`
+    SELECT 
+      stage,
+      COUNT(*) as count
+    FROM leads
+    WHERE projectId = ${projectId}
+    GROUP BY stage
+  `) as any;
+
+  return result.rows || result;
+}
+
+export async function getLeadsByMercadoStats(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db.execute(sql`
+    SELECT 
+      m.nome as mercadoNome,
+      COUNT(l.id) as leadCount
+    FROM mercados_unicos m
+    LEFT JOIN leads l ON l.mercadoId = m.id
+    WHERE m.projectId = ${projectId}
+    GROUP BY m.id, m.nome
+    ORDER BY leadCount DESC
+    LIMIT 10
+  `) as any;
+
+  return result.rows || result;
+}
+
+export async function getQualityScoreEvolution(projectId: number, days: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db.execute(sql`
+    SELECT 
+      DATE(createdAt) as date,
+      AVG(qualidadeScore) as avgScore,
+      COUNT(*) as count
+    FROM leads
+    WHERE projectId = ${projectId}
+      AND createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY)
+    GROUP BY DATE(createdAt)
+    ORDER BY date ASC
+  `) as any;
+
+  return result.rows || result;
+}
+
+export async function getLeadsGrowthOverTime(projectId: number, days: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db.execute(sql`
+    SELECT 
+      DATE(createdAt) as date,
+      COUNT(*) as count,
+      SUM(COUNT(*)) OVER (ORDER BY DATE(createdAt)) as cumulative
+    FROM leads
+    WHERE projectId = ${projectId}
+      AND createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY)
+    GROUP BY DATE(createdAt)
+    ORDER BY date ASC
+  `) as any;
+
+  return result.rows || result;
+}
+
+export async function getDashboardKPIs(projectId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.execute(sql`
+    SELECT 
+      COUNT(DISTINCT l.id) as totalLeads,
+      COUNT(DISTINCT CASE WHEN l.stage = 'fechado' THEN l.id END) as closedLeads,
+      AVG(l.qualidadeScore) as avgQualityScore,
+      COUNT(DISTINCT m.id) as totalMercados,
+      COUNT(DISTINCT c.id) as totalConcorrentes
+    FROM leads l
+    LEFT JOIN mercados_unicos m ON m.projectId = ${projectId}
+    LEFT JOIN concorrentes c ON c.projectId = ${projectId}
+    WHERE l.projectId = ${projectId}
+  `) as any;
+
+  const row = (result.rows && result.rows[0]) || result[0];
+  
+  if (!row) return null;
+
+  return {
+    totalLeads: Number(row.totalLeads) || 0,
+    closedLeads: Number(row.closedLeads) || 0,
+    conversionRate: row.totalLeads > 0 ? (Number(row.closedLeads) / Number(row.totalLeads)) * 100 : 0,
+    avgQualityScore: Number(row.avgQualityScore) || 0,
+    totalMercados: Number(row.totalMercados) || 0,
+    totalConcorrentes: Number(row.totalConcorrentes) || 0,
+  };
+}
+
+
+// ============================================
+// CRUD - NOTIFICATIONS
+// ============================================
+
+export async function createNotification(data: {
+  userId?: string;
+  projectId?: number;
+  type: 'lead_quality' | 'lead_closed' | 'new_competitor' | 'market_threshold' | 'data_incomplete';
+  title: string;
+  message: string;
+  entityType?: 'mercado' | 'cliente' | 'concorrente' | 'lead';
+  entityId?: number;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [result] = await db.insert(notifications).values({
+    userId: data.userId || null,
+    projectId: data.projectId || null,
+    type: data.type,
+    title: data.title,
+    message: data.message,
+    entityType: data.entityType || null,
+    entityId: data.entityId || null,
+    isRead: 0,
+  });
+
+  if (!result.insertId) return null;
+
+  const [notification] = await db.select().from(notifications).where(eq(notifications.id, Number(result.insertId)));
+  return notification;
+}
+
+export async function getUserNotifications(userId: string, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select()
+    .from(notifications)
+    .where(eq(notifications.userId, userId))
+    .orderBy(sql`createdAt DESC`)
+    .limit(limit);
+}
+
+export async function getUnreadNotificationsCount(userId: string) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const result = await db.select({ count: count() })
+    .from(notifications)
+    .where(and(eq(notifications.userId, userId), eq(notifications.isRead, 0)));
+
+  return Number(result[0]?.count || 0);
+}
+
+export async function markNotificationAsRead(id: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  await db.update(notifications)
+    .set({ isRead: 1 })
+    .where(eq(notifications.id, id));
+
+  return true;
+}
+
+export async function markAllNotificationsAsRead(userId: string) {
+  const db = await getDb();
+  if (!db) return false;
+
+  await db.update(notifications)
+    .set({ isRead: 1 })
+    .where(and(eq(notifications.userId, userId), eq(notifications.isRead, 0)));
+
+  return true;
+}
+
+export async function deleteNotification(id: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  await db.delete(notifications).where(eq(notifications.id, id));
+  return true;
+}
+
+// ============================================
+// NOTIFICATION TRIGGERS
+// ============================================
+
+/**
+ * Trigger: Notificar quando lead tem alta qualidade
+ */
+export async function checkAndNotifyHighQualityLead(leadId: number, qualityScore: number, userId?: string) {
+  if (qualityScore >= 80) {
+    const db = await getDb();
+    if (!db) return;
+
+    const [lead] = await db.select().from(leads).where(eq(leads.id, leadId));
+    if (!lead) return;
+
+    await createNotification({
+      userId,
+      projectId: lead.projectId,
+      type: 'lead_quality',
+      title: '🎯 Lead de Alta Qualidade!',
+      message: `O lead "${lead.nome}" foi identificado com score de ${qualityScore}/100`,
+      entityType: 'lead',
+      entityId: leadId,
+    });
+  }
+}
+
+/**
+ * Trigger: Notificar quando lead é fechado
+ */
+export async function notifyLeadClosed(leadId: number, userId?: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  const [lead] = await db.select().from(leads).where(eq(leads.id, leadId));
+  if (!lead) return;
+
+  await createNotification({
+    userId,
+    projectId: lead.projectId,
+    type: 'lead_closed',
+    title: '✅ Lead Fechado!',
+    message: `O lead "${lead.nome}" foi marcado como fechado`,
+    entityType: 'lead',
+    entityId: leadId,
+  });
+}
+
+/**
+ * Trigger: Notificar quando novo concorrente é identificado
+ */
+export async function notifyNewCompetitor(concorrenteId: number, userId?: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  const [concorrente] = await db.select().from(concorrentes).where(eq(concorrentes.id, concorrenteId));
+  if (!concorrente) return;
+
+  await createNotification({
+    userId,
+    projectId: concorrente.projectId,
+    type: 'new_competitor',
+    title: '🔍 Novo Concorrente Identificado',
+    message: `Concorrente "${concorrente.nome}" foi adicionado ao projeto`,
+    entityType: 'concorrente',
+    entityId: concorrenteId,
+  });
 }

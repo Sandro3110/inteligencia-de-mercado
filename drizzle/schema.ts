@@ -229,3 +229,22 @@ export const projectTemplates = mysqlTable("project_templates", {
 
 export type ProjectTemplate = typeof projectTemplates.$inferSelect;
 export type InsertProjectTemplate = typeof projectTemplates.$inferInsert;
+
+/**
+ * Notifications - Sistema de notificações e alertas
+ */
+export const notifications = mysqlTable("notifications", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: varchar("userId", { length: 64 }).references(() => users.id, { onDelete: "cascade" }),
+  projectId: int("projectId").references(() => projects.id, { onDelete: "cascade" }),
+  type: mysqlEnum("type", ["lead_quality", "lead_closed", "new_competitor", "market_threshold", "data_incomplete"]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  entityType: mysqlEnum("entityType", ["mercado", "cliente", "concorrente", "lead"]),
+  entityId: int("entityId"),
+  isRead: int("isRead").default(0).notNull(), // 0 = não lida, 1 = lida
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;

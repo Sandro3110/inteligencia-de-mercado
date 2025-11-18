@@ -24,6 +24,41 @@ export const appRouter = router({
       const { getAnalyticsProgress } = await import('./db');
       return getAnalyticsProgress();
     }),
+    
+    leadsByStage: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getLeadsByStageStats } = await import('./db');
+        return getLeadsByStageStats(input.projectId);
+      }),
+    
+    leadsByMercado: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getLeadsByMercadoStats } = await import('./db');
+        return getLeadsByMercadoStats(input.projectId);
+      }),
+    
+    qualityEvolution: publicProcedure
+      .input(z.object({ projectId: z.number(), days: z.number().optional().default(30) }))
+      .query(async ({ input }) => {
+        const { getQualityScoreEvolution } = await import('./db');
+        return getQualityScoreEvolution(input.projectId, input.days);
+      }),
+    
+    leadsGrowth: publicProcedure
+      .input(z.object({ projectId: z.number(), days: z.number().optional().default(30) }))
+      .query(async ({ input }) => {
+        const { getLeadsGrowthOverTime } = await import('./db');
+        return getLeadsGrowthOverTime(input.projectId, input.days);
+      }),
+    
+    kpis: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getDashboardKPIs } = await import('./db');
+        return getDashboardKPIs(input.projectId);
+      }),
   }),
 
   dashboard: router({
@@ -424,6 +459,28 @@ export const appRouter = router({
         const { deleteLead } = await import('./db');
         return deleteLead(input.id);
       }),
+    
+    advancedSearch: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        filter: z.object({
+          groups: z.array(z.object({
+            conditions: z.array(z.object({
+              field: z.string(),
+              operator: z.enum(['eq', 'ne', 'gt', 'lt', 'gte', 'lte', 'contains', 'startsWith', 'endsWith', 'in', 'notIn', 'isNull', 'isNotNull']),
+              value: z.any().optional(),
+            })),
+            logicalOperator: z.enum(['AND', 'OR']),
+          })),
+          globalOperator: z.enum(['AND', 'OR']),
+        }),
+        page: z.number().optional().default(1),
+        pageSize: z.number().optional().default(20),
+      }))
+      .query(async ({ input }) => {
+        const { searchLeadsAdvanced } = await import('./db');
+        return searchLeadsAdvanced(input.projectId, input.filter, input.page, input.pageSize);
+      }),
   }),
 
   savedFilters: router({
@@ -547,6 +604,41 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const { deleteTemplate } = await import('./db');
         return deleteTemplate(input);
+      }),
+  }),
+
+  notifications: router({
+    list: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user) return [];
+      const { getUserNotifications } = await import('./db');
+      return getUserNotifications(ctx.user.id);
+    }),
+    
+    unreadCount: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user) return 0;
+      const { getUnreadNotificationsCount } = await import('./db');
+      return getUnreadNotificationsCount(ctx.user.id);
+    }),
+    
+    markAsRead: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { markNotificationAsRead } = await import('./db');
+        return markNotificationAsRead(input);
+      }),
+    
+    markAllAsRead: publicProcedure
+      .mutation(async ({ ctx }) => {
+        if (!ctx.user) return false;
+        const { markAllNotificationsAsRead } = await import('./db');
+        return markAllNotificationsAsRead(ctx.user.id);
+      }),
+    
+    delete: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { deleteNotification } = await import('./db');
+        return deleteNotification(input);
       }),
   }),
 

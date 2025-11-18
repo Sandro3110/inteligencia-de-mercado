@@ -50,6 +50,13 @@
       "when": 1763500757464,
       "tag": "0006_rainy_speed",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1763501516973,
+      "tag": "0007_loud_power_pack",
+      "breakpoints": true
     }
   ]
 }

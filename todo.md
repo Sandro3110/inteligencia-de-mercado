@@ -1372,3 +1372,116 @@
 - [ ] Testar templates de projeto (manual)
 - [x] Criar checkpoint final
 
+
+
+---
+
+## Fase 47: Busca e Filtros Avançados 🚧
+
+### 47.1 Backend - Sistema de Filtros
+- [x] Criar tipo FilterCriteria com operadores (eq, ne, gt, lt, contains, in)
+- [x] Implementar função buildDynamicQuery no queryBuilder.ts
+- [x] Adicionar suporte a filtros combinados (AND/OR)
+- [x] Criar endpoint de busca avançada para leads
+- [x] Implementar paginação com offset/limit
+- [ ] Adicionar endpoints para outras entidades (mercados, clientes, concorrentes)
+
+### 47.2 Frontend - Interface de Filtros
+- [x] Criar componente AdvancedFilterBuilder
+- [x] Implementar seletor de campos dinâmico
+- [x] Adicionar operadores por tipo de campo (texto, número, data)
+- [x] Criar UI para adicionar/remover condições e grupos
+- [x] Implementar operação lógica (AND/OR) entre grupos
+- [ ] Integrar com página de leads
+- [ ] Implementar preview de resultados em tempo real
+
+### 47.3 Salvamento e Exportação
+- [ ] Adicionar botão "Salvar Filtro" com nome customizado
+- [ ] Criar dropdown de filtros salvos
+- [ ] Implementar exportação para CSV/Excel
+- [ ] Adicionar opção de compartilhar filtro (URL params)
+
+---
+
+## Fase 48: Dashboard Analítico com Gráficos 🚧
+
+### 48.1 Instalação e Setup
+- [x] Instalar recharts via pnpm
+- [x] Criar tipos para dados de analytics
+- [x] Implementar queries de agregação no backend
+
+### 48.2 Gráficos e Visualizações
+- [x] Gráfico de pizza: Distribuição de leads por estágio
+- [x] Gráfico de barras: Leads por mercado (Top 10)
+- [x] Gráfico de linha: Evolução temporal de qualidade
+- [x] Gráfico de área: Crescimento de leads ao longo do tempo
+- [ ] Heatmap: Qualidade por mercado e segmentação (futuro)
+
+### 48.3 Métricas e KPIs
+- [x] Card de taxa de conversão
+- [x] Card de score médio de qualidade
+- [x] Card de total de leads
+- [x] Card de mercados ativos e concorrentes
+- [x] Implementar filtros de período (7d, 30d, 90d)
+
+### 48.4 Página Dashboard
+- [x] Criar página /analytics com tabs
+- [x] Adicionar seletor de projeto
+- [x] Adicionar seletor de período
+- [ ] Implementar refresh automático (futuro)
+- [ ] Adicionar opção de exportar relatório PDF (futuro)
+
+---
+
+## Fase 49: Sistema de Notificações e Alertas 🚧
+
+### 49.1 Backend - Notificações
+- [x] Criar tabela notifications no schema
+- [x] Implementar funções CRUD de notificações
+- [x] Criar sistema de triggers para eventos importantes
+- [x] Adicionar router tRPC de notificações
+
+### 49.2 Triggers de Eventos
+- [x] Trigger: Novo lead com qualityScore > 80
+- [x] Trigger: Lead mudou para estágio "fechado"
+- [x] Trigger: Novo concorrente identificado
+- [ ] Trigger: Cliente com dados incompletos (futuro)
+- [ ] Trigger: Mercado atingiu threshold de leads (futuro)
+
+### 49.3 Frontend - UI de Notificações
+- [x] Criar componente NotificationBell
+- [x] Implementar dropdown de notificações
+- [x] Adicionar badge de contagem não lidas
+- [x] Implementar marcar como lida
+- [x] Implementar deletar notificação
+- [ ] Criar página /notifications com histórico completo (futuro)
+- [ ] Adicionar NotificationBell ao header (integração)
+
+### 49.4 Notificações em Tempo Real
+- [x] Implementar polling (refetch a cada 30s)
+- [ ] Adicionar toast notifications para eventos críticos (futuro)
+- [ ] Criar preferências de notificação por usuário (futuro)
+- [ ] Integrar triggers com fluxo de enriquecimento (futuro)
+
+---
+
+## Fase 50: Testes e Refinamentos Finais 🚧
+
+### 50.1 Testes de Funcionalidades
+- [x] Verificar status do projeto (sem erros TypeScript)
+- [x] Confirmar servidor rodando corretamente
+- [ ] Testar filtros avançados com queries complexas (manual)
+- [ ] Validar gráficos com diferentes volumes de dados (manual)
+- [ ] Testar notificações em tempo real (manual)
+
+### 50.2 Otimizações
+- [x] Queries de agregação implementadas
+- [x] Loading states em componentes principais
+- [ ] Adicionar índices no banco para queries de filtros (futuro)
+- [ ] Implementar cache de queries frequentes (futuro)
+
+### 50.3 Documentação e Entrega
+- [x] Criar checkpoint final
+- [ ] Atualizar README com novas funcionalidades (futuro)
+- [ ] Criar guia de uso dos filtros avançados (futuro)
+- [ ] Documentar estrutura de notificações (futuro)
