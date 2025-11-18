@@ -229,6 +229,18 @@ export default function CascadeView() {
     return text.toLowerCase().includes(searchQuery.toLowerCase());
   };
 
+  const filteredMercados = useMemo(() => {
+    if (!mercados) return [];
+    let filtered = filterByStatus(mercados);
+    // Filtrar por segmentação
+    if (mercadoFilters.segmentacao.length > 0) {
+      filtered = filtered.filter((m) =>
+        mercadoFilters.segmentacao.includes(m.segmentacao || "")
+      );
+    }
+    return filtered;
+  }, [mercados, statusFilter, mercadoFilters]);
+
   const filteredClientes = useMemo(() => {
     if (!clientes) return [];
     let filtered = filterByStatus(clientes);
@@ -615,6 +627,121 @@ export default function CascadeView() {
             />
           </div>
 
+          {/* Filtros Avançados */}
+          <div>
+            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Filtros Avançados</h3>
+            <div className="space-y-2">
+              {/* Filtros de Mercados */}
+              {currentPage === "mercados" && (
+                <>
+                  <MultiSelectFilter
+                    title="Segmentação"
+                    icon={<Briefcase className="w-3 h-3" />}
+                    options={[
+                      { value: "B2B", label: "B2B" },
+                      { value: "B2C", label: "B2C" },
+                      { value: "Ambos", label: "Ambos" },
+                    ]}
+                    selectedValues={mercadoFilters.segmentacao}
+                    onValuesChange={(values) =>
+                      setMercadoFilters({ ...mercadoFilters, segmentacao: values })
+                    }
+                  />
+                </>
+              )}
+
+              {/* Filtros de Clientes */}
+              {currentPage === "clientes" && (
+                <>
+                  <MultiSelectFilter
+                    title="Segmentação"
+                    icon={<Briefcase className="w-3 h-3" />}
+                    options={[
+                      { value: "B2B", label: "B2B" },
+                      { value: "B2C", label: "B2C" },
+                      { value: "Ambos", label: "Ambos" },
+                    ]}
+                    selectedValues={clienteFilters.segmentacao}
+                    onValuesChange={(values) =>
+                      setClienteFilters({ ...clienteFilters, segmentacao: values })
+                    }
+                  />
+                  <MultiSelectFilter
+                    title="Estado (UF)"
+                    icon={<MapPin className="w-3 h-3" />}
+                    options={[
+                      { value: "SP", label: "São Paulo" },
+                      { value: "RJ", label: "Rio de Janeiro" },
+                      { value: "MG", label: "Minas Gerais" },
+                      { value: "RS", label: "Rio Grande do Sul" },
+                      { value: "PR", label: "Paraná" },
+                      { value: "SC", label: "Santa Catarina" },
+                      { value: "BA", label: "Bahia" },
+                      { value: "PE", label: "Pernambuco" },
+                      { value: "CE", label: "Ceará" },
+                      { value: "GO", label: "Goiás" },
+                    ]}
+                    selectedValues={clienteFilters.uf}
+                    onValuesChange={(values) =>
+                      setClienteFilters({ ...clienteFilters, uf: values })
+                    }
+                  />
+                </>
+              )}
+
+              {/* Filtros de Concorrentes */}
+              {currentPage === "concorrentes" && (
+                <>
+                  <MultiSelectFilter
+                    title="Porte"
+                    icon={<Package className="w-3 h-3" />}
+                    options={[
+                      { value: "Pequeno", label: "Pequeno" },
+                      { value: "Médio", label: "Médio" },
+                      { value: "Grande", label: "Grande" },
+                    ]}
+                    selectedValues={concorrenteFilters.porte}
+                    onValuesChange={(values) =>
+                      setConcorrenteFilters({ ...concorrenteFilters, porte: values })
+                    }
+                  />
+                </>
+              )}
+
+              {/* Filtros de Leads */}
+              {currentPage === "leads" && (
+                <>
+                  <MultiSelectFilter
+                    title="Tipo"
+                    icon={<Target className="w-3 h-3" />}
+                    options={[
+                      { value: "Cliente Potencial", label: "Cliente Potencial" },
+                      { value: "Parceiro", label: "Parceiro" },
+                      { value: "Fornecedor", label: "Fornecedor" },
+                    ]}
+                    selectedValues={leadFilters.tipo}
+                    onValuesChange={(values) =>
+                      setLeadFilters({ ...leadFilters, tipo: values })
+                    }
+                  />
+                  <MultiSelectFilter
+                    title="Porte"
+                    icon={<Package className="w-3 h-3" />}
+                    options={[
+                      { value: "Pequeno", label: "Pequeno" },
+                      { value: "Médio", label: "Médio" },
+                      { value: "Grande", label: "Grande" },
+                    ]}
+                    selectedValues={leadFilters.porte}
+                    onValuesChange={(values) =>
+                      setLeadFilters({ ...leadFilters, porte: values })
+                    }
+                  />
+                </>
+              )}
+            </div>
+          </div>
+
           {/* Estatísticas */}
           <div>
             <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Estatísticas</h3>
@@ -699,103 +826,7 @@ export default function CascadeView() {
             </div>
           </div>
 
-          {/* Filtros Avançados */}
-          {currentPage !== "mercados" && (
-            <div>
-              <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Filtros Avançados</h3>
-              <div className="space-y-2">
-                {/* Filtros de Clientes */}
-                {currentPage === "clientes" && (
-                  <>
-                    <MultiSelectFilter
-                      title="Segmentação"
-                      icon={<Briefcase className="w-3 h-3" />}
-                      options={[
-                        { value: "B2B", label: "B2B" },
-                        { value: "B2C", label: "B2C" },
-                        { value: "Ambos", label: "Ambos" },
-                      ]}
-                      selectedValues={clienteFilters.segmentacao}
-                      onValuesChange={(values) =>
-                        setClienteFilters({ ...clienteFilters, segmentacao: values })
-                      }
-                    />
-                    <MultiSelectFilter
-                      title="Estado (UF)"
-                      icon={<MapPin className="w-3 h-3" />}
-                      options={[
-                        { value: "SP", label: "São Paulo" },
-                        { value: "RJ", label: "Rio de Janeiro" },
-                        { value: "MG", label: "Minas Gerais" },
-                        { value: "RS", label: "Rio Grande do Sul" },
-                        { value: "PR", label: "Paraná" },
-                        { value: "SC", label: "Santa Catarina" },
-                        { value: "BA", label: "Bahia" },
-                        { value: "PE", label: "Pernambuco" },
-                        { value: "CE", label: "Ceará" },
-                        { value: "GO", label: "Goiás" },
-                      ]}
-                      selectedValues={clienteFilters.uf}
-                      onValuesChange={(values) =>
-                        setClienteFilters({ ...clienteFilters, uf: values })
-                      }
-                    />
-                  </>
-                )}
 
-                {/* Filtros de Concorrentes */}
-                {currentPage === "concorrentes" && (
-                  <>
-                    <MultiSelectFilter
-                      title="Porte"
-                      icon={<Package className="w-3 h-3" />}
-                      options={[
-                        { value: "Pequeno", label: "Pequeno" },
-                        { value: "Médio", label: "Médio" },
-                        { value: "Grande", label: "Grande" },
-                      ]}
-                      selectedValues={concorrenteFilters.porte}
-                      onValuesChange={(values) =>
-                        setConcorrenteFilters({ ...concorrenteFilters, porte: values })
-                      }
-                    />
-                  </>
-                )}
-
-                {/* Filtros de Leads */}
-                {currentPage === "leads" && (
-                  <>
-                    <MultiSelectFilter
-                      title="Tipo"
-                      icon={<Target className="w-3 h-3" />}
-                      options={[
-                        { value: "Cliente Potencial", label: "Cliente Potencial" },
-                        { value: "Parceiro", label: "Parceiro" },
-                        { value: "Fornecedor", label: "Fornecedor" },
-                      ]}
-                      selectedValues={leadFilters.tipo}
-                      onValuesChange={(values) =>
-                        setLeadFilters({ ...leadFilters, tipo: values })
-                      }
-                    />
-                    <MultiSelectFilter
-                      title="Porte"
-                      icon={<Package className="w-3 h-3" />}
-                      options={[
-                        { value: "Pequeno", label: "Pequeno" },
-                        { value: "Médio", label: "Médio" },
-                        { value: "Grande", label: "Grande" },
-                      ]}
-                      selectedValues={leadFilters.porte}
-                      onValuesChange={(values) =>
-                        setLeadFilters({ ...leadFilters, porte: values })
-                      }
-                    />
-                  </>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Mercado Atual */}
           {mercadoSelecionado && (
@@ -888,7 +919,7 @@ export default function CascadeView() {
                             initial="hidden"
                             animate="show"
                           >
-                            {mercados?.map((mercado) => (
+                            {filteredMercados.map((mercado) => (
                               <motion.div
                                 key={`mercado-item-${mercado.id}`}
                                 variants={listItemVariants}

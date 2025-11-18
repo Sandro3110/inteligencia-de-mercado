@@ -882,3 +882,11 @@
 - [ ] Testar combinação de múltiplos filtros
 - [ ] Validar performance
 - [ ] Criar checkpoint
+
+
+## Fase 32: Correção - Filtros Avançados para Mercados 🔧 ✅ CONCLUÍDO
+
+### 32.1 Implementação
+- [x] Adicionar filtros de Segmentação na página de Mercados
+- [x] Implementar lógica de filtragem em filteredMercados
+- [x] Testar funcionamento
