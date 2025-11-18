@@ -10,6 +10,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { TagManager } from "@/components/TagManager";
 import { EntityTagPicker } from "@/components/EntityTagPicker";
 import { TagFilter } from "@/components/TagFilter";
+import { MultiSelectFilter } from "@/components/MultiSelectFilter";
 import { SkeletonMercado, SkeletonCliente, SkeletonConcorrente, SkeletonLead } from "@/components/SkeletonLoading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,9 @@ import {
   Download,
   ArrowUp,
   AlertTriangle,
+  MapPin,
+  Briefcase,
+  Package,
 } from "lucide-react";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
@@ -48,6 +52,39 @@ export default function CascadeView() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  
+  // Estados para filtros avançados
+  const [mercadoFilters, setMercadoFilters] = useState<{
+    segmentacao: string[];
+    categoria: string[];
+  }>({
+    segmentacao: [],
+    categoria: [],
+  });
+  
+  const [clienteFilters, setClienteFilters] = useState<{
+    segmentacao: string[];
+    cidade: string[];
+    uf: string[];
+  }>({
+    segmentacao: [],
+    cidade: [],
+    uf: [],
+  });
+  
+  const [concorrenteFilters, setConcorrenteFilters] = useState<{
+    porte: string[];
+  }>({
+    porte: [],
+  });
+  
+  const [leadFilters, setLeadFilters] = useState<{
+    tipo: string[];
+    porte: string[];
+  }>({
+    tipo: [],
+    porte: [],
+  });
   const [detailPopupOpen, setDetailPopupOpen] = useState(false);
   const [detailPopupItem, setDetailPopupItem] = useState<any>(null);
   const [detailPopupType, setDetailPopupType] = useState<"cliente" | "concorrente" | "lead">("cliente");
@@ -209,8 +246,20 @@ export default function CascadeView() {
       const idsComTags = new Set(clientesComTags);
       filtered = filtered.filter((c) => idsComTags.has(c.id));
     }
+    // Filtrar por segmentação
+    if (clienteFilters.segmentacao.length > 0) {
+      filtered = filtered.filter((c) =>
+        clienteFilters.segmentacao.includes(c.segmentacaoB2bB2c || "")
+      );
+    }
+    // Filtrar por UF
+    if (clienteFilters.uf.length > 0) {
+      filtered = filtered.filter((c) =>
+        clienteFilters.uf.includes(c.uf || "")
+      );
+    }
     return filtered;
-  }, [clientes, statusFilter, searchQuery, selectedTagIds, clientesComTags]);
+  }, [clientes, statusFilter, searchQuery, selectedTagIds, clientesComTags, clienteFilters]);
 
   const filteredConcorrentes = useMemo(() => {
     if (!concorrentes) return [];
@@ -228,8 +277,14 @@ export default function CascadeView() {
       const idsComTags = new Set(concorrentesComTags);
       filtered = filtered.filter((c) => idsComTags.has(c.id));
     }
+    // Filtrar por porte
+    if (concorrenteFilters.porte.length > 0) {
+      filtered = filtered.filter((c) =>
+        concorrenteFilters.porte.includes(c.porte || "")
+      );
+    }
     return filtered;
-  }, [concorrentes, statusFilter, searchQuery, selectedTagIds, concorrentesComTags]);
+  }, [concorrentes, statusFilter, searchQuery, selectedTagIds, concorrentesComTags, concorrenteFilters]);
 
   const filteredLeads = useMemo(() => {
     if (!leads) return [];
@@ -247,8 +302,20 @@ export default function CascadeView() {
       const idsComTags = new Set(leadsComTags);
       filtered = filtered.filter((l) => idsComTags.has(l.id));
     }
+    // Filtrar por tipo
+    if (leadFilters.tipo.length > 0) {
+      filtered = filtered.filter((l) =>
+        leadFilters.tipo.includes(l.tipo || "")
+      );
+    }
+    // Filtrar por porte
+    if (leadFilters.porte.length > 0) {
+      filtered = filtered.filter((l) =>
+        leadFilters.porte.includes(l.porte || "")
+      );
+    }
     return filtered;
-  }, [leads, statusFilter, searchQuery, selectedTagIds, leadsComTags]);
+  }, [leads, statusFilter, searchQuery, selectedTagIds, leadsComTags, leadFilters]);
 
   // Contador de resultados de busca
   const searchResultsCount = useMemo(() => {
@@ -539,6 +606,15 @@ export default function CascadeView() {
             )}
           </div>
 
+          {/* Filtro por Tags */}
+          <div>
+            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Tags</h3>
+            <TagFilter
+              selectedTags={selectedTagIds}
+              onTagsChange={setSelectedTagIds}
+            />
+          </div>
+
           {/* Estatísticas */}
           <div>
             <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Estatísticas</h3>
@@ -623,14 +699,103 @@ export default function CascadeView() {
             </div>
           </div>
 
-          {/* Filtro por Tags */}
-          <div>
-            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Tags</h3>
-            <TagFilter
-              selectedTags={selectedTagIds}
-              onTagsChange={setSelectedTagIds}
-            />
-          </div>
+          {/* Filtros Avançados */}
+          {currentPage !== "mercados" && (
+            <div>
+              <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Filtros Avançados</h3>
+              <div className="space-y-2">
+                {/* Filtros de Clientes */}
+                {currentPage === "clientes" && (
+                  <>
+                    <MultiSelectFilter
+                      title="Segmentação"
+                      icon={<Briefcase className="w-3 h-3" />}
+                      options={[
+                        { value: "B2B", label: "B2B" },
+                        { value: "B2C", label: "B2C" },
+                        { value: "Ambos", label: "Ambos" },
+                      ]}
+                      selectedValues={clienteFilters.segmentacao}
+                      onValuesChange={(values) =>
+                        setClienteFilters({ ...clienteFilters, segmentacao: values })
+                      }
+                    />
+                    <MultiSelectFilter
+                      title="Estado (UF)"
+                      icon={<MapPin className="w-3 h-3" />}
+                      options={[
+                        { value: "SP", label: "São Paulo" },
+                        { value: "RJ", label: "Rio de Janeiro" },
+                        { value: "MG", label: "Minas Gerais" },
+                        { value: "RS", label: "Rio Grande do Sul" },
+                        { value: "PR", label: "Paraná" },
+                        { value: "SC", label: "Santa Catarina" },
+                        { value: "BA", label: "Bahia" },
+                        { value: "PE", label: "Pernambuco" },
+                        { value: "CE", label: "Ceará" },
+                        { value: "GO", label: "Goiás" },
+                      ]}
+                      selectedValues={clienteFilters.uf}
+                      onValuesChange={(values) =>
+                        setClienteFilters({ ...clienteFilters, uf: values })
+                      }
+                    />
+                  </>
+                )}
+
+                {/* Filtros de Concorrentes */}
+                {currentPage === "concorrentes" && (
+                  <>
+                    <MultiSelectFilter
+                      title="Porte"
+                      icon={<Package className="w-3 h-3" />}
+                      options={[
+                        { value: "Pequeno", label: "Pequeno" },
+                        { value: "Médio", label: "Médio" },
+                        { value: "Grande", label: "Grande" },
+                      ]}
+                      selectedValues={concorrenteFilters.porte}
+                      onValuesChange={(values) =>
+                        setConcorrenteFilters({ ...concorrenteFilters, porte: values })
+                      }
+                    />
+                  </>
+                )}
+
+                {/* Filtros de Leads */}
+                {currentPage === "leads" && (
+                  <>
+                    <MultiSelectFilter
+                      title="Tipo"
+                      icon={<Target className="w-3 h-3" />}
+                      options={[
+                        { value: "Cliente Potencial", label: "Cliente Potencial" },
+                        { value: "Parceiro", label: "Parceiro" },
+                        { value: "Fornecedor", label: "Fornecedor" },
+                      ]}
+                      selectedValues={leadFilters.tipo}
+                      onValuesChange={(values) =>
+                        setLeadFilters({ ...leadFilters, tipo: values })
+                      }
+                    />
+                    <MultiSelectFilter
+                      title="Porte"
+                      icon={<Package className="w-3 h-3" />}
+                      options={[
+                        { value: "Pequeno", label: "Pequeno" },
+                        { value: "Médio", label: "Médio" },
+                        { value: "Grande", label: "Grande" },
+                      ]}
+                      selectedValues={leadFilters.porte}
+                      onValuesChange={(values) =>
+                        setLeadFilters({ ...leadFilters, porte: values })
+                      }
+                    />
+                  </>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Mercado Atual */}
           {mercadoSelecionado && (

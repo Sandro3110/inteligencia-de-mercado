@@ -849,3 +849,36 @@
 - [ ] Testar todas as funcionalidades
 - [ ] Validar integração entre componentes
 - [ ] Criar checkpoint da Fase 1 e 2
+
+
+## Fase 30: Melhorias de Visibilidade do Filtro de Tags 🔧
+
+### 30.1 Ajustes de UX
+- [x] Sempre exibir seção "TAGS" no sidebar (mesmo sem tags criadas)
+- [x] Mover seção Tags para cima no sidebar (após Busca Global)
+- [x] Melhorar feedback visual
+
+## Fase 31: Filtros Avançados de Qualificação 🎯
+
+### 31.1 Componente Base ✅ CONCLUÍDO
+- [x] Criar componente MultiSelectFilter reutilizável
+- [x] Adicionar suporte a checkboxes múltiplos
+- [x] Implementar contador de seleções
+- [x] Adicionar botão "Limpar filtros"
+
+### 31.2 Filtros por Entidade ✅ CONCLUÍDO
+- [x] Filtro de Clientes (Segmentação, UF)
+- [x] Filtro de Concorrentes (Porte)
+- [x] Filtro de Leads (Tipo, Porte)
+
+### 31.3 Integração ✅ CONCLUÍDO
+- [x] Adicionar estados de filtro no CascadeView
+- [x] Implementar lógica de filtragem nos useMemo
+- [x] Combinar com filtros existentes (status, tags, busca)
+- [x] Adicionar indicador visual de filtros ativos (contador + badges)
+
+### 31.4 Testes
+- [ ] Testar filtros individuais
+- [ ] Testar combinação de múltiplos filtros
+- [ ] Validar performance
+- [ ] Criar checkpoint
