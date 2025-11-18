@@ -292,3 +292,30 @@
 - [x] Testar rolagem em todas as páginas (Mercados/Clientes/Concorrentes/Leads)
 - [x] Verificar responsividade mobile
 - [x] Criar checkpoint da correção
+
+
+## Fase 15: Melhorias de UX - Navegação e Scroll 🚧
+
+### 15.1 Indicador Visual de Scroll
+- [x] Adicionar contador "Exibindo X-Y de Z itens" no header da lista
+- [x] Calcular itens visíveis dinamicamente
+- [x] Atualizar contador ao rolar a lista
+- [x] Estilizar de forma discreta e informativa
+
+### 15.2 Scroll Automático ao Selecionar
+- [x] Implementar scroll para o topo ao selecionar mercado
+- [x] Implementar scroll para o topo ao avançar/voltar páginas
+- [x] Adicionar animação suave de scroll
+- [x] Testar em todas as transições de página
+
+### 15.3 Botão "Voltar ao Topo"
+- [x] Criar botão flutuante no canto inferior direito
+- [x] Mostrar botão apenas após rolar 200px
+- [x] Adicionar animação de fade in/out
+- [x] Implementar scroll suave ao clicar
+- [x] Estilizar com glassmorphism consistente
+
+### 15.4 Finalização
+- [x] Testar todas as melhorias
+- [x] Validar responsividade
+- [x] Criar checkpoint das melhorias de UX

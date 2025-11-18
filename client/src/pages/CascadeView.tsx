@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DetailPopup } from "@/components/DetailPopup";
@@ -24,6 +24,7 @@ import {
   ChevronLeft,
   Search,
   Download,
+  ArrowUp,
 } from "lucide-react";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
@@ -44,6 +45,10 @@ export default function CascadeView() {
   const [batchModalOpen, setBatchModalOpen] = useState(false);
   const [batchStatus, setBatchStatus] = useState<ValidationStatus>("rich");
   const [batchNotes, setBatchNotes] = useState("");
+  
+  // Estados para scroll tracking
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const { data: mercados, isLoading } = trpc.mercados.list.useQuery({ search: "" });
   const { data: clientes } = trpc.clientes.byMercado.useQuery(
@@ -80,6 +85,19 @@ export default function CascadeView() {
   });
 
   const mercadoSelecionado = mercados?.find((m) => m.id === selectedMercadoId);
+
+  // Monitorar scroll para mostrar botão voltar ao topo
+  useEffect(() => {
+    const viewport = scrollAreaRef.current?.querySelector('[data-slot="scroll-area-viewport"]');
+    if (!viewport) return;
+
+    const handleScroll = () => {
+      setShowScrollTop(viewport.scrollTop > 200);
+    };
+
+    viewport.addEventListener('scroll', handleScroll);
+    return () => viewport.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Calcular totais gerais
   const totalMercados = mercados?.length || 0;
@@ -156,10 +174,18 @@ export default function CascadeView() {
   }, [searchQuery, filteredClientes, filteredConcorrentes, filteredLeads]);
 
   // Funções de navegação
+  const scrollToTop = () => {
+    const viewport = scrollAreaRef.current?.querySelector('[data-slot="scroll-area-viewport"]');
+    if (viewport) {
+      viewport.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const handleSelectMercado = (id: number) => {
     setSelectedMercadoId(id);
     setCurrentPage("clientes");
     setSelectedItems(new Set());
+    setTimeout(scrollToTop, 100);
   };
 
   const handleNextPage = () => {
@@ -167,6 +193,7 @@ export default function CascadeView() {
     else if (currentPage === "clientes") setCurrentPage("concorrentes");
     else if (currentPage === "concorrentes") setCurrentPage("leads");
     setSelectedItems(new Set());
+    setTimeout(scrollToTop, 100);
   };
 
   const handlePrevPage = () => {
@@ -174,6 +201,7 @@ export default function CascadeView() {
     else if (currentPage === "concorrentes") setCurrentPage("clientes");
     else if (currentPage === "clientes") setCurrentPage("mercados");
     setSelectedItems(new Set());
+    setTimeout(scrollToTop, 100);
   };
 
   const getPageTitle = () => {
@@ -507,7 +535,29 @@ export default function CascadeView() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold">{getPageTitle()}</h2>
-                <p className="text-sm text-muted-foreground">Página {getPageNumber()} de 4</p>
+                <div className="flex items-center gap-3">
+                  <p className="text-sm text-muted-foreground">Página {getPageNumber()} de 4</p>
+                  {currentPage === "mercados" && (
+                    <Badge variant="outline" className="text-xs">
+                      {mercados?.length || 0} mercados
+                    </Badge>
+                  )}
+                  {currentPage === "clientes" && (
+                    <Badge variant="outline" className="text-xs">
+                      {filteredClientes.length} de {clientes?.length || 0} clientes
+                    </Badge>
+                  )}
+                  {currentPage === "concorrentes" && (
+                    <Badge variant="outline" className="text-xs">
+                      {filteredConcorrentes.length} de {concorrentes?.length || 0} concorrentes
+                    </Badge>
+                  )}
+                  {currentPage === "leads" && (
+                    <Badge variant="outline" className="text-xs">
+                      {filteredLeads.length} de {leads?.length || 0} leads
+                    </Badge>
+                  )}
+                </div>
               </div>
               {currentPage !== "mercados" && (
                 <div className="flex items-center gap-2">
@@ -528,7 +578,7 @@ export default function CascadeView() {
           {/* Conteúdo */}
           <div className="flex-1 overflow-hidden p-6">
             <div className="h-full max-w-6xl mx-auto">
-              <div className="glass-card h-full flex flex-col">
+              <div className="glass-card h-full flex flex-col" ref={scrollAreaRef}>
                 <ScrollArea className="flex-1" style={{ height: 'calc(100vh - 280px)' }}>
                   <div className="p-4">
                     {/* Lista de Mercados */}
@@ -786,6 +836,17 @@ export default function CascadeView() {
         type={detailPopupType}
         onClose={() => setDetailPopupOpen(false)}
       />
+
+      {/* Botão Voltar ao Topo */}
+      {showScrollTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 rounded-full w-12 h-12 p-0 shadow-lg glass-card border-border/40 hover:scale-110 transition-all duration-300 z-50"
+          aria-label="Voltar ao topo"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </Button>
+      )}
     </div>
   );
 }
