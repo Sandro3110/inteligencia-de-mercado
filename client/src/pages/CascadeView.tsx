@@ -667,48 +667,47 @@ export default function CascadeView() {
                           exit="exit"
                           transition={pageTransition}
                         >
-                      {isLoading ? (
-                        <div className="space-y-2">
-                          {Array.from({ length: 10 }).map((_, i) => (
-                            <SkeletonMercado key={i} />
-                          ))}
-                        </div>
-                      ) : (
-                      <motion.div 
-                        className="space-y-2"
-                        variants={listVariants}
-                        initial="hidden"
-                        animate="show"
-                      >
-                        {mercados?.map((mercado) => (
-                          <motion.div
-                            key={`mercado-item-${mercado.id}`}
-                            variants={listItemVariants}
-                          >
-                          <div
-                            key={mercado.id}
-                            className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
-                            onClick={() => handleSelectMercado(mercado.id)}
-                          >
-                            <div className="flex-1">
-                              <h3 className="font-medium group-hover:text-primary transition-colors">
-                                {mercado.nome}
-                              </h3>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline" className="text-xs">
-                                  {mercado.segmentacao}
-                                </Badge>
-                                <span className="text-sm text-muted-foreground">
-                                  {mercado.quantidadeClientes} clientes
-                                </span>
-                              </div>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                        {isLoading ? (
+                          <div className="space-y-2">
+                            {Array.from({ length: 10 }).map((_, i) => (
+                              <SkeletonMercado key={i} />
+                            ))}
                           </div>
+                        ) : (
+                          <motion.div 
+                            className="space-y-2"
+                            variants={listVariants}
+                            initial="hidden"
+                            animate="show"
+                          >
+                            {mercados?.map((mercado) => (
+                              <motion.div
+                                key={`mercado-item-${mercado.id}`}
+                                variants={listItemVariants}
+                              >
+                                <div
+                                  className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
+                                  onClick={() => handleSelectMercado(mercado.id)}
+                                >
+                                  <div className="flex-1">
+                                    <h3 className="font-medium group-hover:text-primary transition-colors">
+                                      {mercado.nome}
+                                    </h3>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <Badge variant="outline" className="text-xs">
+                                        {mercado.segmentacao}
+                                      </Badge>
+                                      <span className="text-sm text-muted-foreground">
+                                        {mercado.quantidadeClientes} clientes
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                                </div>
+                              </motion.div>
+                            ))}
                           </motion.div>
-                        ))}
-                      </motion.div>
-                      )}
+                        )}
                         </motion.div>
                       )}
 

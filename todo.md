@@ -651,3 +651,36 @@
 - [x] Testar todas as funcionalidades
 - [x] Validar performance
 - [x] Criar checkpoint final
+
+
+## Fase 24: Funcionalidades Finais - Paginação + Favoritos + Exportação 🚀
+
+### 24.1 Paginação Server-Side (Roadmap Futuro)
+- [ ] Verificar routers já preparados (byMercado com page/pageSize)
+- [ ] Atualizar CascadeView para usar paginação corretamente
+- [ ] Adicionar controles de paginação na UI (Anterior/Próximo)
+- [ ] Testar com datasets grandes
+
+### 24.2 Sistema de Favoritos (Roadmap Futuro)
+- [ ] Criar tabela favoritos no schema
+- [ ] Adicionar routers favoritos (add, remove, list)
+- [ ] Adicionar funções no db.ts
+- [ ] Criar componente de botão favorito (estrela)
+- [ ] Integrar no CascadeView
+- [ ] Adicionar filtro "Favoritos"
+
+### 24.3 Exportação Avançada (Roadmap Futuro)
+- [ ] Instalar biblioteca para Excel (xlsx)
+- [ ] Criar função exportToExcel com formatação
+- [ ] Criar função exportToPDF com relatório formatado
+- [ ] Adicionar botões de exportação no Dashboard
+- [ ] Testar exportações
+
+### 24.4 Correção de Bugs
+- [x] Corrigir erro de JSX no CascadeView (motion.div)
+- [x] Validar funcionamento
+
+### 24.5 Finalização
+- [x] Testar todas as funcionalidades
+- [x] Validar performance
+- [x] Criar checkpoint final
