@@ -99,7 +99,7 @@
 - [x] Testar navegação em cascata completa
 - [x] Verificar performance com 2.991 registros
 - [x] Validar responsividade mobile
-- [ ] Criar checkpoint da navegação em cascata
+- [x] Criar checkpoint da navegação em cascata
 - [x] Documentar novo fluxo de uso
 
 ---
@@ -118,4 +118,43 @@
 - `rich` (Validado/Rico)
 - `needs_adjustment` (Precisa Ajuste)
 - `discarded` (Descartado)
+
+
+
+## Fase 9: Melhorias de Navegação e Layout 🚧
+
+### 9.1 Pop-up de Detalhes
+- [x] Criar componente DetailPopup para exibir informações completas
+- [x] Implementar clique em item para abrir pop-up
+- [x] Adicionar botão de fechar (X) e overlay
+- [x] Exibir todos os campos do item no pop-up
+- [x] Adicionar animação de entrada/saída
+
+### 9.2 Correção do Tema Light
+- [x] Corrigir cores dos cards no tema light (devem ser claros)
+- [x] Ajustar contraste de texto no tema light
+- [x] Garantir legibilidade em ambos os temas
+- [x] Testar alternância entre temas
+
+### 9.3 Layout Horizontal
+- [x] Analisar layout horizontal do HTML de referência
+- [x] Reestruturar CascadeView para layout em boxes lado a lado
+- [x] Implementar grid horizontal responsivo
+- [x] Ajustar espaçamento e proporções
+- [x] Manter hierarquia visual clara
+
+### 9.4 Gráficos de Proporção
+- [x] Adicionar gráfico de tamanho de mercado vs total
+- [x] Adicionar gráfico de clientes por mercado vs total
+- [x] Adicionar gráfico de leads por mercado vs total
+- [x] Implementar barras de progresso visuais
+- [x] Usar cores consistentes com o design
+
+### 9.5 Finalização
+- [x] Testar todas as melhorias
+- [x] Validar responsividade
+- [ ] Criar checkpoint das melhorias
+- [x] Atualizar documentação
+
+---
 
