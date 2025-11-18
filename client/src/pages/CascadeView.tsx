@@ -524,35 +524,57 @@ export default function CascadeView() {
   const handleExportFiltered = () => {
     let data: any[] = [];
     let headers: string[] = [];
-    let filename = "";
+    let totalData = 0;
+    let entityType = "";
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
 
-    if (currentPage === "clientes") {
+    if (currentPage === "mercados") {
+      data = filteredMercados;
+      totalData = mercados?.length || 0;
+      entityType = "mercados";
+      headers = ["ID", "Nome", "Segmentação", "Categoria", "Tamanho", "Crescimento", "Status"];
+    } else if (currentPage === "clientes") {
       data = filteredClientes;
+      totalData = clientes?.length || 0;
+      entityType = "clientes";
       headers = ["ID", "Empresa", "CNPJ", "Produto", "Segmentação", "Cidade", "UF", "Status"];
-      filename = "clientes_filtrados.csv";
     } else if (currentPage === "concorrentes") {
       data = filteredConcorrentes;
+      totalData = concorrentes?.length || 0;
+      entityType = "concorrentes";
       headers = ["ID", "Nome", "CNPJ", "Produto", "Porte", "Score", "Status"];
-      filename = "concorrentes_filtrados.csv";
     } else if (currentPage === "leads") {
       data = filteredLeads;
+      totalData = leads?.length || 0;
+      entityType = "leads";
       headers = ["ID", "Nome", "CNPJ", "Tipo", "Porte", "Região", "Status"];
-      filename = "leads_filtrados.csv";
     } else {
       toast.error("Selecione uma página com dados para exportar");
       return;
     }
 
     if (data.length === 0) {
-      toast.error("Nenhum dado para exportar");
+      toast.error("Nenhum dado para exportar. Ajuste os filtros.");
       return;
     }
+
+    const filename = `${entityType}_${timestamp}.csv`;
 
     // Gerar CSV
     const csvContent = [
       headers.join(","),
       ...data.map((item) => {
-        if (currentPage === "clientes") {
+        if (currentPage === "mercados") {
+          return [
+            item.id,
+            `"${item.nome || ""}"`,
+            item.segmentacao || "",
+            `"${item.categoria || ""}"`,
+            item.tamanhoMercado || "",
+            item.crescimentoAnual || "",
+            item.validationStatus || "pending",
+          ].join(",");
+        } else if (currentPage === "clientes") {
           return [
             item.id,
             `"${item.empresa || ""}"`,
@@ -594,7 +616,19 @@ export default function CascadeView() {
     link.download = filename;
     link.click();
 
-    toast.success(`${data.length} itens exportados com sucesso!`);
+    // Toast com informação sobre filtros
+    const filtersActive = searchQuery || selectedTagIds.length > 0 || 
+      statusFilter !== "all" || 
+      Object.values(mercadoFilters).some(arr => arr.length > 0) ||
+      Object.values(clienteFilters).some(arr => arr.length > 0) ||
+      Object.values(concorrenteFilters).some(arr => arr.length > 0) ||
+      Object.values(leadFilters).some(arr => arr.length > 0);
+    
+    if (filtersActive) {
+      toast.success(`Exportando ${data.length} de ${totalData} ${entityType} (filtros aplicados)`);
+    } else {
+      toast.success(`${data.length} ${entityType} exportados com sucesso!`);
+    }
   };
 
   return (
@@ -626,12 +660,10 @@ export default function CascadeView() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          {currentPage !== "mercados" && (
-            <Button variant="outline" size="sm" onClick={handleExportFiltered}>
-              <Download className="w-4 h-4 mr-2" />
-              Exportar Filtrados
-            </Button>
-          )}
+          <Button variant="outline" size="sm" onClick={handleExportFiltered}>
+            <Download className="w-4 h-4 mr-2" />
+            Exportar Filtrados
+          </Button>
           <TagManager />
           <ThemeToggle />
         </div>

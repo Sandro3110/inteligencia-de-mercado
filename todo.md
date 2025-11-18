@@ -915,4 +915,23 @@
 - [x] Adicionar badges mostrando campos selecionados
 - [x] Implementar preview de campos ativos
 - [x] Testar busca em múltiplos campos
+- [x] Criar checkpoint
+
+
+## Fase 34: Exportação Inteligente 📤 (Sprint 1)
+
+### 34.1 Atualização da Função de Exportação ✅ CONCLUÍDO
+- [x] Modificar função exportToCSV para aceitar dados filtrados (já estava usando filteredX)
+- [x] Adicionar suporte para exportar mercados
+- [x] Adicionar nome do arquivo com timestamp (formato: entityType_YYYY-MM-DDTHH-MM-SS.csv)
+- [x] Adicionar contador "Exportando X de Y itens (filtros aplicados)" no toast
+- [x] Detectar automaticamente se filtros estão ativos
+- [x] Remover condição que ocultava botão na página de mercados
+
+### 34.2 Testes e Validação
+- [ ] Testar exportação com busca ativa
+- [ ] Testar exportação com tags selecionadas
+- [ ] Testar exportação com filtros avançados ativos
+- [ ] Testar exportação com status filter ativo
+- [ ] Testar exportação com múltiplos filtros combinados
 - [ ] Criar checkpoint
