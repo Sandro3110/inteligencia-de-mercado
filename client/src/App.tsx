@@ -7,12 +7,14 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Dashboard from "./pages/Dashboard";
 import Mercados from "./pages/Mercados";
 import MercadoDetalhes from "./pages/MercadoDetalhes";
+import CascadeView from "./pages/CascadeView";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"/"} component={Dashboard} />
+      <Route path={"/"} component={CascadeView} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/mercados" component={Mercados} />
       <Route path="/mercado/:id" component={MercadoDetalhes} />
       <Route path={"/404"} component={NotFound} />
