@@ -31,6 +31,33 @@ export const appRouter = router({
       const { getDashboardStats } = await import('./db');
       return getDashboardStats();
     }),
+    
+    distribuicaoGeografica: publicProcedure.query(async () => {
+      const { getDistribuicaoGeografica } = await import('./db');
+      return getDistribuicaoGeografica();
+    }),
+    
+    distribuicaoSegmentacao: publicProcedure.query(async () => {
+      const { getDistribuicaoSegmentacao } = await import('./db');
+      return getDistribuicaoSegmentacao();
+    }),
+    
+    timelineValidacoes: publicProcedure
+      .input(z.object({ days: z.number().optional().default(30) }))
+      .query(async ({ input }) => {
+        const { getTimelineValidacoes } = await import('./db');
+        return getTimelineValidacoes(input.days);
+      }),
+    
+    funilConversao: publicProcedure.query(async () => {
+      const { getFunilConversao } = await import('./db');
+      return getFunilConversao();
+    }),
+    
+    top10Mercados: publicProcedure.query(async () => {
+      const { getTop10Mercados } = await import('./db');
+      return getTop10Mercados();
+    }),
   }),
 
   mercados: router({

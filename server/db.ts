@@ -780,3 +780,107 @@ export async function deleteSavedFilter(id: number) {
   
   await db.delete(savedFilters).where(eq(savedFilters.id, id));
 }
+
+
+// ============================================
+// Dashboard Analytics Functions
+// ============================================
+
+export async function getDistribuicaoGeografica() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { clientes } = await import("../drizzle/schema");
+  const { sql } = await import("drizzle-orm");
+  
+  const result = await db
+    .select({
+      uf: clientes.uf,
+      count: sql<number>`count(*)`.as("count"),
+    })
+    .from(clientes)
+    .where(sql`${clientes.uf} IS NOT NULL AND ${clientes.uf} != ''`)
+    .groupBy(clientes.uf)
+    .orderBy(sql`count DESC`);
+  
+  return result;
+}
+
+export async function getDistribuicaoSegmentacao() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { clientes } = await import("../drizzle/schema");
+  const { sql } = await import("drizzle-orm");
+  
+  const result = await db
+    .select({
+      segmentacao: clientes.segmentacaoB2bB2c,
+      count: sql<number>`count(*)`.as("count"),
+    })
+    .from(clientes)
+    .where(sql`${clientes.segmentacaoB2bB2c} IS NOT NULL`)
+    .groupBy(clientes.segmentacaoB2bB2c);
+  
+  return result;
+}
+
+export async function getTimelineValidacoes(days: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { clientes } = await import("../drizzle/schema");
+  const { sql } = await import("drizzle-orm");
+  
+  const result = await db
+    .select({
+      date: sql<string>`DATE(${clientes.validatedAt})`.as("date"),
+      count: sql<number>`count(*)`.as("count"),
+    })
+    .from(clientes)
+    .where(sql`${clientes.validatedAt} >= DATE_SUB(NOW(), INTERVAL ${days} DAY)`)
+    .groupBy(sql`date`)
+    .orderBy(sql`date ASC`);
+  
+  return result;
+}
+
+export async function getFunilConversao() {
+  const db = await getDb();
+  if (!db) return { leads: 0, clientes: 0, validados: 0 };
+  
+  const { leads, clientes } = await import("../drizzle/schema");
+  const { sql, count } = await import("drizzle-orm");
+  
+  const [leadsCount] = await db.select({ value: count() }).from(leads);
+  const [clientesCount] = await db.select({ value: count() }).from(clientes);
+  const [validadosCount] = await db
+    .select({ value: count() })
+    .from(clientes)
+    .where(sql`${clientes.validationStatus} = 'rich'`);
+  
+  return {
+    leads: leadsCount.value,
+    clientes: clientesCount.value,
+    validados: validadosCount.value,
+  };
+}
+
+export async function getTop10Mercados() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { mercadosUnicos } = await import("../drizzle/schema");
+  const { desc } = await import("drizzle-orm");
+  
+  const result = await db
+    .select({
+      nome: mercadosUnicos.nome,
+      quantidadeClientes: mercadosUnicos.quantidadeClientes,
+    })
+    .from(mercadosUnicos)
+    .orderBy(desc(mercadosUnicos.quantidadeClientes))
+    .limit(10);
+  
+  return result;
+}

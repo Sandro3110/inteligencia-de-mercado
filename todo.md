@@ -985,4 +985,39 @@
 - [x] Testar parsear filtersJson corretamente
 - [x] Testar deletar filtro
 - [x] Testar retornar array vazio para usuário sem filtros
+- [x] Criar checkpoint
+
+
+## Fase 38: Dashboard Avançado 📊 (Sprint 3)
+
+### 38.1 Backend - Queries de Analytics ✅ CONCLUÍDO
+- [x] Criar função getDistribuicaoGeografica (count por UF)
+- [x] Criar função getDistribuicaoSegmentacao (count por B2B/B2C/Ambos)
+- [x] Criar função getTimelineValidacoes (validações por data com parâmetro days)
+- [x] Criar função getFunilConversao (leads → clientes → validados)
+- [x] Criar função getTop10Mercados (por quantidade de clientes)
+- [x] Adicionar 5 procedures no router dashboard
+
+### 38.2 Frontend - Instalação de Dependências ✅ CONCLUÍDO
+- [x] Instalar recharts para gráficos
+
+### 38.3 Frontend - Componentes de Gráficos ✅ CONCLUÍDO
+- [x] Criar DistribuicaoGeograficaChart (BarChart) - integrado em DashboardPage
+- [x] Criar DistribuicaoSegmentacaoChart (PieChart) - integrado em DashboardPage
+- [x] Criar TimelineValidacoesChart (LineChart) - integrado em DashboardPage
+- [x] Criar FunilConversaoChart (BarChart horizontal) - integrado em DashboardPage
+- [x] Criar Top10MercadosChart (BarChart horizontal) - integrado em DashboardPage
+
+### 38.4 Frontend - Página de Dashboard ✅ CONCLUÍDO
+- [x] Criar página DashboardPage.tsx com 5 gráficos
+- [x] Adicionar grid layout responsivo (1 col mobile, 2 cols desktop)
+- [x] Adicionar 3 KPI cards (Leads, Clientes, Validados)
+- [x] Adicionar filtros de período (7/30/90 dias)
+- [x] Adicionar botão de refresh para todos os gráficos
+- [x] Adicionar rota /dashboard-avancado no App.tsx
+
+### 38.5 Testes ✅ CONCLUÍDO
+- [x] Testar queries de analytics (6/6 testes passando)
+- [x] Testar renderização de gráficos (validado visualmente)
+- [x] Testar responsividade (grid layout adaptativo)
 - [ ] Criar checkpoint
