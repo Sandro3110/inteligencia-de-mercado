@@ -115,6 +115,14 @@ export type InsertConcorrente = typeof concorrentes.$inferInsert;
 /**
  * Leads - Lead entities with validation
  */
+export const leadStageEnum = mysqlEnum("leadStage", [
+  "novo",
+  "em_contato",
+  "negociacao",
+  "fechado",
+  "perdido",
+]);
+
 export const leads = mysqlTable("leads", {
   id: int("id").primaryKey().autoincrement(),
   leadHash: varchar("leadHash", { length: 64 }),
@@ -130,6 +138,8 @@ export const leads = mysqlTable("leads", {
   setor: varchar("setor", { length: 100 }),
   qualidadeScore: int("qualidadeScore"),
   qualidadeClassificacao: varchar("qualidadeClassificacao", { length: 50 }),
+  stage: leadStageEnum.default("novo"),
+  stageUpdatedAt: timestamp("stageUpdatedAt").defaultNow(),
   validationStatus: validationStatusEnum.default("pending"),
   validationNotes: text("validationNotes"),
   validatedBy: varchar("validatedBy", { length: 64 }),

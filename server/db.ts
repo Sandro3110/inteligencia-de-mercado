@@ -884,3 +884,40 @@ export async function getTop10Mercados() {
   
   return result;
 }
+
+
+// ========== Kanban Functions ==========
+
+export async function updateLeadStage(
+  leadId: number,
+  stage: "novo" | "em_contato" | "negociacao" | "fechado" | "perdido"
+) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update lead stage: database not available");
+    return;
+  }
+
+  await db
+    .update(leads)
+    .set({
+      stage,
+      stageUpdatedAt: new Date(),
+    })
+    .where(eq(leads.id, leadId));
+}
+
+export async function getLeadsByStage(mercadoId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get leads by stage: database not available");
+    return [];
+  }
+
+  const result = await db
+    .select()
+    .from(leads)
+    .where(eq(leads.mercadoId, mercadoId));
+
+  return result;
+}

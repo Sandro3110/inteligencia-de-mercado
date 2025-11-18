@@ -261,6 +261,26 @@ export const appRouter = router({
         const { updateLeadValidation } = await import('./db');
         return updateLeadValidation(input.id, input.status, input.notes, ctx.user?.id);
       }),
+
+    updateStage: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        stage: z.enum(["novo", "em_contato", "negociacao", "fechado", "perdido"]),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateLeadStage } = await import('./db');
+        await updateLeadStage(input.id, input.stage);
+        return { success: true };
+      }),
+
+    byStage: publicProcedure
+      .input(z.object({
+        mercadoId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        const { getLeadsByStage } = await import('./db');
+        return getLeadsByStage(input.mercadoId);
+      }),
   }),
 
   savedFilters: router({

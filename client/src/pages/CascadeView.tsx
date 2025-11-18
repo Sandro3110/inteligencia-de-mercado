@@ -55,10 +55,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import KanbanBoard from "@/components/KanbanBoard";
+import { LayoutList, LayoutGrid } from "lucide-react";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
 type Page = "mercados" | "clientes" | "concorrentes" | "leads";
 type ValidationStatus = "pending" | "rich" | "needs_adjustment" | "discarded";
+type ViewMode = "list" | "kanban";
 
 export default function CascadeView() {
   const [currentPage, setCurrentPage] = useState<Page>("mercados");
@@ -67,6 +70,7 @@ export default function CascadeView() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFields, setSearchFields] = useState<SearchField[]>(["nome", "cnpj", "produto"]); // Campos padrão
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   
   // Estados para filtros avançados
   const [mercadoFilters, setMercadoFilters] = useState<{
@@ -1030,16 +1034,43 @@ export default function CascadeView() {
                 </div>
               </div>
               {currentPage !== "mercados" && (
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    checked={
-                      (currentPage === "clientes" && selectedItems.size === filteredClientes.length) ||
-                      (currentPage === "concorrentes" && selectedItems.size === filteredConcorrentes.length) ||
-                      (currentPage === "leads" && selectedItems.size === filteredLeads.length)
-                    }
-                    onCheckedChange={toggleSelectAll}
-                  />
-                  <span className="text-sm text-muted-foreground">Selecionar todos ({selectedItems.size})</span>
+                <div className="flex items-center gap-4">
+                  {/* Botão de alternância Lista/Kanban (apenas para Leads) */}
+                  {currentPage === "leads" && (
+                    <div className="flex items-center gap-1 border rounded-md">
+                      <Button
+                        variant={viewMode === "list" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setViewMode("list")}
+                        className="h-8 px-3"
+                      >
+                        <LayoutList className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant={viewMode === "kanban" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setViewMode("kanban")}
+                        className="h-8 px-3"
+                      >
+                        <LayoutGrid className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {/* Checkbox de seleção (apenas no modo lista) */}
+                  {viewMode === "list" && (
+                    <>
+                      <Checkbox
+                        checked={
+                          (currentPage === "clientes" && selectedItems.size === filteredClientes.length) ||
+                          (currentPage === "concorrentes" && selectedItems.size === filteredConcorrentes.length) ||
+                          (currentPage === "leads" && selectedItems.size === filteredLeads.length)
+                        }
+                        onCheckedChange={toggleSelectAll}
+                      />
+                      <span className="text-sm text-muted-foreground">Selecionar todos ({selectedItems.size})</span>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -1249,7 +1280,7 @@ export default function CascadeView() {
                         </motion.div>
                       )}
 
-                      {/* Lista de Leads */}
+                      {/* Lista/Kanban de Leads */}
                       {currentPage === "leads" && (
                         <motion.div
                           key="leads"
@@ -1259,54 +1290,61 @@ export default function CascadeView() {
                           exit="exit"
                           transition={pageTransition}
                         >
-                      <div className="space-y-2">
-                        {filteredLeads.map((lead: any) => (
-                          <div
-                            key={lead.id}
-                            className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
-                          >
-                            <Checkbox
-                              checked={selectedItems.has(lead.id)}
-                              onCheckedChange={() => toggleItemSelection(lead.id)}
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            <div
-                              className="flex-1"
-                              onClick={() => {
-                                setDetailPopupItem(lead);
-                                setDetailPopupType("lead");
-                                setDetailPopupOpen(true);
-                              }}
-                            >
-                              <div className="flex items-center gap-2">
-                                {getStatusIcon(lead.validationStatus)}
-                                <h3 className="text-base font-medium group-hover:text-primary transition-colors">
-                                  {lead.nome}
-                                </h3>
-                                <Badge variant="outline" className="text-[11px] px-2 py-0.5">
-                                  {lead.tipo}
-                                </Badge>
-                                {(() => {
-                                  const score = calculateQualityScore(lead);
-                                  const quality = classifyQuality(score);
-                                  return (
-                                    <Badge variant={quality.variant} className={`text-xs ${quality.color}`}>
-                                      {score}%
-                                    </Badge>
-                                  );
-                                })()}
-                              </div>
-                              <p className="text-sm text-muted-foreground mt-1 truncate">{lead.regiao}</p>
-                              <div className="mt-2" onClick={(e) => e.stopPropagation()}>
-                                <EntityTagPicker
-                                  entityType="lead"
-                                  entityId={lead.id}
-                                />
-                              </div>
+                          {viewMode === "list" ? (
+                            <div className="space-y-2">
+                              {filteredLeads.map((lead: any) => (
+                                <div
+                                  key={lead.id}
+                                  className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
+                                >
+                                  <Checkbox
+                                    checked={selectedItems.has(lead.id)}
+                                    onCheckedChange={() => toggleItemSelection(lead.id)}
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                  <div
+                                    className="flex-1"
+                                    onClick={() => {
+                                      setDetailPopupItem(lead);
+                                      setDetailPopupType("lead");
+                                      setDetailPopupOpen(true);
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {getStatusIcon(lead.validationStatus)}
+                                      <h3 className="text-base font-medium group-hover:text-primary transition-colors">
+                                        {lead.nome}
+                                      </h3>
+                                      <Badge variant="outline" className="text-[11px] px-2 py-0.5">
+                                        {lead.tipo}
+                                      </Badge>
+                                      {(() => {
+                                        const score = calculateQualityScore(lead);
+                                        const quality = classifyQuality(score);
+                                        return (
+                                          <Badge variant={quality.variant} className={`text-xs ${quality.color}`}>
+                                            {score}%
+                                          </Badge>
+                                        );
+                                      })()}
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mt-1 truncate">{lead.regiao}</p>
+                                    <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                                      <EntityTagPicker
+                                        entityType="lead"
+                                        entityId={lead.id}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          </div>
-                        ))}
-                      </div>
+                          ) : (
+                            <KanbanBoard
+                              mercadoId={selectedMercadoId!}
+                              leads={filteredLeads}
+                            />
+                          )}
                         </motion.div>
                       )}
                     </AnimatePresence>

@@ -1048,4 +1048,43 @@
 - [x] Testar exportação Excel com dados reais (73 mercados exportados com sucesso)
 - [x] Testar dropdown com 3 opções visíveis
 - [x] Testar toast de confirmação
+- [x] Criar checkpoint
+
+
+## Fase 41: Modo Kanban para Leads 📊 (Sprint 4)
+
+### 41.1 Backend - Schema e Database ✅ CONCLUÍDO
+- [x] Adicionar campo `stage` na tabela `leads` (enum: novo, em_contato, negociacao, fechado, perdido)
+- [x] Adicionar campo `stageUpdatedAt` para rastrear última movimentação
+- [x] Executar db:push (migração 0005_light_xavin.sql criada)
+- [x] Adicionar função updateLeadStage no db.ts
+- [x] Adicionar função getLeadsByStage no db.ts
+
+### 41.2 Backend - Routers ✅ CONCLUÍDO
+- [x] Criar router leads.updateStage (publicProcedure com input id + stage)
+- [x] Criar router leads.byStage (retornar leads por mercadoId)
+
+### 41.3 Frontend - Instalação de Dependências ✅ CONCLUÍDO
+- [x] Instalar @dnd-kit/core para drag & drop
+- [x] Instalar @dnd-kit/sortable para ordenação
+- [x] Instalar @dnd-kit/utilities para helpers
+
+### 41.4 Frontend - Componentes Kanban ✅ CONCLUÍDO
+- [x] Criar componente KanbanBoard.tsx (container principal com DndContext)
+- [x] Criar KanbanColumn integrado (coluna com contador e useDroppable)
+- [x] Criar KanbanCard integrado (card de lead arrastável com useDraggable)
+- [x] Adicionar botão de alternância Lista/Kanban no CascadeView (LayoutList/LayoutGrid)
+
+### 41.5 Frontend - Lógica de Drag & Drop ✅ CONCLUÍDO
+- [x] Implementar DndContext com PointerSensor (distance: 8)
+- [x] Implementar handleDragEnd para atualizar stage via mutation
+- [x] Adicionar feedback visual durante drag (DragOverlay)
+- [x] Implementar toast de confirmação após mover (success/error)
+
+### 41.6 Integração e Testes
+- [x] Integrar KanbanBoard na página de Leads (renderização condicional)
+- [x] Adicionar estado viewMode e botão de alternância
+- [x] Passar filteredLeads para KanbanBoard (filtros funcionando)
+- [ ] Testar drag & drop entre colunas
+- [ ] Testar persistência de stage no banco
 - [ ] Criar checkpoint
