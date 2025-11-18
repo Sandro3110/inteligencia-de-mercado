@@ -274,3 +274,21 @@
 
 ---
 
+
+
+## Fase 14: Correção da Barra de Rolagem 🚧
+
+### 14.1 Investigação do Problema
+- [x] Analisar código do ScrollArea nas listas
+- [x] Identificar causa da limitação de itens visíveis
+- [x] Verificar altura do container
+
+### 14.2 Correção
+- [x] Ajustar altura do ScrollArea para exibir todos os itens
+- [x] Garantir que a barra de rolagem apareça corretamente
+- [x] Testar com os 73 mercados completos
+
+### 14.3 Validação
+- [x] Testar rolagem em todas as páginas (Mercados/Clientes/Concorrentes/Leads)
+- [x] Verificar responsividade mobile
+- [x] Criar checkpoint da correção

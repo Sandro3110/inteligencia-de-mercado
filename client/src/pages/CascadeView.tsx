@@ -529,7 +529,7 @@ export default function CascadeView() {
           <div className="flex-1 overflow-hidden p-6">
             <div className="h-full max-w-6xl mx-auto">
               <div className="glass-card h-full flex flex-col">
-                <ScrollArea className="flex-1">
+                <ScrollArea className="flex-1" style={{ height: 'calc(100vh - 280px)' }}>
                   <div className="p-4">
                     {/* Lista de Mercados */}
                     {currentPage === "mercados" && (
