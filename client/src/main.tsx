@@ -7,8 +7,6 @@ import superjson from "superjson";
 import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
-import { CompactModeProvider } from "./contexts/CompactModeContext";
-import { ZoomProvider } from "./contexts/ZoomContext";
 
 // Quick Win 2: Configurar cache para melhorar performance de navegação
 const queryClient = new QueryClient({
@@ -67,11 +65,7 @@ const trpcClient = trpc.createClient({
 createRoot(document.getElementById("root")!).render(
   <trpc.Provider client={trpcClient} queryClient={queryClient}>
     <QueryClientProvider client={queryClient}>
-      <ZoomProvider>
-        <CompactModeProvider>
-          <App />
-        </CompactModeProvider>
-      </ZoomProvider>
+      <App />
     </QueryClientProvider>
   </trpc.Provider>
 );

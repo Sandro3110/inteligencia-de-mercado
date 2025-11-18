@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE clientes \nADD COLUMN IF NOT EXISTS porte varchar(50) AFTER cnae,\nADD COLUMN IF NOT EXISTS qualidadeScore int AFTER porte,\nADD COLUMN IF NOT EXISTS qualidadeClassificacao varchar(50) AFTER qualidadeScore;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute ALTER TABLE clientes \nADD COLUMN IF NOT EXISTS porte varchar(50) AFTER cnae,\nADD COLUMN IF NOT EXISTS qualidadeScore int AFTER porte,\nADD COLUMN IF NOT EXISTS qualidadeClassificacao varchar(50) AFTER qualidadeScore;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'porte' in 'clientes'"
+  ]
+}
