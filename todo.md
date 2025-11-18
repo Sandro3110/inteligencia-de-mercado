@@ -780,3 +780,72 @@
 - [x] Testar legibilidade em todas as páginas
 - [x] Validar consistência visual
 - [x] Criar checkpoint
+
+
+## Fase 29: Implementação do Roadmap - Fase 1 e 2 (Q1 2026) 🚀
+
+### 29.1 Sistema de Tags Customizáveis (20h) ✅ CONCLUÍDO
+- [x] Criar tabela `tags` no schema
+- [x] Criar tabela `entity_tags` (junction table)
+- [x] Adicionar routers tRPC para tags (list, create, delete, getEntityTags, addToEntity, removeFromEntity, getEntitiesByTag)
+- [x] Adicionar funções no db.ts (getAllTags, createTag, deleteTag, getEntityTags, addTagToEntity, removeTagFromEntity, getEntitiesByTag)
+- [x] Criar componente TagManager.tsx (dialog com CRUD + seletor de cores)
+- [x] Criar componente TagPicker.tsx (popover para adicionar/remover tags)
+- [x] Criar componente TagBadge.tsx (badge visual com cor customizada)
+- [x] Criar componente TagFilter.tsx (filtro multi-seleção)
+- [x] Criar componente EntityTagPicker.tsx (wrapper que carrega tags dinamicamente)
+- [x] Integrar tags no CascadeView (TagManager no header, EntityTagPicker em todos os cards)
+- [x] Adicionar filtro multi-tag no sidebar
+- [x] Implementar lógica de filtragem por tags (queries + useMemo)
+- [x] Testar CRUD de tags
+
+### 29.2 Paginação Server-Side (8h)
+- [ ] Atualizar routers com page/pageSize
+- [ ] Atualizar funções db.ts com limit/offset
+- [ ] Retornar { data, total, page, pageSize, totalPages }
+- [ ] Atualizar CascadeView para usar paginação
+- [ ] Criar componente Pagination.tsx
+- [ ] Testar com datasets grandes
+
+### 29.3 Audit Log (18h)
+- [ ] Criar tabela `audit_logs` no schema
+- [ ] Criar middleware de auditoria
+- [ ] Registrar INSERT/UPDATE/DELETE automaticamente
+- [ ] Adicionar routers para visualizar logs
+- [ ] Criar página AuditLog.tsx
+- [ ] Filtrar logs por entidade/usuário/data
+- [ ] Testar rastreabilidade
+
+### 29.4 Exportação Avançada (12h)
+- [ ] Instalar biblioteca xlsx
+- [ ] Criar função exportToExcel com formatação
+- [ ] Criar função exportToPDF
+- [ ] Integrar Google Sheets API
+- [ ] Adicionar botões de exportação no Dashboard
+- [ ] Testar exportações
+
+### 29.5 Modo Compacto + Zoom (6h)
+- [ ] Integrar CompactModeContext já criado
+- [ ] Integrar ZoomContext já criado
+- [ ] Criar botão toggle no header
+- [ ] Criar controles de zoom (80%, 90%, 100%, 110%)
+- [ ] Testar em diferentes densidades
+
+### 29.6 Validação de Email (4h)
+- [ ] Criar função isValidEmail()
+- [ ] Adicionar validação visual nos cards
+- [ ] Adicionar ícone de alerta para emails inválidos
+- [ ] Adicionar tooltip explicativo
+
+### 29.7 Filtros Salvos (12h)
+- [ ] Criar tabela `saved_filters` no schema
+- [ ] Adicionar routers para salvar/carregar filtros
+- [ ] Criar componente SavedFilters.tsx
+- [ ] Permitir nomear e salvar combinações de filtros
+- [ ] Adicionar dropdown de filtros salvos
+- [ ] Testar persistência
+
+### 29.8 Finalização
+- [ ] Testar todas as funcionalidades
+- [ ] Validar integração entre componentes
+- [ ] Criar checkpoint da Fase 1 e 2

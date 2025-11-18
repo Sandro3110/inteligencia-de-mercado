@@ -617,3 +617,132 @@ export async function getAnalyticsProgress() {
     throw error;
   }
 }
+
+
+// ============================================
+// TAG HELPERS
+// ============================================
+
+export async function getAllTags() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { tags } = await import("../drizzle/schema");
+  return await db.select().from(tags);
+}
+
+export async function createTag(name: string, color: string = "#3b82f6") {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { tags } = await import("../drizzle/schema");
+  await db.insert(tags).values({ name, color });
+  
+  // Get the last inserted tag
+  const inserted = await db.select().from(tags).orderBy(sql`id DESC`).limit(1);
+  return inserted[0] || null;
+}
+
+export async function deleteTag(tagId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { tags } = await import("../drizzle/schema");
+  await db.delete(tags).where(eq(tags.id, tagId));
+  return { success: true };
+}
+
+export async function getEntityTags(entityType: string, entityId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { entityTags, tags } = await import("../drizzle/schema");
+  
+  const results = await db
+    .select({
+      id: entityTags.id,
+      tagId: tags.id,
+      name: tags.name,
+      color: tags.color,
+    })
+    .from(entityTags)
+    .innerJoin(tags, eq(entityTags.tagId, tags.id))
+    .where(
+      and(
+        eq(entityTags.entityType, entityType as any),
+        eq(entityTags.entityId, entityId)
+      )
+    );
+  
+  return results;
+}
+
+export async function addTagToEntity(tagId: number, entityType: string, entityId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { entityTags } = await import("../drizzle/schema");
+  
+  // Check if already exists
+  const existing = await db
+    .select()
+    .from(entityTags)
+    .where(
+      and(
+        eq(entityTags.tagId, tagId),
+        eq(entityTags.entityType, entityType as any),
+        eq(entityTags.entityId, entityId)
+      )
+    )
+    .limit(1);
+  
+  if (existing.length > 0) {
+    return { success: true, alreadyExists: true };
+  }
+  
+  await db.insert(entityTags).values({
+    tagId,
+    entityType: entityType as any,
+    entityId,
+  });
+  
+  return { success: true, alreadyExists: false };
+}
+
+export async function removeTagFromEntity(tagId: number, entityType: string, entityId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { entityTags } = await import("../drizzle/schema");
+  
+  await db
+    .delete(entityTags)
+    .where(
+      and(
+        eq(entityTags.tagId, tagId),
+        eq(entityTags.entityType, entityType as any),
+        eq(entityTags.entityId, entityId)
+      )
+    );
+  
+  return { success: true };
+}
+
+export async function getEntitiesByTag(tagId: number, entityType: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { entityTags } = await import("../drizzle/schema");
+  
+  const results = await db
+    .select()
+    .from(entityTags)
+    .where(
+      and(
+        eq(entityTags.tagId, tagId),
+        eq(entityTags.entityType, entityType as any)
+      )
+    );
+  
+  return results.map(r => r.entityId);
+}

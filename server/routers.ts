@@ -131,6 +131,72 @@ export const appRouter = router({
       }),
   }),
 
+  tags: router({
+    list: publicProcedure.query(async () => {
+      const { getAllTags } = await import('./db');
+      return getAllTags();
+    }),
+    
+    create: publicProcedure
+      .input(z.object({
+        name: z.string().min(1).max(50),
+        color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { createTag } = await import('./db');
+        return createTag(input.name, input.color);
+      }),
+    
+    delete: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { deleteTag } = await import('./db');
+        return deleteTag(input);
+      }),
+    
+    getEntityTags: publicProcedure
+      .input(z.object({
+        entityType: z.enum(["mercado", "cliente", "concorrente", "lead"]),
+        entityId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        const { getEntityTags } = await import('./db');
+        return getEntityTags(input.entityType, input.entityId);
+      }),
+    
+    addToEntity: publicProcedure
+      .input(z.object({
+        tagId: z.number(),
+        entityType: z.enum(["mercado", "cliente", "concorrente", "lead"]),
+        entityId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const { addTagToEntity } = await import('./db');
+        return addTagToEntity(input.tagId, input.entityType, input.entityId);
+      }),
+    
+    removeFromEntity: publicProcedure
+      .input(z.object({
+        tagId: z.number(),
+        entityType: z.enum(["mercado", "cliente", "concorrente", "lead"]),
+        entityId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const { removeTagFromEntity } = await import('./db');
+        return removeTagFromEntity(input.tagId, input.entityType, input.entityId);
+      }),
+    
+    getEntitiesByTag: publicProcedure
+      .input(z.object({
+        tagId: z.number(),
+        entityType: z.enum(["mercado", "cliente", "concorrente", "lead"]),
+      }))
+      .query(async ({ input }) => {
+        const { getEntitiesByTag } = await import('./db');
+        return getEntitiesByTag(input.tagId, input.entityType);
+      }),
+  }),
+
   leads: router({
     list: publicProcedure
       .input(z.object({

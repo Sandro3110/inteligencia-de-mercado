@@ -7,6 +7,9 @@ import { trpc } from "@/lib/trpc";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DetailPopup } from "@/components/DetailPopup";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { TagManager } from "@/components/TagManager";
+import { EntityTagPicker } from "@/components/EntityTagPicker";
+import { TagFilter } from "@/components/TagFilter";
 import { SkeletonMercado, SkeletonCliente, SkeletonConcorrente, SkeletonLead } from "@/components/SkeletonLoading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +47,7 @@ export default function CascadeView() {
   const [selectedMercadoId, setSelectedMercadoId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [detailPopupOpen, setDetailPopupOpen] = useState(false);
   const [detailPopupItem, setDetailPopupItem] = useState<any>(null);
   const [detailPopupType, setDetailPopupType] = useState<"cliente" | "concorrente" | "lead">("cliente");
@@ -81,6 +85,20 @@ export default function CascadeView() {
   const clientes = clientesResponse?.data || [];
   const concorrentes = concorrentesResponse?.data || [];
   const leads = leadsResponse?.data || [];
+
+  // Queries para filtrar por tags (apenas quando tags estão selecionadas)
+  const { data: clientesComTags = [] } = trpc.tags.getEntitiesByTag.useQuery(
+    { tagId: selectedTagIds[0] || 0, entityType: "cliente" },
+    { enabled: selectedTagIds.length > 0 && currentPage === "clientes" }
+  );
+  const { data: concorrentesComTags = [] } = trpc.tags.getEntitiesByTag.useQuery(
+    { tagId: selectedTagIds[0] || 0, entityType: "concorrente" },
+    { enabled: selectedTagIds.length > 0 && currentPage === "concorrentes" }
+  );
+  const { data: leadsComTags = [] } = trpc.tags.getEntitiesByTag.useQuery(
+    { tagId: selectedTagIds[0] || 0, entityType: "lead" },
+    { enabled: selectedTagIds.length > 0 && currentPage === "leads" }
+  );
 
   // Atalhos de teclado
   useKeyboardShortcuts([
@@ -186,8 +204,13 @@ export default function CascadeView() {
           searchInText(c.cidade)
       );
     }
+    // Filtrar por tags
+    if (selectedTagIds.length > 0) {
+      const idsComTags = new Set(clientesComTags);
+      filtered = filtered.filter((c) => idsComTags.has(c.id));
+    }
     return filtered;
-  }, [clientes, statusFilter, searchQuery]);
+  }, [clientes, statusFilter, searchQuery, selectedTagIds, clientesComTags]);
 
   const filteredConcorrentes = useMemo(() => {
     if (!concorrentes) return [];
@@ -200,8 +223,13 @@ export default function CascadeView() {
           searchInText(c.produto)
       );
     }
+    // Filtrar por tags
+    if (selectedTagIds.length > 0) {
+      const idsComTags = new Set(concorrentesComTags);
+      filtered = filtered.filter((c) => idsComTags.has(c.id));
+    }
     return filtered;
-  }, [concorrentes, statusFilter, searchQuery]);
+  }, [concorrentes, statusFilter, searchQuery, selectedTagIds, concorrentesComTags]);
 
   const filteredLeads = useMemo(() => {
     if (!leads) return [];
@@ -214,8 +242,13 @@ export default function CascadeView() {
           searchInText(l.regiao)
       );
     }
+    // Filtrar por tags
+    if (selectedTagIds.length > 0) {
+      const idsComTags = new Set(leadsComTags);
+      filtered = filtered.filter((l) => idsComTags.has(l.id));
+    }
     return filtered;
-  }, [leads, statusFilter, searchQuery]);
+  }, [leads, statusFilter, searchQuery, selectedTagIds, leadsComTags]);
 
   // Contador de resultados de busca
   const searchResultsCount = useMemo(() => {
@@ -475,6 +508,7 @@ export default function CascadeView() {
               Exportar Filtrados
             </Button>
           )}
+          <TagManager />
           <ThemeToggle />
         </div>
       </div>
@@ -589,6 +623,15 @@ export default function CascadeView() {
             </div>
           </div>
 
+          {/* Filtro por Tags */}
+          <div>
+            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Tags</h3>
+            <TagFilter
+              selectedTags={selectedTagIds}
+              onTagsChange={setSelectedTagIds}
+            />
+          </div>
+
           {/* Mercado Atual */}
           {mercadoSelecionado && (
             <div>
@@ -701,6 +744,12 @@ export default function CascadeView() {
                                         {mercado.quantidadeClientes} clientes
                                       </span>
                                     </div>
+                                    <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                                      <EntityTagPicker
+                                        entityType="mercado"
+                                        entityId={mercado.id}
+                                      />
+                                    </div>
                                   </div>
                                   <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                                 </div>
@@ -774,6 +823,12 @@ export default function CascadeView() {
                               <p className="text-sm text-muted-foreground mt-1 truncate">
                                 {cliente.produtoPrincipal}
                               </p>
+                              <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                                <EntityTagPicker
+                                  entityType="cliente"
+                                  entityId={cliente.id}
+                                />
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -829,6 +884,12 @@ export default function CascadeView() {
                                 })()}
                               </div>
                               <p className="text-sm text-muted-foreground mt-1 truncate">{concorrente.produto}</p>
+                              <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                                <EntityTagPicker
+                                  entityType="concorrente"
+                                  entityId={concorrente.id}
+                                />
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -865,9 +926,11 @@ export default function CascadeView() {
                                 setDetailPopupOpen(true);
                               }}
                             >
-                                         <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2">
                                 {getStatusIcon(lead.validationStatus)}
-                                <h3 className="text-base font-medium group-hover:text-primary transition-colors">{lead.nome}</h3>
+                                <h3 className="text-base font-medium group-hover:text-primary transition-colors">
+                                  {lead.nome}
+                                </h3>
                                 <Badge variant="outline" className="text-[11px] px-2 py-0.5">
                                   {lead.tipo}
                                 </Badge>
@@ -880,7 +943,14 @@ export default function CascadeView() {
                                     </Badge>
                                   );
                                 })()}
-                              </div>   <p className="text-sm text-muted-foreground mt-1 truncate">{lead.regiao}</p>
+                              </div>
+                              <p className="text-sm text-muted-foreground mt-1 truncate">{lead.regiao}</p>
+                              <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                                <EntityTagPicker
+                                  entityType="lead"
+                                  entityId={lead.id}
+                                />
+                              </div>
                             </div>
                           </div>
                         ))}

@@ -140,3 +140,29 @@ export const leads = mysqlTable("leads", {
 export type Lead = typeof leads.$inferSelect;
 export type InsertLead = typeof leads.$inferInsert;
 
+/**
+ * Tags - Custom tags for organization
+ */
+export const tags = mysqlTable("tags", {
+  id: int("id").primaryKey().autoincrement(),
+  name: varchar("name", { length: 50 }).notNull(),
+  color: varchar("color", { length: 7 }).default("#3b82f6"), // hex color
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type Tag = typeof tags.$inferSelect;
+export type InsertTag = typeof tags.$inferInsert;
+
+/**
+ * Entity_Tags - Junction table for tags
+ */
+export const entityTags = mysqlTable("entity_tags", {
+  id: int("id").primaryKey().autoincrement(),
+  tagId: int("tagId").notNull().references(() => tags.id, { onDelete: "cascade" }),
+  entityType: mysqlEnum("entityType", ["mercado", "cliente", "concorrente", "lead"]).notNull(),
+  entityId: int("entityId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type EntityTag = typeof entityTags.$inferSelect;
+export type InsertEntityTag = typeof entityTags.$inferInsert;
