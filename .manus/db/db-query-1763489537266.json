@@ -1,0 +1,178 @@
+{
+  "query": "SHOW COLUMNS FROM leads",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SHOW COLUMNS FROM leads",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "leadHash",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "mercadoId",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "nome",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "cnpj",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "site",
+      "Type": "varchar(500)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "email",
+      "Type": "varchar(320)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "telefone",
+      "Type": "varchar(50)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "tipo",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "porte",
+      "Type": "varchar(50)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "regiao",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "setor",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "qualidadeScore",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "qualidadeClassificacao",
+      "Type": "varchar(50)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "leadStage",
+      "Type": "enum('novo','em_contato','negociacao','fechado','perdido')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "novo",
+      "Extra": ""
+    },
+    {
+      "Field": "stageUpdatedAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "validationStatus",
+      "Type": "enum('pending','rich','needs_adjustment','discarded')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "pending",
+      "Extra": ""
+    },
+    {
+      "Field": "validationNotes",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "validatedBy",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "validatedAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nleadHash\tvarchar(64)\tYES\t\tNULL\t\nmercadoId\tint(11)\tNO\t\tNULL\t\nnome\tvarchar(255)\tNO\t\tNULL\t\ncnpj\tvarchar(20)\tYES\t\tNULL\t\nsite\tvarchar(500)\tYES\t\tNULL\t\nemail\tvarchar(320)\tYES\t\tNULL\t\ntelefone\tvarchar(50)\tYES\t\tNULL\t\ntipo\tvarchar(20)\tYES\t\tNULL\t\nporte\tvarchar(50)\tYES\t\tNULL\t\nregiao\tvarchar(100)\tYES\t\tNULL\t\nsetor\tvarchar(100)\tYES\t\tNULL\t\nqualidadeScore\tint(11)\tYES\t\tNULL\t\nqualidadeClassificacao\tvarchar(50)\tYES\t\tNULL\t\nleadStage\tenum('novo','em_contato','negociacao','fechado','perdido')\tYES\t\tnovo\t\nstageUpdatedAt\ttimestamp\tYES\t\tCURRENT_TIMESTAMP\t\nvalidationStatus\tenum('pending','rich','needs_adjustment','discarded')\tYES\t\tpending\t\nvalidationNotes\ttext\tYES\t\tNULL\t\nvalidatedBy\tvarchar(64)\tYES\t\tNULL\t\nvalidatedAt\ttimestamp\tYES\t\tNULL\t\ncreatedAt\ttimestamp\tYES\t\tCURRENT_TIMESTAMP\t\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

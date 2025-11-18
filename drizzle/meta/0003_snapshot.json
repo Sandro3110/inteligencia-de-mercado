@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "ee9c32ae-1039-4290-ae02-3fd2af14d6ce",
+  "id": "dc777622-32db-465e-b458-fbe2dfcdda73",
   "prevId": "9c360e65-d5d9-4eb6-a4a4-51d91464fa94",
   "tables": {
     "clientes": {
@@ -501,6 +501,22 @@
           "notNull": false,
           "autoincrement": false
         },
+        "leadStage": {
+          "name": "leadStage",
+          "type": "enum('novo','em_contato','negociacao','fechado','perdido')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'novo'"
+        },
+        "stageUpdatedAt": {
+          "name": "stageUpdatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(now())"
+        },
         "validationStatus": {
           "name": "validationStatus",
           "type": "enum('pending','rich','needs_adjustment','discarded')",
@@ -640,6 +656,73 @@
       "compositePrimaryKeys": {
         "mercados_unicos_id": {
           "name": "mercados_unicos_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "saved_filters": {
+      "name": "saved_filters",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "filtersJson": {
+          "name": "filtersJson",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "saved_filters_userId_users_id_fk": {
+          "name": "saved_filters_userId_users_id_fk",
+          "tableFrom": "saved_filters",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "saved_filters_id": {
+          "name": "saved_filters_id",
           "columns": [
             "id"
           ]

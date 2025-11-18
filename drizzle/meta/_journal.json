@@ -26,22 +26,8 @@
     {
       "idx": 3,
       "version": "5",
-      "when": 1763475642085,
-      "tag": "0003_sweet_shard",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1763480528881,
-      "tag": "0004_zippy_stark_industries",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1763482591611,
-      "tag": "0005_light_xavin",
+      "when": 1763488860286,
+      "tag": "0003_daily_orphan",
       "breakpoints": true
     }
   ]
