@@ -11,6 +11,7 @@ import { TagManager } from "@/components/TagManager";
 import { EntityTagPicker } from "@/components/EntityTagPicker";
 import { TagFilter } from "@/components/TagFilter";
 import { MultiSelectFilter } from "@/components/MultiSelectFilter";
+import { SearchFieldSelector, SearchField } from "@/components/SearchFieldSelector";
 import { SkeletonMercado, SkeletonCliente, SkeletonConcorrente, SkeletonLead } from "@/components/SkeletonLoading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +52,7 @@ export default function CascadeView() {
   const [selectedMercadoId, setSelectedMercadoId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchFields, setSearchFields] = useState<SearchField[]>(["nome", "cnpj", "produto"]); // Campos padrão
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   
   // Estados para filtros avançados
@@ -223,35 +225,84 @@ export default function CascadeView() {
     return items;
   };
 
-  // Busca global inteligente
-  const searchInText = (text: string | null | undefined) => {
-    if (!text) return false;
-    return text.toLowerCase().includes(searchQuery.toLowerCase());
+  // Busca global multi-campo
+  const matchesSearch = (item: any, type: "mercado" | "cliente" | "concorrente" | "lead") => {
+    if (!searchQuery || searchFields.length === 0) return true;
+    
+    const query = searchQuery.toLowerCase();
+    const checkField = (value: string | null | undefined) => {
+      if (!value) return false;
+      return value.toLowerCase().includes(query);
+    };
+
+    return searchFields.some((field) => {
+      switch (field) {
+        case "nome":
+          if (type === "mercado") return checkField(item.nome);
+          if (type === "cliente") return checkField(item.empresa);
+          if (type === "concorrente") return checkField(item.nome);
+          if (type === "lead") return checkField(item.nome);
+          return false;
+        
+        case "cnpj":
+          return checkField(item.cnpj);
+        
+        case "produto":
+          if (type === "mercado") return checkField(item.categoria);
+          if (type === "cliente") return checkField(item.produtoPrincipal);
+          if (type === "concorrente") return checkField(item.produto);
+          return false;
+        
+        case "cidade":
+          if (type === "cliente") return checkField(item.cidade);
+          if (type === "lead") return checkField(item.regiao); // Região como aproximação
+          return false;
+        
+        case "uf":
+          if (type === "cliente") return checkField(item.uf);
+          return false;
+        
+        case "email":
+          return checkField(item.email);
+        
+        case "telefone":
+          return checkField(item.telefone);
+        
+        case "observacoes":
+          return checkField(item.observacoes) || checkField(item.notas);
+        
+        default:
+          return false;
+      }
+    });
   };
 
   const filteredMercados = useMemo(() => {
     if (!mercados) return [];
     let filtered = filterByStatus(mercados);
+    
+    // Busca multi-campo
+    if (searchQuery && searchFields.length > 0) {
+      filtered = filtered.filter((m) => matchesSearch(m, "mercado"));
+    }
+    
     // Filtrar por segmentação
     if (mercadoFilters.segmentacao.length > 0) {
       filtered = filtered.filter((m) =>
         mercadoFilters.segmentacao.includes(m.segmentacao || "")
       );
     }
+    
     return filtered;
-  }, [mercados, statusFilter, mercadoFilters]);
+  }, [mercados, statusFilter, searchQuery, searchFields, mercadoFilters]);
 
   const filteredClientes = useMemo(() => {
     if (!clientes) return [];
     let filtered = filterByStatus(clientes);
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (c) =>
-          searchInText(c.empresa) ||
-          searchInText(c.cnpj) ||
-          searchInText(c.produtoPrincipal) ||
-          searchInText(c.cidade)
-      );
+    
+    // Busca multi-campo
+    if (searchQuery && searchFields.length > 0) {
+      filtered = filtered.filter((c) => matchesSearch(c, "cliente"));
     }
     // Filtrar por tags
     if (selectedTagIds.length > 0) {
@@ -276,13 +327,10 @@ export default function CascadeView() {
   const filteredConcorrentes = useMemo(() => {
     if (!concorrentes) return [];
     let filtered = filterByStatus(concorrentes);
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (c) =>
-          searchInText(c.nome) ||
-          searchInText(c.cnpj) ||
-          searchInText(c.produto)
-      );
+    
+    // Busca multi-campo
+    if (searchQuery && searchFields.length > 0) {
+      filtered = filtered.filter((c) => matchesSearch(c, "concorrente"));
     }
     // Filtrar por tags
     if (selectedTagIds.length > 0) {
@@ -301,13 +349,10 @@ export default function CascadeView() {
   const filteredLeads = useMemo(() => {
     if (!leads) return [];
     let filtered = filterByStatus(leads);
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (l) =>
-          searchInText(l.nome) ||
-          searchInText(l.cnpj) ||
-          searchInText(l.regiao)
-      );
+    
+    // Busca multi-campo
+    if (searchQuery && searchFields.length > 0) {
+      filtered = filtered.filter((l) => matchesSearch(l, "lead"));
     }
     // Filtrar por tags
     if (selectedTagIds.length > 0) {
@@ -597,19 +642,49 @@ export default function CascadeView() {
         <div className="w-[280px] border-r border-border/40 p-6 flex flex-col gap-6">
           {/* Busca Global */}
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">
-              Busca Global
-            </Label>
+            <div className="flex items-center justify-between mb-2">
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                Busca Global
+              </Label>
+              <SearchFieldSelector
+                selectedFields={searchFields}
+                onFieldsChange={setSearchFields}
+              />
+            </div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 ref={searchInputRef}
-                placeholder="Nome, CNPJ, produto... (Ctrl+K ou /)" 
+                placeholder="Digite sua busca..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
             </div>
+            {searchFields.length > 0 && (
+              <div className="mt-2">
+                <p className="text-[10px] text-muted-foreground mb-1">Buscando em:</p>
+                <div className="flex flex-wrap gap-1">
+                  {searchFields.map((field) => {
+                    const labels: Record<SearchField, string> = {
+                      nome: "Nome",
+                      cnpj: "CNPJ",
+                      produto: "Produto",
+                      cidade: "Cidade",
+                      uf: "UF",
+                      email: "Email",
+                      telefone: "Telefone",
+                      observacoes: "Obs",
+                    };
+                    return (
+                      <Badge key={field} variant="outline" className="text-[9px] px-1.5 py-0">
+                        {labels[field]}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             {searchResultsCount && (
               <p className="text-xs text-muted-foreground mt-2">
                 {searchResultsCount.clientes} clientes, {searchResultsCount.concorrentes} concorrentes,{" "}

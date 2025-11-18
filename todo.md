@@ -890,3 +890,29 @@
 - [x] Adicionar filtros de Segmentação na página de Mercados
 - [x] Implementar lógica de filtragem em filteredMercados
 - [x] Testar funcionamento
+
+
+## Fase 33: Busca Global Avançada com Seletor Multi-Campo 🔍
+
+### 33.1 Componente de Seleção ✅ CONCLUÍDO
+- [x] Criar componente SearchFieldSelector
+- [x] Adicionar checkboxes para campos (Nome, CNPJ, Produto, Cidade, UF, Email, Telefone, Observações)
+- [x] Implementar botão de configuração (⚙️) ao lado do campo de busca
+- [x] Adicionar popover com opções de campos
+- [x] Adicionar botões "Todos" e "Limpar"
+- [x] Mostrar contador de campos selecionados no badge
+
+### 33.2 Estado e Lógica ✅ CONCLUÍDO
+- [x] Adicionar estado searchFields no CascadeView (padrão: nome, cnpj, produto)
+- [x] Criar função matchesSearch com lógica multi-campo
+- [x] Implementar lógica de busca multi-campo em filteredMercados
+- [x] Implementar lógica de busca multi-campo em filteredClientes
+- [x] Implementar lógica de busca multi-campo em filteredConcorrentes
+- [x] Implementar lógica de busca multi-campo em filteredLeads
+
+### 33.3 Interface ✅ CONCLUÍDO
+- [x] Integrar SearchFieldSelector no header de busca
+- [x] Adicionar badges mostrando campos selecionados
+- [x] Implementar preview de campos ativos
+- [x] Testar busca em múltiplos campos
+- [ ] Criar checkpoint
