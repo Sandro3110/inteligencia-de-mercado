@@ -86,23 +86,31 @@ export default function Dashboard() {
   const validationProgress = Math.round((totalValidated / totalRecords) * 100);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="border-b bg-card/50 backdrop-blur-sm">
+      <div className="border-b border-border/50">
         <div className="container py-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Gestor de Pesquisa de Mercado PAV
-          </h1>
-          <p className="text-muted-foreground">
-            Visualize, valide e gerencie seus dados de pesquisa de mercado
-          </p>
+          <div className="flex justify-between items-center flex-wrap gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold tracking-ultra-wide uppercase text-foreground mb-1">
+                Gestor PAV
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Gestão completa de pesquisa de mercado · 73 mercados · 2.991 registros
+              </p>
+            </div>
+            <div className="pill-badge">
+              <span className="status-dot success"></span>
+              <span>Sistema Operacional</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="container py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="card-hover border-l-4 border-l-primary">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+          <Card className="glass-card border-l-4 border-l-primary">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Mercados
@@ -117,7 +125,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="card-hover border-l-4 border-l-blue-500">
+          <Card className="glass-card border-l-4 border-l-blue-500">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Clientes
@@ -132,7 +140,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="card-hover border-l-4 border-l-orange-500">
+          <Card className="glass-card border-l-4 border-l-orange-500">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Concorrentes
@@ -147,7 +155,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="card-hover border-l-4 border-l-green-500">
+          <Card className="glass-card border-l-4 border-l-green-500">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Leads
@@ -164,9 +172,9 @@ export default function Dashboard() {
         </div>
 
         {/* Validation Progress */}
-        <Card className="mb-8">
+        <Card className="glass-card-subtle mb-6">
           <CardHeader>
-            <CardTitle className="text-xl">Progresso da Validação</CardTitle>
+            <CardTitle className="section-title">Progresso da Validação</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -221,9 +229,9 @@ export default function Dashboard() {
         </Card>
 
         {/* Quick Actions */}
-        <Card>
+        <Card className="glass-card-subtle">
           <CardHeader>
-            <CardTitle className="text-xl">Ações Rápidas</CardTitle>
+            <CardTitle className="section-title">Ações Rápidas</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-4">

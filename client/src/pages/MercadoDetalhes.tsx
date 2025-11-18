@@ -159,32 +159,48 @@ export default function MercadoDetalhes() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="border-b bg-card/50 backdrop-blur-sm">
+      <div className="border-b border-border/50">
         <div className="container py-6">
-          <div className="flex items-center gap-4 mb-4">
-            <Link href="/mercados">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </Link>
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-foreground mb-2">{mercado.nome}</h1>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                {mercado.segmentacao && (
-                  <span className="font-medium">{mercado.segmentacao}</span>
-                )}
-                {mercado.categoria && (
-                  <span>• {mercado.categoria}</span>
-                )}
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-4">
+              <Link href="/mercados">
+                <Button variant="ghost" size="icon" className="hover-lift">
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+              </Link>
+              <div>
+                <h2 className="section-title">Detalhes do Mercado</h2>
+                <h1 className="text-2xl font-semibold text-foreground">{mercado.nome}</h1>
               </div>
             </div>
+            {/* Breadcrumbs */}
+            <div className="text-sm text-muted-foreground hidden md:block">
+              <Link href="/"><span className="hover:text-foreground cursor-pointer">Dashboard</span></Link>
+              <span className="mx-2">·</span>
+              <Link href="/mercados"><span className="hover:text-foreground cursor-pointer">Mercados</span></Link>
+              <span className="mx-2">·</span>
+              <span className="font-semibold text-foreground">Detalhes</span>
+            </div>
+          </div>
+          
+          {/* Segmentação e Categoria */}
+          <div className="flex items-center gap-2 mb-4">
+            {mercado.segmentacao && (
+              <span className="pill-badge">
+                <span className="status-dot info"></span>
+                {mercado.segmentacao}
+              </span>
+            )}
+            {mercado.categoria && (
+              <span className="text-sm text-muted-foreground">{mercado.categoria}</span>
+            )}
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Card className="glass-card-subtle">
               <CardContent className="p-4 flex items-center gap-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <Users className="h-5 w-5 text-blue-600" />
@@ -196,7 +212,7 @@ export default function MercadoDetalhes() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="glass-card-subtle">
               <CardContent className="p-4 flex items-center gap-3">
                 <div className="p-2 bg-orange-100 rounded-lg">
                   <Target className="h-5 w-5 text-orange-600" />
@@ -208,7 +224,7 @@ export default function MercadoDetalhes() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="glass-card-subtle">
               <CardContent className="p-4 flex items-center gap-3">
                 <div className="p-2 bg-green-100 rounded-lg">
                   <TrendingUp className="h-5 w-5 text-green-600" />

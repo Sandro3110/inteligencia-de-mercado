@@ -19,21 +19,21 @@ export default function Mercados() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="border-b bg-card/50 backdrop-blur-sm">
+      <div className="border-b border-border/50">
         <div className="container py-6">
           <div className="flex items-center gap-4 mb-4">
             <Link href="/">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="hover-lift">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Mercados</h1>
-              <p className="text-muted-foreground">
-                {mercados?.length || 0} mercados únicos identificados
-              </p>
+              <h2 className="section-title">Lista de Mercados</h2>
+              <h1 className="text-2xl font-semibold text-foreground">
+                {mercados?.length || 0} Mercados Únicos
+              </h1>
             </div>
           </div>
 
@@ -52,16 +52,17 @@ export default function Mercados() {
 
       {/* Mercados Grid */}
       <div className="container py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {mercados?.map((mercado) => (
             <Link key={mercado.id} href={`/mercado/${mercado.id}`}>
-              <Card className="card-hover cursor-pointer h-full">
+              <Card className="glass-card cursor-pointer h-full">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="p-3 bg-primary/10 rounded-lg">
                       <Building2 className="h-6 w-6 text-primary" />
                     </div>
-                    <span className="text-xs font-medium px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                    <span className="pill-badge">
+                      <span className="status-dot info"></span>
                       {mercado.segmentacao || 'N/A'}
                     </span>
                   </div>
