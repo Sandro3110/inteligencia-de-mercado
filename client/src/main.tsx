@@ -8,7 +8,17 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 
-const queryClient = new QueryClient();
+// Quick Win 2: Configurar cache para melhorar performance de navegação
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutos - dados considerados "frescos"
+      gcTime: 10 * 60 * 1000, // 10 minutos - tempo de retenção em cache (antes chamado cacheTime)
+      refetchOnWindowFocus: false, // Não refetch ao voltar para a aba
+      retry: 1, // Tentar apenas 1 vez em caso de erro
+    },
+  },
+});
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;

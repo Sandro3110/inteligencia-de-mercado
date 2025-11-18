@@ -1,7 +1,9 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { calculateQualityScore, classifyQuality, isValidCNPJFormat, isValidEmailFormat } from "@shared/qualityScore";
 import { trpc } from "@/lib/trpc";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DetailPopup } from "@/components/DetailPopup";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import {
   Building2,
@@ -25,6 +28,7 @@ import {
   Search,
   Download,
   ArrowUp,
+  AlertTriangle,
 } from "lucide-react";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
@@ -244,19 +248,19 @@ export default function CascadeView() {
       if (selectedItems.size === filteredClientes.length) {
         setSelectedItems(new Set());
       } else {
-        setSelectedItems(new Set(filteredClientes.map((c) => c.id)));
+        setSelectedItems(new Set(filteredClientes.map((c: any) => c.id)));
       }
     } else if (currentPage === "concorrentes") {
       if (selectedItems.size === filteredConcorrentes.length) {
         setSelectedItems(new Set());
       } else {
-        setSelectedItems(new Set(filteredConcorrentes.map((c) => c.id)));
+        setSelectedItems(new Set(filteredConcorrentes.map((c: any) => c.id)));
       }
     } else if (currentPage === "leads") {
       if (selectedItems.size === filteredLeads.length) {
         setSelectedItems(new Set());
       } else {
-        setSelectedItems(new Set(filteredLeads.map((l) => l.id)));
+        setSelectedItems(new Set(filteredLeads.map((l: any) => l.id)));
       }
     }
   };
@@ -393,6 +397,26 @@ export default function CascadeView() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">GESTOR PAV</h1>
           <p className="text-sm text-muted-foreground">Pesquisa de Mercado</p>
+          <div className="mt-2">
+            <Breadcrumbs
+              items={[
+                { label: "Início", onClick: () => { setCurrentPage("mercados"); setSelectedMercadoId(null); } },
+                ...(currentPage !== "mercados" && selectedMercadoId
+                  ? [
+                      {
+                        label: mercados?.find((m: any) => m.id === selectedMercadoId)?.nome || "Mercado",
+                        onClick: () => setCurrentPage("clientes"),
+                      },
+                    ]
+                  : []),
+                ...(currentPage !== "mercados" && currentPage !== "clientes"
+                  ? [{ label: currentPage === "concorrentes" ? "Concorrentes" : "Leads" }]
+                  : currentPage === "clientes"
+                  ? [{ label: "Clientes" }]
+                  : []),
+              ]}
+            />
+          </div>
         </div>
         <div className="flex items-center gap-4">
           {currentPage !== "mercados" && (
@@ -612,7 +636,7 @@ export default function CascadeView() {
                     {/* Lista de Clientes */}
                     {currentPage === "clientes" && (
                       <div className="space-y-2">
-                        {filteredClientes.map((cliente) => (
+                        {filteredClientes.map((cliente: any) => (
                           <div
                             key={cliente.id}
                             className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
@@ -632,13 +656,32 @@ export default function CascadeView() {
                             >
                               <div className="flex items-center gap-2">
                                 {getStatusIcon(cliente.validationStatus)}
+                                {cliente.cnpj && !isValidCNPJFormat(cliente.cnpj) && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>CNPJ inválido</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
                                 <h3 className="font-medium group-hover:text-primary transition-colors">
                                   {cliente.empresa}
                                 </h3>
-                                <Badge variant="outline" className="text-xs ml-auto">
+                                <Badge variant="outline" className="text-xs">
                                   {cliente.segmentacaoB2bB2c}
                                 </Badge>
-                                <span className="text-sm text-muted-foreground">
+                                {(() => {
+                                  const score = calculateQualityScore(cliente);
+                                  const quality = classifyQuality(score);
+                                  return (
+                                    <Badge variant={quality.variant} className={`text-xs ${quality.color}`}>
+                                      {score}%
+                                    </Badge>
+                                  );
+                                })()}
+                                <span className="text-sm text-muted-foreground ml-auto">
                                   {cliente.cidade}, {cliente.uf}
                                 </span>
                               </div>
@@ -654,7 +697,7 @@ export default function CascadeView() {
                     {/* Lista de Concorrentes */}
                     {currentPage === "concorrentes" && (
                       <div className="space-y-2">
-                        {filteredConcorrentes.map((concorrente) => (
+                        {filteredConcorrentes.map((concorrente: any) => (
                           <div
                             key={concorrente.id}
                             className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
@@ -677,12 +720,18 @@ export default function CascadeView() {
                                 <h3 className="font-medium group-hover:text-primary transition-colors">
                                   {concorrente.nome}
                                 </h3>
-                                <Badge variant="outline" className="text-xs ml-auto">
+                                <Badge variant="outline" className="text-xs">
                                   {concorrente.porte}
                                 </Badge>
-                                <span className="text-sm text-muted-foreground">
-                                  Score: {concorrente.qualidadeScore}%
-                                </span>
+                                {(() => {
+                                  const score = calculateQualityScore(concorrente);
+                                  const quality = classifyQuality(score);
+                                  return (
+                                    <Badge variant={quality.variant} className={`text-xs ${quality.color}`}>
+                                      {score}%
+                                    </Badge>
+                                  );
+                                })()}
                               </div>
                               <p className="text-sm text-muted-foreground mt-1 truncate">{concorrente.produto}</p>
                             </div>
@@ -694,7 +743,7 @@ export default function CascadeView() {
                     {/* Lista de Leads */}
                     {currentPage === "leads" && (
                       <div className="space-y-2">
-                        {filteredLeads.map((lead) => (
+                        {filteredLeads.map((lead: any) => (
                           <div
                             key={lead.id}
                             className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
@@ -712,17 +761,22 @@ export default function CascadeView() {
                                 setDetailPopupOpen(true);
                               }}
                             >
-                              <div className="flex items-center gap-2">
+                                         <div className="flex items-center gap-2">
                                 {getStatusIcon(lead.validationStatus)}
-                                <h3 className="font-medium group-hover:text-primary transition-colors">
-                                  {lead.nome}
-                                </h3>
-                                <Badge variant="outline" className="text-xs ml-auto">
+                                <h3 className="font-medium group-hover:text-primary transition-colors">{lead.nome}</h3>
+                                <Badge variant="outline" className="text-xs">
                                   {lead.tipo}
                                 </Badge>
-                                <span className="text-sm text-muted-foreground">{lead.porte}</span>
-                              </div>
-                              <p className="text-sm text-muted-foreground mt-1 truncate">{lead.regiao}</p>
+                                {(() => {
+                                  const score = calculateQualityScore(lead);
+                                  const quality = classifyQuality(score);
+                                  return (
+                                    <Badge variant={quality.variant} className={`text-xs ${quality.color}`}>
+                                      {score}%
+                                    </Badge>
+                                  );
+                                })()}
+                              </div>   <p className="text-sm text-muted-foreground mt-1 truncate">{lead.regiao}</p>
                             </div>
                           </div>
                         ))}
