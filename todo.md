@@ -706,3 +706,33 @@
 - [x] Testar em diferentes resoluções
 - [x] Validar responsividade
 - [x] Criar checkpoint
+
+
+## Fase 26: Ajustes Finais de UX 🎯
+
+### 26.1 Modo Compacto Toggle
+- [ ] Criar contexto CompactModeContext
+- [ ] Adicionar botão toggle no header
+- [ ] Aplicar espaçamentos reduzidos quando ativo
+- [ ] Persistir preferência no localStorage
+
+### 26.2 Zoom Customizável
+- [ ] Criar contexto ZoomContext
+- [ ] Adicionar controles de zoom (80%, 90%, 100%, 110%)
+- [ ] Aplicar font-size no root
+- [ ] Persistir preferência no localStorage
+
+### 26.3 Exportação com Filtros
+- [ ] Atualizar função exportToCSV para aceitar dados filtrados
+- [ ] Passar dados visíveis (após filtros/busca) para exportação
+- [ ] Testar exportação filtrada
+
+### 26.4 Plano de Roadmap
+- [ ] Criar documento PLANO_IMPLEMENTACAO_ROADMAP.md
+- [ ] Organizar todas as funcionalidades em fases
+- [ ] Adicionar estimativas de tempo por fase
+- [ ] Incluir dependências e priorização
+
+### 26.5 Finalização
+- [ ] Testar todas as funcionalidades
+- [ ] Criar checkpoint final
