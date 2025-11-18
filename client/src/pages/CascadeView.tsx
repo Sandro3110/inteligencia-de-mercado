@@ -686,15 +686,15 @@ export default function CascadeView() {
                                 variants={listItemVariants}
                               >
                                 <div
-                                  className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
+                                  className="flex items-center gap-2 p-2 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
                                   onClick={() => handleSelectMercado(mercado.id)}
                                 >
                                   <div className="flex-1">
-                                    <h3 className="font-medium group-hover:text-primary transition-colors">
+                                    <h3 className="text-sm font-medium group-hover:text-primary transition-colors">
                                       {mercado.nome}
                                     </h3>
                                     <div className="flex items-center gap-2 mt-1">
-                                      <Badge variant="outline" className="text-xs">
+                                      <Badge variant="outline" className="text-[10px] mt-0.5 px-1.5 py-0">
                                         {mercado.segmentacao}
                                       </Badge>
                                       <span className="text-sm text-muted-foreground">
@@ -725,7 +725,7 @@ export default function CascadeView() {
                         {filteredClientes.map((cliente: any) => (
                           <div
                             key={cliente.id}
-                            className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
+                            className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
                           >
                             <Checkbox
                               checked={selectedItems.has(cliente.id)}
@@ -752,10 +752,10 @@ export default function CascadeView() {
                                     </TooltipContent>
                                   </Tooltip>
                                 )}
-                                <h3 className="font-medium group-hover:text-primary transition-colors">
+                                <h3 className="text-base font-medium group-hover:text-primary transition-colors">
                                   {cliente.empresa}
                                 </h3>
-                                <Badge variant="outline" className="text-xs">
+                                <Badge variant="outline" className="text-[11px] px-2 py-0.5">
                                   {cliente.segmentacaoB2bB2c}
                                 </Badge>
                                 {(() => {
@@ -795,7 +795,7 @@ export default function CascadeView() {
                         {filteredConcorrentes.map((concorrente: any) => (
                           <div
                             key={concorrente.id}
-                            className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
+                            className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
                           >
                             <Checkbox
                               checked={selectedItems.has(concorrente.id)}
@@ -812,10 +812,10 @@ export default function CascadeView() {
                             >
                               <div className="flex items-center gap-2">
                                 {getStatusIcon(concorrente.validationStatus)}
-                                <h3 className="font-medium group-hover:text-primary transition-colors">
+                                <h3 className="text-base font-medium group-hover:text-primary transition-colors">
                                   {concorrente.nome}
                                 </h3>
-                                <Badge variant="outline" className="text-xs">
+                                <Badge variant="outline" className="text-[11px] px-2 py-0.5">
                                   {concorrente.porte}
                                 </Badge>
                                 {(() => {
@@ -850,7 +850,7 @@ export default function CascadeView() {
                         {filteredLeads.map((lead: any) => (
                           <div
                             key={lead.id}
-                            className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
+                            className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
                           >
                             <Checkbox
                               checked={selectedItems.has(lead.id)}
@@ -867,8 +867,8 @@ export default function CascadeView() {
                             >
                                          <div className="flex items-center gap-2">
                                 {getStatusIcon(lead.validationStatus)}
-                                <h3 className="font-medium group-hover:text-primary transition-colors">{lead.nome}</h3>
-                                <Badge variant="outline" className="text-xs">
+                                <h3 className="text-base font-medium group-hover:text-primary transition-colors">{lead.nome}</h3>
+                                <Badge variant="outline" className="text-[11px] px-2 py-0.5">
                                   {lead.tipo}
                                 </Badge>
                                 {(() => {

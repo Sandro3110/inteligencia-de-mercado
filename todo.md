@@ -736,3 +736,47 @@
 ### 26.5 Finalização
 - [ ] Testar todas as funcionalidades
 - [ ] Criar checkpoint final
+
+
+## Fase 27: Padronização de Layout e Fontes 🎨
+
+### 27.1 Análise de Diferenças
+- [ ] Comparar layout atual com imagem de referência
+- [ ] Identificar diferenças de tamanho de fonte
+- [ ] Identificar diferenças de espaçamento
+- [ ] Identificar diferenças de ícones e badges
+
+### 27.2 Ajustes de Layout
+- [ ] Reduzir altura das linhas (mais compacto)
+- [ ] Ajustar tamanho de fonte (menor e mais discreta)
+- [ ] Reduzir tamanho dos badges
+- [ ] Ajustar espaçamento entre elementos
+- [ ] Garantir alinhamento consistente
+
+### 27.3 Finalização
+- [x] Testar em todas as páginas
+- [x] Validar consistência visual
+- [ ] Criar checkpoint
+
+## Fase 28: Padronização de Tamanhos de Texto 📝
+
+### 28.1 Identificação
+- [x] Verificar tamanho de texto em cards de mercados
+- [x] Verificar tamanho de texto em cards de clientes
+- [x] Verificar tamanho de texto em cards de concorrentes
+- [x] Verificar tamanho de texto em cards de leads
+
+### 28.2 Padronização
+- [x] Definir tamanho padrão de título (text-base para melhor legibilidade)
+- [x] Definir tamanho padrão de descrição (text-sm)
+- [x] Aplicar em todos os cards de clientes
+- [x] Aplicar em todos os cards de concorrentes
+- [x] Aplicar em todos os cards de leads
+- [x] Reduzir padding de p-4 para p-3
+- [x] Reduzir tamanho de badges (text-[11px] px-2 py-0.5)
+- [x] Garantir consistência com cards de mercados
+
+### 28.3 Finalização
+- [x] Testar legibilidade em todas as páginas
+- [x] Validar consistência visual
+- [x] Criar checkpoint
