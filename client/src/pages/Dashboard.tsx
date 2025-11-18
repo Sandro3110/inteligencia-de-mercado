@@ -87,10 +87,10 @@ export default function Dashboard() {
   const validationProgress = Math.round((totalValidated / totalRecords) * 100);
 
   return (
-    <div className="min-h-screen">
+    <div className="h-screen overflow-hidden flex flex-col">
       {/* Header */}
       <div className="border-b border-border/50">
-        <div className="container py-6">
+        <div className="container py-3">
           <div className="flex justify-between items-center flex-wrap gap-4">
             <div>
               <h1 className="text-2xl font-semibold tracking-ultra-wide uppercase text-foreground mb-1">
@@ -108,9 +108,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="container py-8">
+      <div className="container py-4 flex-1 overflow-y-auto">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
           <Card className="glass-card border-l-4 border-l-primary">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">

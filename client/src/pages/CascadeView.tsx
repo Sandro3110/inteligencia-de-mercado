@@ -443,7 +443,7 @@ export default function CascadeView() {
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border/40">
+      <div className="flex items-center justify-between px-6 py-2 border-b border-border/40">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">GESTOR PAV</h1>
           <p className="text-sm text-muted-foreground">Pesquisa de Mercado</p>
