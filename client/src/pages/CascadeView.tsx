@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DetailPopup } from "@/components/DetailPopup";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 import {
   Building2,
   Users,
@@ -16,18 +22,28 @@ import {
   AlertCircle,
   ChevronRight,
   ChevronLeft,
+  Search,
+  Download,
 } from "lucide-react";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
 type Page = "mercados" | "clientes" | "concorrentes" | "leads";
+type ValidationStatus = "pending" | "rich" | "needs_adjustment" | "discarded";
 
 export default function CascadeView() {
   const [currentPage, setCurrentPage] = useState<Page>("mercados");
   const [selectedMercadoId, setSelectedMercadoId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [detailPopupOpen, setDetailPopupOpen] = useState(false);
   const [detailPopupItem, setDetailPopupItem] = useState<any>(null);
   const [detailPopupType, setDetailPopupType] = useState<"cliente" | "concorrente" | "lead">("cliente");
+  
+  // Estados para validação em lote
+  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+  const [batchModalOpen, setBatchModalOpen] = useState(false);
+  const [batchStatus, setBatchStatus] = useState<ValidationStatus>("rich");
+  const [batchNotes, setBatchNotes] = useState("");
 
   const { data: mercados, isLoading } = trpc.mercados.list.useQuery({ search: "" });
   const { data: clientes } = trpc.clientes.byMercado.useQuery(
@@ -43,398 +59,623 @@ export default function CascadeView() {
     { enabled: !!selectedMercadoId }
   );
 
+  const utils = trpc.useUtils();
+  const updateClienteMutation = trpc.clientes.updateValidation.useMutation({
+    onSuccess: () => {
+      utils.clientes.byMercado.invalidate();
+      utils.mercados.list.invalidate();
+    },
+  });
+  const updateConcorrenteMutation = trpc.concorrentes.updateValidation.useMutation({
+    onSuccess: () => {
+      utils.concorrentes.byMercado.invalidate();
+      utils.mercados.list.invalidate();
+    },
+  });
+  const updateLeadMutation = trpc.leads.updateValidation.useMutation({
+    onSuccess: () => {
+      utils.leads.byMercado.invalidate();
+      utils.mercados.list.invalidate();
+    },
+  });
+
   const mercadoSelecionado = mercados?.find((m) => m.id === selectedMercadoId);
 
   // Calcular totais gerais
   const totalMercados = mercados?.length || 0;
   const totalClientes = mercados?.reduce((sum, m) => sum + (m.quantidadeClientes || 0), 0) || 0;
-  const totalConcorrentes = 591;
-  const totalLeads = 727;
+  const totalConcorrentes = 591; // Fixo conforme dados
+  const totalLeads = 727; // Fixo conforme dados
 
-  const handleSelectMercado = (mercadoId: number) => {
-    setSelectedMercadoId(mercadoId);
-    setCurrentPage("clientes");
-  };
-
-  const handleAvancar = () => {
-    if (currentPage === "mercados" && selectedMercadoId) {
-      setCurrentPage("clientes");
-    } else if (currentPage === "clientes") {
-      setCurrentPage("concorrentes");
-    } else if (currentPage === "concorrentes") {
-      setCurrentPage("leads");
-    }
-  };
-
-  const handleVoltar = () => {
-    if (currentPage === "leads") {
-      setCurrentPage("concorrentes");
-    } else if (currentPage === "concorrentes") {
-      setCurrentPage("clientes");
-    } else if (currentPage === "clientes") {
-      setCurrentPage("mercados");
-      setSelectedMercadoId(null);
-    }
-  };
-
-  const handleOpenDetail = (item: any, type: "cliente" | "concorrente" | "lead") => {
-    setDetailPopupItem(item);
-    setDetailPopupType(type);
-    setDetailPopupOpen(true);
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "rich":
-        return <CheckCircle2 className="h-4 w-4 text-success" />;
-      case "needs_adjustment":
-        return <AlertCircle className="h-4 w-4 text-warning" />;
-      case "discarded":
-        return <XCircle className="h-4 w-4 text-error" />;
-      default:
-        return <Clock className="h-4 w-4 text-muted-foreground" />;
-    }
-  };
-
+  // Filtrar por status
   const filterByStatus = (items: any[]) => {
     if (statusFilter === "all") return items;
-    return items.filter((item) => item.validationStatus === statusFilter);
+    if (statusFilter === "pending") return items.filter((i) => i.validationStatus === "pending");
+    if (statusFilter === "rich") return items.filter((i) => i.validationStatus === "rich");
+    if (statusFilter === "discarded") return items.filter((i) => i.validationStatus === "discarded");
+    return items;
   };
 
-  const getPageNumber = () => {
-    switch (currentPage) {
-      case "mercados":
-        return 1;
-      case "clientes":
-        return 2;
-      case "concorrentes":
-        return 3;
-      case "leads":
-        return 4;
-      default:
-        return 1;
+  // Busca global inteligente
+  const searchInText = (text: string | null | undefined) => {
+    if (!text) return false;
+    return text.toLowerCase().includes(searchQuery.toLowerCase());
+  };
+
+  const filteredClientes = useMemo(() => {
+    if (!clientes) return [];
+    let filtered = filterByStatus(clientes);
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (c) =>
+          searchInText(c.empresa) ||
+          searchInText(c.cnpj) ||
+          searchInText(c.produtoPrincipal) ||
+          searchInText(c.cidade)
+      );
     }
+    return filtered;
+  }, [clientes, statusFilter, searchQuery]);
+
+  const filteredConcorrentes = useMemo(() => {
+    if (!concorrentes) return [];
+    let filtered = filterByStatus(concorrentes);
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (c) =>
+          searchInText(c.nome) ||
+          searchInText(c.cnpj) ||
+          searchInText(c.produto)
+      );
+    }
+    return filtered;
+  }, [concorrentes, statusFilter, searchQuery]);
+
+  const filteredLeads = useMemo(() => {
+    if (!leads) return [];
+    let filtered = filterByStatus(leads);
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (l) =>
+          searchInText(l.nome) ||
+          searchInText(l.cnpj) ||
+          searchInText(l.regiao)
+      );
+    }
+    return filtered;
+  }, [leads, statusFilter, searchQuery]);
+
+  // Contador de resultados de busca
+  const searchResultsCount = useMemo(() => {
+    if (!searchQuery) return null;
+    return {
+      clientes: filteredClientes.length,
+      concorrentes: filteredConcorrentes.length,
+      leads: filteredLeads.length,
+    };
+  }, [searchQuery, filteredClientes, filteredConcorrentes, filteredLeads]);
+
+  // Funções de navegação
+  const handleSelectMercado = (id: number) => {
+    setSelectedMercadoId(id);
+    setCurrentPage("clientes");
+    setSelectedItems(new Set());
+  };
+
+  const handleNextPage = () => {
+    if (currentPage === "mercados") setCurrentPage("clientes");
+    else if (currentPage === "clientes") setCurrentPage("concorrentes");
+    else if (currentPage === "concorrentes") setCurrentPage("leads");
+    setSelectedItems(new Set());
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage === "leads") setCurrentPage("concorrentes");
+    else if (currentPage === "concorrentes") setCurrentPage("clientes");
+    else if (currentPage === "clientes") setCurrentPage("mercados");
+    setSelectedItems(new Set());
   };
 
   const getPageTitle = () => {
-    switch (currentPage) {
-      case "mercados":
-        return "Selecione um Mercado";
-      case "clientes":
-        return "Clientes";
-      case "concorrentes":
-        return "Concorrentes";
-      case "leads":
-        return "Leads";
-      default:
-        return "";
+    if (currentPage === "mercados") return "Selecione um Mercado";
+    if (currentPage === "clientes") return `Clientes - ${mercadoSelecionado?.nome || ""}`;
+    if (currentPage === "concorrentes") return `Concorrentes - ${mercadoSelecionado?.nome || ""}`;
+    if (currentPage === "leads") return `Leads - ${mercadoSelecionado?.nome || ""}`;
+    return "";
+  };
+
+  const getPageNumber = () => {
+    if (currentPage === "mercados") return 1;
+    if (currentPage === "clientes") return 2;
+    if (currentPage === "concorrentes") return 3;
+    if (currentPage === "leads") return 4;
+    return 1;
+  };
+
+  // Ícones de status
+  const getStatusIcon = (status: string | null) => {
+    if (status === "rich") return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+    if (status === "needs_adjustment") return <AlertCircle className="w-4 h-4 text-yellow-500" />;
+    if (status === "discarded") return <XCircle className="w-4 h-4 text-red-500" />;
+    return <Clock className="w-4 h-4 text-muted-foreground" />;
+  };
+
+  // Checkbox handlers
+  const toggleItemSelection = (id: number) => {
+    const newSet = new Set(selectedItems);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+    } else {
+      newSet.add(id);
+    }
+    setSelectedItems(newSet);
+  };
+
+  const toggleSelectAll = () => {
+    if (currentPage === "clientes") {
+      if (selectedItems.size === filteredClientes.length) {
+        setSelectedItems(new Set());
+      } else {
+        setSelectedItems(new Set(filteredClientes.map((c) => c.id)));
+      }
+    } else if (currentPage === "concorrentes") {
+      if (selectedItems.size === filteredConcorrentes.length) {
+        setSelectedItems(new Set());
+      } else {
+        setSelectedItems(new Set(filteredConcorrentes.map((c) => c.id)));
+      }
+    } else if (currentPage === "leads") {
+      if (selectedItems.size === filteredLeads.length) {
+        setSelectedItems(new Set());
+      } else {
+        setSelectedItems(new Set(filteredLeads.map((l) => l.id)));
+      }
     }
   };
 
-  const canAvancar = () => {
-    if (currentPage === "mercados") return false;
-    if (currentPage === "leads") return false;
-    return true;
+  // Validação em lote
+  const handleBatchValidation = async () => {
+    if (selectedItems.size === 0) return;
+
+    try {
+      const ids = Array.from(selectedItems);
+      
+      if (currentPage === "clientes") {
+        await Promise.all(
+          ids.map((id) =>
+            updateClienteMutation.mutateAsync({
+              id,
+              status: batchStatus,
+              notes: batchNotes,
+            })
+          )
+        );
+      } else if (currentPage === "concorrentes") {
+        await Promise.all(
+          ids.map((id) =>
+            updateConcorrenteMutation.mutateAsync({
+              id,
+              status: batchStatus,
+              notes: batchNotes,
+            })
+          )
+        );
+      } else if (currentPage === "leads") {
+        await Promise.all(
+          ids.map((id) =>
+            updateLeadMutation.mutateAsync({
+              id,
+              status: batchStatus,
+              notes: batchNotes,
+            })
+          )
+        );
+      }
+
+      toast.success(`${selectedItems.size} itens validados com sucesso!`);
+      setSelectedItems(new Set());
+      setBatchModalOpen(false);
+      setBatchNotes("");
+    } catch (error) {
+      toast.error("Erro ao validar itens em lote");
+    }
   };
 
-  const canVoltar = () => {
-    return currentPage !== "mercados";
+  // Exportação de dados filtrados
+  const handleExportFiltered = () => {
+    let data: any[] = [];
+    let headers: string[] = [];
+    let filename = "";
+
+    if (currentPage === "clientes") {
+      data = filteredClientes;
+      headers = ["ID", "Empresa", "CNPJ", "Produto", "Segmentação", "Cidade", "UF", "Status"];
+      filename = "clientes_filtrados.csv";
+    } else if (currentPage === "concorrentes") {
+      data = filteredConcorrentes;
+      headers = ["ID", "Nome", "CNPJ", "Produto", "Porte", "Score", "Status"];
+      filename = "concorrentes_filtrados.csv";
+    } else if (currentPage === "leads") {
+      data = filteredLeads;
+      headers = ["ID", "Nome", "CNPJ", "Tipo", "Porte", "Região", "Status"];
+      filename = "leads_filtrados.csv";
+    } else {
+      toast.error("Selecione uma página com dados para exportar");
+      return;
+    }
+
+    if (data.length === 0) {
+      toast.error("Nenhum dado para exportar");
+      return;
+    }
+
+    // Gerar CSV
+    const csvContent = [
+      headers.join(","),
+      ...data.map((item) => {
+        if (currentPage === "clientes") {
+          return [
+            item.id,
+            `"${item.empresa || ""}"`,
+            item.cnpj || "",
+            `"${item.produtoPrincipal || ""}"`,
+            item.segmentacaoB2bB2c || "",
+            item.cidade || "",
+            item.uf || "",
+            item.validationStatus || "pending",
+          ].join(",");
+        } else if (currentPage === "concorrentes") {
+          return [
+            item.id,
+            `"${item.nome || ""}"`,
+            item.cnpj || "",
+            `"${item.produto || ""}"`,
+            item.porte || "",
+            item.qualidadeScore || "",
+            item.validationStatus || "pending",
+          ].join(",");
+        } else {
+          return [
+            item.id,
+            `"${item.nome || ""}"`,
+            item.cnpj || "",
+            item.tipo || "",
+            item.porte || "",
+            item.regiao || "",
+            item.validationStatus || "pending",
+          ].join(",");
+        }
+      }),
+    ].join("\n");
+
+    // Download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+
+    toast.success(`${data.length} itens exportados com sucesso!`);
   };
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border/40">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">GESTOR PAV</h1>
+          <p className="text-sm text-muted-foreground">Pesquisa de Mercado</p>
+        </div>
+        <div className="flex items-center gap-4">
+          {currentPage !== "mercados" && (
+            <Button variant="outline" size="sm" onClick={handleExportFiltered}>
+              <Download className="w-4 h-4 mr-2" />
+              Exportar Filtrados
+            </Button>
+          )}
+          <ThemeToggle />
+        </div>
+      </div>
+
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar Fixo */}
-        <aside className="w-72 border-r border-border bg-card/50 backdrop-blur-sm flex flex-col">
-          <div className="p-4 border-b border-border">
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="text-lg font-semibold">GESTOR PAV</h1>
-              <ThemeToggle />
+        {/* Sidebar */}
+        <div className="w-[280px] border-r border-border/40 p-6 flex flex-col gap-6">
+          {/* Busca Global */}
+          <div>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">
+              Busca Global
+            </Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Nome, CNPJ, produto..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
             </div>
-            <p className="text-xs text-muted-foreground">Pesquisa de Mercado</p>
+            {searchResultsCount && (
+              <p className="text-xs text-muted-foreground mt-2">
+                {searchResultsCount.clientes} clientes, {searchResultsCount.concorrentes} concorrentes,{" "}
+                {searchResultsCount.leads} leads
+              </p>
+            )}
           </div>
 
-          <ScrollArea className="flex-1">
-            <div className="p-4 space-y-6">
-              {/* KPIs */}
-              <div>
-                <h3 className="section-title mb-3">Estatísticas</h3>
-                <div className="space-y-2">
-                  <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Building2 className="h-4 w-4 text-primary" />
-                      <span className="text-xs text-muted-foreground">Mercados</span>
-                    </div>
+          {/* Estatísticas */}
+          <div>
+            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Estatísticas</h3>
+            <div className="space-y-3">
+              <div className="glass-card p-4">
+                <div className="flex items-center gap-3">
+                  <Building2 className="w-5 h-5 text-blue-400" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Mercados</p>
                     <p className="text-2xl font-bold">{totalMercados}</p>
                   </div>
-                  <div className="p-3 rounded-lg bg-info/10 border border-info/20">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Users className="h-4 w-4 text-info" />
-                      <span className="text-xs text-muted-foreground">Clientes</span>
-                    </div>
+                </div>
+              </div>
+
+              <div className="glass-card p-4">
+                <div className="flex items-center gap-3">
+                  <Users className="w-5 h-5 text-green-400" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Clientes</p>
                     <p className="text-2xl font-bold">{totalClientes}</p>
                   </div>
-                  <div className="p-3 rounded-lg bg-warning/10 border border-warning/20">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Target className="h-4 w-4 text-warning" />
-                      <span className="text-xs text-muted-foreground">Concorrentes</span>
-                    </div>
+                </div>
+              </div>
+
+              <div className="glass-card p-4">
+                <div className="flex items-center gap-3">
+                  <Target className="w-5 h-5 text-purple-400" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Concorrentes</p>
                     <p className="text-2xl font-bold">{totalConcorrentes}</p>
                   </div>
-                  <div className="p-3 rounded-lg bg-success/10 border border-success/20">
-                    <div className="flex items-center gap-2 mb-1">
-                      <TrendingUp className="h-4 w-4 text-success" />
-                      <span className="text-xs text-muted-foreground">Leads</span>
-                    </div>
+                </div>
+              </div>
+
+              <div className="glass-card p-4">
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="w-5 h-5 text-orange-400" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Leads</p>
                     <p className="text-2xl font-bold">{totalLeads}</p>
                   </div>
                 </div>
               </div>
-
-              {/* Filtros */}
-              <div>
-                <h3 className="section-title mb-3">Filtros</h3>
-                <div className="space-y-2">
-                  <Button
-                    variant={statusFilter === "all" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setStatusFilter("all")}
-                    className="w-full justify-start text-sm"
-                  >
-                    Todos
-                  </Button>
-                  <Button
-                    variant={statusFilter === "pending" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setStatusFilter("pending")}
-                    className="w-full justify-start text-sm"
-                  >
-                    <Clock className="h-4 w-4 mr-2" />
-                    Pendentes
-                  </Button>
-                  <Button
-                    variant={statusFilter === "rich" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setStatusFilter("rich")}
-                    className="w-full justify-start text-sm"
-                  >
-                    <CheckCircle2 className="h-4 w-4 mr-2" />
-                    Validados
-                  </Button>
-                  <Button
-                    variant={statusFilter === "discarded" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setStatusFilter("discarded")}
-                    className="w-full justify-start text-sm"
-                  >
-                    <XCircle className="h-4 w-4 mr-2" />
-                    Descartados
-                  </Button>
-                </div>
-              </div>
-
-              {/* Navegação Hierárquica */}
-              {selectedMercadoId && mercadoSelecionado && (
-                <div>
-                  <h3 className="section-title mb-3">Mercado Atual</h3>
-                  <div className="p-3 rounded-lg bg-muted/50 border border-border">
-                    <p className="text-xs font-semibold mb-2 truncate">
-                      {mercadoSelecionado.nome}
-                    </p>
-                    <div className="space-y-1">
-                      <div className="text-xs">
-                        <span className="text-muted-foreground">Clientes:</span>
-                        <span className="ml-2 font-semibold">{clientes?.length || 0}</span>
-                      </div>
-                      <div className="text-xs">
-                        <span className="text-muted-foreground">Concorrentes:</span>
-                        <span className="ml-2 font-semibold">{concorrentes?.length || 0}</span>
-                      </div>
-                      <div className="text-xs">
-                        <span className="text-muted-foreground">Leads:</span>
-                        <span className="ml-2 font-semibold">{leads?.length || 0}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
-        </aside>
-
-        {/* Área Principal */}
-        <main className="flex-1 flex flex-col">
-          {/* Header */}
-          <div className="border-b border-border p-4 flex-shrink-0">
-            <div className="max-w-6xl mx-auto flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-semibold">{getPageTitle()}</h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Página {getPageNumber()} de 4
-                  {mercadoSelecionado && ` • ${mercadoSelecionado.nome}`}
-                </p>
-              </div>
-              <Badge variant="outline" className="text-sm">
-                {currentPage === "mercados" && `${totalMercados} mercados`}
-                {currentPage === "clientes" && `${filterByStatus(clientes || []).length} clientes`}
-                {currentPage === "concorrentes" && `${filterByStatus(concorrentes || []).length} concorrentes`}
-                {currentPage === "leads" && `${filterByStatus(leads || []).length} leads`}
-              </Badge>
             </div>
           </div>
 
-          {/* Conteúdo com Caixa Fixa */}
-          <div className="flex-1 overflow-hidden">
-            <div className="h-full max-w-6xl mx-auto p-6">
+          {/* Filtros */}
+          <div>
+            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Filtros</h3>
+            <div className="space-y-2">
+              <Button
+                variant={statusFilter === "all" ? "default" : "ghost"}
+                className="w-full justify-start"
+                onClick={() => setStatusFilter("all")}
+              >
+                Todos
+              </Button>
+              <Button
+                variant={statusFilter === "pending" ? "default" : "ghost"}
+                className="w-full justify-start"
+                onClick={() => setStatusFilter("pending")}
+              >
+                <Clock className="w-4 h-4 mr-2" />
+                Pendentes
+              </Button>
+              <Button
+                variant={statusFilter === "rich" ? "default" : "ghost"}
+                className="w-full justify-start"
+                onClick={() => setStatusFilter("rich")}
+              >
+                <CheckCircle2 className="w-4 h-4 mr-2" />
+                Validados
+              </Button>
+              <Button
+                variant={statusFilter === "discarded" ? "default" : "ghost"}
+                className="w-full justify-start"
+                onClick={() => setStatusFilter("discarded")}
+              >
+                <XCircle className="w-4 h-4 mr-2" />
+                Descartados
+              </Button>
+            </div>
+          </div>
+
+          {/* Mercado Atual */}
+          {mercadoSelecionado && (
+            <div>
+              <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Mercado Atual</h3>
+              <div className="glass-card p-3">
+                <p className="text-sm font-medium truncate">{mercadoSelecionado.nome}</p>
+                <Badge variant="outline" className="text-xs mt-2">
+                  {mercadoSelecionado.segmentacao}
+                </Badge>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Área Principal */}
+        <div className="flex-1 overflow-hidden flex flex-col">
+          {/* Header da Página */}
+          <div className="px-6 py-4 border-b border-border/40">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold">{getPageTitle()}</h2>
+                <p className="text-sm text-muted-foreground">Página {getPageNumber()} de 4</p>
+              </div>
+              {currentPage !== "mercados" && (
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={
+                      (currentPage === "clientes" && selectedItems.size === filteredClientes.length) ||
+                      (currentPage === "concorrentes" && selectedItems.size === filteredConcorrentes.length) ||
+                      (currentPage === "leads" && selectedItems.size === filteredLeads.length)
+                    }
+                    onCheckedChange={toggleSelectAll}
+                  />
+                  <span className="text-sm text-muted-foreground">Selecionar todos ({selectedItems.size})</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Conteúdo */}
+          <div className="flex-1 overflow-hidden p-6">
+            <div className="h-full max-w-6xl mx-auto">
               <div className="glass-card h-full flex flex-col">
                 <ScrollArea className="flex-1">
                   <div className="p-4">
-                    {/* Página 1: Mercados */}
+                    {/* Lista de Mercados */}
                     {currentPage === "mercados" && (
-                      <div className="space-y-1">
-                        {isLoading && <p className="text-muted-foreground p-4">Carregando...</p>}
+                      <div className="space-y-2">
                         {mercados?.map((mercado) => (
                           <div
                             key={mercado.id}
+                            className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
                             onClick={() => handleSelectMercado(mercado.id)}
-                            className="flex items-center justify-between p-3 rounded-md hover:bg-muted/50 cursor-pointer group transition-colors"
                           >
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
+                            <div className="flex-1">
+                              <h3 className="font-medium group-hover:text-primary transition-colors">
                                 {mercado.nome}
                               </h3>
-                              <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-                                {mercado.segmentacao && (
-                                  <Badge variant="outline" className="text-xs">
-                                    {mercado.segmentacao}
-                                  </Badge>
-                                )}
-                                <span>{mercado.quantidadeClientes || 0} clientes</span>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="outline" className="text-xs">
+                                  {mercado.segmentacao}
+                                </Badge>
+                                <span className="text-sm text-muted-foreground">
+                                  {mercado.quantidadeClientes} clientes
+                                </span>
                               </div>
                             </div>
-                            <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+                            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                           </div>
                         ))}
                       </div>
                     )}
 
-                    {/* Página 2: Clientes */}
+                    {/* Lista de Clientes */}
                     {currentPage === "clientes" && (
-                      <div className="space-y-1">
-                        {filterByStatus(clientes || []).map((cliente) => (
+                      <div className="space-y-2">
+                        {filteredClientes.map((cliente) => (
                           <div
                             key={cliente.id}
-                            onClick={() => handleOpenDetail(cliente, "cliente")}
-                            className="flex items-center gap-3 p-3 rounded-md hover:bg-muted/50 cursor-pointer group transition-colors"
+                            className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
                           >
-                            {getStatusIcon(cliente.validationStatus || "pending")}
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
-                                {cliente.empresa}
-                              </h3>
-                              <p className="text-sm text-muted-foreground truncate">
-                                {cliente.produtoPrincipal || "N/A"}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-2 flex-shrink-0">
-                              {cliente.segmentacaoB2bB2c && (
-                                <Badge variant="outline" className="text-xs">
+                            <Checkbox
+                              checked={selectedItems.has(cliente.id)}
+                              onCheckedChange={() => toggleItemSelection(cliente.id)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <div
+                              className="flex-1"
+                              onClick={() => {
+                                setDetailPopupItem(cliente);
+                                setDetailPopupType("cliente");
+                                setDetailPopupOpen(true);
+                              }}
+                            >
+                              <div className="flex items-center gap-2">
+                                {getStatusIcon(cliente.validationStatus)}
+                                <h3 className="font-medium group-hover:text-primary transition-colors">
+                                  {cliente.empresa}
+                                </h3>
+                                <Badge variant="outline" className="text-xs ml-auto">
                                   {cliente.segmentacaoB2bB2c}
                                 </Badge>
-                              )}
-                              {cliente.cidade && (
-                                <span className="text-xs text-muted-foreground">
+                                <span className="text-sm text-muted-foreground">
                                   {cliente.cidade}, {cliente.uf}
                                 </span>
-                              )}
+                              </div>
+                              <p className="text-sm text-muted-foreground mt-1 truncate">
+                                {cliente.produtoPrincipal}
+                              </p>
                             </div>
                           </div>
                         ))}
-                        {filterByStatus(clientes || []).length === 0 && (
-                          <p className="text-center text-muted-foreground py-12">
-                            Nenhum cliente encontrado
-                          </p>
-                        )}
                       </div>
                     )}
 
-                    {/* Página 3: Concorrentes */}
+                    {/* Lista de Concorrentes */}
                     {currentPage === "concorrentes" && (
-                      <div className="space-y-1">
-                        {filterByStatus(concorrentes || []).map((concorrente) => (
+                      <div className="space-y-2">
+                        {filteredConcorrentes.map((concorrente) => (
                           <div
                             key={concorrente.id}
-                            onClick={() => handleOpenDetail(concorrente, "concorrente")}
-                            className="flex items-center gap-3 p-3 rounded-md hover:bg-muted/50 cursor-pointer group transition-colors"
+                            className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
                           >
-                            {getStatusIcon(concorrente.validationStatus || "pending")}
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
-                                {concorrente.nome}
-                              </h3>
-                              <p className="text-sm text-muted-foreground truncate">
-                                {concorrente.produto || "N/A"}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-2 flex-shrink-0">
-                              {concorrente.porte && (
-                                <Badge variant="outline" className="text-xs">
+                            <Checkbox
+                              checked={selectedItems.has(concorrente.id)}
+                              onCheckedChange={() => toggleItemSelection(concorrente.id)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <div
+                              className="flex-1"
+                              onClick={() => {
+                                setDetailPopupItem(concorrente);
+                                setDetailPopupType("concorrente");
+                                setDetailPopupOpen(true);
+                              }}
+                            >
+                              <div className="flex items-center gap-2">
+                                {getStatusIcon(concorrente.validationStatus)}
+                                <h3 className="font-medium group-hover:text-primary transition-colors">
+                                  {concorrente.nome}
+                                </h3>
+                                <Badge variant="outline" className="text-xs ml-auto">
                                   {concorrente.porte}
                                 </Badge>
-                              )}
-                              {concorrente.qualidadeScore && (
-                                <span className="text-xs text-muted-foreground">
+                                <span className="text-sm text-muted-foreground">
                                   Score: {concorrente.qualidadeScore}%
                                 </span>
-                              )}
+                              </div>
+                              <p className="text-sm text-muted-foreground mt-1 truncate">{concorrente.produto}</p>
                             </div>
                           </div>
                         ))}
-                        {filterByStatus(concorrentes || []).length === 0 && (
-                          <p className="text-center text-muted-foreground py-12">
-                            Nenhum concorrente encontrado
-                          </p>
-                        )}
                       </div>
                     )}
 
-                    {/* Página 4: Leads */}
+                    {/* Lista de Leads */}
                     {currentPage === "leads" && (
-                      <div className="space-y-1">
-                        {filterByStatus(leads || []).map((lead) => (
+                      <div className="space-y-2">
+                        {filteredLeads.map((lead) => (
                           <div
                             key={lead.id}
-                            onClick={() => handleOpenDetail(lead, "lead")}
-                            className="flex items-center gap-3 p-3 rounded-md hover:bg-muted/50 cursor-pointer group transition-colors"
+                            className="flex items-center gap-3 p-4 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
                           >
-                            {getStatusIcon(lead.validationStatus || "pending")}
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
-                                {lead.nome}
-                              </h3>
-                              <p className="text-sm text-muted-foreground truncate">
-                                {lead.regiao || "N/A"}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-2 flex-shrink-0">
-                              {lead.tipo && (
-                                <Badge variant="outline" className="text-xs">
+                            <Checkbox
+                              checked={selectedItems.has(lead.id)}
+                              onCheckedChange={() => toggleItemSelection(lead.id)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <div
+                              className="flex-1"
+                              onClick={() => {
+                                setDetailPopupItem(lead);
+                                setDetailPopupType("lead");
+                                setDetailPopupOpen(true);
+                              }}
+                            >
+                              <div className="flex items-center gap-2">
+                                {getStatusIcon(lead.validationStatus)}
+                                <h3 className="font-medium group-hover:text-primary transition-colors">
+                                  {lead.nome}
+                                </h3>
+                                <Badge variant="outline" className="text-xs ml-auto">
                                   {lead.tipo}
                                 </Badge>
-                              )}
-                              {lead.porte && (
-                                <span className="text-xs text-muted-foreground">
-                                  {lead.porte}
-                                </span>
-                              )}
+                                <span className="text-sm text-muted-foreground">{lead.porte}</span>
+                              </div>
+                              <p className="text-sm text-muted-foreground mt-1 truncate">{lead.regiao}</p>
                             </div>
                           </div>
                         ))}
-                        {filterByStatus(leads || []).length === 0 && (
-                          <p className="text-center text-muted-foreground py-12">
-                            Nenhum lead encontrado
-                          </p>
-                        )}
                       </div>
                     )}
                   </div>
@@ -443,44 +684,107 @@ export default function CascadeView() {
             </div>
           </div>
 
-          {/* Footer com Botões de Navegação */}
-          <div className="border-t border-border p-4 flex-shrink-0">
-            <div className="max-w-6xl mx-auto flex items-center justify-between">
-              <Button
-                variant="outline"
-                onClick={handleVoltar}
-                disabled={!canVoltar()}
-                className="min-w-[120px]"
-              >
-                <ChevronLeft className="h-4 w-4 mr-2" />
-                Voltar
+          {/* Footer */}
+          <div className="px-6 py-4 border-t border-border/40 flex items-center justify-between">
+            <Button
+              variant="outline"
+              onClick={handlePrevPage}
+              disabled={currentPage === "mercados"}
+            >
+              <ChevronLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+
+            {selectedItems.size > 0 && currentPage !== "mercados" && (
+              <Button onClick={() => setBatchModalOpen(true)}>
+                Validar Selecionados ({selectedItems.size})
               </Button>
-              <div className="text-sm text-muted-foreground">
-                {currentPage === "mercados" && "Selecione um mercado para continuar"}
-                {currentPage === "clientes" && "Clique em Avançar para ver concorrentes"}
-                {currentPage === "concorrentes" && "Clique em Avançar para ver leads"}
-                {currentPage === "leads" && "Última página"}
-              </div>
-              <Button
-                variant="default"
-                onClick={handleAvancar}
-                disabled={!canAvancar()}
-                className="min-w-[120px]"
-              >
-                Avançar
-                <ChevronRight className="h-4 w-4 ml-2" />
-              </Button>
-            </div>
+            )}
+
+            {currentPage === "mercados" && (
+              <span className="text-sm text-muted-foreground">
+                Selecione um mercado para continuar
+              </span>
+            )}
+
+            <Button
+              onClick={handleNextPage}
+              disabled={currentPage === "leads" || (currentPage === "mercados" && !selectedMercadoId)}
+            >
+              Avançar
+              <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
           </div>
-        </main>
+        </div>
       </div>
 
-      {/* Detail Popup */}
+      {/* Modal de Validação em Lote */}
+      <Dialog open={batchModalOpen} onOpenChange={setBatchModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Validar {selectedItems.size} itens selecionados</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <Label>Status de Validação</Label>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <Button
+                  variant={batchStatus === "rich" ? "default" : "outline"}
+                  onClick={() => setBatchStatus("rich")}
+                  className="w-full"
+                >
+                  <CheckCircle2 className="w-4 h-4 mr-2" />
+                  Rico
+                </Button>
+                <Button
+                  variant={batchStatus === "needs_adjustment" ? "default" : "outline"}
+                  onClick={() => setBatchStatus("needs_adjustment")}
+                  className="w-full"
+                >
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  Precisa Ajuste
+                </Button>
+                <Button
+                  variant={batchStatus === "discarded" ? "default" : "outline"}
+                  onClick={() => setBatchStatus("discarded")}
+                  className="w-full col-span-2"
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Descartado
+                </Button>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="batch-notes">Observações (opcional)</Label>
+              <Textarea
+                id="batch-notes"
+                placeholder="Adicione observações sobre a validação..."
+                value={batchNotes}
+                onChange={(e) => setBatchNotes(e.target.value)}
+                rows={4}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBatchModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleBatchValidation}>
+              Validar {selectedItems.size} itens
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pop-up de Detalhes */}
       <DetailPopup
         isOpen={detailPopupOpen}
-        onClose={() => setDetailPopupOpen(false)}
         item={detailPopupItem}
         type={detailPopupType}
+        onClose={() => setDetailPopupOpen(false)}
       />
     </div>
   );
