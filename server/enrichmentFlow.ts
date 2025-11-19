@@ -440,13 +440,30 @@ async function findCompetitorsForMarkets(
   const { searchCompetitors } = await import('./_core/serpApi');
   const { createConcorrente } = await import('./db');
   const { filterDuplicates } = await import('./_core/deduplication');
+  const { filterRealCompanies } = await import('./_core/companyFilters');
   const concorrentes: any[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {
       // Buscar concorrentes reais via SerpAPI (20 resultados)
       console.log(`[Enrichment] Buscando concorrentes para mercado: ${mercadoNome}`);
-      const searchResults = await searchCompetitors(mercadoNome, undefined, 20);
+      const rawResults = await searchCompetitors(mercadoNome, undefined, 20);
+      
+      // Filtrar apenas empresas reais (remover artigos/notícias)
+      const searchResults = filterRealCompanies(rawResults
+        .filter(r => r.site) // Garantir que tem site
+        .map(r => ({
+          title: r.nome,
+          link: r.site!,
+          snippet: r.descricao,
+        }))
+      ).map((filtered) => ({
+        nome: filtered.title,
+        site: filtered.link,
+        descricao: filtered.snippet,
+      }));
+      
+      console.log(`[Filter] Concorrentes após filtro: ${searchResults.length}/${rawResults.length}`);
       
       // Extrair nomes de empresas dos resultados do SerpAPI
       const concorrentesCandidatos = searchResults.map(result => ({
@@ -542,13 +559,30 @@ async function findLeadsForMarkets(
   const { searchLeads } = await import('./_core/serpApi');
   const { createLead } = await import('./db');
   const { filterDuplicates } = await import('./_core/deduplication');
+  const { filterRealCompanies } = await import('./_core/companyFilters');
   const leads: any[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {
       // Buscar leads reais via SerpAPI (20 resultados)
       console.log(`[Enrichment] Buscando leads para mercado: ${mercadoNome}`);
-      const searchResults = await searchLeads(mercadoNome, 'fornecedores', 20);
+      const rawResults = await searchLeads(mercadoNome, 'fornecedores', 20);
+      
+      // Filtrar apenas empresas reais (remover artigos/notícias)
+      const searchResults = filterRealCompanies(rawResults
+        .filter(r => r.site) // Garantir que tem site
+        .map(r => ({
+          title: r.nome,
+          link: r.site!,
+          snippet: r.descricao,
+        }))
+      ).map((filtered) => ({
+        nome: filtered.title,
+        site: filtered.link,
+        descricao: filtered.snippet,
+      }));
+      
+      console.log(`[Filter] Leads após filtro: ${searchResults.length}/${rawResults.length}`);
       
       // Extrair nomes de empresas dos resultados do SerpAPI
       const leadsCandidatos = searchResults.map(result => ({
