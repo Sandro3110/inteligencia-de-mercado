@@ -1973,3 +1973,47 @@
 - [x] Documentar fluxo de controle
 - [x] Criar checkpoint da integração
 - [x] Validar sistema completo end-to-end
+
+
+## Fase 29: Melhorias Avançadas do Dashboard 📊
+
+### 29.1 Gráficos de Evolução
+- [x] Instalar biblioteca de gráficos (recharts)
+- [x] Criar componente EvolutionCharts.tsx
+- [x] Implementar gráfico de clientes processados ao longo do tempo
+- [x] Implementar gráfico de taxa de sucesso por lote
+- [x] Implementar gráfico de tempo médio por cliente
+- [x] Adicionar seletor de período (24h, 7d, 30d, tudo)
+- [x] Integrar gráficos na página EnrichmentProgress
+
+### 29.2 Filtros e Exportação do Histórico
+- [x] Criar componente HistoryFilters.tsx
+- [x] Implementar filtro por data (range picker)
+- [x] Implementar filtro por status (running/paused/completed/error)
+- [x] Implementar filtro por duração (min/max minutos)
+- [x] Criar função de exportação para CSV
+- [x] Criar função de exportação para PDF
+- [x] Adicionar botão "Exportar Relatório"
+- [x] Implementar download automático do arquivo
+
+### 29.3 Agendamento de Enriquecimento
+- [x] Criar tabela scheduled_enrichments no schema
+- [ ] Criar funções no db.ts (createSchedule, listSchedules, deleteSchedule)
+- [ ] Criar router tRPC enrichment.schedule
+- [ ] Criar componente ScheduleEnrichment.tsx
+- [ ] Implementar date/time picker para agendamento
+- [ ] Adicionar opção de recorrência (única, diária, semanal)
+- [ ] Implementar configuração de lote (tamanho, intervalo)
+- [ ] Implementar configuração de limites (max clientes, timeout)
+- [ ] Criar lista de agendamentos futuros
+- [ ] Implementar cancelamento de agendamento
+- [ ] Criar worker para executar agendamentos (cron job)
+
+### 29.4 Testes e Validação
+- [ ] Testar gráficos com dados reais
+- [ ] Testar filtros de histórico
+- [ ] Testar exportação CSV/PDF
+- [ ] Testar criação de agendamento
+- [ ] Testar execução de agendamento
+- [ ] Validar worker de agendamentos
+- [ ] Criar checkpoint das melhorias avançadas

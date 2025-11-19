@@ -292,3 +292,24 @@ export const enrichmentRuns = mysqlTable("enrichment_runs", {
 
 export type EnrichmentRun = typeof enrichmentRuns.$inferSelect;
 export type InsertEnrichmentRun = typeof enrichmentRuns.$inferInsert;
+
+/**
+ * Scheduled Enrichments - Agendamentos de enriquecimento
+ */
+export const scheduledEnrichments = mysqlTable("scheduled_enrichments", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  scheduledAt: timestamp("scheduledAt").notNull(),
+  recurrence: mysqlEnum("recurrence", ["once", "daily", "weekly"]).default("once").notNull(),
+  batchSize: int("batchSize").default(50),
+  maxClients: int("maxClients"),
+  timeout: int("timeout").default(3600), // segundos
+  status: mysqlEnum("scheduleStatus", ["pending", "running", "completed", "cancelled"]).default("pending").notNull(),
+  lastRunAt: timestamp("lastRunAt"),
+  nextRunAt: timestamp("nextRunAt"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type ScheduledEnrichment = typeof scheduledEnrichments.$inferSelect;
+export type InsertScheduledEnrichment = typeof scheduledEnrichments.$inferInsert;

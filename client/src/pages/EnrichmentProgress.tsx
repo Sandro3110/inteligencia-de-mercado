@@ -6,10 +6,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, CheckCircle2, Clock, TrendingUp, Pause, Play, History } from "lucide-react";
+import EvolutionCharts from "@/components/EvolutionCharts";
+import HistoryFilters, { FilterState } from "@/components/HistoryFilters";
+import { exportToCSV, exportToPDF } from "@/lib/exportHistory";
 
 export default function EnrichmentProgress() {
   const { selectedProjectId } = useSelectedProject();
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [filters, setFilters] = useState<FilterState>({
+    dateFrom: "",
+    dateTo: "",
+    status: "all",
+    durationMin: "",
+    durationMax: "",
+  });
+  const [filteredHistory, setFilteredHistory] = useState<any[]>([]);
 
   // Query com polling automático a cada 5 segundos
   // Usa projectId selecionado ou 1 como fallback
@@ -63,6 +74,57 @@ export default function EnrichmentProgress() {
       setLastUpdate(new Date());
     }
   }, [progress]);
+
+  // Aplicar filtros ao histórico
+  useEffect(() => {
+    if (!history) {
+      setFilteredHistory([]);
+      return;
+    }
+
+    let filtered = [...history];
+
+    // Filtro por data
+    if (filters.dateFrom) {
+      const dateFrom = new Date(filters.dateFrom);
+      filtered = filtered.filter((run) => new Date(run.startedAt) >= dateFrom);
+    }
+    if (filters.dateTo) {
+      const dateTo = new Date(filters.dateTo);
+      dateTo.setHours(23, 59, 59, 999); // Incluir o dia inteiro
+      filtered = filtered.filter((run) => new Date(run.startedAt) <= dateTo);
+    }
+
+    // Filtro por status
+    if (filters.status !== "all") {
+      filtered = filtered.filter((run) => run.status === filters.status);
+    }
+
+    // Filtro por duração
+    if (filters.durationMin) {
+      const minSeconds = parseInt(filters.durationMin) * 60;
+      filtered = filtered.filter((run) => (run.durationSeconds || 0) >= minSeconds);
+    }
+    if (filters.durationMax) {
+      const maxSeconds = parseInt(filters.durationMax) * 60;
+      filtered = filtered.filter((run) => (run.durationSeconds || 0) <= maxSeconds);
+    }
+
+    setFilteredHistory(filtered);
+  }, [history, filters]);
+
+  // Funções de exportação
+  const handleExportCSV = () => {
+    if (filteredHistory.length > 0) {
+      exportToCSV(filteredHistory);
+    }
+  };
+
+  const handleExportPDF = () => {
+    if (filteredHistory.length > 0) {
+      exportToPDF(filteredHistory);
+    }
+  };
 
   const handleManualRefresh = () => {
     refetch();
@@ -284,8 +346,35 @@ export default function EnrichmentProgress() {
           </Card>
         </div>
 
-        {/* Histórico de Execuções */}
+        {/* Gráficos de Evolução */}
+        {status?.activeRun && (
+          <Card className="glass-card">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-blue-400" />
+                <CardTitle>Gráficos de Evolução</CardTitle>
+              </div>
+              <CardDescription>
+                Visualize o progresso do enriquecimento ao longo do tempo
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EvolutionCharts runId={status.activeRun.id} />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Filtros do Histórico */}
         {history && history.length > 0 && (
+          <HistoryFilters
+            onFilterChange={setFilters}
+            onExportCSV={handleExportCSV}
+            onExportPDF={handleExportPDF}
+          />
+        )}
+
+        {/* Histórico de Execuções */}
+        {filteredHistory && filteredHistory.length > 0 && (
           <Card className="glass-card">
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -296,7 +385,7 @@ export default function EnrichmentProgress() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {history.map((run) => {
+                {filteredHistory.map((run) => {
                   const duration = run.durationSeconds ? Math.floor(run.durationSeconds / 60) : 0;
                   const statusColor = {
                     completed: 'text-green-400',
