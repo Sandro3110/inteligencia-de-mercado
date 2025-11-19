@@ -1,0 +1,31 @@
+{
+  "query": "SELECT id, nome, \n  (SELECT COUNT(*) FROM clientes WHERE projectId = p.id) as clientes,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = p.id) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE projectId = p.id) as leads\nFROM projects p\nORDER BY id",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, \n  (SELECT COUNT(*) FROM clientes WHERE projectId = p.id) as clientes,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = p.id) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE projectId = p.id) as leads\nFROM projects p\nORDER BY id",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Embalagens",
+      "clientes": "800",
+      "concorrentes": "419",
+      "leads": "513"
+    },
+    {
+      "id": "240002",
+      "nome": "Embalagens 2",
+      "clientes": "0",
+      "concorrentes": "0",
+      "leads": "0"
+    },
+    {
+      "id": "240003",
+      "nome": "Embalagens 2",
+      "clientes": "0",
+      "concorrentes": "0",
+      "leads": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tclientes\tconcorrentes\tleads\n1\tEmbalagens\t800\t419\t513\n240002\tEmbalagens 2\t0\t0\t0\n240003\tEmbalagens 2\t0\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

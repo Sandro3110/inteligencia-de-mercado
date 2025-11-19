@@ -1,0 +1,30 @@
+{
+  "query": "SELECT \n  'projects' as tabela, COUNT(*) as total FROM projects\nUNION ALL\nSELECT 'clientes', COUNT(*) FROM clientes\nUNION ALL\nSELECT 'concorrentes', COUNT(*) FROM concorrentes\nUNION ALL\nSELECT 'leads', COUNT(*) FROM leads\nUNION ALL\nSELECT 'mercados', COUNT(*) FROM mercados_unicos",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  'projects' as tabela, COUNT(*) as total FROM projects\nUNION ALL\nSELECT 'clientes', COUNT(*) FROM clientes\nUNION ALL\nSELECT 'concorrentes', COUNT(*) FROM concorrentes\nUNION ALL\nSELECT 'leads', COUNT(*) FROM leads\nUNION ALL\nSELECT 'mercados', COUNT(*) FROM mercados_unicos",
+  "rows": [
+    {
+      "tabela": "clientes",
+      "total": "800"
+    },
+    {
+      "tabela": "projects",
+      "total": "1"
+    },
+    {
+      "tabela": "mercados",
+      "total": "73"
+    },
+    {
+      "tabela": "leads",
+      "total": "513"
+    },
+    {
+      "tabela": "concorrentes",
+      "total": "419"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\ttotal\nclientes\t800\nprojects\t1\nmercados\t73\nleads\t513\nconcorrentes\t419\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}
