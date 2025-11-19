@@ -54,6 +54,12 @@ const navItems: NavItem[] = [
     description: "Acompanhar progresso em tempo real"
   },
   {
+    title: "Evolução",
+    href: "/enrichment-evolution",
+    icon: TrendingUp,
+    description: "Evolução e previsões do enriquecimento"
+  },
+  {
     title: "Alertas",
     href: "/alertas",
     icon: Bell,

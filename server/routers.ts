@@ -685,6 +685,20 @@ export const appRouter = router({
         const { getEnrichmentHistory } = await import('./db');
         return getEnrichmentHistory(input.projectId, input.limit);
       }),
+    
+    evolution: publicProcedure
+      .input(z.object({ projectId: z.number(), days: z.number().optional().default(30) }))
+      .query(async ({ input }) => {
+        const { getEnrichmentEvolution } = await import('./db');
+        return getEnrichmentEvolution(input.projectId, input.days);
+      }),
+    
+    predictions: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getEnrichmentPredictions } = await import('./db');
+        return getEnrichmentPredictions(input.projectId);
+      }),
 
     pause: publicProcedure
       .input(z.object({ projectId: z.number(), runId: z.number() }))

@@ -2972,3 +2972,143 @@ export async function getQueueHistory(
     totalPages: Math.ceil(total / pageSize),
   };
 }
+
+
+/**
+ * Get enrichment evolution over time
+ */
+export async function getEnrichmentEvolution(projectId: number, days: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { enrichmentRuns } = await import('../drizzle/schema');
+  const { and, eq, gte } = await import('drizzle-orm');
+
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+
+  const runs = await db
+    .select()
+    .from(enrichmentRuns)
+    .where(
+      and(
+        eq(enrichmentRuns.projectId, projectId),
+        gte(enrichmentRuns.startedAt, startDate)
+      )
+    )
+    .orderBy(enrichmentRuns.startedAt);
+
+  return runs;
+}
+
+/**
+ * Get enrichment predictions (ETA and totals)
+ */
+export async function getEnrichmentPredictions(projectId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const { enrichmentRuns, clientes, concorrentes, leads, mercadosUnicos } = await import('../drizzle/schema');
+
+  // Buscar últimos 10 runs para calcular taxa média
+  const recentRuns = await db
+    .select()
+    .from(enrichmentRuns)
+    .where(
+      and(
+        eq(enrichmentRuns.projectId, projectId),
+        eq(enrichmentRuns.status, 'completed')
+      )
+    )
+    .orderBy(desc(enrichmentRuns.startedAt))
+    .limit(10);
+
+  if (recentRuns.length === 0) {
+    return {
+      eta: null,
+      estimatedTotals: null,
+      processingRate: 0,
+    };
+  }
+
+  // Calcular taxa média de processamento (registros/hora)
+  let totalProcessed = 0;
+  let totalDuration = 0;
+
+  for (const run of recentRuns) {
+    if (run.startedAt && run.completedAt) {
+      const duration = new Date(run.completedAt).getTime() - new Date(run.startedAt).getTime();
+      const processed = run.processedClients || 0;
+      
+      totalProcessed += processed;
+      totalDuration += duration;
+    }
+  }
+
+  const avgProcessingRate = totalDuration > 0 
+    ? (totalProcessed / (totalDuration / 1000 / 3600)) // registros por hora
+    : 0;
+
+  // Contar totais atuais
+  const [clientesCount] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(clientes)
+    .where(eq(clientes.projectId, projectId));
+
+  const [concorrentesCount] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(concorrentes)
+    .where(eq(concorrentes.projectId, projectId));
+
+  const [leadsCount] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(leads)
+    .where(eq(leads.projectId, projectId));
+
+  const [mercadosCount] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(mercadosUnicos)
+    .where(eq(mercadosUnicos.projectId, projectId));
+
+  const currentTotals = {
+    clientes: Number(clientesCount?.count || 0),
+    concorrentes: Number(concorrentesCount?.count || 0),
+    leads: Number(leadsCount?.count || 0),
+    mercados: Number(mercadosCount?.count || 0),
+  };
+
+  // Buscar último run para ver quantos faltam processar
+  const [lastRun] = await db
+    .select()
+    .from(enrichmentRuns)
+    .where(eq(enrichmentRuns.projectId, projectId))
+    .orderBy(desc(enrichmentRuns.startedAt))
+    .limit(1);
+
+  let estimatedTotals = currentTotals;
+  let eta = null;
+
+  if (lastRun && lastRun.status === 'running') {
+    const remaining = (lastRun.totalClients || 0) - (lastRun.processedClients || 0);
+
+    if (avgProcessingRate > 0 && remaining > 0) {
+      const hoursRemaining = remaining / avgProcessingRate;
+      eta = new Date(Date.now() + hoursRemaining * 3600 * 1000);
+    }
+
+    estimatedTotals = {
+      clientes: currentTotals.clientes + remaining,
+      concorrentes: currentTotals.concorrentes,
+      leads: currentTotals.leads,
+      mercados: currentTotals.mercados,
+    };
+  }
+
+  return {
+    eta,
+    currentTotals,
+    estimatedTotals,
+    processingRate: Math.round(avgProcessingRate * 100) / 100,
+    lastRun,
+  };
+}
