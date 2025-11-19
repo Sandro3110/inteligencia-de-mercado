@@ -19,20 +19,12 @@ export type InsertUser = typeof users.$inferInsert;
 /**
  * Projects - Separate workspaces for different business units
  */
-export const executionModeEnum = mysqlEnum("executionMode", [
-  "parallel",
-  "sequential",
-]);
-
 export const projects = mysqlTable("projects", {
   id: int("id").primaryKey().autoincrement(),
   nome: varchar("nome", { length: 255 }).notNull(),
   descricao: text("descricao"),
   cor: varchar("cor", { length: 7 }).default("#3b82f6"), // hex color
-  ativo: int("ativo").default(1).notNull(),
-  executionMode: mysqlEnum("executionMode", ["parallel", "sequential"]).default("sequential"),
-  maxParallelJobs: int("maxParallelJobs").default(3),
-  isPaused: int("isPaused").default(0), // 0 = ativo, 1 = pausado
+  ativo: int("ativo").default(1).notNull(), // 1 = ativo, 0 = inativo
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
@@ -77,7 +69,7 @@ export type InsertMercadoUnico = typeof mercadosUnicos.$inferInsert;
 export const clientes = mysqlTable("clientes", {
   id: int("id").primaryKey().autoincrement(),
   projectId: int("projectId").notNull(),
-  clienteHash: varchar("clienteHash", { length: 255 }).unique(),
+  clienteHash: varchar("clienteHash", { length: 255 }),
   nome: varchar("nome", { length: 255 }).notNull(),
   cnpj: varchar("cnpj", { length: 20 }),
   siteOficial: varchar("siteOficial", { length: 500 }),
@@ -214,11 +206,8 @@ export type InsertEntityTag = typeof entityTags.$inferInsert;
 export const savedFilters = mysqlTable("saved_filters", {
   id: int("id").primaryKey().autoincrement(),
   userId: varchar("userId", { length: 64 }).notNull().references(() => users.id, { onDelete: "cascade" }),
-  projectId: int("projectId"),
   name: varchar("name", { length: 100 }).notNull(),
   filtersJson: text("filtersJson").notNull(), // JSON string with filter state
-  isPublic: int("isPublic").default(0).notNull(), // 0 = private, 1 = public
-  shareToken: varchar("shareToken", { length: 64 }), // unique token for sharing
   createdAt: timestamp("createdAt").defaultNow(),
 });
 
@@ -397,46 +386,3 @@ export const activityLog = mysqlTable("activity_log", {
 
 export type ActivityLog = typeof activityLog.$inferSelect;
 export type InsertActivityLog = typeof activityLog.$inferInsert;
-
-/**
- * Enrichment Queue - Fila de enriquecimento de dados
- */
-export const enrichmentQueueStatusEnum = mysqlEnum("enrichmentQueueStatus", [
-  "pending",
-  "processing",
-  "completed",
-  "error",
-]);
-
-export const enrichmentQueue = mysqlTable("enrichment_queue", {
-  id: int("id").primaryKey().autoincrement(),
-  projectId: int("projectId").notNull(),
-  status: enrichmentQueueStatusEnum.default("pending"),
-  priority: int("priority").default(0),
-  clienteData: json("clienteData").notNull(),
-  result: json("result"),
-  errorMessage: text("errorMessage"),
-  retryCount: int("retryCount").default(0),
-  lastError: text("lastError"),
-  createdAt: timestamp("createdAt").defaultNow(),
-  startedAt: timestamp("startedAt"),
-  completedAt: timestamp("completedAt"),
-});
-
-export type EnrichmentQueue = typeof enrichmentQueue.$inferSelect;
-export type InsertEnrichmentQueue = typeof enrichmentQueue.$inferInsert;
-
-/**
- * Job_Metrics - Métricas de performance dos jobs para cálculo de ETA
- */
-export const jobMetrics = mysqlTable("job_metrics", {
-  id: int("id").primaryKey().autoincrement(),
-  projectId: int("projectId"),
-  jobType: varchar("jobType", { length: 50 }).notNull(), // 'enrichment', 'validation', etc
-  avgDurationMs: int("avgDurationMs").notNull(), // Duração média em milissegundos
-  totalJobs: int("totalJobs").default(0),
-  lastUpdated: timestamp("lastUpdated").defaultNow(),
-});
-
-export type JobMetric = typeof jobMetrics.$inferSelect;
-export type InsertJobMetric = typeof jobMetrics.$inferInsert;

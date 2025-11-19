@@ -6,13 +6,10 @@ import { Link } from "wouter";
 
 export default function AlertsPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="bg-white border-b border-border px-6 py-4">
-        <div className="max-w-7xl mx-auto">
-          <Breadcrumbs items={[{ label: "Alertas" }]} />
-        </div>
-      </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Breadcrumbs */}
+        <Breadcrumbs items={[{ label: "Alertas" }]} />
         
         {/* Botão Ver Histórico */}
         <div className="flex justify-end">

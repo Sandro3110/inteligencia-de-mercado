@@ -1,8 +1,0 @@
-{
-  "query": "\nSELECT \n  COUNT(*) as total_clientes,\n  SUM(CASE WHEN updatedAt > createdAt THEN 1 ELSE 0 END) as clientes_atualizados,\n  SUM(CASE WHEN DATE(updatedAt) = '2025-11-19' AND DATE(createdAt) = '2025-10-21' THEN 1 ELSE 0 END) as originais_atualizados_no_run,\n  ROUND(AVG(CASE WHEN DATE(updatedAt) = '2025-11-19' THEN qualidadeScore ELSE NULL END), 2) as score_medio_atualizados\nFROM clientes;\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  COUNT(*) as total_clientes,\n  SUM(CASE WHEN updatedAt > createdAt THEN 1 ELSE 0 END) as clientes_atualizados,\n  SUM(CASE WHEN DATE(updatedAt) = '2025-11-19' AND DATE(createdAt) = '2025-10-21' THEN 1 ELSE 0 END) as originais_atualizados_no_run,\n  ROUND(AVG(CASE WHEN DATE(updatedAt) = '2025-11-19' THEN qualidadeScore ELSE NULL END), 2) as score_medio_atualizados\nFROM clientes;\n",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1054 (42S22) at line 2: Unknown column 'updatedat' in ''"
-  ]
-}

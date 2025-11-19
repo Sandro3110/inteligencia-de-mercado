@@ -36,13 +36,9 @@ export function useSelectedProject() {
   }, [projects, isLoadingProjects]);
 
   // Função para trocar de projeto
-  const selectProject = (projectId: number | null) => {
+  const selectProject = (projectId: number) => {
     setSelectedProjectId(projectId);
-    if (projectId === null) {
-      localStorage.removeItem(STORAGE_KEY);
-    } else {
-      localStorage.setItem(STORAGE_KEY, projectId.toString());
-    }
+    localStorage.setItem(STORAGE_KEY, projectId.toString());
   };
 
   const selectedProject = projects.find(p => p.id === selectedProjectId);

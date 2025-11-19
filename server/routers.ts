@@ -2,7 +2,7 @@ import { z } from "zod";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { publicProcedure, router } from "./_core/trpc";
 
 export const appRouter = router({
   system: systemRouter,
@@ -212,10 +212,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const { updateClienteValidation } = await import('./db');
-        const { invalidateEntityCache } = await import('./_core/cache');
-        const result = await updateClienteValidation(input.id, input.status, input.notes, ctx.user?.id);
-        invalidateEntityCache('clientes');
-        return result;
+        return updateClienteValidation(input.id, input.status, input.notes, ctx.user?.id);
       }),
     
     byProject: publicProcedure
@@ -296,10 +293,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const { updateConcorrenteValidation } = await import('./db');
-        const { invalidateEntityCache } = await import('./_core/cache');
-        const result = await updateConcorrenteValidation(input.id, input.status, input.notes, ctx.user?.id);
-        invalidateEntityCache('concorrentes');
-        return result;
+        return updateConcorrenteValidation(input.id, input.status, input.notes, ctx.user?.id);
       }),
     
     byProject: publicProcedure
@@ -438,10 +432,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const { updateLeadValidation } = await import('./db');
-        const { invalidateEntityCache } = await import('./_core/cache');
-        const result = await updateLeadValidation(input.id, input.status, input.notes, ctx.user?.id);
-        invalidateEntityCache('leads');
-        return result;
+        return updateLeadValidation(input.id, input.status, input.notes, ctx.user?.id);
       }),
 
     updateStage: publicProcedure
@@ -684,20 +675,6 @@ export const appRouter = router({
       .query(async ({ input }) => {
         const { getEnrichmentHistory } = await import('./db');
         return getEnrichmentHistory(input.projectId, input.limit);
-      }),
-    
-    evolution: publicProcedure
-      .input(z.object({ projectId: z.number(), days: z.number().optional().default(30) }))
-      .query(async ({ input }) => {
-        const { getEnrichmentEvolution } = await import('./db');
-        return getEnrichmentEvolution(input.projectId, input.days);
-      }),
-    
-    predictions: publicProcedure
-      .input(z.object({ projectId: z.number() }))
-      .query(async ({ input }) => {
-        const { getEnrichmentPredictions } = await import('./db');
-        return getEnrichmentPredictions(input.projectId);
       }),
 
     pause: publicProcedure
@@ -1061,188 +1038,6 @@ export const appRouter = router({
         const { globalSearch } = await import('./db');
         return globalSearch(input.query, input.projectId, input.limit);
       }),
-  }),
-
-  // Filtros salvos compartilháveis
-  filter: router({
-    list: protectedProcedure
-      .query(async ({ ctx }) => {
-        const { getSavedFilters } = await import('./db');
-        return getSavedFilters(ctx.user.id);
-      }),
-    
-    save: protectedProcedure
-      .input(z.object({
-        projectId: z.number().optional(),
-        name: z.string(),
-        filtersJson: z.string(),
-        isPublic: z.number().optional().default(0),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        const { createSavedFilter } = await import('./db');
-        return createSavedFilter({
-          userId: ctx.user.id,
-          ...input,
-        });
-      }),
-    
-    delete: protectedProcedure
-      .input(z.object({ id: z.number() }))
-      .mutation(async ({ input }) => {
-        const { deleteSavedFilter } = await import('./db');
-        await deleteSavedFilter(input.id);
-        return { success: true };
-      }),
-    
-    getByToken: publicProcedure
-      .input(z.object({ shareToken: z.string() }))
-      .query(async ({ input }) => {
-        const { getSavedFilterByToken } = await import('./db');
-        return getSavedFilterByToken(input.shareToken);
-      }),
-  }),
-
-  // Comparação de mercados
-  compare: router({
-    mercados: publicProcedure
-      .input(z.object({ mercadoIds: z.array(z.number()) }))
-      .query(async ({ input }) => {
-        const { compareMercados } = await import('./db');
-        return compareMercados(input.mercadoIds);
-      }),
-  }),
-
-  stats: router({
-    totals: publicProcedure
-      .input(z.object({ projectId: z.number().optional() }))
-      .query(async ({ input }) => {
-        const { getTotalMercados, getTotalClientes, getTotalConcorrentes, getTotalLeads } = await import('./db');
-        return {
-          mercados: await getTotalMercados(input.projectId),
-          clientes: await getTotalClientes(input.projectId),
-          concorrentes: await getTotalConcorrentes(input.projectId),
-          leads: await getTotalLeads(input.projectId),
-        };
-      }),
-    
-    evolution: publicProcedure
-      .input(z.object({ 
-        projectId: z.number(),
-        period: z.enum(['24h', '7d', '30d']).optional().default('24h')
-      }))
-      .query(async ({ input }) => {
-        const { getEvolutionMetrics } = await import('./db');
-        return getEvolutionMetrics(input.projectId, input.period);
-      }),
-  }),
-  
-  // Queue Management - Sistema de fila de enriquecimento
-  queue: router({
-    // Adicionar item à fila
-    add: protectedProcedure
-      .input(z.object({
-        projectId: z.number(),
-        clienteData: z.any(),
-        priority: z.number().optional().default(0),
-      }))
-      .mutation(async ({ input }) => {
-        const { queueManager } = await import('./queueManager');
-        const queueId = await queueManager.addToQueue(
-          input.projectId,
-          input.clienteData,
-          input.priority
-        );
-        return { queueId };
-      }),
-    
-    // Obter status da fila
-    status: protectedProcedure
-      .input(z.object({ projectId: z.number() }))
-      .query(async ({ input }) => {
-        const { queueManager } = await import('./queueManager');
-        return queueManager.getQueueStatus(input.projectId);
-      }),
-    
-    // Limpar itens concluídos/erro
-    clear: protectedProcedure
-      .input(z.object({ projectId: z.number() }))
-      .mutation(async ({ input }) => {
-        const { queueManager } = await import('./queueManager');
-        await queueManager.clearCompleted(input.projectId);
-        return { success: true };
-      }),
-    
-    // Definir modo de execução (parallel/sequential)
-    setMode: protectedProcedure
-      .input(z.object({
-        projectId: z.number(),
-        mode: z.enum(['parallel', 'sequential']),
-        maxParallelJobs: z.number().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        const { updateProjectExecutionMode } = await import('./db');
-        await updateProjectExecutionMode(
-          input.projectId,
-          input.mode,
-          input.maxParallelJobs
-        );
-        return { success: true };
-      }),
-    
-    // Histórico de jobs com paginação e filtros
-    history: protectedProcedure
-      .input(z.object({
-        projectId: z.number().optional(),
-        status: z.enum(['pending', 'processing', 'completed', 'error']).optional(),
-        dateFrom: z.date().optional(),
-        dateTo: z.date().optional(),
-        page: z.number().default(1),
-        pageSize: z.number().default(50),
-      }))
-      .query(async ({ input }) => {
-        const { getQueueHistory } = await import('./db');
-        return getQueueHistory(
-          input.projectId,
-          input.status,
-          input.dateFrom,
-          input.dateTo,
-          input.page,
-          input.pageSize
-        );
-      }),
-    
-    // Calcular ETA (estimativa de tempo)
-    eta: protectedProcedure
-      .input(z.object({ projectId: z.number() }))
-      .query(async ({ input }) => {
-        const { queueManager } = await import('./queueManager');
-        return queueManager.calculateETA(input.projectId);
-      }),
-    
-    // Métricas detalhadas da fila
-    metrics: protectedProcedure
-      .input(z.object({ projectId: z.number() }))
-      .query(async ({ input }) => {
-        const { queueManager } = await import('./queueManager');
-        return queueManager.getQueueMetrics(input.projectId);
-      }),
-  }),
-  
-  // Cache Management - Dashboard de cache
-  cache: router({
-    // Estatísticas do cache
-    stats: protectedProcedure.query(async () => {
-      const { getCacheStats } = await import('./_core/cache');
-      return getCacheStats();
-    }),
-    
-    // Limpar cache
-    clear: protectedProcedure.mutation(async () => {
-      const { cache, resetCacheStats } = await import('./_core/cache');
-      cache.clear();
-      resetCacheStats();
-      return { success: true };
-    }),
   }),
 });
 

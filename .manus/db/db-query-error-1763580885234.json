@@ -1,8 +1,0 @@
-{
-  "query": "\nSELECT \n  'Concorrentes' as tipo,\n  fonte,\n  COUNT(*) as total,\n  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM concorrentes), 2) as percentual\nFROM concorrentes\nGROUP BY fonte\nUNION ALL\nSELECT \n  'Leads' as tipo,\n  fonte,\n  COUNT(*) as total,\n  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM leads), 2) as percentual\nFROM leads\nGROUP BY fonte\nORDER BY tipo, total DESC;\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  'Concorrentes' as tipo,\n  fonte,\n  COUNT(*) as total,\n  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM concorrentes), 2) as percentual\nFROM concorrentes\nGROUP BY fonte\nUNION ALL\nSELECT \n  'Leads' as tipo,\n  fonte,\n  COUNT(*) as total,\n  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM leads), 2) as percentual\nFROM leads\nGROUP BY fonte\nORDER BY tipo, total DESC;\n",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1054 (42S22) at line 2: Unknown column 'fonte' in 'group statement'"
-  ]
-}

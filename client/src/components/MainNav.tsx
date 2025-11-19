@@ -4,7 +4,7 @@ import { useOnboarding } from "@/contexts/OnboardingContext";
 import { HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
-  Home, BarChart3, Database as DatabaseIcon, TrendingUp, 
+  Home, BarChart3, Database, TrendingUp, 
   Settings, Clock, FileText, Bell, Activity 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ const navItems: NavItem[] = [
   {
     title: "Mercados",
     href: "/mercados",
-    icon: DatabaseIcon,
+    icon: Database,
     description: "Explorar mercados identificados"
   },
   {
@@ -52,12 +52,6 @@ const navItems: NavItem[] = [
     href: "/enrichment-progress",
     icon: Clock,
     description: "Acompanhar progresso em tempo real"
-  },
-  {
-    title: "Evolução",
-    href: "/enrichment-evolution",
-    icon: TrendingUp,
-    description: "Evolução e previsões do enriquecimento"
   },
   {
     title: "Alertas",
@@ -95,24 +89,6 @@ const navItems: NavItem[] = [
     icon: Activity,
     description: "Timeline de atividades do sistema"
   },
-  {
-    title: "Cache",
-    href: "/admin/cache",
-    icon: DatabaseIcon,
-    description: "Dashboard de cache e performance"
-  },
-  {
-    title: "Histórico de Jobs",
-    href: "/admin/queue-history",
-    icon: Clock,
-    description: "Histórico completo da fila de processamento"
-  },
-  {
-    title: "Métricas da Fila",
-    href: "/admin/queue-metrics",
-    icon: TrendingUp,
-    description: "Dashboard de performance e estatísticas"
-  },
 ];
 
 export default function MainNav() {
@@ -124,7 +100,7 @@ export default function MainNav() {
       <div className="container flex h-16 items-center">
         <div className="mr-8 flex items-center space-x-2">
           <FileText className="h-6 w-6 text-primary" />
-          <span className="text-sm font-bold">Inteligência de Mercado</span>
+          <span className="text-xl font-bold">Gestor PAV</span>
         </div>
         
         <div className="flex flex-1 items-center space-x-1">

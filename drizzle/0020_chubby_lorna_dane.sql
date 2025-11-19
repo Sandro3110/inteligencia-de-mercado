@@ -1,1 +1,0 @@
-ALTER TABLE `projects` ADD `isPaused` int DEFAULT 0;

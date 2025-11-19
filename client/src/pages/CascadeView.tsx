@@ -14,8 +14,6 @@ import { MultiSelectFilter } from "@/components/MultiSelectFilter";
 import { SearchFieldSelector, SearchField } from "@/components/SearchFieldSelector";
 import { SaveFilterDialog } from "@/components/SaveFilterDialog";
 import { SavedFilters } from "@/components/SavedFilters";
-import { SavedFiltersManager } from "@/components/SavedFiltersManager";
-import { CompararMercadosModal } from "@/components/CompararMercadosModal";
 import { SkeletonMercado, SkeletonCliente, SkeletonConcorrente, SkeletonLead } from "@/components/SkeletonLoading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -78,10 +76,6 @@ export default function CascadeView() {
   const [searchFields, setSearchFields] = useState<SearchField[]>(["nome", "cnpj", "produto"]); // Campos padrão
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
-  
-  // Estados para comparação de mercados
-  const [selectedMercadosForComparison, setSelectedMercadosForComparison] = useState<number[]>([]);
-  const [compareModalOpen, setCompareModalOpen] = useState(false);
   
   // Estados para filtros avançados
   const [mercadoFilters, setMercadoFilters] = useState<{
@@ -254,17 +248,11 @@ export default function CascadeView() {
     return () => viewport.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Buscar totais dinâmicos do backend
-  // Se selectedProjectId for null, busca todos os projetos
-  const { data: totals } = trpc.stats.totals.useQuery({ 
-    projectId: selectedProjectId || undefined // undefined = todos os projetos
-  });
-  
   // Calcular totais gerais
-  const totalMercados = totals?.mercados || 0;
-  const totalClientes = totals?.clientes || 0;
-  const totalConcorrentes = totals?.concorrentes || 0;
-  const totalLeads = totals?.leads || 0;
+  const totalMercados = mercados?.length || 0;
+  const totalClientes = mercados?.reduce((sum, m) => sum + (m.quantidadeClientes || 0), 0) || 0;
+  const totalConcorrentes = 591; // Fixo conforme dados
+  const totalLeads = 727; // Fixo conforme dados
 
   // Filtrar por status
   const filterByStatus = (items: any[]) => {
@@ -696,13 +684,13 @@ export default function CascadeView() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100 overflow-x-hidden max-w-full">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-2 border-b border-border/40">
         <div className="flex items-center gap-6">
           <div>
-            <h1 className="text-base font-bold tracking-tight">INTELIGÊNCIA DE MERCADO</h1>
-            <p className="text-xs text-muted-foreground">Análise Estratégica</p>
+            <h1 className="text-2xl font-bold tracking-tight">GESTOR PAV</h1>
+            <p className="text-sm text-muted-foreground">Pesquisa de Mercado</p>
           </div>
           <ProjectSelector />
           <div className="mt-2">
@@ -726,62 +714,66 @@ export default function CascadeView() {
             />
           </div>
         </div>
-        <div className="flex flex-col gap-2">
-          {/* Primeira linha de botões */}
-          <div className="flex items-center gap-2">
-            <Link href="/dashboard-avancado">
+        <div className="flex items-center gap-4">
+          <Link href="/dashboard-avancado">
+            <Button variant="outline" size="sm">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
+          </Link>
+          <Link href="/enrichment-progress">
+            <Button variant="outline" size="sm" className="gap-2">
+              <Clock className="w-4 h-4" />
+              Monitorar Enriquecimento
+            </Button>
+          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Dashboard
+                <Download className="w-4 h-4 mr-2" />
+                Exportar Filtrados
               </Button>
-            </Link>
-            <Link href="/enrichment-progress">
-              <Button variant="outline" size="sm" className="gap-2">
-                <Clock className="w-4 h-4" />
-                Monitorar Enriquecimento
-              </Button>
-            </Link>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Download className="w-4 h-4 mr-2" />
-                  Exportar Filtrados
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleExportFiltered("csv")}>
-                  <FileText className="w-4 h-4 mr-2" />
-                  CSV
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleExportFiltered("excel")}>
-                  <FileSpreadsheet className="w-4 h-4 mr-2" />
-                  Excel (.xlsx)
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleExportFiltered("pdf")}>
-                  <FileDown className="w-4 h-4 mr-2" />
-                  PDF
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          {/* Segunda linha de botões */}
-          <div className="flex items-center gap-2">
-            <Link href="/enrichment">
-              <Button variant="default" size="sm" className="gap-2">
-                <TrendingUp className="h-4 w-4" />
-                Novo Projeto
-              </Button>
-            </Link>
-            <TagManager />
-          </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExportFiltered("csv")}>
+                <FileText className="w-4 h-4 mr-2" />
+                CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExportFiltered("excel")}>
+                <FileSpreadsheet className="w-4 h-4 mr-2" />
+                Excel (.xlsx)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExportFiltered("pdf")}>
+                <FileDown className="w-4 h-4 mr-2" />
+                PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Link href="/enrichment">
+            <Button variant="default" size="sm" className="gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Novo Projeto
+            </Button>
+          </Link>
+          <TagManager />
         </div>
       </div>
 
       {/* Barra de Filtros Horizontal */}
       <div className="border-b border-border/40 px-6 py-3 bg-white/80 backdrop-blur-sm">
         <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex items-center gap-2">
-            {/* Busca Global */}
+          {/* Busca Global *        <div className="flex items-center gap-2">
+          <Link href="/enrichment">
+            <Button variant="default" size="sm" className="gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Novo Projeto (Enriquecimento)
+            </Button>
+          </Link>
+        </div>      onSelectSearch={(query) => {
+                setSearchQuery(query);
+                toast.success(`Busca aplicada: "${query}"`);
+              }}
+            />
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -923,30 +915,34 @@ export default function CascadeView() {
 
           {/* Filtro de Status */}
           <div className="flex items-center gap-2 ml-auto">
-            {/* Gerenciador de Filtros Salvos */}
-            <SavedFiltersManager
-              currentFilters={{
-                searchQuery,
-                searchFields,
-                selectedTagIds,
-                statusFilter,
-                mercadoFilters,
-                clienteFilters,
-                concorrenteFilters,
-                leadFilters,
-              }}
-              projectId={selectedProjectId || undefined}
-              onApplyFilter={(filters) => {
-                setSearchQuery(filters.searchQuery || "");
-                setSearchFields(filters.searchFields || ["nome", "cnpj", "produto"]);
-                setSelectedTagIds(filters.selectedTagIds || []);
-                setStatusFilter(filters.statusFilter || "all");
-                setMercadoFilters(filters.mercadoFilters || { segmentacao: [], categoria: [] });
-                setClienteFilters(filters.clienteFilters || { segmentacao: [], cidade: [], uf: [] });
-                setConcorrenteFilters(filters.concorrenteFilters || { porte: [] });
-                setLeadFilters(filters.leadFilters || { tipo: [], porte: [] });
+            {/* Filtros Salvos */}
+            <SavedFilters
+              onApply={(filtersJson) => {
+                try {
+                  const filters = JSON.parse(filtersJson);
+                  setSearchQuery(filters.searchQuery || "");
+                  setSearchFields(filters.searchFields || ["nome", "cnpj", "produto"]);
+                  setSelectedTagIds(filters.selectedTagIds || []);
+                  setStatusFilter(filters.statusFilter || "all");
+                  setMercadoFilters(filters.mercadoFilters || { segmentacao: [], categoria: [] });
+                  setClienteFilters(filters.clienteFilters || { segmentacao: [], cidade: [], uf: [] });
+                  setConcorrenteFilters(filters.concorrenteFilters || { porte: [] });
+                  setLeadFilters(filters.leadFilters || { tipo: [], porte: [] });
+                } catch (e) {
+                  toast.error("Erro ao aplicar filtro");
+                }
               }}
             />
+            
+            {/* Botão Salvar Filtros */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSaveFilterDialogOpen(true)}
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Salvar Filtros
+            </Button>
             
             {/* Botão Limpar Filtros */}
             <Button
@@ -1017,7 +1013,7 @@ export default function CascadeView() {
                   <Building2 className="w-5 h-5 text-blue-400" />
                   <div>
                     <p className="text-xs text-muted-foreground">Mercados</p>
-                    <p className="text-base font-bold">{totalMercados}</p>
+                    <p className="text-2xl font-bold">{totalMercados}</p>
                   </div>
                 </div>
               </div>
@@ -1027,7 +1023,7 @@ export default function CascadeView() {
                   <Users className="w-5 h-5 text-green-400" />
                   <div>
                     <p className="text-xs text-muted-foreground">Clientes</p>
-                    <p className="text-base font-bold">{totalClientes}</p>
+                    <p className="text-2xl font-bold">{totalClientes}</p>
                   </div>
                 </div>
               </div>
@@ -1037,7 +1033,7 @@ export default function CascadeView() {
                   <Target className="w-5 h-5 text-purple-400" />
                   <div>
                     <p className="text-xs text-muted-foreground">Concorrentes</p>
-                    <p className="text-base font-bold">{totalConcorrentes}</p>
+                    <p className="text-2xl font-bold">{totalConcorrentes}</p>
                   </div>
                 </div>
               </div>
@@ -1047,7 +1043,7 @@ export default function CascadeView() {
                   <TrendingUp className="w-5 h-5 text-orange-400" />
                   <div>
                     <p className="text-xs text-muted-foreground">Leads</p>
-                    <p className="text-base font-bold">{totalLeads}</p>
+                    <p className="text-2xl font-bold">{totalLeads}</p>
                   </div>
                 </div>
               </div>
@@ -1182,21 +1178,6 @@ export default function CascadeView() {
                                   className="flex items-center gap-2 p-2 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
                                   onClick={() => handleSelectMercado(mercado.id)}
                                 >
-                                  <Checkbox
-                                    checked={selectedMercadosForComparison.includes(mercado.id)}
-                                    onCheckedChange={(checked) => {
-                                      if (checked) {
-                                        if (selectedMercadosForComparison.length < 3) {
-                                          setSelectedMercadosForComparison([...selectedMercadosForComparison, mercado.id]);
-                                        } else {
-                                          toast.error("Máximo de 3 mercados para comparação");
-                                        }
-                                      } else {
-                                        setSelectedMercadosForComparison(selectedMercadosForComparison.filter(id => id !== mercado.id));
-                                      }
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                  />
                                   <div className="flex-1">
                                     <h3 className="text-sm font-medium group-hover:text-primary transition-colors">
                                       {mercado.nome}
@@ -1454,20 +1435,9 @@ export default function CascadeView() {
             )}
 
             {currentPage === "mercados" && (
-              <>
-                {selectedMercadosForComparison.length >= 2 ? (
-                  <Button
-                    variant="default"
-                    onClick={() => setCompareModalOpen(true)}
-                  >
-                    Comparar Selecionados ({selectedMercadosForComparison.length})
-                  </Button>
-                ) : (
-                  <span className="text-sm text-muted-foreground">
-                    Selecione 2-3 mercados para comparar
-                  </span>
-                )}
-              </>
+              <span className="text-sm text-muted-foreground">
+                Selecione um mercado para continuar
+              </span>
             )}
 
             <Button
@@ -1567,13 +1537,6 @@ export default function CascadeView() {
         item={detailPopupItem}
         type={detailPopupType}
         onClose={() => setDetailPopupOpen(false)}
-      />
-
-      {/* Modal de Comparação de Mercados */}
-      <CompararMercadosModal
-        open={compareModalOpen}
-        onOpenChange={setCompareModalOpen}
-        mercadoIds={selectedMercadosForComparison}
       />
 
       {/* Botão Voltar ao Topo */}

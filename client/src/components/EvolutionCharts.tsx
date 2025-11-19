@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { trpc } from "@/lib/trpc";
 import {
   LineChart,
   Line,
@@ -21,20 +20,44 @@ interface EvolutionChartsProps {
   runId: number;
 }
 
-type Period = "24h" | "7d" | "30d";
+type Period = "24h" | "7d" | "30d" | "all";
 
 export default function EvolutionCharts({ runId }: EvolutionChartsProps) {
   const [period, setPeriod] = useState<Period>("24h");
 
-  // Buscar dados reais do backend
-  const { data: evolutionData, isLoading } = trpc.stats.evolution.useQuery({ 
-    projectId: 1, // TODO: usar projectId dinâmico
-    period 
-  });
+  // TODO: Buscar dados reais do backend
+  // Por enquanto, dados mockados para demonstração
+  const clientsOverTime = [
+    { time: "00:00", clientes: 0 },
+    { time: "01:00", clientes: 12 },
+    { time: "02:00", clientes: 28 },
+    { time: "03:00", clientes: 45 },
+    { time: "04:00", clientes: 67 },
+    { time: "05:00", clientes: 89 },
+    { time: "06:00", clientes: 112 },
+    { time: "07:00", clientes: 138 },
+    { time: "08:00", clientes: 152 },
+  ];
 
-  const clientsOverTime = evolutionData?.clientsOverTime || [];
-  const successRateByBatch = evolutionData?.successRateByBatch || [];
-  const avgTimePerClient = evolutionData?.avgTimePerClient || [];
+  const successRateByBatch = [
+    { lote: "Lote 1", sucesso: 98, erro: 2 },
+    { lote: "Lote 2", sucesso: 96, erro: 4 },
+    { lote: "Lote 3", sucesso: 100, erro: 0 },
+    { lote: "Lote 4", sucesso: 94, erro: 6 },
+    { lote: "Lote 5", sucesso: 98, erro: 2 },
+  ];
+
+  const avgTimePerClient = [
+    { hora: "00:00", tempo: 28 },
+    { hora: "01:00", tempo: 30 },
+    { hora: "02:00", tempo: 27 },
+    { hora: "03:00", tempo: 32 },
+    { hora: "04:00", tempo: 29 },
+    { hora: "05:00", tempo: 31 },
+    { hora: "06:00", tempo: 28 },
+    { hora: "07:00", tempo: 30 },
+    { hora: "08:00", tempo: 29 },
+  ];
 
   return (
     <div className="space-y-6">
@@ -60,6 +83,13 @@ export default function EvolutionCharts({ runId }: EvolutionChartsProps) {
           onClick={() => setPeriod("30d")}
         >
           30 Dias
+        </Button>
+        <Button
+          variant={period === "all" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setPeriod("all")}
+        >
+          Tudo
         </Button>
       </div>
 
