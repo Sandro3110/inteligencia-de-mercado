@@ -696,13 +696,13 @@ export default function CascadeView() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100 overflow-x-hidden max-w-full">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-2 border-b border-border/40">
         <div className="flex items-center gap-6">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">GESTOR PAV</h1>
-            <p className="text-sm text-muted-foreground">Pesquisa de Mercado</p>
+            <h1 className="text-base font-bold tracking-tight">INTELIGÊNCIA DE MERCADO</h1>
+            <p className="text-xs text-muted-foreground">Análise Estratégica</p>
           </div>
           <ProjectSelector />
           <div className="mt-2">
@@ -726,66 +726,62 @@ export default function CascadeView() {
             />
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard-avancado">
-            <Button variant="outline" size="sm">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Dashboard
-            </Button>
-          </Link>
-          <Link href="/enrichment-progress">
-            <Button variant="outline" size="sm" className="gap-2">
-              <Clock className="w-4 h-4" />
-              Monitorar Enriquecimento
-            </Button>
-          </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+        <div className="flex flex-col gap-2">
+          {/* Primeira linha de botões */}
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard-avancado">
               <Button variant="outline" size="sm">
-                <Download className="w-4 h-4 mr-2" />
-                Exportar Filtrados
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Dashboard
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleExportFiltered("csv")}>
-                <FileText className="w-4 h-4 mr-2" />
-                CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExportFiltered("excel")}>
-                <FileSpreadsheet className="w-4 h-4 mr-2" />
-                Excel (.xlsx)
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExportFiltered("pdf")}>
-                <FileDown className="w-4 h-4 mr-2" />
-                PDF
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Link href="/enrichment">
-            <Button variant="default" size="sm" className="gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Novo Projeto
-            </Button>
-          </Link>
-          <TagManager />
+            </Link>
+            <Link href="/enrichment-progress">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Clock className="w-4 h-4" />
+                Monitorar Enriquecimento
+              </Button>
+            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Download className="w-4 h-4 mr-2" />
+                  Exportar Filtrados
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleExportFiltered("csv")}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExportFiltered("excel")}>
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Excel (.xlsx)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExportFiltered("pdf")}>
+                  <FileDown className="w-4 h-4 mr-2" />
+                  PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          {/* Segunda linha de botões */}
+          <div className="flex items-center gap-2">
+            <Link href="/enrichment">
+              <Button variant="default" size="sm" className="gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Novo Projeto
+              </Button>
+            </Link>
+            <TagManager />
+          </div>
         </div>
       </div>
 
       {/* Barra de Filtros Horizontal */}
       <div className="border-b border-border/40 px-6 py-3 bg-white/80 backdrop-blur-sm">
         <div className="flex items-center gap-4 flex-wrap">
-          {/* Busca Global *        <div className="flex items-center gap-2">
-          <Link href="/enrichment">
-            <Button variant="default" size="sm" className="gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Novo Projeto (Enriquecimento)
-            </Button>
-          </Link>
-        </div>      onSelectSearch={(query) => {
-                setSearchQuery(query);
-                toast.success(`Busca aplicada: "${query}"`);
-              }}
-            />
+          <div className="flex items-center gap-2">
+            {/* Busca Global */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -1021,7 +1017,7 @@ export default function CascadeView() {
                   <Building2 className="w-5 h-5 text-blue-400" />
                   <div>
                     <p className="text-xs text-muted-foreground">Mercados</p>
-                    <p className="text-2xl font-bold">{totalMercados}</p>
+                    <p className="text-base font-bold">{totalMercados}</p>
                   </div>
                 </div>
               </div>
@@ -1031,7 +1027,7 @@ export default function CascadeView() {
                   <Users className="w-5 h-5 text-green-400" />
                   <div>
                     <p className="text-xs text-muted-foreground">Clientes</p>
-                    <p className="text-2xl font-bold">{totalClientes}</p>
+                    <p className="text-base font-bold">{totalClientes}</p>
                   </div>
                 </div>
               </div>
@@ -1041,7 +1037,7 @@ export default function CascadeView() {
                   <Target className="w-5 h-5 text-purple-400" />
                   <div>
                     <p className="text-xs text-muted-foreground">Concorrentes</p>
-                    <p className="text-2xl font-bold">{totalConcorrentes}</p>
+                    <p className="text-base font-bold">{totalConcorrentes}</p>
                   </div>
                 </div>
               </div>
@@ -1051,7 +1047,7 @@ export default function CascadeView() {
                   <TrendingUp className="w-5 h-5 text-orange-400" />
                   <div>
                     <p className="text-xs text-muted-foreground">Leads</p>
-                    <p className="text-2xl font-bold">{totalLeads}</p>
+                    <p className="text-base font-bold">{totalLeads}</p>
                   </div>
                 </div>
               </div>

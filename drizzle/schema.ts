@@ -29,9 +29,10 @@ export const projects = mysqlTable("projects", {
   nome: varchar("nome", { length: 255 }).notNull(),
   descricao: text("descricao"),
   cor: varchar("cor", { length: 7 }).default("#3b82f6"), // hex color
-  ativo: int("ativo").default(1).notNull(), // 1 = ativo, 0 = inativo
-  executionMode: executionModeEnum.default("sequential"),
+  ativo: int("ativo").default(1).notNull(),
+  executionMode: mysqlEnum("executionMode", ["parallel", "sequential"]).default("sequential"),
   maxParallelJobs: int("maxParallelJobs").default(3),
+  isPaused: int("isPaused").default(0), // 0 = ativo, 1 = pausado
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });

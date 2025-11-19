@@ -3051,3 +3051,59 @@
 - [x] Testar retry automático
 - [x] Validar cálculo de ETA
 - [x] Criar checkpoint final
+
+
+---
+
+## Fase 63: Filtros de Data, Dashboard de Métricas e Controle de Fila ⏸️
+
+### 63.1 Filtro por Data no Histórico
+- [x] Adicionar parâmetros dateFrom e dateTo no endpoint queue.history
+- [x] Criar componente DateRangePicker
+- [x] Integrar DateRangePicker na página QueueHistory
+- [x] Adicionar presets (última semana, último mês, customizado)
+- [x] Atualizar query do histórico com filtros de data
+
+### 63.2 Dashboard de Métricas da Fila
+- [x] Criar página /admin/queue-metrics
+- [x] Criar endpoint tRPC queue.metrics
+- [x] Implementar cálculo de throughput (jobs/hora)
+- [x] Implementar cálculo de taxa de erro
+- [x] Criar gráfico de tempo médio de processamento
+- [x] Criar gráfico comparativo parallel vs sequential
+- [x] Adicionar link no MainNav
+
+### 63.3 Pausar/Retomar Fila
+- [ ] Adicionar campo isPaused na tabela projects
+- [ ] Implementar função pauseQueue() no QueueManager
+- [ ] Implementar função resumeQueue() no QueueManager
+- [ ] Criar endpoints tRPC queue.pause e queue.resume
+- [ ] Adicionar botão Pausar/Retomar no QueueModeSelector
+- [ ] Exibir badge "PAUSADO" quando fila estiver pausada
+
+### 63.4 Testes e Finalização
+- [ ] Testar filtros de data
+- [ ] Testar dashboard de métricas
+- [ ] Testar pausar/retomar fila
+- [ ] Criar checkpoint final
+
+
+---
+
+## Fase 64: Correções de Layout e Responsividade 📱
+
+### 64.1 Corrigir Scroll Horizontal e Tamanhos
+- [x] Remover scroll horizontal da página
+- [x] Reduzir título "GESTOR PAV" em 60%
+- [x] Reduzir números das estatísticas em 60%
+- [x] Mudar título da aplicação para "Inteligência de Mercado"
+
+### 64.2 Reorganizar Botões
+- [x] Alinhar botões em duas linhas
+- [x] Garantir layout responsivo dos botões
+- [x] Ajustar espaçamento entre botões
+
+### 64.3 Testes
+- [x] Testar em mobile
+- [x] Verificar ausência de scroll horizontal
+- [x] Criar checkpoint

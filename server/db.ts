@@ -2919,6 +2919,8 @@ export async function getProjectExecutionConfig(projectId: number) {
 export async function getQueueHistory(
   projectId?: number,
   status?: 'pending' | 'processing' | 'completed' | 'error',
+  dateFrom?: Date,
+  dateTo?: Date,
   page: number = 1,
   pageSize: number = 50
 ) {
@@ -2934,6 +2936,15 @@ export async function getQueueHistory(
   }
   if (status) {
     conditions.push(eq(enrichmentQueue.status, status));
+  }
+  if (dateFrom) {
+    conditions.push(gte(enrichmentQueue.createdAt, dateFrom));
+  }
+  if (dateTo) {
+    // Adicionar 1 dia para incluir todo o dia final
+    const dateToEnd = new Date(dateTo);
+    dateToEnd.setHours(23, 59, 59, 999);
+    conditions.push(sql`${enrichmentQueue.createdAt} <= ${dateToEnd}`);
   }
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;

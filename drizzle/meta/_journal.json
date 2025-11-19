@@ -141,6 +141,13 @@
       "when": 1763567081870,
       "tag": "0019_curvy_silverclaw",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1763567713260,
+      "tag": "0020_chubby_lorna_dane",
+      "breakpoints": true
     }
   ]
 }

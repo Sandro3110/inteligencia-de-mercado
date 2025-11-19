@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { trpc } from '@/lib/trpc';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
+import { DateRangePicker, DateRange } from '@/components/DateRangePicker';
 import {
   Card,
   CardContent,
@@ -40,12 +41,15 @@ import { ptBR } from 'date-fns/locale';
 export default function QueueHistory() {
   const { selectedProjectId } = useSelectedProject();
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [page, setPage] = useState(1);
   const pageSize = 50;
 
   const { data, isLoading, refetch } = trpc.queue.history.useQuery({
     projectId: selectedProjectId || undefined,
     status: statusFilter === 'all' ? undefined : (statusFilter as any),
+    dateFrom: dateRange?.from,
+    dateTo: dateRange?.to,
     page,
     pageSize,
   });
@@ -102,7 +106,7 @@ export default function QueueHistory() {
           <CardTitle>Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap">
             <div className="w-48">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger>
@@ -117,6 +121,8 @@ export default function QueueHistory() {
                 </SelectContent>
               </Select>
             </div>
+            
+            <DateRangePicker value={dateRange} onChange={setDateRange} />
           </div>
         </CardContent>
       </Card>

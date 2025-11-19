@@ -29,6 +29,7 @@ import AtividadePage from "./pages/AtividadePage";
 import SharedFilterView from "./pages/SharedFilterView";
 import CacheDashboard from "./pages/CacheDashboard";
 import QueueHistory from "./pages/QueueHistory";
+import QueueMetrics from "./pages/QueueMetrics";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -53,6 +54,7 @@ function Router() {
       <Route path="/filtros/:token" component={SharedFilterView} />
       <Route path="/admin/cache" component={CacheDashboard} />
       <Route path="/admin/queue-history" component={QueueHistory} />
+      <Route path="/admin/queue-metrics" component={QueueMetrics} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

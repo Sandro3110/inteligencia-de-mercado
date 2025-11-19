@@ -393,6 +393,129 @@ class QueueManager extends EventEmitter {
         )
       );
   }
+
+  /**
+   * Pausar processamento da fila
+   */
+  async pauseQueue(projectId: number) {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+
+    await db
+      .update(projects)
+      .set({ isPaused: 1 })
+      .where(eq(projects.id, projectId));
+
+    this.emit('queue-paused', { projectId });
+    return { success: true };
+  }
+
+  /**
+   * Retomar processamento da fila
+   */
+  async resumeQueue(projectId: number) {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+
+    await db
+      .update(projects)
+      .set({ isPaused: 0 })
+      .where(eq(projects.id, projectId));
+
+    this.emit('queue-resumed', { projectId });
+    return { success: true };
+  }
+
+  /**
+   * Retorna métricas detalhadas da fila
+   */
+  async getQueueMetrics(projectId: number) {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+
+    try {
+      // Buscar jobs das últimas 24 horas
+      const last24Hours = new Date();
+      last24Hours.setHours(last24Hours.getHours() - 24);
+
+      const recentJobs = await db
+        .select()
+        .from(enrichmentQueue)
+        .where(
+          and(
+            eq(enrichmentQueue.projectId, projectId),
+            sql`${enrichmentQueue.createdAt} >= ${last24Hours}`
+          )
+        );
+
+      // Calcular throughput (jobs/hora)
+      const completedJobs = recentJobs.filter(j => j.status === 'completed');
+      const throughput = completedJobs.length / 24;
+
+      // Calcular taxa de erro
+      const errorJobs = recentJobs.filter(j => j.status === 'error');
+      const errorRate = recentJobs.length > 0 
+        ? (errorJobs.length / recentJobs.length) * 100 
+        : 0;
+
+      // Calcular tempo médio de processamento
+      let totalDuration = 0;
+      let validCount = 0;
+
+      for (const job of completedJobs) {
+        if (job.startedAt && job.completedAt) {
+          const duration = new Date(job.completedAt).getTime() - new Date(job.startedAt).getTime();
+          totalDuration += duration;
+          validCount++;
+        }
+      }
+
+      const avgProcessingTimeMs = validCount > 0 ? totalDuration / validCount : 0;
+
+      // Buscar métricas por modo de execução (últimos 7 dias)
+      const last7Days = new Date();
+      last7Days.setDate(last7Days.getDate() - 7);
+
+      const [project] = await db
+        .select()
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .limit(1);
+
+      const currentMode = project?.executionMode || 'sequential';
+
+      // Estatísticas gerais
+      const allJobs = await db
+        .select()
+        .from(enrichmentQueue)
+        .where(eq(enrichmentQueue.projectId, projectId));
+
+      const totalCompleted = allJobs.filter(j => j.status === 'completed').length;
+      const totalErrors = allJobs.filter(j => j.status === 'error').length;
+      const totalPending = allJobs.filter(j => j.status === 'pending').length;
+
+      return {
+        throughput: Math.round(throughput * 100) / 100,
+        errorRate: Math.round(errorRate * 100) / 100,
+        avgProcessingTimeMs: Math.round(avgProcessingTimeMs),
+        currentMode,
+        stats: {
+          totalCompleted,
+          totalErrors,
+          totalPending,
+          total: allJobs.length,
+        },
+        recentActivity: {
+          last24Hours: recentJobs.length,
+          completedLast24h: completedJobs.length,
+          errorsLast24h: errorJobs.length,
+        },
+      };
+    } catch (error) {
+      console.error('[QueueManager] Error getting metrics:', error);
+      throw error;
+    }
+  }
 }
 
 // Singleton instance

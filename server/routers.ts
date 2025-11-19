@@ -1180,6 +1180,8 @@ export const appRouter = router({
       .input(z.object({
         projectId: z.number().optional(),
         status: z.enum(['pending', 'processing', 'completed', 'error']).optional(),
+        dateFrom: z.date().optional(),
+        dateTo: z.date().optional(),
         page: z.number().default(1),
         pageSize: z.number().default(50),
       }))
@@ -1188,6 +1190,8 @@ export const appRouter = router({
         return getQueueHistory(
           input.projectId,
           input.status,
+          input.dateFrom,
+          input.dateTo,
           input.page,
           input.pageSize
         );
@@ -1199,6 +1203,14 @@ export const appRouter = router({
       .query(async ({ input }) => {
         const { queueManager } = await import('./queueManager');
         return queueManager.calculateETA(input.projectId);
+      }),
+    
+    // Métricas detalhadas da fila
+    metrics: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { queueManager } = await import('./queueManager');
+        return queueManager.getQueueMetrics(input.projectId);
       }),
   }),
   
