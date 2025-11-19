@@ -1877,3 +1877,32 @@
 - [ ] Testar que mercado existente é reusado
 - [ ] Validar que não há duplicatas após correção
 - [ ] Reiniciar enriquecimento dos 800 clientes
+
+
+## Fase 26: Dashboard de Progresso em Tempo Real 📊
+
+### 26.1 Backend - Monitoramento de Progresso
+- [x] Criar função getEnrichmentProgress() no db.ts
+- [x] Calcular total de clientes no projeto
+- [x] Calcular clientes já processados (com mercados/concorrentes/leads)
+- [x] Calcular estatísticas (mercados criados, concorrentes, leads)
+- [x] Criar router tRPC enrichment.progress
+
+### 26.2 Frontend - Página de Dashboard
+- [x] Criar página EnrichmentProgress.tsx
+- [x] Implementar barra de progresso dinâmica (0-100%)
+- [x] Implementar contador online (X/906 clientes)
+- [x] Adicionar estatísticas detalhadas (mercados, concorrentes, leads)
+- [x] Implementar polling automático (atualização a cada 5s)
+- [x] Adicionar indicador de "Atualizado há X segundos"
+
+### 26.3 Frontend - Integração na Home
+- [x] Adicionar botão "Monitorar Enriquecimento" na página Home
+- [x] Adicionar rota /enrichment-progress no App.tsx
+- [x] Estilizar botão com destaque visual
+
+### 26.4 Testes e Validação
+- [x] Testar atualização em tempo real durante enriquecimento
+- [x] Validar cálculo de porcentagem
+- [x] Verificar performance do polling
+- [x] Criar checkpoint do dashboard de progresso

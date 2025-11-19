@@ -1851,3 +1851,72 @@ export async function notifyNewCompetitor(concorrenteId: number, userId?: string
     entityId: concorrenteId,
   });
 }
+
+
+// ============================================
+// ENRICHMENT PROGRESS HELPERS
+// ============================================
+
+/**
+ * Retorna progresso do enriquecimento em tempo real
+ */
+export async function getEnrichmentProgress(projectId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Total de clientes no projeto
+  const [totalResult] = await db
+    .select({ count: count() })
+    .from(clientes)
+    .where(eq(clientes.projectId, projectId));
+  const total = totalResult?.count || 0;
+
+  // Clientes processados: clientes que têm mercados associados
+  // (mercados são criados durante o enriquecimento)
+  const [processedResult] = await db
+    .select({ count: sql<number>`COUNT(DISTINCT ${clientes.id})` })
+    .from(clientes)
+    .innerJoin(clientesMercados, eq(clientesMercados.clienteId, clientes.id))
+    .where(eq(clientes.projectId, projectId));
+  
+  const processed = Number(processedResult?.count || 0);
+
+  // Mercados únicos do projeto
+  const [mercadosResult] = await db
+    .select({ count: sql<number>`COUNT(DISTINCT ${mercadosUnicos.id})` })
+    .from(mercadosUnicos)
+    .innerJoin(clientesMercados, eq(clientesMercados.mercadoId, mercadosUnicos.id))
+    .innerJoin(clientes, eq(clientes.id, clientesMercados.clienteId))
+    .where(eq(clientes.projectId, projectId));
+  const mercados = Number(mercadosResult?.count || 0);
+
+  // Concorrentes do projeto
+  const [concorrentesResult] = await db
+    .select({ count: count() })
+    .from(concorrentes)
+    .where(eq(concorrentes.projectId, projectId));
+  const concorrentesCount = concorrentesResult?.count || 0;
+
+  // Leads do projeto
+  const [leadsResult] = await db
+    .select({ count: count() })
+    .from(leads)
+    .where(eq(leads.projectId, projectId));
+  const leadsCount = leadsResult?.count || 0;
+
+  const percentage = total > 0 ? Math.round((processed / total) * 100) : 0;
+
+  return {
+    total,
+    processed,
+    remaining: total - processed,
+    percentage,
+    stats: {
+      mercados,
+      concorrentes: concorrentesCount,
+      leads: leadsCount,
+    },
+  };
+}

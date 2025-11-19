@@ -640,6 +640,13 @@ export const appRouter = router({
   }),
 
   enrichment: router({
+    progress: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getEnrichmentProgress } = await import('./db');
+        return getEnrichmentProgress(input.projectId);
+      }),
+
     execute: publicProcedure
       .input(z.object({
         clientes: z.array(z.object({

@@ -721,6 +721,12 @@ export default function CascadeView() {
               Dashboard
             </Button>
           </Link>
+          <Link href="/enrichment-progress">
+            <Button variant="outline" size="sm" className="gap-2">
+              <Clock className="w-4 h-4" />
+              Monitorar Enriquecimento
+            </Button>
+          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
