@@ -22,10 +22,8 @@ export function QueueModeSelector() {
   const [maxJobs, setMaxJobs] = useState(3);
 
   // Buscar configuração atual do projeto
-  const { data: project } = trpc.projects.getById.useQuery(
-    { id: selectedProjectId! },
-    { enabled: !!selectedProjectId }
-  );
+  const { data: projects } = trpc.projects.list.useQuery();
+  const project = projects?.find(p => p.id === selectedProjectId);
 
   // Buscar status da fila
   const { data: queueStatus } = trpc.queue.status.useQuery(
@@ -46,8 +44,8 @@ export function QueueModeSelector() {
   // Sincronizar com dados do projeto
   useEffect(() => {
     if (project) {
-      setMode(project.executionMode || 'sequential');
-      setMaxJobs(project.maxParallelJobs || 3);
+      setMode((project.executionMode as any) || 'sequential');
+      setMaxJobs((project.maxParallelJobs as any) || 3);
     }
   }, [project]);
 

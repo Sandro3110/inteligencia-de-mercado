@@ -4,7 +4,7 @@ import { useOnboarding } from "@/contexts/OnboardingContext";
 import { HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
-  Home, BarChart3, Database, TrendingUp, 
+  Home, BarChart3, Database as DatabaseIcon, TrendingUp, 
   Settings, Clock, FileText, Bell, Activity 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ const navItems: NavItem[] = [
   {
     title: "Mercados",
     href: "/mercados",
-    icon: Database,
+    icon: DatabaseIcon,
     description: "Explorar mercados identificados"
   },
   {
@@ -88,6 +88,12 @@ const navItems: NavItem[] = [
     href: "/atividade",
     icon: Activity,
     description: "Timeline de atividades do sistema"
+  },
+  {
+    title: "Cache",
+    href: "/admin/cache",
+    icon: DatabaseIcon,
+    description: "Dashboard de cache e performance"
   },
 ];
 

@@ -8,13 +8,17 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, CheckCircle2, XCircle, Upload, FileSpreadsheet } from 'lucide-react';
 import { EnrichmentProgress, EnrichmentStep } from '@/components/EnrichmentProgress';
 import { useEnrichmentProgress } from '@/hooks/useEnrichmentProgress';
+import { useQueueProgress } from '@/hooks/useQueueProgress';
+import { useSelectedProject } from '@/hooks/useSelectedProject';
 import { TemplateSelector } from '@/components/TemplateSelector';
+import { QueueModeSelector } from '@/components/QueueModeSelector';
 import { useLocation } from 'wouter';
 import * as XLSX from 'xlsx';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 
 export default function EnrichmentFlow() {
   const [, setLocation] = useLocation();
+  const { selectedProjectId } = useSelectedProject();
   const [projectName, setProjectName] = useState('');
   const [clientesText, setClientesText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -25,6 +29,12 @@ export default function EnrichmentFlow() {
   const [templateConfig, setTemplateConfig] = useState<any>(null);
   const [uploadMode, setUploadMode] = useState<'text' | 'file'>('text');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Monitorar progresso da fila com notificações
+  const { queueStatus, isProcessing: isQueueProcessing, hasPending } = useQueueProgress({
+    projectId: selectedProjectId,
+    enabled: true,
+  });
 
   const enrichmentMutation = trpc.enrichment.execute.useMutation();
 
@@ -129,6 +139,26 @@ export default function EnrichmentFlow() {
             />
           </CardContent>
         </Card>
+
+        <QueueModeSelector />
+        
+        {/* Indicador de Progresso da Fila */}
+        {(isQueueProcessing || hasPending) && queueStatus && (
+          <Alert>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <AlertDescription>
+              <div className="flex items-center justify-between">
+                <span>
+                  {isQueueProcessing && `${queueStatus.processing} job(s) em processamento`}
+                  {hasPending && ` • ${queueStatus.pending} pendente(s)`}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {queueStatus.completed} concluído(s) • {queueStatus.error} erro(s)
+                </span>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
 
         <Card>
           <CardHeader>

@@ -2988,3 +2988,31 @@
 - [ ] Validar invalidação automática de cache
 - [ ] Testar dashboard de cache
 - [ ] Criar checkpoint final
+
+
+---
+
+## Fase 61: Integração e Melhorias de UX da Fila 🔔
+
+### 61.1 Integrar QueueModeSelector na Página de Enriquecimento
+- [x] Adicionar QueueModeSelector no EnrichmentFlow
+- [x] Posicionar componente de forma visível e intuitiva
+- [x] Testar alternância de modos durante enriquecimento
+
+### 61.2 Notificações de Progresso da Fila
+- [x] Criar hook useQueueProgress com polling
+- [x] Implementar toast notifications para jobs concluídos
+- [x] Adicionar indicador visual de progresso
+- [x] Mostrar notificação de erro quando job falhar
+
+### 61.3 Link Cache no MainNav
+- [x] Adicionar item "Cache" no MainNav
+- [x] Posicionar no grupo de administração/configurações
+- [x] Adicionar ícone apropriado (Database)
+- [x] Testar navegação para /admin/cache
+
+### 61.4 Testes e Finalização
+- [x] Testar QueueModeSelector integrado
+- [x] Testar notificações de progresso
+- [x] Validar navegação para dashboard de cache
+- [x] Criar checkpoint final
