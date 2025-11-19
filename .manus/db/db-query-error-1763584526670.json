@@ -1,0 +1,8 @@
+{
+  "query": "\n-- Ver detalhes dos enrichment runs\nSELECT \n  id,\n  status,\n  started_at,\n  paused_at,\n  completed_at,\n  error_message,\n  TIMESTAMPDIFF(MINUTE, started_at, COALESCE(paused_at, completed_at)) as duracao_minutos\nFROM enrichment_runs\nWHERE id IN (SELECT id FROM enrichment_runs ORDER BY id DESC LIMIT 3);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Ver detalhes dos enrichment runs\nSELECT \n  id,\n  status,\n  started_at,\n  paused_at,\n  completed_at,\n  error_message,\n  TIMESTAMPDIFF(MINUTE, started_at, COALESCE(paused_at, completed_at)) as duracao_minutos\nFROM enrichment_runs\nWHERE id IN (SELECT id FROM enrichment_runs ORDER BY id DESC LIMIT 3);\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 3: Unknown column 'started_at' in 'field list'"
+  ]
+}

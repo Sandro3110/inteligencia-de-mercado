@@ -1,0 +1,8 @@
+{
+  "query": "\n-- Totais ATUAIS no banco\nSELECT \n  'ATUAL' as momento,\n  (SELECT COUNT(*) FROM mercados_unicos) as mercados,\n  (SELECT COUNT(*) FROM clientes) as clientes,\n  (SELECT COUNT(*) FROM concorrentes) as concorrentes,\n  (SELECT COUNT(*) FROM leads) as leads,\n  (SELECT COUNT(*) FROM clientes_mercados) as associacoes\n\nUNION ALL\n\n-- Totais do ENRICHMENT RUN (o que ele reportou criar)\nSELECT \n  'CRIADO NO RUN' as momento,\n  mercados_criados as mercados,\n  clientes_processados as clientes,\n  concorrentes_criados as concorrentes,\n  leads_criados as leads,\n  NULL as associacoes\nFROM enrichment_runs\nWHERE status = 'paused'\nORDER BY id DESC\nLIMIT 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Totais ATUAIS no banco\nSELECT \n  'ATUAL' as momento,\n  (SELECT COUNT(*) FROM mercados_unicos) as mercados,\n  (SELECT COUNT(*) FROM clientes) as clientes,\n  (SELECT COUNT(*) FROM concorrentes) as concorrentes,\n  (SELECT COUNT(*) FROM leads) as leads,\n  (SELECT COUNT(*) FROM clientes_mercados) as associacoes\n\nUNION ALL\n\n-- Totais do ENRICHMENT RUN (o que ele reportou criar)\nSELECT \n  'CRIADO NO RUN' as momento,\n  mercados_criados as mercados,\n  clientes_processados as clientes,\n  concorrentes_criados as concorrentes,\n  leads_criados as leads,\n  NULL as associacoes\nFROM enrichment_runs\nWHERE status = 'paused'\nORDER BY id DESC\nLIMIT 1;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 3: Unknown column 'mercados_criados' in 'field list'"
+  ]
+}

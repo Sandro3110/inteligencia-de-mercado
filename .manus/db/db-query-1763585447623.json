@@ -1,0 +1,55 @@
+{
+  "query": "\nSELECT \n  'Total de Clientes' as metrica,\n  COUNT(*) as valor,\n  '100%' as percentual\nFROM clientes\n\nUNION ALL\n\nSELECT \n  'Com Nome',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE nome IS NOT NULL AND nome != ''\n\nUNION ALL\n\nSELECT \n  'Com CNPJ',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE cnpj IS NOT NULL AND cnpj != ''\n\nUNION ALL\n\nSELECT \n  'Com Email',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE email IS NOT NULL AND email != ''\n\nUNION ALL\n\nSELECT \n  'Com Telefone',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE telefone IS NOT NULL AND telefone != ''\n\nUNION ALL\n\nSELECT \n  'Com Site Oficial',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE siteOficial IS NOT NULL AND siteOficial != ''\n\nUNION ALL\n\nSELECT \n  'Com Cidade',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE cidade IS NOT NULL AND cidade != ''\n\nUNION ALL\n\nSELECT \n  'Com UF',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE uf IS NOT NULL AND uf != ''\n\nUNION ALL\n\nSELECT \n  'Com Produto Principal',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE produtoPrincipal IS NOT NULL AND produtoPrincipal != '';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  'Total de Clientes' as metrica,\n  COUNT(*) as valor,\n  '100%' as percentual\nFROM clientes\n\nUNION ALL\n\nSELECT \n  'Com Nome',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE nome IS NOT NULL AND nome != ''\n\nUNION ALL\n\nSELECT \n  'Com CNPJ',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE cnpj IS NOT NULL AND cnpj != ''\n\nUNION ALL\n\nSELECT \n  'Com Email',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE email IS NOT NULL AND email != ''\n\nUNION ALL\n\nSELECT \n  'Com Telefone',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE telefone IS NOT NULL AND telefone != ''\n\nUNION ALL\n\nSELECT \n  'Com Site Oficial',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE siteOficial IS NOT NULL AND siteOficial != ''\n\nUNION ALL\n\nSELECT \n  'Com Cidade',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE cidade IS NOT NULL AND cidade != ''\n\nUNION ALL\n\nSELECT \n  'Com UF',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE uf IS NOT NULL AND uf != ''\n\nUNION ALL\n\nSELECT \n  'Com Produto Principal',\n  COUNT(*),\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%')\nFROM clientes\nWHERE produtoPrincipal IS NOT NULL AND produtoPrincipal != '';\n",
+  "rows": [
+    {
+      "metrica": "Total de Clientes",
+      "valor": "808",
+      "percentual": "100%"
+    },
+    {
+      "metrica": "Com Telefone",
+      "valor": "805",
+      "percentual": "99.63%"
+    },
+    {
+      "metrica": "Com Email",
+      "valor": "805",
+      "percentual": "99.63%"
+    },
+    {
+      "metrica": "Com CNPJ",
+      "valor": "805",
+      "percentual": "99.63%"
+    },
+    {
+      "metrica": "Com Nome",
+      "valor": "808",
+      "percentual": "100.00%"
+    },
+    {
+      "metrica": "Com Site Oficial",
+      "valor": "7",
+      "percentual": "0.87%"
+    },
+    {
+      "metrica": "Com Cidade",
+      "valor": "8",
+      "percentual": "0.99%"
+    },
+    {
+      "metrica": "Com UF",
+      "valor": "7",
+      "percentual": "0.87%"
+    },
+    {
+      "metrica": "Com Produto Principal",
+      "valor": "796",
+      "percentual": "98.51%"
+    }
+  ],
+  "messages": [],
+  "stdout": "metrica\tvalor\tpercentual\nTotal de Clientes\t808\t100%\nCom Telefone\t805\t99.63%\nCom Email\t805\t99.63%\nCom CNPJ\t805\t99.63%\nCom Nome\t808\t100.00%\nCom Site Oficial\t7\t0.87%\nCom Cidade\t8\t0.99%\nCom UF\t7\t0.87%\nCom Produto Principal\t796\t98.51%\n",
+  "stderr": "",
+  "execution_time_ms": 92
+}

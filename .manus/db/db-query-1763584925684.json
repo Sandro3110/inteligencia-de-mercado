@@ -1,0 +1,35 @@
+{
+  "query": "\n-- Contar registros por data COMPLETA (não apenas DATE)\nSELECT \n  'Mercados' as entidade,\n  DATE(createdAt) as data,\n  COUNT(*) as quantidade\nFROM mercados_unicos\nGROUP BY DATE(createdAt)\n\nUNION ALL\n\nSELECT \n  'Clientes' as entidade,\n  DATE(createdAt) as data,\n  COUNT(*) as quantidade\nFROM clientes\nGROUP BY DATE(createdAt)\n\nUNION ALL\n\nSELECT \n  'Concorrentes' as entidade,\n  DATE(createdAt) as data,\n  COUNT(*) as quantidade\nFROM concorrentes\nGROUP BY DATE(createdAt)\n\nUNION ALL\n\nSELECT \n  'Leads' as entidade,\n  DATE(createdAt) as data,\n  COUNT(*) as quantidade\nFROM leads\nGROUP BY DATE(createdAt)\n\nORDER BY data DESC, entidade;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Contar registros por data COMPLETA (não apenas DATE)\nSELECT \n  'Mercados' as entidade,\n  DATE(createdAt) as data,\n  COUNT(*) as quantidade\nFROM mercados_unicos\nGROUP BY DATE(createdAt)\n\nUNION ALL\n\nSELECT \n  'Clientes' as entidade,\n  DATE(createdAt) as data,\n  COUNT(*) as quantidade\nFROM clientes\nGROUP BY DATE(createdAt)\n\nUNION ALL\n\nSELECT \n  'Concorrentes' as entidade,\n  DATE(createdAt) as data,\n  COUNT(*) as quantidade\nFROM concorrentes\nGROUP BY DATE(createdAt)\n\nUNION ALL\n\nSELECT \n  'Leads' as entidade,\n  DATE(createdAt) as data,\n  COUNT(*) as quantidade\nFROM leads\nGROUP BY DATE(createdAt)\n\nORDER BY data DESC, entidade;\n",
+  "rows": [
+    {
+      "entidade": "Clientes",
+      "data": "2025-11-19",
+      "quantidade": "801"
+    },
+    {
+      "entidade": "Concorrentes",
+      "data": "2025-11-19",
+      "quantidade": "16282"
+    },
+    {
+      "entidade": "Leads",
+      "data": "2025-11-19",
+      "quantidade": "16304"
+    },
+    {
+      "entidade": "Mercados",
+      "data": "2025-11-19",
+      "quantidade": "2000"
+    },
+    {
+      "entidade": "Clientes",
+      "data": "2025-10-21",
+      "quantidade": "7"
+    }
+  ],
+  "messages": [],
+  "stdout": "entidade\tdata\tquantidade\nClientes\t2025-11-19\t801\nConcorrentes\t2025-11-19\t16282\nLeads\t2025-11-19\t16304\nMercados\t2025-11-19\t2000\nClientes\t2025-10-21\t7\n",
+  "stderr": "",
+  "execution_time_ms": 854
+}

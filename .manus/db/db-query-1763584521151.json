@@ -1,0 +1,42 @@
+{
+  "query": "\n-- Verificar se há IDs faltando (indicando deleções)\nSELECT \n  'Mercados' as entidade,\n  MIN(id) as id_minimo,\n  MAX(id) as id_maximo,\n  COUNT(*) as registros_atuais,\n  (MAX(id) - MIN(id) + 1) as registros_esperados,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados\nFROM mercados_unicos\n\nUNION ALL\n\nSELECT \n  'Clientes' as entidade,\n  MIN(id) as id_minimo,\n  MAX(id) as id_maximo,\n  COUNT(*) as registros_atuais,\n  (MAX(id) - MIN(id) + 1) as registros_esperados,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados\nFROM clientes\n\nUNION ALL\n\nSELECT \n  'Concorrentes' as entidade,\n  MIN(id) as id_minimo,\n  MAX(id) as id_maximo,\n  COUNT(*) as registros_atuais,\n  (MAX(id) - MIN(id) + 1) as registros_esperados,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados\nFROM concorrentes\n\nUNION ALL\n\nSELECT \n  'Leads' as entidade,\n  MIN(id) as id_minimo,\n  MAX(id) as id_maximo,\n  COUNT(*) as registros_atuais,\n  (MAX(id) - MIN(id) + 1) as registros_esperados,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados\nFROM leads;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Verificar se há IDs faltando (indicando deleções)\nSELECT \n  'Mercados' as entidade,\n  MIN(id) as id_minimo,\n  MAX(id) as id_maximo,\n  COUNT(*) as registros_atuais,\n  (MAX(id) - MIN(id) + 1) as registros_esperados,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados\nFROM mercados_unicos\n\nUNION ALL\n\nSELECT \n  'Clientes' as entidade,\n  MIN(id) as id_minimo,\n  MAX(id) as id_maximo,\n  COUNT(*) as registros_atuais,\n  (MAX(id) - MIN(id) + 1) as registros_esperados,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados\nFROM clientes\n\nUNION ALL\n\nSELECT \n  'Concorrentes' as entidade,\n  MIN(id) as id_minimo,\n  MAX(id) as id_maximo,\n  COUNT(*) as registros_atuais,\n  (MAX(id) - MIN(id) + 1) as registros_esperados,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados\nFROM concorrentes\n\nUNION ALL\n\nSELECT \n  'Leads' as entidade,\n  MIN(id) as id_minimo,\n  MAX(id) as id_maximo,\n  COUNT(*) as registros_atuais,\n  (MAX(id) - MIN(id) + 1) as registros_esperados,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados\nFROM leads;\n",
+  "rows": [
+    {
+      "entidade": "Clientes",
+      "id_minimo": "2205",
+      "id_maximo": "391955",
+      "registros_atuais": "808",
+      "registros_esperados": "389751",
+      "registros_deletados": "388943"
+    },
+    {
+      "entidade": "Mercados",
+      "id_minimo": "300002",
+      "id_maximo": "390011",
+      "registros_atuais": "2000",
+      "registros_esperados": "90010",
+      "registros_deletados": "88010"
+    },
+    {
+      "entidade": "Concorrentes",
+      "id_minimo": "240002",
+      "id_maximo": "330081",
+      "registros_atuais": "16282",
+      "registros_esperados": "90080",
+      "registros_deletados": "73798"
+    },
+    {
+      "entidade": "Leads",
+      "id_minimo": "240002",
+      "id_maximo": "330101",
+      "registros_atuais": "16304",
+      "registros_esperados": "90100",
+      "registros_deletados": "73796"
+    }
+  ],
+  "messages": [],
+  "stdout": "entidade\tid_minimo\tid_maximo\tregistros_atuais\tregistros_esperados\tregistros_deletados\nClientes\t2205\t391955\t808\t389751\t388943\nMercados\t300002\t390011\t2000\t90010\t88010\nConcorrentes\t240002\t330081\t16282\t90080\t73798\nLeads\t240002\t330101\t16304\t90100\t73796\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

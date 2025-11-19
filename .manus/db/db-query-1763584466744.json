@@ -1,0 +1,31 @@
+{
+  "query": "\n-- Verificar se produtos foram atualizados\nSELECT \n  'Clientes com Produto Longo (>100 chars)' as metrica,\n  COUNT(*) as quantidade,\n  ROUND(AVG(LENGTH(produtoPrincipal)), 0) as tamanho_medio,\n  MIN(DATE(createdAt)) as data_criacao_min,\n  MAX(DATE(createdAt)) as data_criacao_max\nFROM clientes\nWHERE DATE(createdAt) = '2024-10-21'\n  AND produtoPrincipal IS NOT NULL\n  AND LENGTH(produtoPrincipal) > 100\n\nUNION ALL\n\nSELECT \n  'Clientes com Produto Curto (<50 chars)' as metrica,\n  COUNT(*) as quantidade,\n  ROUND(AVG(LENGTH(produtoPrincipal)), 0) as tamanho_medio,\n  MIN(DATE(createdAt)) as data_criacao_min,\n  MAX(DATE(createdAt)) as data_criacao_max\nFROM clientes\nWHERE DATE(createdAt) = '2024-10-21'\n  AND produtoPrincipal IS NOT NULL\n  AND LENGTH(produtoPrincipal) < 50\n\nUNION ALL\n\nSELECT \n  'Clientes SEM Produto' as metrica,\n  COUNT(*) as quantidade,\n  NULL as tamanho_medio,\n  MIN(DATE(createdAt)) as data_criacao_min,\n  MAX(DATE(createdAt)) as data_criacao_max\nFROM clientes\nWHERE DATE(createdAt) = '2024-10-21'\n  AND (produtoPrincipal IS NULL OR produtoPrincipal = '');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Verificar se produtos foram atualizados\nSELECT \n  'Clientes com Produto Longo (>100 chars)' as metrica,\n  COUNT(*) as quantidade,\n  ROUND(AVG(LENGTH(produtoPrincipal)), 0) as tamanho_medio,\n  MIN(DATE(createdAt)) as data_criacao_min,\n  MAX(DATE(createdAt)) as data_criacao_max\nFROM clientes\nWHERE DATE(createdAt) = '2024-10-21'\n  AND produtoPrincipal IS NOT NULL\n  AND LENGTH(produtoPrincipal) > 100\n\nUNION ALL\n\nSELECT \n  'Clientes com Produto Curto (<50 chars)' as metrica,\n  COUNT(*) as quantidade,\n  ROUND(AVG(LENGTH(produtoPrincipal)), 0) as tamanho_medio,\n  MIN(DATE(createdAt)) as data_criacao_min,\n  MAX(DATE(createdAt)) as data_criacao_max\nFROM clientes\nWHERE DATE(createdAt) = '2024-10-21'\n  AND produtoPrincipal IS NOT NULL\n  AND LENGTH(produtoPrincipal) < 50\n\nUNION ALL\n\nSELECT \n  'Clientes SEM Produto' as metrica,\n  COUNT(*) as quantidade,\n  NULL as tamanho_medio,\n  MIN(DATE(createdAt)) as data_criacao_min,\n  MAX(DATE(createdAt)) as data_criacao_max\nFROM clientes\nWHERE DATE(createdAt) = '2024-10-21'\n  AND (produtoPrincipal IS NULL OR produtoPrincipal = '');\n",
+  "rows": [
+    {
+      "metrica": "Clientes com Produto Longo (>100 chars)",
+      "quantidade": "0",
+      "tamanho_medio": "NULL",
+      "data_criacao_min": "NULL",
+      "data_criacao_max": "NULL"
+    },
+    {
+      "metrica": "Clientes com Produto Curto (<50 chars)",
+      "quantidade": "0",
+      "tamanho_medio": "NULL",
+      "data_criacao_min": "NULL",
+      "data_criacao_max": "NULL"
+    },
+    {
+      "metrica": "Clientes SEM Produto",
+      "quantidade": "0",
+      "tamanho_medio": "NULL",
+      "data_criacao_min": "NULL",
+      "data_criacao_max": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "metrica\tquantidade\ttamanho_medio\tdata_criacao_min\tdata_criacao_max\nClientes com Produto Longo (>100 chars)\t0\tNULL\tNULL\tNULL\nClientes com Produto Curto (<50 chars)\t0\tNULL\tNULL\tNULL\nClientes SEM Produto\t0\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 186
+}

@@ -1,0 +1,55 @@
+{
+  "query": "\n-- Amostra de clientes com produtos enriquecidos\nSELECT \n  id,\n  nome,\n  SUBSTRING(produtoPrincipal, 1, 100) as produto_preview,\n  LENGTH(produtoPrincipal) as tamanho_produto,\n  qualidadeScore,\n  qualidadeClassificacao,\n  DATE(createdAt) as data_criacao\nFROM clientes\nWHERE produtoPrincipal IS NOT NULL \n  AND LENGTH(produtoPrincipal) > 50\nORDER BY qualidadeScore DESC\nLIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Amostra de clientes com produtos enriquecidos\nSELECT \n  id,\n  nome,\n  SUBSTRING(produtoPrincipal, 1, 100) as produto_preview,\n  LENGTH(produtoPrincipal) as tamanho_produto,\n  qualidadeScore,\n  qualidadeClassificacao,\n  DATE(createdAt) as data_criacao\nFROM clientes\nWHERE produtoPrincipal IS NOT NULL \n  AND LENGTH(produtoPrincipal) > 50\nORDER BY qualidadeScore DESC\nLIMIT 5;\n",
+  "rows": [
+    {
+      "id": "301634",
+      "nome": "AGRO-COMERCIAL AFUBRA LTDA",
+      "produto_preview": "Comercialização e distribuição de insumos agrícolas (fertilizantes, defensivos e sementes) e produto",
+      "tamanho_produto": "124",
+      "qualidadeScore": "100",
+      "qualidadeClassificacao": "Alta",
+      "data_criacao": "2025-11-19"
+    },
+    {
+      "id": "301633",
+      "nome": "AGRO INDUSTRIAL ITUBERA LTDA",
+      "produto_preview": "Produção e comercialização de açúcar cristal e refinado, atendendo tanto o mercado industrial quanto",
+      "tamanho_produto": "116",
+      "qualidadeScore": "100",
+      "qualidadeClassificacao": "Alta",
+      "data_criacao": "2025-11-19"
+    },
+    {
+      "id": "301636",
+      "nome": "AGROPECUARIA FAZENDA ALIANCA LTDA",
+      "produto_preview": "Criação, recria e engorda de gado bovino (corte) para abate, com foco na produção de carne bovina de",
+      "tamanho_produto": "120",
+      "qualidadeScore": "100",
+      "qualidadeClassificacao": "Alta",
+      "data_criacao": "2025-11-19"
+    },
+    {
+      "id": "301637",
+      "nome": "AGROPONTO COM AGRICOLA LTDA",
+      "produto_preview": "Comercialização e distribuição de insumos agrícolas, como fertilizantes, sementes e defensivos quími",
+      "tamanho_produto": "134",
+      "qualidadeScore": "100",
+      "qualidadeClassificacao": "Alta",
+      "data_criacao": "2025-11-19"
+    },
+    {
+      "id": "301638",
+      "nome": "AGUA MINERAL NATURAL SERRA DE FLORES LTDA",
+      "produto_preview": "Água Mineral Natural engarrafada em diversos volumes (principalmente 500ml, 1L e 1,5L) para consumo ",
+      "tamanho_produto": "108",
+      "qualidadeScore": "100",
+      "qualidadeClassificacao": "Alta",
+      "data_criacao": "2025-11-19"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tproduto_preview\ttamanho_produto\tqualidadeScore\tqualidadeClassificacao\tdata_criacao\n301634\tAGRO-COMERCIAL AFUBRA LTDA\tComercialização e distribuição de insumos agrícolas (fertilizantes, defensivos e sementes) e produto\t124\t100\tAlta\t2025-11-19\n301633\tAGRO INDUSTRIAL ITUBERA LTDA\tProdução e comercialização de açúcar cristal e refinado, atendendo tanto o mercado industrial quanto\t116\t100\tAlta\t2025-11-19\n301636\tAGROPECUARIA FAZENDA ALIANCA LTDA\tCriação, recria e engorda de gado bovino (corte) para abate, com foco na produção de carne bovina de\t120\t100\tAlta\t2025-11-19\n301637\tAGROPONTO COM AGRICOLA LTDA\tComercialização e distribuição de insumos agrícolas, como fertilizantes, sementes e defensivos quími\t134\t100\tAlta\t2025-11-19\n301638\tAGUA MINERAL NATURAL SERRA DE FLORES LTDA\tÁgua Mineral Natural engarrafada em diversos volumes (principalmente 500ml, 1L e 1,5L) para consumo \t108\t100\tAlta\t2025-11-19\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

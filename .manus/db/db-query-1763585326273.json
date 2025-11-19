@@ -1,0 +1,74 @@
+{
+  "query": "\nSELECT 'users' as tabela, COUNT(*) as total FROM users\nUNION ALL SELECT 'projects', COUNT(*) FROM projects\nUNION ALL SELECT 'mercados_unicos', COUNT(*) FROM mercados_unicos\nUNION ALL SELECT 'clientes', COUNT(*) FROM clientes\nUNION ALL SELECT 'concorrentes', COUNT(*) FROM concorrentes\nUNION ALL SELECT 'leads', COUNT(*) FROM leads\nUNION ALL SELECT 'clientes_mercados', COUNT(*) FROM clientes_mercados\nUNION ALL SELECT 'enrichment_runs', COUNT(*) FROM enrichment_runs\nUNION ALL SELECT 'mercados_history', COUNT(*) FROM mercados_history\nUNION ALL SELECT 'clientes_history', COUNT(*) FROM clientes_history\nUNION ALL SELECT 'concorrentes_history', COUNT(*) FROM concorrentes_history\nUNION ALL SELECT 'leads_history', COUNT(*) FROM leads_history\nUNION ALL SELECT 'entity_tags', COUNT(*) FROM entity_tags\nUNION ALL SELECT 'saved_filters', COUNT(*) FROM saved_filters\nUNION ALL SELECT 'project_templates', COUNT(*) FROM project_templates\nUNION ALL SELECT 'notifications', COUNT(*) FROM notifications\nORDER BY total DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT 'users' as tabela, COUNT(*) as total FROM users\nUNION ALL SELECT 'projects', COUNT(*) FROM projects\nUNION ALL SELECT 'mercados_unicos', COUNT(*) FROM mercados_unicos\nUNION ALL SELECT 'clientes', COUNT(*) FROM clientes\nUNION ALL SELECT 'concorrentes', COUNT(*) FROM concorrentes\nUNION ALL SELECT 'leads', COUNT(*) FROM leads\nUNION ALL SELECT 'clientes_mercados', COUNT(*) FROM clientes_mercados\nUNION ALL SELECT 'enrichment_runs', COUNT(*) FROM enrichment_runs\nUNION ALL SELECT 'mercados_history', COUNT(*) FROM mercados_history\nUNION ALL SELECT 'clientes_history', COUNT(*) FROM clientes_history\nUNION ALL SELECT 'concorrentes_history', COUNT(*) FROM concorrentes_history\nUNION ALL SELECT 'leads_history', COUNT(*) FROM leads_history\nUNION ALL SELECT 'entity_tags', COUNT(*) FROM entity_tags\nUNION ALL SELECT 'saved_filters', COUNT(*) FROM saved_filters\nUNION ALL SELECT 'project_templates', COUNT(*) FROM project_templates\nUNION ALL SELECT 'notifications', COUNT(*) FROM notifications\nORDER BY total DESC;\n",
+  "rows": [
+    {
+      "tabela": "leads",
+      "total": "16304"
+    },
+    {
+      "tabela": "concorrentes",
+      "total": "16282"
+    },
+    {
+      "tabela": "clientes_mercados",
+      "total": "2464"
+    },
+    {
+      "tabela": "mercados_unicos",
+      "total": "2000"
+    },
+    {
+      "tabela": "clientes",
+      "total": "808"
+    },
+    {
+      "tabela": "project_templates",
+      "total": "3"
+    },
+    {
+      "tabela": "mercados_history",
+      "total": "3"
+    },
+    {
+      "tabela": "clientes_history",
+      "total": "3"
+    },
+    {
+      "tabela": "projects",
+      "total": "3"
+    },
+    {
+      "tabela": "enrichment_runs",
+      "total": "3"
+    },
+    {
+      "tabela": "users",
+      "total": "3"
+    },
+    {
+      "tabela": "entity_tags",
+      "total": "1"
+    },
+    {
+      "tabela": "concorrentes_history",
+      "total": "0"
+    },
+    {
+      "tabela": "leads_history",
+      "total": "0"
+    },
+    {
+      "tabela": "saved_filters",
+      "total": "0"
+    },
+    {
+      "tabela": "notifications",
+      "total": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\ttotal\nleads\t16304\nconcorrentes\t16282\nclientes_mercados\t2464\nmercados_unicos\t2000\nclientes\t808\nproject_templates\t3\nmercados_history\t3\nclientes_history\t3\nprojects\t3\nenrichment_runs\t3\nusers\t3\nentity_tags\t1\nconcorrentes_history\t0\nleads_history\t0\nsaved_filters\t0\nnotifications\t0\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

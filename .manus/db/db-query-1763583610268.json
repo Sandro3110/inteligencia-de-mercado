@@ -1,0 +1,19 @@
+{
+  "query": "\n-- Comparar clientes por data de criação (originais vs enriquecidos)\nSELECT \n  CASE \n    WHEN DATE(createdAt) = '2024-10-21' THEN 'Originais (21/10)'\n    WHEN DATE(createdAt) = '2024-11-19' THEN 'Enriquecidos (19/11)'\n    ELSE 'Outros'\n  END as grupo,\n  COUNT(*) as total_clientes,\n  ROUND(AVG(qualidadeScore), 2) as score_medio,\n  ROUND(AVG(LENGTH(COALESCE(produtoPrincipal, ''))), 0) as tamanho_medio_produto,\n  SUM(CASE WHEN email IS NOT NULL AND email != '' THEN 1 ELSE 0 END) as com_email,\n  SUM(CASE WHEN telefone IS NOT NULL AND telefone != '' THEN 1 ELSE 0 END) as com_telefone,\n  SUM(CASE WHEN cidade IS NOT NULL AND cidade != '' THEN 1 ELSE 0 END) as com_cidade\nFROM clientes\nGROUP BY grupo\nORDER BY grupo;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Comparar clientes por data de criação (originais vs enriquecidos)\nSELECT \n  CASE \n    WHEN DATE(createdAt) = '2024-10-21' THEN 'Originais (21/10)'\n    WHEN DATE(createdAt) = '2024-11-19' THEN 'Enriquecidos (19/11)'\n    ELSE 'Outros'\n  END as grupo,\n  COUNT(*) as total_clientes,\n  ROUND(AVG(qualidadeScore), 2) as score_medio,\n  ROUND(AVG(LENGTH(COALESCE(produtoPrincipal, ''))), 0) as tamanho_medio_produto,\n  SUM(CASE WHEN email IS NOT NULL AND email != '' THEN 1 ELSE 0 END) as com_email,\n  SUM(CASE WHEN telefone IS NOT NULL AND telefone != '' THEN 1 ELSE 0 END) as com_telefone,\n  SUM(CASE WHEN cidade IS NOT NULL AND cidade != '' THEN 1 ELSE 0 END) as com_cidade\nFROM clientes\nGROUP BY grupo\nORDER BY grupo;\n",
+  "rows": [
+    {
+      "grupo": "Outros",
+      "total_clientes": "804",
+      "score_medio": "97.19",
+      "tamanho_medio_produto": "126",
+      "com_email": "801",
+      "com_telefone": "801",
+      "com_cidade": "8"
+    }
+  ],
+  "messages": [],
+  "stdout": "grupo\ttotal_clientes\tscore_medio\ttamanho_medio_produto\tcom_email\tcom_telefone\tcom_cidade\nOutros\t804\t97.19\t126\t801\t801\t8\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

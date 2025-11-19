@@ -1,0 +1,70 @@
+{
+  "query": "\n-- Análise de concorrentes\nSELECT \n  'CONCORRENTES' as categoria,\n  'Total' as metrica,\n  COUNT(*) as valor,\n  NULL as percentual\nFROM concorrentes\n\nUNION ALL\n\nSELECT \n  'CONCORRENTES' as categoria,\n  'Com CNPJ' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM concorrentes), 2), '%') as percentual\nFROM concorrentes\nWHERE cnpj IS NOT NULL AND cnpj != ''\n\nUNION ALL\n\nSELECT \n  'CONCORRENTES' as categoria,\n  'Com Site' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM concorrentes), 2), '%') as percentual\nFROM concorrentes\nWHERE site IS NOT NULL AND site != ''\n\nUNION ALL\n\nSELECT \n  'CONCORRENTES' as categoria,\n  'Com Produto' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM concorrentes), 2), '%') as percentual\nFROM concorrentes\nWHERE produto IS NOT NULL AND produto != ''\n\nUNION ALL\n\nSELECT \n  'CONCORRENTES' as categoria,\n  'Score Médio' as metrica,\n  ROUND(AVG(qualidadeScore), 2) as valor,\n  NULL as percentual\nFROM concorrentes\n\nUNION ALL\n\n-- Análise de leads\nSELECT \n  'LEADS' as categoria,\n  'Total' as metrica,\n  COUNT(*) as valor,\n  NULL as percentual\nFROM leads\n\nUNION ALL\n\nSELECT \n  'LEADS' as categoria,\n  'Com Email' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM leads), 2), '%') as percentual\nFROM leads\nWHERE email IS NOT NULL AND email != ''\n\nUNION ALL\n\nSELECT \n  'LEADS' as categoria,\n  'Com Telefone' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM leads), 2), '%') as percentual\nFROM leads\nWHERE telefone IS NOT NULL AND telefone != ''\n\nUNION ALL\n\nSELECT \n  'LEADS' as categoria,\n  'Com Site' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM leads), 2), '%') as percentual\nFROM leads\nWHERE site IS NOT NULL AND site != ''\n\nUNION ALL\n\nSELECT \n  'LEADS' as categoria,\n  'Score Médio' as metrica,\n  ROUND(AVG(qualidadeScore), 2) as valor,\n  NULL as percentual\nFROM leads;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Análise de concorrentes\nSELECT \n  'CONCORRENTES' as categoria,\n  'Total' as metrica,\n  COUNT(*) as valor,\n  NULL as percentual\nFROM concorrentes\n\nUNION ALL\n\nSELECT \n  'CONCORRENTES' as categoria,\n  'Com CNPJ' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM concorrentes), 2), '%') as percentual\nFROM concorrentes\nWHERE cnpj IS NOT NULL AND cnpj != ''\n\nUNION ALL\n\nSELECT \n  'CONCORRENTES' as categoria,\n  'Com Site' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM concorrentes), 2), '%') as percentual\nFROM concorrentes\nWHERE site IS NOT NULL AND site != ''\n\nUNION ALL\n\nSELECT \n  'CONCORRENTES' as categoria,\n  'Com Produto' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM concorrentes), 2), '%') as percentual\nFROM concorrentes\nWHERE produto IS NOT NULL AND produto != ''\n\nUNION ALL\n\nSELECT \n  'CONCORRENTES' as categoria,\n  'Score Médio' as metrica,\n  ROUND(AVG(qualidadeScore), 2) as valor,\n  NULL as percentual\nFROM concorrentes\n\nUNION ALL\n\n-- Análise de leads\nSELECT \n  'LEADS' as categoria,\n  'Total' as metrica,\n  COUNT(*) as valor,\n  NULL as percentual\nFROM leads\n\nUNION ALL\n\nSELECT \n  'LEADS' as categoria,\n  'Com Email' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM leads), 2), '%') as percentual\nFROM leads\nWHERE email IS NOT NULL AND email != ''\n\nUNION ALL\n\nSELECT \n  'LEADS' as categoria,\n  'Com Telefone' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM leads), 2), '%') as percentual\nFROM leads\nWHERE telefone IS NOT NULL AND telefone != ''\n\nUNION ALL\n\nSELECT \n  'LEADS' as categoria,\n  'Com Site' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM leads), 2), '%') as percentual\nFROM leads\nWHERE site IS NOT NULL AND site != ''\n\nUNION ALL\n\nSELECT \n  'LEADS' as categoria,\n  'Score Médio' as metrica,\n  ROUND(AVG(qualidadeScore), 2) as valor,\n  NULL as percentual\nFROM leads;\n",
+  "rows": [
+    {
+      "categoria": "CONCORRENTES",
+      "metrica": "Total",
+      "valor": "16202.00",
+      "percentual": "NULL"
+    },
+    {
+      "categoria": "CONCORRENTES",
+      "metrica": "Score Médio",
+      "valor": "99.96",
+      "percentual": "NULL"
+    },
+    {
+      "categoria": "CONCORRENTES",
+      "metrica": "Com Site",
+      "valor": "16202.00",
+      "percentual": "100.00%"
+    },
+    {
+      "categoria": "CONCORRENTES",
+      "metrica": "Com CNPJ",
+      "valor": "16202.00",
+      "percentual": "100.00%"
+    },
+    {
+      "categoria": "LEADS",
+      "metrica": "Total",
+      "valor": "16224.00",
+      "percentual": "NULL"
+    },
+    {
+      "categoria": "CONCORRENTES",
+      "metrica": "Com Produto",
+      "valor": "16202.00",
+      "percentual": "100.00%"
+    },
+    {
+      "categoria": "LEADS",
+      "metrica": "Com Email",
+      "valor": "16224.00",
+      "percentual": "100.00%"
+    },
+    {
+      "categoria": "LEADS",
+      "metrica": "Com Telefone",
+      "valor": "16224.00",
+      "percentual": "100.00%"
+    },
+    {
+      "categoria": "LEADS",
+      "metrica": "Com Site",
+      "valor": "16224.00",
+      "percentual": "100.00%"
+    },
+    {
+      "categoria": "LEADS",
+      "metrica": "Score Médio",
+      "valor": "98.52",
+      "percentual": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "categoria\tmetrica\tvalor\tpercentual\nCONCORRENTES\tTotal\t16202.00\tNULL\nCONCORRENTES\tScore Médio\t99.96\tNULL\nCONCORRENTES\tCom Site\t16202.00\t100.00%\nCONCORRENTES\tCom CNPJ\t16202.00\t100.00%\nLEADS\tTotal\t16224.00\tNULL\nCONCORRENTES\tCom Produto\t16202.00\t100.00%\nLEADS\tCom Email\t16224.00\t100.00%\nLEADS\tCom Telefone\t16224.00\t100.00%\nLEADS\tCom Site\t16224.00\t100.00%\nLEADS\tScore Médio\t98.52\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 115
+}

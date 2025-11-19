@@ -1,0 +1,54 @@
+{
+  "query": "\nSELECT 'ANTES DA LIMPEZA' as momento, NOW() as timestamp\nUNION ALL\nSELECT 'clientes', COUNT(*) FROM clientes\nUNION ALL SELECT 'mercados_unicos', COUNT(*) FROM mercados_unicos\nUNION ALL SELECT 'concorrentes', COUNT(*) FROM concorrentes\nUNION ALL SELECT 'leads', COUNT(*) FROM leads\nUNION ALL SELECT 'clientes_mercados', COUNT(*) FROM clientes_mercados\nUNION ALL SELECT 'mercados_history', COUNT(*) FROM mercados_history\nUNION ALL SELECT 'clientes_history', COUNT(*) FROM clientes_history\nUNION ALL SELECT 'concorrentes_history', COUNT(*) FROM concorrentes_history\nUNION ALL SELECT 'leads_history', COUNT(*) FROM leads_history\nUNION ALL SELECT 'enrichment_runs', COUNT(*) FROM enrichment_runs;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT 'ANTES DA LIMPEZA' as momento, NOW() as timestamp\nUNION ALL\nSELECT 'clientes', COUNT(*) FROM clientes\nUNION ALL SELECT 'mercados_unicos', COUNT(*) FROM mercados_unicos\nUNION ALL SELECT 'concorrentes', COUNT(*) FROM concorrentes\nUNION ALL SELECT 'leads', COUNT(*) FROM leads\nUNION ALL SELECT 'clientes_mercados', COUNT(*) FROM clientes_mercados\nUNION ALL SELECT 'mercados_history', COUNT(*) FROM mercados_history\nUNION ALL SELECT 'clientes_history', COUNT(*) FROM clientes_history\nUNION ALL SELECT 'concorrentes_history', COUNT(*) FROM concorrentes_history\nUNION ALL SELECT 'leads_history', COUNT(*) FROM leads_history\nUNION ALL SELECT 'enrichment_runs', COUNT(*) FROM enrichment_runs;\n",
+  "rows": [
+    {
+      "momento": "ANTES DA LIMPEZA",
+      "timestamp": "2025-11-19 20:54:27"
+    },
+    {
+      "momento": "clientes",
+      "timestamp": "808"
+    },
+    {
+      "momento": "mercados_unicos",
+      "timestamp": "2000"
+    },
+    {
+      "momento": "clientes_mercados",
+      "timestamp": "2464"
+    },
+    {
+      "momento": "mercados_history",
+      "timestamp": "3"
+    },
+    {
+      "momento": "clientes_history",
+      "timestamp": "3"
+    },
+    {
+      "momento": "concorrentes_history",
+      "timestamp": "0"
+    },
+    {
+      "momento": "enrichment_runs",
+      "timestamp": "3"
+    },
+    {
+      "momento": "leads_history",
+      "timestamp": "0"
+    },
+    {
+      "momento": "leads",
+      "timestamp": "16304"
+    },
+    {
+      "momento": "concorrentes",
+      "timestamp": "16282"
+    }
+  ],
+  "messages": [],
+  "stdout": "momento\ttimestamp\nANTES DA LIMPEZA\t2025-11-19 20:54:27\nclientes\t808\nmercados_unicos\t2000\nclientes_mercados\t2464\nmercados_history\t3\nclientes_history\t3\nconcorrentes_history\t0\nenrichment_runs\t3\nleads_history\t0\nleads\t16304\nconcorrentes\t16282\n",
+  "stderr": "",
+  "execution_time_ms": 1575
+}

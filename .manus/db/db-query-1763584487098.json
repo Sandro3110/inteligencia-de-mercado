@@ -1,0 +1,38 @@
+{
+  "query": "\n-- Verificar histórico de mudanças (query corrigida)\nSELECT \n  'Clientes' as entidade,\n  changeType,\n  DATE(changedAt) as data,\n  COUNT(*) as quantidade_mudancas,\n  COUNT(DISTINCT clienteId) as registros_afetados\nFROM clientes_history\nGROUP BY changeType, DATE(changedAt)\n\nUNION ALL\n\nSELECT \n  'Mercados' as entidade,\n  changeType,\n  DATE(changedAt) as data,\n  COUNT(*) as quantidade_mudancas,\n  COUNT(DISTINCT mercadoId) as registros_afetados\nFROM mercados_history\nGROUP BY changeType, DATE(changedAt)\n\nUNION ALL\n\nSELECT \n  'Concorrentes' as entidade,\n  changeType,\n  DATE(changedAt) as data,\n  COUNT(*) as quantidade_mudancas,\n  COUNT(DISTINCT concorrenteId) as registros_afetados\nFROM concorrentes_history\nGROUP BY changeType, DATE(changedAt)\n\nUNION ALL\n\nSELECT \n  'Leads' as entidade,\n  changeType,\n  DATE(changedAt) as data,\n  COUNT(*) as quantidade_mudancas,\n  COUNT(DISTINCT leadId) as registros_afetados\nFROM leads_history\nGROUP BY changeType, DATE(changedAt)\n\nORDER BY data DESC, entidade, changeType;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Verificar histórico de mudanças (query corrigida)\nSELECT \n  'Clientes' as entidade,\n  changeType,\n  DATE(changedAt) as data,\n  COUNT(*) as quantidade_mudancas,\n  COUNT(DISTINCT clienteId) as registros_afetados\nFROM clientes_history\nGROUP BY changeType, DATE(changedAt)\n\nUNION ALL\n\nSELECT \n  'Mercados' as entidade,\n  changeType,\n  DATE(changedAt) as data,\n  COUNT(*) as quantidade_mudancas,\n  COUNT(DISTINCT mercadoId) as registros_afetados\nFROM mercados_history\nGROUP BY changeType, DATE(changedAt)\n\nUNION ALL\n\nSELECT \n  'Concorrentes' as entidade,\n  changeType,\n  DATE(changedAt) as data,\n  COUNT(*) as quantidade_mudancas,\n  COUNT(DISTINCT concorrenteId) as registros_afetados\nFROM concorrentes_history\nGROUP BY changeType, DATE(changedAt)\n\nUNION ALL\n\nSELECT \n  'Leads' as entidade,\n  changeType,\n  DATE(changedAt) as data,\n  COUNT(*) as quantidade_mudancas,\n  COUNT(DISTINCT leadId) as registros_afetados\nFROM leads_history\nGROUP BY changeType, DATE(changedAt)\n\nORDER BY data DESC, entidade, changeType;\n",
+  "rows": [
+    {
+      "entidade": "Clientes",
+      "changeType": "created",
+      "data": "2025-11-19",
+      "quantidade_mudancas": "1",
+      "registros_afetados": "1"
+    },
+    {
+      "entidade": "Clientes",
+      "changeType": "enriched",
+      "data": "2025-11-19",
+      "quantidade_mudancas": "2",
+      "registros_afetados": "1"
+    },
+    {
+      "entidade": "Mercados",
+      "changeType": "created",
+      "data": "2025-11-19",
+      "quantidade_mudancas": "1",
+      "registros_afetados": "1"
+    },
+    {
+      "entidade": "Mercados",
+      "changeType": "updated",
+      "data": "2025-11-19",
+      "quantidade_mudancas": "2",
+      "registros_afetados": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "entidade\tchangeType\tdata\tquantidade_mudancas\tregistros_afetados\nClientes\tcreated\t2025-11-19\t1\t1\nClientes\tenriched\t2025-11-19\t2\t1\nMercados\tcreated\t2025-11-19\t1\t1\nMercados\tupdated\t2025-11-19\t2\t1\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

@@ -1,0 +1,8 @@
+{
+  "query": "\n-- Buscar o enrichment run pausado\nSELECT \n  id,\n  status,\n  totalClientes,\n  clientesProcessados,\n  mercadosCriados,\n  concorrentesCriados,\n  leadsCriados,\n  startedAt,\n  pausedAt\nFROM enrichment_runs\nWHERE status = 'paused'\nORDER BY id DESC\nLIMIT 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Buscar o enrichment run pausado\nSELECT \n  id,\n  status,\n  totalClientes,\n  clientesProcessados,\n  mercadosCriados,\n  concorrentesCriados,\n  leadsCriados,\n  startedAt,\n  pausedAt\nFROM enrichment_runs\nWHERE status = 'paused'\nORDER BY id DESC\nLIMIT 1;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 3: Unknown column 'totalclientes' in 'field list'"
+  ]
+}

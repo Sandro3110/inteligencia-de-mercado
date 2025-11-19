@@ -1,0 +1,24 @@
+{
+  "query": "\nSELECT * FROM enrichment_runs WHERE status = 'paused' ORDER BY id DESC LIMIT 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT * FROM enrichment_runs WHERE status = 'paused' ORDER BY id DESC LIMIT 1;\n",
+  "rows": [
+    {
+      "id": "1",
+      "projectId": "1",
+      "startedAt": "2025-11-19 03:27:22",
+      "completedAt": "NULL",
+      "totalClients": "800",
+      "processedClients": "450",
+      "status": "paused",
+      "durationSeconds": "NULL",
+      "errorMessage": "NULL",
+      "notifiedAt50": "0",
+      "notifiedAt75": "0",
+      "notifiedAt100": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tprojectId\tstartedAt\tcompletedAt\ttotalClients\tprocessedClients\tstatus\tdurationSeconds\terrorMessage\tnotifiedAt50\tnotifiedAt75\tnotifiedAt100\n1\t1\t2025-11-19 03:27:22\tNULL\t800\t450\tpaused\tNULL\tNULL\t0\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

@@ -1,0 +1,42 @@
+{
+  "query": "\n-- Estatísticas gerais\nSELECT \n  'MERCADOS' as entidade,\n  COUNT(*) as total,\n  COUNT(DISTINCT mercadoHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT mercadoHash) as duplicatas,\n  COUNT(DISTINCT nome) as nomes_unicos,\n  AVG(quantidadeClientes) as media_clientes_por_mercado\nFROM mercados_unicos\n\nUNION ALL\n\nSELECT \n  'CLIENTES' as entidade,\n  COUNT(*) as total,\n  COUNT(DISTINCT clienteHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT clienteHash) as duplicatas,\n  COUNT(DISTINCT nome) as nomes_unicos,\n  AVG(qualidadeScore) as media_score\nFROM clientes\n\nUNION ALL\n\nSELECT \n  'CONCORRENTES' as entidade,\n  COUNT(*) as total,\n  COUNT(DISTINCT concorrenteHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT concorrenteHash) as duplicatas,\n  COUNT(DISTINCT nome) as nomes_unicos,\n  AVG(qualidadeScore) as media_score\nFROM concorrentes\n\nUNION ALL\n\nSELECT \n  'LEADS' as entidade,\n  COUNT(*) as total,\n  COUNT(DISTINCT leadHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT leadHash) as duplicatas,\n  COUNT(DISTINCT nome) as nomes_unicos,\n  AVG(qualidadeScore) as media_score\nFROM leads;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Estatísticas gerais\nSELECT \n  'MERCADOS' as entidade,\n  COUNT(*) as total,\n  COUNT(DISTINCT mercadoHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT mercadoHash) as duplicatas,\n  COUNT(DISTINCT nome) as nomes_unicos,\n  AVG(quantidadeClientes) as media_clientes_por_mercado\nFROM mercados_unicos\n\nUNION ALL\n\nSELECT \n  'CLIENTES' as entidade,\n  COUNT(*) as total,\n  COUNT(DISTINCT clienteHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT clienteHash) as duplicatas,\n  COUNT(DISTINCT nome) as nomes_unicos,\n  AVG(qualidadeScore) as media_score\nFROM clientes\n\nUNION ALL\n\nSELECT \n  'CONCORRENTES' as entidade,\n  COUNT(*) as total,\n  COUNT(DISTINCT concorrenteHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT concorrenteHash) as duplicatas,\n  COUNT(DISTINCT nome) as nomes_unicos,\n  AVG(qualidadeScore) as media_score\nFROM concorrentes\n\nUNION ALL\n\nSELECT \n  'LEADS' as entidade,\n  COUNT(*) as total,\n  COUNT(DISTINCT leadHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT leadHash) as duplicatas,\n  COUNT(DISTINCT nome) as nomes_unicos,\n  AVG(qualidadeScore) as media_score\nFROM leads;\n",
+  "rows": [
+    {
+      "entidade": "CLIENTES",
+      "total": "804",
+      "unicos": "804",
+      "duplicatas": "0",
+      "nomes_unicos": "795",
+      "media_clientes_por_mercado": "97.1895"
+    },
+    {
+      "entidade": "MERCADOS",
+      "total": "1991",
+      "unicos": "1991",
+      "duplicatas": "0",
+      "nomes_unicos": "1991",
+      "media_clientes_por_mercado": "1.2150"
+    },
+    {
+      "entidade": "LEADS",
+      "total": "16224",
+      "unicos": "16224",
+      "duplicatas": "0",
+      "nomes_unicos": "7847",
+      "media_clientes_por_mercado": "98.5238"
+    },
+    {
+      "entidade": "CONCORRENTES",
+      "total": "16202",
+      "unicos": "16202",
+      "duplicatas": "0",
+      "nomes_unicos": "9434",
+      "media_clientes_por_mercado": "99.9574"
+    }
+  ],
+  "messages": [],
+  "stdout": "entidade\ttotal\tunicos\tduplicatas\tnomes_unicos\tmedia_clientes_por_mercado\nCLIENTES\t804\t804\t0\t795\t97.1895\nMERCADOS\t1991\t1991\t0\t1991\t1.2150\nLEADS\t16224\t16224\t0\t7847\t98.5238\nCONCORRENTES\t16202\t16202\t0\t9434\t99.9574\n",
+  "stderr": "",
+  "execution_time_ms": 94
+}

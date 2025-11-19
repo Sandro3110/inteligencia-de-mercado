@@ -1,0 +1,46 @@
+{
+  "query": "\n-- Verificar IDs máximos para entender o volume que existiu\nSELECT \n  'Mercados' as entidade,\n  MIN(id) as id_min,\n  MAX(id) as id_max,\n  COUNT(*) as registros_atuais,\n  MAX(id) - MIN(id) + 1 as registros_que_existiram,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados,\n  ROUND(((MAX(id) - MIN(id) + 1) - COUNT(*)) * 100.0 / (MAX(id) - MIN(id) + 1), 2) as percentual_deletado\nFROM mercados_unicos\n\nUNION ALL\n\nSELECT \n  'Clientes' as entidade,\n  MIN(id) as id_min,\n  MAX(id) as id_max,\n  COUNT(*) as registros_atuais,\n  MAX(id) - MIN(id) + 1 as registros_que_existiram,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados,\n  ROUND(((MAX(id) - MIN(id) + 1) - COUNT(*)) * 100.0 / (MAX(id) - MIN(id) + 1), 2) as percentual_deletado\nFROM clientes\n\nUNION ALL\n\nSELECT \n  'Concorrentes' as entidade,\n  MIN(id) as id_min,\n  MAX(id) as id_max,\n  COUNT(*) as registros_atuais,\n  MAX(id) - MIN(id) + 1 as registros_que_existiram,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados,\n  ROUND(((MAX(id) - MIN(id) + 1) - COUNT(*)) * 100.0 / (MAX(id) - MIN(id) + 1), 2) as percentual_deletado\nFROM concorrentes\n\nUNION ALL\n\nSELECT \n  'Leads' as entidade,\n  MIN(id) as id_min,\n  MAX(id) as id_max,\n  COUNT(*) as registros_atuais,\n  MAX(id) - MIN(id) + 1 as registros_que_existiram,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados,\n  ROUND(((MAX(id) - MIN(id) + 1) - COUNT(*)) * 100.0 / (MAX(id) - MIN(id) + 1), 2) as percentual_deletado\nFROM leads;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Verificar IDs máximos para entender o volume que existiu\nSELECT \n  'Mercados' as entidade,\n  MIN(id) as id_min,\n  MAX(id) as id_max,\n  COUNT(*) as registros_atuais,\n  MAX(id) - MIN(id) + 1 as registros_que_existiram,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados,\n  ROUND(((MAX(id) - MIN(id) + 1) - COUNT(*)) * 100.0 / (MAX(id) - MIN(id) + 1), 2) as percentual_deletado\nFROM mercados_unicos\n\nUNION ALL\n\nSELECT \n  'Clientes' as entidade,\n  MIN(id) as id_min,\n  MAX(id) as id_max,\n  COUNT(*) as registros_atuais,\n  MAX(id) - MIN(id) + 1 as registros_que_existiram,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados,\n  ROUND(((MAX(id) - MIN(id) + 1) - COUNT(*)) * 100.0 / (MAX(id) - MIN(id) + 1), 2) as percentual_deletado\nFROM clientes\n\nUNION ALL\n\nSELECT \n  'Concorrentes' as entidade,\n  MIN(id) as id_min,\n  MAX(id) as id_max,\n  COUNT(*) as registros_atuais,\n  MAX(id) - MIN(id) + 1 as registros_que_existiram,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados,\n  ROUND(((MAX(id) - MIN(id) + 1) - COUNT(*)) * 100.0 / (MAX(id) - MIN(id) + 1), 2) as percentual_deletado\nFROM concorrentes\n\nUNION ALL\n\nSELECT \n  'Leads' as entidade,\n  MIN(id) as id_min,\n  MAX(id) as id_max,\n  COUNT(*) as registros_atuais,\n  MAX(id) - MIN(id) + 1 as registros_que_existiram,\n  (MAX(id) - MIN(id) + 1) - COUNT(*) as registros_deletados,\n  ROUND(((MAX(id) - MIN(id) + 1) - COUNT(*)) * 100.0 / (MAX(id) - MIN(id) + 1), 2) as percentual_deletado\nFROM leads;\n",
+  "rows": [
+    {
+      "entidade": "Clientes",
+      "id_min": "2205",
+      "id_max": "391955",
+      "registros_atuais": "808",
+      "registros_que_existiram": "389751",
+      "registros_deletados": "388943",
+      "percentual_deletado": "99.79"
+    },
+    {
+      "entidade": "Mercados",
+      "id_min": "300002",
+      "id_max": "390011",
+      "registros_atuais": "2000",
+      "registros_que_existiram": "90010",
+      "registros_deletados": "88010",
+      "percentual_deletado": "97.78"
+    },
+    {
+      "entidade": "Leads",
+      "id_min": "240002",
+      "id_max": "330101",
+      "registros_atuais": "16304",
+      "registros_que_existiram": "90100",
+      "registros_deletados": "73796",
+      "percentual_deletado": "81.90"
+    },
+    {
+      "entidade": "Concorrentes",
+      "id_min": "240002",
+      "id_max": "330081",
+      "registros_atuais": "16282",
+      "registros_que_existiram": "90080",
+      "registros_deletados": "73798",
+      "percentual_deletado": "81.92"
+    }
+  ],
+  "messages": [],
+  "stdout": "entidade\tid_min\tid_max\tregistros_atuais\tregistros_que_existiram\tregistros_deletados\tpercentual_deletado\nClientes\t2205\t391955\t808\t389751\t388943\t99.79\nMercados\t300002\t390011\t2000\t90010\t88010\t97.78\nLeads\t240002\t330101\t16304\t90100\t73796\t81.90\nConcorrentes\t240002\t330081\t16282\t90080\t73798\t81.92\n",
+  "stderr": "",
+  "execution_time_ms": 70
+}

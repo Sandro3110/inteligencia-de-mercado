@@ -1,0 +1,35 @@
+{
+  "query": "\n-- Análise de associações clientes-mercados\nSELECT \n  'Total de Associações' as metrica,\n  COUNT(*) as valor,\n  NULL as detalhes\nFROM clientes_mercados\n\nUNION ALL\n\nSELECT \n  'Clientes Associados' as metrica,\n  COUNT(DISTINCT clienteId) as valor,\n  CONCAT(ROUND(COUNT(DISTINCT clienteId) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%') as detalhes\nFROM clientes_mercados\n\nUNION ALL\n\nSELECT \n  'Clientes SEM Associação' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%') as detalhes\nFROM clientes c\nWHERE NOT EXISTS (SELECT 1 FROM clientes_mercados cm WHERE cm.clienteId = c.id)\n\nUNION ALL\n\nSELECT \n  'Mercados com Clientes' as metrica,\n  COUNT(DISTINCT mercadoId) as valor,\n  CONCAT(ROUND(COUNT(DISTINCT mercadoId) * 100.0 / (SELECT COUNT(*) FROM mercados_unicos), 2), '%') as detalhes\nFROM clientes_mercados\n\nUNION ALL\n\nSELECT \n  'Média de Clientes por Mercado' as metrica,\n  ROUND(AVG(cliente_count), 2) as valor,\n  NULL as detalhes\nFROM (\n  SELECT mercadoId, COUNT(*) as cliente_count\n  FROM clientes_mercados\n  GROUP BY mercadoId\n) as subquery;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Análise de associações clientes-mercados\nSELECT \n  'Total de Associações' as metrica,\n  COUNT(*) as valor,\n  NULL as detalhes\nFROM clientes_mercados\n\nUNION ALL\n\nSELECT \n  'Clientes Associados' as metrica,\n  COUNT(DISTINCT clienteId) as valor,\n  CONCAT(ROUND(COUNT(DISTINCT clienteId) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%') as detalhes\nFROM clientes_mercados\n\nUNION ALL\n\nSELECT \n  'Clientes SEM Associação' as metrica,\n  COUNT(*) as valor,\n  CONCAT(ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2), '%') as detalhes\nFROM clientes c\nWHERE NOT EXISTS (SELECT 1 FROM clientes_mercados cm WHERE cm.clienteId = c.id)\n\nUNION ALL\n\nSELECT \n  'Mercados com Clientes' as metrica,\n  COUNT(DISTINCT mercadoId) as valor,\n  CONCAT(ROUND(COUNT(DISTINCT mercadoId) * 100.0 / (SELECT COUNT(*) FROM mercados_unicos), 2), '%') as detalhes\nFROM clientes_mercados\n\nUNION ALL\n\nSELECT \n  'Média de Clientes por Mercado' as metrica,\n  ROUND(AVG(cliente_count), 2) as valor,\n  NULL as detalhes\nFROM (\n  SELECT mercadoId, COUNT(*) as cliente_count\n  FROM clientes_mercados\n  GROUP BY mercadoId\n) as subquery;\n",
+  "rows": [
+    {
+      "metrica": "Total de Associações",
+      "valor": "2452.00",
+      "detalhes": "NULL"
+    },
+    {
+      "metrica": "Clientes Associados",
+      "valor": "827.00",
+      "detalhes": "102.86%"
+    },
+    {
+      "metrica": "Mercados com Clientes",
+      "valor": "2023.00",
+      "detalhes": "101.61%"
+    },
+    {
+      "metrica": "Clientes SEM Associação",
+      "valor": "19.00",
+      "detalhes": "2.36%"
+    },
+    {
+      "metrica": "Média de Clientes por Mercado",
+      "valor": "1.21",
+      "detalhes": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "metrica\tvalor\tdetalhes\nTotal de Associações\t2452.00\tNULL\nClientes Associados\t827.00\t102.86%\nMercados com Clientes\t2023.00\t101.61%\nClientes SEM Associação\t19.00\t2.36%\nMédia de Clientes por Mercado\t1.21\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}

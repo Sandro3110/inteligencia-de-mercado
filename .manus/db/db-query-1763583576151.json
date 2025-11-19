@@ -1,0 +1,30 @@
+{
+  "query": "\n-- Análise de produtos enriquecidos\nSELECT \n  'Produtos Preenchidos' as metrica,\n  COUNT(*) as quantidade,\n  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2) as percentual\nFROM clientes\nWHERE produtoPrincipal IS NOT NULL AND produtoPrincipal != ''\n\nUNION ALL\n\nSELECT \n  'Produtos Vazios' as metrica,\n  COUNT(*) as quantidade,\n  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2) as percentual\nFROM clientes\nWHERE produtoPrincipal IS NULL OR produtoPrincipal = ''\n\nUNION ALL\n\nSELECT \n  'Produtos com Descrição Longa (>100 chars)' as metrica,\n  COUNT(*) as quantidade,\n  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes WHERE produtoPrincipal IS NOT NULL), 2) as percentual\nFROM clientes\nWHERE LENGTH(produtoPrincipal) > 100\n\nUNION ALL\n\nSELECT \n  'Tamanho Médio de Produto' as metrica,\n  ROUND(AVG(LENGTH(produtoPrincipal)), 0) as quantidade,\n  NULL as percentual\nFROM clientes\nWHERE produtoPrincipal IS NOT NULL;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Análise de produtos enriquecidos\nSELECT \n  'Produtos Preenchidos' as metrica,\n  COUNT(*) as quantidade,\n  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2) as percentual\nFROM clientes\nWHERE produtoPrincipal IS NOT NULL AND produtoPrincipal != ''\n\nUNION ALL\n\nSELECT \n  'Produtos Vazios' as metrica,\n  COUNT(*) as quantidade,\n  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes), 2) as percentual\nFROM clientes\nWHERE produtoPrincipal IS NULL OR produtoPrincipal = ''\n\nUNION ALL\n\nSELECT \n  'Produtos com Descrição Longa (>100 chars)' as metrica,\n  COUNT(*) as quantidade,\n  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM clientes WHERE produtoPrincipal IS NOT NULL), 2) as percentual\nFROM clientes\nWHERE LENGTH(produtoPrincipal) > 100\n\nUNION ALL\n\nSELECT \n  'Tamanho Médio de Produto' as metrica,\n  ROUND(AVG(LENGTH(produtoPrincipal)), 0) as quantidade,\n  NULL as percentual\nFROM clientes\nWHERE produtoPrincipal IS NOT NULL;\n",
+  "rows": [
+    {
+      "metrica": "Produtos com Descrição Longa (>100 chars)",
+      "quantidade": "675",
+      "percentual": "85.23"
+    },
+    {
+      "metrica": "Tamanho Médio de Produto",
+      "quantidade": "128",
+      "percentual": "NULL"
+    },
+    {
+      "metrica": "Produtos Preenchidos",
+      "quantidade": "792",
+      "percentual": "98.51"
+    },
+    {
+      "metrica": "Produtos Vazios",
+      "quantidade": "12",
+      "percentual": "1.49"
+    }
+  ],
+  "messages": [],
+  "stdout": "metrica\tquantidade\tpercentual\nProdutos com Descrição Longa (>100 chars)\t675\t85.23\nTamanho Médio de Produto\t128\tNULL\nProdutos Preenchidos\t792\t98.51\nProdutos Vazios\t12\t1.49\n",
+  "stderr": "",
+  "execution_time_ms": 76
+}
