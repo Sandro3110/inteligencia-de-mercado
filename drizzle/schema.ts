@@ -496,3 +496,31 @@ export const leadsHistory = mysqlTable("leads_history", {
 
 export type LeadHistory = typeof leadsHistory.$inferSelect;
 export type InsertLeadHistory = typeof leadsHistory.$inferInsert;
+
+/**
+ * Enrichment Jobs - Controle de processamento em lote
+ */
+export const enrichmentJobs = mysqlTable("enrichment_jobs", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  status: mysqlEnum("status", ["pending", "running", "paused", "completed", "failed"]).default("pending").notNull(),
+  totalClientes: int("totalClientes").notNull(),
+  processedClientes: int("processedClientes").default(0).notNull(),
+  successClientes: int("successClientes").default(0).notNull(),
+  failedClientes: int("failedClientes").default(0).notNull(),
+  currentBatch: int("currentBatch").default(0).notNull(),
+  totalBatches: int("totalBatches").notNull(),
+  batchSize: int("batchSize").default(5).notNull(),
+  checkpointInterval: int("checkpointInterval").default(50).notNull(),
+  startedAt: timestamp("startedAt"),
+  pausedAt: timestamp("pausedAt"),
+  completedAt: timestamp("completedAt"),
+  estimatedTimeRemaining: int("estimatedTimeRemaining"), // em segundos
+  lastClienteId: int("lastClienteId"), // último cliente processado (para retomar)
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type EnrichmentJob = typeof enrichmentJobs.$inferSelect;
+export type InsertEnrichmentJob = typeof enrichmentJobs.$inferInsert;

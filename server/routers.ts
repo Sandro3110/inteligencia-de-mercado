@@ -1261,6 +1261,59 @@ export const appRouter = router({
         const { estimateBatchCost } = await import('./enrichmentBatch');
         return estimateBatchCost(input.numClientes);
       }),
+
+    // Job Manager - Pausa/Retomar
+    createJob: publicProcedure
+      .input(z.object({ 
+        projectId: z.number(),
+        batchSize: z.number().optional(),
+        checkpointInterval: z.number().optional()
+      }))
+      .mutation(async ({ input }) => {
+        const { createEnrichmentJob } = await import('./enrichmentJobManager');
+        return createEnrichmentJob(input.projectId, {
+          batchSize: input.batchSize,
+          checkpointInterval: input.checkpointInterval,
+        });
+      }),
+
+    startJob: publicProcedure
+      .input(z.object({ jobId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { startEnrichmentJob } = await import('./enrichmentJobManager');
+        await startEnrichmentJob(input.jobId);
+        return { success: true };
+      }),
+
+    pauseJob: publicProcedure
+      .input(z.object({ jobId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { pauseEnrichmentJob } = await import('./enrichmentJobManager');
+        await pauseEnrichmentJob(input.jobId);
+        return { success: true };
+      }),
+
+    cancelJob: publicProcedure
+      .input(z.object({ jobId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { cancelEnrichmentJob } = await import('./enrichmentJobManager');
+        await cancelEnrichmentJob(input.jobId);
+        return { success: true };
+      }),
+
+    getJobProgress: publicProcedure
+      .input(z.object({ jobId: z.number() }))
+      .query(async ({ input }) => {
+        const { getJobProgress } = await import('./enrichmentJobManager');
+        return getJobProgress(input.jobId);
+      }),
+
+    listJobs: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { listProjectJobs } = await import('./enrichmentJobManager');
+        return listProjectJobs(input.projectId);
+      }),
   }),
 });
 export type AppRouter = typeof appRouter;
