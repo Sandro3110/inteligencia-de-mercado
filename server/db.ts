@@ -7,7 +7,8 @@ import {
   concorrentes, leads,
   projectTemplates, ProjectTemplate, InsertProjectTemplate,
   notifications, Notification, InsertNotification,
-  MercadoUnico, Cliente, Concorrente, Lead
+  MercadoUnico, Cliente, Concorrente, Lead,
+  activityLog, ActivityLog, InsertActivityLog
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -2334,4 +2335,40 @@ export async function getFunnelData(projectId: number) {
     conversionRates,
     totalLeads: Object.values(stageCounts).reduce((sum, count) => sum + count, 0),
   };
+}
+
+
+/**
+ * Activity Log Functions
+ */
+export async function logActivity(data: InsertActivityLog) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    await db.insert(activityLog).values(data);
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to log activity:", error);
+    return false;
+  }
+}
+
+export async function getRecentActivities(projectId: number, limit: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const activities = await db
+      .select()
+      .from(activityLog)
+      .where(eq(activityLog.projectId, projectId))
+      .orderBy(desc(activityLog.createdAt))
+      .limit(limit);
+
+    return activities;
+  } catch (error) {
+    console.error("[Database] Failed to get recent activities:", error);
+    return [];
+  }
 }

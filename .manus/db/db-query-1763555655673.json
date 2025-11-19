@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS activity_log (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  projectId INT NOT NULL,\n  activityType VARCHAR(50) NOT NULL,\n  description TEXT,\n  metadata JSON,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_project (projectId),\n  INDEX idx_type (activityType),\n  INDEX idx_created (createdAt)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute CREATE TABLE IF NOT EXISTS activity_log (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  projectId INT NOT NULL,\n  activityType VARCHAR(50) NOT NULL,\n  description TEXT,\n  metadata JSON,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_project (projectId),\n  INDEX idx_type (activityType),\n  INDEX idx_created (createdAt)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 301
+}

@@ -1,4 +1,4 @@
-import { mysqlEnum, mysqlTable, text, timestamp, varchar, int, boolean, decimal } from "drizzle-orm/mysql-core";
+import { mysqlEnum, mysqlTable, text, timestamp, varchar, int, boolean, decimal, json } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -371,3 +371,18 @@ export const leadConversions = mysqlTable("lead_conversions", {
 
 export type LeadConversion = typeof leadConversions.$inferSelect;
 export type InsertLeadConversion = typeof leadConversions.$inferInsert;
+
+/**
+ * Activity Log - Track system activities
+ */
+export const activityLog = mysqlTable("activity_log", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  activityType: varchar("activityType", { length: 50 }).notNull(),
+  description: text("description"),
+  metadata: json("metadata"),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type ActivityLog = typeof activityLog.$inferSelect;
+export type InsertActivityLog = typeof activityLog.$inferInsert;

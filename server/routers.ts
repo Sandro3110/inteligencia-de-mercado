@@ -977,6 +977,15 @@ export const appRouter = router({
         );
       }),
   }),
+
+  activity: router({
+    recent: publicProcedure
+      .input(z.object({ projectId: z.number(), limit: z.number().optional().default(30) }))
+      .query(async ({ input }) => {
+        const { getRecentActivities } = await import('./db');
+        return getRecentActivities(input.projectId, input.limit);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

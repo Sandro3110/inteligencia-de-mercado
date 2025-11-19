@@ -109,6 +109,54 @@ export default function Mercados() {
                 {exportMutation.isPending ? 'Exportando...' : 'Exportar Excel'}
               </Button>
             </div>
+            
+            {/* Painel de Filtros */}
+            {showFilters && (
+              <div className="mt-4 p-4 bg-muted/50 rounded-lg border border-border">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Categoria/CNAE</label>
+                    <Input
+                      placeholder="Ex: Tecnologia, Saúde..."
+                      value={categoria}
+                      onChange={(e) => setCategoria(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Segmentação</label>
+                    <select
+                      value={segmentacao}
+                      onChange={(e) => setSegmentacao(e.target.value)}
+                      className="w-full px-3 py-2 border border-input bg-background rounded-md"
+                    >
+                      <option value="">Todos</option>
+                      <option value="B2B">B2B</option>
+                      <option value="B2C">B2C</option>
+                    </select>
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setCategoria("");
+                        setSegmentacao("");
+                      }}
+                      className="w-full"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Limpar Filtros
+                    </Button>
+                  </div>
+                </div>
+                {(categoria || segmentacao) && (
+                  <div className="mt-3 text-sm text-muted-foreground">
+                    {[categoria && `Categoria: ${categoria}`, segmentacao && `Segmentação: ${segmentacao}`]
+                      .filter(Boolean)
+                      .join(' • ')}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

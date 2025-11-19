@@ -113,6 +113,13 @@
       "when": 1763553022164,
       "tag": "0015_redundant_masked_marvel",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1763556059200,
+      "tag": "0016_curly_daredevil",
+      "breakpoints": true
     }
   ]
 }
