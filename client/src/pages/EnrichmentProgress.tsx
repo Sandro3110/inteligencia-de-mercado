@@ -5,10 +5,12 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, CheckCircle2, Clock, TrendingUp, Pause, Play, History } from "lucide-react";
+import { RefreshCw, CheckCircle2, Clock, TrendingUp, Pause, Play, History, CalendarPlus } from "lucide-react";
 import EvolutionCharts from "@/components/EvolutionCharts";
 import HistoryFilters, { FilterState } from "@/components/HistoryFilters";
 import { exportToCSV, exportToPDF } from "@/lib/exportHistory";
+import { ScheduleEnrichment } from "@/components/ScheduleEnrichment";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function EnrichmentProgress() {
   const { selectedProjectId } = useSelectedProject();
@@ -21,6 +23,7 @@ export default function EnrichmentProgress() {
     durationMax: "",
   });
   const [filteredHistory, setFilteredHistory] = useState<any[]>([]);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
 
   // Query com polling automático a cada 5 segundos
   // Usa projectId selecionado ou 1 como fallback
@@ -166,14 +169,24 @@ export default function EnrichmentProgress() {
               Acompanhe em tempo real o processamento dos clientes
             </p>
           </div>
-          <Button
-            onClick={handleManualRefresh}
-            variant="outline"
-            className="gap-2"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Atualizar
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleManualRefresh}
+              variant="outline"
+              className="gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Atualizar
+            </Button>
+            <Button
+              onClick={() => setShowScheduleModal(true)}
+              variant="outline"
+              className="gap-2 border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+            >
+              <CalendarPlus className="w-4 h-4" />
+              Agendar
+            </Button>
+          </div>
         </div>
 
         {/* Status Badge */}
@@ -453,6 +466,16 @@ export default function EnrichmentProgress() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal de Agendamento */}
+      <Dialog open={showScheduleModal} onOpenChange={setShowScheduleModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-2xl text-slate-100">Agendamento de Enriquecimento</DialogTitle>
+          </DialogHeader>
+          <ScheduleEnrichment projectId={projectId} onClose={() => setShowScheduleModal(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

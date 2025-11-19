@@ -2068,3 +2068,31 @@
 - [ ] Testar geração de relatórios
 - [ ] Validar integração entre sistemas
 - [ ] Criar checkpoint final
+
+
+## Fase 31: Interface Completa de Agendamento
+
+### 31.1 Routers tRPC de Agendamento
+- [x] Criar router schedule.create
+- [x] Criar router schedule.list
+- [x] Criar router schedule.cancel
+- [x] Criar router schedule.delete
+
+### 31.2 Componente ScheduleEnrichment
+- [x] Criar componente ScheduleEnrichment.tsx
+- [x] Implementar date/time picker
+- [x] Implementar seletor de recorrência (única, diária, semanal)
+- [x] Implementar configurações de lote (tamanho, max clientes)
+- [x] Adicionar validação de formulário
+
+### 31.3 Integração e Lista de Agendamentos
+- [x] Criar lista de agendamentos futuros
+- [x] Adicionar botão "Agendar Enriquecimento" na página de progresso
+- [x] Implementar modal de agendamento
+- [x] Adicionar ações (cancelar, deletar) nos agendamentos
+
+### 31.4 Testes
+- [x] Testar criação de agendamento
+- [x] Testar listagem de agendamentos
+- [x] Testar cancelamento
+- [x] Criar checkpoint
