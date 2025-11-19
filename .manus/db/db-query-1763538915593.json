@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COUNT(DISTINCT nome) as mercados_unicos, COUNT(*) as total_registros\nFROM mercados_unicos\nWHERE projectId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT COUNT(DISTINCT nome) as mercados_unicos, COUNT(*) as total_registros\nFROM mercados_unicos\nWHERE projectId = 1;",
+  "rows": [
+    {
+      "mercados_unicos": "285",
+      "total_registros": "285"
+    }
+  ],
+  "messages": [],
+  "stdout": "mercados_unicos\ttotal_registros\n285\t285\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

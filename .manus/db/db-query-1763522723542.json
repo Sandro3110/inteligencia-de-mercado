@@ -1,0 +1,16 @@
+{
+  "query": "-- Limpar produtos dos clientes\nUPDATE clientes SET produtoPrincipal = NULL WHERE projectId = 1;\n\n-- Deletar associações clientes-mercados\nDELETE FROM clientes_mercados WHERE clienteId IN (SELECT id FROM clientes WHERE projectId = 1);\n\n-- Deletar mercados únicos\nDELETE FROM mercados_unicos WHERE projectId = 1;\n\n-- Deletar concorrentes\nDELETE FROM concorrentes WHERE projectId = 1;\n\n-- Deletar leads\nDELETE FROM leads WHERE projectId = 1;\n\n-- Verificar limpeza\nSELECT \n  (SELECT COUNT(*) FROM clientes WHERE projectId = 1) as clientes_restantes,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE projectId = 1) as mercados_deletados,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = 1) as concorrentes_deletados,\n  (SELECT COUNT(*) FROM leads WHERE projectId = 1) as leads_deletados;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute -- Limpar produtos dos clientes\nUPDATE clientes SET produtoPrincipal = NULL WHERE projectId = 1;\n\n-- Deletar associações clientes-mercados\nDELETE FROM clientes_mercados WHERE clienteId IN (SELECT id FROM clientes WHERE projectId = 1);\n\n-- Deletar mercados únicos\nDELETE FROM mercados_unicos WHERE projectId = 1;\n\n-- Deletar concorrentes\nDELETE FROM concorrentes WHERE projectId = 1;\n\n-- Deletar leads\nDELETE FROM leads WHERE projectId = 1;\n\n-- Verificar limpeza\nSELECT \n  (SELECT COUNT(*) FROM clientes WHERE projectId = 1) as clientes_restantes,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE projectId = 1) as mercados_deletados,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = 1) as concorrentes_deletados,\n  (SELECT COUNT(*) FROM leads WHERE projectId = 1) as leads_deletados;",
+  "rows": [
+    {
+      "clientes_restantes": "801",
+      "mercados_deletados": "0",
+      "concorrentes_deletados": "0",
+      "leads_deletados": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "clientes_restantes\tmercados_deletados\tconcorrentes_deletados\tleads_deletados\n801\t0\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 218
+}

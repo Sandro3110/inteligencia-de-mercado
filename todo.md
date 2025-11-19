@@ -1792,3 +1792,88 @@
 - [ ] Criar endpoint tRPC `enrichment.enrichClienteFaseado`
 - [ ] Criar página de enriquecimento na aplicação
 - [ ] Criar checkpoint do enriquecimento faseado
+
+
+---
+
+## Fase 23: Otimização de Performance do Enriquecimento ⚡
+
+### 23.1 Análise de Gargalos
+- [ ] Medir tempo de cada fase individualmente
+- [ ] Identificar chamadas LLM mais lentas
+- [ ] Analisar tempo de gravação no banco
+- [ ] Calcular tempo total atual (baseline)
+
+### 23.2 Otimizações Propostas
+- [ ] **Paralelização de chamadas LLM** - Gerar concorrentes e leads em paralelo
+- [ ] **Batch insert no banco** - Gravar 20 concorrentes de uma vez ao invés de 20 INSERTs
+- [ ] **Cache de empresas existentes** - Carregar lista uma vez ao invés de consultar 30+ vezes
+- [ ] **Reduzir quantidade gerada pelo Gemini** - Gerar 25 ao invés de 30 (1.2x ao invés de 1.5x)
+- [ ] **Streaming de respostas** - Processar resultados conforme chegam
+
+### 23.3 Implementação
+- [ ] Implementar paralelização de Fase 4 e Fase 5
+- [ ] Implementar batch insert para concorrentes e leads
+- [ ] Implementar cache de empresas existentes
+- [ ] Testar performance com 1 cliente
+
+### 23.4 Validação
+- [ ] Comparar tempo antes/depois
+- [ ] Validar que não há regressão de qualidade
+- [ ] Criar checkpoint com otimizações
+
+
+---
+
+## Fase 24: Enriquecimento Completo de 800 Clientes 🚀
+
+### 24.1 Preparação
+- [ ] Deletar produtos antigos (campo produtoPrincipal dos clientes)
+- [ ] Deletar mercados antigos e associações
+- [ ] Deletar concorrentes antigos
+- [ ] Deletar leads antigos
+- [ ] Manter apenas dados básicos dos clientes (nome, CNPJ)
+
+### 24.2 Script de Processamento em Lotes
+- [ ] Criar script que processa 50 clientes por vez
+- [ ] Implementar checkpoint automático a cada lote
+- [ ] Implementar retry em caso de erro
+- [ ] Salvar progresso em arquivo para retomar se necessário
+
+### 24.3 Execução Automática
+- [ ] Lote 1-50 (clientes 1-50)
+- [ ] Lote 2-50 (clientes 51-100)
+- [ ] ... (continuar até 800)
+- [ ] Lote 16-50 (clientes 751-800)
+
+### 24.4 Validação
+- [ ] Verificar total de registros criados
+- [ ] Validar que não há duplicatas
+- [ ] Gerar relatório final com estatísticas
+- [ ] Criar checkpoint final
+
+
+---
+
+## Fase 25: Unicidade de Mercados 🔄
+
+### 25.1 Problema Identificado
+- [ ] 100 clientes geraram 100+ mercados (duplicatas)
+- [ ] Mercados com mesmo nome estão sendo criados múltiplas vezes
+- [ ] Exemplo: "Indústria Automotiva" criado para cada cliente
+
+### 25.2 Implementação
+- [ ] Parar processamento atual
+- [ ] Adicionar verificação de mercado existente antes de criar
+- [ ] Reusar mercado existente ao invés de criar duplicata
+- [ ] Atualizar `enrichClienteFase3()` com lógica de reuso
+
+### 25.3 Limpeza
+- [x] Identificar mercados duplicados no banco (19 mercados tinham duplicatas)
+- [x] Consolidar mercados com mesmo nome (deletados duplicados)
+- [x] Resultado: 100 mercados únicos mantidos
+
+### 25.4 Testes
+- [ ] Testar que mercado existente é reusado
+- [ ] Validar que não há duplicatas após correção
+- [ ] Reiniciar enriquecimento dos 800 clientes

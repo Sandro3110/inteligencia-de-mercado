@@ -8,6 +8,7 @@ import {
   createConcorrente,
   createLead,
 } from "./db";
+import { getMercadoByNome } from "./getMercadoByNome";
 import {
   generateConcorrentesUnicos,
   generateLeadsUnicos,
@@ -221,30 +222,41 @@ Retorne APENAS JSON válido, sem markdown.`;
 
     // Gravar cada mercado e associar ao cliente
     for (const mercadoData of resultado.mercados || []) {
-      const mercadoCreated = await createMercado({
-        projectId,
-        nome: mercadoData.nome,
-        segmentacao: (mercadoData.segmentacao as "B2B" | "B2C" | "B2B2C") || null,
-        categoria: mercadoData.categoria || null,
-        tamanhoMercado: mercadoData.tamanhoMercado || null,
-        crescimentoAnual: mercadoData.crescimentoAnual || null,
-        tendencias: mercadoData.tendencias || null,
-        principaisPlayers: mercadoData.principaisPlayers
-          ? JSON.stringify(mercadoData.principaisPlayers)
-          : null,
+      // Verificar se mercado já existe
+      const mercadoExistente = await getMercadoByNome(projectId, mercadoData.nome);
+      
+      let mercadoId: number;
+      
+      if (mercadoExistente) {
+        // Reusar mercado existente
+        mercadoId = mercadoExistente.id;
+        console.log(`[Fase 3] Mercado "${mercadoData.nome}" já existe (ID: ${mercadoId}) - Reusando`);
+      } else {
+        // Criar novo mercado
+        const mercadoCreated = await createMercado({
+          projectId,
+          nome: mercadoData.nome,
+          segmentacao: (mercadoData.segmentacao as "B2B" | "B2C" | "B2B2C") || null,
+          categoria: mercadoData.categoria || null,
+          tamanhoMercado: mercadoData.tamanhoMercado || null,
+          crescimentoAnual: mercadoData.crescimentoAnual || null,
+          tendencias: mercadoData.tendencias || null,
+          principaisPlayers: mercadoData.principaisPlayers
+            ? JSON.stringify(mercadoData.principaisPlayers)
+            : null,
+        });
 
-      });
-
-      const mercadoId = mercadoCreated?.id;
-      if (!mercadoId) {
-        throw new Error(`Falha ao criar mercado: ${mercadoData.nome}`);
+        if (!mercadoCreated?.id) {
+          throw new Error(`Falha ao criar mercado: ${mercadoData.nome}`);
+        }
+        mercadoId = mercadoCreated.id;
+        console.log(`[Fase 3] Mercado "${mercadoData.nome}" criado (ID: ${mercadoId})`);
       }
 
       // Associar cliente ao mercado
       await associateClienteToMercado(clienteId, mercadoId);
 
       mercadosIds.push(mercadoId);
-      console.log(`[Fase 3] Mercado "${mercadoData.nome}" gravado (ID: ${mercadoId})`);
     }
 
     return {

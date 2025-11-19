@@ -48,7 +48,7 @@ export const validationStatusEnum = mysqlEnum("validationStatus", [
 export const mercadosUnicos = mysqlTable("mercados_unicos", {
   id: int("id").primaryKey().autoincrement(),
   projectId: int("projectId").notNull(),
-  mercadoHash: varchar("mercadoHash", { length: 64 }),
+  mercadoHash: varchar("mercadoHash", { length: 255 }),
   nome: varchar("nome", { length: 255 }).notNull(),
   segmentacao: varchar("segmentacao", { length: 50 }),
   categoria: varchar("categoria", { length: 100 }),

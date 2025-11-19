@@ -1,0 +1,17 @@
+{
+  "query": "SELECT \n  (SELECT COUNT(*) FROM clientes WHERE projectId = 1) as total_clientes,\n  (SELECT COUNT(*) FROM clientes WHERE projectId = 1 AND produtoPrincipal IS NOT NULL) as clientes_enriquecidos,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE projectId = 1) as total_mercados,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = 1) as total_concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE projectId = 1) as total_leads;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  (SELECT COUNT(*) FROM clientes WHERE projectId = 1) as total_clientes,\n  (SELECT COUNT(*) FROM clientes WHERE projectId = 1 AND produtoPrincipal IS NOT NULL) as clientes_enriquecidos,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE projectId = 1) as total_mercados,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = 1) as total_concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE projectId = 1) as total_leads;",
+  "rows": [
+    {
+      "total_clientes": "900",
+      "clientes_enriquecidos": "99",
+      "total_mercados": "293",
+      "total_concorrentes": "1920",
+      "total_leads": "1898"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_clientes\tclientes_enriquecidos\ttotal_mercados\ttotal_concorrentes\ttotal_leads\n900\t99\t293\t1920\t1898\n",
+  "stderr": "",
+  "execution_time_ms": 95
+}

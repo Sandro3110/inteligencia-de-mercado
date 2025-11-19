@@ -1,0 +1,86 @@
+{
+  "query": "SELECT nome, COUNT(*) as quantidade\nFROM mercados_unicos\nWHERE projectId = 1\nGROUP BY nome\nHAVING COUNT(*) > 1\nORDER BY quantidade DESC\nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT nome, COUNT(*) as quantidade\nFROM mercados_unicos\nWHERE projectId = 1\nGROUP BY nome\nHAVING COUNT(*) > 1\nORDER BY quantidade DESC\nLIMIT 20;",
+  "rows": [
+    {
+      "nome": "Construção Civil e Infraestrutura",
+      "quantidade": "3"
+    },
+    {
+      "nome": "Setor de Construção Civil e Infraestrutura",
+      "quantidade": "3"
+    },
+    {
+      "nome": "Indústria Metalúrgica e de Transformação",
+      "quantidade": "3"
+    },
+    {
+      "nome": "Distribuição e Revenda de Insumos Agrícolas",
+      "quantidade": "3"
+    },
+    {
+      "nome": "Construção Civil e Incorporação Imobiliária (B2B2C)",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Agricultura de Commodities (Grãos e Fibras)",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Indústria Automotiva e de Autopeças",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Fertilizantes e Nutrição Vegetal",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Hospitalidade e Hotelaria (Setor Hoteleiro)",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Setor de Óleo, Gás e Energia",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Indústria Automotiva (Componentes Internos)",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Distribuição e Revenda Agropecuária",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Indústria Automotiva e de Transportes",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Construção Civil Pesada e Infraestrutura",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Varejo Alimentar (Supermercados e Hipermercados)",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Food Service e Hospitalidade",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Indústria de Alimentos e Bebidas",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Alimentos e Bebidas (Food & Beverage)",
+      "quantidade": "2"
+    },
+    {
+      "nome": "Embalagens Industriais e Agronegócio",
+      "quantidade": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "nome\tquantidade\nConstrução Civil e Infraestrutura\t3\nSetor de Construção Civil e Infraestrutura\t3\nIndústria Metalúrgica e de Transformação\t3\nDistribuição e Revenda de Insumos Agrícolas\t3\nConstrução Civil e Incorporação Imobiliária (B2B2C)\t2\nAgricultura de Commodities (Grãos e Fibras)\t2\nIndústria Automotiva e de Autopeças\t2\nFertilizantes e Nutrição Vegetal\t2\nHospitalidade e Hotelaria (Setor Hoteleiro)\t2\nSetor de Óleo, Gás e Energia\t2\nIndústria Automotiva (Componentes Internos)\t2\nDistribuição e Revenda Agropecuária\t2\nIndústria Automotiva e de Transportes\t2\nConstrução Civil Pesada e Infraestrutura\t2\nVarejo Alimentar (Supermercados e Hipermercados)\t2\nFood Service e Hospitalidade\t2\nIndústria de Alimentos e Bebidas\t2\nAlimentos e Bebidas (Food & Beverage)\t2\nEmbalagens Industriais e Agronegócio\t2\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}
