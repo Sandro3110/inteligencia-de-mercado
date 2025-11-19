@@ -1,4 +1,4 @@
-import { mysqlEnum, mysqlTable, text, timestamp, varchar, int, boolean } from "drizzle-orm/mysql-core";
+import { mysqlEnum, mysqlTable, text, timestamp, varchar, int, boolean, decimal } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -349,3 +349,25 @@ export const alertHistory = mysqlTable("alert_history", {
 
 export type AlertHistory = typeof alertHistory.$inferSelect;
 export type InsertAlertHistory = typeof alertHistory.$inferInsert;
+
+/**
+ * Lead Conversions - Rastreamento de leads convertidos em clientes
+ */
+export const conversionStatusEnum = mysqlEnum("conversionStatus", [
+  "won",
+  "lost",
+]);
+
+export const leadConversions = mysqlTable("lead_conversions", {
+  id: int("id").primaryKey().autoincrement(),
+  leadId: int("leadId").notNull(),
+  projectId: int("projectId").notNull(),
+  dealValue: decimal("dealValue", { precision: 15, scale: 2 }),
+  convertedAt: timestamp("convertedAt").defaultNow().notNull(),
+  notes: text("notes"),
+  status: conversionStatusEnum.default("won").notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type LeadConversion = typeof leadConversions.$inferSelect;
+export type InsertLeadConversion = typeof leadConversions.$inferInsert;

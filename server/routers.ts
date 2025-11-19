@@ -855,6 +855,52 @@ export const appRouter = router({
       }),
   }),
 
+  // Conversões de Leads
+  conversion: router({
+    create: publicProcedure
+      .input(z.object({
+        leadId: z.number(),
+        projectId: z.number(),
+        dealValue: z.number().optional(),
+        notes: z.string().optional(),
+        status: z.enum(['won', 'lost']).default('won'),
+      }))
+      .mutation(async ({ input }) => {
+        const { createLeadConversion } = await import('./db');
+        const conversionData = {
+          ...input,
+          dealValue: input.dealValue ? input.dealValue.toString() : undefined,
+        };
+        await createLeadConversion(conversionData as any);
+        return { success: true };
+      }),
+
+    list: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getLeadConversions } = await import('./db');
+        return await getLeadConversions(input.projectId);
+      }),
+
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteLeadConversion } = await import('./db');
+        await deleteLeadConversion(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // Métricas de ROI
+  roi: router({
+    metrics: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { calculateROIMetrics } = await import('./db');
+        return await calculateROIMetrics(input.projectId);
+      }),
+  }),
+
   // Relatórios Executivos
   reports: router({
     generate: publicProcedure

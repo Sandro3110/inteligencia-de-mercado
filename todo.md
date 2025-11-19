@@ -2442,3 +2442,125 @@
 - [ ] Testar dashboard de ROI
 - [ ] Testar marcação de conversão
 - [ ] Criar checkpoint final
+
+
+---
+
+## Fase 37: Dashboard de ROI e Conversão 💰
+
+### 37.1 Backend - Tabela de Conversões
+- [x] Criar tabela lead_conversions no schema.ts
+- [x] Campos: id, leadId, projectId, convertedAt, dealValue, notes, status
+- [x] Executar criação via SQL
+- [x] Criar funções CRUD no db.ts
+
+### 37.2 Backend - Métricas de ROI
+- [x] Criar função calculateROIMetrics() no backend
+- [x] Calcular taxa de conversão por mercado
+- [x] Calcular valor médio de deal
+- [x] Calcular ROI total do projeto
+
+### 37.3 Backend - Routers tRPC
+- [x] Criar router conversion.create
+- [x] Criar router conversion.list
+- [x] Criar router roi.metrics
+
+### 37.4 Frontend - Página de ROI
+- [x] Criar página ROIDashboard.tsx
+- [x] Adicionar rota /roi no App.tsx
+- [x] Implementar cards de métricas principais
+- [x] Criar tabela de leads convertidos
+- [x] Adicionar formulário para marcar lead como convertido
+
+---
+
+## Fase 38: Agendamento de Enriquecimento Recorrente ⏰
+
+### 38.1 Backend - Sistema de Agendamento
+- [ ] Verificar tabela scheduled_enrichments existente
+- [ ] Criar função scheduleRecurringEnrichment() no db.ts
+- [ ] Implementar lógica de recorrência (diário, semanal, mensal)
+
+### 38.2 Backend - Routers tRPC
+- [ ] Criar router schedule.create
+- [ ] Criar router schedule.list
+- [ ] Criar router schedule.delete
+
+### 38.3 Frontend - Interface de Agendamento
+- [ ] Criar componente ScheduleEnrichment.tsx
+- [ ] Adicionar seletor de frequência (diário, semanal, mensal)
+- [ ] Adicionar seletor de horário
+- [ ] Mostrar lista de agendamentos ativos
+
+---
+
+## Fase 39: Visualizações de Funil de Vendas 📊
+
+### 39.1 Backend - Dados do Funil
+- [ ] Criar função getFunnelData() no db.ts
+- [ ] Contar leads por estágio
+- [ ] Calcular taxa de conversão entre estágios
+
+### 39.2 Backend - Router tRPC
+- [ ] Criar router funnel.data
+
+### 39.3 Frontend - Visualização
+- [ ] Criar página FunnelView.tsx
+- [ ] Implementar gráfico de funil com recharts
+- [ ] Adicionar métricas de conversão entre estágios
+- [ ] Identificar gargalos visualmente
+
+---
+
+## Fase 40: Redesign Completo - Tema Branco Moderno 🎨
+
+### 40.1 Sistema de Cores
+- [ ] Atualizar index.css com tema light
+- [ ] Definir paleta de cores vibrantes (azul, verde, laranja, roxo, rosa)
+- [ ] Atualizar variáveis CSS para tema claro
+
+### 40.2 Componentes Base
+- [ ] Atualizar Button com cores vibrantes
+- [ ] Atualizar Card com sombras suaves
+- [ ] Atualizar Badge com cores alegres
+- [ ] Adicionar ícones coloridos em todos os componentes
+
+### 40.3 Páginas Principais
+- [ ] Redesign Home/CascadeView
+- [ ] Redesign Dashboard
+- [ ] Redesign EnrichmentFlow
+- [ ] Redesign todas as páginas com tema claro
+
+### 40.4 Navegação
+- [ ] Atualizar MainNav com ícones coloridos
+- [ ] Adicionar gradientes suaves
+- [ ] Melhorar espaçamento e hierarquia visual
+
+---
+
+## Fase 41: Atualização de Rotas e Menus 🗺️
+
+### 41.1 Auditoria de Rotas
+- [ ] Listar todas as rotas implementadas
+- [ ] Verificar rotas faltantes no App.tsx
+- [ ] Adicionar rotas de ROI, Funil, Agendamento
+
+### 41.2 Atualização do MainNav
+- [ ] Adicionar item "ROI" no menu
+- [ ] Adicionar item "Funil" no menu
+- [ ] Reorganizar ordem dos itens
+- [ ] Adicionar ícones coloridos
+
+### 41.3 Breadcrumbs
+- [ ] Verificar breadcrumbs em todas as páginas
+- [ ] Adicionar onde estiver faltando
+
+---
+
+## Fase 42: Testes e Validação Final 🧪
+- [ ] Testar Dashboard de ROI
+- [ ] Testar Agendamento
+- [ ] Testar Funil de Vendas
+- [ ] Testar tema claro em todas as páginas
+- [ ] Verificar navegação completa
+- [ ] Criar checkpoint final

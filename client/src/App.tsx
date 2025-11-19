@@ -16,6 +16,7 @@ import EnrichmentProgress from "./pages/EnrichmentProgress";
 import AlertsPage from "./pages/AlertsPage";
 import AlertHistoryPage from "./pages/AlertHistoryPage";
 import ReportsPage from "./pages/ReportsPage";
+import ROIDashboard from "./pages/ROIDashboard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/alertas" component={AlertsPage} />
       <Route path="/alertas/historico" component={AlertHistoryPage} />
       <Route path="/relatorios" component={ReportsPage} />
+      <Route path="/roi" component={ROIDashboard} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

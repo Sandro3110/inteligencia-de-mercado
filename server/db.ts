@@ -2062,7 +2062,7 @@ export async function deleteScheduledEnrichment(id: number) {
 
 // ========== Alert Configs Functions ==========
 
-import { alertConfigs, InsertAlertConfig, alertHistory, InsertAlertHistory } from "../drizzle/schema";
+import { alertConfigs, InsertAlertConfig, alertHistory, InsertAlertHistory, leadConversions, InsertLeadConversion } from "../drizzle/schema";
 
 export async function createAlertConfig(config: InsertAlertConfig) {
   const db = await getDb();
@@ -2135,4 +2135,107 @@ export async function getAlertHistory(
     .offset(options?.offset || 0);
   
   return results;
+}
+
+// ============================================
+// LEAD CONVERSIONS HELPERS
+// ============================================
+
+export async function createLeadConversion(conversion: InsertLeadConversion) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const result = await db.insert(leadConversions).values(conversion);
+  return result;
+}
+
+export async function getLeadConversions(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const results = await db
+    .select()
+    .from(leadConversions)
+    .where(eq(leadConversions.projectId, projectId))
+    .orderBy(desc(leadConversions.convertedAt));
+  
+  return results;
+}
+
+export async function deleteLeadConversion(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  await db
+    .delete(leadConversions)
+    .where(eq(leadConversions.id, id));
+}
+
+// ============================================
+// ROI METRICS HELPERS
+// ============================================
+
+export async function calculateROIMetrics(projectId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Total de leads
+  const totalLeadsResult = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(leads)
+    .where(eq(leads.projectId, projectId));
+  const totalLeads = totalLeadsResult[0]?.count || 0;
+  
+  // Total de conversões (won)
+  const conversionsResult = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(leadConversions)
+    .where(and(
+      eq(leadConversions.projectId, projectId),
+      eq(leadConversions.status, 'won')
+    ));
+  const totalConversions = conversionsResult[0]?.count || 0;
+  
+  // Valor total de deals
+  const dealValueResult = await db
+    .select({ total: sql<number>`SUM(dealValue)` })
+    .from(leadConversions)
+    .where(and(
+      eq(leadConversions.projectId, projectId),
+      eq(leadConversions.status, 'won')
+    ));
+  const totalDealValue = dealValueResult[0]?.total || 0;
+  
+  // Taxa de conversão
+  const conversionRate = totalLeads > 0 ? (totalConversions / totalLeads) * 100 : 0;
+  
+  // Valor médio de deal
+  const averageDealValue = totalConversions > 0 ? totalDealValue / totalConversions : 0;
+  
+  // Conversões por mercado
+  const conversionsByMarketResult = await db
+    .select({
+      mercadoId: leads.mercadoId,
+      mercadoNome: mercadosUnicos.nome,
+      conversions: sql<number>`COUNT(${leadConversions.id})`,
+      totalValue: sql<number>`SUM(${leadConversions.dealValue})`,
+    })
+    .from(leadConversions)
+    .innerJoin(leads, eq(leadConversions.leadId, leads.id))
+    .innerJoin(mercadosUnicos, eq(leads.mercadoId, mercadosUnicos.id))
+    .where(and(
+      eq(leadConversions.projectId, projectId),
+      eq(leadConversions.status, 'won')
+    ))
+    .groupBy(leads.mercadoId, mercadosUnicos.nome)
+    .orderBy(desc(sql`COUNT(${leadConversions.id})`));
+  
+  return {
+    totalLeads,
+    totalConversions,
+    totalDealValue,
+    conversionRate,
+    averageDealValue,
+    conversionsByMarket: conversionsByMarketResult,
+  };
 }
