@@ -393,20 +393,24 @@ async function enrichClientes(
 }
 
 /**
- * Busca concorrentes para cada mercado
+ * Busca concorrentes para cada mercado usando SerpAPI
  */
 async function findCompetitorsForMarkets(
   mercadosMap: Map<string, number>,
   projectId: number
 ) {
+  const { searchCompetitors } = await import('./_core/serpApi');
   const { invokeLLM } = await import('./_core/llm');
-  const { callDataApi } = await import('./_core/dataApi');
   const { createConcorrente } = await import('./db');
   const concorrentes: any[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {
-      // Usar LLM para gerar lista de concorrentes
+      // Buscar concorrentes reais via SerpAPI
+      console.log(`[Enrichment] Buscando concorrentes para mercado: ${mercadoNome}`);
+      const searchResults = await searchCompetitors(mercadoNome, undefined, 10);
+      
+      // Usar LLM (Gemini) para filtrar e validar resultados
       const response = await invokeLLM({
         messages: [
           {
@@ -447,31 +451,34 @@ async function findCompetitorsForMarkets(
       });
 
       const content = response.choices[0]?.message?.content;
-      if (!content || typeof content !== 'string') continue;
+      if (!content || typeof content !== 'string') {
+        console.warn(`[Enrichment] Resposta inválida do OpenAI para mercado ${mercadoNome}`);
+        continue;
+      }
 
       const data = JSON.parse(content);
 
-      // Processar cada concorrente
-      for (const comp of data.concorrentes.slice(0, 3)) { // Limitar a 3 por mercado
+      // Processar cada concorrente validado
+      for (const comp of data.concorrentes.slice(0, 5)) {
         try {
-          // Tentar enriquecer via Data API (busca por nome)
-          let enrichedData: any = {};
-          try {
-            const apiResult = await callDataApi(comp.nome);
-            if (apiResult) {
-              enrichedData = apiResult;
-            }
-          } catch (e) {
-            // Ignorar erro de API e usar apenas dados do LLM
-          }
+          // Dados já vêm do SerpAPI (searchResults)
+          const searchMatch = searchResults.find(r => 
+            r.nome.toLowerCase().includes(comp.nome.toLowerCase()) ||
+            comp.nome.toLowerCase().includes(r.nome.toLowerCase())
+          );
 
-          // Calcular score de qualidade
+          const enrichedData = {
+            site: searchMatch?.site || comp.site,
+            descricao: searchMatch?.descricao || comp.produto,
+          };
+
+          // Calcular score de qualidade baseado em dados disponíveis
           const qualidadeScore = calculateQualityScore({
-            cnpj: enrichedData.cnpj,
+            cnpj: null,
             email: null,
             telefone: null,
             site: enrichedData.site,
-            siteOficial: null,
+            siteOficial: enrichedData.site,
             linkedin: null,
             instagram: null,
             produto: comp.produto,
@@ -497,7 +504,7 @@ async function findCompetitorsForMarkets(
             projectId,
             mercadoId,
             nome: comp.nome,
-            cnpj: enrichedData.cnpj || null,
+            cnpj: null, // CNPJ será enriquecido posteriormente
             site: enrichedData.site || null,
             produto: comp.produto,
             qualidadeScore,
@@ -521,20 +528,24 @@ async function findCompetitorsForMarkets(
 }
 
 /**
- * Busca leads para cada mercado
+ * Busca leads para cada mercado usando SerpAPI
  */
 async function findLeadsForMarkets(
   mercadosMap: Map<string, number>,
   projectId: number
 ) {
+  const { searchLeads } = await import('./_core/serpApi');
   const { invokeLLM } = await import('./_core/llm');
-  const { callDataApi } = await import('./_core/dataApi');
   const { createLead } = await import('./db');
   const leads: any[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {
-      // Usar LLM para gerar lista de leads potenciais
+      // Buscar leads reais via SerpAPI
+      console.log(`[Enrichment] Buscando leads para mercado: ${mercadoNome}`);
+      const searchResults = await searchLeads(mercadoNome, 'fornecedores', 15);
+      
+      // Usar LLM (Gemini) para filtrar e validar resultados
       const response = await invokeLLM({
         messages: [
           {
@@ -576,39 +587,42 @@ async function findLeadsForMarkets(
       });
 
       const content = response.choices[0]?.message?.content;
-      if (!content || typeof content !== 'string') continue;
+      if (!content || typeof content !== 'string') {
+        console.warn(`[Enrichment] Resposta inválida do OpenAI para leads de ${mercadoNome}`);
+        continue;
+      }
 
       const data = JSON.parse(content);
 
-      // Processar cada lead
-      for (const lead of data.leads.slice(0, 3)) { // Limitar a 3 por mercado
+      // Processar cada lead validado
+      for (const lead of data.leads.slice(0, 5)) {
         try {
-          // Tentar enriquecer via Data API
-          let enrichedData: any = {};
-          try {
-            const apiResult = await callDataApi(lead.nome);
-            if (apiResult) {
-              enrichedData = apiResult;
-            }
-          } catch (e) {
-            // Ignorar erro de API
-          }
+          // Dados já vêm do SerpAPI (searchResults)
+          const searchMatch = searchResults.find(r => 
+            r.nome.toLowerCase().includes(lead.nome.toLowerCase()) ||
+            lead.nome.toLowerCase().includes(r.nome.toLowerCase())
+          );
 
-          // Calcular score de qualidade
+          const enrichedData = {
+            site: searchMatch?.site || null,
+            descricao: searchMatch?.descricao || null,
+          };
+
+          // Calcular score de qualidade baseado em dados disponíveis
           const qualidadeScore = calculateQualityScore({
-            cnpj: enrichedData.cnpj,
-            email: enrichedData.email,
-            telefone: enrichedData.telefone,
+            cnpj: null,
+            email: null,
+            telefone: null,
             site: enrichedData.site,
-            siteOficial: null,
+            siteOficial: enrichedData.site,
             linkedin: null,
             instagram: null,
             produto: null,
             produtoPrincipal: null,
-            cidade: enrichedData.cidade,
-            uf: enrichedData.uf,
+            cidade: null,
+            uf: null,
             cnae: null,
-            porte: enrichedData.porte,
+            porte: null,
             faturamentoEstimado: null,
           });
 
@@ -626,13 +640,13 @@ async function findLeadsForMarkets(
             projectId,
             mercadoId,
             nome: lead.nome,
-            cnpj: enrichedData.cnpj || null,
-            email: enrichedData.email || null,
-            telefone: enrichedData.telefone || null,
+            cnpj: null, // CNPJ será enriquecido posteriormente
+            email: null,
+            telefone: null,
             site: enrichedData.site || null,
-            tipo: lead.tipo, // Aceita qualquer string
-            regiao: lead.regiao,
-            setor: null,
+            tipo: lead.tipo || 'Outbound',
+            regiao: lead.regiao || 'Brasil',
+            setor: mercadoNome,
             qualidadeScore,
             qualidadeClassificacao,
             validationStatus: 'pending',

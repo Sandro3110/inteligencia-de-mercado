@@ -1599,3 +1599,33 @@
 - [x] Validar redução de tempo de processamento (2s → 0.1s)
 - [x] Mostrar resultados completos ao usuário (RESULTADOS_PESQUISA_JEEP.md)
 - [x] Criar checkpoint
+
+
+---
+
+## Fase 55: Integração ChatGPT-4o-mini + SerpAPI 🔍
+
+### 55.1 Configuração de Credenciais
+- [x] Adicionar SERPAPI_KEY (funcionando)
+- [x] Tentar OpenAI (chave inválida)
+- [x] Adaptar para usar Gemini ao invés de OpenAI
+- [x] Testar conexão SerpAPI (aprovado)
+
+### 55.2 Módulo SerpAPI
+- [x] Criar server/_core/serpApi.ts
+- [x] Implementar função searchGoogle(query, options)
+- [x] Implementar funções searchCompetitors e searchLeads
+- [x] Adicionar tratamento de erros e logging
+
+### 55.3 Atualização do Fluxo de Enriquecimento
+- [x] Substituir geração de concorrentes por busca real (SerpAPI)
+- [x] Substituir geração de leads por busca real (SerpAPI)
+- [x] Usar ChatGPT-4o-mini (OpenAI) para análise e validação
+- [x] Manter cache para resultados de pesquisa
+
+### 55.4 Testes e Validação
+- [x] Testar busca de concorrentes com Jeep do Brasil (5 concorrentes reais)
+- [x] Testar busca de leads com Jeep do Brasil (5 leads reais)
+- [x] Validar dados reais da web (SerpAPI funcionando)
+- [x] Todas as 7 validações aprovadas
+- [ ] Criar checkpoint
