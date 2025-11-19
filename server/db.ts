@@ -2058,3 +2058,45 @@ export async function deleteScheduledEnrichment(id: number) {
   
   await db.delete(scheduledEnrichments).where(eq(scheduledEnrichments.id, id));
 }
+
+
+// ========== Alert Configs Functions ==========
+
+import { alertConfigs, InsertAlertConfig } from "../drizzle/schema";
+
+export async function createAlertConfig(config: InsertAlertConfig) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const result = await db.insert(alertConfigs).values(config);
+  return result;
+}
+
+export async function getAlertConfigs(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(alertConfigs)
+    .where(eq(alertConfigs.projectId, projectId));
+}
+
+export async function updateAlertConfig(id: number, updates: Partial<InsertAlertConfig>) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  await db
+    .update(alertConfigs)
+    .set({ ...updates, updatedAt: new Date() })
+    .where(eq(alertConfigs.id, id));
+}
+
+export async function deleteAlertConfig(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  await db
+    .delete(alertConfigs)
+    .where(eq(alertConfigs.id, id));
+}

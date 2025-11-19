@@ -2115,8 +2115,8 @@
 ## Fase 33: Sistema de Alertas Personalizados
 
 ### 33.1 Schema e Backend
-- [ ] Criar tabela alert_configs no schema
-- [ ] Criar funções CRUD de alertas no db.ts
+- [x] Criar tabela alert_configs no schema
+- [x] Criar funções CRUD de alertas no db.ts
 - [ ] Criar routers tRPC de alertas
 - [ ] Implementar verificação de condições de alerta
 

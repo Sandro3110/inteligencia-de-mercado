@@ -1,4 +1,4 @@
-import { mysqlEnum, mysqlTable, text, timestamp, varchar, int } from "drizzle-orm/mysql-core";
+import { mysqlEnum, mysqlTable, text, timestamp, varchar, int, boolean } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -314,3 +314,22 @@ export const scheduledEnrichments = mysqlTable("scheduled_enrichments", {
 
 export type ScheduledEnrichment = typeof scheduledEnrichments.$inferSelect;
 export type InsertScheduledEnrichment = typeof scheduledEnrichments.$inferInsert;
+
+
+/**
+ * Alert Configs - Configurações de alertas personalizados
+ */
+export const alertConfigs = mysqlTable("alert_configs", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  type: mysqlEnum("alertType", ["error_rate", "high_quality_lead", "market_threshold"]).notNull(),
+  condition: text("condition").notNull(), // JSON: { operator: ">", value: 5 }
+  enabled: boolean("enabled").default(true).notNull(),
+  lastTriggeredAt: timestamp("lastTriggeredAt"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type AlertConfig = typeof alertConfigs.$inferSelect;
+export type InsertAlertConfig = typeof alertConfigs.$inferInsert;
