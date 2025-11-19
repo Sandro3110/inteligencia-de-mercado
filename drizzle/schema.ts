@@ -114,7 +114,7 @@ export type InsertClienteMercado = typeof clientesMercados.$inferInsert;
 export const concorrentes = mysqlTable("concorrentes", {
   id: int("id").primaryKey().autoincrement(),
   projectId: int("projectId").notNull(),
-  concorrenteHash: varchar("concorrenteHash", { length: 64 }),
+  concorrenteHash: varchar("concorrenteHash", { length: 255 }),
   mercadoId: int("mercadoId").notNull(),
   nome: varchar("nome", { length: 255 }).notNull(),
   cnpj: varchar("cnpj", { length: 20 }),
@@ -148,7 +148,7 @@ export const leadStageEnum = mysqlEnum("leadStage", [
 export const leads = mysqlTable("leads", {
   id: int("id").primaryKey().autoincrement(),
   projectId: int("projectId").notNull(),
-  leadHash: varchar("leadHash", { length: 64 }),
+  leadHash: varchar("leadHash", { length: 255 }),
   mercadoId: int("mercadoId").notNull(),
   nome: varchar("nome", { length: 255 }).notNull(),
   cnpj: varchar("cnpj", { length: 20 }),
