@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, projectId, nome, site FROM concorrentes WHERE nome LIKE '%50 Maiores%' OR nome LIKE '%Maiores Empres%' LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, projectId, nome, site FROM concorrentes WHERE nome LIKE '%50 Maiores%' OR nome LIKE '%Maiores Empres%' LIMIT 5",
+  "rows": [
+    {
+      "id": "106",
+      "projectId": "1",
+      "nome": "50 Maiores Empres de Corcio",
+      "site": "https://www.econodata.com.br"
+    },
+    {
+      "id": "125",
+      "projectId": "1",
+      "nome": "As 43 maiores empres de",
+      "site": "https://valor.globo.com"
+    },
+    {
+      "id": "128",
+      "projectId": "1",
+      "nome": "50 Maiores Empres de Industria",
+      "site": "https://www.econodata.com.br"
+    },
+    {
+      "id": "131",
+      "projectId": "1",
+      "nome": "50 Maiores Empres de Metalurgica",
+      "site": "https://www.econodata.com.br"
+    },
+    {
+      "id": "135",
+      "projectId": "1",
+      "nome": "50 Maiores Empres de Materiais",
+      "site": "https://www.econodata.com.br"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tprojectId\tnome\tsite\n106\t1\t50 Maiores Empres de Corcio\thttps://www.econodata.com.br\n125\t1\tAs 43 maiores empres de\thttps://valor.globo.com\n128\t1\t50 Maiores Empres de Industria\thttps://www.econodata.com.br\n131\t1\t50 Maiores Empres de Metalurgica\thttps://www.econodata.com.br\n135\t1\t50 Maiores Empres de Materiais\thttps://www.econodata.com.br\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

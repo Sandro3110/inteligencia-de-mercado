@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, nome, ativo, createdAt FROM projects ORDER BY id",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, ativo, createdAt FROM projects ORDER BY id",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Embalagens",
+      "ativo": "1",
+      "createdAt": "2025-11-18 18:29:46"
+    },
+    {
+      "id": "240002",
+      "nome": "Embalagens 2",
+      "ativo": "1",
+      "createdAt": "2025-11-19 01:27:51"
+    },
+    {
+      "id": "240003",
+      "nome": "Embalagens 2",
+      "ativo": "1",
+      "createdAt": "2025-11-19 01:34:24"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tativo\tcreatedAt\n1\tEmbalagens\t1\t2025-11-18 18:29:46\n240002\tEmbalagens 2\t1\t2025-11-19 01:27:51\n240003\tEmbalagens 2\t1\t2025-11-19 01:34:24\n",
+  "stderr": "",
+  "execution_time_ms": 101
+}

@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, projectId, nome, siteOficial, site FROM concorrentes WHERE nome LIKE '%50 Maiores%' OR nome LIKE '%Maiores Empres%' LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, projectId, nome, siteOficial, site FROM concorrentes WHERE nome LIKE '%50 Maiores%' OR nome LIKE '%Maiores Empres%' LIMIT 5",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'siteoficial' in 'field list'"
+  ]
+}
