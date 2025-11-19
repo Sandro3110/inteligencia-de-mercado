@@ -1725,3 +1725,37 @@
 - [x] SerpAPI como única fonte de dados
 - [x] 20 concorrentes e 20 leads configurados
 - [x] Criar checkpoint
+
+
+---
+
+## Fase 21: Regra de Unicidade de Empresas 🔒 ✅
+
+### 21.1 Database Schema
+- [x] Criar função de normalização de nome
+- [x] Criar função `isEmpresaUnica()` para verificar duplicatas
+- [x] Implementar verificação em clientes, concorrentes e leads
+
+### 21.2 Função de Validação
+- [x] Criar função `isEmpresaUnica()` no empresasUnicas.ts
+- [x] Implementar normalização de nome (lowercase, trim, remove acentos)
+- [x] Verificar duplicatas em clientes, concorrentes e leads
+- [x] Retornar informação de onde a empresa já existe
+
+### 21.3 Deduplicação no Gemini
+- [x] Criar `generateConcorrentesUnicos()` que gera extras (quantidade * 1.5)
+- [x] Implementar filtro de duplicatas após geração
+- [x] Chamar Gemini novamente até completar quantidade (máx 5 tentativas)
+- [x] Passar lista de empresas existentes para evitar duplicatas
+
+### 21.4 Atualização das Funções de Enriquecimento
+- [x] Criar `generateConcorrentesUnicos()` com verificação de unicidade
+- [x] Criar `generateLeadsUnicos()` com verificação de unicidade
+- [x] Implementar busca incremental automática
+- [x] Adicionar parâmetro para excluir concorrentes ao gerar leads
+
+### 21.5 Testes
+- [x] Testar geração de 20 concorrentes sem duplicatas
+- [x] Testar geração de 20 leads sem duplicatas
+- [x] Validar que não há duplicatas entre concorrentes e leads
+- [x] Teste passou: 40 empresas únicas (0 duplicatas)
