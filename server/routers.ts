@@ -1039,6 +1039,73 @@ export const appRouter = router({
         return globalSearch(input.query, input.projectId, input.limit);
       }),
   }),
+
+  // History router
+  history: router({
+    getMercadoHistory: publicProcedure
+      .input(z.object({ mercadoId: z.number() }))
+      .query(async ({ input }) => {
+        const { getDb } = await import('./db');
+        const { mercadosHistory } = await import('../drizzle/schema');
+        const { eq, desc } = await import('drizzle-orm');
+        
+        const db = await getDb();
+        if (!db) return [];
+        
+        return db.select()
+          .from(mercadosHistory)
+          .where(eq(mercadosHistory.mercadoId, input.mercadoId))
+          .orderBy(desc(mercadosHistory.changedAt));
+      }),
+
+    getClienteHistory: publicProcedure
+      .input(z.object({ clienteId: z.number() }))
+      .query(async ({ input }) => {
+        const { getDb } = await import('./db');
+        const { clientesHistory } = await import('../drizzle/schema');
+        const { eq, desc } = await import('drizzle-orm');
+        
+        const db = await getDb();
+        if (!db) return [];
+        
+        return db.select()
+          .from(clientesHistory)
+          .where(eq(clientesHistory.clienteId, input.clienteId))
+          .orderBy(desc(clientesHistory.changedAt));
+      }),
+
+    getConcorrenteHistory: publicProcedure
+      .input(z.object({ concorrenteId: z.number() }))
+      .query(async ({ input }) => {
+        const { getDb } = await import('./db');
+        const { concorrentesHistory } = await import('../drizzle/schema');
+        const { eq, desc } = await import('drizzle-orm');
+        
+        const db = await getDb();
+        if (!db) return [];
+        
+        return db.select()
+          .from(concorrentesHistory)
+          .where(eq(concorrentesHistory.concorrenteId, input.concorrenteId))
+          .orderBy(desc(concorrentesHistory.changedAt));
+      }),
+
+    getLeadHistory: publicProcedure
+      .input(z.object({ leadId: z.number() }))
+      .query(async ({ input }) => {
+        const { getDb } = await import('./db');
+        const { leadsHistory } = await import('../drizzle/schema');
+        const { eq, desc } = await import('drizzle-orm');
+        
+        const db = await getDb();
+        if (!db) return [];
+        
+        return db.select()
+          .from(leadsHistory)
+          .where(eq(leadsHistory.leadId, input.leadId))
+          .orderBy(desc(leadsHistory.changedAt));
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

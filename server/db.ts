@@ -1098,8 +1098,51 @@ export async function createMercado(data: {
   const db = await getDb();
   if (!db) return null;
 
+  // Hash sem timestamp para garantir unicidade
   const mercadoHash = `${data.nome}-${data.projectId}`.toLowerCase().replace(/\s+/g, '-');
 
+  // Verificar se já existe
+  const existing = await db.select().from(mercadosUnicos)
+    .where(and(
+      eq(mercadosUnicos.mercadoHash, mercadoHash),
+      eq(mercadosUnicos.projectId, data.projectId)
+    ))
+    .limit(1);
+
+  if (existing.length > 0) {
+    // Detectar mudanças
+    const { detectChanges, trackMercadoChanges } = await import('./_core/historyTracker');
+    const changes = detectChanges(
+      existing[0],
+      data,
+      ['nome', 'categoria', 'segmentacao', 'tamanhoMercado', 'crescimentoAnual', 'tendencias', 'principaisPlayers']
+    );
+
+    // Registrar histórico
+    await trackMercadoChanges(existing[0].id, changes, 'updated');
+
+    // Atualizar se houver mudanças
+    if (changes.length > 0) {
+      await db.update(mercadosUnicos)
+        .set({
+          nome: data.nome,
+          categoria: data.categoria || existing[0].categoria,
+          segmentacao: data.segmentacao || existing[0].segmentacao,
+          tamanhoMercado: data.tamanhoMercado || existing[0].tamanhoMercado,
+          crescimentoAnual: data.crescimentoAnual || existing[0].crescimentoAnual,
+          tendencias: data.tendencias || existing[0].tendencias,
+          principaisPlayers: data.principaisPlayers || existing[0].principaisPlayers,
+          quantidadeClientes: data.quantidadeClientes ?? existing[0].quantidadeClientes,
+        })
+        .where(eq(mercadosUnicos.id, existing[0].id));
+
+      console.log(`[Mercado] Atualizado: ${data.nome} (${changes.length} mudanças)`);
+    }
+
+    return existing[0];
+  }
+
+  // Criar novo mercado
   const [result] = await db.insert(mercadosUnicos).values({
     projectId: data.projectId,
     mercadoHash,
@@ -1115,7 +1158,15 @@ export async function createMercado(data: {
 
   if (!result.insertId) return null;
 
-  return await getMercadoById(Number(result.insertId));
+  const mercado = await getMercadoById(Number(result.insertId));
+  if (!mercado) return null;
+
+  // Registrar criação no histórico
+  const { trackCreation } = await import('./_core/historyTracker');
+  await trackCreation('mercado', mercado.id, data);
+
+  console.log(`[Mercado] Criado: ${data.nome}`);
+  return mercado;
 }
 
 export async function updateMercado(id: number, data: {
@@ -1187,7 +1238,12 @@ export async function createCliente(data: {
   const db = await getDb();
   if (!db) return null;
 
-  const clienteHash = `${data.nome}-${data.cnpj || Date.now()}-${data.projectId}`
+  // Hash sem timestamp (usar apenas nome-projectId se não tiver CNPJ)
+  const clienteHash = data.cnpj
+    ? `${data.nome}-${data.cnpj}-${data.projectId}`
+    : `${data.nome}-${data.projectId}`;
+
+  const normalizedHash = clienteHash
     .toLowerCase()
     .replace(/[^a-z0-9-]/g, '-')
     .replace(/-+/g, '-')
@@ -1196,32 +1252,47 @@ export async function createCliente(data: {
   // Verificar se já existe um cliente com esse hash
   const existing = await db.select().from(clientes)
     .where(and(
-      eq(clientes.clienteHash, clienteHash),
+      eq(clientes.clienteHash, normalizedHash),
       eq(clientes.projectId, data.projectId)
     ))
     .limit(1);
 
   if (existing.length > 0) {
+    // Detectar mudanças
+    const { detectChanges, trackClienteChanges } = await import('./_core/historyTracker');
+    const changes = detectChanges(
+      existing[0],
+      data,
+      ['nome', 'cnpj', 'siteOficial', 'produtoPrincipal', 'email', 'telefone', 'cidade', 'uf', 'linkedin', 'instagram', 'cnae', 'porte']
+    );
+
+    // Registrar histórico
+    await trackClienteChanges(existing[0].id, changes, 'enriched');
+
     // Atualizar cliente existente
-    await db.update(clientes)
-      .set({
-        nome: data.nome,
-        cnpj: data.cnpj || null,
-        siteOficial: data.siteOficial || null,
-        produtoPrincipal: data.produtoPrincipal || null,
-        segmentacaoB2bB2c: data.segmentacaoB2bB2c || null,
-        email: data.email || null,
-        telefone: data.telefone || null,
-        linkedin: data.linkedin || null,
-        instagram: data.instagram || null,
-        cidade: data.cidade || null,
-        uf: data.uf || null,
-        cnae: data.cnae || null,
-        porte: data.porte || null,
-        qualidadeScore: data.qualidadeScore || existing[0].qualidadeScore,
-        qualidadeClassificacao: data.qualidadeClassificacao || existing[0].qualidadeClassificacao,
-      })
-      .where(eq(clientes.id, existing[0].id));
+    if (changes.length > 0) {
+      await db.update(clientes)
+        .set({
+          nome: data.nome,
+          cnpj: data.cnpj || existing[0].cnpj,
+          siteOficial: data.siteOficial || existing[0].siteOficial,
+          produtoPrincipal: data.produtoPrincipal || existing[0].produtoPrincipal,
+          segmentacaoB2bB2c: data.segmentacaoB2bB2c || existing[0].segmentacaoB2bB2c,
+          email: data.email || existing[0].email,
+          telefone: data.telefone || existing[0].telefone,
+          linkedin: data.linkedin || existing[0].linkedin,
+          instagram: data.instagram || existing[0].instagram,
+          cidade: data.cidade || existing[0].cidade,
+          uf: data.uf || existing[0].uf,
+          cnae: data.cnae || existing[0].cnae,
+          porte: data.porte || existing[0].porte,
+          qualidadeScore: data.qualidadeScore || existing[0].qualidadeScore,
+          qualidadeClassificacao: data.qualidadeClassificacao || existing[0].qualidadeClassificacao,
+        })
+        .where(eq(clientes.id, existing[0].id));
+
+      console.log(`[Cliente] Atualizado: ${data.nome} (${changes.length} mudanças)`);
+    }
     
     return existing[0];
   }
@@ -1229,7 +1300,7 @@ export async function createCliente(data: {
   // Criar novo cliente
   const [result] = await db.insert(clientes).values({
     projectId: data.projectId,
-    clienteHash,
+    clienteHash: normalizedHash,
     nome: data.nome,
     cnpj: data.cnpj || null,
     siteOficial: data.siteOficial || null,
@@ -1251,6 +1322,12 @@ export async function createCliente(data: {
   if (!result.insertId) return null;
 
   const [cliente] = await db.select().from(clientes).where(eq(clientes.id, Number(result.insertId)));
+  
+  // Registrar criação no histórico
+  const { trackCreation } = await import('./_core/historyTracker');
+  await trackCreation('cliente', cliente.id, data);
+
+  console.log(`[Cliente] Criado: ${data.nome}`);
   return cliente;
 }
 
@@ -1349,8 +1426,55 @@ export async function createConcorrente(data: {
   const db = await getDb();
   if (!db) return null;
 
-  const concorrenteHash = `${data.nome}-${data.mercadoId}-${Date.now()}`.toLowerCase().replace(/\s+/g, '-');
+  // Hash sem timestamp para garantir unicidade
+  const concorrenteHash = `${data.nome}-${data.mercadoId}-${data.projectId}`
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 
+  // Verificar se já existe
+  const existing = await db.select().from(concorrentes)
+    .where(and(
+      eq(concorrentes.concorrenteHash, concorrenteHash),
+      eq(concorrentes.projectId, data.projectId)
+    ))
+    .limit(1);
+
+  if (existing.length > 0) {
+    // Detectar mudanças
+    const { detectChanges, trackConcorrenteChanges } = await import('./_core/historyTracker');
+    const changes = detectChanges(
+      existing[0],
+      data,
+      ['nome', 'cnpj', 'site', 'produto', 'porte', 'faturamentoEstimado']
+    );
+
+    // Registrar histórico
+    await trackConcorrenteChanges(existing[0].id, changes, 'enriched');
+
+    // Atualizar se houver mudanças
+    if (changes.length > 0) {
+      await db.update(concorrentes)
+        .set({
+          nome: data.nome,
+          cnpj: data.cnpj || existing[0].cnpj,
+          site: data.site || existing[0].site,
+          produto: data.produto || existing[0].produto,
+          porte: data.porte || existing[0].porte,
+          faturamentoEstimado: data.faturamentoEstimado || existing[0].faturamentoEstimado,
+          qualidadeScore: data.qualidadeScore || existing[0].qualidadeScore,
+          qualidadeClassificacao: data.qualidadeClassificacao || existing[0].qualidadeClassificacao,
+        })
+        .where(eq(concorrentes.id, existing[0].id));
+
+      console.log(`[Concorrente] Atualizado: ${data.nome} (${changes.length} mudanças)`);
+    }
+
+    return existing[0];
+  }
+
+  // Criar novo concorrente
   const [result] = await db.insert(concorrentes).values({
     projectId: data.projectId,
     mercadoId: data.mercadoId,
@@ -1369,6 +1493,12 @@ export async function createConcorrente(data: {
   if (!result.insertId) return null;
 
   const [concorrente] = await db.select().from(concorrentes).where(eq(concorrentes.id, Number(result.insertId)));
+  
+  // Registrar criação no histórico
+  const { trackCreation } = await import('./_core/historyTracker');
+  await trackCreation('concorrente', concorrente.id, data);
+
+  console.log(`[Concorrente] Criado: ${data.nome}`);
   return concorrente;
 }
 
@@ -1432,26 +1562,82 @@ export async function createLead(data: {
   const db = await getDb();
   if (!db) return null;
 
-  const leadHash = `${data.nome}-${data.mercadoId}-${Date.now()}`.toLowerCase().replace(/\s+/g, '-');
+  // Hash sem timestamp para garantir unicidade
+  const leadHash = `${data.nome}-${data.mercadoId}-${data.projectId}`
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 
-  // Usar SQL raw para evitar problemas de tipos do Drizzle
+  // Verificar se já existe
+  const existing = await db.select().from(leads)
+    .where(and(
+      eq(leads.leadHash, leadHash),
+      eq(leads.projectId, data.projectId)
+    ))
+    .limit(1);
+
+  if (existing.length > 0) {
+    // Detectar mudanças (NÃO incluir 'stage' para preservar progresso de vendas)
+    const { detectChanges, trackLeadChanges } = await import('./_core/historyTracker');
+    const changes = detectChanges(
+      existing[0],
+      data,
+      ['nome', 'cnpj', 'site', 'email', 'telefone', 'tipo', 'porte', 'regiao', 'setor']
+    );
+
+    // Registrar histórico
+    await trackLeadChanges(existing[0].id, changes, 'enriched');
+
+    // Atualizar se houver mudanças (sem modificar stage)
+    if (changes.length > 0) {
+      await db.update(leads)
+        .set({
+          nome: data.nome,
+          cnpj: data.cnpj || existing[0].cnpj,
+          site: data.site || existing[0].site,
+          email: data.email || existing[0].email,
+          telefone: data.telefone || existing[0].telefone,
+          tipo: data.tipo || existing[0].tipo,
+          porte: data.porte || existing[0].porte,
+          regiao: data.regiao || existing[0].regiao,
+          setor: data.setor || existing[0].setor,
+          qualidadeScore: data.qualidadeScore || existing[0].qualidadeScore,
+          qualidadeClassificacao: data.qualidadeClassificacao || existing[0].qualidadeClassificacao,
+          // ⚠️ stage NÃO é atualizado para preservar progresso de vendas
+        })
+        .where(eq(leads.id, existing[0].id));
+
+      console.log(`[Lead] Atualizado: ${data.nome} (${changes.length} mudanças)`);
+    }
+
+    return existing[0];
+  }
+
+  // Criar novo lead
   const result = await db.execute(sql`
     INSERT INTO leads (
       projectId, mercadoId, leadHash, nome, cnpj, site, email, telefone,
       tipo, porte, regiao, setor, qualidadeScore, qualidadeClassificacao,
-      validationStatus
+      validationStatus, stage
     ) VALUES (
       ${data.projectId}, ${data.mercadoId}, ${leadHash}, ${data.nome},
       ${data.cnpj || null}, ${data.site || null}, ${data.email || null}, ${data.telefone || null},
       ${data.tipo || null}, ${data.porte || null}, ${data.regiao || null}, ${data.setor || null},
       ${data.qualidadeScore || 0}, ${data.qualidadeClassificacao || 'Ruim'},
-      ${data.validationStatus || 'pending'}
+      ${data.validationStatus || 'pending'}, 'novo'
     )
   `) as any;
 
   if (!result.insertId) return null;
 
   const [lead] = await db.select().from(leads).where(eq(leads.id, Number(result.insertId)));
+  
+  // Registrar criação no histórico
+  const { trackCreation } = await import('./_core/historyTracker');
+  await trackCreation('lead', lead.id, data);
+
+  console.log(`[Lead] Criado: ${data.nome}`);
   return lead;
 }
 

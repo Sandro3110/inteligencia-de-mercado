@@ -1,0 +1,34 @@
+{
+  "query": "\nSELECT \n  'mercados' as tabela,\n  COUNT(*) as total,\n  COUNT(DISTINCT mercadoHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT mercadoHash) as duplicados\nFROM mercados_unicos\nUNION ALL\nSELECT \n  'clientes' as tabela,\n  COUNT(*) as total,\n  COUNT(DISTINCT clienteHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT clienteHash) as duplicados\nFROM clientes\nUNION ALL\nSELECT \n  'concorrentes' as tabela,\n  COUNT(*) as total,\n  COUNT(DISTINCT concorrenteHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT concorrenteHash) as duplicados\nFROM concorrentes\nUNION ALL\nSELECT \n  'leads' as tabela,\n  COUNT(*) as total,\n  COUNT(DISTINCT leadHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT leadHash) as duplicados\nFROM leads;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  'mercados' as tabela,\n  COUNT(*) as total,\n  COUNT(DISTINCT mercadoHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT mercadoHash) as duplicados\nFROM mercados_unicos\nUNION ALL\nSELECT \n  'clientes' as tabela,\n  COUNT(*) as total,\n  COUNT(DISTINCT clienteHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT clienteHash) as duplicados\nFROM clientes\nUNION ALL\nSELECT \n  'concorrentes' as tabela,\n  COUNT(*) as total,\n  COUNT(DISTINCT concorrenteHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT concorrenteHash) as duplicados\nFROM concorrentes\nUNION ALL\nSELECT \n  'leads' as tabela,\n  COUNT(*) as total,\n  COUNT(DISTINCT leadHash) as unicos,\n  COUNT(*) - COUNT(DISTINCT leadHash) as duplicados\nFROM leads;\n",
+  "rows": [
+    {
+      "tabela": "clientes",
+      "total": "803",
+      "unicos": "803",
+      "duplicados": "0"
+    },
+    {
+      "tabela": "mercados",
+      "total": "1990",
+      "unicos": "1990",
+      "duplicados": "0"
+    },
+    {
+      "tabela": "concorrentes",
+      "total": "16202",
+      "unicos": "16202",
+      "duplicados": "0"
+    },
+    {
+      "tabela": "leads",
+      "total": "16224",
+      "unicos": "16224",
+      "duplicados": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\ttotal\tunicos\tduplicados\nclientes\t803\t803\t0\nmercados\t1990\t1990\t0\nconcorrentes\t16202\t16202\t0\nleads\t16224\t16224\t0\n",
+  "stderr": "",
+  "execution_time_ms": 74
+}

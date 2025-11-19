@@ -386,3 +386,81 @@ export const activityLog = mysqlTable("activity_log", {
 
 export type ActivityLog = typeof activityLog.$inferSelect;
 export type InsertActivityLog = typeof activityLog.$inferInsert;
+
+/**
+ * Change Type Enum - Tipos de mudanças rastreadas
+ */
+export const changeTypeEnum = mysqlEnum("changeType", [
+  "created",    // Registro criado
+  "updated",    // Campo atualizado
+  "enriched",   // Enriquecido via API
+  "validated",  // Validado manualmente
+]);
+
+/**
+ * Mercados History - Rastreamento de mudanças em mercados
+ */
+export const mercadosHistory = mysqlTable("mercados_history", {
+  id: int("id").primaryKey().autoincrement(),
+  mercadoId: int("mercadoId").notNull(),
+  field: varchar("field", { length: 100 }), // Campo que mudou
+  oldValue: text("oldValue"), // Valor anterior
+  newValue: text("newValue"), // Valor novo
+  changeType: changeTypeEnum.default("updated"),
+  changedBy: varchar("changedBy", { length: 64 }), // Quem mudou (user ID ou "system")
+  changedAt: timestamp("changedAt").defaultNow(),
+});
+
+export type MercadoHistory = typeof mercadosHistory.$inferSelect;
+export type InsertMercadoHistory = typeof mercadosHistory.$inferInsert;
+
+/**
+ * Clientes History - Rastreamento de mudanças em clientes
+ */
+export const clientesHistory = mysqlTable("clientes_history", {
+  id: int("id").primaryKey().autoincrement(),
+  clienteId: int("clienteId").notNull(),
+  field: varchar("field", { length: 100 }),
+  oldValue: text("oldValue"),
+  newValue: text("newValue"),
+  changeType: changeTypeEnum.default("updated"),
+  changedBy: varchar("changedBy", { length: 64 }),
+  changedAt: timestamp("changedAt").defaultNow(),
+});
+
+export type ClienteHistory = typeof clientesHistory.$inferSelect;
+export type InsertClienteHistory = typeof clientesHistory.$inferInsert;
+
+/**
+ * Concorrentes History - Rastreamento de mudanças em concorrentes
+ */
+export const concorrentesHistory = mysqlTable("concorrentes_history", {
+  id: int("id").primaryKey().autoincrement(),
+  concorrenteId: int("concorrenteId").notNull(),
+  field: varchar("field", { length: 100 }),
+  oldValue: text("oldValue"),
+  newValue: text("newValue"),
+  changeType: changeTypeEnum.default("updated"),
+  changedBy: varchar("changedBy", { length: 64 }),
+  changedAt: timestamp("changedAt").defaultNow(),
+});
+
+export type ConcorrenteHistory = typeof concorrentesHistory.$inferSelect;
+export type InsertConcorrenteHistory = typeof concorrentesHistory.$inferInsert;
+
+/**
+ * Leads History - Rastreamento de mudanças em leads
+ */
+export const leadsHistory = mysqlTable("leads_history", {
+  id: int("id").primaryKey().autoincrement(),
+  leadId: int("leadId").notNull(),
+  field: varchar("field", { length: 100 }),
+  oldValue: text("oldValue"),
+  newValue: text("newValue"),
+  changeType: changeTypeEnum.default("updated"),
+  changedBy: varchar("changedBy", { length: 64 }),
+  changedAt: timestamp("changedAt").defaultNow(),
+});
+
+export type LeadHistory = typeof leadsHistory.$inferSelect;
+export type InsertLeadHistory = typeof leadsHistory.$inferInsert;

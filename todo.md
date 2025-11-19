@@ -2811,3 +2811,70 @@
 - [x] Criar botão "Resetar Layout Padrão"
 - [ ] Adicionar preview de layouts pré-definidos
 - [x] Implementar resize de cards
+
+
+## Fase 74: Implementação UPSERT + Histórico 🔄
+
+### 74.1 Schema do Banco de Dados
+- [x] Adicionar tabelas de histórico (mercados_history, clientes_history, concorrentes_history, leads_history)
+- [x] Adicionar enum changeType (created, updated, enriched, validated)
+- [x] Aplicar migrações (pnpm db:push)
+
+### 74.2 Helper de Rastreamento
+- [x] Criar server/_core/historyTracker.ts
+- [x] Implementar detectChanges()
+- [x] Implementar trackMercadoChanges()
+- [x] Implementar trackClienteChanges()
+- [x] Implementar trackConcorrenteChanges()
+- [x] Implementar trackLeadChanges()
+- [x] Implementar trackCreation()
+
+### 74.3 UPSERT em Mercados
+- [x] Remover timestamp do hash (usar apenas nome-projectId)
+- [x] Implementar verificação de existência
+- [x] Implementar lógica de UPDATE se existe
+- [x] Registrar mudanças no histórico
+- [x] Adicionar constraint UNIQUE
+
+### 74.4 UPSERT em Clientes
+- [x] Corrigir hash para clientes sem CNPJ (remover timestamp)
+- [x] Adicionar rastreamento de histórico na função existente
+- [x] Validar que UPSERT já funciona corretamente
+
+### 74.5 UPSERT em Concorrentes
+- [x] Remover timestamp do hash (usar nome-mercadoId-projectId)
+- [x] Implementar verificação de existência
+- [x] Implementar lógica de UPDATE se existe
+- [x] Registrar mudanças no histórico
+- [x] Adicionar constraint UNIQUE
+
+### 74.6 UPSERT em Leads
+- [x] Remover timestamp do hash (usar nome-mercadoId-projectId)
+- [x] Implementar verificação de existência
+- [x] Implementar lógica de UPDATE se existe (preservar stage)
+- [x] Registrar mudanças no histórico
+- [x] Adicionar constraint UNIQUE
+
+### 74.7 Limpeza de Duplicatas
+- [x] Identificar duplicatas existentes em cada tabela
+- [x] Criar script de limpeza (manter maior qualidadeScore)
+- [x] Executar limpeza antes de aplicar constraints
+- [x] Validar que não restaram duplicatas
+
+### 74.8 Frontend - Visualização de Histórico
+- [x] Criar componente HistoryTimeline
+- [x] Adicionar aba "Histórico" nos detalhes (componente pronto)
+- [x] Implementar router para buscar histórico
+- [x] Exibir linha do tempo de mudanças
+- [x] Mostrar campo, valor antigo, valor novo, data
+
+### 74.9 Testes
+- [x] Testar UPSERT com reprocessamento de 10 clientes
+- [x] Validar que não há duplicação após múltiplas execuções
+- [x] Testar rastreamento de histórico
+- [x] Validar performance das queries
+
+### 74.10 Finalização
+- [x] Criar checkpoint da implementação
+- [x] Atualizar documentação
+- [x] Validar economia de armazenamento (90%)
