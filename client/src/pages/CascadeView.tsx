@@ -14,6 +14,8 @@ import { MultiSelectFilter } from "@/components/MultiSelectFilter";
 import { SearchFieldSelector, SearchField } from "@/components/SearchFieldSelector";
 import { SaveFilterDialog } from "@/components/SaveFilterDialog";
 import { SavedFilters } from "@/components/SavedFilters";
+import { SavedFiltersManager } from "@/components/SavedFiltersManager";
+import { CompararMercadosModal } from "@/components/CompararMercadosModal";
 import { SkeletonMercado, SkeletonCliente, SkeletonConcorrente, SkeletonLead } from "@/components/SkeletonLoading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -76,6 +78,10 @@ export default function CascadeView() {
   const [searchFields, setSearchFields] = useState<SearchField[]>(["nome", "cnpj", "produto"]); // Campos padrão
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
+  
+  // Estados para comparação de mercados
+  const [selectedMercadosForComparison, setSelectedMercadosForComparison] = useState<number[]>([]);
+  const [compareModalOpen, setCompareModalOpen] = useState(false);
   
   // Estados para filtros avançados
   const [mercadoFilters, setMercadoFilters] = useState<{
@@ -915,34 +921,30 @@ export default function CascadeView() {
 
           {/* Filtro de Status */}
           <div className="flex items-center gap-2 ml-auto">
-            {/* Filtros Salvos */}
-            <SavedFilters
-              onApply={(filtersJson) => {
-                try {
-                  const filters = JSON.parse(filtersJson);
-                  setSearchQuery(filters.searchQuery || "");
-                  setSearchFields(filters.searchFields || ["nome", "cnpj", "produto"]);
-                  setSelectedTagIds(filters.selectedTagIds || []);
-                  setStatusFilter(filters.statusFilter || "all");
-                  setMercadoFilters(filters.mercadoFilters || { segmentacao: [], categoria: [] });
-                  setClienteFilters(filters.clienteFilters || { segmentacao: [], cidade: [], uf: [] });
-                  setConcorrenteFilters(filters.concorrenteFilters || { porte: [] });
-                  setLeadFilters(filters.leadFilters || { tipo: [], porte: [] });
-                } catch (e) {
-                  toast.error("Erro ao aplicar filtro");
-                }
+            {/* Gerenciador de Filtros Salvos */}
+            <SavedFiltersManager
+              currentFilters={{
+                searchQuery,
+                searchFields,
+                selectedTagIds,
+                statusFilter,
+                mercadoFilters,
+                clienteFilters,
+                concorrenteFilters,
+                leadFilters,
+              }}
+              projectId={selectedProjectId || undefined}
+              onApplyFilter={(filters) => {
+                setSearchQuery(filters.searchQuery || "");
+                setSearchFields(filters.searchFields || ["nome", "cnpj", "produto"]);
+                setSelectedTagIds(filters.selectedTagIds || []);
+                setStatusFilter(filters.statusFilter || "all");
+                setMercadoFilters(filters.mercadoFilters || { segmentacao: [], categoria: [] });
+                setClienteFilters(filters.clienteFilters || { segmentacao: [], cidade: [], uf: [] });
+                setConcorrenteFilters(filters.concorrenteFilters || { porte: [] });
+                setLeadFilters(filters.leadFilters || { tipo: [], porte: [] });
               }}
             />
-            
-            {/* Botão Salvar Filtros */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSaveFilterDialogOpen(true)}
-            >
-              <Save className="w-4 h-4 mr-2" />
-              Salvar Filtros
-            </Button>
             
             {/* Botão Limpar Filtros */}
             <Button
@@ -1178,6 +1180,21 @@ export default function CascadeView() {
                                   className="flex items-center gap-2 p-2 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
                                   onClick={() => handleSelectMercado(mercado.id)}
                                 >
+                                  <Checkbox
+                                    checked={selectedMercadosForComparison.includes(mercado.id)}
+                                    onCheckedChange={(checked) => {
+                                      if (checked) {
+                                        if (selectedMercadosForComparison.length < 3) {
+                                          setSelectedMercadosForComparison([...selectedMercadosForComparison, mercado.id]);
+                                        } else {
+                                          toast.error("Máximo de 3 mercados para comparação");
+                                        }
+                                      } else {
+                                        setSelectedMercadosForComparison(selectedMercadosForComparison.filter(id => id !== mercado.id));
+                                      }
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
                                   <div className="flex-1">
                                     <h3 className="text-sm font-medium group-hover:text-primary transition-colors">
                                       {mercado.nome}
@@ -1435,9 +1452,20 @@ export default function CascadeView() {
             )}
 
             {currentPage === "mercados" && (
-              <span className="text-sm text-muted-foreground">
-                Selecione um mercado para continuar
-              </span>
+              <>
+                {selectedMercadosForComparison.length >= 2 ? (
+                  <Button
+                    variant="default"
+                    onClick={() => setCompareModalOpen(true)}
+                  >
+                    Comparar Selecionados ({selectedMercadosForComparison.length})
+                  </Button>
+                ) : (
+                  <span className="text-sm text-muted-foreground">
+                    Selecione 2-3 mercados para comparar
+                  </span>
+                )}
+              </>
             )}
 
             <Button
@@ -1537,6 +1565,13 @@ export default function CascadeView() {
         item={detailPopupItem}
         type={detailPopupType}
         onClose={() => setDetailPopupOpen(false)}
+      />
+
+      {/* Modal de Comparação de Mercados */}
+      <CompararMercadosModal
+        open={compareModalOpen}
+        onOpenChange={setCompareModalOpen}
+        mercadoIds={selectedMercadosForComparison}
       />
 
       {/* Botão Voltar ao Topo */}

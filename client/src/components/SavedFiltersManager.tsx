@@ -176,7 +176,7 @@ export function SavedFiltersManager({ currentFilters, projectId, onApplyFilter }
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(filter.createdAt).toLocaleDateString('pt-BR')}
+                    {filter.createdAt ? new Date(filter.createdAt).toLocaleDateString('pt-BR') : 'N/A'}
                   </p>
                 </div>
 
