@@ -2372,3 +2372,91 @@ export async function getRecentActivities(projectId: number, limit: number = 30)
     return [];
   }
 }
+
+
+/**
+ * Analytics Functions - Gráficos Interativos
+ */
+
+// Evolução temporal (mercados, clientes, leads por mês)
+export async function getEvolutionData(projectId: number, months: number = 6) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const result = await db.execute(sql`
+      SELECT 
+        DATE_FORMAT(createdAt, '%Y-%m') as month,
+        COUNT(DISTINCT CASE WHEN table_name = 'mercados' THEN id END) as mercados,
+        COUNT(DISTINCT CASE WHEN table_name = 'clientes' THEN id END) as clientes,
+        COUNT(DISTINCT CASE WHEN table_name = 'leads' THEN id END) as leads
+      FROM (
+        SELECT id, createdAt, 'mercados' as table_name FROM mercados_unicos WHERE projectId = ${projectId}
+        UNION ALL
+        SELECT id, createdAt, 'clientes' as table_name FROM clientes WHERE projectId = ${projectId}
+        UNION ALL
+        SELECT id, createdAt, 'leads' as table_name FROM leads WHERE projectId = ${projectId}
+      ) combined
+      WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${months} MONTH)
+      GROUP BY month
+      ORDER BY month ASC
+    `);
+
+    return (result as any).rows as Array<{ month: string; mercados: number; clientes: number; leads: number }>;
+  } catch (error) {
+    console.error("[Database] Failed to get evolution data:", error);
+    return [];
+  }
+}
+
+// Distribuição geográfica (top 10 UFs)
+export async function getGeographicDistribution(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const result = await db.execute(sql`
+      SELECT 
+        uf,
+        COUNT(*) as count
+      FROM (
+        SELECT uf FROM clientes WHERE projectId = ${projectId} AND uf IS NOT NULL
+        UNION ALL
+        SELECT uf FROM concorrentes WHERE projectId = ${projectId} AND uf IS NOT NULL
+        UNION ALL
+        SELECT uf FROM leads WHERE projectId = ${projectId} AND uf IS NOT NULL
+      ) combined
+      GROUP BY uf
+      ORDER BY count DESC
+      LIMIT 10
+    `);
+
+    return (result as any).rows as Array<{ uf: string; count: number }>;
+  } catch (error) {
+    console.error("[Database] Failed to get geographic distribution:", error);
+    return [];
+  }
+}
+
+// Distribuição por segmentação (B2B/B2C/Ambos)
+export async function getSegmentationDistribution(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const result = await db.execute(sql`
+      SELECT 
+        segmentacao,
+        COUNT(*) as count
+      FROM mercados_unicos
+      WHERE projectId = ${projectId} AND segmentacao IS NOT NULL
+      GROUP BY segmentacao
+      ORDER BY count DESC
+    `);
+
+    return (result as any).rows as Array<{ segmentacao: string; count: number }>;
+  } catch (error) {
+    console.error("[Database] Failed to get segmentation distribution:", error);
+    return [];
+  }
+}

@@ -36,6 +36,7 @@ export default function ROIDashboard() {
   );
 
   const createConversionMutation = trpc.conversion.create.useMutation();
+  const logActivityMutation = trpc.activity.log.useMutation();
 
   const handleCreateConversion = async () => {
     if (!selectedLeadId || !selectedProjectId) {
@@ -53,6 +54,16 @@ export default function ROIDashboard() {
       });
 
       toast.success("Conversão registrada com sucesso!");
+      
+      // Registrar atividade
+      const leadName = allLeads?.find((l: any) => l.id === selectedLeadId)?.nome || `Lead #${selectedLeadId}`;
+      await logActivityMutation.mutateAsync({
+        projectId: selectedProjectId,
+        activityType: "conversion",
+        description: `Conversão registrada: ${leadName} - ${status === "won" ? "Ganho" : "Perdido"} - R$ ${parseFloat(dealValue || "0").toFixed(2)}`,
+        metadata: JSON.stringify({ leadId: selectedLeadId, dealValue, status, notes }),
+      });
+      
       setShowConversionDialog(false);
       setSelectedLeadId(null);
       setDealValue("");

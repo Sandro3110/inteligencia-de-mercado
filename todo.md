@@ -2683,3 +2683,29 @@
 - [ ] Adicionar gráfico de densidade competitiva
 - [ ] Usar recharts para visualizações
 - [ ] Integrar na página Analytics
+
+
+## Fase 51: Integração logActivity no ROI ⏰
+- [x] Integrar logActivity() no ROIDashboard ao registrar conversão
+- [x] Registrar tipo "conversion" com metadata (leadId, valor, status)
+- [x] Testar registro de atividades na página /atividade
+
+## Fase 52: Gráficos Interativos no Analytics 📊
+- [x] Criar queries backend para evolução temporal (mercados/clientes/leads por mês)
+- [x] Criar queries backend para distribuição geográfica (top 10 UFs)
+- [x] Criar queries backend para segmentação (B2B/B2C/Ambos)
+- [x] Implementar LineChart de evolução temporal
+- [x] Implementar BarChart de distribuição por UF
+- [x] Implementar PieChart de segmentação B2B/B2C
+- [x] Criar página /analytics com os 3 gráficos
+- [x] Adicionar filtros de período (3/6/12 meses)
+
+## Fase 53: Sistema de Tags Personalizadas 🏷️
+- [x] Criar tabela tags no banco (id, name, color)
+- [x] Criar tabela entity_tags (junction table com FK)
+- [x] Implementar funções CRUD no db.ts (getAllTags, createTag, deleteTag)
+- [x] Criar routers tRPC para tags (list, create, delete)
+- [x] Criar componente TagManager (CRUD interface)
+- [x] Criar componente TagPicker (adicionar/remover tags de entidades)
+- [x] Integrar filtros por tags nas páginas (mercados/clientes/concorrentes/leads)
+- [x] Testar criação, edição e exclusão de tags

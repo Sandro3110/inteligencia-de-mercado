@@ -59,6 +59,27 @@ export const appRouter = router({
         const { getDashboardKPIs } = await import('./db');
         return getDashboardKPIs(input.projectId);
       }),
+    
+    evolution: publicProcedure
+      .input(z.object({ projectId: z.number(), months: z.number().optional().default(6) }))
+      .query(async ({ input }) => {
+        const { getEvolutionData } = await import('./db');
+        return getEvolutionData(input.projectId, input.months);
+      }),
+    
+    geographic: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getGeographicDistribution } = await import('./db');
+        return getGeographicDistribution(input.projectId);
+      }),
+    
+    segmentation: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getSegmentationDistribution } = await import('./db');
+        return getSegmentationDistribution(input.projectId);
+      }),
   }),
 
   dashboard: router({
@@ -984,6 +1005,24 @@ export const appRouter = router({
       .query(async ({ input }) => {
         const { getRecentActivities } = await import('./db');
         return getRecentActivities(input.projectId, input.limit);
+      }),
+    
+    log: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        activityType: z.string(),
+        description: z.string(),
+        metadata: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { logActivity } = await import('./db');
+        await logActivity({
+          projectId: input.projectId,
+          activityType: input.activityType,
+          description: input.description,
+          metadata: input.metadata,
+        });
+        return { success: true };
       }),
   }),
 });

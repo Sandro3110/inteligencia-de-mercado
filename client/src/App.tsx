@@ -12,6 +12,7 @@ import MercadoDetalhes from "./pages/MercadoDetalhes";
 import CascadeView from "./pages/CascadeView";
 import EnrichmentFlow from "./pages/EnrichmentFlow";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
+import AnalyticsPage from "./pages/AnalyticsPage";
 import EnrichmentProgress from "./pages/EnrichmentProgress";
 import AlertsPage from "./pages/AlertsPage";
 import AlertHistoryPage from "./pages/AlertHistoryPage";
@@ -31,7 +32,8 @@ function Router() {
       <Route path="/mercados" component={Mercados} />
       <Route path="/mercado/:id" component={MercadoDetalhes} />
       <Route path="/enrichment" component={EnrichmentFlow} />
-      <Route path="/analytics" component={AnalyticsDashboard} />
+      <Route path="/analytics" component={AnalyticsPage} />
+      <Route path="/analytics-dashboard" component={AnalyticsDashboard} />
       <Route path="/enrichment-progress" component={EnrichmentProgress} />
       <Route path="/alertas" component={AlertsPage} />
       <Route path="/alertas/historico" component={AlertHistoryPage} />
