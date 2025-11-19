@@ -255,9 +255,9 @@ export default function CascadeView() {
   }, []);
 
   // Buscar totais dinâmicos do backend
-  // Por enquanto, buscar todos os dados (projectId=1 tem os dados reais)
+  // Se selectedProjectId for null, busca todos os projetos
   const { data: totals } = trpc.stats.totals.useQuery({ 
-    projectId: 1 // Usar projectId fixo 1 onde estão os dados
+    projectId: selectedProjectId || undefined // undefined = todos os projetos
   });
   
   // Calcular totais gerais

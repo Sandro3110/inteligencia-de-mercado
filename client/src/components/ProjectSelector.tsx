@@ -34,13 +34,25 @@ export function ProjectSelector() {
     <div className="flex items-center gap-2">
       <Briefcase className="h-4 w-4 text-muted-foreground" />
       <Select
-        value={selectedProjectId?.toString()}
-        onValueChange={(value) => selectProject(parseInt(value, 10))}
+        value={selectedProjectId?.toString() || "all"}
+        onValueChange={(value) => {
+          if (value === "all") {
+            selectProject(null);
+          } else {
+            selectProject(parseInt(value, 10));
+          }
+        }}
       >
         <SelectTrigger className="w-[200px] h-9">
           <SelectValue placeholder="Selecione um projeto" />
         </SelectTrigger>
         <SelectContent>
+          <SelectItem value="all">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
+              <span className="font-medium">Todos os Projetos</span>
+            </div>
+          </SelectItem>
           {projects.map((project) => (
             <SelectItem key={project.id} value={project.id.toString()}>
               <div className="flex items-center gap-2">

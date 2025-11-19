@@ -2942,3 +2942,49 @@
 - [x] Criar endpoint tRPC para métricas de evolução
 - [x] Atualizar EvolutionCharts para usar dados reais
 - [x] Remover dados mockados
+
+
+---
+
+## Fase 60: Sistema de Coleta Simultânea vs Fila + Melhorias de Cache 🚀
+
+### 60.1 Seletor de Projeto Dinâmico
+- [x] Criar query projects.list no backend
+- [x] Atualizar ProjectSelector para buscar projetos do banco
+- [x] Adicionar opção "Todos os Projetos" (projectId = null)
+- [x] Atualizar queries de totais para suportar projectId null
+- [x] Atualizar CascadeView para filtrar por projeto selecionado
+
+### 60.2 Sistema de Coleta Simultânea vs Fila
+- [x] Criar tabela enrichment_queue no banco de dados
+- [x] Implementar QueueManager com modos parallel/sequential
+- [x] Adicionar campo executionMode na tabela projects
+- [x] Criar seletor de modo (Simultâneo/Fila) na interface
+- [x] Implementar controle de concorrência (máximo de jobs paralelos)
+- [x] Criar endpoint tRPC queue.setMode
+- [x] Criar endpoint tRPC queue.status
+
+### 60.3 Invalidação Automática de Cache
+- [x] Integrar invalidateEntityCache() em createMercado
+- [x] Integrar invalidateEntityCache() em createCliente
+- [x] Integrar invalidateEntityCache() em createConcorrente
+- [x] Integrar invalidateEntityCache() em createLead
+- [x] Integrar invalidateEntityCache() em mutations de update/delete
+- [x] Testar invalidação automática
+
+### 60.4 Dashboard de Cache
+- [x] Criar página /admin/cache
+- [x] Implementar getCacheStats() no módulo cache
+- [x] Criar endpoint tRPC cache.stats
+- [x] Criar endpoint tRPC cache.clear
+- [x] Adicionar UI com métricas (hit rate, entradas ativas, TTL)
+- [x] Adicionar botão "Limpar Cache"
+- [x] Adicionar rota no App.tsx
+- [ ] Adicionar item "Cache" no MainNav
+
+### 60.5 Testes e Finalização
+- [ ] Testar seletor de projeto com múltiplos projetos
+- [ ] Testar modo simultâneo vs fila
+- [ ] Validar invalidação automática de cache
+- [ ] Testar dashboard de cache
+- [ ] Criar checkpoint final

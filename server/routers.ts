@@ -212,7 +212,10 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const { updateClienteValidation } = await import('./db');
-        return updateClienteValidation(input.id, input.status, input.notes, ctx.user?.id);
+        const { invalidateEntityCache } = await import('./_core/cache');
+        const result = await updateClienteValidation(input.id, input.status, input.notes, ctx.user?.id);
+        invalidateEntityCache('clientes');
+        return result;
       }),
     
     byProject: publicProcedure
@@ -293,7 +296,10 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const { updateConcorrenteValidation } = await import('./db');
-        return updateConcorrenteValidation(input.id, input.status, input.notes, ctx.user?.id);
+        const { invalidateEntityCache } = await import('./_core/cache');
+        const result = await updateConcorrenteValidation(input.id, input.status, input.notes, ctx.user?.id);
+        invalidateEntityCache('concorrentes');
+        return result;
       }),
     
     byProject: publicProcedure
@@ -432,7 +438,10 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const { updateLeadValidation } = await import('./db');
-        return updateLeadValidation(input.id, input.status, input.notes, ctx.user?.id);
+        const { invalidateEntityCache } = await import('./_core/cache');
+        const result = await updateLeadValidation(input.id, input.status, input.notes, ctx.user?.id);
+        invalidateEntityCache('leads');
+        return result;
       }),
 
     updateStage: publicProcedure
@@ -1111,6 +1120,77 @@ export const appRouter = router({
         const { getEvolutionMetrics } = await import('./db');
         return getEvolutionMetrics(input.projectId, input.period);
       }),
+  }),
+  
+  // Queue Management - Sistema de fila de enriquecimento
+  queue: router({
+    // Adicionar item à fila
+    add: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        clienteData: z.any(),
+        priority: z.number().optional().default(0),
+      }))
+      .mutation(async ({ input }) => {
+        const { queueManager } = await import('./queueManager');
+        const queueId = await queueManager.addToQueue(
+          input.projectId,
+          input.clienteData,
+          input.priority
+        );
+        return { queueId };
+      }),
+    
+    // Obter status da fila
+    status: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { queueManager } = await import('./queueManager');
+        return queueManager.getQueueStatus(input.projectId);
+      }),
+    
+    // Limpar itens concluídos/erro
+    clear: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { queueManager } = await import('./queueManager');
+        await queueManager.clearCompleted(input.projectId);
+        return { success: true };
+      }),
+    
+    // Definir modo de execução (parallel/sequential)
+    setMode: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        mode: z.enum(['parallel', 'sequential']),
+        maxParallelJobs: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateProjectExecutionMode } = await import('./db');
+        await updateProjectExecutionMode(
+          input.projectId,
+          input.mode,
+          input.maxParallelJobs
+        );
+        return { success: true };
+      }),
+  }),
+  
+  // Cache Management - Dashboard de cache
+  cache: router({
+    // Estatísticas do cache
+    stats: protectedProcedure.query(async () => {
+      const { getCacheStats } = await import('./_core/cache');
+      return getCacheStats();
+    }),
+    
+    // Limpar cache
+    clear: protectedProcedure.mutation(async () => {
+      const { cache, resetCacheStats } = await import('./_core/cache');
+      cache.clear();
+      resetCacheStats();
+      return { success: true };
+    }),
   }),
 });
 

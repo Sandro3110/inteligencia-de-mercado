@@ -127,6 +127,13 @@
       "when": 1763562178809,
       "tag": "0017_fast_lethal_legion",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1763565979538,
+      "tag": "0018_supreme_guardsmen",
+      "breakpoints": true
     }
   ]
 }

@@ -2853,3 +2853,61 @@ export async function getEvolutionMetrics(projectId: number, period: '24h' | '7d
     avgTimePerClient,
   };
 }
+
+
+/**
+ * Atualiza modo de execução de enriquecimento do projeto
+ */
+export async function updateProjectExecutionMode(
+  projectId: number,
+  mode: 'parallel' | 'sequential',
+  maxParallelJobs?: number
+): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    const updateData: any = {
+      executionMode: mode,
+      updatedAt: new Date(),
+    };
+
+    if (maxParallelJobs !== undefined) {
+      updateData.maxParallelJobs = maxParallelJobs;
+    }
+
+    await db
+      .update(projects)
+      .set(updateData)
+      .where(eq(projects.id, projectId));
+
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to update project execution mode:", error);
+    return false;
+  }
+}
+
+/**
+ * Busca configuração de execução do projeto
+ */
+export async function getProjectExecutionConfig(projectId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const [project] = await db
+      .select({
+        executionMode: projects.executionMode,
+        maxParallelJobs: projects.maxParallelJobs,
+      })
+      .from(projects)
+      .where(eq(projects.id, projectId))
+      .limit(1);
+
+    return project || { executionMode: 'sequential', maxParallelJobs: 3 };
+  } catch (error) {
+    console.error("[Database] Failed to get project execution config:", error);
+    return null;
+  }
+}

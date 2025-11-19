@@ -19,12 +19,19 @@ export type InsertUser = typeof users.$inferInsert;
 /**
  * Projects - Separate workspaces for different business units
  */
+export const executionModeEnum = mysqlEnum("executionMode", [
+  "parallel",
+  "sequential",
+]);
+
 export const projects = mysqlTable("projects", {
   id: int("id").primaryKey().autoincrement(),
   nome: varchar("nome", { length: 255 }).notNull(),
   descricao: text("descricao"),
   cor: varchar("cor", { length: 7 }).default("#3b82f6"), // hex color
   ativo: int("ativo").default(1).notNull(), // 1 = ativo, 0 = inativo
+  executionMode: executionModeEnum.default("sequential"),
+  maxParallelJobs: int("maxParallelJobs").default(3),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
@@ -389,3 +396,29 @@ export const activityLog = mysqlTable("activity_log", {
 
 export type ActivityLog = typeof activityLog.$inferSelect;
 export type InsertActivityLog = typeof activityLog.$inferInsert;
+
+/**
+ * Enrichment Queue - Fila de enriquecimento de dados
+ */
+export const enrichmentQueueStatusEnum = mysqlEnum("enrichmentQueueStatus", [
+  "pending",
+  "processing",
+  "completed",
+  "error",
+]);
+
+export const enrichmentQueue = mysqlTable("enrichment_queue", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  status: enrichmentQueueStatusEnum.default("pending"),
+  priority: int("priority").default(0),
+  clienteData: json("clienteData").notNull(),
+  result: json("result"),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  startedAt: timestamp("startedAt"),
+  completedAt: timestamp("completedAt"),
+});
+
+export type EnrichmentQueue = typeof enrichmentQueue.$inferSelect;
+export type InsertEnrichmentQueue = typeof enrichmentQueue.$inferInsert;

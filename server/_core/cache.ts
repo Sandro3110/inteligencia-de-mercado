@@ -151,3 +151,41 @@ export function invalidateEntityCache(entityType: 'mercados' | 'clientes' | 'con
     cache.invalidatePattern(`${entityType}:`);
   }
 }
+
+
+/**
+ * Get detailed cache statistics with hit/miss tracking
+ */
+let cacheHits = 0;
+let cacheMisses = 0;
+
+// Wrapper para rastrear hits/misses
+const originalGet = cache.get.bind(cache);
+(cache as any).get = function<T>(key: string): T | undefined {
+  const result = originalGet<T>(key);
+  if (result !== undefined) {
+    cacheHits++;
+  } else {
+    cacheMisses++;
+  }
+  return result;
+};
+
+export function getCacheStats() {
+  const stats = cache.getStats();
+  const totalRequests = cacheHits + cacheMisses;
+  const hitRate = totalRequests > 0 ? (cacheHits / totalRequests) * 100 : 0;
+
+  return {
+    ...stats,
+    hits: cacheHits,
+    misses: cacheMisses,
+    hitRate: Math.round(hitRate * 100) / 100, // 2 casas decimais
+    totalRequests,
+  };
+}
+
+export function resetCacheStats() {
+  cacheHits = 0;
+  cacheMisses = 0;
+}

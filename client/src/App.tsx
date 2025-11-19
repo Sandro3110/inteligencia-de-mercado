@@ -27,6 +27,7 @@ import FunnelView from "./pages/FunnelView";
 import SchedulePage from "./pages/SchedulePage";
 import AtividadePage from "./pages/AtividadePage";
 import SharedFilterView from "./pages/SharedFilterView";
+import CacheDashboard from "./pages/CacheDashboard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -49,6 +50,7 @@ function Router() {
       <Route path="/agendamento" component={SchedulePage} />
       <Route path="/atividade" component={AtividadePage} />
       <Route path="/filtros/:token" component={SharedFilterView} />
+      <Route path="/admin/cache" component={CacheDashboard} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
