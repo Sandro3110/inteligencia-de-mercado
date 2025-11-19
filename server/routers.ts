@@ -1088,6 +1088,20 @@ export const appRouter = router({
         return compareMercados(input.mercadoIds);
       }),
   }),
+
+  stats: router({
+    totals: publicProcedure
+      .input(z.object({ projectId: z.number().optional() }))
+      .query(async ({ input }) => {
+        const { getTotalMercados, getTotalClientes, getTotalConcorrentes, getTotalLeads } = await import('./db');
+        return {
+          mercados: await getTotalMercados(input.projectId),
+          clientes: await getTotalClientes(input.projectId),
+          concorrentes: await getTotalConcorrentes(input.projectId),
+          leads: await getTotalLeads(input.projectId),
+        };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

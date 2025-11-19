@@ -254,11 +254,14 @@ export default function CascadeView() {
     return () => viewport.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Buscar totais dinâmicos do backend (sem filtro de projeto para mostrar todos os dados)
+  const { data: totals } = trpc.stats.totals.useQuery({ projectId: undefined });
+  
   // Calcular totais gerais
-  const totalMercados = mercados?.length || 0;
-  const totalClientes = mercados?.reduce((sum, m) => sum + (m.quantidadeClientes || 0), 0) || 0;
-  const totalConcorrentes = 591; // Fixo conforme dados
-  const totalLeads = 727; // Fixo conforme dados
+  const totalMercados = totals?.mercados || 0;
+  const totalClientes = totals?.clientes || 0;
+  const totalConcorrentes = totals?.concorrentes || 0;
+  const totalLeads = totals?.leads || 0;
 
   // Filtrar por status
   const filterByStatus = (items: any[]) => {

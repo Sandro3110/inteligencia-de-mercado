@@ -2896,3 +2896,27 @@
 - [x] Adicionar botão "Comparar Selecionados"
 - [x] Testar salvamento e aplicação de filtros
 - [x] Testar comparação de mercados
+
+
+## Fase 60: Auditoria de Dados 🔍
+
+- [ ] Consultar contagem real de mercados no banco
+- [ ] Consultar contagem real de clientes no banco
+- [ ] Consultar contagem real de concorrentes no banco
+- [ ] Consultar contagem real de leads no banco
+- [ ] Verificar valores exibidos no dashboard
+- [ ] Comparar e documentar diferenças
+- [ ] Corrigir queries se necessário
+
+
+## Fase 61: Correção de Valores Hardcoded 🔧
+
+- [x] Criar getTotalConcorrentes() no db.ts
+- [x] Criar getTotalLeads() no db.ts
+- [x] Criar getTotalMercados() no db.ts
+- [x] Criar getTotalClientes() no db.ts
+- [x] Criar endpoint tRPC stats.totals
+- [x] Atualizar CascadeView para usar trpc.stats.totals
+- [x] Auditar todo o código frontend para valores fixos
+- [x] Documentar todos os valores hardcoded encontrados
+- [x] Corrigir todos os valores fixos identificados

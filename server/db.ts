@@ -2686,3 +2686,60 @@ export async function compareMercados(mercadoIds: number[]) {
 
   return results;
 }
+
+
+// ============================================
+// ESTATÍSTICAS E TOTAIS DINÂMICOS
+// ============================================
+
+export async function getTotalMercados(projectId?: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  let query = db.select({ count: sql<number>`count(*)` }).from(mercadosUnicos);
+  if (projectId) {
+    query = query.where(eq(mercadosUnicos.projectId, projectId)) as any;
+  }
+  
+  const result = await query;
+  return Number(result[0]?.count) || 0;
+}
+
+export async function getTotalClientes(projectId?: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  let query = db.select({ count: sql<number>`count(*)` }).from(clientes);
+  if (projectId) {
+    query = query.where(eq(clientes.projectId, projectId)) as any;
+  }
+  
+  const result = await query;
+  return Number(result[0]?.count) || 0;
+}
+
+export async function getTotalConcorrentes(projectId?: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  let query = db.select({ count: sql<number>`count(*)` }).from(concorrentes);
+  if (projectId) {
+    query = query.where(eq(concorrentes.projectId, projectId)) as any;
+  }
+  
+  const result = await query;
+  return Number(result[0]?.count) || 0;
+}
+
+export async function getTotalLeads(projectId?: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  let query = db.select({ count: sql<number>`count(*)` }).from(leads);
+  if (projectId) {
+    query = query.where(eq(leads.projectId, projectId)) as any;
+  }
+  
+  const result = await query;
+  return Number(result[0]?.count) || 0;
+}

@@ -1,0 +1,16 @@
+{
+  "query": "SELECT \n  (SELECT COUNT(*) FROM mercados_unicos) as total_mercados,\n  (SELECT COUNT(*) FROM clientes) as total_clientes,\n  (SELECT COUNT(*) FROM concorrentes) as total_concorrentes,\n  (SELECT COUNT(*) FROM leads) as total_leads;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  (SELECT COUNT(*) FROM mercados_unicos) as total_mercados,\n  (SELECT COUNT(*) FROM clientes) as total_clientes,\n  (SELECT COUNT(*) FROM concorrentes) as total_concorrentes,\n  (SELECT COUNT(*) FROM leads) as total_leads;",
+  "rows": [
+    {
+      "total_mercados": "1334",
+      "total_clientes": "1326",
+      "total_concorrentes": "10332",
+      "total_leads": "10330"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_mercados\ttotal_clientes\ttotal_concorrentes\ttotal_leads\n1334\t1326\t10332\t10330\n",
+  "stderr": "",
+  "execution_time_ms": 75
+}

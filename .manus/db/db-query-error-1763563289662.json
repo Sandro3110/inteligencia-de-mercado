@@ -1,0 +1,8 @@
+{
+  "query": "SELECT \n  (SELECT COUNT(*) FROM mercados) as total_mercados,\n  (SELECT COUNT(*) FROM clientes) as total_clientes,\n  (SELECT COUNT(*) FROM concorrentes) as total_concorrentes,\n  (SELECT COUNT(*) FROM leads) as total_leads;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  (SELECT COUNT(*) FROM mercados) as total_mercados,\n  (SELECT COUNT(*) FROM clientes) as total_clientes,\n  (SELECT COUNT(*) FROM concorrentes) as total_concorrentes,\n  (SELECT COUNT(*) FROM leads) as total_leads;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'xpshcsieistmx38x46v9tq.mercados' doesn't exist"
+  ]
+}
