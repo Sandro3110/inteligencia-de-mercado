@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { exportToCSV } from "@/lib/export";
 import { toast } from "sonner";
+import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { 
   Building2, 
   Users, 
@@ -17,10 +18,24 @@ import {
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
 export default function Dashboard() {
-  const { data: stats, isLoading } = trpc.dashboard.stats.useQuery();
-  const { data: allClientes } = trpc.clientes.list.useQuery({});
-  const { data: allConcorrentes } = trpc.concorrentes.list.useQuery({});
-  const { data: allLeads } = trpc.leads.list.useQuery({});
+  const { selectedProjectId } = useSelectedProject();
+  
+  const { data: stats, isLoading } = trpc.dashboard.stats.useQuery(
+    { projectId: selectedProjectId! },
+    { enabled: !!selectedProjectId }
+  );
+  const { data: allClientes } = trpc.clientes.list.useQuery(
+    { projectId: selectedProjectId ?? undefined },
+    { enabled: !!selectedProjectId }
+  );
+  const { data: allConcorrentes } = trpc.concorrentes.list.useQuery(
+    { projectId: selectedProjectId ?? undefined },
+    { enabled: !!selectedProjectId }
+  );
+  const { data: allLeads } = trpc.leads.list.useQuery(
+    { projectId: selectedProjectId ?? undefined },
+    { enabled: !!selectedProjectId }
+  );
 
   const handleExportClientes = () => {
     if (!allClientes || allClientes.length === 0) {

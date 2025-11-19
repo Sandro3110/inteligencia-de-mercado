@@ -101,39 +101,64 @@ export async function getUser(id: string) {
 // DASHBOARD HELPERS
 // ============================================
 
-export async function getDashboardStats() {
+export async function getDashboardStats(projectId?: number) {
   const db = await getDb();
   if (!db) return null;
 
-  const [mercadosCount] = await db.select({ count: count() }).from(mercadosUnicos);
-  const [clientesCount] = await db.select({ count: count() }).from(clientes);
-  const [concorrentesCount] = await db.select({ count: count() }).from(concorrentes);
-  const [leadsCount] = await db.select({ count: count() }).from(leads);
+  // Filtrar por projeto se especificado
+  const mercadosQuery = projectId 
+    ? db.select({ count: count() }).from(mercadosUnicos).where(eq(mercadosUnicos.projectId, projectId))
+    : db.select({ count: count() }).from(mercadosUnicos);
+  const [mercadosCount] = await mercadosQuery;
+
+  const clientesQuery = projectId
+    ? db.select({ count: count() }).from(clientes).where(eq(clientes.projectId, projectId))
+    : db.select({ count: count() }).from(clientes);
+  const [clientesCount] = await clientesQuery;
+
+  const concorrentesQuery = projectId
+    ? db.select({ count: count() }).from(concorrentes).where(eq(concorrentes.projectId, projectId))
+    : db.select({ count: count() }).from(concorrentes);
+  const [concorrentesCount] = await concorrentesQuery;
+
+  const leadsQuery = projectId
+    ? db.select({ count: count() }).from(leads).where(eq(leads.projectId, projectId))
+    : db.select({ count: count() }).from(leads);
+  const [leadsCount] = await leadsQuery;
 
   // Contagem por status de validação
-  const clientesStatus = await db
+  const clientesStatusQuery = db
     .select({ 
       status: clientes.validationStatus, 
       count: count() 
     })
-    .from(clientes)
-    .groupBy(clientes.validationStatus);
+    .from(clientes);
+  if (projectId) {
+    clientesStatusQuery.where(eq(clientes.projectId, projectId));
+  }
+  const clientesStatus = await clientesStatusQuery.groupBy(clientes.validationStatus);
 
-  const concorrentesStatus = await db
+  const concorrentesStatusQuery = db
     .select({ 
       status: concorrentes.validationStatus, 
       count: count() 
     })
-    .from(concorrentes)
-    .groupBy(concorrentes.validationStatus);
+    .from(concorrentes);
+  if (projectId) {
+    concorrentesStatusQuery.where(eq(concorrentes.projectId, projectId));
+  }
+  const concorrentesStatus = await concorrentesStatusQuery.groupBy(concorrentes.validationStatus);
 
-  const leadsStatus = await db
+  const leadsStatusQuery = db
     .select({ 
       status: leads.validationStatus, 
       count: count() 
     })
-    .from(leads)
-    .groupBy(leads.validationStatus);
+    .from(leads);
+  if (projectId) {
+    leadsStatusQuery.where(eq(leads.projectId, projectId));
+  }
+  const leadsStatus = await leadsStatusQuery.groupBy(leads.validationStatus);
 
   return {
     totals: {

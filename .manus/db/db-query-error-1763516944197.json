@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT \n  p.id,\n  p.nome,\n  p.ativo,\n  (SELECT COUNT(*) FROM clientes WHERE projectId = p.id) as clientes,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = p.id) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE projectId = p.id) as leads,\n  (SELECT COUNT(DISTINCT mercadoId) FROM clientes WHERE projectId = p.id AND mercadoId IS NOT NULL) as mercados\nFROM projects p\nORDER BY p.id DESC\nLIMIT 20\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  p.id,\n  p.nome,\n  p.ativo,\n  (SELECT COUNT(*) FROM clientes WHERE projectId = p.id) as clientes,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = p.id) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE projectId = p.id) as leads,\n  (SELECT COUNT(DISTINCT mercadoId) FROM clientes WHERE projectId = p.id AND mercadoId IS NOT NULL) as mercados\nFROM projects p\nORDER BY p.id DESC\nLIMIT 20\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'mercadoid' in 'where clause'"
+  ]
+}

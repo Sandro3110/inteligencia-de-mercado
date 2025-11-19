@@ -1,8 +1,8 @@
+import { z } from "zod";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
-import { z } from "zod";
 
 export const appRouter = router({
   system: systemRouter,
@@ -62,10 +62,12 @@ export const appRouter = router({
   }),
 
   dashboard: router({
-    stats: publicProcedure.query(async () => {
-      const { getDashboardStats } = await import('./db');
-      return getDashboardStats();
-    }),
+    stats: publicProcedure
+      .input(z.object({ projectId: z.number().optional() }).optional())
+      .query(async ({ input }) => {
+        const { getDashboardStats } = await import('./db');
+        return getDashboardStats(input?.projectId);
+      }),
     
     distribuicaoGeografica: publicProcedure.query(async () => {
       const { getDistribuicaoGeografica } = await import('./db');
@@ -562,11 +564,6 @@ export const appRouter = router({
   }),
 
   templates: router({
-    list: publicProcedure.query(async () => {
-      const { getAllTemplates } = await import('./db');
-      return getAllTemplates();
-    }),
-    
     byId: publicProcedure
       .input(z.number())
       .query(async ({ input }) => {

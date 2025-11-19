@@ -1,0 +1,208 @@
+{
+  "query": "SELECT \n  p.id,\n  p.nome,\n  p.ativo,\n  (SELECT COUNT(*) FROM clientes WHERE projectId = p.id) as clientes,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = p.id) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE projectId = p.id) as leads,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE projectId = p.id) as mercados\nFROM projects p\nORDER BY p.id DESC\nLIMIT 30",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  p.id,\n  p.nome,\n  p.ativo,\n  (SELECT COUNT(*) FROM clientes WHERE projectId = p.id) as clientes,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = p.id) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE projectId = p.id) as leads,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE projectId = p.id) as mercados\nFROM projects p\nORDER BY p.id DESC\nLIMIT 30",
+  "rows": [
+    {
+      "id": "240004",
+      "nome": "Embalagens 2",
+      "ativo": "1",
+      "clientes": "0",
+      "concorrentes": "0",
+      "leads": "0",
+      "mercados": "0"
+    },
+    {
+      "id": "240003",
+      "nome": "Embalagens 2",
+      "ativo": "1",
+      "clientes": "0",
+      "concorrentes": "0",
+      "leads": "0",
+      "mercados": "54"
+    },
+    {
+      "id": "240002",
+      "nome": "Embalagens 2",
+      "ativo": "1",
+      "clientes": "0",
+      "concorrentes": "0",
+      "leads": "0",
+      "mercados": "84"
+    },
+    {
+      "id": "240001",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "1",
+      "leads": "4",
+      "mercados": "1"
+    },
+    {
+      "id": "210001",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "1",
+      "leads": "5",
+      "mercados": "1"
+    },
+    {
+      "id": "180004",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "10",
+      "leads": "8",
+      "mercados": "1"
+    },
+    {
+      "id": "180003",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "0",
+      "leads": "9",
+      "mercados": "1"
+    },
+    {
+      "id": "180002",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "0",
+      "leads": "6",
+      "mercados": "1"
+    },
+    {
+      "id": "180001",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "0",
+      "leads": "6",
+      "mercados": "1"
+    },
+    {
+      "id": "150001",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "10",
+      "leads": "8",
+      "mercados": "1"
+    },
+    {
+      "id": "120001",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "5",
+      "leads": "5",
+      "mercados": "1"
+    },
+    {
+      "id": "90001",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "0",
+      "leads": "0",
+      "mercados": "1"
+    },
+    {
+      "id": "60007",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "3",
+      "leads": "3",
+      "mercados": "1"
+    },
+    {
+      "id": "60006",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "3",
+      "leads": "3",
+      "mercados": "1"
+    },
+    {
+      "id": "60005",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "3",
+      "leads": "3",
+      "mercados": "1"
+    },
+    {
+      "id": "60004",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "3",
+      "leads": "3",
+      "mercados": "1"
+    },
+    {
+      "id": "60003",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "3",
+      "leads": "3",
+      "mercados": "1"
+    },
+    {
+      "id": "60002",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "3",
+      "leads": "0",
+      "mercados": "1"
+    },
+    {
+      "id": "60001",
+      "nome": "Teste Jeep API Corrigida",
+      "ativo": "1",
+      "clientes": "1",
+      "concorrentes": "3",
+      "leads": "0",
+      "mercados": "1"
+    },
+    {
+      "id": "30001",
+      "nome": "Teste Jeep do Brasil",
+      "ativo": "1",
+      "clientes": "0",
+      "concorrentes": "0",
+      "leads": "0",
+      "mercados": "0"
+    },
+    {
+      "id": "2",
+      "nome": "Projeto Teste Atualizado",
+      "ativo": "0",
+      "clientes": "0",
+      "concorrentes": "0",
+      "leads": "0",
+      "mercados": "0"
+    },
+    {
+      "id": "1",
+      "nome": "Embalagens",
+      "ativo": "1",
+      "clientes": "800",
+      "concorrentes": "591",
+      "leads": "727",
+      "mercados": "73"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tativo\tclientes\tconcorrentes\tleads\tmercados\n240004\tEmbalagens 2\t1\t0\t0\t0\t0\n240003\tEmbalagens 2\t1\t0\t0\t0\t54\n240002\tEmbalagens 2\t1\t0\t0\t0\t84\n240001\tTeste Jeep API Corrigida\t1\t1\t1\t4\t1\n210001\tTeste Jeep API Corrigida\t1\t1\t1\t5\t1\n180004\tTeste Jeep API Corrigida\t1\t1\t10\t8\t1\n180003\tTeste Jeep API Corrigida\t1\t1\t0\t9\t1\n180002\tTeste Jeep API Corrigida\t1\t1\t0\t6\t1\n180001\tTeste Jeep API Corrigida\t1\t1\t0\t6\t1\n150001\tTeste Jeep API Corrigida\t1\t1\t10\t8\t1\n120001\tTeste Jeep API Corrigida\t1\t1\t5\t5\t1\n90001\tTeste Jeep API Corrigida\t1\t1\t0\t0\t1\n60007\tTeste Jeep API Corrigida\t1\t1\t3\t3\t1\n60006\tTeste Jeep API Corrigida\t1\t1\t3\t3\t1\n60005\tTeste Jeep API Corrigida\t1\t1\t3\t3\t1\n60004\tTeste Jeep API Corrigida\t1\t1\t3\t3\t1\n60003\tTeste Jeep API Corrigida\t1\t1\t3\t3\t1\n60002\tTeste Jeep API Corrigida\t1\t1\t3\t0\t1\n60001\tTeste Jeep API Corrigida\t1\t1\t3\t0\t1\n30001\tTeste Jeep do Brasil\t1\t0\t0\t0\t0\n2\tProjeto Teste Atualizado\t0\t0\t0\t0\t0\n1\tEmbalagens\t1\t800\t591\t727\t73\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

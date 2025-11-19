@@ -1,0 +1,150 @@
+{
+  "query": "SELECT id, nome, descricao, ativo, createdAt FROM projects ORDER BY id DESC LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, descricao, ativo, createdAt FROM projects ORDER BY id DESC LIMIT 20",
+  "rows": [
+    {
+      "id": "240004",
+      "nome": "Embalagens 2",
+      "descricao": "Reprocessamento com filtros avançados",
+      "ativo": "1",
+      "createdAt": "2025-11-19 01:38:43"
+    },
+    {
+      "id": "240003",
+      "nome": "Embalagens 2",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-19 01:34:24"
+    },
+    {
+      "id": "240002",
+      "nome": "Embalagens 2",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-19 01:27:51"
+    },
+    {
+      "id": "240001",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-19 01:22:35"
+    },
+    {
+      "id": "210001",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-19 01:12:10"
+    },
+    {
+      "id": "180004",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-19 00:51:58"
+    },
+    {
+      "id": "180003",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-19 00:51:14"
+    },
+    {
+      "id": "180002",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-19 00:49:46"
+    },
+    {
+      "id": "180001",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-19 00:46:33"
+    },
+    {
+      "id": "150001",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-19 00:20:04"
+    },
+    {
+      "id": "120001",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-19 00:03:21"
+    },
+    {
+      "id": "90001",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-18 23:49:05"
+    },
+    {
+      "id": "60007",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-18 23:25:15"
+    },
+    {
+      "id": "60006",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-18 23:24:34"
+    },
+    {
+      "id": "60005",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-18 23:18:48"
+    },
+    {
+      "id": "60004",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-18 23:17:39"
+    },
+    {
+      "id": "60003",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-18 23:16:19"
+    },
+    {
+      "id": "60002",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-18 23:15:23"
+    },
+    {
+      "id": "60001",
+      "nome": "Teste Jeep API Corrigida",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-18 23:14:31"
+    },
+    {
+      "id": "30001",
+      "nome": "Teste Jeep do Brasil",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-18 21:39:07"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tdescricao\tativo\tcreatedAt\n240004\tEmbalagens 2\tReprocessamento com filtros avançados\t1\t2025-11-19 01:38:43\n240003\tEmbalagens 2\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-19 01:34:24\n240002\tEmbalagens 2\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-19 01:27:51\n240001\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-19 01:22:35\n210001\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-19 01:12:10\n180004\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-19 00:51:58\n180003\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-19 00:51:14\n180002\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-19 00:49:46\n180001\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-19 00:46:33\n150001\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-19 00:20:04\n120001\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-19 00:03:21\n90001\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-18 23:49:05\n60007\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-18 23:25:15\n60006\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-18 23:24:34\n60005\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-18 23:18:48\n60004\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-18 23:17:39\n60003\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-18 23:16:19\n60002\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-18 23:15:23\n60001\tTeste Jeep API Corrigida\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-18 23:14:31\n30001\tTeste Jeep do Brasil\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-18 21:39:07\n",
+  "stderr": "",
+  "execution_time_ms": 739
+}
