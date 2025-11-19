@@ -1,0 +1,24 @@
+{
+  "query": "\nWITH duplicates AS (\n  SELECT clienteHash, \n         MIN(id) as keep_id,\n         GROUP_CONCAT(id ORDER BY qualidadeScore DESC, id DESC) as all_ids\n  FROM clientes\n  GROUP BY clienteHash\n  HAVING COUNT(*) > 1\n)\nSELECT c.id, c.clienteHash, c.nome, c.qualidadeScore, d.keep_id\nFROM clientes c\nJOIN duplicates d ON c.clienteHash = d.clienteHash\nORDER BY c.clienteHash, c.qualidadeScore DESC, c.id DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nWITH duplicates AS (\n  SELECT clienteHash, \n         MIN(id) as keep_id,\n         GROUP_CONCAT(id ORDER BY qualidadeScore DESC, id DESC) as all_ids\n  FROM clientes\n  GROUP BY clienteHash\n  HAVING COUNT(*) > 1\n)\nSELECT c.id, c.clienteHash, c.nome, c.qualidadeScore, d.keep_id\nFROM clientes c\nJOIN duplicates d ON c.clienteHash = d.clienteHash\nORDER BY c.clienteHash, c.qualidadeScore DESC, c.id DESC;\n",
+  "rows": [
+    {
+      "id": "361957",
+      "clienteHash": "agro-coml-sao-paulo-ltda-4696061000196-1",
+      "nome": "AGRO COML SAO PAULO LTDA",
+      "qualidadeScore": "100",
+      "keep_id": "301632"
+    },
+    {
+      "id": "301632",
+      "clienteHash": "agro-coml-sao-paulo-ltda-4696061000196-1",
+      "nome": "AGRO COML SAO PAULO LTDA",
+      "qualidadeScore": "100",
+      "keep_id": "301632"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclienteHash\tnome\tqualidadeScore\tkeep_id\n361957\tagro-coml-sao-paulo-ltda-4696061000196-1\tAGRO COML SAO PAULO LTDA\t100\t301632\n301632\tagro-coml-sao-paulo-ltda-4696061000196-1\tAGRO COML SAO PAULO LTDA\t100\t301632\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

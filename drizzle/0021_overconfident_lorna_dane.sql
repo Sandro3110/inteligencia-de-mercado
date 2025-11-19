@@ -1,0 +1,1 @@
+ALTER TABLE `clientes` ADD CONSTRAINT `clientes_clienteHash_unique` UNIQUE(`clienteHash`);

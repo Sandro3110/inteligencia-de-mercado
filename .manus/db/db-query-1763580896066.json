@@ -1,0 +1,120 @@
+{
+  "query": "\nSELECT \n  id,\n  mercadoId,\n  nome,\n  cnpj,\n  site,\n  produto,\n  porte,\n  qualidadeScore,\n  createdAt\nFROM concorrentes\nWHERE DATE(createdAt) = '2025-11-19'\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  id,\n  mercadoId,\n  nome,\n  cnpj,\n  site,\n  produto,\n  porte,\n  qualidadeScore,\n  createdAt\nFROM concorrentes\nWHERE DATE(createdAt) = '2025-11-19'\nLIMIT 10;\n",
+  "rows": [
+    {
+      "id": "240002",
+      "mercadoId": "300007",
+      "nome": "MAGAZINE LUIZA S/A",
+      "cnpj": "47.960.950/0001-21",
+      "site": "https://www.magazineluiza.com.br",
+      "produto": "Gigante do varejo multicanal (online e físico), oferece ampla gama de produtos (eletrônicos, móveis, moda, etc.). Possui marketplace robusto e serviços financeiros digitais (LuizaCred, Magalu Pagamentos).",
+      "porte": "Grande",
+      "qualidadeScore": "100",
+      "createdAt": "2025-11-19 03:27:55"
+    },
+    {
+      "id": "240003",
+      "mercadoId": "300007",
+      "nome": "B2W COMPANHIA DIGITAL",
+      "cnpj": "00.776.574/0006-60",
+      "site": "https://www.americanas.com.br",
+      "produto": "Controladora das marcas Americanas, Submarino, Shoptime e Sou Barato. Opera um dos maiores marketplaces do país, focando em eletrônicos, livros, utilidades domésticas e serviços de logística (AME Digital).",
+      "porte": "Grande",
+      "qualidadeScore": "100",
+      "createdAt": "2025-11-19 03:27:55"
+    },
+    {
+      "id": "240004",
+      "mercadoId": "300007",
+      "nome": "VIA S.A.",
+      "cnpj": "33.041.260/0652-90",
+      "site": "https://www.via.com.br",
+      "produto": "Dona das marcas Casas Bahia, Ponto e Extra.com.br. Atua fortemente no varejo de móveis e eletrodomésticos, com forte presença física e crescente investimento em e-commerce e soluções logísticas (Envio Fácil).",
+      "porte": "Grande",
+      "qualidadeScore": "100",
+      "createdAt": "2025-11-19 03:27:55"
+    },
+    {
+      "id": "240005",
+      "mercadoId": "300007",
+      "nome": "MERCADOLIVRE.COM ATIVIDADES DE INTERNET LTDA.",
+      "cnpj": "03.361.259/0001-08",
+      "site": "https://www.mercadolivre.com.br",
+      "produto": "Maior plataforma de e-commerce e marketplace da América Latina. Oferece soluções completas de vendas online, logística (Mercado Envios) e pagamentos digitais (Mercado Pago).",
+      "porte": "Grande",
+      "qualidadeScore": "100",
+      "createdAt": "2025-11-19 03:27:55"
+    },
+    {
+      "id": "240006",
+      "mercadoId": "300007",
+      "nome": "AMAZON SERVICOS DE VAREJO DO BRASIL LTDA.",
+      "cnpj": "15.436.940/0001-03",
+      "site": "https://www.amazon.com.br",
+      "produto": "Varejista global com forte atuação no Brasil, oferecendo desde livros e eletrônicos até produtos de supermercado. Possui um vasto marketplace e serviços de assinatura (Prime) e logística avançada (FBA).",
+      "porte": "Grande",
+      "qualidadeScore": "100",
+      "createdAt": "2025-11-19 03:27:55"
+    },
+    {
+      "id": "240007",
+      "mercadoId": "300007",
+      "nome": "GRUPO NETSHOES S.A.",
+      "cnpj": "03.007.418/0001-09",
+      "site": "https://www.netshoes.com.br",
+      "produto": "E-commerce especializado em artigos esportivos, calçados e vestuário. Faz parte do Magazine Luiza, mas mantém operação e marca independentes no segmento de nicho.",
+      "porte": "Grande",
+      "qualidadeScore": "100",
+      "createdAt": "2025-11-19 03:27:55"
+    },
+    {
+      "id": "240008",
+      "mercadoId": "300007",
+      "nome": "GRUPO ZATTINI S.A.",
+      "cnpj": "03.007.418/0001-09",
+      "site": "https://www.zattini.com.br",
+      "produto": "Plataforma de e-commerce de moda e lifestyle, oferecendo roupas, calçados e acessórios. Opera sob o mesmo CNPJ do Grupo Netshoes, mas com foco distinto em moda casual.",
+      "porte": "Média",
+      "qualidadeScore": "100",
+      "createdAt": "2025-11-19 03:27:55"
+    },
+    {
+      "id": "240009",
+      "mercadoId": "300007",
+      "nome": "GRUPO GPA S.A.",
+      "cnpj": "47.508.411/0001-56",
+      "site": "https://www.gpa-pa.com.br",
+      "produto": "Um dos maiores varejistas de alimentos do país (Pão de Açúcar, Extra), com forte presença em e-commerce de supermercado (e-commerce alimentar) e serviços de delivery rápido.",
+      "porte": "Grande",
+      "qualidadeScore": "100",
+      "createdAt": "2025-11-19 03:27:55"
+    },
+    {
+      "id": "240010",
+      "mercadoId": "300007",
+      "nome": "C&A MODAS S.A.",
+      "cnpj": "45.242.914/0001-05",
+      "site": "https://www.cea.com.br",
+      "produto": "Varejista de moda com forte integração entre lojas físicas e e-commerce. Oferece vestuário, acessórios e serviços financeiros, com foco em moda rápida e sustentabilidade.",
+      "porte": "Grande",
+      "qualidadeScore": "100",
+      "createdAt": "2025-11-19 03:27:55"
+    },
+    {
+      "id": "240011",
+      "mercadoId": "300007",
+      "nome": "RENNER S.A.",
+      "cnpj": "92.754.738/0001-62",
+      "site": "https://www.lojasrenner.com.br",
+      "produto": "Varejista de moda e lifestyle, incluindo as marcas Camicado e Youcom. Possui um e-commerce maduro, oferecendo vestuário, decoração e serviços financeiros (Realize CFI).",
+      "porte": "Grande",
+      "qualidadeScore": "100",
+      "createdAt": "2025-11-19 03:27:55"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tmercadoId\tnome\tcnpj\tsite\tproduto\tporte\tqualidadeScore\tcreatedAt\n240002\t300007\tMAGAZINE LUIZA S/A\t47.960.950/0001-21\thttps://www.magazineluiza.com.br\tGigante do varejo multicanal (online e físico), oferece ampla gama de produtos (eletrônicos, móveis, moda, etc.). Possui marketplace robusto e serviços financeiros digitais (LuizaCred, Magalu Pagamentos).\tGrande\t100\t2025-11-19 03:27:55\n240003\t300007\tB2W COMPANHIA DIGITAL\t00.776.574/0006-60\thttps://www.americanas.com.br\tControladora das marcas Americanas, Submarino, Shoptime e Sou Barato. Opera um dos maiores marketplaces do país, focando em eletrônicos, livros, utilidades domésticas e serviços de logística (AME Digital).\tGrande\t100\t2025-11-19 03:27:55\n240004\t300007\tVIA S.A.\t33.041.260/0652-90\thttps://www.via.com.br\tDona das marcas Casas Bahia, Ponto e Extra.com.br. Atua fortemente no varejo de móveis e eletrodomésticos, com forte presença física e crescente investimento em e-commerce e soluções logísticas (Envio Fácil).\tGrande\t100\t2025-11-19 03:27:55\n240005\t300007\tMERCADOLIVRE.COM ATIVIDADES DE INTERNET LTDA.\t03.361.259/0001-08\thttps://www.mercadolivre.com.br\tMaior plataforma de e-commerce e marketplace da América Latina. Oferece soluções completas de vendas online, logística (Mercado Envios) e pagamentos digitais (Mercado Pago).\tGrande\t100\t2025-11-19 03:27:55\n240006\t300007\tAMAZON SERVICOS DE VAREJO DO BRASIL LTDA.\t15.436.940/0001-03\thttps://www.amazon.com.br\tVarejista global com forte atuação no Brasil, oferecendo desde livros e eletrônicos até produtos de supermercado. Possui um vasto marketplace e serviços de assinatura (Prime) e logística avançada (FBA).\tGrande\t100\t2025-11-19 03:27:55\n240007\t300007\tGRUPO NETSHOES S.A.\t03.007.418/0001-09\thttps://www.netshoes.com.br\tE-commerce especializado em artigos esportivos, calçados e vestuário. Faz parte do Magazine Luiza, mas mantém operação e marca independentes no segmento de nicho.\tGrande\t100\t2025-11-19 03:27:55\n240008\t300007\tGRUPO ZATTINI S.A.\t03.007.418/0001-09\thttps://www.zattini.com.br\tPlataforma de e-commerce de moda e lifestyle, oferecendo roupas, calçados e acessórios. Opera sob o mesmo CNPJ do Grupo Netshoes, mas com foco distinto em moda casual.\tMédia\t100\t2025-11-19 03:27:55\n240009\t300007\tGRUPO GPA S.A.\t47.508.411/0001-56\thttps://www.gpa-pa.com.br\tUm dos maiores varejistas de alimentos do país (Pão de Açúcar, Extra), com forte presença em e-commerce de supermercado (e-commerce alimentar) e serviços de delivery rápido.\tGrande\t100\t2025-11-19 03:27:55\n240010\t300007\tC&A MODAS S.A.\t45.242.914/0001-05\thttps://www.cea.com.br\tVarejista de moda com forte integração entre lojas físicas e e-commerce. Oferece vestuário, acessórios e serviços financeiros, com foco em moda rápida e sustentabilidade.\tGrande\t100\t2025-11-19 03:27:55\n240011\t300007\tRENNER S.A.\t92.754.738/0001-62\thttps://www.lojasrenner.com.br\tVarejista de moda e lifestyle, incluindo as marcas Camicado e Youcom. Possui um e-commerce maduro, oferecendo vestuário, decoração e serviços financeiros (Realize CFI).\tGrande\t100\t2025-11-19 03:27:55\n",
+  "stderr": "",
+  "execution_time_ms": 178
+}

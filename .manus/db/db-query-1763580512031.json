@@ -1,0 +1,28 @@
+{
+  "query": "\nSELECT \n  'Mercados' as entidade,\n  COUNT(*) as total,\n  SUM(CASE WHEN DATE(createdAt) = '2025-11-19' THEN 1 ELSE 0 END) as criados_no_run,\n  SUM(CASE WHEN DATE(createdAt) = '2025-10-21' THEN 1 ELSE 0 END) as originais\nFROM mercados_unicos\nUNION ALL\nSELECT \n  'Concorrentes' as entidade,\n  COUNT(*) as total,\n  SUM(CASE WHEN DATE(createdAt) = '2025-11-19' THEN 1 ELSE 0 END) as criados_no_run,\n  SUM(CASE WHEN DATE(createdAt) = '2025-10-21' THEN 1 ELSE 0 END) as originais\nFROM concorrentes\nUNION ALL\nSELECT \n  'Leads' as entidade,\n  COUNT(*) as total,\n  SUM(CASE WHEN DATE(createdAt) = '2025-11-19' THEN 1 ELSE 0 END) as criados_no_run,\n  SUM(CASE WHEN DATE(createdAt) = '2025-10-21' THEN 1 ELSE 0 END) as originais\nFROM leads;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  'Mercados' as entidade,\n  COUNT(*) as total,\n  SUM(CASE WHEN DATE(createdAt) = '2025-11-19' THEN 1 ELSE 0 END) as criados_no_run,\n  SUM(CASE WHEN DATE(createdAt) = '2025-10-21' THEN 1 ELSE 0 END) as originais\nFROM mercados_unicos\nUNION ALL\nSELECT \n  'Concorrentes' as entidade,\n  COUNT(*) as total,\n  SUM(CASE WHEN DATE(createdAt) = '2025-11-19' THEN 1 ELSE 0 END) as criados_no_run,\n  SUM(CASE WHEN DATE(createdAt) = '2025-10-21' THEN 1 ELSE 0 END) as originais\nFROM concorrentes\nUNION ALL\nSELECT \n  'Leads' as entidade,\n  COUNT(*) as total,\n  SUM(CASE WHEN DATE(createdAt) = '2025-11-19' THEN 1 ELSE 0 END) as criados_no_run,\n  SUM(CASE WHEN DATE(createdAt) = '2025-10-21' THEN 1 ELSE 0 END) as originais\nFROM leads;\n",
+  "rows": [
+    {
+      "entidade": "Mercados",
+      "total": "1939",
+      "criados_no_run": "1939",
+      "originais": "0"
+    },
+    {
+      "entidade": "Concorrentes",
+      "total": "15743",
+      "criados_no_run": "15743",
+      "originais": "0"
+    },
+    {
+      "entidade": "Leads",
+      "total": "15745",
+      "criados_no_run": "15745",
+      "originais": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "entidade\ttotal\tcriados_no_run\toriginais\nMercados\t1939\t1939\t0\nConcorrentes\t15743\t15743\t0\nLeads\t15745\t15745\t0\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

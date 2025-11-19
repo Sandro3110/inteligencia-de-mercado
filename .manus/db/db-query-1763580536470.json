@@ -1,0 +1,58 @@
+{
+  "query": "\nSELECT \n  id,\n  nome,\n  cnpj,\n  qualidadeScore,\n  produtoPrincipal,\n  email,\n  telefone,\n  siteOficial,\n  cidade,\n  uf\nFROM clientes\nWHERE DATE(createdAt) = '2025-11-19'\nLIMIT 4;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  id,\n  nome,\n  cnpj,\n  qualidadeScore,\n  produtoPrincipal,\n  email,\n  telefone,\n  siteOficial,\n  cidade,\n  uf\nFROM clientes\nWHERE DATE(createdAt) = '2025-11-19'\nLIMIT 4;\n",
+  "rows": [
+    {
+      "id": "271612",
+      "nome": "Petrobras",
+      "cnpj": "33.000.167/0001-01",
+      "qualidadeScore": "100",
+      "produtoPrincipal": "NULL",
+      "email": "sac@petrobras.com.br",
+      "telefone": "+552132244477",
+      "siteOficial": "NULL",
+      "cidade": "NULL",
+      "uf": "NULL"
+    },
+    {
+      "id": "301614",
+      "nome": "1001 EMBALAGEM ADESIVOS E ENVELOPES LTDA",
+      "cnpj": "33265973000101",
+      "qualidadeScore": "100",
+      "produtoPrincipal": "Embalagens plásticas flexíveis para e-commerce e logística (sacos e envelopes de segurança com adesivo inviolável).",
+      "email": "contato@1001embalagem.com.br",
+      "telefone": "1141144001",
+      "siteOficial": "NULL",
+      "cidade": "NULL",
+      "uf": "NULL"
+    },
+    {
+      "id": "301615",
+      "nome": "4MMD GESSO PISO E REVESTIMENTO EIRELI",
+      "cnpj": "20953721000123",
+      "qualidadeScore": "80",
+      "produtoPrincipal": "Comercialização e instalação de pisos e revestimentos em gesso para construção civil.",
+      "email": "4mmdgesso@gmail.com",
+      "telefone": "(11) 98765-4321",
+      "siteOficial": "NULL",
+      "cidade": "NULL",
+      "uf": "NULL"
+    },
+    {
+      "id": "301616",
+      "nome": "A C P IND DE MOVEIS LTDA",
+      "cnpj": "30746945000118",
+      "qualidadeScore": "80",
+      "produtoPrincipal": "Fabricação e distribuição B2B de móveis planejados e modulados para cozinhas, dormitórios e escritórios.",
+      "email": "acp.moveis@hotmail.com",
+      "telefone": "(47) 3374-2794",
+      "siteOficial": "NULL",
+      "cidade": "NULL",
+      "uf": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcnpj\tqualidadeScore\tprodutoPrincipal\temail\ttelefone\tsiteOficial\tcidade\tuf\n271612\tPetrobras\t33.000.167/0001-01\t100\tNULL\tsac@petrobras.com.br\t+552132244477\tNULL\tNULL\tNULL\n301614\t1001 EMBALAGEM ADESIVOS E ENVELOPES LTDA\t33265973000101\t100\tEmbalagens plásticas flexíveis para e-commerce e logística (sacos e envelopes de segurança com adesivo inviolável).\tcontato@1001embalagem.com.br\t1141144001\tNULL\tNULL\tNULL\n301615\t4MMD GESSO PISO E REVESTIMENTO EIRELI\t20953721000123\t80\tComercialização e instalação de pisos e revestimentos em gesso para construção civil.\t4mmdgesso@gmail.com\t(11) 98765-4321\tNULL\tNULL\tNULL\n301616\tA C P IND DE MOVEIS LTDA\t30746945000118\t80\tFabricação e distribuição B2B de móveis planejados e modulados para cozinhas, dormitórios e escritórios.\tacp.moveis@hotmail.com\t(47) 3374-2794\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

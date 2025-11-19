@@ -1,0 +1,8 @@
+{
+  "query": "\nALTER TABLE clientes \nADD UNIQUE KEY unique_cliente_hash (clienteHash);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nALTER TABLE clientes \nADD UNIQUE KEY unique_cliente_hash (clienteHash);\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1062 (23000) at line 2: Duplicate entry '?' for key 'clientes.unique_cliente_hash'"
+  ]
+}

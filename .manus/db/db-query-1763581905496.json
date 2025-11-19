@@ -1,0 +1,9 @@
+{
+  "query": "\nDELETE FROM clientes \nWHERE clienteHash IN (\n  SELECT clienteHash FROM (\n    SELECT clienteHash\n    FROM clientes\n    GROUP BY clienteHash\n    HAVING COUNT(*) > 1\n  ) AS dups\n)\nAND id NOT IN (\n  SELECT max_id FROM (\n    SELECT MAX(id) as max_id\n    FROM clientes\n    WHERE clienteHash IN (\n      SELECT clienteHash FROM (\n        SELECT clienteHash\n        FROM clientes\n        GROUP BY clienteHash\n        HAVING COUNT(*) > 1\n      ) AS dups2\n    )\n    GROUP BY clienteHash\n  ) AS keep_ids\n);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nDELETE FROM clientes \nWHERE clienteHash IN (\n  SELECT clienteHash FROM (\n    SELECT clienteHash\n    FROM clientes\n    GROUP BY clienteHash\n    HAVING COUNT(*) > 1\n  ) AS dups\n)\nAND id NOT IN (\n  SELECT max_id FROM (\n    SELECT MAX(id) as max_id\n    FROM clientes\n    WHERE clienteHash IN (\n      SELECT clienteHash FROM (\n        SELECT clienteHash\n        FROM clientes\n        GROUP BY clienteHash\n        HAVING COUNT(*) > 1\n      ) AS dups2\n    )\n    GROUP BY clienteHash\n  ) AS keep_ids\n);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 69
+}

@@ -1,0 +1,32 @@
+{
+  "query": "\nSELECT \n  CASE \n    WHEN DATE(createdAt) = '2025-10-21' THEN 'ORIGINAIS (21/10)'\n    WHEN DATE(createdAt) = '2025-11-19' THEN 'ENRIQUECIDOS (19/11)'\n    ELSE 'OUTROS'\n  END as tipo,\n  COUNT(*) as total,\n  ROUND(AVG(qualidadeScore), 2) as score_medio,\n  ROUND(AVG(CASE WHEN email IS NOT NULL AND email != '' THEN 1 ELSE 0 END) * 100, 2) as perc_email,\n  ROUND(AVG(CASE WHEN telefone IS NOT NULL AND telefone != '' THEN 1 ELSE 0 END) * 100, 2) as perc_telefone,\n  ROUND(AVG(CASE WHEN siteOficial IS NOT NULL AND siteOficial != '' THEN 1 ELSE 0 END) * 100, 2) as perc_site,\n  ROUND(AVG(CASE WHEN produtoPrincipal IS NOT NULL AND produtoPrincipal != '' THEN 1 ELSE 0 END) * 100, 2) as perc_produto,\n  ROUND(AVG(CASE WHEN cidade IS NOT NULL AND cidade != '' THEN 1 ELSE 0 END) * 100, 2) as perc_cidade,\n  ROUND(AVG(LENGTH(produtoPrincipal)), 0) as tamanho_medio_produto\nFROM clientes\nGROUP BY tipo\nORDER BY MIN(createdAt);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  CASE \n    WHEN DATE(createdAt) = '2025-10-21' THEN 'ORIGINAIS (21/10)'\n    WHEN DATE(createdAt) = '2025-11-19' THEN 'ENRIQUECIDOS (19/11)'\n    ELSE 'OUTROS'\n  END as tipo,\n  COUNT(*) as total,\n  ROUND(AVG(qualidadeScore), 2) as score_medio,\n  ROUND(AVG(CASE WHEN email IS NOT NULL AND email != '' THEN 1 ELSE 0 END) * 100, 2) as perc_email,\n  ROUND(AVG(CASE WHEN telefone IS NOT NULL AND telefone != '' THEN 1 ELSE 0 END) * 100, 2) as perc_telefone,\n  ROUND(AVG(CASE WHEN siteOficial IS NOT NULL AND siteOficial != '' THEN 1 ELSE 0 END) * 100, 2) as perc_site,\n  ROUND(AVG(CASE WHEN produtoPrincipal IS NOT NULL AND produtoPrincipal != '' THEN 1 ELSE 0 END) * 100, 2) as perc_produto,\n  ROUND(AVG(CASE WHEN cidade IS NOT NULL AND cidade != '' THEN 1 ELSE 0 END) * 100, 2) as perc_cidade,\n  ROUND(AVG(LENGTH(produtoPrincipal)), 0) as tamanho_medio_produto\nFROM clientes\nGROUP BY tipo\nORDER BY MIN(createdAt);\n",
+  "rows": [
+    {
+      "tipo": "ORIGINAIS (21/10)",
+      "total": "7",
+      "score_medio": "NULL",
+      "perc_email": "100.00",
+      "perc_telefone": "100.00",
+      "perc_site": "100.00",
+      "perc_produto": "0.00",
+      "perc_cidade": "100.00",
+      "tamanho_medio_produto": "NULL"
+    },
+    {
+      "tipo": "ENRIQUECIDOS (19/11)",
+      "total": "799",
+      "score_medio": "97.25",
+      "perc_email": "99.75",
+      "perc_telefone": "99.75",
+      "perc_site": "0.00",
+      "perc_produto": "99.37",
+      "perc_cidade": "0.00",
+      "tamanho_medio_produto": "128"
+    }
+  ],
+  "messages": [],
+  "stdout": "tipo\ttotal\tscore_medio\tperc_email\tperc_telefone\tperc_site\tperc_produto\tperc_cidade\ttamanho_medio_produto\nORIGINAIS (21/10)\t7\tNULL\t100.00\t100.00\t100.00\t0.00\t100.00\tNULL\nENRIQUECIDOS (19/11)\t799\t97.25\t99.75\t99.75\t0.00\t99.37\t0.00\t128\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

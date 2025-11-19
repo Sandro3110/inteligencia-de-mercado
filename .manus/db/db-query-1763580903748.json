@@ -1,0 +1,28 @@
+{
+  "query": "\nSELECT \n  'Concorrentes' as tipo,\n  COUNT(*) as total,\n  SUM(CASE WHEN cnpj IS NOT NULL AND cnpj != '' THEN 1 ELSE 0 END) as com_cnpj,\n  SUM(CASE WHEN site IS NOT NULL AND site != '' THEN 1 ELSE 0 END) as com_site,\n  SUM(CASE WHEN produto IS NOT NULL AND produto != '' THEN 1 ELSE 0 END) as com_produto,\n  SUM(CASE WHEN porte IS NOT NULL AND porte != '' THEN 1 ELSE 0 END) as com_porte,\n  ROUND(AVG(qualidadeScore), 2) as score_medio\nFROM concorrentes\nWHERE DATE(createdAt) = '2025-11-19'\nUNION ALL\nSELECT \n  'Leads' as tipo,\n  COUNT(*) as total,\n  SUM(CASE WHEN cnpj IS NOT NULL AND cnpj != '' THEN 1 ELSE 0 END) as com_cnpj,\n  SUM(CASE WHEN site IS NOT NULL AND site != '' THEN 1 ELSE 0 END) as com_site,\n  SUM(CASE WHEN email IS NOT NULL AND email != '' THEN 1 ELSE 0 END) as com_email,\n  SUM(CASE WHEN porte IS NOT NULL AND porte != '' THEN 1 ELSE 0 END) as com_porte,\n  ROUND(AVG(qualidadeScore), 2) as score_medio\nFROM leads\nWHERE DATE(createdAt) = '2025-11-19';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  'Concorrentes' as tipo,\n  COUNT(*) as total,\n  SUM(CASE WHEN cnpj IS NOT NULL AND cnpj != '' THEN 1 ELSE 0 END) as com_cnpj,\n  SUM(CASE WHEN site IS NOT NULL AND site != '' THEN 1 ELSE 0 END) as com_site,\n  SUM(CASE WHEN produto IS NOT NULL AND produto != '' THEN 1 ELSE 0 END) as com_produto,\n  SUM(CASE WHEN porte IS NOT NULL AND porte != '' THEN 1 ELSE 0 END) as com_porte,\n  ROUND(AVG(qualidadeScore), 2) as score_medio\nFROM concorrentes\nWHERE DATE(createdAt) = '2025-11-19'\nUNION ALL\nSELECT \n  'Leads' as tipo,\n  COUNT(*) as total,\n  SUM(CASE WHEN cnpj IS NOT NULL AND cnpj != '' THEN 1 ELSE 0 END) as com_cnpj,\n  SUM(CASE WHEN site IS NOT NULL AND site != '' THEN 1 ELSE 0 END) as com_site,\n  SUM(CASE WHEN email IS NOT NULL AND email != '' THEN 1 ELSE 0 END) as com_email,\n  SUM(CASE WHEN porte IS NOT NULL AND porte != '' THEN 1 ELSE 0 END) as com_porte,\n  ROUND(AVG(qualidadeScore), 2) as score_medio\nFROM leads\nWHERE DATE(createdAt) = '2025-11-19';\n",
+  "rows": [
+    {
+      "tipo": "Leads",
+      "total": "15844",
+      "com_cnpj": "15844",
+      "com_site": "15844",
+      "com_produto": "15844",
+      "com_porte": "15844",
+      "score_medio": "98.54"
+    },
+    {
+      "tipo": "Concorrentes",
+      "total": "15862",
+      "com_cnpj": "15862",
+      "com_site": "15862",
+      "com_produto": "15862",
+      "com_porte": "15862",
+      "score_medio": "99.96"
+    }
+  ],
+  "messages": [],
+  "stdout": "tipo\ttotal\tcom_cnpj\tcom_site\tcom_produto\tcom_porte\tscore_medio\nLeads\t15844\t15844\t15844\t15844\t15844\t98.54\nConcorrentes\t15862\t15862\t15862\t15862\t15862\t99.96\n",
+  "stderr": "",
+  "execution_time_ms": 84
+}

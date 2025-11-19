@@ -1,0 +1,30 @@
+{
+  "query": "\nSELECT \n  DATE(createdAt) as data_criacao,\n  COUNT(*) as total_clientes,\n  ROUND(AVG(qualidadeScore), 2) as score_medio,\n  MIN(id) as primeiro_id,\n  MAX(id) as ultimo_id,\n  SUM(CASE WHEN qualidadeScore >= 80 THEN 1 ELSE 0 END) as score_alto,\n  SUM(CASE WHEN qualidadeScore >= 60 AND qualidadeScore < 80 THEN 1 ELSE 0 END) as score_medio_cat,\n  SUM(CASE WHEN qualidadeScore < 60 THEN 1 ELSE 0 END) as score_baixo\nFROM clientes\nGROUP BY DATE(createdAt)\nORDER BY data_criacao;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  DATE(createdAt) as data_criacao,\n  COUNT(*) as total_clientes,\n  ROUND(AVG(qualidadeScore), 2) as score_medio,\n  MIN(id) as primeiro_id,\n  MAX(id) as ultimo_id,\n  SUM(CASE WHEN qualidadeScore >= 80 THEN 1 ELSE 0 END) as score_alto,\n  SUM(CASE WHEN qualidadeScore >= 60 AND qualidadeScore < 80 THEN 1 ELSE 0 END) as score_medio_cat,\n  SUM(CASE WHEN qualidadeScore < 60 THEN 1 ELSE 0 END) as score_baixo\nFROM clientes\nGROUP BY DATE(createdAt)\nORDER BY data_criacao;\n",
+  "rows": [
+    {
+      "data_criacao": "2025-10-21",
+      "total_clientes": "7",
+      "score_medio": "NULL",
+      "primeiro_id": "2205",
+      "ultimo_id": "2410",
+      "score_alto": "0",
+      "score_medio_cat": "0",
+      "score_baixo": "0"
+    },
+    {
+      "data_criacao": "2025-11-19",
+      "total_clientes": "798",
+      "score_medio": "97.24",
+      "primeiro_id": "271612",
+      "ultimo_id": "361933",
+      "score_alto": "796",
+      "score_medio_cat": "0",
+      "score_baixo": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "data_criacao\ttotal_clientes\tscore_medio\tprimeiro_id\tultimo_id\tscore_alto\tscore_medio_cat\tscore_baixo\n2025-10-21\t7\tNULL\t2205\t2410\t0\t0\t0\n2025-11-19\t798\t97.24\t271612\t361933\t796\t0\t2\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}
