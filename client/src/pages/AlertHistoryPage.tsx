@@ -61,24 +61,26 @@ export default function AlertHistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
-      <div className="max-w-5xl mx-auto space-y-6">
-        {/* Breadcrumbs */}
-        <Breadcrumbs
-          items={[
-            { label: "Alertas" },
-            { label: "Histórico" },
-          ]}
-        />
-
+    <div className="min-h-screen bg-slate-50">
+      <div className="bg-white border-b border-border px-6 py-4">
+        <div className="max-w-7xl mx-auto">
+          <Breadcrumbs
+            items={[
+              { label: "Alertas" },
+              { label: "Histórico" },
+            ]}
+          />
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <Clock className="w-6 h-6 text-blue-500" />
               Histórico de Alertas
             </h2>
-            <p className="text-slate-400 mt-1">
+            <p className="text-muted-foreground mt-1">
               Timeline completa de todos os alertas disparados
             </p>
           </div>
@@ -88,14 +90,14 @@ export default function AlertHistoryPage() {
         {isLoading ? (
           <Card className="glass-card">
             <CardContent className="p-8 text-center">
-              <p className="text-slate-400">Carregando histórico...</p>
+              <p className="text-muted-foreground">Carregando histórico...</p>
             </CardContent>
           </Card>
         ) : !history || history.length === 0 ? (
           <Card className="glass-card">
             <CardContent className="p-8 text-center">
               <Bell className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <p className="text-slate-400">Nenhum alerta foi disparado ainda</p>
+              <p className="text-muted-foreground">Nenhum alerta foi disparado ainda</p>
             </CardContent>
           </Card>
         ) : (

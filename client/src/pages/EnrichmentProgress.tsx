@@ -145,10 +145,10 @@ export default function EnrichmentProgress() {
 
   if (isLoading || !progress) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="text-center">
           <RefreshCw className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
-          <p className="text-slate-400">Carregando progresso...</p>
+          <p className="text-muted-foreground">Carregando progresso...</p>
         </div>
       </div>
     );
@@ -158,18 +158,20 @@ export default function EnrichmentProgress() {
   const isInProgress = progress.processed > 0 && progress.percentage < 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
-      <div className="max-w-5xl mx-auto space-y-6">
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[{ label: "Monitoramento" }]} />
-        
+    <div className="min-h-screen bg-slate-50">
+      <div className="bg-white border-b border-border px-6 py-4">
+        <div className="max-w-7xl mx-auto">
+          <Breadcrumbs items={[{ label: "Monitoramento" }]} />
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Progresso do Enriquecimento
             </h1>
-            <p className="text-slate-400">
+            <p className="text-muted-foreground">
               Acompanhe em tempo real o processamento dos clientes
             </p>
           </div>
@@ -266,7 +268,7 @@ export default function EnrichmentProgress() {
             {/* Barra de Progresso */}
             <div className="space-y-2">
               <Progress value={progress.percentage} className="h-4" />
-              <div className="flex justify-between text-sm text-slate-400">
+              <div className="flex justify-between text-sm text-muted-foreground">
                 <span>Processados: {progress.processed}</span>
                 <span>Restantes: {progress.remaining}</span>
               </div>
@@ -278,19 +280,19 @@ export default function EnrichmentProgress() {
                 <div className="text-3xl font-bold text-blue-500">
                   {progress.processed}
                 </div>
-                <div className="text-sm text-slate-400 mt-1">Processados</div>
+                <div className="text-sm text-muted-foreground mt-1">Processados</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-yellow-500">
                   {progress.remaining}
                 </div>
-                <div className="text-sm text-slate-400 mt-1">Restantes</div>
+                <div className="text-sm text-muted-foreground mt-1">Restantes</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-green-500">
                   {progress.total}
                 </div>
-                <div className="text-sm text-slate-400 mt-1">Total</div>
+                <div className="text-sm text-muted-foreground mt-1">Total</div>
               </div>
             </div>
           </CardContent>
@@ -310,7 +312,7 @@ export default function EnrichmentProgress() {
               <div className="text-4xl font-bold text-purple-500">
                 {progress.stats.mercados}
               </div>
-              <p className="text-sm text-slate-400 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Mercados identificados
               </p>
             </CardContent>
@@ -328,7 +330,7 @@ export default function EnrichmentProgress() {
               <div className="text-4xl font-bold text-orange-500">
                 {progress.stats.concorrentes}
               </div>
-              <p className="text-sm text-slate-400 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Concorrentes encontrados
               </p>
               <p className="text-xs text-slate-500 mt-1">
@@ -351,7 +353,7 @@ export default function EnrichmentProgress() {
               <div className="text-4xl font-bold text-green-500">
                 {progress.stats.leads}
               </div>
-              <p className="text-sm text-slate-400 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Leads gerados
               </p>
               <p className="text-xs text-slate-500 mt-1">
@@ -425,7 +427,7 @@ export default function EnrichmentProgress() {
                             {new Date(run.startedAt).toLocaleString('pt-BR')}
                           </span>
                         </div>
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-muted-foreground">
                           {run.processedClients}/{run.totalClients} clientes
                           {duration > 0 && ` • ${duration} minutos`}
                         </div>
@@ -445,22 +447,22 @@ export default function EnrichmentProgress() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-slate-300">
             <div className="flex justify-between py-2 border-b border-slate-700">
-              <span className="text-slate-400">Status:</span>
+              <span className="text-muted-foreground">Status:</span>
               <span className="font-medium">
                 {isComplete ? "Concluído" : isInProgress ? "Em Progresso" : "Aguardando"}
               </span>
             </div>
             <div className="flex justify-between py-2 border-b border-slate-700">
-              <span className="text-slate-400">Atualização automática:</span>
+              <span className="text-muted-foreground">Atualização automática:</span>
               <span className="font-medium">A cada 5 segundos</span>
             </div>
             <div className="flex justify-between py-2 border-b border-slate-700">
-              <span className="text-slate-400">Última atualização:</span>
+              <span className="text-muted-foreground">Última atualização:</span>
               <span className="font-medium">{lastUpdate.toLocaleTimeString('pt-BR')}</span>
             </div>
             {isInProgress && progress.remaining > 0 && (
               <div className="flex justify-between py-2">
-                <span className="text-slate-400">Tempo estimado:</span>
+                <span className="text-muted-foreground">Tempo estimado:</span>
                 <span className="font-medium">
                   {Math.round((progress.remaining * 30) / 60)} minutos
                   <span className="text-xs text-slate-500 ml-1">(~30s por cliente)</span>

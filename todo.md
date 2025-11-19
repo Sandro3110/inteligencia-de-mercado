@@ -2811,3 +2811,40 @@
 - [x] Criar botão "Resetar Layout Padrão"
 - [ ] Adicionar preview de layouts pré-definidos
 - [x] Implementar resize de cards
+
+
+## Fase 57: Auditoria e Refinamento Visual Completo 🎨
+
+### 57.1 Auditoria de Páginas
+- [x] Auditar CascadeView (página inicial)
+- [x] Auditar Dashboard e DashboardPage
+- [x] Auditar AnalyticsPage e AnalyticsDashboard
+- [x] Auditar ROIDashboard
+- [x] Auditar FunnelView
+- [x] Auditar MercadoDetalhes
+- [x] Auditar EnrichmentFlow e EnrichmentProgress
+- [x] Auditar AlertsPage e AlertHistoryPage
+- [x] Auditar ReportsPage, SchedulePage, AtividadePage
+- [x] Documentar problemas encontrados
+
+### 57.2 Padronização de Botões
+- [x] Definir paleta padrão (primary, secondary, ghost, outline)
+- [x] Substituir todos os botões por variantes padronizadas
+- [x] Remover cores inconsistentes (verde, vermelho custom, etc)
+- [x] Garantir hover states consistentes
+- [x] Padronizar tamanhos (sm, default, lg)
+
+### 57.3 Unificação de Backgrounds
+- [x] Converter todas as páginas para bg-slate-50 ou bg-white
+- [x] Remover gradientes escuros (from-slate-950, from-gray-900)
+- [x] Padronizar cards com bg-white e shadow-sm
+- [x] Ajustar cores de texto para tema light
+- [x] Garantir contraste WCAG AA
+
+### 57.4 Centralização e Responsividade
+- [x] Envolver todo conteúdo em .container ou max-w-7xl mx-auto
+- [x] Adicionar padding horizontal responsivo (px-4 sm:px-6 lg:px-8)
+- [x] Remover larguras fixas que causam overflow
+- [x] Garantir scroll apenas vertical
+- [x] Testar em mobile (375px), tablet (768px), desktop (1280px+)
+- [x] Corrigir quebras de layout em telas pequenas
