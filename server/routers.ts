@@ -102,6 +102,8 @@ export const appRouter = router({
       .input(z.object({
         projectId: z.number().optional(),
         search: z.string().optional(),
+        categoria: z.string().optional(),
+        segmentacao: z.string().optional(),
         limit: z.number().optional(),
         offset: z.number().optional(),
       }).optional())

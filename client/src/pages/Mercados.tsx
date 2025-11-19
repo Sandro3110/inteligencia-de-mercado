@@ -4,14 +4,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { Search, Building2, ArrowLeft, TrendingUp, Users, Download } from "lucide-react";
+import { Search, Building2, ArrowLeft, TrendingUp, Users, Download, Filter, X } from "lucide-react";
 import { toast } from "sonner";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 
 export default function Mercados() {
   const [search, setSearch] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [segmentacao, setSegmentacao] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
   const { selectedProjectId } = useSelectedProject();
-  const { data: mercados, isLoading } = trpc.mercados.list.useQuery({ search });
+  const { data: mercados, isLoading } = trpc.mercados.list.useQuery({ 
+    search, 
+    categoria: categoria || undefined,
+    segmentacao: segmentacao || undefined
+  });
   const exportMutation = trpc.export.mercados.useMutation();
 
   const handleExport = async () => {
@@ -73,25 +80,35 @@ export default function Mercados() {
           </div>
 
           {/* Search e Exportar */}
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar por nome ou categoria..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
-            />
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar por nome ou categoria..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                className="gap-2"
+              >
+                <Filter className="w-4 h-4" />
+                Filtros
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleExport}
+                disabled={exportMutation.isPending}
+                className="gap-2"
+              >
+                <Download className="w-4 h-4" />
+                {exportMutation.isPending ? 'Exportando...' : 'Exportar Excel'}
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              onClick={handleExport}
-              disabled={exportMutation.isPending}
-              className="gap-2"
-            >
-              <Download className="w-4 h-4" />
-              {exportMutation.isPending ? 'Exportando...' : 'Exportar Excel'}
-            </Button>
           </div>
         </div>
       </div>

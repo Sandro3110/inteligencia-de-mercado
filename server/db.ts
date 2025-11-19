@@ -1,4 +1,4 @@
-import { eq, sql, and, or, like, count, desc } from "drizzle-orm";
+import { eq, sql, and, or, like, count, desc, gte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users, 
@@ -182,6 +182,8 @@ export async function getDashboardStats(projectId?: number) {
 export async function getMercados(params?: {
   projectId?: number;
   search?: string;
+  categoria?: string;
+  segmentacao?: string;
   limit?: number;
   offset?: number;
 }) {
@@ -202,6 +204,12 @@ export async function getMercados(params?: {
         like(mercadosUnicos.categoria, `%${params.search}%`)
       )!
     );
+  }
+  if (params?.categoria) {
+    conditions.push(like(mercadosUnicos.categoria, `%${params.categoria}%`));
+  }
+  if (params?.segmentacao) {
+    conditions.push(eq(mercadosUnicos.segmentacao, params.segmentacao));
   }
 
   if (conditions.length > 0) {
