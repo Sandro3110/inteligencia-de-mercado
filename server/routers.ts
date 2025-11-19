@@ -891,6 +891,16 @@ export const appRouter = router({
       }),
   }),
 
+  // Funil de Vendas
+  funnel: router({
+    data: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getFunnelData } = await import('./db');
+        return await getFunnelData(input.projectId);
+      }),
+  }),
+
   // Métricas de ROI
   roi: router({
     metrics: publicProcedure

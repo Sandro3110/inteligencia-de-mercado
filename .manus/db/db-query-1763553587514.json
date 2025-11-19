@@ -1,0 +1,30 @@
+{
+  "query": "SELECT clienteHash, COUNT(*) as duplicates \nFROM clientes \nWHERE projectId = 1 AND clienteHash IS NOT NULL\nGROUP BY clienteHash \nHAVING COUNT(*) > 1 \nLIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT clienteHash, COUNT(*) as duplicates \nFROM clientes \nWHERE projectId = 1 AND clienteHash IS NOT NULL\nGROUP BY clienteHash \nHAVING COUNT(*) > 1 \nLIMIT 10",
+  "rows": [
+    {
+      "clienteHash": "brasilbag-com-de-embalagens-eireli-15399889000107-1",
+      "duplicates": "2"
+    },
+    {
+      "clienteHash": "4mmd-gesso-piso-e-revestimento-eireli-20953721000123-1",
+      "duplicates": "2"
+    },
+    {
+      "clienteHash": "brasalpla-rio-de-janeiro-ind-de-embalagens-ltda-11767105000197-1",
+      "duplicates": "2"
+    },
+    {
+      "clienteHash": "1001-embalagem-adesivos-e-envelopes-ltda-33265973000101-1",
+      "duplicates": "2"
+    },
+    {
+      "clienteHash": "brasalpla-brasil-ind-de-embalagens-ltda-1377724000111-1",
+      "duplicates": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "clienteHash\tduplicates\nbrasilbag-com-de-embalagens-eireli-15399889000107-1\t2\n4mmd-gesso-piso-e-revestimento-eireli-20953721000123-1\t2\nbrasalpla-rio-de-janeiro-ind-de-embalagens-ltda-11767105000197-1\t2\n1001-embalagem-adesivos-e-envelopes-ltda-33265973000101-1\t2\nbrasalpla-brasil-ind-de-embalagens-ltda-1377724000111-1\t2\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

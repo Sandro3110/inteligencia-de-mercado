@@ -61,6 +61,18 @@ const navItems: NavItem[] = [
     icon: FileText,
     description: "Gerar relatórios executivos em PDF"
   },
+  {
+    title: "ROI",
+    href: "/roi",
+    icon: TrendingUp,
+    description: "Dashboard de ROI e conversões"
+  },
+  {
+    title: "Funil",
+    href: "/funil",
+    icon: BarChart3,
+    description: "Visualizar funil de vendas"
+  },
 ];
 
 export default function MainNav() {

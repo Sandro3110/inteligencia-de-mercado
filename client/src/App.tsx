@@ -17,6 +17,7 @@ import AlertsPage from "./pages/AlertsPage";
 import AlertHistoryPage from "./pages/AlertHistoryPage";
 import ReportsPage from "./pages/ReportsPage";
 import ROIDashboard from "./pages/ROIDashboard";
+import FunnelView from "./pages/FunnelView";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/alertas/historico" component={AlertHistoryPage} />
       <Route path="/relatorios" component={ReportsPage} />
       <Route path="/roi" component={ROIDashboard} />
+      <Route path="/funil" component={FunnelView} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -50,7 +52,7 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider
-        defaultTheme="dark"
+        defaultTheme="light"
         switchable
       >
         <TooltipProvider>

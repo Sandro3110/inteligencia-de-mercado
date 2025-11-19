@@ -1184,6 +1184,40 @@ export async function createCliente(data: {
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
 
+  // Verificar se já existe um cliente com esse hash
+  const existing = await db.select().from(clientes)
+    .where(and(
+      eq(clientes.clienteHash, clienteHash),
+      eq(clientes.projectId, data.projectId)
+    ))
+    .limit(1);
+
+  if (existing.length > 0) {
+    // Atualizar cliente existente
+    await db.update(clientes)
+      .set({
+        nome: data.nome,
+        cnpj: data.cnpj || null,
+        siteOficial: data.siteOficial || null,
+        produtoPrincipal: data.produtoPrincipal || null,
+        segmentacaoB2bB2c: data.segmentacaoB2bB2c || null,
+        email: data.email || null,
+        telefone: data.telefone || null,
+        linkedin: data.linkedin || null,
+        instagram: data.instagram || null,
+        cidade: data.cidade || null,
+        uf: data.uf || null,
+        cnae: data.cnae || null,
+        porte: data.porte || null,
+        qualidadeScore: data.qualidadeScore || existing[0].qualidadeScore,
+        qualidadeClassificacao: data.qualidadeClassificacao || existing[0].qualidadeClassificacao,
+      })
+      .where(eq(clientes.id, existing[0].id));
+    
+    return existing[0];
+  }
+
+  // Criar novo cliente
   const [result] = await db.insert(clientes).values({
     projectId: data.projectId,
     clienteHash,
@@ -2237,5 +2271,59 @@ export async function calculateROIMetrics(projectId: number) {
     conversionRate,
     averageDealValue,
     conversionsByMarket: conversionsByMarketResult,
+  };
+}
+
+// ============================================
+// FUNNEL DATA HELPERS
+// ============================================
+
+export async function getFunnelData(projectId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Contar leads por estágio
+  const stageCountsResult = await db
+    .select({
+      stage: leads.stage,
+      count: sql<number>`COUNT(*)`,
+    })
+    .from(leads)
+    .where(eq(leads.projectId, projectId))
+    .groupBy(leads.stage);
+  
+  // Mapear para objeto
+  const stageCounts: Record<string, number> = {};
+  stageCountsResult.forEach((row: any) => {
+    stageCounts[row.stage] = row.count;
+  });
+  
+  // Ordem dos estágios
+  const stages = ['novo', 'qualificado', 'negociacao', 'fechado', 'perdido'];
+  const funnelData = stages.map(stage => ({
+    stage,
+    count: stageCounts[stage] || 0,
+  }));
+  
+  // Calcular taxas de conversão entre estágios
+  const conversionRates = [];
+  for (let i = 0; i < stages.length - 1; i++) {
+    const currentStage = stages[i];
+    const nextStage = stages[i + 1];
+    const currentCount = stageCounts[currentStage] || 0;
+    const nextCount = stageCounts[nextStage] || 0;
+    const rate = currentCount > 0 ? (nextCount / currentCount) * 100 : 0;
+    
+    conversionRates.push({
+      from: currentStage,
+      to: nextStage,
+      rate: parseFloat(rate.toFixed(2)),
+    });
+  }
+  
+  return {
+    funnelData,
+    conversionRates,
+    totalLeads: Object.values(stageCounts).reduce((sum, count) => sum + count, 0),
   };
 }
