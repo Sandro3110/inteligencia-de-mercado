@@ -69,7 +69,7 @@ export type InsertMercadoUnico = typeof mercadosUnicos.$inferInsert;
 export const clientes = mysqlTable("clientes", {
   id: int("id").primaryKey().autoincrement(),
   projectId: int("projectId").notNull(),
-  clienteHash: varchar("clienteHash", { length: 64 }),
+  clienteHash: varchar("clienteHash", { length: 255 }),
   nome: varchar("nome", { length: 255 }).notNull(),
   cnpj: varchar("cnpj", { length: 20 }),
   siteOficial: varchar("siteOficial", { length: 500 }),

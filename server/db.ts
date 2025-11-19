@@ -1178,7 +1178,11 @@ export async function createCliente(data: {
   const db = await getDb();
   if (!db) return null;
 
-  const clienteHash = `${data.nome}-${data.cnpj || Date.now()}`.toLowerCase().replace(/\s+/g, '-');
+  const clienteHash = `${data.nome}-${data.cnpj || Date.now()}-${data.projectId}`
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 
   const [result] = await db.insert(clientes).values({
     projectId: data.projectId,

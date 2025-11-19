@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, nome, produtoPrincipal\nFROM clientes \nWHERE projectId = 1 \nLIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, produtoPrincipal\nFROM clientes \nWHERE projectId = 1 \nLIMIT 5",
+  "rows": [
+    {
+      "id": "1611",
+      "nome": "1001 EMBALAGEM ADESIVOS E ENVELOPES LTDA",
+      "produtoPrincipal": "Comércio varejista de livros"
+    },
+    {
+      "id": "1612",
+      "nome": "4MMD GESSO PISO E REVESTIMENTO EIRELI",
+      "produtoPrincipal": "Comércio atacadista especializado de materiais de "
+    },
+    {
+      "id": "1613",
+      "nome": "A C P IND DE MOVEIS LTDA",
+      "produtoPrincipal": "Fabricação de móveis com predominância de madeira"
+    },
+    {
+      "id": "1614",
+      "nome": "A C PENTEADO NETO & CIA LTDA",
+      "produtoPrincipal": "Fabricação de laticínios"
+    },
+    {
+      "id": "1615",
+      "nome": "A C RIBAS COMERCIO TEXTIL LTDA",
+      "produtoPrincipal": "Comércio varejista especializado de tecidos e artigos de cama"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tprodutoPrincipal\n1611\t1001 EMBALAGEM ADESIVOS E ENVELOPES LTDA\tComércio varejista de livros\n1612\t4MMD GESSO PISO E REVESTIMENTO EIRELI\tComércio atacadista especializado de materiais de \n1613\tA C P IND DE MOVEIS LTDA\tFabricação de móveis com predominância de madeira\n1614\tA C PENTEADO NETO & CIA LTDA\tFabricação de laticínios\n1615\tA C RIBAS COMERCIO TEXTIL LTDA\tComércio varejista especializado de tecidos e artigos de cama\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

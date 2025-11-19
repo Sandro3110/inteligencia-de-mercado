@@ -20,7 +20,9 @@ export type EnrichmentInput = {
     site?: string;
     produto?: string;
   }>;
-  projectName: string;
+  projectName?: string;
+  projectId?: number;
+  projectDescription?: string;
 };
 
 export type EnrichmentProgress = {
@@ -70,31 +72,50 @@ export async function executeEnrichmentFlow(
       jobManager.createJob(jobId, totalSteps);
     }
 
-    // Passo 1: Criar projeto
-    const step1 = {
-      status: 'processing' as const,
-      message: `Criando projeto "${input.projectName}"...`,
-      currentStep: ++currentStep,
-      totalSteps,
-    };
-    onProgress(step1);
-    if (jobId) {
-      jobManager.updateJob(jobId, {
-        step: currentStep,
-        currentStepName: 'Criando projeto',
-        message: step1.message,
-        progress: 0,
+    // Passo 1: Criar ou reusar projeto
+    let project: { id: number; nome: string } | null = null;
+    
+    if (input.projectId) {
+      // Reusar projeto existente
+      const { getProjectById } = await import('./db');
+      const existingProject = await getProjectById(input.projectId);
+      if (!existingProject) {
+        throw new Error(`Projeto com ID ${input.projectId} não encontrado`);
+      }
+      project = { id: existingProject.id, nome: existingProject.nome };
+      onProgress({
+        status: 'processing',
+        message: `Reusando projeto "${project.nome}" (ID: ${project.id})...`,
+        currentStep: ++currentStep,
+        totalSteps,
       });
-    }
+    } else {
+      // Criar novo projeto
+      const step1 = {
+        status: 'processing' as const,
+        message: `Criando projeto "${input.projectName}"...`,
+        currentStep: ++currentStep,
+        totalSteps,
+      };
+      onProgress(step1);
+      if (jobId) {
+        jobManager.updateJob(jobId, {
+          step: currentStep,
+          currentStepName: 'Criando projeto',
+          message: step1.message,
+          progress: 0,
+        });
+      }
 
-    const { createProject } = await import('./db');
-    const project = await createProject({
-      nome: input.projectName,
-      descricao: `Projeto criado automaticamente via fluxo de enriquecimento`,
-    });
+      const { createProject } = await import('./db');
+      project = await createProject({
+        nome: input.projectName!,
+        descricao: input.projectDescription || `Projeto criado automaticamente via fluxo de enriquecimento`,
+      });
 
-    if (!project) {
-      throw new Error('Falha ao criar projeto');
+      if (!project) {
+        throw new Error('Falha ao criar projeto');
+      }
     }
 
     // Passo 2: Identificar mercados únicos

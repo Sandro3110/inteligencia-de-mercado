@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, nome, produtoPrincipal, segmentacaoB2bB2c \nFROM clientes \nWHERE projectId = 270005 \nLIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, produtoPrincipal, segmentacaoB2bB2c \nFROM clientes \nWHERE projectId = 270005 \nLIMIT 10",
+  "rows": [
+    {
+      "id": "241730",
+      "nome": "1001 EMBALAGEM",
+      "produtoPrincipal": "NULL",
+      "segmentacaoB2bB2c": "NULL"
+    },
+    {
+      "id": "241731",
+      "nome": "4MMD GESSO, PISO E REVESTIMENTO LTDA",
+      "produtoPrincipal": "NULL",
+      "segmentacaoB2bB2c": "NULL"
+    },
+    {
+      "id": "241732",
+      "nome": "A.C.P. INDUSTRIA DE MOVEIS LTDA",
+      "produtoPrincipal": "NULL",
+      "segmentacaoB2bB2c": "NULL"
+    },
+    {
+      "id": "241733",
+      "nome": "A C PENTEADO NETO & CIA LTDA",
+      "produtoPrincipal": "NULL",
+      "segmentacaoB2bB2c": "NULL"
+    },
+    {
+      "id": "241734",
+      "nome": "ACR MALHAS E TECIDOS",
+      "produtoPrincipal": "NULL",
+      "segmentacaoB2bB2c": "NULL"
+    },
+    {
+      "id": "241735",
+      "nome": "A DA CRUZ GOUVEIA NETO",
+      "produtoPrincipal": "NULL",
+      "segmentacaoB2bB2c": "NULL"
+    },
+    {
+      "id": "241736",
+      "nome": "A & G INDUSTRIA E COMERCIO DE PLASTICOS LTDA",
+      "produtoPrincipal": "NULL",
+      "segmentacaoB2bB2c": "NULL"
+    },
+    {
+      "id": "241737",
+      "nome": "A LUIZ NETO EIRELI",
+      "produtoPrincipal": "NULL",
+      "segmentacaoB2bB2c": "NULL"
+    },
+    {
+      "id": "241738",
+      "nome": "A MUNDIAL FERRAGENS LTDA",
+      "produtoPrincipal": "NULL",
+      "segmentacaoB2bB2c": "NULL"
+    },
+    {
+      "id": "241739",
+      "nome": "ABARCA MOVEIS",
+      "produtoPrincipal": "NULL",
+      "segmentacaoB2bB2c": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tprodutoPrincipal\tsegmentacaoB2bB2c\n241730\t1001 EMBALAGEM\tNULL\tNULL\n241731\t4MMD GESSO, PISO E REVESTIMENTO LTDA\tNULL\tNULL\n241732\tA.C.P. INDUSTRIA DE MOVEIS LTDA\tNULL\tNULL\n241733\tA C PENTEADO NETO & CIA LTDA\tNULL\tNULL\n241734\tACR MALHAS E TECIDOS\tNULL\tNULL\n241735\tA DA CRUZ GOUVEIA NETO\tNULL\tNULL\n241736\tA & G INDUSTRIA E COMERCIO DE PLASTICOS LTDA\tNULL\tNULL\n241737\tA LUIZ NETO EIRELI\tNULL\tNULL\n241738\tA MUNDIAL FERRAGENS LTDA\tNULL\tNULL\n241739\tABARCA MOVEIS\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 90
+}
