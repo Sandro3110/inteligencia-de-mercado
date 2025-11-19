@@ -2878,3 +2878,51 @@
 - [x] Criar checkpoint da implementação
 - [x] Atualizar documentação
 - [x] Validar economia de armazenamento (90%)
+
+---
+
+## Nova Feature: Tabela de Produtos 📦
+
+### Objetivo
+Criar tabela que relaciona cliente + produto + mercado, permitindo que um cliente tenha múltiplos produtos associados a mercados específicos.
+
+### Tarefas
+- [ ] Criar schema da tabela produtos no drizzle/schema.ts
+- [ ] Implementar funções CRUD no server/db.ts
+- [ ] Criar routers tRPC para produtos
+- [ ] Aplicar migração no banco de dados
+- [ ] Testar relacionamentos e queries
+- [ ] Validar integridade referencial (FKs)
+
+
+## Atualização: Tabela de Produtos Implementada ✅
+
+- [x] Criar schema da tabela produtos no drizzle/schema.ts
+- [x] Implementar funções CRUD no server/db.ts
+- [x] Criar routers tRPC para produtos
+- [x] Aplicar migração no banco de dados
+- [x] Testar relacionamentos e queries
+- [x] Validar integridade referencial (FKs)
+
+**Estrutura da Tabela:**
+- id (PK, auto increment)
+- projectId (FK para projects)
+- clienteId (FK para clientes)
+- mercadoId (FK para mercados_unicos)
+- nome (varchar 255)
+- descricao (text)
+- categoria (varchar 100)
+- preco (decimal 10,2)
+- unidade (varchar 50)
+- ativo (int, default 1)
+- createdAt, updatedAt (timestamps)
+
+**Routers tRPC Disponíveis:**
+- produtos.create - Criar novo produto
+- produtos.byCliente - Listar produtos de um cliente
+- produtos.byMercado - Listar produtos de um mercado
+- produtos.byProject - Listar produtos de um projeto
+- produtos.byId - Buscar produto por ID
+- produtos.update - Atualizar produto
+- produtos.delete - Deletar produto
+

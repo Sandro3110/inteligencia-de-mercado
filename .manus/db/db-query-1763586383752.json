@@ -1,0 +1,24 @@
+{
+  "query": "\nSELECT * FROM produtos;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT * FROM produtos;\n",
+  "rows": [
+    {
+      "id": "1",
+      "projectId": "1",
+      "clienteId": "1",
+      "mercadoId": "1",
+      "nome": "Embalagem Plástica 500ml",
+      "descricao": "Embalagem plástica transparente para bebidas",
+      "categoria": "Embalagens",
+      "preco": "2.50",
+      "unidade": "unidade",
+      "ativo": "1",
+      "createdAt": "2025-11-19 21:06:19",
+      "updatedAt": "2025-11-19 21:06:19"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tprojectId\tclienteId\tmercadoId\tnome\tdescricao\tcategoria\tpreco\tunidade\tativo\tcreatedAt\tupdatedAt\n1\t1\t1\t1\tEmbalagem Plástica 500ml\tEmbalagem plástica transparente para bebidas\tEmbalagens\t2.50\tunidade\t1\t2025-11-19 21:06:19\t2025-11-19 21:06:19\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

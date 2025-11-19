@@ -1106,6 +1106,77 @@ export const appRouter = router({
           .orderBy(desc(leadsHistory.changedAt));
       }),
   }),
+
+  // Produtos router
+  produtos: router({
+    create: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        clienteId: z.number(),
+        mercadoId: z.number(),
+        nome: z.string(),
+        descricao: z.string().optional().nullable(),
+        categoria: z.string().optional().nullable(),
+        preco: z.string().optional().nullable(),
+        unidade: z.string().optional().nullable(),
+        ativo: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { createProduto } = await import('./db');
+        return createProduto(input);
+      }),
+
+    byCliente: publicProcedure
+      .input(z.object({ clienteId: z.number() }))
+      .query(async ({ input }) => {
+        const { getProdutosByCliente } = await import('./db');
+        return getProdutosByCliente(input.clienteId);
+      }),
+
+    byMercado: publicProcedure
+      .input(z.object({ mercadoId: z.number() }))
+      .query(async ({ input }) => {
+        const { getProdutosByMercado } = await import('./db');
+        return getProdutosByMercado(input.mercadoId);
+      }),
+
+    byProject: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getProdutosByProject } = await import('./db');
+        return getProdutosByProject(input.projectId);
+      }),
+
+    byId: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { getProdutoById } = await import('./db');
+        return getProdutoById(input);
+      }),
+
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        nome: z.string().optional(),
+        descricao: z.string().optional().nullable(),
+        categoria: z.string().optional().nullable(),
+        preco: z.string().optional().nullable(),
+        unidade: z.string().optional().nullable(),
+        ativo: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        const { updateProduto } = await import('./db');
+        return updateProduto(id, data);
+      }),
+
+    delete: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { deleteProduto } = await import('./db');
+        return deleteProduto(input);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

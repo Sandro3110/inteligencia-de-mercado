@@ -127,6 +127,13 @@
       "when": 1763582950877,
       "tag": "0017_peaceful_maelstrom",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1763586349689,
+      "tag": "0018_rapid_tusk",
+      "breakpoints": true
     }
   ]
 }

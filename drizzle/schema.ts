@@ -109,6 +109,27 @@ export type ClienteMercado = typeof clientesMercados.$inferSelect;
 export type InsertClienteMercado = typeof clientesMercados.$inferInsert;
 
 /**
+ * Produtos - Product catalog linking clients to markets
+ */
+export const produtos = mysqlTable("produtos", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  clienteId: int("clienteId").notNull(),
+  mercadoId: int("mercadoId").notNull(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  categoria: varchar("categoria", { length: 100 }),
+  preco: decimal("preco", { precision: 10, scale: 2 }),
+  unidade: varchar("unidade", { length: 50 }), // kg, litro, unidade, etc
+  ativo: int("ativo").default(1).notNull(), // 1 = ativo, 0 = inativo
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type Produto = typeof produtos.$inferSelect;
+export type InsertProduto = typeof produtos.$inferInsert;
+
+/**
  * Concorrentes - Competitor entities with validation
  */
 export const concorrentes = mysqlTable("concorrentes", {

@@ -4,7 +4,7 @@ import {
   InsertUser, users, 
   projects, Project, InsertProject,
   mercadosUnicos, clientes, clientesMercados, 
-  concorrentes, leads,
+  concorrentes, leads, produtos,
   projectTemplates, ProjectTemplate, InsertProjectTemplate,
   notifications, Notification, InsertNotification,
   MercadoUnico, Cliente, Concorrente, Lead,
@@ -2785,5 +2785,144 @@ export async function globalSearch(query: string, projectId?: number, limit: num
   } catch (error) {
     console.error('[Database] Global search failed:', error);
     return [];
+  }
+}
+
+// ============================================
+// PRODUTOS HELPERS
+// ============================================
+
+export async function createProduto(data: {
+  projectId: number;
+  clienteId: number;
+  mercadoId: number;
+  nome: string;
+  descricao?: string | null;
+  categoria?: string | null;
+  preco?: string | null;
+  unidade?: string | null;
+  ativo?: number;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const [produto] = await db.insert(produtos).values({
+      projectId: data.projectId,
+      clienteId: data.clienteId,
+      mercadoId: data.mercadoId,
+      nome: data.nome,
+      descricao: data.descricao,
+      categoria: data.categoria,
+      preco: data.preco,
+      unidade: data.unidade,
+      ativo: data.ativo ?? 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    return produto;
+  } catch (error) {
+    console.error("[Database] Failed to create produto:", error);
+    return null;
+  }
+}
+
+export async function getProdutosByCliente(clienteId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const result = await db.select().from(produtos)
+      .where(eq(produtos.clienteId, clienteId))
+      .orderBy(desc(produtos.createdAt));
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get produtos by cliente:", error);
+    return [];
+  }
+}
+
+export async function getProdutosByMercado(mercadoId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const result = await db.select().from(produtos)
+      .where(eq(produtos.mercadoId, mercadoId))
+      .orderBy(desc(produtos.createdAt));
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get produtos by mercado:", error);
+    return [];
+  }
+}
+
+export async function getProdutosByProject(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const result = await db.select().from(produtos)
+      .where(eq(produtos.projectId, projectId))
+      .orderBy(desc(produtos.createdAt));
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get produtos by project:", error);
+    return [];
+  }
+}
+
+export async function getProdutoById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.select().from(produtos)
+      .where(eq(produtos.id, id))
+      .limit(1);
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("[Database] Failed to get produto by id:", error);
+    return null;
+  }
+}
+
+export async function updateProduto(id: number, data: {
+  nome?: string;
+  descricao?: string | null;
+  categoria?: string | null;
+  preco?: string | null;
+  unidade?: string | null;
+  ativo?: number;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    await db.update(produtos)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(produtos.id, id));
+
+    return await getProdutoById(id);
+  } catch (error) {
+    console.error("[Database] Failed to update produto:", error);
+    return null;
+  }
+}
+
+export async function deleteProduto(id: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.delete(produtos).where(eq(produtos.id, id));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete produto:", error);
+    return false;
   }
 }
