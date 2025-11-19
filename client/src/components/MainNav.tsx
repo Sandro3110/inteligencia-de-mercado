@@ -1,4 +1,5 @@
 import { Link, useLocation } from "wouter";
+import { CompactModeToggle } from "./CompactModeToggle";
 import { 
   Home, BarChart3, Database, TrendingUp, 
   Settings, Clock, FileText, Bell, Activity 
@@ -125,6 +126,7 @@ export default function MainNav() {
         </div>
 
         <div className="flex items-center gap-2">
+          <CompactModeToggle />
           <button
             className="relative p-2 rounded-md hover:bg-accent transition-colors"
             title="Alertas e notificações"

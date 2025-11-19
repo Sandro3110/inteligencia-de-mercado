@@ -4,6 +4,8 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { CompactModeProvider } from "./contexts/CompactModeContext";
+import { GlobalShortcuts } from "./components/GlobalShortcuts";
 import MainNav from "./components/MainNav";
 import Dashboard from "./pages/Dashboard";
 import DashboardPage from "./pages/DashboardPage";
@@ -60,11 +62,14 @@ function App() {
       <ThemeProvider
         defaultTheme="light"
       >
-        <TooltipProvider>
-          <Toaster />
-          <MainNav />
-          <Router />
-        </TooltipProvider>
+        <CompactModeProvider>
+          <TooltipProvider>
+            <Toaster />
+            <GlobalShortcuts />
+            <MainNav />
+            <Router />
+          </TooltipProvider>
+        </CompactModeProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

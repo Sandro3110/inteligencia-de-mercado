@@ -494,3 +494,289 @@
     margin-bottom: 0.75rem !important;
   }
 }
+
+/* ========================================
+   COMPACT MODE - Densidade Reduzida
+   ======================================== */
+
+.compact-mode {
+  /* Reduzir espaçamentos globais */
+  --space-1: 0.2rem;  /* 3.2px (was 4px) */
+  --space-2: 0.4rem;  /* 6.4px (was 8px) */
+  --space-3: 0.6rem;  /* 9.6px (was 12px) */
+  --space-4: 0.8rem;  /* 12.8px (was 16px) */
+  --space-5: 1rem;    /* 16px (was 20px) */
+  --space-6: 1.2rem;  /* 19.2px (was 24px) */
+  --space-8: 1.6rem;  /* 25.6px (was 32px) */
+  
+  /* Reduzir tamanhos de fonte */
+  --text-xs: 0.6rem;    /* 9.6px (was 10.24px) */
+  --text-sm: 0.75rem;   /* 12px (was 12.8px) */
+  --text-base: 0.9rem;  /* 14.4px (was 16px) */
+  --text-lg: 1.1rem;    /* 17.6px (was 20px) */
+  --text-xl: 1.35rem;   /* 21.6px (was 25px) */
+  --text-2xl: 1.7rem;   /* 27.2px (was 31.25px) */
+}
+
+/* Cards em modo compacto */
+.compact-mode .card,
+.compact-mode [class*="Card"] {
+  padding: 0.75rem !important;
+}
+
+.compact-mode .card-header,
+.compact-mode [class*="CardHeader"] {
+  padding: 0.75rem !important;
+}
+
+.compact-mode .card-content,
+.compact-mode [class*="CardContent"] {
+  padding: 0.75rem !important;
+}
+
+/* Botões em modo compacto */
+.compact-mode button {
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+  font-size: 0.85rem !important;
+}
+
+.compact-mode button[class*="icon"] {
+  padding: 0.4rem !important;
+}
+
+/* Inputs em modo compacto */
+.compact-mode input,
+.compact-mode select,
+.compact-mode textarea {
+  padding: 0.4rem 0.75rem !important;
+  font-size: 0.85rem !important;
+}
+
+/* Tabelas em modo compacto */
+.compact-mode table th,
+.compact-mode table td {
+  padding: 0.4rem 0.75rem !important;
+  font-size: 0.85rem !important;
+}
+
+/* Listas em modo compacto */
+.compact-mode li {
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+}
+
+/* Headers em modo compacto */
+.compact-mode h1 { font-size: 1.7rem !important; }
+.compact-mode h2 { font-size: 1.5rem !important; }
+.compact-mode h3 { font-size: 1.3rem !important; }
+.compact-mode h4 { font-size: 1.1rem !important; }
+.compact-mode h5 { font-size: 1rem !important; }
+.compact-mode h6 { font-size: 0.9rem !important; }
+
+/* Espaçamentos específicos em modo compacto */
+.compact-mode .space-y-6 > * + * {
+  margin-top: 1rem !important;
+}
+
+.compact-mode .space-y-4 > * + * {
+  margin-top: 0.75rem !important;
+}
+
+.compact-mode .gap-4 {
+  gap: 0.75rem !important;
+}
+
+.compact-mode .gap-6 {
+  gap: 1rem !important;
+}
+
+/* Navegação em modo compacto */
+.compact-mode nav {
+  height: 3.5rem !important;
+}
+
+.compact-mode nav a,
+.compact-mode nav button {
+  padding: 0.4rem 0.75rem !important;
+  font-size: 0.85rem !important;
+}
+
+
+/* ========================================
+   MICRO-ANIMAÇÕES DE FEEDBACK
+   ======================================== */
+
+/* Ripple effect em botões */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+button:active::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  animation: ripple 0.6s ease-out;
+  pointer-events: none;
+}
+
+button {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Pulse animation em cards ao hover */
+@keyframes pulse-soft {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.card-interactive:hover {
+  animation: pulse-soft 2s infinite;
+}
+
+/* Shake animation para erros */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.shake-error {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Spinner animado */
+@keyframes spin-smooth {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin-smooth 1s linear infinite;
+}
+
+/* Fade in suave para modals */
+@keyframes fade-in-modal {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+[role="dialog"],
+[data-radix-dialog-content] {
+  animation: fade-in-modal 0.2s ease-out;
+}
+
+/* Bounce suave em success */
+@keyframes bounce-soft {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.success-bounce {
+  animation: bounce-soft 0.5s ease-in-out;
+}
+
+/* Glow effect em focus */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Slide in from right para toasts */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+[data-sonner-toast] {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+/* Scale in para badges */
+@keyframes scale-in {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.badge,
+[class*="badge-"] {
+  animation: scale-in 0.2s ease-out;
+}
+
+/* Smooth transitions globais */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover lift com shadow */
+.hover-lift-shadow {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift-shadow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.hover-lift-shadow:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
