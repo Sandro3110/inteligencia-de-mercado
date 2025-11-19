@@ -73,6 +73,12 @@ const navItems: NavItem[] = [
     icon: BarChart3,
     description: "Visualizar funil de vendas"
   },
+  {
+    title: "Agendamento",
+    href: "/agendamento",
+    icon: Clock,
+    description: "Agendar enriquecimentos recorrentes"
+  },
 ];
 
 export default function MainNav() {

@@ -911,6 +911,49 @@ export const appRouter = router({
       }),
   }),
 
+  // Agendamento de Enriquecimento
+  schedule: router({  
+    create: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        scheduledAt: z.string(),
+        recurrence: z.enum(["once", "daily", "weekly"]),
+        batchSize: z.number().optional(),
+        maxClients: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { createScheduledEnrichment } = await import('./db');
+        const id = await createScheduledEnrichment({
+          projectId: input.projectId,
+          scheduledAt: new Date(input.scheduledAt),
+          recurrence: input.recurrence,
+          batchSize: input.batchSize,
+          maxClients: input.maxClients,
+        });
+        return { id };
+      }),
+    list: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { listScheduledEnrichments } = await import('./db');
+        return await listScheduledEnrichments(input.projectId);
+      }),
+    cancel: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { cancelScheduledEnrichment } = await import('./db');
+        await cancelScheduledEnrichment(input.id);
+        return { success: true };
+      }),
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteScheduledEnrichment } = await import('./db');
+        await deleteScheduledEnrichment(input.id);
+        return { success: true };
+      }),
+  }),
+
   // Relatórios Executivos
   reports: router({
     generate: publicProcedure

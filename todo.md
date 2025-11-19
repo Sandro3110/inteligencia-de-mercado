@@ -2564,3 +2564,80 @@
 - [ ] Testar tema claro em todas as páginas
 - [ ] Verificar navegação completa
 - [ ] Criar checkpoint final
+
+
+---
+
+## Fase 43: Sistema de Agendamento de Enriquecimento Recorrente ⏰
+
+### 43.1 Backend - Tabela de Agendamentos
+- [x] Verificar se tabela scheduled_enrichments já existe
+- [x] Tabela já existe com campos completos
+- [x] Funções CRUD já existem no db.ts
+
+### 43.2 Backend - Routers tRPC
+- [x] Criar router schedule.create (input: projectId, scheduledAt, recurrence)
+- [x] Criar router schedule.list (retorna agendamentos ativos)
+- [x] Criar router schedule.cancel (input: id)
+- [x] Criar router schedule.delete (input: id)
+
+### 43.3 Frontend - Interface de Agendamento
+- [x] Criar página SchedulePage.tsx
+- [x] Adicionar seletor de frequência (uma vez, diário, semanal)
+- [x] Mostrar lista de agendamentos ativos com status
+- [x] Adicionar botões cancelar/deletar
+- [x] Adicionar rota /agendamento no App.tsx
+- [x] Adicionar item no MainNav
+
+---
+
+## Fase 44: Filtros Avançados na Página Inicial 🔍
+
+### 44.1 Backend - Função de Filtragem
+- [ ] Modificar getMercados() para aceitar filtros
+- [ ] Adicionar filtro por CNAE
+- [ ] Adicionar filtro por porte (MEI, Pequena, Média, Grande)
+- [ ] Adicionar filtro por localização (cidade, UF)
+- [ ] Adicionar filtro por score de qualidade
+
+### 44.2 Frontend - Componente de Filtros
+- [ ] Criar componente FilterPanel.tsx
+- [ ] Adicionar input de busca por CNAE
+- [ ] Adicionar seletor de porte
+- [ ] Adicionar seletor de UF
+- [ ] Adicionar input de cidade
+- [ ] Adicionar slider de score mínimo
+- [ ] Integrar filtros na página CascadeView
+
+---
+
+## Fase 45: Dashboard de Atividade Recente 📊
+
+### 45.1 Backend - Tabela de Atividades
+- [ ] Criar tabela activity_log (id, projectId, type, description, createdAt)
+- [ ] Criar função logActivity() no db.ts
+- [ ] Criar função getRecentActivities() no db.ts
+
+### 45.2 Backend - Integração
+- [ ] Adicionar log ao criar lead
+- [ ] Adicionar log ao criar conversão
+- [ ] Adicionar log ao disparar alerta
+- [ ] Adicionar log ao concluir enriquecimento
+
+### 45.3 Backend - Router tRPC
+- [ ] Criar router activity.recent (input: projectId, limit)
+
+### 45.4 Frontend - Componente de Timeline
+- [ ] Criar componente ActivityTimeline.tsx
+- [ ] Mostrar ícones por tipo de atividade
+- [ ] Formatar datas relativas (há 2 horas, ontem, etc)
+- [ ] Adicionar paginação
+- [ ] Integrar na página DashboardPage
+
+---
+
+## Fase 46: Testes e Validação Final 🧪
+- [ ] Testar agendamento de enriquecimento
+- [ ] Testar filtros avançados
+- [ ] Testar dashboard de atividades
+- [ ] Criar checkpoint final

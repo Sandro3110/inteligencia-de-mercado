@@ -18,6 +18,7 @@ import AlertHistoryPage from "./pages/AlertHistoryPage";
 import ReportsPage from "./pages/ReportsPage";
 import ROIDashboard from "./pages/ROIDashboard";
 import FunnelView from "./pages/FunnelView";
+import SchedulePage from "./pages/SchedulePage";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -36,6 +37,7 @@ function Router() {
       <Route path="/relatorios" component={ReportsPage} />
       <Route path="/roi" component={ROIDashboard} />
       <Route path="/funil" component={FunnelView} />
+      <Route path="/agendamento" component={SchedulePage} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
