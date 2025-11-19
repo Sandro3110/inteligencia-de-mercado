@@ -741,6 +741,15 @@ async function findLeadsForMarkets(
           if (novoLead) {
             leads.push(novoLead);
             
+            // Registrar atividade
+            const { logActivity } = await import('./db');
+            await logActivity({
+              projectId,
+              activityType: 'lead_created',
+              description: `Novo lead criado: ${lead.nome} (Score: ${qualidadeScore})`,
+              metadata: JSON.stringify({ leadId: novoLead.id, score: qualidadeScore }),
+            });
+            
             // Verificar alertas de lead de alta qualidade
             if (qualidadeScore >= 80) {
               const { checkAlerts } = await import('./enrichmentMonitor');

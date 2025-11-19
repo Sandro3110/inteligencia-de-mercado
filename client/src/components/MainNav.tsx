@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { 
   Home, BarChart3, Database, TrendingUp, 
-  Settings, Clock, FileText, Bell 
+  Settings, Clock, FileText, Bell, Activity 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -78,6 +78,12 @@ const navItems: NavItem[] = [
     href: "/agendamento",
     icon: Clock,
     description: "Agendar enriquecimentos recorrentes"
+  },
+  {
+    title: "Atividade",
+    href: "/atividade",
+    icon: Activity,
+    description: "Timeline de atividades do sistema"
   },
 ];
 

@@ -93,6 +93,15 @@ export async function checkAlerts(
           message,
         });
         
+        // Registrar atividade
+        const { logActivity } = await import('./db');
+        await logActivity({
+          projectId,
+          activityType: 'alert',
+          description: `Alerta disparado: ${alert.name}`,
+          metadata: JSON.stringify({ alertId: alert.id, type: alert.type }),
+        });
+        
         console.log(`[Alertas] Disparado: ${alert.name} - Projeto ${projectId}`);
       }
     }
