@@ -415,6 +415,8 @@ export const enrichmentQueue = mysqlTable("enrichment_queue", {
   clienteData: json("clienteData").notNull(),
   result: json("result"),
   errorMessage: text("errorMessage"),
+  retryCount: int("retryCount").default(0),
+  lastError: text("lastError"),
   createdAt: timestamp("createdAt").defaultNow(),
   startedAt: timestamp("startedAt"),
   completedAt: timestamp("completedAt"),
@@ -422,3 +424,18 @@ export const enrichmentQueue = mysqlTable("enrichment_queue", {
 
 export type EnrichmentQueue = typeof enrichmentQueue.$inferSelect;
 export type InsertEnrichmentQueue = typeof enrichmentQueue.$inferInsert;
+
+/**
+ * Job_Metrics - Métricas de performance dos jobs para cálculo de ETA
+ */
+export const jobMetrics = mysqlTable("job_metrics", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId"),
+  jobType: varchar("jobType", { length: 50 }).notNull(), // 'enrichment', 'validation', etc
+  avgDurationMs: int("avgDurationMs").notNull(), // Duração média em milissegundos
+  totalJobs: int("totalJobs").default(0),
+  lastUpdated: timestamp("lastUpdated").defaultNow(),
+});
+
+export type JobMetric = typeof jobMetrics.$inferSelect;
+export type InsertJobMetric = typeof jobMetrics.$inferInsert;

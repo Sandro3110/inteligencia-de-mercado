@@ -3016,3 +3016,38 @@
 - [x] Testar notificações de progresso
 - [x] Validar navegação para dashboard de cache
 - [x] Criar checkpoint final
+
+
+---
+
+## Fase 62: Histórico de Jobs, Retry Automático e ETA ⏱️
+
+### 62.1 Histórico de Jobs na Fila
+- [x] Criar endpoint tRPC queue.history com paginação
+- [x] Adicionar filtros por status, data e projeto
+- [x] Criar página /admin/queue-history
+- [x] Implementar tabela com detalhes dos jobs
+- [x] Adicionar visualização de erros e logs
+- [x] Adicionar link no MainNav
+
+### 62.2 Retry Automático com Backoff Exponencial
+- [x] Adicionar campo retryCount na tabela enrichment_queue
+- [x] Adicionar campo lastError na tabela enrichment_queue
+- [x] Implementar lógica de retry no QueueManager
+- [x] Configurar backoff exponencial (1s, 2s, 4s)
+- [x] Limitar máximo de tentativas (3 retries)
+- [x] Atualizar status para 'error' após max retries
+
+### 62.3 Estimativa de Tempo (ETA)
+- [x] Criar tabela job_metrics para armazenar tempo médio
+- [x] Calcular tempo médio de processamento por tipo de job
+- [x] Adicionar função calculateETA() no QueueManager
+- [x] Exibir ETA no QueueModeSelector
+- [x] Exibir ETA no indicador de progresso
+- [x] Adicionar tooltip com detalhes do cálculo
+
+### 62.4 Testes e Finalização
+- [x] Testar histórico de jobs com filtros
+- [x] Testar retry automático
+- [x] Validar cálculo de ETA
+- [x] Criar checkpoint final

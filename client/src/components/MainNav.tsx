@@ -95,6 +95,12 @@ const navItems: NavItem[] = [
     icon: DatabaseIcon,
     description: "Dashboard de cache e performance"
   },
+  {
+    title: "Histórico de Jobs",
+    href: "/admin/queue-history",
+    icon: Clock,
+    description: "Histórico completo da fila de processamento"
+  },
 ];
 
 export default function MainNav() {

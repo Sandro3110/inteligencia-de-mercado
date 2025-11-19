@@ -172,11 +172,14 @@ class QueueManager extends EventEmitter {
   }
 
   /**
-   * Processa um item da fila
+   * Processa um item da fila com retry automático
    */
   private async processItem(item: any) {
     const db = await getDb();
     if (!db) return;
+
+    const MAX_RETRIES = 3;
+    const retryCount = item.retryCount || 0;
 
     try {
       // Marcar como processando
@@ -209,17 +212,40 @@ class QueueManager extends EventEmitter {
     } catch (error: any) {
       console.error(`[QueueManager] Error processing item ${item.id}:`, error);
 
-      // Marcar como erro
-      await db
-        .update(enrichmentQueue)
-        .set({
-          status: 'error',
-          errorMessage: error.message,
-          completedAt: new Date(),
-        })
-        .where(eq(enrichmentQueue.id, item.id));
+      // Verificar se deve fazer retry
+      if (retryCount < MAX_RETRIES) {
+        // Calcular backoff exponencial: 1s, 2s, 4s
+        const backoffMs = Math.pow(2, retryCount) * 1000;
+        
+        console.log(`[QueueManager] Retrying item ${item.id} in ${backoffMs}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`);
+        
+        // Aguardar backoff e recolocar na fila
+        await new Promise(resolve => setTimeout(resolve, backoffMs));
+        
+        await db
+          .update(enrichmentQueue)
+          .set({
+            status: 'pending',
+            retryCount: retryCount + 1,
+            lastError: error.message,
+          })
+          .where(eq(enrichmentQueue.id, item.id));
+        
+        this.emit('item-retry', { queueId: item.id, retryCount: retryCount + 1, error: error.message });
+      } else {
+        // Máximo de tentativas atingido - marcar como erro permanente
+        await db
+          .update(enrichmentQueue)
+          .set({
+            status: 'error',
+            errorMessage: `Failed after ${MAX_RETRIES} retries: ${error.message}`,
+            lastError: error.message,
+            completedAt: new Date(),
+          })
+          .where(eq(enrichmentQueue.id, item.id));
 
-      this.emit('item-error', { queueId: item.id, error: error.message });
+        this.emit('item-error', { queueId: item.id, error: error.message, retries: MAX_RETRIES });
+      }
     }
   }
 
@@ -248,6 +274,98 @@ class QueueManager extends EventEmitter {
     };
 
     return result;
+  }
+
+  /**
+   * Calcula estimativa de tempo (ETA) para jobs pendentes
+   */
+  async calculateETA(projectId: number): Promise<{ etaSeconds: number; avgDurationMs: number }> {
+    const db = await getDb();
+    if (!db) return { etaSeconds: 0, avgDurationMs: 0 };
+
+    try {
+      // Buscar tempo médio de processamento dos últimos 50 jobs concluídos
+      const completedJobs = await db
+        .select({
+          startedAt: enrichmentQueue.startedAt,
+          completedAt: enrichmentQueue.completedAt,
+        })
+        .from(enrichmentQueue)
+        .where(
+          and(
+            eq(enrichmentQueue.projectId, projectId),
+            eq(enrichmentQueue.status, 'completed')
+          )
+        )
+        .orderBy(sql`completedAt DESC`)
+        .limit(50);
+
+      if (completedJobs.length === 0) {
+        // Sem histórico, usar estimativa padrão de 30s por job
+        const [{ pending }] = await db
+          .select({ pending: sql<number>`COUNT(*)` })
+          .from(enrichmentQueue)
+          .where(
+            and(
+              eq(enrichmentQueue.projectId, projectId),
+              eq(enrichmentQueue.status, 'pending')
+            )
+          );
+        
+        return { etaSeconds: Number(pending) * 30, avgDurationMs: 30000 };
+      }
+
+      // Calcular duração média
+      let totalDuration = 0;
+      let validCount = 0;
+
+      for (const job of completedJobs) {
+        if (job.startedAt && job.completedAt) {
+          const duration = new Date(job.completedAt).getTime() - new Date(job.startedAt).getTime();
+          totalDuration += duration;
+          validCount++;
+        }
+      }
+
+      const avgDurationMs = validCount > 0 ? totalDuration / validCount : 30000;
+
+      // Contar jobs pendentes
+      const [{ pending }] = await db
+        .select({ pending: sql<number>`COUNT(*)` })
+        .from(enrichmentQueue)
+        .where(
+          and(
+            eq(enrichmentQueue.projectId, projectId),
+            eq(enrichmentQueue.status, 'pending')
+          )
+        );
+
+      // Buscar configuração do projeto
+      const [project] = await db
+        .select()
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .limit(1);
+
+      const executionMode = project?.executionMode || 'sequential';
+      const maxParallelJobs = project?.maxParallelJobs || 3;
+
+      // Calcular ETA baseado no modo de execução
+      let etaSeconds;
+      if (executionMode === 'parallel') {
+        // Em paralelo: dividir jobs pendentes pelo número de workers
+        const batches = Math.ceil(Number(pending) / maxParallelJobs);
+        etaSeconds = Math.round((batches * avgDurationMs) / 1000);
+      } else {
+        // Sequencial: somar todos os jobs
+        etaSeconds = Math.round((Number(pending) * avgDurationMs) / 1000);
+      }
+
+      return { etaSeconds, avgDurationMs: Math.round(avgDurationMs) };
+    } catch (error) {
+      console.error('[QueueManager] Error calculating ETA:', error);
+      return { etaSeconds: 0, avgDurationMs: 0 };
+    }
   }
 
   /**

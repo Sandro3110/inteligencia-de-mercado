@@ -134,6 +134,13 @@
       "when": 1763565979538,
       "tag": "0018_supreme_guardsmen",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1763567081870,
+      "tag": "0019_curvy_silverclaw",
+      "breakpoints": true
     }
   ]
 }

@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Zap, Clock, Settings } from 'lucide-react';
+import { Zap, Clock as ClockIcon, Settings } from 'lucide-react';
 
 export function QueueModeSelector() {
   const { selectedProjectId } = useSelectedProject();
@@ -29,6 +29,12 @@ export function QueueModeSelector() {
   const { data: queueStatus } = trpc.queue.status.useQuery(
     { projectId: selectedProjectId! },
     { enabled: !!selectedProjectId, refetchInterval: 5000 } // Atualizar a cada 5s
+  );
+  
+  // Buscar ETA
+  const { data: eta } = trpc.queue.eta.useQuery(
+    { projectId: selectedProjectId! },
+    { enabled: !!selectedProjectId && (queueStatus?.pending || 0) > 0, refetchInterval: 10000 }
   );
 
   // Mutation para atualizar modo
@@ -84,7 +90,8 @@ export function QueueModeSelector() {
       <CardContent className="space-y-6">
         {/* Status da Fila */}
         {queueStatus && (
-          <div className="grid grid-cols-4 gap-4">
+          <div className="space-y-4">
+            <div className="grid grid-cols-4 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-yellow-500">
                 {queueStatus.pending || 0}
@@ -110,6 +117,28 @@ export function QueueModeSelector() {
               <div className="text-xs text-muted-foreground">Erros</div>
             </div>
           </div>
+          
+          {/* ETA (Estimativa de Tempo) */}
+          {eta && eta.etaSeconds > 0 && (
+            <div className="p-3 border rounded-lg bg-muted/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ClockIcon className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Tempo Estimado:</span>
+                </div>
+                <div className="text-sm font-bold">
+                  {eta.etaSeconds < 60 
+                    ? `${eta.etaSeconds}s`
+                    : `${Math.floor(eta.etaSeconds / 60)}m ${eta.etaSeconds % 60}s`
+                  }
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Baseado em média de {Math.round(eta.avgDurationMs / 1000)}s por job
+              </p>
+            </div>
+          )}
+          </div>
         )}
 
         {/* Seletor de Modo */}
@@ -134,7 +163,7 @@ export function QueueModeSelector() {
               <RadioGroupItem value="sequential" id="sequential" className="mt-1" />
               <div className="flex-1">
                 <Label htmlFor="sequential" className="flex items-center gap-2 cursor-pointer">
-                  <Clock className="h-4 w-4 text-green-500" />
+                  <ClockIcon className="h-4 w-4 text-green-500" />
                   <span className="font-semibold">Fila (Sequencial)</span>
                   <Badge variant="secondary" className="ml-2">Estável</Badge>
                 </Label>

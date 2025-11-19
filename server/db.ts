@@ -2911,3 +2911,53 @@ export async function getProjectExecutionConfig(projectId: number) {
     return null;
   }
 }
+
+
+/**
+ * Get queue history with pagination and filters
+ */
+export async function getQueueHistory(
+  projectId?: number,
+  status?: 'pending' | 'processing' | 'completed' | 'error',
+  page: number = 1,
+  pageSize: number = 50
+) {
+  const db = await getDb();
+  if (!db) return { items: [], total: 0, page, pageSize };
+
+  const { enrichmentQueue } = await import('../drizzle/schema');
+
+  // Build where conditions
+  const conditions = [];
+  if (projectId) {
+    conditions.push(eq(enrichmentQueue.projectId, projectId));
+  }
+  if (status) {
+    conditions.push(eq(enrichmentQueue.status, status));
+  }
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+  // Get total count
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(enrichmentQueue)
+    .where(whereClause);
+
+  // Get paginated items
+  const items = await db
+    .select()
+    .from(enrichmentQueue)
+    .where(whereClause)
+    .orderBy(desc(enrichmentQueue.createdAt))
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
+
+  return {
+    items,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+  };
+}

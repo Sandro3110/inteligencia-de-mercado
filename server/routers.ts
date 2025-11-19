@@ -1174,6 +1174,32 @@ export const appRouter = router({
         );
         return { success: true };
       }),
+    
+    // Histórico de jobs com paginação e filtros
+    history: protectedProcedure
+      .input(z.object({
+        projectId: z.number().optional(),
+        status: z.enum(['pending', 'processing', 'completed', 'error']).optional(),
+        page: z.number().default(1),
+        pageSize: z.number().default(50),
+      }))
+      .query(async ({ input }) => {
+        const { getQueueHistory } = await import('./db');
+        return getQueueHistory(
+          input.projectId,
+          input.status,
+          input.page,
+          input.pageSize
+        );
+      }),
+    
+    // Calcular ETA (estimativa de tempo)
+    eta: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { queueManager } = await import('./queueManager');
+        return queueManager.calculateETA(input.projectId);
+      }),
   }),
   
   // Cache Management - Dashboard de cache
