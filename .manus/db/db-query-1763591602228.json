@@ -1,0 +1,45 @@
+{
+  "query": "\nSELECT \n  'Clientes' as tabela,\n  COUNT(*) as total,\n  COUNT(CASE WHEN qualidadeScore >= 90 THEN 1 END) as excelentes,\n  COUNT(CASE WHEN qualidadeScore >= 70 THEN 1 END) as bons,\n  ROUND(AVG(qualidadeScore), 2) as avg_quality\nFROM clientes WHERE projectId = 1\nUNION ALL\nSELECT \n  'Mercados',\n  COUNT(*),\n  NULL,\n  NULL,\n  NULL\nFROM mercados_unicos WHERE projectId = 1\nUNION ALL\nSELECT \n  'Produtos',\n  COUNT(*),\n  NULL,\n  NULL,\n  NULL\nFROM produtos WHERE projectId = 1\nUNION ALL\nSELECT \n  'Concorrentes',\n  COUNT(DISTINCT concorrenteHash),\n  NULL,\n  NULL,\n  NULL\nFROM concorrentes WHERE projectId = 1\nUNION ALL\nSELECT \n  'Leads',\n  COUNT(DISTINCT leadHash),\n  NULL,\n  NULL,\n  NULL\nFROM leads WHERE projectId = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  'Clientes' as tabela,\n  COUNT(*) as total,\n  COUNT(CASE WHEN qualidadeScore >= 90 THEN 1 END) as excelentes,\n  COUNT(CASE WHEN qualidadeScore >= 70 THEN 1 END) as bons,\n  ROUND(AVG(qualidadeScore), 2) as avg_quality\nFROM clientes WHERE projectId = 1\nUNION ALL\nSELECT \n  'Mercados',\n  COUNT(*),\n  NULL,\n  NULL,\n  NULL\nFROM mercados_unicos WHERE projectId = 1\nUNION ALL\nSELECT \n  'Produtos',\n  COUNT(*),\n  NULL,\n  NULL,\n  NULL\nFROM produtos WHERE projectId = 1\nUNION ALL\nSELECT \n  'Concorrentes',\n  COUNT(DISTINCT concorrenteHash),\n  NULL,\n  NULL,\n  NULL\nFROM concorrentes WHERE projectId = 1\nUNION ALL\nSELECT \n  'Leads',\n  COUNT(DISTINCT leadHash),\n  NULL,\n  NULL,\n  NULL\nFROM leads WHERE projectId = 1;\n",
+  "rows": [
+    {
+      "tabela": "Produtos",
+      "total": "21",
+      "excelentes": "NULL",
+      "bons": "NULL",
+      "avg_quality": "NULL"
+    },
+    {
+      "tabela": "Mercados",
+      "total": "12",
+      "excelentes": "NULL",
+      "bons": "NULL",
+      "avg_quality": "NULL"
+    },
+    {
+      "tabela": "Clientes",
+      "total": "806",
+      "excelentes": "697",
+      "bons": "798",
+      "avg_quality": "97.33"
+    },
+    {
+      "tabela": "Leads",
+      "total": "5",
+      "excelentes": "NULL",
+      "bons": "NULL",
+      "avg_quality": "NULL"
+    },
+    {
+      "tabela": "Concorrentes",
+      "total": "15",
+      "excelentes": "NULL",
+      "bons": "NULL",
+      "avg_quality": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\ttotal\texcelentes\tbons\tavg_quality\nProdutos\t21\tNULL\tNULL\tNULL\nMercados\t12\tNULL\tNULL\tNULL\nClientes\t806\t697\t798\t97.33\nLeads\t5\tNULL\tNULL\tNULL\nConcorrentes\t15\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

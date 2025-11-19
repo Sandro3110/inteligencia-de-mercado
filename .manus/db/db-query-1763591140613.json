@@ -1,0 +1,17 @@
+{
+  "query": "\nSELECT id, nome, cnpj, produtoPrincipal, projectId \nFROM clientes \nWHERE projectId = 1 \nORDER BY RAND() \nLIMIT 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT id, nome, cnpj, produtoPrincipal, projectId \nFROM clientes \nWHERE projectId = 1 \nORDER BY RAND() \nLIMIT 1;\n",
+  "rows": [
+    {
+      "id": "361741",
+      "nome": "R 2 A DO BRASIL LTDA",
+      "cnpj": "3447831000102",
+      "produtoPrincipal": "Desenvolvimento e fabricação de sistemas de vedação de alta performance (juntas, gaxetas e anéis) para aplicações críticas em indústrias como óleo e gás, petroquímica e geração de energia.",
+      "projectId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcnpj\tprodutoPrincipal\tprojectId\n361741\tR 2 A DO BRASIL LTDA\t3447831000102\tDesenvolvimento e fabricação de sistemas de vedação de alta performance (juntas, gaxetas e anéis) para aplicações críticas em indústrias como óleo e gás, petroquímica e geração de energia.\t1\n",
+  "stderr": "",
+  "execution_time_ms": 85
+}

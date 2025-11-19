@@ -1,0 +1,130 @@
+{
+  "query": "\nSELECT nome, cidade, uf, porte, produto, qualidadeScore\nFROM concorrentes \nWHERE projectId = 1\nORDER BY id\nLIMIT 15;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT nome, cidade, uf, porte, produto, qualidadeScore\nFROM concorrentes \nWHERE projectId = 1\nORDER BY id\nLIMIT 15;\n",
+  "rows": [
+    {
+      "nome": "BERNECK S.A. PRODUTOS FLORESTAIS",
+      "cidade": "Araucária",
+      "uf": "PR",
+      "porte": "Grande",
+      "produto": "Painéis de madeira (MDF, MDP) com foco em padrões e acabamentos para a indústria moveleira e construção civil.",
+      "qualidadeScore": "85"
+    },
+    {
+      "nome": "ARAUCO DO BRASIL S.A.",
+      "cidade": "Curitiba",
+      "uf": "PR",
+      "porte": "Grande",
+      "produto": "Linha completa de painéis de madeira (MDF, MDP) e produtos de madeira sólida, incluindo painéis de alta performance e resistência.",
+      "qualidadeScore": "85"
+    },
+    {
+      "nome": "GUARARAPES PAINÉIS S/A",
+      "cidade": "Caçador",
+      "uf": "SC",
+      "porte": "Grande",
+      "produto": "Painéis de MDF e MDP, incluindo linhas BP (Baixa Pressão) e produtos específicos para móveis e interiores, com forte presença no Nordeste.",
+      "qualidadeScore": "85"
+    },
+    {
+      "nome": "PLACA DO BRASIL S/A",
+      "cidade": "Pinheiros",
+      "uf": "ES",
+      "porte": "Grande",
+      "produto": "Chapas de MDF e HDF, com foco em soluções para a indústria moveleira, construção e design de interiores, utilizando madeira de eucalipto.",
+      "qualidadeScore": "85"
+    },
+    {
+      "nome": "SUDATI PAINÉIS S.A.",
+      "cidade": "Otacílio Costa",
+      "uf": "SC",
+      "porte": "Grande",
+      "produto": "Produção de painéis de MDF e MDP, com destaque para a linha BP, atendendo marcenarias e grandes indústrias de móveis.",
+      "qualidadeScore": "85"
+    },
+    {
+      "nome": "MINERVA S.A.",
+      "cidade": "Barretos",
+      "uf": "SP",
+      "porte": "Grande",
+      "produto": "Carne bovina in natura e processada (resfriada/congelada), exportação para China (HACCP, ISO, SIF), Food Service.",
+      "qualidadeScore": "100"
+    },
+    {
+      "nome": "MARFRIG GLOBAL FOODS S.A.",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "porte": "Grande",
+      "produto": "Líder global em produção de hambúrgueres e grande player em carne bovina in natura e processada para atacado e exportação (EUA, Ásia).",
+      "qualidadeScore": "100"
+    },
+    {
+      "nome": "FRIGORÍFICO SÃO JOÃO LTDA",
+      "cidade": "São João do Paraíso",
+      "uf": "MG",
+      "porte": "Grande",
+      "produto": "Carne bovina (cortes desossados, miúdos) resfriada e congelada, com foco em atacado e exportação (SIF 1461).",
+      "qualidadeScore": "100"
+    },
+    {
+      "nome": "FRIGORÍFICO VALE DO SAPUCAÍ LTDA (FRIVASA)",
+      "cidade": "Ituiutaba",
+      "uf": "MG",
+      "porte": "Grande",
+      "produto": "Carne bovina resfriada e congelada, miúdos, com forte atuação no mercado interno (atacado) e exportação (SIF 455).",
+      "qualidadeScore": "100"
+    },
+    {
+      "nome": "FRIGORÍFICO RIO MARIA LTDA",
+      "cidade": "Rio Maria",
+      "uf": "PA",
+      "porte": "Grande",
+      "produto": "Carne bovina in natura (cortes dianteiro e traseiro), miúdos e aparas para indústria, com foco em atacado e exportação (SIF 2588).",
+      "qualidadeScore": "100"
+    },
+    {
+      "nome": "FRIGORÍFICO COMAI LTDA",
+      "cidade": "Rondonópolis",
+      "uf": "MT",
+      "porte": "Grande",
+      "produto": "Carne bovina resfriada e congelada, cortes especiais e miúdos, atendendo Food Service, atacado e exportação (SIF 1001).",
+      "qualidadeScore": "100"
+    },
+    {
+      "nome": "FRIGORÍFICO REDENTOR S/A",
+      "cidade": "Guarantã do Norte",
+      "uf": "MT",
+      "porte": "Grande",
+      "produto": "Abate e processamento de carne bovina, cortes primários, aparas e miúdos para atacado e exportação (Habilitado para China).",
+      "qualidadeScore": "100"
+    },
+    {
+      "nome": "FRIGORÍFICO 3M S.A.",
+      "cidade": "São Gabriel do Oeste",
+      "uf": "MS",
+      "porte": "Grande",
+      "produto": "Carne bovina resfriada e congelada, cortes especiais (Picanha, Fraldinha), miúdos, atendendo Food Service e exportação (SIF 2717).",
+      "qualidadeScore": "100"
+    },
+    {
+      "nome": "FRIGORÍFICO NATAL LTDA",
+      "cidade": "São Gonçalo do Amarante",
+      "uf": "RN",
+      "porte": "Grande",
+      "produto": "Produção de carne bovina, cortes para atacado e Food Service, miúdos e subprodutos. Forte presença no Nordeste e exportação (SIF 2533).",
+      "qualidadeScore": "100"
+    },
+    {
+      "nome": "FRIGORÍFICO ASTECA INDÚSTRIA E COMÉRCIO S.A.",
+      "cidade": "Jaguariúna",
+      "uf": "SP",
+      "porte": "Grande",
+      "produto": "Carne bovina (traseiro, dianteiro, aparas) para atacado, indústria e exportação. Atende mercados exigentes como o asiático (SIF 1249).",
+      "qualidadeScore": "100"
+    }
+  ],
+  "messages": [],
+  "stdout": "nome\tcidade\tuf\tporte\tproduto\tqualidadeScore\nBERNECK S.A. PRODUTOS FLORESTAIS\tAraucária\tPR\tGrande\tPainéis de madeira (MDF, MDP) com foco em padrões e acabamentos para a indústria moveleira e construção civil.\t85\nARAUCO DO BRASIL S.A.\tCuritiba\tPR\tGrande\tLinha completa de painéis de madeira (MDF, MDP) e produtos de madeira sólida, incluindo painéis de alta performance e resistência.\t85\nGUARARAPES PAINÉIS S/A\tCaçador\tSC\tGrande\tPainéis de MDF e MDP, incluindo linhas BP (Baixa Pressão) e produtos específicos para móveis e interiores, com forte presença no Nordeste.\t85\nPLACA DO BRASIL S/A\tPinheiros\tES\tGrande\tChapas de MDF e HDF, com foco em soluções para a indústria moveleira, construção e design de interiores, utilizando madeira de eucalipto.\t85\nSUDATI PAINÉIS S.A.\tOtacílio Costa\tSC\tGrande\tProdução de painéis de MDF e MDP, com destaque para a linha BP, atendendo marcenarias e grandes indústrias de móveis.\t85\nMINERVA S.A.\tBarretos\tSP\tGrande\tCarne bovina in natura e processada (resfriada/congelada), exportação para China (HACCP, ISO, SIF), Food Service.\t100\nMARFRIG GLOBAL FOODS S.A.\tSão Paulo\tSP\tGrande\tLíder global em produção de hambúrgueres e grande player em carne bovina in natura e processada para atacado e exportação (EUA, Ásia).\t100\nFRIGORÍFICO SÃO JOÃO LTDA\tSão João do Paraíso\tMG\tGrande\tCarne bovina (cortes desossados, miúdos) resfriada e congelada, com foco em atacado e exportação (SIF 1461).\t100\nFRIGORÍFICO VALE DO SAPUCAÍ LTDA (FRIVASA)\tItuiutaba\tMG\tGrande\tCarne bovina resfriada e congelada, miúdos, com forte atuação no mercado interno (atacado) e exportação (SIF 455).\t100\nFRIGORÍFICO RIO MARIA LTDA\tRio Maria\tPA\tGrande\tCarne bovina in natura (cortes dianteiro e traseiro), miúdos e aparas para indústria, com foco em atacado e exportação (SIF 2588).\t100\nFRIGORÍFICO COMAI LTDA\tRondonópolis\tMT\tGrande\tCarne bovina resfriada e congelada, cortes especiais e miúdos, atendendo Food Service, atacado e exportação (SIF 1001).\t100\nFRIGORÍFICO REDENTOR S/A\tGuarantã do Norte\tMT\tGrande\tAbate e processamento de carne bovina, cortes primários, aparas e miúdos para atacado e exportação (Habilitado para China).\t100\nFRIGORÍFICO 3M S.A.\tSão Gabriel do Oeste\tMS\tGrande\tCarne bovina resfriada e congelada, cortes especiais (Picanha, Fraldinha), miúdos, atendendo Food Service e exportação (SIF 2717).\t100\nFRIGORÍFICO NATAL LTDA\tSão Gonçalo do Amarante\tRN\tGrande\tProdução de carne bovina, cortes para atacado e Food Service, miúdos e subprodutos. Forte presença no Nordeste e exportação (SIF 2533).\t100\nFRIGORÍFICO ASTECA INDÚSTRIA E COMÉRCIO S.A.\tJaguariúna\tSP\tGrande\tCarne bovina (traseiro, dianteiro, aparas) para atacado, indústria e exportação. Atende mercados exigentes como o asiático (SIF 1249).\t100\n",
+  "stderr": "",
+  "execution_time_ms": 205
+}

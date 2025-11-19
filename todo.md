@@ -3000,3 +3000,41 @@ Redefinir completamente o fluxo de enriquecimento de dados com base nos 801 clie
 - [ ] Validar resultados com SQL
 - [ ] Executar enriquecimento completo (801 clientes)
 
+
+---
+
+## Melhorias Críticas do Sistema de Enriquecimento
+
+### Correções Técnicas
+- [ ] Adicionar constraints UNIQUE no banco (mercados, concorrentes, leads, produtos)
+- [ ] Criar triggers de updatedAt automático (clientes, produtos)
+- [ ] Implementar UPSERT completo em produtos
+- [ ] Implementar UPDATE em concorrentes quando já existir
+- [ ] Implementar UPDATE em leads quando já existir
+
+### Melhorias nos Prompts
+- [ ] Melhorar prompt de concorrentes (mais específico ao mercado)
+- [ ] Melhorar prompt de leads (mais diversidade regional)
+- [ ] Adicionar validação de CNPJs nos prompts
+- [ ] Melhorar descrições de produtos (mais técnicas)
+
+
+## Teste com 5 Clientes - 10 Concorrentes
+- [ ] Atualizar prompt para 10 concorrentes
+- [ ] Executar teste com 5 clientes aleatórios
+- [ ] Validar deduplicação de concorrentes
+- [ ] Gerar relatório de performance
+
+
+## ✅ Melhorias Implementadas e Testadas
+- [x] Adicionar constraints UNIQUE no banco (mercados, concorrentes, leads, produtos)
+- [x] Implementar UPSERT completo em produtos
+- [x] Implementar UPDATE em concorrentes quando já existir
+- [x] Implementar UPDATE em leads quando já existir
+- [x] Melhorar prompt de concorrentes (mais específico ao mercado)
+- [x] Melhorar prompt de leads (mais diversidade regional)
+- [x] Atualizar prompt para 10 concorrentes
+- [x] Executar teste com 5 clientes aleatórios
+- [x] Validar deduplicação de concorrentes (28,6% de reuso)
+- [x] Gerar relatório de performance completo
+

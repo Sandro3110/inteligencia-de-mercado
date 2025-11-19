@@ -120,6 +120,7 @@ REGRAS:
     updateData.qualidadeClassificacao = getQualityClassification(updateData.qualidadeScore);
 
     if (Object.keys(updateData).length > 0) {
+      updateData.updatedAt = new Date();
       await db.update(clientes).set(updateData).where(eq(clientes.id, clienteId));
     }
 
@@ -279,6 +280,7 @@ Retorne APENAS um objeto JSON com array "produtos" (sem markdown):
 
     let count = 0;
     for (const produtoData of produtosData) {
+      // UPSERT: Insert or Update if exists
       await db.insert(produtos).values({
         projectId,
         clienteId,
@@ -289,6 +291,14 @@ Retorne APENAS um objeto JSON com array "produtos" (sem markdown):
         preco: produtoData.preco,
         unidade: produtoData.unidade,
         ativo: 1,
+      }).onDuplicateKeyUpdate({
+        set: {
+          descricao: produtoData.descricao,
+          categoria: produtoData.categoria,
+          preco: produtoData.preco,
+          unidade: produtoData.unidade,
+          updatedAt: new Date(),
+        }
       });
       count++;
     }
@@ -323,32 +333,51 @@ export async function findConcorrentesCliente(clienteId: number, projectId: numb
 
   const mercadosInfo = mercadosCliente.map(m => ({ id: m.mercados_unicos.id, nome: m.mercados_unicos.nome }));
 
+  const produtosCliente = await db.select().from(produtos).where(eq(produtos.clienteId, clienteId));
+  const produtosInfo = produtosCliente.map(p => p.nome).join(', ');
+
   const prompt = `Você é um especialista em mapeamento competitivo B2B brasileiro.
 
-Identifique EXATAMENTE 5 empresas CONCORRENTES REAIS:
-- Cliente: ${cliente.nome}
-- Mercados: ${JSON.stringify(mercadosInfo)}
+Identifique EXATAMENTE 10 empresas CONCORRENTES DIRETAS que fabricam/fornecem produtos SIMILARES:
+
+**Cliente Referência:**
+- Nome: ${cliente.nome}
+- Produto Principal: ${cliente.produtoPrincipal || 'não informado'}
+- Produtos Específicos: ${produtosInfo || 'não informado'}
+- Localização: ${cliente.cidade || '?'}/${cliente.uf || '?'}
+- Porte: ${cliente.porte || '?'}
+
+**Mercados de Atuação:**
+${mercadosInfo.map(m => `- ${m.nome}`).join('\n')}
+
+**CRITÉRIOS OBRIGATÓRIOS:**
+1. Concorrentes devem fabricar/fornecer produtos SIMILARES aos do cliente
+2. Priorizar empresas do mesmo porte ou maiores
+3. Incluir empresas de diferentes regiões do Brasil (diversidade geográfica)
+4. Buscar empresas REAIS e ATIVAS no mercado
+5. CNPJs devem ser válidos (formato: 00.000.000/0001-00)
 
 Retorne APENAS um objeto JSON com array "concorrentes" (sem markdown):
 {
   "concorrentes": [
     {
       "mercadoId": 10,
-      "nome": "Nome completo da empresa",
-      "cnpj": "CNPJ ou null",
-      "site": "URL do site",
-      "produto": "Principais produtos",
-      "cidade": "Cidade da sede",
-      "uf": "UF",
+      "nome": "Razão social completa da empresa",
+      "cnpj": "00.000.000/0001-00 (formato válido) ou null",
+      "site": "URL completa do site oficial",
+      "produto": "Linha de produtos específica que compete diretamente",
+      "cidade": "Cidade da sede principal",
+      "uf": "UF (2 letras maiúsculas)",
       "porte": "MEI | Pequena | Média | Grande",
-      "faturamentoEstimado": "Estimativa de faturamento",
-      "faturamentoDeclarado": "Faturamento declarado ou null",
-      "numeroEstabelecimentos": "Número de filiais ou null"
+      "faturamentoEstimado": "Faixa de faturamento anual estimado",
+      "faturamentoDeclarado": "Faturamento público declarado ou null",
+      "numeroEstabelecimentos": "Quantidade de filiais/unidades ou null"
     }
   ]
 }
 
-CRÍTICO: NÃO incluir: ${JSON.stringify(clientesExistentes)}`;
+**CRÍTICO - NÃO INCLUIR ESTAS EMPRESAS:**
+${JSON.stringify(clientesExistentes)}`;
 
   try {
     const response = await invokeLLM({
@@ -378,14 +407,29 @@ CRÍTICO: NÃO incluir: ${JSON.stringify(clientesExistentes)}`;
         .where(eq(concorrentes.concorrenteHash, hash))
         .limit(1);
 
-      if (!existing) {
-        const weights = {
-          cnpj: 20, site: 15, produto: 15, cidade: 5, uf: 5,
-          porte: 10, faturamentoDeclarado: 15, numeroEstabelecimentos: 5,
-          faturamentoEstimado: 10
-        };
-        const qualidadeScore = calculateQualityScore(concorrenteData, weights);
+      const weights = {
+        cnpj: 20, site: 15, produto: 15, cidade: 5, uf: 5,
+        porte: 10, faturamentoDeclarado: 15, numeroEstabelecimentos: 5,
+        faturamentoEstimado: 10
+      };
+      const qualidadeScore = calculateQualityScore(concorrenteData, weights);
 
+      if (existing) {
+        // UPDATE: Atualizar dados do concorrente
+        await db.update(concorrentes).set({
+          site: concorrenteData.site,
+          produto: concorrenteData.produto,
+          cidade: concorrenteData.cidade,
+          uf: concorrenteData.uf,
+          porte: concorrenteData.porte,
+          faturamentoEstimado: concorrenteData.faturamentoEstimado,
+          faturamentoDeclarado: concorrenteData.faturamentoDeclarado,
+          numeroEstabelecimentos: concorrenteData.numeroEstabelecimentos,
+          qualidadeScore,
+          qualidadeClassificacao: getQualityClassification(qualidadeScore),
+        }).where(eq(concorrentes.id, existing.id));
+      } else {
+        // INSERT: Criar novo concorrente
         await db.insert(concorrentes).values({
           projectId,
           concorrenteHash: hash,
@@ -403,8 +447,8 @@ CRÍTICO: NÃO incluir: ${JSON.stringify(clientesExistentes)}`;
           qualidadeScore,
           qualidadeClassificacao: getQualityClassification(qualidadeScore),
         });
-        count++;
       }
+      count++;
     }
 
     return count;
@@ -440,34 +484,60 @@ export async function findLeadsCliente(clienteId: number, projectId: number) {
 
   const mercadosInfo = mercadosCliente.map(m => ({ id: m.mercados_unicos.id, nome: m.mercados_unicos.nome }));
 
+  const produtosCliente = await db.select().from(produtos).where(eq(produtos.clienteId, clienteId));
+  const produtosInfo = produtosCliente.map(p => `${p.nome} (${p.categoria || 'N/A'})`).join(', ');
+
   const prompt = `Você é um especialista em prospecção de leads B2B/B2C brasileiro.
 
-Identifique EXATAMENTE 5 empresas que são POTENCIAIS COMPRADORES:
-- Mercados: ${JSON.stringify(mercadosInfo)}
+Identifique EXATAMENTE 5 empresas que são POTENCIAIS COMPRADORES dos produtos abaixo:
+
+**Produtos a Vender:**
+${produtosInfo || cliente.produtoPrincipal || 'não informado'}
+
+**Mercados-Alvo:**
+${mercadosInfo.map(m => `- ${m.nome}`).join('\n')}
+
+**Segmentação:** ${cliente.segmentacaoB2bB2c || 'B2B'}
+
+**CRITÉRIOS OBRIGATÓRIOS:**
+1. Leads devem ser empresas que COMPRAM/UTILIZAM os produtos listados
+2. Diversidade geográfica: incluir leads de DIFERENTES regiões do Brasil (Norte, Nordeste, Centro-Oeste, Sudeste, Sul)
+3. Diversidade de porte: incluir empresas de diferentes tamanhos (Pequena, Média, Grande)
+4. Diversidade de tipo: incluir pelo menos 3 tipos diferentes (Cliente Potencial, Distribuidor, Parceiro, Integrador, Revendedor)
+5. Empresas REAIS e ATIVAS no mercado brasileiro
+6. CNPJs válidos quando disponíveis (formato: 00.000.000/0001-00)
+
+**EXEMPLOS DE LEADS POR TIPO:**
+- Cliente Potencial: Empresa que usa o produto no seu processo/operação
+- Distribuidor: Atacadista que revende para o varejo
+- Parceiro: Empresa que pode integrar/complementar a solução
+- Integrador: Empresa que incorpora o produto em projetos maiores
+- Revendedor: Varejista especializado
 
 Retorne APENAS um objeto JSON com array "leads" (sem markdown):
 {
   "leads": [
     {
       "mercadoId": 10,
-      "nome": "Nome completo da empresa",
-      "cnpj": "CNPJ ou null",
-      "site": "URL do site",
-      "email": "Email comercial",
-      "telefone": "Telefone com DDD",
-      "tipo": "Cliente Potencial | Parceiro | Distribuidor",
-      "cidade": "Cidade",
-      "uf": "UF",
-      "porte": "MEI | Pequena | Média | Grande",
-      "faturamentoDeclarado": "Faturamento ou null",
-      "numeroEstabelecimentos": "Número de filiais ou null",
+      "nome": "Razão social completa da empresa",
+      "cnpj": "00.000.000/0001-00 (formato válido) ou null",
+      "site": "URL completa do site oficial",
+      "email": "Email comercial/contato",
+      "telefone": "(XX) XXXX-XXXX ou (XX) XXXXX-XXXX",
+      "tipo": "Cliente Potencial | Distribuidor | Parceiro | Integrador | Revendedor",
+      "cidade": "Cidade da sede",
+      "uf": "UF (2 letras maiúsculas)",
+      "porte": "Pequena | Média | Grande",
+      "faturamentoDeclarado": "Faturamento anual declarado ou null",
+      "numeroEstabelecimentos": "Quantidade de unidades ou null",
       "regiao": "Norte | Nordeste | Centro-Oeste | Sudeste | Sul",
-      "setor": "Setor de atuação"
+      "setor": "Setor específico de atuação do lead"
     }
   ]
 }
 
-CRÍTICO: NÃO incluir: ${JSON.stringify([...clientesExistentes, ...concorrentesExistentes])}`;
+**CRÍTICO - NÃO INCLUIR ESTAS EMPRESAS:**
+${JSON.stringify([...clientesExistentes, ...concorrentesExistentes])}`;
 
   try {
     const response = await invokeLLM({
@@ -506,13 +576,31 @@ CRÍTICO: NÃO incluir: ${JSON.stringify([...clientesExistentes, ...concorrentes
         .where(eq(leads.leadHash, hash))
         .limit(1);
 
-      if (!existing) {
-        const weights = {
-          cnpj: 15, email: 15, telefone: 10, site: 10, cidade: 5, uf: 5,
-          tipo: 10, porte: 10, faturamentoDeclarado: 10, numeroEstabelecimentos: 5, setor: 5
-        };
-        const qualidadeScore = calculateQualityScore(leadData, weights);
+      const weights = {
+        cnpj: 15, email: 15, telefone: 10, site: 10, cidade: 5, uf: 5,
+        tipo: 10, porte: 10, faturamentoDeclarado: 10, numeroEstabelecimentos: 5, setor: 5
+      };
+      const qualidadeScore = calculateQualityScore(leadData, weights);
 
+      if (existing) {
+        // UPDATE: Atualizar dados do lead
+        await db.update(leads).set({
+          site: leadData.site,
+          email: leadData.email,
+          telefone: leadData.telefone,
+          tipo: leadData.tipo,
+          cidade: leadData.cidade,
+          uf: leadData.uf,
+          porte: leadData.porte,
+          faturamentoDeclarado: leadData.faturamentoDeclarado,
+          numeroEstabelecimentos: leadData.numeroEstabelecimentos,
+          regiao: leadData.regiao,
+          setor: leadData.setor,
+          qualidadeScore,
+          qualidadeClassificacao: getQualityClassification(qualidadeScore),
+        }).where(eq(leads.id, existing.id));
+      } else {
+        // INSERT: Criar novo lead
         await db.insert(leads).values({
           projectId,
           leadHash: hash,
@@ -533,8 +621,8 @@ CRÍTICO: NÃO incluir: ${JSON.stringify([...clientesExistentes, ...concorrentes
           qualidadeScore,
           qualidadeClassificacao: getQualityClassification(qualidadeScore),
         });
-        count++;
       }
+      count++;
     }
 
     return count;

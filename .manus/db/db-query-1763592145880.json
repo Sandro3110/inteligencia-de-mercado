@@ -1,0 +1,9 @@
+{
+  "query": "\nDELETE FROM leads WHERE projectId = 1;\nDELETE FROM concorrentes WHERE projectId = 1;\nDELETE FROM produtos WHERE projectId = 1;\nDELETE FROM clientes_mercados WHERE clienteId IN (SELECT id FROM clientes WHERE projectId = 1);\nDELETE FROM mercados_unicos WHERE projectId = 1;\nUPDATE clientes SET \n  email = NULL, \n  telefone = NULL, \n  siteOficial = NULL,\n  cidade = NULL,\n  uf = NULL,\n  regiao = NULL,\n  cnae = NULL,\n  porte = NULL,\n  faturamentoDeclarado = NULL,\n  numeroEstabelecimentos = NULL,\n  qualidadeScore = NULL,\n  qualidadeClassificacao = NULL\nWHERE projectId = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nDELETE FROM leads WHERE projectId = 1;\nDELETE FROM concorrentes WHERE projectId = 1;\nDELETE FROM produtos WHERE projectId = 1;\nDELETE FROM clientes_mercados WHERE clienteId IN (SELECT id FROM clientes WHERE projectId = 1);\nDELETE FROM mercados_unicos WHERE projectId = 1;\nUPDATE clientes SET \n  email = NULL, \n  telefone = NULL, \n  siteOficial = NULL,\n  cidade = NULL,\n  uf = NULL,\n  regiao = NULL,\n  cnae = NULL,\n  porte = NULL,\n  faturamentoDeclarado = NULL,\n  numeroEstabelecimentos = NULL,\n  qualidadeScore = NULL,\n  qualidadeClassificacao = NULL\nWHERE projectId = 1;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 286
+}

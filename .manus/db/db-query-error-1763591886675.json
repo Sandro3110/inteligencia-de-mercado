@@ -1,0 +1,8 @@
+{
+  "query": "\n-- Trigger para clientes\nDROP TRIGGER IF EXISTS update_clientes_timestamp;\nCREATE TRIGGER update_clientes_timestamp \nBEFORE UPDATE ON clientes\nFOR EACH ROW \nSET NEW.updatedAt = NOW();\n\n-- Trigger para produtos\nDROP TRIGGER IF EXISTS update_produtos_timestamp;\nCREATE TRIGGER update_produtos_timestamp \nBEFORE UPDATE ON produtos\nFOR EACH ROW \nSET NEW.updatedAt = NOW();\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Trigger para clientes\nDROP TRIGGER IF EXISTS update_clientes_timestamp;\nCREATE TRIGGER update_clientes_timestamp \nBEFORE UPDATE ON clientes\nFOR EACH ROW \nSET NEW.updatedAt = NOW();\n\n-- Trigger para produtos\nDROP TRIGGER IF EXISTS update_produtos_timestamp;\nCREATE TRIGGER update_produtos_timestamp \nBEFORE UPDATE ON produtos\nFOR EACH ROW \nSET NEW.updatedAt = NOW();\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1064 (42000) at line 3: You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 1 column 12 near \"TRIGGER IF EXISTS update_clientes_timestamp\""
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "query": "\n-- 1. Mercados únicos\nALTER TABLE mercados_unicos ADD UNIQUE INDEX idx_mercado_hash (mercadoHash);\n\n-- 2. Concorrentes únicos\nALTER TABLE concorrentes ADD UNIQUE INDEX idx_concorrente_hash (concorrenteHash);\n\n-- 3. Leads únicos\nALTER TABLE leads ADD UNIQUE INDEX idx_lead_hash (leadHash);\n\n-- 4. Produtos únicos (clienteId + mercadoId + nome)\nALTER TABLE produtos ADD UNIQUE INDEX idx_produto_unique (clienteId, mercadoId, nome);\n\n-- 5. Clientes_Mercados únicos\nALTER TABLE clientes_mercados ADD UNIQUE INDEX idx_cliente_mercado (clienteId, mercadoId);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- 1. Mercados únicos\nALTER TABLE mercados_unicos ADD UNIQUE INDEX idx_mercado_hash (mercadoHash);\n\n-- 2. Concorrentes únicos\nALTER TABLE concorrentes ADD UNIQUE INDEX idx_concorrente_hash (concorrenteHash);\n\n-- 3. Leads únicos\nALTER TABLE leads ADD UNIQUE INDEX idx_lead_hash (leadHash);\n\n-- 4. Produtos únicos (clienteId + mercadoId + nome)\nALTER TABLE produtos ADD UNIQUE INDEX idx_produto_unique (clienteId, mercadoId, nome);\n\n-- 5. Clientes_Mercados únicos\nALTER TABLE clientes_mercados ADD UNIQUE INDEX idx_cliente_mercado (clienteId, mercadoId);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 4265
+}

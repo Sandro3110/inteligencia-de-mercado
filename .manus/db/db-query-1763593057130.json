@@ -1,0 +1,30 @@
+{
+  "query": "\nSELECT \n  'Mercados' as entidade,\n  COUNT(DISTINCT id) as unicos,\n  NULL as total_gerado\nFROM mercados_unicos WHERE projectId = 1\nUNION ALL\nSELECT \n  'Produtos',\n  COUNT(*),\n  NULL\nFROM produtos WHERE projectId = 1\nUNION ALL\nSELECT \n  'Concorrentes',\n  COUNT(DISTINCT concorrenteHash),\n  49 as total_gerado\nFROM concorrentes WHERE projectId = 1\nUNION ALL\nSELECT \n  'Leads',\n  COUNT(DISTINCT leadHash),\n  25 as total_gerado\nFROM leads WHERE projectId = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  'Mercados' as entidade,\n  COUNT(DISTINCT id) as unicos,\n  NULL as total_gerado\nFROM mercados_unicos WHERE projectId = 1\nUNION ALL\nSELECT \n  'Produtos',\n  COUNT(*),\n  NULL\nFROM produtos WHERE projectId = 1\nUNION ALL\nSELECT \n  'Concorrentes',\n  COUNT(DISTINCT concorrenteHash),\n  49 as total_gerado\nFROM concorrentes WHERE projectId = 1\nUNION ALL\nSELECT \n  'Leads',\n  COUNT(DISTINCT leadHash),\n  25 as total_gerado\nFROM leads WHERE projectId = 1;\n",
+  "rows": [
+    {
+      "entidade": "Produtos",
+      "unicos": "63",
+      "total_gerado": "NULL"
+    },
+    {
+      "entidade": "Mercados",
+      "unicos": "27",
+      "total_gerado": "NULL"
+    },
+    {
+      "entidade": "Concorrentes",
+      "unicos": "64",
+      "total_gerado": "49"
+    },
+    {
+      "entidade": "Leads",
+      "unicos": "30",
+      "total_gerado": "25"
+    }
+  ],
+  "messages": [],
+  "stdout": "entidade\tunicos\ttotal_gerado\nProdutos\t63\tNULL\nMercados\t27\tNULL\nConcorrentes\t64\t49\nLeads\t30\t25\n",
+  "stderr": "",
+  "execution_time_ms": 72
+}

@@ -1,0 +1,145 @@
+{
+  "query": "\nSELECT nome, tipo, cidade, uf, regiao, porte, qualidadeScore\nFROM leads \nWHERE projectId = 1\nORDER BY id\nLIMIT 15;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT nome, tipo, cidade, uf, regiao, porte, qualidadeScore\nFROM leads \nWHERE projectId = 1\nORDER BY id\nLIMIT 15;\n",
+  "rows": [
+    {
+      "nome": "Todeschini S.A.",
+      "tipo": "Cliente Potencial",
+      "cidade": "Bento Gonçalves",
+      "uf": "RS",
+      "regiao": "Sul",
+      "porte": "Grande",
+      "qualidadeScore": "85"
+    },
+    {
+      "nome": "C&C Casa e Construção (Companhia de Materiais de Construção)",
+      "tipo": "Distribuidor",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "regiao": "Sudeste",
+      "porte": "Grande",
+      "qualidadeScore": "85"
+    },
+    {
+      "nome": "MRV Engenharia e Participações S.A.",
+      "tipo": "Integrador",
+      "cidade": "Belo Horizonte",
+      "uf": "MG",
+      "regiao": "Sudeste",
+      "porte": "Grande",
+      "qualidadeScore": "85"
+    },
+    {
+      "nome": "Madeireira Cedro",
+      "tipo": "Revendedor",
+      "cidade": "Goiânia",
+      "uf": "GO",
+      "regiao": "Centro-Oeste",
+      "porte": "Média",
+      "qualidadeScore": "85"
+    },
+    {
+      "nome": "Portas Pormade S.A.",
+      "tipo": "Cliente Potencial",
+      "cidade": "União da Vitória",
+      "uf": "PR",
+      "regiao": "Sul",
+      "porte": "Grande",
+      "qualidadeScore": "85"
+    },
+    {
+      "nome": "Makro Atacadista S.A.",
+      "tipo": "Distribuidor",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "regiao": "Sudeste",
+      "porte": "Grande",
+      "qualidadeScore": "90"
+    },
+    {
+      "nome": "Pif Paf Alimentos S/A",
+      "tipo": "Cliente Potencial",
+      "cidade": "Belo Horizonte",
+      "uf": "MG",
+      "regiao": "Sudeste",
+      "porte": "Grande",
+      "qualidadeScore": "90"
+    },
+    {
+      "nome": "Supermercado Nordestão Ltda.",
+      "tipo": "Revendedor",
+      "cidade": "Natal",
+      "uf": "RN",
+      "regiao": "Nordeste",
+      "porte": "Média",
+      "qualidadeScore": "90"
+    },
+    {
+      "nome": "Comercial de Alimentos Nutriplan Ltda.",
+      "tipo": "Distribuidor",
+      "cidade": "Campo Grande",
+      "uf": "MS",
+      "regiao": "Centro-Oeste",
+      "porte": "Média",
+      "qualidadeScore": "90"
+    },
+    {
+      "nome": "Frigorífico Irmãos Gonçalves Ltda. (FIG)",
+      "tipo": "Parceiro",
+      "cidade": "Ji-Paraná",
+      "uf": "RO",
+      "regiao": "Norte",
+      "porte": "Grande",
+      "qualidadeScore": "90"
+    },
+    {
+      "nome": "Unilever Brasil Industrial Ltda.",
+      "tipo": "Cliente Potencial",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "regiao": "Sudeste",
+      "porte": "Grande",
+      "qualidadeScore": "100"
+    },
+    {
+      "nome": "Aché Laboratórios Farmacêuticos S.A.",
+      "tipo": "Cliente Potencial",
+      "cidade": "Guarulhos",
+      "uf": "SP",
+      "regiao": "Sudeste",
+      "porte": "Grande",
+      "qualidadeScore": "100"
+    },
+    {
+      "nome": "Cooperativa Central Aurora Alimentos",
+      "tipo": "Cliente Potencial",
+      "cidade": "Chapecó",
+      "uf": "SC",
+      "regiao": "Sul",
+      "porte": "Grande",
+      "qualidadeScore": "100"
+    },
+    {
+      "nome": "Distribuidora de Produtos Químicos Nordeste Ltda (DPQN)",
+      "tipo": "Distribuidor",
+      "cidade": "Jaboatão dos Guararapes",
+      "uf": "PE",
+      "regiao": "Nordeste",
+      "porte": "Média",
+      "qualidadeScore": "90"
+    },
+    {
+      "nome": "Nutriex Indústria de Cosméticos Ltda",
+      "tipo": "Cliente Potencial",
+      "cidade": "Goiânia",
+      "uf": "GO",
+      "regiao": "Centro-Oeste",
+      "porte": "Média",
+      "qualidadeScore": "90"
+    }
+  ],
+  "messages": [],
+  "stdout": "nome\ttipo\tcidade\tuf\tregiao\tporte\tqualidadeScore\nTodeschini S.A.\tCliente Potencial\tBento Gonçalves\tRS\tSul\tGrande\t85\nC&C Casa e Construção (Companhia de Materiais de Construção)\tDistribuidor\tSão Paulo\tSP\tSudeste\tGrande\t85\nMRV Engenharia e Participações S.A.\tIntegrador\tBelo Horizonte\tMG\tSudeste\tGrande\t85\nMadeireira Cedro\tRevendedor\tGoiânia\tGO\tCentro-Oeste\tMédia\t85\nPortas Pormade S.A.\tCliente Potencial\tUnião da Vitória\tPR\tSul\tGrande\t85\nMakro Atacadista S.A.\tDistribuidor\tSão Paulo\tSP\tSudeste\tGrande\t90\nPif Paf Alimentos S/A\tCliente Potencial\tBelo Horizonte\tMG\tSudeste\tGrande\t90\nSupermercado Nordestão Ltda.\tRevendedor\tNatal\tRN\tNordeste\tMédia\t90\nComercial de Alimentos Nutriplan Ltda.\tDistribuidor\tCampo Grande\tMS\tCentro-Oeste\tMédia\t90\nFrigorífico Irmãos Gonçalves Ltda. (FIG)\tParceiro\tJi-Paraná\tRO\tNorte\tGrande\t90\nUnilever Brasil Industrial Ltda.\tCliente Potencial\tSão Paulo\tSP\tSudeste\tGrande\t100\nAché Laboratórios Farmacêuticos S.A.\tCliente Potencial\tGuarulhos\tSP\tSudeste\tGrande\t100\nCooperativa Central Aurora Alimentos\tCliente Potencial\tChapecó\tSC\tSul\tGrande\t100\nDistribuidora de Produtos Químicos Nordeste Ltda (DPQN)\tDistribuidor\tJaboatão dos Guararapes\tPE\tNordeste\tMédia\t90\nNutriex Indústria de Cosméticos Ltda\tCliente Potencial\tGoiânia\tGO\tCentro-Oeste\tMédia\t90\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}
