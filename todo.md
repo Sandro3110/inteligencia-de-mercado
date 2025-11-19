@@ -1945,3 +1945,31 @@
 - [x] Testar retomar após pausa
 - [x] Validar persistência de dados
 - [x] Criar checkpoint das melhorias
+
+
+## Fase 28: Conexão do Enriquecimento em Execução 🔗
+
+### 28.1 Identificação e Registro
+- [x] Identificar processo de enriquecimento em execução (PID 83824)
+- [x] Registrar execução atual na tabela enrichment_runs
+- [x] Calcular progresso inicial (100/800 clientes, 2 lotes concluídos)
+- [x] Definir startedAt baseado no timestamp do primeiro lote
+
+### 28.2 Script de Controle
+- [x] Criar control-enrichment.ts para monitorar e controlar processo
+- [x] Implementar verificação de estado no banco a cada 5s
+- [x] Implementar lógica de start/stop baseada no status
+- [x] Adicionar atualização automática de progresso no banco
+- [x] Iniciar monitor em background via nohup
+
+### 28.3 Testes de Controle
+- [x] Testar botão Pausar (running → paused)
+- [x] Testar botão Retomar (paused → running)
+- [x] Verificar atualização de UI em tempo real
+- [x] Validar persistência de estado no banco
+- [x] Confirmar monitor detectando mudanças de estado
+
+### 28.4 Finalização
+- [x] Documentar fluxo de controle
+- [x] Criar checkpoint da integração
+- [x] Validar sistema completo end-to-end
