@@ -1,0 +1,90 @@
+{
+  "query": "\nSELECT \n  cnpj,\n  GROUP_CONCAT(id ORDER BY id) as ids,\n  GROUP_CONCAT(qualidadeScore ORDER BY id) as scores,\n  COUNT(DISTINCT qualidadeScore) as qtd_scores_distintos,\n  MAX(qualidadeScore) as max_score,\n  MIN(qualidadeScore) as min_score\nFROM clientes\nWHERE cnpj IS NOT NULL AND cnpj != ''\nGROUP BY cnpj\nHAVING COUNT(*) > 1\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  cnpj,\n  GROUP_CONCAT(id ORDER BY id) as ids,\n  GROUP_CONCAT(qualidadeScore ORDER BY id) as scores,\n  COUNT(DISTINCT qualidadeScore) as qtd_scores_distintos,\n  MAX(qualidadeScore) as max_score,\n  MIN(qualidadeScore) as min_score\nFROM clientes\nWHERE cnpj IS NOT NULL AND cnpj != ''\nGROUP BY cnpj\nHAVING COUNT(*) > 1\nLIMIT 10;\n",
+  "rows": [
+    {
+      "cnpj": "33265973000101",
+      "ids": "1611,301614",
+      "scores": "100",
+      "qtd_scores_distintos": "1",
+      "max_score": "100",
+      "min_score": "100"
+    },
+    {
+      "cnpj": "20953721000123",
+      "ids": "1612,301615",
+      "scores": "80",
+      "qtd_scores_distintos": "1",
+      "max_score": "80",
+      "min_score": "80"
+    },
+    {
+      "cnpj": "30746945000118",
+      "ids": "1613,301616",
+      "scores": "80",
+      "qtd_scores_distintos": "1",
+      "max_score": "80",
+      "min_score": "80"
+    },
+    {
+      "cnpj": "5918064000190",
+      "ids": "1614,301617",
+      "scores": "100",
+      "qtd_scores_distintos": "1",
+      "max_score": "100",
+      "min_score": "100"
+    },
+    {
+      "cnpj": "10664147000130",
+      "ids": "1615,301618",
+      "scores": "80",
+      "qtd_scores_distintos": "1",
+      "max_score": "80",
+      "min_score": "80"
+    },
+    {
+      "cnpj": "7537577000186",
+      "ids": "1616,301619",
+      "scores": "100",
+      "qtd_scores_distintos": "1",
+      "max_score": "100",
+      "min_score": "100"
+    },
+    {
+      "cnpj": "12414789000106",
+      "ids": "1617,301620",
+      "scores": "100",
+      "qtd_scores_distintos": "1",
+      "max_score": "100",
+      "min_score": "100"
+    },
+    {
+      "cnpj": "2891966000191",
+      "ids": "1618,301621",
+      "scores": "100",
+      "qtd_scores_distintos": "1",
+      "max_score": "100",
+      "min_score": "100"
+    },
+    {
+      "cnpj": "19674019000141",
+      "ids": "1619,301622",
+      "scores": "100",
+      "qtd_scores_distintos": "1",
+      "max_score": "100",
+      "min_score": "100"
+    },
+    {
+      "cnpj": "50212224000135",
+      "ids": "1620,301623",
+      "scores": "80",
+      "qtd_scores_distintos": "1",
+      "max_score": "80",
+      "min_score": "80"
+    }
+  ],
+  "messages": [],
+  "stdout": "cnpj\tids\tscores\tqtd_scores_distintos\tmax_score\tmin_score\n33265973000101\t1611,301614\t100\t1\t100\t100\n20953721000123\t1612,301615\t80\t1\t80\t80\n30746945000118\t1613,301616\t80\t1\t80\t80\n5918064000190\t1614,301617\t100\t1\t100\t100\n10664147000130\t1615,301618\t80\t1\t80\t80\n7537577000186\t1616,301619\t100\t1\t100\t100\n12414789000106\t1617,301620\t100\t1\t100\t100\n2891966000191\t1618,301621\t100\t1\t100\t100\n19674019000141\t1619,301622\t100\t1\t100\t100\n50212224000135\t1620,301623\t80\t1\t80\t80\n",
+  "stderr": "",
+  "execution_time_ms": 173
+}

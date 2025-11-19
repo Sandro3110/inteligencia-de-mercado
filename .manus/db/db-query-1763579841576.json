@@ -1,0 +1,34 @@
+{
+  "query": "\nWITH duplicados AS (\n  SELECT cnpj, COUNT(*) as total_duplicatas\n  FROM clientes\n  WHERE cnpj IS NOT NULL AND cnpj != ''\n  GROUP BY cnpj\n  HAVING COUNT(*) > 1\n),\nanalise_duplicados AS (\n  SELECT \n    c.id,\n    c.cnpj,\n    c.createdAt,\n    c.qualidadeScore,\n    DATE(c.createdAt) as data_criacao,\n    CASE \n      WHEN DATE(c.createdAt) = '2025-10-21' THEN 'ORIGINAL'\n      WHEN DATE(c.createdAt) = '2025-11-19' THEN 'ENRIQUECIDO'\n      ELSE 'OUTRO'\n    END as tipo,\n    CASE WHEN c.email IS NOT NULL AND c.email != '' THEN 1 ELSE 0 END as tem_email,\n    CASE WHEN c.telefone IS NOT NULL AND c.telefone != '' THEN 1 ELSE 0 END as tem_telefone,\n    CASE WHEN c.siteOficial IS NOT NULL AND c.siteOficial != '' THEN 1 ELSE 0 END as tem_site,\n    CASE WHEN c.produtoPrincipal IS NOT NULL AND c.produtoPrincipal != '' THEN 1 ELSE 0 END as tem_produto,\n    CASE WHEN c.cidade IS NOT NULL AND c.cidade != '' THEN 1 ELSE 0 END as tem_cidade,\n    CASE WHEN c.uf IS NOT NULL AND c.uf != '' THEN 1 ELSE 0 END as tem_uf,\n    ROW_NUMBER() OVER (PARTITION BY c.cnpj ORDER BY c.qualidadeScore DESC, c.id DESC) as rank_qualidade\n  FROM clientes c\n  INNER JOIN duplicados d ON c.cnpj = d.cnpj\n)\nSELECT \n  tipo,\n  COUNT(*) as total_registros,\n  ROUND(AVG(qualidadeScore), 2) as score_medio,\n  ROUND(AVG(tem_email) * 100, 2) as perc_com_email,\n  ROUND(AVG(tem_telefone) * 100, 2) as perc_com_telefone,\n  ROUND(AVG(tem_site) * 100, 2) as perc_com_site,\n  ROUND(AVG(tem_produto) * 100, 2) as perc_com_produto,\n  ROUND(AVG(tem_cidade) * 100, 2) as perc_com_cidade,\n  ROUND(AVG(tem_uf) * 100, 2) as perc_com_uf,\n  SUM(CASE WHEN rank_qualidade = 1 THEN 1 ELSE 0 END) as seria_mantido\nFROM analise_duplicados\nGROUP BY tipo\nORDER BY tipo;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nWITH duplicados AS (\n  SELECT cnpj, COUNT(*) as total_duplicatas\n  FROM clientes\n  WHERE cnpj IS NOT NULL AND cnpj != ''\n  GROUP BY cnpj\n  HAVING COUNT(*) > 1\n),\nanalise_duplicados AS (\n  SELECT \n    c.id,\n    c.cnpj,\n    c.createdAt,\n    c.qualidadeScore,\n    DATE(c.createdAt) as data_criacao,\n    CASE \n      WHEN DATE(c.createdAt) = '2025-10-21' THEN 'ORIGINAL'\n      WHEN DATE(c.createdAt) = '2025-11-19' THEN 'ENRIQUECIDO'\n      ELSE 'OUTRO'\n    END as tipo,\n    CASE WHEN c.email IS NOT NULL AND c.email != '' THEN 1 ELSE 0 END as tem_email,\n    CASE WHEN c.telefone IS NOT NULL AND c.telefone != '' THEN 1 ELSE 0 END as tem_telefone,\n    CASE WHEN c.siteOficial IS NOT NULL AND c.siteOficial != '' THEN 1 ELSE 0 END as tem_site,\n    CASE WHEN c.produtoPrincipal IS NOT NULL AND c.produtoPrincipal != '' THEN 1 ELSE 0 END as tem_produto,\n    CASE WHEN c.cidade IS NOT NULL AND c.cidade != '' THEN 1 ELSE 0 END as tem_cidade,\n    CASE WHEN c.uf IS NOT NULL AND c.uf != '' THEN 1 ELSE 0 END as tem_uf,\n    ROW_NUMBER() OVER (PARTITION BY c.cnpj ORDER BY c.qualidadeScore DESC, c.id DESC) as rank_qualidade\n  FROM clientes c\n  INNER JOIN duplicados d ON c.cnpj = d.cnpj\n)\nSELECT \n  tipo,\n  COUNT(*) as total_registros,\n  ROUND(AVG(qualidadeScore), 2) as score_medio,\n  ROUND(AVG(tem_email) * 100, 2) as perc_com_email,\n  ROUND(AVG(tem_telefone) * 100, 2) as perc_com_telefone,\n  ROUND(AVG(tem_site) * 100, 2) as perc_com_site,\n  ROUND(AVG(tem_produto) * 100, 2) as perc_com_produto,\n  ROUND(AVG(tem_cidade) * 100, 2) as perc_com_cidade,\n  ROUND(AVG(tem_uf) * 100, 2) as perc_com_uf,\n  SUM(CASE WHEN rank_qualidade = 1 THEN 1 ELSE 0 END) as seria_mantido\nFROM analise_duplicados\nGROUP BY tipo\nORDER BY tipo;\n",
+  "rows": [
+    {
+      "tipo": "ENRIQUECIDO",
+      "total_registros": "787",
+      "score_medio": "97.51",
+      "perc_com_email": "100.00",
+      "perc_com_telefone": "100.00",
+      "perc_com_site": "0.00",
+      "perc_com_produto": "99.75",
+      "perc_com_cidade": "0.00",
+      "perc_com_uf": "0.00",
+      "seria_mantido": "785"
+    },
+    {
+      "tipo": "ORIGINAL",
+      "total_registros": "787",
+      "score_medio": "NULL",
+      "perc_com_email": "100.00",
+      "perc_com_telefone": "100.00",
+      "perc_com_site": "100.00",
+      "perc_com_produto": "0.00",
+      "perc_com_cidade": "93.65",
+      "perc_com_uf": "93.65",
+      "seria_mantido": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "tipo\ttotal_registros\tscore_medio\tperc_com_email\tperc_com_telefone\tperc_com_site\tperc_com_produto\tperc_com_cidade\tperc_com_uf\tseria_mantido\nENRIQUECIDO\t787\t97.51\t100.00\t100.00\t0.00\t99.75\t0.00\t0.00\t785\nORIGINAL\t787\tNULL\t100.00\t100.00\t100.00\t0.00\t93.65\t93.65\t0\n",
+  "stderr": "",
+  "execution_time_ms": 71
+}

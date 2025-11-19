@@ -1,0 +1,9 @@
+{
+  "query": "\nDELETE c1 FROM clientes c1\nINNER JOIN (\n  SELECT \n    cnpj,\n    MAX(qualidadeScore) as max_score,\n    MAX(id) as max_id\n  FROM clientes\n  WHERE cnpj IS NOT NULL AND cnpj != ''\n  GROUP BY cnpj\n  HAVING COUNT(*) > 1\n) c2 ON c1.cnpj = c2.cnpj\nWHERE c1.qualidadeScore < c2.max_score\n   OR (c1.qualidadeScore = c2.max_score AND c1.id < c2.max_id);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nDELETE c1 FROM clientes c1\nINNER JOIN (\n  SELECT \n    cnpj,\n    MAX(qualidadeScore) as max_score,\n    MAX(id) as max_id\n  FROM clientes\n  WHERE cnpj IS NOT NULL AND cnpj != ''\n  GROUP BY cnpj\n  HAVING COUNT(*) > 1\n) c2 ON c1.cnpj = c2.cnpj\nWHERE c1.qualidadeScore < c2.max_score\n   OR (c1.qualidadeScore = c2.max_score AND c1.id < c2.max_id);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 112
+}

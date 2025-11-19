@@ -1,0 +1,18 @@
+{
+  "query": "\nSELECT \n  COUNT(*) as total_depois,\n  COUNT(DISTINCT cnpj) as cnpjs_unicos,\n  COUNT(*) - COUNT(DISTINCT cnpj) as duplicatas_restantes,\n  SUM(CASE WHEN DATE(createdAt) = '2025-10-21' THEN 1 ELSE 0 END) as originais_restantes,\n  SUM(CASE WHEN DATE(createdAt) = '2025-11-19' THEN 1 ELSE 0 END) as enriquecidos_restantes,\n  ROUND(AVG(qualidadeScore), 2) as score_medio_geral\nFROM clientes \nWHERE cnpj IS NOT NULL AND cnpj != '';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  COUNT(*) as total_depois,\n  COUNT(DISTINCT cnpj) as cnpjs_unicos,\n  COUNT(*) - COUNT(DISTINCT cnpj) as duplicatas_restantes,\n  SUM(CASE WHEN DATE(createdAt) = '2025-10-21' THEN 1 ELSE 0 END) as originais_restantes,\n  SUM(CASE WHEN DATE(createdAt) = '2025-11-19' THEN 1 ELSE 0 END) as enriquecidos_restantes,\n  ROUND(AVG(qualidadeScore), 2) as score_medio_geral\nFROM clientes \nWHERE cnpj IS NOT NULL AND cnpj != '';\n",
+  "rows": [
+    {
+      "total_depois": "1587",
+      "cnpjs_unicos": "799",
+      "duplicatas_restantes": "788",
+      "originais_restantes": "800",
+      "enriquecidos_restantes": "787",
+      "score_medio_geral": "97.51"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_depois\tcnpjs_unicos\tduplicatas_restantes\toriginais_restantes\tenriquecidos_restantes\tscore_medio_geral\n1587\t799\t788\t800\t787\t97.51\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

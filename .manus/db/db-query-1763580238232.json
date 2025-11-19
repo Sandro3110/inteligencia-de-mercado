@@ -1,0 +1,19 @@
+{
+  "query": "\nSELECT \n  COUNT(*) as total_clientes,\n  COUNT(DISTINCT cnpj) as cnpjs_unicos,\n  SUM(CASE WHEN DATE(createdAt) = '2025-10-21' THEN 1 ELSE 0 END) as originais,\n  SUM(CASE WHEN DATE(createdAt) = '2025-11-19' THEN 1 ELSE 0 END) as enriquecidos,\n  ROUND(AVG(qualidadeScore), 2) as score_medio,\n  MIN(qualidadeScore) as score_min,\n  MAX(qualidadeScore) as score_max\nFROM clientes;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  COUNT(*) as total_clientes,\n  COUNT(DISTINCT cnpj) as cnpjs_unicos,\n  SUM(CASE WHEN DATE(createdAt) = '2025-10-21' THEN 1 ELSE 0 END) as originais,\n  SUM(CASE WHEN DATE(createdAt) = '2025-11-19' THEN 1 ELSE 0 END) as enriquecidos,\n  ROUND(AVG(qualidadeScore), 2) as score_medio,\n  MIN(qualidadeScore) as score_min,\n  MAX(qualidadeScore) as score_max\nFROM clientes;\n",
+  "rows": [
+    {
+      "total_clientes": "801",
+      "cnpjs_unicos": "799",
+      "originais": "7",
+      "enriquecidos": "794",
+      "score_medio": "97.25",
+      "score_min": "0",
+      "score_max": "100"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_clientes\tcnpjs_unicos\toriginais\tenriquecidos\tscore_medio\tscore_min\tscore_max\n801\t799\t7\t794\t97.25\t0\t100\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}
