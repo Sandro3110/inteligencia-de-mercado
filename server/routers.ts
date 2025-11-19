@@ -811,6 +811,48 @@ export const appRouter = router({
         const { deleteAlertConfig } = await import('./db');
         return deleteAlertConfig(input.id);
       }),
+
+    // Histórico de alertas
+    history: publicProcedure
+      .input(z.object({ 
+        projectId: z.number(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+        alertType: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getAlertHistory } = await import('./db');
+        return getAlertHistory(input.projectId, {
+          limit: input.limit,
+          offset: input.offset,
+          alertType: input.alertType,
+        });
+      }),
+  }),
+
+  // Exportação de Dados
+  export: router({
+    mercados: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { exportMercadosToExcel } = await import('./exportToExcel');
+        const buffer = await exportMercadosToExcel(input.projectId);
+        return {
+          data: buffer.toString('base64'),
+          filename: `mercados_${new Date().toISOString().split('T')[0]}.xlsx`,
+        };
+      }),
+
+    leads: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { exportLeadsToExcel } = await import('./exportToExcel');
+        const buffer = await exportLeadsToExcel(input.projectId);
+        return {
+          data: buffer.toString('base64'),
+          filename: `leads_${new Date().toISOString().split('T')[0]}.xlsx`,
+        };
+      }),
   }),
 
   // Relatórios Executivos

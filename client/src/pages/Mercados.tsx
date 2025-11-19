@@ -4,11 +4,46 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { Search, Building2, ArrowLeft, TrendingUp, Users } from "lucide-react";
+import { Search, Building2, ArrowLeft, TrendingUp, Users, Download } from "lucide-react";
+import { toast } from "sonner";
+import { useSelectedProject } from "@/hooks/useSelectedProject";
 
 export default function Mercados() {
   const [search, setSearch] = useState("");
+  const { selectedProjectId } = useSelectedProject();
   const { data: mercados, isLoading } = trpc.mercados.list.useQuery({ search });
+  const exportMutation = trpc.export.mercados.useMutation();
+
+  const handleExport = async () => {
+    if (!selectedProjectId) {
+      toast.error('Selecione um projeto primeiro');
+      return;
+    }
+    
+    try {
+      toast.info('Gerando arquivo Excel...');
+      const result = await exportMutation.mutateAsync({ projectId: selectedProjectId });
+      
+      // Converter base64 para blob e fazer download
+      const binaryString = atob(result.data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = result.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      toast.success('Mercados exportados com sucesso!');
+    } catch (error) {
+      console.error('Erro ao exportar:', error);
+      toast.error('Erro ao exportar mercados');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -37,8 +72,9 @@ export default function Mercados() {
             </div>
           </div>
 
-          {/* Search */}
-          <div className="relative max-w-md">
+          {/* Search e Exportar */}
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Buscar por nome ou categoria..."
@@ -46,6 +82,16 @@ export default function Mercados() {
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10"
             />
+            </div>
+            <Button
+              variant="outline"
+              onClick={handleExport}
+              disabled={exportMutation.isPending}
+              className="gap-2"
+            >
+              <Download className="w-4 h-4" />
+              {exportMutation.isPending ? 'Exportando...' : 'Exportar Excel'}
+            </Button>
           </div>
         </div>
       </div>

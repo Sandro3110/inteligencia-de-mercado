@@ -5,7 +5,7 @@
  * nos marcos de 50%, 75% e 100%
  */
 
-import { getEnrichmentProgress, getAlertConfigs, updateAlertConfig } from './db';
+import { getEnrichmentProgress, getAlertConfigs, updateAlertConfig, createAlertHistory } from './db';
 import { updateEnrichmentRun } from './db';
 import { notifyOwner } from './_core/notification';
 
@@ -82,6 +82,15 @@ export async function checkAlerts(
         // Atualizar lastTriggeredAt
         await updateAlertConfig(alert.id, {
           lastTriggeredAt: new Date(),
+        });
+        
+        // Registrar no histórico
+        await createAlertHistory({
+          alertConfigId: alert.id,
+          projectId,
+          alertType: alert.type,
+          condition: alert.condition,
+          message,
         });
         
         console.log(`[Alertas] Disparado: ${alert.name} - Projeto ${projectId}`);

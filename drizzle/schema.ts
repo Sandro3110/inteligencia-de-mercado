@@ -333,3 +333,19 @@ export const alertConfigs = mysqlTable("alert_configs", {
 
 export type AlertConfig = typeof alertConfigs.$inferSelect;
 export type InsertAlertConfig = typeof alertConfigs.$inferInsert;
+
+/**
+ * Alert History - Histórico de alertas disparados
+ */
+export const alertHistory = mysqlTable("alert_history", {
+  id: int("id").primaryKey().autoincrement(),
+  alertConfigId: int("alertConfigId").notNull(),
+  projectId: int("projectId").notNull(),
+  alertType: mysqlEnum("alertType", ["error_rate", "high_quality_lead", "market_threshold"]).notNull(),
+  condition: text("condition").notNull(), // JSON da condição que disparou
+  message: text("message").notNull(), // Mensagem enviada na notificação
+  triggeredAt: timestamp("triggeredAt").defaultNow().notNull(),
+});
+
+export type AlertHistory = typeof alertHistory.$inferSelect;
+export type InsertAlertHistory = typeof alertHistory.$inferInsert;

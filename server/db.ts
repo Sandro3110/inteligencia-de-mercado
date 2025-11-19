@@ -1,4 +1,4 @@
-import { eq, sql, and, or, like, count } from "drizzle-orm";
+import { eq, sql, and, or, like, count, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users, 
@@ -2062,7 +2062,7 @@ export async function deleteScheduledEnrichment(id: number) {
 
 // ========== Alert Configs Functions ==========
 
-import { alertConfigs, InsertAlertConfig } from "../drizzle/schema";
+import { alertConfigs, InsertAlertConfig, alertHistory, InsertAlertHistory } from "../drizzle/schema";
 
 export async function createAlertConfig(config: InsertAlertConfig) {
   const db = await getDb();
@@ -2099,4 +2099,40 @@ export async function deleteAlertConfig(id: number) {
   await db
     .delete(alertConfigs)
     .where(eq(alertConfigs.id, id));
+}
+
+// ============================================
+// ALERT HISTORY HELPERS
+// ============================================
+
+export async function createAlertHistory(history: InsertAlertHistory) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const result = await db.insert(alertHistory).values(history);
+  return result;
+}
+
+export async function getAlertHistory(
+  projectId: number,
+  options?: { limit?: number; offset?: number; alertType?: string }
+) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [eq(alertHistory.projectId, projectId)];
+  
+  if (options?.alertType) {
+    conditions.push(eq(alertHistory.alertType, options.alertType as any));
+  }
+  
+  const results = await db
+    .select()
+    .from(alertHistory)
+    .where(and(...conditions))
+    .orderBy(desc(alertHistory.triggeredAt))
+    .limit(options?.limit || 100)
+    .offset(options?.offset || 0);
+  
+  return results;
 }

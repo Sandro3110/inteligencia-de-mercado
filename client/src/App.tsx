@@ -14,6 +14,7 @@ import EnrichmentFlow from "./pages/EnrichmentFlow";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import EnrichmentProgress from "./pages/EnrichmentProgress";
 import AlertsPage from "./pages/AlertsPage";
+import AlertHistoryPage from "./pages/AlertHistoryPage";
 import ReportsPage from "./pages/ReportsPage";
 
 function Router() {
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/analytics" component={AnalyticsDashboard} />
       <Route path="/enrichment-progress" component={EnrichmentProgress} />
       <Route path="/alertas" component={AlertsPage} />
+      <Route path="/alertas/historico" component={AlertHistoryPage} />
       <Route path="/relatorios" component={ReportsPage} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

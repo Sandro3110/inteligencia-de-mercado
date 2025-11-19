@@ -99,6 +99,13 @@
       "when": 1763540160479,
       "tag": "0013_omniscient_killmonger",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "5",
+      "when": 1763549090211,
+      "tag": "0014_powerful_wonder_man",
+      "breakpoints": true
     }
   ]
 }

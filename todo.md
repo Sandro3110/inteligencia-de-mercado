@@ -2339,3 +2339,106 @@
 - [x] Testar geração de relatórios com filtros
 - [x] Validar notificações de alertas
 - [ ] Criar checkpoint final
+
+
+---
+
+## Fase 34: Histórico de Alertas Disparados 📜
+
+### 34.1 Backend - Tabela de Histórico
+- [x] Criar tabela alert_history no schema.ts
+- [x] Campos: id, alertConfigId, projectId, triggeredAt, alertType, condition, message
+- [x] Executar criação via SQL direto
+- [x] Criar função createAlertHistory() no db.ts
+- [x] Criar função getAlertHistory() no db.ts (com filtros)
+
+### 34.2 Integração com checkAlerts
+- [x] Modificar checkAlerts() para registrar em alert_history
+- [x] Salvar tipo de alerta, condição e mensagem
+- [x] Adicionar timestamp de disparo
+
+### 34.3 Backend - Router tRPC
+- [x] Criar router alert.history (input: projectId, limit, offset)
+- [x] Retornar lista paginada de alertas disparados
+- [x] Incluir informações do alert_config relacionado
+
+### 34.4 Frontend - Página de Histórico
+- [x] Criar página AlertHistoryPage.tsx
+- [x] Adicionar rota /alertas/historico no App.tsx
+- [x] Implementar timeline visual com cards
+- [x] Mostrar tipo de alerta, condição, mensagem e timestamp
+- [x] Adicionar paginação
+- [ ] Adicionar filtro por tipo de alerta (futuro)
+- [x] Adicionar link "Ver Histórico" na página de alertas
+
+---
+
+## Fase 35: Exportação de Dados em Excel/CSV 📊
+
+### 35.1 Backend - Instalação
+- [x] Instalar biblioteca xlsx (SheetJS)
+- [x] Configurar tipos TypeScript
+
+### 35.2 Backend - Funções de Exportação
+- [x] Criar função exportMercadosToExcel() no backend
+- [x] Criar função exportLeadsToExcel() no backend
+- [x] Incluir todos os campos enriquecidos
+- [x] Formatar colunas (datas, números, scores)
+
+### 35.3 Backend - Routers tRPC
+- [x] Criar router export.mercados (input: projectId, filtros)
+- [x] Criar router export.leads (input: projectId, filtros)
+- [x] Retornar buffer do arquivo Excel como base64
+
+### 35.4 Frontend - Botões de Exportação
+- [x] Adicionar botão "Exportar Excel" na página de mercados
+- [x] CascadeView já possui exportação completa (CSV, Excel, PDF)
+- [x] Implementar download automático do arquivo
+- [x] Adicionar loading state durante exportação
+- [x] Mostrar toast de sucesso/erro
+
+---
+
+## Fase 36: Dashboard de ROI e Conversão 💰
+
+### 36.1 Backend - Tabela de Conversões
+- [ ] Criar tabela lead_conversions no schema.ts
+- [ ] Campos: id, leadId, projectId, convertedAt, dealValue, notes, status
+- [ ] Executar pnpm db:push
+- [ ] Criar funções CRUD no db.ts
+
+### 36.2 Backend - Análise de ROI
+- [ ] Criar função calculateROIMetrics() no backend
+- [ ] Calcular taxa de conversão por mercado
+- [ ] Calcular valor médio de deal
+- [ ] Calcular custo de aquisição por lead
+- [ ] Calcular ROI total do projeto
+
+### 36.3 Backend - Router tRPC
+- [ ] Criar router conversion.create (marcar lead como convertido)
+- [ ] Criar router conversion.list (listar conversões)
+- [ ] Criar router roi.metrics (retornar métricas calculadas)
+
+### 36.4 Frontend - Página de ROI
+- [ ] Criar página ROIDashboard.tsx
+- [ ] Adicionar rota /roi no App.tsx
+- [ ] Adicionar item "ROI" no MainNav
+- [ ] Implementar cards de métricas principais
+- [ ] Criar gráfico de conversão por mercado
+- [ ] Criar tabela de leads convertidos
+- [ ] Adicionar formulário para marcar lead como convertido
+
+### 36.5 Integração
+- [ ] Adicionar botão "Marcar como Convertido" na página de leads
+- [ ] Implementar modal de conversão (valor do deal, notas)
+- [ ] Atualizar status do lead após conversão
+
+---
+
+## Fase 37: Testes e Validação Final 🧪
+- [ ] Testar histórico de alertas
+- [ ] Testar exportação de mercados
+- [ ] Testar exportação de leads
+- [ ] Testar dashboard de ROI
+- [ ] Testar marcação de conversão
+- [ ] Criar checkpoint final

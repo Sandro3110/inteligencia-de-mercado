@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS alert_history (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  alertConfigId INT NOT NULL,\n  projectId INT NOT NULL,\n  alertType ENUM('error_rate', 'high_quality_lead', 'market_threshold') NOT NULL,\n  `condition` TEXT NOT NULL,\n  message TEXT NOT NULL,\n  triggeredAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute CREATE TABLE IF NOT EXISTS alert_history (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  alertConfigId INT NOT NULL,\n  projectId INT NOT NULL,\n  alertType ENUM('error_rate', 'high_quality_lead', 'market_threshold') NOT NULL,\n  `condition` TEXT NOT NULL,\n  message TEXT NOT NULL,\n  triggeredAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 242
+}
