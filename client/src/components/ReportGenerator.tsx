@@ -3,16 +3,25 @@ import { trpc } from "@/lib/trpc";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { FileText, Download, Loader2, CheckCircle2, TrendingUp, Target, Users } from "lucide-react";
+import { FileText, Download, Loader2, CheckCircle2, TrendingUp, Target, Users, Filter } from "lucide-react";
 import { generateExecutivePDF } from "@/lib/generatePDF";
 
 export function ReportGenerator() {
   const { selectedProjectId } = useSelectedProject();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   const { data: reportData, refetch, isLoading } = trpc.reports.generate.useQuery(
-    { projectId: selectedProjectId! },
+    { 
+      projectId: selectedProjectId!,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+    },
     { enabled: false } // Não buscar automaticamente
   );
 
@@ -23,7 +32,8 @@ export function ReportGenerator() {
     }
 
     setIsGenerating(true);
-    toast.info("Gerando relatório executivo...");
+    const filterMsg = dateFrom || dateTo ? " (com filtros)" : "";
+    toast.info(`Gerando relatório executivo${filterMsg}...`);
 
     try {
       const result = await refetch();
@@ -70,6 +80,69 @@ export function ReportGenerator() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Filtros */}
+          <div className="space-y-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowFilters(!showFilters)}
+              className="gap-2"
+            >
+              <Filter className="w-4 h-4" />
+              {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
+            </Button>
+
+            {showFilters && (
+              <div className="p-4 rounded-lg bg-slate-800/30 border border-slate-700/50 space-y-4">
+                <h3 className="font-medium text-white mb-3">Filtros do Relatório</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="dateFrom">Data Início</Label>
+                    <Input
+                      id="dateFrom"
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => setDateFrom(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="dateTo">Data Fim</Label>
+                    <Input
+                      id="dateTo"
+                      type="date"
+                      value={dateTo}
+                      onChange={(e) => setDateTo(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {(dateFrom || dateTo) && (
+                  <div className="flex items-center gap-2 text-sm text-slate-400">
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <span>
+                      Filtros ativos: {dateFrom && `De ${new Date(dateFrom).toLocaleDateString('pt-BR')}`}
+                      {dateFrom && dateTo && " "}
+                      {dateTo && `Até ${new Date(dateTo).toLocaleDateString('pt-BR')}`}
+                    </span>
+                  </div>
+                )}
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setDateFrom("");
+                    setDateTo("");
+                  }}
+                  className="text-slate-400 hover:text-white"
+                >
+                  Limpar Filtros
+                </Button>
+              </div>
+            )}
+          </div>
+
           {/* Conteúdo do Relatório */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">

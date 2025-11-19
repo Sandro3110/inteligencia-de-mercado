@@ -49,6 +49,18 @@ const navItems: NavItem[] = [
     icon: Clock,
     description: "Acompanhar progresso em tempo real"
   },
+  {
+    title: "Alertas",
+    href: "/alertas",
+    icon: Bell,
+    description: "Configurar alertas personalizados"
+  },
+  {
+    title: "Relatórios",
+    href: "/relatorios",
+    icon: FileText,
+    description: "Gerar relatórios executivos em PDF"
+  },
 ];
 
 export default function MainNav() {

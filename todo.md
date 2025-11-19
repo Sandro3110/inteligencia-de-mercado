@@ -2303,3 +2303,39 @@
 - [ ] Criar checkpoint
 
 ---
+
+
+---
+
+## Fase 33: Melhorias Finais - MainNav, Alertas e Filtros 🎯
+
+### 33.1 Adicionar Itens no MainNav
+- [x] Adicionar item "Alertas" no MainNav com ícone Bell
+- [x] Adicionar item "Relatórios" no MainNav com ícone FileText
+- [x] Ajustar ordem dos itens no menu
+- [x] Testar navegação
+
+### 33.2 Integração de Alertas com EnrichmentMonitor
+- [x] Criar função checkAlerts() no enrichmentMonitor.ts
+- [x] Verificar taxa de erro (error_rate) durante enriquecimento
+- [x] Verificar leads de alta qualidade (high_quality_lead) quando score >= 80
+- [x] Verificar limite de mercado (market_threshold) quando atingir número mínimo
+- [x] Enviar notificação via notifyOwner() quando alerta disparar
+- [x] Atualizar lastTriggeredAt na tabela alert_configs
+- [x] Adicionar logs de alertas disparados
+
+### 33.3 Filtros nos Relatórios
+- [x] Adicionar filtro de período (data início/fim) no ReportGenerator
+- [ ] Adicionar seletor de mercados específicos (futuro)
+- [x] Atualizar generateExecutiveReportData() para aceitar filtros
+- [x] Modificar router reports.generate para aceitar filtros opcionais
+- [x] Atualizar queries SQL com WHERE clauses baseadas em filtros
+- [x] Adicionar UI de filtros no componente ReportGenerator
+- [x] Testar geração com diferentes combinações de filtros
+
+### 33.4 Testes e Validação
+- [x] Testar navegação via MainNav
+- [x] Testar disparo de alertas durante enriquecimento
+- [x] Testar geração de relatórios com filtros
+- [x] Validar notificações de alertas
+- [ ] Criar checkpoint final

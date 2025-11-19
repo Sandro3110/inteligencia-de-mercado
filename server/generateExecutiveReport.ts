@@ -37,7 +37,16 @@ export interface ExecutiveReportData {
   insights: string[];
 }
 
-export async function generateExecutiveReportData(projectId: number): Promise<ExecutiveReportData> {
+export interface ReportFilters {
+  dateFrom?: string;
+  dateTo?: string;
+  mercadoIds?: number[];
+}
+
+export async function generateExecutiveReportData(
+  projectId: number,
+  filters?: ReportFilters
+): Promise<ExecutiveReportData> {
   const db = await getDb();
   if (!db) {
     throw new Error('Database not available');
@@ -49,9 +58,16 @@ export async function generateExecutiveReportData(projectId: number): Promise<Ex
   const projectName = project[0]?.nome || 'Projeto Desconhecido';
 
   // 2. Estatísticas Gerais
+  // Construir WHERE clauses baseadas em filtros
+  const whereConditions = [eq(mercadosUnicos.projectId, projectId)];
+  
+  if (filters?.mercadoIds && filters.mercadoIds.length > 0) {
+    whereConditions.push(sql`${mercadosUnicos.id} IN (${sql.join(filters.mercadoIds.map(id => sql`${id}`), sql`, `)})`);
+  }
+  
   const mercadosResult = await db.select({ count: sql<number>`count(*)` })
     .from(mercadosUnicos)
-    .where(eq(mercadosUnicos.projectId, projectId));
+    .where(and(...whereConditions));
   
   const clientesResult = await db.select({ count: sql<number>`count(*)` })
     .from(clientes)

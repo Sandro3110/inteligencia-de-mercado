@@ -816,10 +816,22 @@ export const appRouter = router({
   // Relatórios Executivos
   reports: router({
     generate: publicProcedure
-      .input(z.object({ projectId: z.number() }))
+      .input(z.object({ 
+        projectId: z.number(),
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
+        mercadoIds: z.array(z.number()).optional(),
+      }))
       .query(async ({ input }) => {
         const { generateExecutiveReportData } = await import('./generateExecutiveReport');
-        return generateExecutiveReportData(input.projectId);
+        return generateExecutiveReportData(
+          input.projectId, 
+          {
+            dateFrom: input.dateFrom,
+            dateTo: input.dateTo,
+            mercadoIds: input.mercadoIds,
+          }
+        );
       }),
   }),
 });

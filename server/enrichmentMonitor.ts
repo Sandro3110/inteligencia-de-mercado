@@ -5,7 +5,7 @@
  * nos marcos de 50%, 75% e 100%
  */
 
-import { getEnrichmentProgress } from './db';
+import { getEnrichmentProgress, getAlertConfigs, updateAlertConfig } from './db';
 import { updateEnrichmentRun } from './db';
 import { notifyOwner } from './_core/notification';
 
@@ -20,6 +20,77 @@ const MILESTONES: NotificationMilestone[] = [
   { percentage: 50, field: 'notifiedAt50', title: 'Metade Concluída', emoji: '🎯' },
   { percentage: 75, field: 'notifiedAt75', title: '75% Concluído', emoji: '🚀' },
 ];
+
+/**
+ * Verifica alertas personalizados e dispara notificações
+ */
+export async function checkAlerts(
+  projectId: number,
+  stats: {
+    errorCount: number;
+    totalProcessed: number;
+    newLeadScore?: number;
+    mercadoId?: number;
+    mercadoLeadsCount?: number;
+  }
+): Promise<void> {
+  try {
+    const alerts = await getAlertConfigs(projectId);
+    
+    for (const alert of alerts) {
+      if (!alert.enabled) continue;
+      
+      const condition = JSON.parse(alert.condition);
+      let shouldTrigger = false;
+      let message = '';
+      
+      // Verificar tipo de alerta
+      switch (alert.type) {
+        case 'error_rate': {
+          const errorRate = (stats.errorCount / stats.totalProcessed) * 100;
+          if (errorRate >= condition.value) {
+            shouldTrigger = true;
+            message = `Taxa de erro atingiu ${errorRate.toFixed(1)}% (limite: ${condition.value}%)\n\n• ${stats.errorCount} erros em ${stats.totalProcessed} processados`;
+          }
+          break;
+        }
+        
+        case 'high_quality_lead': {
+          if (stats.newLeadScore && stats.newLeadScore >= condition.value) {
+            shouldTrigger = true;
+            message = `Novo lead de alta qualidade identificado!\n\n• Score: ${stats.newLeadScore} (limite: ${condition.value})`;
+          }
+          break;
+        }
+        
+        case 'market_threshold': {
+          if (stats.mercadoLeadsCount && stats.mercadoLeadsCount >= condition.value) {
+            shouldTrigger = true;
+            message = `Mercado atingiu limite de leads!\n\n• ${stats.mercadoLeadsCount} leads (limite: ${condition.value})`;
+          }
+          break;
+        }
+      }
+      
+      if (shouldTrigger) {
+        // Enviar notificação
+        await notifyOwner({
+          title: `🔔 Alerta: ${alert.name}`,
+          content: message,
+        });
+        
+        // Atualizar lastTriggeredAt
+        await updateAlertConfig(alert.id, {
+          lastTriggeredAt: new Date(),
+        });
+        
+        console.log(`[Alertas] Disparado: ${alert.name} - Projeto ${projectId}`);
+      }
+    }
+  } catch (error) {
+    console.error('[Alertas] Erro ao verificar alertas:', error);
+  }
+}
 
 /**
  * Verifica progresso e envia notificações se necessário

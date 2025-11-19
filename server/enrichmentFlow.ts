@@ -740,6 +740,16 @@ async function findLeadsForMarkets(
 
           if (novoLead) {
             leads.push(novoLead);
+            
+            // Verificar alertas de lead de alta qualidade
+            if (qualidadeScore >= 80) {
+              const { checkAlerts } = await import('./enrichmentMonitor');
+              await checkAlerts(projectId, {
+                errorCount: 0,
+                totalProcessed: leads.length,
+                newLeadScore: qualidadeScore,
+              });
+            }
           }
         } catch (error) {
           console.error(`Erro ao criar lead ${lead.nome}:`, error);
