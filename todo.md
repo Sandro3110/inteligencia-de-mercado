@@ -2641,3 +2641,45 @@
 - [ ] Testar filtros avançados
 - [ ] Testar dashboard de atividades
 - [ ] Criar checkpoint final
+
+
+---
+
+## Fase 47: Correção de Erros de React 🐛
+- [x] Identificar componentes com nested anchor tags
+- [x] Corrigir Link dentro de Link ou a dentro de a (MainNav)
+- [x] Trocar <a> por <span> dentro de <Link>
+- [ ] Testar e validar correções
+
+---
+
+## Fase 48: Filtros Avançados na Página Mercados 🔍
+- [ ] Adicionar input de busca por CNAE
+- [ ] Adicionar seletor de porte (MEI, Pequena, Média, Grande)
+- [ ] Adicionar seletor de UF
+- [ ] Adicionar input de cidade
+- [ ] Adicionar slider de score mínimo
+- [ ] Atualizar backend getMercados() para aceitar filtros
+- [ ] Integrar filtros na página Mercados.tsx
+
+---
+
+## Fase 49: Dashboard de Atividade Recente 📊
+- [ ] Criar tabela activity_log
+- [ ] Criar função logActivity() no db.ts
+- [ ] Criar função getRecentActivities() no db.ts
+- [ ] Adicionar logs ao criar lead
+- [ ] Adicionar logs ao criar conversão
+- [ ] Adicionar logs ao disparar alerta
+- [ ] Criar router activity.recent
+- [ ] Criar componente ActivityTimeline.tsx
+- [ ] Integrar na página DashboardPage
+
+---
+
+## Fase 50: Gráficos Interativos no Analytics 📈
+- [ ] Adicionar gráfico de evolução temporal (mercados/clientes/leads)
+- [ ] Adicionar gráfico de distribuição geográfica por UF
+- [ ] Adicionar gráfico de densidade competitiva
+- [ ] Usar recharts para visualizações
+- [ ] Integrar na página Analytics

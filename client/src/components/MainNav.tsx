@@ -100,9 +100,9 @@ export default function MainNav() {
             
             return (
               <Link key={item.href} href={item.href}>
-                <a
+                <span
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                    "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer",
                     "hover:bg-accent hover:text-accent-foreground",
                     isActive 
                       ? "bg-accent text-accent-foreground" 
@@ -112,7 +112,7 @@ export default function MainNav() {
                 >
                   <Icon className="h-4 w-4" />
                   <span className="hidden md:inline">{item.title}</span>
-                </a>
+                </span>
               </Link>
             );
           })}
