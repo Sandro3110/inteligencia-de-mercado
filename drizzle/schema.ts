@@ -206,8 +206,11 @@ export type InsertEntityTag = typeof entityTags.$inferInsert;
 export const savedFilters = mysqlTable("saved_filters", {
   id: int("id").primaryKey().autoincrement(),
   userId: varchar("userId", { length: 64 }).notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: int("projectId"),
   name: varchar("name", { length: 100 }).notNull(),
   filtersJson: text("filtersJson").notNull(), // JSON string with filter state
+  isPublic: int("isPublic").default(0).notNull(), // 0 = private, 1 = public
+  shareToken: varchar("shareToken", { length: 64 }), // unique token for sharing
   createdAt: timestamp("createdAt").defaultNow(),
 });
 

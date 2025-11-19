@@ -120,6 +120,13 @@
       "when": 1763556059200,
       "tag": "0016_curly_daredevil",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1763562178809,
+      "tag": "0017_fast_lethal_legion",
+      "breakpoints": true
     }
   ]
 }

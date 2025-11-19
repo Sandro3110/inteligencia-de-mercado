@@ -2,7 +2,7 @@ import { z } from "zod";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 
 export const appRouter = router({
   system: systemRouter,
@@ -1037,6 +1037,55 @@ export const appRouter = router({
       .query(async ({ input }) => {
         const { globalSearch } = await import('./db');
         return globalSearch(input.query, input.projectId, input.limit);
+      }),
+  }),
+
+  // Filtros salvos compartilháveis
+  filter: router({
+    list: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getSavedFilters } = await import('./db');
+        return getSavedFilters(ctx.user.id);
+      }),
+    
+    save: protectedProcedure
+      .input(z.object({
+        projectId: z.number().optional(),
+        name: z.string(),
+        filtersJson: z.string(),
+        isPublic: z.number().optional().default(0),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { createSavedFilter } = await import('./db');
+        return createSavedFilter({
+          userId: ctx.user.id,
+          ...input,
+        });
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteSavedFilter } = await import('./db');
+        await deleteSavedFilter(input.id);
+        return { success: true };
+      }),
+    
+    getByToken: publicProcedure
+      .input(z.object({ shareToken: z.string() }))
+      .query(async ({ input }) => {
+        const { getSavedFilterByToken } = await import('./db');
+        return getSavedFilterByToken(input.shareToken);
+      }),
+  }),
+
+  // Comparação de mercados
+  compare: router({
+    mercados: publicProcedure
+      .input(z.object({ mercadoIds: z.array(z.number()) }))
+      .query(async ({ input }) => {
+        const { compareMercados } = await import('./db');
+        return compareMercados(input.mercadoIds);
       }),
   }),
 });

@@ -2848,3 +2848,40 @@
 - [x] Garantir scroll apenas vertical
 - [x] Testar em mobile (375px), tablet (768px), desktop (1280px+)
 - [x] Corrigir quebras de layout em telas pequenas
+
+
+## Fase 58: Funcionalidades Avançadas de Produtividade 🚀
+
+### 58.1 Filtros Salvos Compartilháveis
+- [x] Criar tabela saved_filters no banco (id, nome, userId, projectId, filters JSON, isPublic, shareToken)
+- [x] Implementar funções CRUD no db.ts (createSavedFilter, getSavedFilters, deleteSavedFilter)
+- [x] Criar routers tRPC (filter.save, filter.list, filter.delete, filter.getByToken)
+- [x] Criar componente SavedFiltersManager
+- [x] Adicionar botão "Salvar Filtros" no CascadeView
+- [x] Implementar modal de salvar com nome e opção "Compartilhável"
+- [x] Gerar shareToken único para filtros públicos
+- [x] Criar rota /filtros/:token para aplicar filtros via link
+- [x] Adicionar botão "Copiar Link" para compartilhar
+
+### 58.2 Comparação de Mercados Side-by-Side
+- [x] Criar query backend compareMercados (recebe array de mercadoIds)
+- [x] Retornar métricas: total clientes, concorrentes, leads, qualidade média
+- [x] Criar componente CompararMercadosModal
+- [x] Implementar seleção de 2-3 mercados (checkboxes)
+- [x] Criar layout side-by-side com cards comparativos
+- [x] Adicionar gráficos comparativos (BarChart de métricas)
+- [x] Implementar tabela comparativa de detalhes
+- [x] Adicionar botão "Comparar Selecionados" no CascadeView
+- [ ] Exportar comparação em PDF
+
+### 58.3 Modo Apresentação Fullscreen
+- [ ] Criar context PresentationModeContext
+- [ ] Implementar toggle fullscreen (F11 programático)
+- [ ] Criar componente PresentationView
+- [ ] Ocultar sidebar, header e controles de edição
+- [ ] Destacar apenas KPIs e gráficos principais
+- [ ] Implementar navegação por slides (setas ←→)
+- [ ] Adicionar transições suaves entre slides
+- [ ] Criar slides: Overview, Mercados Top 10, Funil, ROI, Timeline
+- [ ] Adicionar botão "Modo Apresentação" no Dashboard
+- [ ] Implementar ESC para sair do modo

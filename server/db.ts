@@ -833,13 +833,28 @@ export async function getSavedFilters(userId: string) {
   return await db.select().from(savedFilters).where(eq(savedFilters.userId, userId));
 }
 
-export async function createSavedFilter(data: { userId: string; name: string; filtersJson: string }) {
+export async function createSavedFilter(data: { 
+  userId: string; 
+  projectId?: number;
+  name: string; 
+  filtersJson: string;
+  isPublic?: number;
+}) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
   const { savedFilters } = await import("../drizzle/schema");
+  const { randomBytes } = await import("crypto");
   
-  await db.insert(savedFilters).values(data);
+  // Generate shareToken if isPublic
+  const shareToken = data.isPublic ? randomBytes(32).toString("hex") : null;
+  
+  const [result] = await db.insert(savedFilters).values({
+    ...data,
+    shareToken,
+  });
+  
+  return { id: result.insertId, shareToken };
 }
 
 export async function deleteSavedFilter(id: number) {
@@ -850,6 +865,17 @@ export async function deleteSavedFilter(id: number) {
   const { eq } = await import("drizzle-orm");
   
   await db.delete(savedFilters).where(eq(savedFilters.id, id));
+}
+
+export async function getSavedFilterByToken(shareToken: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { savedFilters } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+  
+  const result = await db.select().from(savedFilters).where(eq(savedFilters.shareToken, shareToken)).limit(1);
+  return result.length > 0 ? result[0] : null;
 }
 
 
@@ -2600,4 +2626,63 @@ export async function globalSearch(query: string, projectId?: number, limit: num
     console.error('[Database] Global search failed:', error);
     return [];
   }
+}
+
+
+// ============================================
+// Comparação de Mercados
+// ============================================
+
+export async function compareMercados(mercadoIds: number[]) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { mercadosUnicos, clientesMercados, concorrentes, leads } = await import("../drizzle/schema");
+  const { eq, inArray, sql, avg } = await import("drizzle-orm");
+
+  const results = [];
+
+  for (const mercadoId of mercadoIds) {
+    // Get mercado info
+    const [mercado] = await db.select().from(mercadosUnicos).where(eq(mercadosUnicos.id, mercadoId)).limit(1);
+    
+    if (!mercado) continue;
+
+    // Count clientes (via junction table)
+    const [clientesCount] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(clientesMercados)
+      .where(eq(clientesMercados.mercadoId, mercadoId));
+
+    // Count concorrentes
+    const [concorrentesCount] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(concorrentes)
+      .where(eq(concorrentes.mercadoId, mercadoId));
+
+    // Count leads and avg quality
+    const [leadsStats] = await db
+      .select({ 
+        count: sql<number>`count(*)`,
+        avgQuality: avg(leads.qualidadeScore)
+      })
+      .from(leads)
+      .where(eq(leads.mercadoId, mercadoId));
+
+    results.push({
+      mercado: {
+        id: mercado.id,
+        nome: mercado.nome,
+        segmentacao: mercado.segmentacao,
+      },
+      metrics: {
+        clientes: Number(clientesCount?.count || 0),
+        concorrentes: Number(concorrentesCount?.count || 0),
+        leads: Number(leadsStats?.count || 0),
+        qualidadeMedia: Number(leadsStats?.avgQuality || 0),
+      },
+    });
+  }
+
+  return results;
 }

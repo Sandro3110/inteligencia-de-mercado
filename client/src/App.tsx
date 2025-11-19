@@ -26,6 +26,7 @@ import ROIDashboard from "./pages/ROIDashboard";
 import FunnelView from "./pages/FunnelView";
 import SchedulePage from "./pages/SchedulePage";
 import AtividadePage from "./pages/AtividadePage";
+import SharedFilterView from "./pages/SharedFilterView";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/funil" component={FunnelView} />
       <Route path="/agendamento" component={SchedulePage} />
       <Route path="/atividade" component={AtividadePage} />
+      <Route path="/filtros/:token" component={SharedFilterView} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
