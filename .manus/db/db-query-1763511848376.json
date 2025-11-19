@@ -1,0 +1,15 @@
+{
+  "query": "\nSELECT \n  p.id as projeto_id,\n  p.nome as projeto_nome,\n  p.createdAt as projeto_criado\nFROM projects p\nWHERE p.nome LIKE '%Jeep%'\nORDER BY p.createdAt DESC\nLIMIT 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  p.id as projeto_id,\n  p.nome as projeto_nome,\n  p.createdAt as projeto_criado\nFROM projects p\nWHERE p.nome LIKE '%Jeep%'\nORDER BY p.createdAt DESC\nLIMIT 1;\n",
+  "rows": [
+    {
+      "projeto_id": "150001",
+      "projeto_nome": "Teste Jeep API Corrigida",
+      "projeto_criado": "2025-11-19 00:20:04"
+    }
+  ],
+  "messages": [],
+  "stdout": "projeto_id\tprojeto_nome\tprojeto_criado\n150001\tTeste Jeep API Corrigida\t2025-11-19 00:20:04\n",
+  "stderr": "",
+  "execution_time_ms": 102
+}

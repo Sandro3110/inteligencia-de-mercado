@@ -1,0 +1,50 @@
+{
+  "query": "\nSELECT \n  p.id,\n  p.nome,\n  p.createdAt,\n  (SELECT COUNT(*) FROM clientes c WHERE c.projectId = p.id) as total_clientes,\n  (SELECT COUNT(*) FROM concorrentes co WHERE co.projectId = p.id) as total_concorrentes,\n  (SELECT COUNT(*) FROM leads l WHERE l.projectId = p.id) as total_leads\nFROM projects p\nORDER BY p.createdAt DESC\nLIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  p.id,\n  p.nome,\n  p.createdAt,\n  (SELECT COUNT(*) FROM clientes c WHERE c.projectId = p.id) as total_clientes,\n  (SELECT COUNT(*) FROM concorrentes co WHERE co.projectId = p.id) as total_concorrentes,\n  (SELECT COUNT(*) FROM leads l WHERE l.projectId = p.id) as total_leads\nFROM projects p\nORDER BY p.createdAt DESC\nLIMIT 5;\n",
+  "rows": [
+    {
+      "id": "150001",
+      "nome": "Teste Jeep API Corrigida",
+      "createdAt": "2025-11-19 00:20:04",
+      "total_clientes": "1",
+      "total_concorrentes": "10",
+      "total_leads": "8"
+    },
+    {
+      "id": "120001",
+      "nome": "Teste Jeep API Corrigida",
+      "createdAt": "2025-11-19 00:03:21",
+      "total_clientes": "1",
+      "total_concorrentes": "5",
+      "total_leads": "5"
+    },
+    {
+      "id": "90001",
+      "nome": "Teste Jeep API Corrigida",
+      "createdAt": "2025-11-18 23:49:05",
+      "total_clientes": "1",
+      "total_concorrentes": "0",
+      "total_leads": "0"
+    },
+    {
+      "id": "60007",
+      "nome": "Teste Jeep API Corrigida",
+      "createdAt": "2025-11-18 23:25:15",
+      "total_clientes": "1",
+      "total_concorrentes": "3",
+      "total_leads": "3"
+    },
+    {
+      "id": "60006",
+      "nome": "Teste Jeep API Corrigida",
+      "createdAt": "2025-11-18 23:24:34",
+      "total_clientes": "1",
+      "total_concorrentes": "3",
+      "total_leads": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcreatedAt\ttotal_clientes\ttotal_concorrentes\ttotal_leads\n150001\tTeste Jeep API Corrigida\t2025-11-19 00:20:04\t1\t10\t8\n120001\tTeste Jeep API Corrigida\t2025-11-19 00:03:21\t1\t5\t5\n90001\tTeste Jeep API Corrigida\t2025-11-18 23:49:05\t1\t0\t0\n60007\tTeste Jeep API Corrigida\t2025-11-18 23:25:15\t1\t3\t3\n60006\tTeste Jeep API Corrigida\t2025-11-18 23:24:34\t1\t3\t3\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

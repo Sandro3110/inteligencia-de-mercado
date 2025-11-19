@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT \n  m.id,\n  m.nome,\n  m.categoria,\n  m.segmentacao,\n  m.descricao\nFROM mercados m\nWHERE m.projectId = 120001\nLIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  m.id,\n  m.nome,\n  m.categoria,\n  m.segmentacao,\n  m.descricao\nFROM mercados m\nWHERE m.projectId = 120001\nLIMIT 5;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 2: Table 'xpshcsieistmx38x46v9tq.mercados' doesn't exist"
+  ]
+}

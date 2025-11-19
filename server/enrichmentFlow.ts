@@ -458,7 +458,7 @@ async function findCompetitorsForMarkets(
           },
           {
             role: 'user',
-            content: `Mercado: ${mercadoNome}\n\nListe 10 principais empresas concorrentes neste mercado no Brasil. Retorne JSON com: { "concorrentes": [{ "nome": "Nome da empresa", "produto": "Produto principal" }] }`,
+            content: `Mercado: ${mercadoNome}\n\nListe 20 principais empresas concorrentes neste mercado no Brasil. Retorne JSON com: { "concorrentes": [{ "nome": "Nome da empresa", "produto": "Produto principal" }] }`,
           },
         ],
         response_format: {
@@ -608,7 +608,7 @@ async function findLeadsForMarkets(
           },
           {
             role: 'user',
-            content: `Mercado: ${mercadoNome}\n\nListe 10 empresas que seriam leads qualificados para este mercado no Brasil. Retorne JSON com: { "leads": [{ "nome": "Nome da empresa", "tipo": "B2B ou B2C", "regiao": "Região" }] }`,
+            content: `Mercado: ${mercadoNome}\n\nListe 20 empresas que seriam leads qualificados para este mercado no Brasil. Retorne JSON com: { "leads": [{ "nome": "Nome da empresa", "tipo": "B2B ou B2C", "regiao": "Região" }] }`,
           },
         ],
         response_format: {

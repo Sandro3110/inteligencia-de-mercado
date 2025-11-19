@@ -1,0 +1,52 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "clientes"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "clientes_mercados"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "concorrentes"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "enrichment_cache"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "entity_tags"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "leads"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "mercados_unicos"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "notifications"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "project_templates"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "projects"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "saved_filters"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "tags"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "users"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_XpSHcSiEisTmX38X46V9tQ\n__drizzle_migrations\nclientes\nclientes_mercados\nconcorrentes\nenrichment_cache\nentity_tags\nleads\nmercados_unicos\nnotifications\nproject_templates\nprojects\nsaved_filters\ntags\nusers\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}
