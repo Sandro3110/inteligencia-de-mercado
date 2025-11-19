@@ -1238,6 +1238,29 @@ export const appRouter = router({
         const { findLeadsCliente } = await import('./enrichmentV2');
         return findLeadsCliente(input.clienteId, input.projectId);
       }),
+
+    // Processamento em lote com paralelização
+    enrichBatch: publicProcedure
+      .input(z.object({ 
+        projectId: z.number(),
+        batchSize: z.number().optional().default(5),
+        checkpointInterval: z.number().optional().default(50)
+      }))
+      .mutation(async ({ input }) => {
+        const { enrichClientesBatch } = await import('./enrichmentBatch');
+        return enrichClientesBatch(input.projectId, {
+          batchSize: input.batchSize,
+          checkpointInterval: input.checkpointInterval,
+        });
+      }),
+
+    // Estimar custo e tempo
+    estimateCost: publicProcedure
+      .input(z.object({ numClientes: z.number() }))
+      .query(async ({ input }) => {
+        const { estimateBatchCost } = await import('./enrichmentBatch');
+        return estimateBatchCost(input.numClientes);
+      }),
   }),
 });
 export type AppRouter = typeof appRouter;

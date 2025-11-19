@@ -3,7 +3,8 @@
  * Implementação completa das 5 etapas de enriquecimento
  */
 
-import { invokeLLM } from "./_core/llm";
+import { invokeLLM } from './_core/llm';
+import { validateAndFormatCNPJ } from './validators';
 import { getDb } from "./db";
 import { eq, or, sql, and } from "drizzle-orm";
 import { clientes, mercadosUnicos, clientesMercados, produtos, concorrentes, leads } from "../drizzle/schema";
@@ -402,7 +403,10 @@ ${JSON.stringify(clientesExistentes)}`;
 
       if (isCliente) continue;
 
-      const hash = normalizeHash(`${concorrenteData.nome}-${concorrenteData.cnpj || ""}`);
+      // Validar e formatar CNPJ
+      const cnpjValidado = validateAndFormatCNPJ(concorrenteData.cnpj);
+
+      const hash = normalizeHash(`${concorrenteData.nome}-${cnpjValidado || ""}`);
       const [existing] = await db.select().from(concorrentes)
         .where(eq(concorrentes.concorrenteHash, hash))
         .limit(1);
@@ -435,7 +439,7 @@ ${JSON.stringify(clientesExistentes)}`;
           concorrenteHash: hash,
           mercadoId: concorrenteData.mercadoId,
           nome: concorrenteData.nome,
-          cnpj: concorrenteData.cnpj,
+          cnpj: cnpjValidado,
           site: concorrenteData.site,
           produto: concorrenteData.produto,
           cidade: concorrenteData.cidade,
@@ -571,7 +575,10 @@ ${JSON.stringify([...clientesExistentes, ...concorrentesExistentes])}`;
 
       if (isConcorrente) continue;
 
-      const hash = normalizeHash(`${leadData.nome}-${leadData.cnpj || ""}`);
+      // Validar e formatar CNPJ
+      const cnpjValidado = validateAndFormatCNPJ(leadData.cnpj);
+
+      const hash = normalizeHash(`${leadData.nome}-${cnpjValidado || ""}`);
       const [existing] = await db.select().from(leads)
         .where(eq(leads.leadHash, hash))
         .limit(1);
@@ -606,7 +613,7 @@ ${JSON.stringify([...clientesExistentes, ...concorrentesExistentes])}`;
           leadHash: hash,
           mercadoId: leadData.mercadoId,
           nome: leadData.nome,
-          cnpj: leadData.cnpj,
+          cnpj: cnpjValidado,
           site: leadData.site,
           email: leadData.email,
           telefone: leadData.telefone,
