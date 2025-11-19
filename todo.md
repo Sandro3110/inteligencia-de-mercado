@@ -1906,3 +1906,42 @@
 - [x] Validar cálculo de porcentagem
 - [x] Verificar performance do polling
 - [x] Criar checkpoint do dashboard de progresso
+
+
+## Fase 27: Melhorias do Dashboard de Progresso 🚀
+
+### 27.1 Notificações Push Automáticas
+- [x] Adicionar lógica de detecção de marcos (50%, 75%, 100%)
+- [x] Integrar notifyOwner() no enrichmentFlow
+- [x] Enviar notificação ao atingir 50% do progresso
+- [x] Enviar notificação ao atingir 75% do progresso
+- [x] Enviar notificação ao atingir 100% (conclusão)
+- [x] Incluir estatísticas na notificação (tempo decorrido, total processado)
+
+### 27.2 Histórico de Execuções
+- [x] Criar tabela enrichment_runs no schema
+- [x] Adicionar campos: id, projectId, startedAt, completedAt, totalClients, processedClients, status, duration
+- [x] Criar funções no db.ts (createRun, updateRun, getRunHistory)
+- [x] Criar router tRPC enrichment.history
+- [x] Registrar início de execução no enrichmentFlow
+- [x] Registrar conclusão/erro de execução
+- [x] Criar componente EnrichmentHistory.tsx
+- [x] Exibir histórico na página de progresso
+
+### 27.3 Pausar/Retomar Enriquecimento
+- [x] Criar flag global de controle (pauseEnrichment)
+- [x] Adicionar verificação de pausa no loop do enrichmentFlow
+- [x] Criar router tRPC enrichment.pause
+- [x] Criar router tRPC enrichment.resume
+- [x] Criar router tRPC enrichment.getStatus
+- [x] Adicionar botões Pausar/Retomar na UI
+- [x] Mostrar status visual (Rodando/Pausado/Parado)
+- [x] Persistir estado de pausa no banco
+
+### 27.4 Testes e Validação
+- [x] Testar notificações nos marcos corretos
+- [x] Testar registro de histórico
+- [x] Testar pausar durante execução
+- [x] Testar retomar após pausa
+- [x] Validar persistência de dados
+- [x] Criar checkpoint das melhorias

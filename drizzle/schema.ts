@@ -263,3 +263,32 @@ export const enrichmentCache = mysqlTable("enrichment_cache", {
 
 export type EnrichmentCache = typeof enrichmentCache.$inferSelect;
 export type InsertEnrichmentCache = typeof enrichmentCache.$inferInsert;
+
+
+/**
+ * Enrichment Runs - Historical record of enrichment executions
+ */
+export const enrichmentStatusEnum = mysqlEnum("status", [
+  "running",
+  "paused",
+  "completed",
+  "error",
+]);
+
+export const enrichmentRuns = mysqlTable("enrichment_runs", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  startedAt: timestamp("startedAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+  totalClients: int("totalClients").notNull(),
+  processedClients: int("processedClients").default(0).notNull(),
+  status: enrichmentStatusEnum.default("running").notNull(),
+  durationSeconds: int("durationSeconds"), // Calculated on completion
+  errorMessage: text("errorMessage"),
+  notifiedAt50: int("notifiedAt50").default(0).notNull(), // Flag: 1 if notified
+  notifiedAt75: int("notifiedAt75").default(0).notNull(),
+  notifiedAt100: int("notifiedAt100").default(0).notNull(),
+});
+
+export type EnrichmentRun = typeof enrichmentRuns.$inferSelect;
+export type InsertEnrichmentRun = typeof enrichmentRuns.$inferInsert;

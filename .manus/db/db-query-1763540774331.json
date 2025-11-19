@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS enrichment_runs (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  projectId INT NOT NULL,\n  startedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  completedAt TIMESTAMP NULL,\n  totalClients INT NOT NULL,\n  processedClients INT DEFAULT 0 NOT NULL,\n  status ENUM('running', 'paused', 'completed', 'error') DEFAULT 'running' NOT NULL,\n  durationSeconds INT NULL,\n  errorMessage TEXT NULL,\n  notifiedAt50 INT DEFAULT 0 NOT NULL,\n  notifiedAt75 INT DEFAULT 0 NOT NULL,\n  notifiedAt100 INT DEFAULT 0 NOT NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute CREATE TABLE IF NOT EXISTS enrichment_runs (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  projectId INT NOT NULL,\n  startedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  completedAt TIMESTAMP NULL,\n  totalClients INT NOT NULL,\n  processedClients INT DEFAULT 0 NOT NULL,\n  status ENUM('running', 'paused', 'completed', 'error') DEFAULT 'running' NOT NULL,\n  durationSeconds INT NULL,\n  errorMessage TEXT NULL,\n  notifiedAt50 INT DEFAULT 0 NOT NULL,\n  notifiedAt75 INT DEFAULT 0 NOT NULL,\n  notifiedAt100 INT DEFAULT 0 NOT NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 269
+}

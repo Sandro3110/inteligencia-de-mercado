@@ -647,6 +647,56 @@ export const appRouter = router({
         return getEnrichmentProgress(input.projectId);
       }),
 
+    history: publicProcedure
+      .input(z.object({ projectId: z.number(), limit: z.number().optional() }))
+      .query(async ({ input }) => {
+        const { getEnrichmentHistory } = await import('./db');
+        return getEnrichmentHistory(input.projectId, input.limit);
+      }),
+
+    pause: publicProcedure
+      .input(z.object({ projectId: z.number(), runId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { pauseEnrichment } = await import('./enrichmentControl');
+        await pauseEnrichment(input.projectId, input.runId);
+        return { success: true, message: 'Enriquecimento pausado' };
+      }),
+
+    resume: publicProcedure
+      .input(z.object({ projectId: z.number(), runId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { resumeEnrichment } = await import('./enrichmentControl');
+        await resumeEnrichment(input.projectId, input.runId);
+        return { success: true, message: 'Enriquecimento retomado' };
+      }),
+
+    status: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        try {
+          const { getActiveEnrichmentRun } = await import('./db');
+          const { getEnrichmentState } = await import('./enrichmentControl');
+          
+          const activeRun = await getActiveEnrichmentRun(input.projectId);
+          const controlState = getEnrichmentState();
+          
+          return {
+            activeRun,
+            isPaused: controlState.isPaused,
+            canPause: activeRun?.status === 'running',
+            canResume: activeRun?.status === 'paused',
+          };
+        } catch (error) {
+          console.error('[enrichment.status] Error:', error);
+          return {
+            activeRun: null,
+            isPaused: false,
+            canPause: false,
+            canResume: false,
+          };
+        }
+      }),
+
     execute: publicProcedure
       .input(z.object({
         clientes: z.array(z.object({

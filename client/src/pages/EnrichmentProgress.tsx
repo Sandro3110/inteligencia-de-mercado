@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, CheckCircle2, Clock, TrendingUp } from "lucide-react";
+import { RefreshCw, CheckCircle2, Clock, TrendingUp, Pause, Play, History } from "lucide-react";
 
 export default function EnrichmentProgress() {
   const { selectedProjectId } = useSelectedProject();
@@ -22,6 +22,40 @@ export default function EnrichmentProgress() {
       refetchIntervalInBackground: true,
     }
   );
+
+  // Query de status (para controles de pausa/retomada)
+  const { data: status, refetch: refetchStatus } = trpc.enrichment.status.useQuery(
+    { projectId },
+    {
+      enabled: !!projectId,
+      refetchInterval: 5000,
+      refetchIntervalInBackground: true,
+    }
+  );
+
+  // Query de histórico
+  const { data: history } = trpc.enrichment.history.useQuery(
+    { projectId, limit: 5 },
+    {
+      enabled: !!projectId,
+      refetchInterval: 10000,
+    }
+  );
+
+  // Mutations de pausa/retomada
+  const pauseMutation = trpc.enrichment.pause.useMutation({
+    onSuccess: () => {
+      refetchStatus();
+      refetch();
+    },
+  });
+
+  const resumeMutation = trpc.enrichment.resume.useMutation({
+    onSuccess: () => {
+      refetchStatus();
+      refetch();
+    },
+  });
 
   // Atualizar timestamp quando dados mudam
   useEffect(() => {
@@ -100,6 +134,37 @@ export default function EnrichmentProgress() {
               Aguardando Início
             </Badge>
           )}
+          
+          {/* Botões de Controle */}
+          {status?.activeRun && (
+            <div className="flex gap-2">
+              {status.canPause && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => pauseMutation.mutate({ projectId, runId: status.activeRun!.id })}
+                  disabled={pauseMutation.isPending}
+                  className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
+                >
+                  <Pause className="w-4 h-4 mr-2" />
+                  Pausar
+                </Button>
+              )}
+              {status.canResume && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => resumeMutation.mutate({ projectId, runId: status.activeRun!.id })}
+                  disabled={resumeMutation.isPending}
+                  className="border-green-500/30 text-green-400 hover:bg-green-500/10"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Retomar
+                </Button>
+              )}
+            </div>
+          )}
+          
           <span className="text-sm text-slate-500">
             Atualizado {formatTimeSince(lastUpdate)}
           </span>
@@ -218,6 +283,54 @@ export default function EnrichmentProgress() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Histórico de Execuções */}
+        {history && history.length > 0 && (
+          <Card className="glass-card">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <History className="w-5 h-5 text-purple-400" />
+                <CardTitle>Histórico de Execuções</CardTitle>
+              </div>
+              <CardDescription>Ultimas 5 execuções do enriquecimento</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {history.map((run) => {
+                  const duration = run.durationSeconds ? Math.floor(run.durationSeconds / 60) : 0;
+                  const statusColor = {
+                    completed: 'text-green-400',
+                    running: 'text-blue-400',
+                    paused: 'text-yellow-400',
+                    error: 'text-red-400',
+                  }[run.status];
+                  
+                  return (
+                    <div key={run.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 border border-slate-700/50">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`text-sm font-medium ${statusColor}`}>
+                            {run.status === 'completed' && '✅ Concluído'}
+                            {run.status === 'running' && '⏳ Em Execução'}
+                            {run.status === 'paused' && '⏸️ Pausado'}
+                            {run.status === 'error' && '❌ Erro'}
+                          </span>
+                          <span className="text-xs text-slate-500">
+                            {new Date(run.startedAt).toLocaleString('pt-BR')}
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          {run.processedClients}/{run.totalClients} clientes
+                          {duration > 0 && ` • ${duration} minutos`}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Informações Adicionais */}
         <Card className="glass-card">

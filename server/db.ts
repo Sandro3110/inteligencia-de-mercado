@@ -1920,3 +1920,104 @@ export async function getEnrichmentProgress(projectId: number) {
     },
   };
 }
+
+
+// ============================================
+// ENRICHMENT RUNS HELPERS
+// ============================================
+
+/**
+ * Cria novo registro de execução de enriquecimento
+ */
+export async function createEnrichmentRun(projectId: number, totalClients: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const { enrichmentRuns } = await import("../drizzle/schema");
+  
+  const result = await db.insert(enrichmentRuns).values({
+    projectId,
+    totalClients,
+    processedClients: 0,
+    status: "running",
+  });
+
+  // Retornar o ID inserido
+  return Number(result[0].insertId);
+}
+
+/**
+ * Atualiza progresso de execução
+ */
+export async function updateEnrichmentRun(
+  runId: number,
+  data: {
+    processedClients?: number;
+    status?: "running" | "paused" | "completed" | "error";
+    completedAt?: Date;
+    durationSeconds?: number;
+    errorMessage?: string;
+    notifiedAt50?: number;
+    notifiedAt75?: number;
+    notifiedAt100?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const { enrichmentRuns } = await import("../drizzle/schema");
+  
+  await db
+    .update(enrichmentRuns)
+    .set(data)
+    .where(eq(enrichmentRuns.id, runId));
+}
+
+/**
+ * Busca histórico de execuções de um projeto
+ */
+export async function getEnrichmentHistory(projectId: number, limit: number = 10) {
+  const db = await getDb();
+  if (!db) {
+    return [];
+  }
+
+  const { enrichmentRuns } = await import("../drizzle/schema");
+  
+  return await db
+    .select()
+    .from(enrichmentRuns)
+    .where(eq(enrichmentRuns.projectId, projectId))
+    .orderBy(sql`${enrichmentRuns.startedAt} DESC`)
+    .limit(limit);
+}
+
+/**
+ * Busca execução em andamento de um projeto
+ */
+export async function getActiveEnrichmentRun(projectId: number) {
+  const db = await getDb();
+  if (!db) {
+    return null;
+  }
+
+  const { enrichmentRuns } = await import("../drizzle/schema");
+  
+  const result = await db
+    .select()
+    .from(enrichmentRuns)
+    .where(
+      and(
+        eq(enrichmentRuns.projectId, projectId),
+        sql`${enrichmentRuns.status} IN ('running', 'paused')`
+      )
+    )
+    .orderBy(sql`${enrichmentRuns.startedAt} DESC`)
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}

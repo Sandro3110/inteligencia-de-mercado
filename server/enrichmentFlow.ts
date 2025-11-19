@@ -63,6 +63,10 @@ export async function executeEnrichmentFlow(
   onProgress: ProgressCallback,
   jobId?: string
 ): Promise<EnrichmentProgress> {
+  let runId: number | null = null;
+  let monitorInterval: NodeJS.Timeout | null = null;
+  const startTime = Date.now();
+  
   try {
     const totalSteps = 7;
     let currentStep = 0;
@@ -125,6 +129,15 @@ export async function executeEnrichmentFlow(
       currentStep: ++currentStep,
       totalSteps,
     });
+
+    // Registrar início da execução
+    const { createEnrichmentRun } = await import('./db');
+    runId = await createEnrichmentRun(project.id, input.clientes.length);
+    console.log(`[Enrichment] Run ID ${runId} criado para projeto ${project.id}`);
+
+    // Iniciar monitoramento de progresso
+    const { startProgressMonitoring, stopProgressMonitoring } = await import('./enrichmentMonitor');
+    const monitorInterval = startProgressMonitoring(project.id, runId, project.nome);
 
     const mercadosMap = await identifyMarkets(input.clientes, project.id);
 
@@ -200,6 +213,33 @@ export async function executeEnrichmentFlow(
       },
     });
 
+    // Parar monitoramento
+    if (monitorInterval) {
+      const { stopProgressMonitoring } = await import('./enrichmentMonitor');
+      stopProgressMonitoring(monitorInterval);
+    }
+
+    // Registrar conclusão da execução
+    if (runId) {
+      const durationSeconds = Math.floor((Date.now() - startTime) / 1000);
+      const { updateEnrichmentRun } = await import('./db');
+      await updateEnrichmentRun(runId, {
+        status: 'completed',
+        processedClients: clientesEnriquecidos.length,
+        completedAt: new Date(),
+        durationSeconds,
+        notifiedAt100: 1,
+      });
+      
+      // Enviar notificação de conclusão
+      const { notifyOwner } = await import('./_core/notification');
+      await notifyOwner({
+        title: `✅ Enriquecimento Concluído - ${project.nome}`,
+        content: `O enriquecimento foi concluído com sucesso!\n\n• ${clientesEnriquecidos.length} clientes processados\n• ${mercadosMap.size} mercados identificados\n• ${concorrentes.length} concorrentes encontrados\n• ${leadsEncontrados.length} leads gerados\n• Tempo total: ${Math.floor(durationSeconds / 60)} minutos`,
+      });
+      console.log(`[Enrichment] Run ${runId} concluído com sucesso`);
+    }
+
     // Buscar dados completos do banco para retornar
     const db = await (await import('./db')).getDb();
     if (!db) throw new Error('Database not available');
@@ -236,6 +276,25 @@ export async function executeEnrichmentFlow(
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Erro desconhecido';
+
+    // Parar monitoramento em caso de erro
+    if (monitorInterval) {
+      const { stopProgressMonitoring } = await import('./enrichmentMonitor');
+      stopProgressMonitoring(monitorInterval);
+    }
+
+    // Registrar erro na execução
+    if (runId) {
+      const durationSeconds = Math.floor((Date.now() - startTime) / 1000);
+      const { updateEnrichmentRun } = await import('./db');
+      await updateEnrichmentRun(runId, {
+        status: 'error',
+        completedAt: new Date(),
+        durationSeconds,
+        errorMessage,
+      });
+      console.error(`[Enrichment] Run ${runId} falhou: ${errorMessage}`);
+    }
 
     return {
       status: 'error',
