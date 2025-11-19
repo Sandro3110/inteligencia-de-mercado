@@ -2021,3 +2021,40 @@ export async function getActiveEnrichmentRun(projectId: number) {
 
   return result.length > 0 ? result[0] : null;
 }
+
+
+// ===== Scheduled Enrichments =====
+import { scheduledEnrichments, InsertScheduledEnrichment } from "../drizzle/schema";
+
+export async function createScheduledEnrichment(data: InsertScheduledEnrichment) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(scheduledEnrichments).values(data);
+  return result.insertId;
+}
+
+export async function listScheduledEnrichments(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(scheduledEnrichments)
+    .where(eq(scheduledEnrichments.projectId, projectId))
+    .orderBy(scheduledEnrichments.scheduledAt);
+}
+
+export async function cancelScheduledEnrichment(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(scheduledEnrichments)
+    .set({ status: "cancelled" })
+    .where(eq(scheduledEnrichments.id, id));
+}
+
+export async function deleteScheduledEnrichment(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(scheduledEnrichments).where(eq(scheduledEnrichments.id, id));
+}

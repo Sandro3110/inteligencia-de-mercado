@@ -387,12 +387,12 @@ export default function EnrichmentProgress() {
               <div className="space-y-3">
                 {filteredHistory.map((run) => {
                   const duration = run.durationSeconds ? Math.floor(run.durationSeconds / 60) : 0;
-                  const statusColor = {
+                  const statusColor = ({
                     completed: 'text-green-400',
                     running: 'text-blue-400',
                     paused: 'text-yellow-400',
                     error: 'text-red-400',
-                  }[run.status];
+                  } as Record<string, string>)[run.status];
                   
                   return (
                     <div key={run.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 border border-slate-700/50">

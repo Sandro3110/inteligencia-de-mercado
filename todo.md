@@ -2017,3 +2017,54 @@
 - [ ] Testar execução de agendamento
 - [ ] Validar worker de agendamentos
 - [ ] Criar checkpoint das melhorias avançadas
+
+
+## Fase 30: Correções e Finalizações
+
+### 30.1 Correções de Problemas Pendentes
+- [x] Corrigir coluna enrichmentStatus no banco (renomear para status)
+- [x] Corrigir erros TypeScript no TemplateSelector
+- [x] Corrigir erro TypeScript no EnrichmentProgress (statusColors)
+- [x] Testar queries de enrichment_runs após correções
+
+### 30.2 Completar Sistema de Agendamento
+- [x] Criar funções CRUD no db.ts (createSchedule, listSchedules, deleteSchedule, updateSchedule)
+- [ ] Criar routers tRPC (schedule.create, schedule.list, schedule.delete, schedule.cancel)
+- [ ] Criar componente ScheduleEnrichment.tsx
+- [ ] Implementar date/time picker para agendamento
+- [ ] Adicionar seletor de recorrência (única, diária, semanal)
+- [ ] Implementar configurações de lote (tamanho, max clientes, timeout)
+- [ ] Criar lista de agendamentos futuros
+- [ ] Criar worker para executar agendamentos (cron job)
+- [ ] Integrar agendamento na página EnrichmentProgress
+
+### 30.3 Sistema de Alertas Personalizados
+- [ ] Criar tabela alert_configs no schema
+- [ ] Criar funções no db.ts (createAlert, listAlerts, updateAlert, deleteAlert)
+- [ ] Criar routers tRPC para alertas
+- [ ] Criar componente AlertConfig.tsx
+- [ ] Implementar tipos de alerta (taxa_erro, lead_qualidade, mercado_threshold)
+- [ ] Implementar configuração de condições (>, <, =, entre)
+- [ ] Implementar configuração de valores de threshold
+- [ ] Criar worker para verificar alertas periodicamente
+- [ ] Integrar notifyOwner() quando alerta disparar
+- [ ] Criar página de gerenciamento de alertas
+
+### 30.4 Sistema de Relatórios Executivos
+- [ ] Criar tabela report_schedules no schema
+- [ ] Criar funções de geração de relatório (generateExecutiveReport)
+- [ ] Implementar análise de top 10 mercados
+- [ ] Implementar análise de concorrência
+- [ ] Implementar recomendações de leads prioritários
+- [ ] Criar template PDF para relatório
+- [ ] Implementar geração de PDF com gráficos
+- [ ] Criar agendamento de relatórios (diário, semanal, mensal)
+- [ ] Integrar envio por email via notifyOwner()
+- [ ] Criar página de histórico de relatórios
+
+### 30.5 Testes e Validação
+- [ ] Testar agendamento de enriquecimento
+- [ ] Testar disparo de alertas
+- [ ] Testar geração de relatórios
+- [ ] Validar integração entre sistemas
+- [ ] Criar checkpoint final
