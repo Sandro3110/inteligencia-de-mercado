@@ -131,7 +131,8 @@ export async function executeEnrichmentFlow(
 
     const concorrentes = await findCompetitorsForMarkets(
       mercadosMap,
-      project.id
+      project.id,
+      clientesEnriquecidos.map(c => ({ nome: c.nome, cnpj: c.cnpj || undefined })) // Passar clientes para exclusão
     );
 
     // Passo 5: Buscar leads
@@ -142,7 +143,12 @@ export async function executeEnrichmentFlow(
       totalSteps,
     });
 
-    const leadsEncontrados = await findLeadsForMarkets(mercadosMap, project.id);
+    const leadsEncontrados = await findLeadsForMarkets(
+      mercadosMap,
+      project.id,
+      clientesEnriquecidos.map(c => ({ nome: c.nome, cnpj: c.cnpj || undefined })), // Passar clientes para exclusão
+      concorrentes.map(c => ({ nome: c.nome, cnpj: c.cnpj || undefined })) // Passar concorrentes para exclusão
+    );
 
     // Passo 6: Calcular estatísticas
     onProgress({
@@ -303,6 +309,7 @@ async function enrichClientes(
   const { createCliente, associateClienteToMercado } = await import('./db');
   const { invokeLLM } = await import('./_core/llm');
   const { getCachedEnrichment, setCachedEnrichment } = await import('./_core/enrichmentCache');
+  const { consultarCNPJ, extractPorte, extractEndereco, extractCNAE } = await import('./_core/receitaws');
 
   const enriched = [];
 
@@ -313,6 +320,27 @@ async function enrichClientes(
       const cnpjLimpo = cliente.cnpj.replace(/\D/g, '');
       if (cnpjLimpo.length === 14) {
         dadosEnriquecidos = await getCachedEnrichment(cnpjLimpo);
+        
+        // Se não tem cache, consultar ReceitaWS
+        if (!dadosEnriquecidos) {
+          const receitaData = await consultarCNPJ(cnpjLimpo);
+          if (receitaData) {
+            dadosEnriquecidos = {
+              nome: receitaData.fantasia || receitaData.nome,
+              razaoSocial: receitaData.nome,
+              cnpj: receitaData.cnpj,
+              porte: extractPorte(receitaData),
+              endereco: extractEndereco(receitaData),
+              cnae: extractCNAE(receitaData),
+              email: receitaData.email,
+              telefone: receitaData.telefone,
+              situacao: receitaData.situacao,
+            };
+            
+            // Salvar no cache
+            await setCachedEnrichment(cnpjLimpo, dadosEnriquecidos, 'receitaws');
+          }
+        }
       }
     }
     // Identificar mercado do cliente
@@ -341,8 +369,17 @@ async function enrichClientes(
       }
     }
 
+    // Usar dados enriquecidos se disponíveis
+    const clienteData: any = {
+      ...cliente,
+      nome: dadosEnriquecidos?.nome || cliente.nome,
+      porte: dadosEnriquecidos?.porte,
+      email: dadosEnriquecidos?.email,
+      telefone: dadosEnriquecidos?.telefone,
+    };
+    
     // Calcular score de qualidade
-    const qualidadeScore = calculateQualityScore(cliente);
+    const qualidadeScore = calculateQualityScore(clienteData);
     const qualidadeClassificacao =
       qualidadeScore >= 80
         ? 'Excelente'
@@ -397,11 +434,13 @@ async function enrichClientes(
  */
 async function findCompetitorsForMarkets(
   mercadosMap: Map<string, number>,
-  projectId: number
+  projectId: number,
+  clientes: Array<{ nome: string; cnpj?: string }> = []
 ) {
   const { searchCompetitors } = await import('./_core/serpApi');
   const { invokeLLM } = await import('./_core/llm');
   const { createConcorrente } = await import('./db');
+  const { filterDuplicates } = await import('./_core/deduplication');
   const concorrentes: any[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
@@ -419,7 +458,7 @@ async function findCompetitorsForMarkets(
           },
           {
             role: 'user',
-            content: `Mercado: ${mercadoNome}\n\nListe 5 principais empresas concorrentes neste mercado no Brasil. Retorne JSON com: { "concorrentes": [{ "nome": "Nome da empresa", "produto": "Produto principal" }] }`,
+            content: `Mercado: ${mercadoNome}\n\nListe 10 principais empresas concorrentes neste mercado no Brasil. Retorne JSON com: { "concorrentes": [{ "nome": "Nome da empresa", "produto": "Produto principal" }] }`,
           },
         ],
         response_format: {
@@ -458,8 +497,20 @@ async function findCompetitorsForMarkets(
 
       const data = JSON.parse(content);
 
-      // Processar cada concorrente validado
-      for (const comp of data.concorrentes.slice(0, 5)) {
+      // Filtrar duplicatas (excluir clientes)
+      const concorrentesCandidatos: any[] = data.concorrentes.map((c: any) => ({
+        nome: c.nome,
+        produto: c.produto,
+        cnpj: undefined,
+      }));
+      
+      const concorrentesFiltrados = filterDuplicates(
+        concorrentesCandidatos,
+        clientes // Excluir empresas que são clientes
+      );
+      
+      // Processar cada concorrente validado (aumentado para 10)
+      for (const comp of concorrentesFiltrados.slice(0, 10)) {
         try {
           // Dados já vêm do SerpAPI (searchResults)
           const searchMatch = searchResults.find(r => 
@@ -532,11 +583,14 @@ async function findCompetitorsForMarkets(
  */
 async function findLeadsForMarkets(
   mercadosMap: Map<string, number>,
-  projectId: number
+  projectId: number,
+  clientes: Array<{ nome: string; cnpj?: string }> = [],
+  concorrentes: Array<{ nome: string; cnpj?: string }> = []
 ) {
   const { searchLeads } = await import('./_core/serpApi');
   const { invokeLLM } = await import('./_core/llm');
   const { createLead } = await import('./db');
+  const { filterDuplicates } = await import('./_core/deduplication');
   const leads: any[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
@@ -554,7 +608,7 @@ async function findLeadsForMarkets(
           },
           {
             role: 'user',
-            content: `Mercado: ${mercadoNome}\n\nListe 5 empresas que seriam leads qualificados para este mercado no Brasil. Retorne JSON com: { "leads": [{ "nome": "Nome da empresa", "tipo": "B2B ou B2C", "regiao": "Região" }] }`,
+            content: `Mercado: ${mercadoNome}\n\nListe 10 empresas que seriam leads qualificados para este mercado no Brasil. Retorne JSON com: { "leads": [{ "nome": "Nome da empresa", "tipo": "B2B ou B2C", "regiao": "Região" }] }`,
           },
         ],
         response_format: {
@@ -594,8 +648,22 @@ async function findLeadsForMarkets(
 
       const data = JSON.parse(content);
 
-      // Processar cada lead validado
-      for (const lead of data.leads.slice(0, 5)) {
+      // Filtrar duplicatas (excluir clientes e concorrentes)
+      const leadsCandidatos: any[] = data.leads.map((l: any) => ({
+        nome: l.nome,
+        tipo: l.tipo,
+        regiao: l.regiao,
+        cnpj: undefined,
+      }));
+      
+      const leadsFiltrados = filterDuplicates(
+        leadsCandidatos,
+        clientes, // Excluir empresas que são clientes
+        concorrentes // Excluir empresas que são concorrentes
+      );
+      
+      // Processar cada lead validado (aumentado para 10)
+      for (const lead of leadsFiltrados.slice(0, 10)) {
         try {
           // Dados já vêm do SerpAPI (searchResults)
           const searchMatch = searchResults.find(r => 

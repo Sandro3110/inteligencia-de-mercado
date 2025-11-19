@@ -1628,4 +1628,45 @@
 - [x] Testar busca de leads com Jeep do Brasil (5 leads reais)
 - [x] Validar dados reais da web (SerpAPI funcionando)
 - [x] Todas as 7 validações aprovadas
-- [ ] Criar checkpoint
+- [x] Criar checkpoint
+
+
+---
+
+## Fase 56: Integração ReceitaWS e Regras de Negócio
+
+### 56.1 Módulo ReceitaWS
+- [x] Criar server/_core/receitaws.ts
+- [x] Implementar função consultarCNPJ(cnpj)
+- [x] Tratar erros (CNPJ inválido, não encontrado, rate limit)
+- [x] Adicionar cache de consultas (usar enrichment_cache)
+- [x] Normalizar e validar CNPJ antes de consultar
+
+### 56.2 Enriquecimento com ReceitaWS
+- [x] Integrar ReceitaWS no enrichmentFlow
+- [x] Enriquecer clientes com dados da Receita
+- [ ] Enriquecer concorrentes com dados da Receita (próxima fase)
+- [ ] Enriquecer leads com dados da Receita (próxima fase)
+- [x] Atualizar cálculo de qualityScore com novos campos
+
+### 56.3 Regra de Exclusão de Duplicatas
+- [x] Criar função para normalizar nomes de empresas
+- [x] Implementar verificação de CNPJ duplicado
+- [x] Implementar verificação de nome similar (fuzzy matching - Levenshtein)
+- [x] Excluir empresa se já existe como cliente
+- [x] Excluir empresa se já existe como concorrente (ao adicionar lead)
+- [x] Adicionar logs de exclusão para auditoria
+
+### 56.4 Aumento de Quantidade
+- [x] Alterar limite de concorrentes de 5 para 10
+- [x] Alterar limite de leads de 5 para 10
+- [x] Ajustar prompts LLM para solicitar 10 resultados
+- [x] Garantir que filtros de exclusão ainda funcionem
+
+### 56.5 Testes e Validação
+- [x] Testar ReceitaWS com CNPJ válido (aprovado)
+- [x] Testar ReceitaWS com CNPJ inválido (tratamento de erro OK)
+- [x] Testar regra de exclusão (cliente não aparece em concorrentes)
+- [x] Testar com Jeep do Brasil (10+10 resultados)
+- [x] Validar scores de qualidade melhorados
+- [x] Criar checkpoint

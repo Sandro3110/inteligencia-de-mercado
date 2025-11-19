@@ -1,0 +1,124 @@
+
+══════════════════════════════════════════════════════════
+=== PROJETO ===
+ID: 120001
+Nome: Teste Jeep API Corrigida
+Descrição: Projeto criado automaticamente via fluxo de enriquecimento
+
+=== CLIENTES ===
+
+1. Jeep do Brasil
+   CNPJ: 04601397000165
+   Site: N/A
+   Produto: N/A
+   Porte: N/A
+   Score: 50/100
+
+=== MERCADOS ===
+
+1. Automotivo
+   Categoria: Manufatura e Venda de Veículos
+   Segmentação: B2C
+
+=== CONCORRENTES ===
+
+1. Stellantis (Fiat, Jeep, Peugeot, Citroën)
+   CNPJ: N/A
+   Site: N/A
+   Produto: Veículos de passeio, SUVs e comerciais leves
+   Score: 15/100
+   Classificação: Ruim
+
+2. Volkswagen do Brasil
+   CNPJ: N/A
+   Site: N/A
+   Produto: Veículos de passeio, SUVs e picapes
+   Score: 15/100
+   Classificação: Ruim
+
+3. General Motors (Chevrolet)
+   CNPJ: N/A
+   Site: N/A
+   Produto: Veículos de passeio, SUVs e picapes
+   Score: 15/100
+   Classificação: Ruim
+
+4. Hyundai Motor Brasil
+   CNPJ: N/A
+   Site: N/A
+   Produto: Veículos de passeio e SUVs
+   Score: 15/100
+   Classificação: Ruim
+
+5. Toyota do Brasil
+   CNPJ: N/A
+   Site: N/A
+   Produto: Veículos de passeio, SUVs e picapes (incluindo híbridos)
+   Score: 15/100
+   Classificação: Ruim
+
+=== LEADS ===
+
+1. Bosch Brasil
+   CNPJ: N/A
+   Email: N/A
+   Telefone: N/A
+   Site: N/A
+   Tipo: B2B
+   Região: Sudeste (São Paulo/Campinas)
+   Setor: Automotivo
+   Score: 0/100
+   Classificação: Ruim
+
+2. ZF do Brasil
+   CNPJ: N/A
+   Email: N/A
+   Telefone: N/A
+   Site: N/A
+   Tipo: B2B
+   Região: Sudeste (Sorocaba/Limeira)
+   Setor: Automotivo
+   Score: 0/100
+   Classificação: Ruim
+
+3. Magneti Marelli Cofap
+   CNPJ: N/A
+   Email: N/A
+   Telefone: N/A
+   Site: N/A
+   Tipo: B2B
+   Região: Sudeste (Minas Gerais/São Paulo)
+   Setor: Automotivo
+   Score: 0/100
+   Classificação: Ruim
+
+4. Volkswagen do Brasil
+   CNPJ: N/A
+   Email: N/A
+   Telefone: N/A
+   Site: N/A
+   Tipo: B2B
+   Região: Sudeste (São Bernardo do Campo)
+   Setor: Automotivo
+   Score: 0/100
+   Classificação: Ruim
+
+5. Randon Implementos e Participações
+   CNPJ: N/A
+   Email: N/A
+   Telefone: N/A
+   Site: N/A
+   Tipo: B2B
+   Região: Sul (Caxias do Sul)
+   Setor: Automotivo
+   Score: 0/100
+   Classificação: Ruim
+
+══════════════════════════════════════════════════════════
+=== RESUMO ===
+Total de clientes: 1
+Total de mercados: 1
+Total de concorrentes: 5
+Total de leads: 5
+══════════════════════════════════════════════════════════
+
