@@ -1686,3 +1686,42 @@
 - [x] Sistema configurado para 20 concorrentes
 - [x] Sistema configurado para 20 leads
 - [x] Criar checkpoint
+
+
+---
+
+## Fase 58: Configurar Gemini Particular
+
+### 58.1 Configuração da Chave
+- [ ] Adicionar GEMINI_API_KEY via webdev_request_secrets
+- [ ] Criar módulo server/_core/geminiCustom.ts
+- [ ] Implementar função invokeGemini()
+
+### 58.2 Substituição do LLM
+- [ ] Substituir invokeLLM por invokeGemini em enrichmentFlow.ts
+- [ ] Manter compatibilidade com structured output
+- [ ] Testar chamadas à API
+
+### 58.3 Validação
+- [ ] Testar com Jeep do Brasil
+- [ ] Confirmar que não consome créditos Manus
+- [ ] Criar checkpoint
+
+
+---
+
+## Fase 59: Usar Apenas SerpAPI (Remover LLM)
+
+### 59.1 Modificações no enrichmentFlow
+- [x] Remover chamadas invokeLLM de findCompetitorsForMarkets
+- [x] Usar apenas searchCompetitors do SerpAPI (20 resultados)
+- [x] Remover chamadas invokeLLM de findLeadsForMarkets
+- [x] Usar apenas searchLeads do SerpAPI (20 resultados)
+- [x] Extrair nomes de empresas dos resultados do Google
+
+### 59.2 Testes
+- [x] Código modificado e validado (sem erros TypeScript)
+- [x] LLM completamente removido do fluxo
+- [x] SerpAPI como única fonte de dados
+- [x] 20 concorrentes e 20 leads configurados
+- [x] Criar checkpoint

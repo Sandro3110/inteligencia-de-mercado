@@ -438,69 +438,21 @@ async function findCompetitorsForMarkets(
   clientes: Array<{ nome: string; cnpj?: string }> = []
 ) {
   const { searchCompetitors } = await import('./_core/serpApi');
-  const { invokeLLM } = await import('./_core/llm');
   const { createConcorrente } = await import('./db');
   const { filterDuplicates } = await import('./_core/deduplication');
   const concorrentes: any[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {
-      // Buscar concorrentes reais via SerpAPI
+      // Buscar concorrentes reais via SerpAPI (20 resultados)
       console.log(`[Enrichment] Buscando concorrentes para mercado: ${mercadoNome}`);
-      const searchResults = await searchCompetitors(mercadoNome, undefined, 10);
+      const searchResults = await searchCompetitors(mercadoNome, undefined, 20);
       
-      // Usar LLM (Gemini) para filtrar e validar resultados
-      const response = await invokeLLM({
-        messages: [
-          {
-            role: 'system',
-            content: 'Você é um especialista em análise de mercado. Liste empresas concorrentes no mercado especificado.',
-          },
-          {
-            role: 'user',
-            content: `Mercado: ${mercadoNome}\n\nListe 20 principais empresas concorrentes neste mercado no Brasil. Retorne JSON com: { "concorrentes": [{ "nome": "Nome da empresa", "produto": "Produto principal" }] }`,
-          },
-        ],
-        response_format: {
-          type: 'json_schema',
-          json_schema: {
-            name: 'competitors_list',
-            strict: true,
-            schema: {
-              type: 'object',
-              properties: {
-                concorrentes: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      nome: { type: 'string' },
-                      produto: { type: 'string' },
-                    },
-                    required: ['nome', 'produto'],
-                    additionalProperties: false,
-                  },
-                },
-              },
-              required: ['concorrentes'],
-              additionalProperties: false,
-            },
-          },
-        },
-      });
-
-      const content = response.choices[0]?.message?.content;
-      if (!content || typeof content !== 'string') {
-        console.warn(`[Enrichment] Resposta inválida do OpenAI para mercado ${mercadoNome}`);
-        continue;
-      }
-
-      const data = JSON.parse(content);
-
-      // Filtrar duplicatas (excluir clientes)
-      const concorrentesCandidatos: any[] = data.concorrentes.map((c: any) => ({
-        nome: c.nome,
-        produto: c.produto,
+      // Extrair nomes de empresas dos resultados do SerpAPI
+      const concorrentesCandidatos = searchResults.map(result => ({
+        nome: result.nome,
+        produto: result.descricao || mercadoNome,
+        site: result.site,
         cnpj: undefined,
       }));
       
@@ -509,8 +461,8 @@ async function findCompetitorsForMarkets(
         clientes // Excluir empresas que são clientes
       );
       
-      // Processar cada concorrente validado (aumentado para 10)
-      for (const comp of concorrentesFiltrados.slice(0, 10)) {
+      // Processar cada concorrente validado (aumentado para 20)
+      for (const comp of concorrentesFiltrados.slice(0, 20)) {
         try {
           // Dados já vêm do SerpAPI (searchResults)
           const searchMatch = searchResults.find(r => 
@@ -588,71 +540,22 @@ async function findLeadsForMarkets(
   concorrentes: Array<{ nome: string; cnpj?: string }> = []
 ) {
   const { searchLeads } = await import('./_core/serpApi');
-  const { invokeLLM } = await import('./_core/llm');
   const { createLead } = await import('./db');
   const { filterDuplicates } = await import('./_core/deduplication');
   const leads: any[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {
-      // Buscar leads reais via SerpAPI
+      // Buscar leads reais via SerpAPI (20 resultados)
       console.log(`[Enrichment] Buscando leads para mercado: ${mercadoNome}`);
-      const searchResults = await searchLeads(mercadoNome, 'fornecedores', 15);
+      const searchResults = await searchLeads(mercadoNome, 'fornecedores', 20);
       
-      // Usar LLM (Gemini) para filtrar e validar resultados
-      const response = await invokeLLM({
-        messages: [
-          {
-            role: 'system',
-            content: 'Você é um especialista em geração de leads B2B. Identifique empresas que podem ser leads qualificados.',
-          },
-          {
-            role: 'user',
-            content: `Mercado: ${mercadoNome}\n\nListe 20 empresas que seriam leads qualificados para este mercado no Brasil. Retorne JSON com: { "leads": [{ "nome": "Nome da empresa", "tipo": "B2B ou B2C", "regiao": "Região" }] }`,
-          },
-        ],
-        response_format: {
-          type: 'json_schema',
-          json_schema: {
-            name: 'leads_list',
-            strict: true,
-            schema: {
-              type: 'object',
-              properties: {
-                leads: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      nome: { type: 'string' },
-                      tipo: { type: 'string' },
-                      regiao: { type: 'string' },
-                    },
-                    required: ['nome', 'tipo', 'regiao'],
-                    additionalProperties: false,
-                  },
-                },
-              },
-              required: ['leads'],
-              additionalProperties: false,
-            },
-          },
-        },
-      });
-
-      const content = response.choices[0]?.message?.content;
-      if (!content || typeof content !== 'string') {
-        console.warn(`[Enrichment] Resposta inválida do OpenAI para leads de ${mercadoNome}`);
-        continue;
-      }
-
-      const data = JSON.parse(content);
-
-      // Filtrar duplicatas (excluir clientes e concorrentes)
-      const leadsCandidatos: any[] = data.leads.map((l: any) => ({
-        nome: l.nome,
-        tipo: l.tipo,
-        regiao: l.regiao,
+      // Extrair nomes de empresas dos resultados do SerpAPI
+      const leadsCandidatos = searchResults.map(result => ({
+        nome: result.nome,
+        tipo: 'B2B',
+        regiao: 'Brasil',
+        site: result.site,
         cnpj: undefined,
       }));
       
@@ -662,8 +565,9 @@ async function findLeadsForMarkets(
         concorrentes // Excluir empresas que são concorrentes
       );
       
-      // Processar cada lead validado (aumentado para 10)
-      for (const lead of leadsFiltrados.slice(0, 10)) {
+      // Processar cada lead validado (aumentado para 20)
+      for (const lead of leadsFiltrados.slice(0, 20)) {
+
         try {
           // Dados já vêm do SerpAPI (searchResults)
           const searchMatch = searchResults.find(r => 
@@ -712,7 +616,7 @@ async function findLeadsForMarkets(
             email: null,
             telefone: null,
             site: enrichedData.site || null,
-            tipo: lead.tipo || 'Outbound',
+            tipo: lead.tipo?.toLowerCase() as 'inbound' | 'outbound' | 'referral' || 'outbound',
             regiao: lead.regiao || 'Brasil',
             setor: mercadoNome,
             qualidadeScore,
