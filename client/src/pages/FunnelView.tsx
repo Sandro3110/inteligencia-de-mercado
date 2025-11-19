@@ -98,7 +98,20 @@ export default function FunnelView() {
                   labelStyle={{ color: "#f1f5f9" }}
                 />
                 <Funnel dataKey="value" data={chartData} isAnimationActive>
-                  <LabelList position="right" fill="#fff" stroke="none" dataKey="name" />
+                  <LabelList 
+                    position="right" 
+                    fill="#1e293b" 
+                    stroke="none" 
+                    dataKey="name"
+                    style={{ fontSize: '14px', fontWeight: 'bold' }}
+                  />
+                  <LabelList 
+                    position="inside" 
+                    fill="#ffffff" 
+                    stroke="none" 
+                    dataKey="value"
+                    style={{ fontSize: '16px', fontWeight: 'bold' }}
+                  />
                 </Funnel>
               </FunnelChart>
             </ResponsiveContainer>
@@ -113,21 +126,21 @@ export default function FunnelView() {
           <CardContent>
             <div className="space-y-4">
               {funnelData.conversionRates.map((rate: any, index: number) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-4 bg-slate-100 rounded-lg border border-slate-200">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-slate-300">{getStageName(rate.from)}</span>
-                      <span className="text-slate-500">→</span>
-                      <span className="text-slate-300">{getStageName(rate.to)}</span>
+                      <span className="text-slate-700 font-medium">{getStageName(rate.from)}</span>
+                      <span className="text-slate-400">→</span>
+                      <span className="text-slate-700 font-medium">{getStageName(rate.to)}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     {rate.rate >= 50 ? (
-                      <TrendingUp className="w-4 h-4 text-green-500" />
+                      <TrendingUp className="w-4 h-4 text-green-600" />
                     ) : (
-                      <TrendingDown className="w-4 h-4 text-red-500" />
+                      <TrendingDown className="w-4 h-4 text-red-600" />
                     )}
-                    <span className={`text-lg font-bold ${rate.rate >= 50 ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`text-lg font-bold ${rate.rate >= 50 ? 'text-green-600' : 'text-red-600'}`}>
                       {rate.rate}%
                     </span>
                   </div>
@@ -145,8 +158,8 @@ export default function FunnelView() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {funnelData.funnelData.map((item: any) => (
-                <div key={item.stage} className="p-4 bg-slate-800/50 rounded-lg text-center">
-                  <div className="text-sm text-slate-400 mb-2">{getStageName(item.stage)}</div>
+                <div key={item.stage} className="p-4 bg-slate-100 rounded-lg text-center border border-slate-200">
+                  <div className="text-sm text-slate-600 font-medium mb-2">{getStageName(item.stage)}</div>
                   <div className="text-2xl font-bold text-slate-900">{item.count}</div>
                   <div
                     className="mt-2 h-2 rounded-full"

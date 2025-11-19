@@ -3107,3 +3107,19 @@
 - [x] Testar em mobile
 - [x] Verificar ausência de scroll horizontal
 - [x] Criar checkpoint
+
+
+---
+
+## Fase 65: Correção do Funil de Vendas 📊
+
+### 65.1 Corrigir Visualização do Funil
+- [x] Adicionar cores escuras aos textos dos labels
+- [x] Implementar formato de funil real (camadas empilhadas)
+- [x] Adicionar números e percentuais em cada estágio
+- [x] Melhorar contraste e legibilidade
+
+### 65.2 Testes
+- [x] Testar visualização em mobile
+- [x] Verificar legibilidade dos textos
+- [x] Criar checkpoint
