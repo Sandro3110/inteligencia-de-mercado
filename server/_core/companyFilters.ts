@@ -97,19 +97,26 @@ const ARTICLE_TITLE_KEYWORDS = [
   'principais empresas',
   'top 10',
   'top 20',
+  'top',
   'ranking',
   'lista de',
+  'lista',
   'conheça as',
+  'conheça',
   'quais são',
   'confira',
   'saiba quais',
   'veja as',
+  'veja',
   'descubra',
   'entenda',
   'como escolher',
   'guia completo',
+  'guia',
   'tudo sobre',
   'melhores',
+  'maiores',
+  'principais',
   'fabricantes de',
   'distribuidores de',
   'fornecedores de',
@@ -157,9 +164,36 @@ export function isArticleTitle(title: string): boolean {
   
   const titleLower = title.toLowerCase();
   
-  return ARTICLE_TITLE_KEYWORDS.some(keyword => {
+  // 1. Verificar palavras-chave
+  const hasKeyword = ARTICLE_TITLE_KEYWORDS.some(keyword => {
     return titleLower.includes(keyword);
   });
+  
+  if (hasKeyword) return true;
+  
+  // 2. Verificar se inicia com número (ex: "50 Maiores", "23 Empresas")
+  if (/^\d+\s/.test(title)) {
+    return true;
+  }
+  
+  // 3. Verificar pontuação excessiva (múltiplos : ou ?)
+  const punctuationCount = (title.match(/[?:]/g) || []).length;
+  if (punctuationCount > 1) {
+    return true;
+  }
+  
+  // 4. Verificar nome muito longo (provavelmente título de artigo)
+  if (title.length > 80) {
+    return true;
+  }
+  
+  // 5. Verificar nomes genéricos
+  const genericNames = ['lista', 'ranking', 'guia', 'portal'];
+  if (genericNames.some(generic => titleLower === generic || titleLower.startsWith(generic + ' '))) {
+    return true;
+  }
+  
+  return false;
 }
 
 /**
