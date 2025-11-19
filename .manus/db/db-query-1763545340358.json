@@ -1,0 +1,29 @@
+{
+  "query": "SHOW CREATE TABLE scheduled_enrichments;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SHOW CREATE TABLE scheduled_enrichments;",
+  "rows": [
+    {
+      "Table": "scheduled_enrichments",
+      "Create Table": "CREATE TABLE `scheduled_enrichments` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `projectId` int(11) NOT NULL,",
+    "  `scheduledAt` timestamp NOT NULL,",
+    "  `recurrence` enum('once','daily','weekly') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'once',",
+    "  `batchSize` int(11) DEFAULT '50',",
+    "  `maxClients` int(11) DEFAULT NULL,",
+    "  `timeout` int(11) DEFAULT '3600',",
+    "  `status` enum('pending','running','completed','cancelled') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',",
+    "  `lastRunAt` timestamp NULL DEFAULT NULL,",
+    "  `nextRunAt` timestamp NULL DEFAULT NULL,",
+    "  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+  ],
+  "stdout": "Table\tCreate Table\nscheduled_enrichments\tCREATE TABLE `scheduled_enrichments` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `projectId` int(11) NOT NULL,\n  `scheduledAt` timestamp NOT NULL,\n  `recurrence` enum('once','daily','weekly') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'once',\n  `batchSize` int(11) DEFAULT '50',\n  `maxClients` int(11) DEFAULT NULL,\n  `timeout` int(11) DEFAULT '3600',\n  `status` enum('pending','running','completed','cancelled') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',\n  `lastRunAt` timestamp NULL DEFAULT NULL,\n  `nextRunAt` timestamp NULL DEFAULT NULL,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n",
+  "stderr": "",
+  "execution_time_ms": 134
+}

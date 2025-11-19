@@ -304,7 +304,8 @@ export const scheduledEnrichments = mysqlTable("scheduled_enrichments", {
   batchSize: int("batchSize").default(50),
   maxClients: int("maxClients"),
   timeout: int("timeout").default(3600), // segundos
-  status: mysqlEnum("scheduleStatus", ["pending", "running", "completed", "cancelled"]).default("pending").notNull(),
+  status: mysqlEnum("scheduleStatus", ["pending", "running", "completed", "cancelled", "error"]).default("pending").notNull(),
+  errorMessage: text("errorMessage"),
   lastRunAt: timestamp("lastRunAt"),
   nextRunAt: timestamp("nextRunAt"),
   createdAt: timestamp("createdAt").defaultNow(),

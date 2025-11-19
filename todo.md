@@ -2096,3 +2096,61 @@
 - [x] Testar listagem de agendamentos
 - [x] Testar cancelamento
 - [x] Criar checkpoint
+
+
+## Fase 32: Worker de Agendamento Automático
+
+### 32.1 Script Worker
+- [x] Criar scheduleWorker.ts
+- [x] Implementar verificação de agendamentos pendentes
+- [x] Implementar lógica de execução automática
+- [x] Atualizar status do agendamento (pending → running → completed)
+- [x] Tratar recorrência (criar próximo agendamento)
+
+### 32.2 Integração
+- [x] Iniciar worker em background
+- [x] Adicionar logs de execução
+- [x] Testar execução automática
+
+## Fase 33: Sistema de Alertas Personalizados
+
+### 33.1 Schema e Backend
+- [ ] Criar tabela alert_configs no schema
+- [ ] Criar funções CRUD de alertas no db.ts
+- [ ] Criar routers tRPC de alertas
+- [ ] Implementar verificação de condições de alerta
+
+### 33.2 Frontend
+- [ ] Criar componente AlertConfig.tsx
+- [ ] Adicionar página de configuração de alertas
+- [ ] Implementar formulário de criação de alerta
+- [ ] Listar alertas configurados
+
+### 33.3 Triggers
+- [ ] Integrar verificação no enrichmentMonitor
+- [ ] Enviar notificações quando condições forem atingidas
+
+## Fase 34: Relatórios Executivos em PDF
+
+### 34.1 Geração de Relatório
+- [ ] Criar generateExecutiveReport.ts
+- [ ] Implementar análise de top 10 mercados
+- [ ] Implementar análise de concorrência
+- [ ] Implementar análise de leads prioritários
+- [ ] Gerar PDF com formatação profissional
+
+### 34.2 Agendamento de Envio
+- [ ] Criar tabela report_schedules
+- [ ] Implementar worker de relatórios
+- [ ] Integrar envio por email (notifyOwner)
+
+### 34.3 Interface
+- [ ] Criar página de relatórios
+- [ ] Adicionar botão "Gerar Relatório"
+- [ ] Configurar agendamento semanal
+
+### 34.4 Testes e Checkpoint
+- [ ] Testar worker de agendamento
+- [ ] Testar alertas personalizados
+- [ ] Testar geração de relatório PDF
+- [ ] Criar checkpoint final

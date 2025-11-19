@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE scheduled_enrichments \nADD COLUMN errorMessage TEXT AFTER status,\nMODIFY COLUMN scheduleStatus ENUM('pending', 'running', 'completed', 'cancelled', 'error') DEFAULT 'pending' NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute ALTER TABLE scheduled_enrichments \nADD COLUMN errorMessage TEXT AFTER status,\nMODIFY COLUMN scheduleStatus ENUM('pending', 'running', 'completed', 'cancelled', 'error') DEFAULT 'pending' NOT NULL;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'scheduleStatus' in 'scheduled_enrichments'"
+  ]
+}
