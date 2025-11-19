@@ -1759,3 +1759,36 @@
 - [x] Testar geração de 20 leads sem duplicatas
 - [x] Validar que não há duplicatas entre concorrentes e leads
 - [x] Teste passou: 40 empresas únicas (0 duplicatas)
+
+
+---
+
+## Fase 22: Enriquecimento Faseado com Gravação Incremental 🔄 ✅
+
+### 22.1 Estrutura do Fluxo Faseado
+- [x] Criar função `enrichClienteFase1()` - CNPJ → Gemini → gravar cliente
+- [x] Criar função `enrichClienteFase2()` - Identificar produtos → gravar em cliente.produtoPrincipal
+- [x] Criar função `enrichClienteFase3()` - Identificar mercados → gravar mercados + associações
+- [x] Criar função `enrichClienteFase4()` - Gerar 20 concorrentes únicos → gravar
+- [x] Criar função `enrichClienteFase5()` - Gerar 20 leads únicos → gravar
+- [x] Criar função `enrichClienteCompleto()` - Executa todas as 5 fases sequencialmente
+
+### 22.2 Validação e Indexação
+- [x] Cada fase valida dados da fase anterior antes de executar
+- [x] Cada fase grava no banco antes de avançar
+- [x] Retornar IDs gerados para indexação
+- [x] Tratamento de erros por fase
+
+### 22.3 Testes
+- [x] Testar Fase 1: Enriquecer cliente Petrobras
+- [x] Testar Fase 2: Identificar produtos (petróleo, gás, derivados)
+- [x] Testar Fase 3: Identificar 3 mercados (E&P, Refino, Gás)
+- [x] Testar Fase 4: Gerar 20 concorrentes únicos (Shell, BP, Chevron, etc)
+- [x] Testar Fase 5: Gerar 20 leads únicos (Schlumberger, Halliburton, etc)
+- [x] Validar que não há duplicatas (Petrobras detectada e removida)
+- [x] Teste completo aprovado: 1 cliente + 3 mercados + 20 concorrentes + 20 leads
+
+### 22.4 Próximos Passos
+- [ ] Criar endpoint tRPC `enrichment.enrichClienteFaseado`
+- [ ] Criar página de enriquecimento na aplicação
+- [ ] Criar checkpoint do enriquecimento faseado
