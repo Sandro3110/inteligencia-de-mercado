@@ -1101,6 +1101,16 @@ export const appRouter = router({
           leads: await getTotalLeads(input.projectId),
         };
       }),
+    
+    evolution: publicProcedure
+      .input(z.object({ 
+        projectId: z.number(),
+        period: z.enum(['24h', '7d', '30d']).optional().default('24h')
+      }))
+      .query(async ({ input }) => {
+        const { getEvolutionMetrics } = await import('./db');
+        return getEvolutionMetrics(input.projectId, input.period);
+      }),
   }),
 });
 

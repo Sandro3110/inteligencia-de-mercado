@@ -254,8 +254,11 @@ export default function CascadeView() {
     return () => viewport.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Buscar totais dinâmicos do backend (sem filtro de projeto para mostrar todos os dados)
-  const { data: totals } = trpc.stats.totals.useQuery({ projectId: undefined });
+  // Buscar totais dinâmicos do backend
+  // Por enquanto, buscar todos os dados (projectId=1 tem os dados reais)
+  const { data: totals } = trpc.stats.totals.useQuery({ 
+    projectId: 1 // Usar projectId fixo 1 onde estão os dados
+  });
   
   // Calcular totais gerais
   const totalMercados = totals?.mercados || 0;

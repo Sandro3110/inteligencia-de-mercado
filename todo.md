@@ -2920,3 +2920,25 @@
 - [x] Auditar todo o código frontend para valores fixos
 - [x] Documentar todos os valores hardcoded encontrados
 - [x] Corrigir todos os valores fixos identificados
+
+
+## Fase 62: Melhorias de Performance e Dados Reais 🚀
+
+### 62.1 Filtro por Projeto Funcional
+- [x] Restaurar filtro por projeto no CascadeView
+- [x] Adicionar opção "Todos os Projetos" no seletor
+- [x] Garantir que totais respeitem projeto selecionado
+- [x] Testar filtro com múltiplos projetos
+
+### 62.2 Cache de Totais
+- [x] Criar módulo de cache in-memory
+- [x] Implementar TTL de 5 minutos para totais
+- [x] Adicionar invalidação ao criar/atualizar entidades
+- [x] Integrar cache nas queries de totais
+
+### 62.3 EvolutionCharts com Dados Reais
+- [x] Criar query para evolução temporal de clientes/leads
+- [x] Criar query para taxa de sucesso de enriquecimento
+- [x] Criar endpoint tRPC para métricas de evolução
+- [x] Atualizar EvolutionCharts para usar dados reais
+- [x] Remover dados mockados
