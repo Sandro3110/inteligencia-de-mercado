@@ -1,0 +1,9 @@
+{
+  "query": "\nALTER TABLE `clientes` ADD `regiao` varchar(100);\nALTER TABLE `clientes` ADD `faturamentoDeclarado` text;\nALTER TABLE `clientes` ADD `numeroEstabelecimentos` int;\nALTER TABLE `concorrentes` ADD `faturamentoDeclarado` text;\nALTER TABLE `concorrentes` ADD `numeroEstabelecimentos` int;\nALTER TABLE `leads` ADD `faturamentoDeclarado` text;\nALTER TABLE `leads` ADD `numeroEstabelecimentos` int;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nALTER TABLE `clientes` ADD `regiao` varchar(100);\nALTER TABLE `clientes` ADD `faturamentoDeclarado` text;\nALTER TABLE `clientes` ADD `numeroEstabelecimentos` int;\nALTER TABLE `concorrentes` ADD `faturamentoDeclarado` text;\nALTER TABLE `concorrentes` ADD `numeroEstabelecimentos` int;\nALTER TABLE `leads` ADD `faturamentoDeclarado` text;\nALTER TABLE `leads` ADD `numeroEstabelecimentos` int;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3269
+}

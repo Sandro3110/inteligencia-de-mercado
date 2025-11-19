@@ -1176,7 +1176,68 @@ export const appRouter = router({
         const { deleteProduto } = await import('./db');
         return deleteProduto(input);
       }),
+   }),
+
+  // Enriquecimento V2 router
+  enrichmentV2: router({
+    // Teste 1: Enriquecer 1 cliente completo
+    enrichOne: publicProcedure
+      .input(z.object({ clienteId: z.number(), projectId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { enrichClienteCompleto } = await import('./enrichmentV2');
+        return enrichClienteCompleto(input.clienteId, input.projectId);
+      }),
+
+    // Teste 2: Enriquecer múltiplos clientes
+    enrichMultiple: publicProcedure
+      .input(z.object({ clienteIds: z.array(z.number()), projectId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { enrichClienteCompleto } = await import('./enrichmentV2');
+        const results = [];
+        
+        for (const clienteId of input.clienteIds) {
+          const result = await enrichClienteCompleto(clienteId, input.projectId);
+          results.push({ clienteId, ...result });
+        }
+        
+        return results;
+      }),
+
+    // Etapas individuais
+    enrichCliente: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { enrichCliente } = await import('./enrichmentV2');
+        return enrichCliente(input);
+      }),
+
+    identifyMercados: publicProcedure
+      .input(z.object({ clienteId: z.number(), projectId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { identifyMercados } = await import('./enrichmentV2');
+        return identifyMercados(input.clienteId, input.projectId);
+      }),
+
+    createProdutos: publicProcedure
+      .input(z.object({ clienteId: z.number(), projectId: z.number(), mercadoIds: z.array(z.number()) }))
+      .mutation(async ({ input }) => {
+        const { createProdutosCliente } = await import('./enrichmentV2');
+        return createProdutosCliente(input.clienteId, input.projectId, input.mercadoIds);
+      }),
+
+    findConcorrentes: publicProcedure
+      .input(z.object({ clienteId: z.number(), projectId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { findConcorrentesCliente } = await import('./enrichmentV2');
+        return findConcorrentesCliente(input.clienteId, input.projectId);
+      }),
+
+    findLeads: publicProcedure
+      .input(z.object({ clienteId: z.number(), projectId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { findLeadsCliente } = await import('./enrichmentV2');
+        return findLeadsCliente(input.clienteId, input.projectId);
+      }),
   }),
 });
-
 export type AppRouter = typeof appRouter;

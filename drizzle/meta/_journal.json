@@ -134,6 +134,20 @@
       "when": 1763586349689,
       "tag": "0018_rapid_tusk",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1763590326598,
+      "tag": "0019_strange_invisible_woman",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1763590438344,
+      "tag": "0020_curved_meteorite",
+      "breakpoints": true
     }
   ]
 }

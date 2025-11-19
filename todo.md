@@ -2926,3 +2926,77 @@ Criar tabela que relaciona cliente + produto + mercado, permitindo que um client
 - produtos.update - Atualizar produto
 - produtos.delete - Deletar produto
 
+
+---
+
+## Nova Feature: Redefinição da API de Enriquecimento 🔄
+
+### Objetivo
+Redefinir completamente o fluxo de enriquecimento de dados com base nos 801 clientes limpos, estabelecendo novo fluxo, regras de qualidade e integrações de APIs.
+
+### Fases
+- [ ] Discutir e documentar requisitos do novo fluxo
+- [ ] Definir arquitetura e integrações de APIs (ReceitaWS, Gemini, SerpAPI)
+- [ ] Implementar novo fluxo de enriquecimento no backend
+- [ ] Criar sistema de controle e monitoramento (pausar/retomar)
+- [ ] Testar com amostra de clientes e validar resultados
+- [ ] Executar enriquecimento completo nos 801 clientes
+
+### Decisões Pendentes
+- Quais APIs usar e para quê?
+- Fluxo de enriquecimento (ordem das etapas)
+- Quantidade de concorrentes/leads por cliente
+- Regras de unicidade e qualidade
+- Sistema de controle (pausar/retomar/checkpoint)
+
+
+---
+
+## Atualização: Campos Adicionados ao Schema ✅
+
+### Campos Adicionados
+- [x] Clientes: regiao, faturamentoDeclarado, numeroEstabelecimentos
+- [x] Concorrentes: cidade, uf, faturamentoDeclarado, numeroEstabelecimentos
+- [x] Leads: cidade, uf, faturamentoDeclarado, numeroEstabelecimentos
+- [x] Aplicar migrações no banco de dados
+- [x] Validar estrutura das tabelas
+
+### Totais de Campos
+- Clientes: 26 campos
+- Concorrentes: 21 campos
+- Leads: 26 campos
+
+### Próximos Passos
+- [ ] Atualizar prompts Gemini com novos campos
+- [ ] Atualizar funções CRUD no backend (db.ts)
+- [ ] Implementar sistema de enriquecimento modular
+- [ ] Testar com amostra de clientes
+
+
+---
+
+## Sistema de Enriquecimento V2 Implementado ✅
+
+### Implementação Completa
+- [x] Documento de lógica atualizado (LOGICA_ENRIQUECIMENTO_FINAL.md)
+- [x] Funções de enriquecimento implementadas (enrichmentV2.ts)
+- [x] Routers tRPC criados (enrichmentV2 router)
+- [x] Erros TypeScript corrigidos
+- [x] Testes preparados (TESTES_ENRIQUECIMENTO.md)
+- [x] Script de teste criado (scripts/test-enrichment.mjs)
+
+### Arquivos Criados
+- LOGICA_ENRIQUECIMENTO_FINAL.md - Documentação completa
+- ESTIMATIVA_ENRIQUECIMENTO.md - Cálculos e estimativas
+- CAMPOS_ADICIONADOS.md - Resumo de campos novos
+- server/enrichmentV2.ts - Implementação das 5 etapas
+- scripts/test-enrichment.mjs - Script de testes
+- TESTES_ENRIQUECIMENTO.md - Guia de testes
+
+### Próximos Passos
+- [ ] Executar Teste 1 (1 cliente)
+- [ ] Executar Teste 2 (10 clientes)
+- [ ] Executar Teste 3 (50 clientes)
+- [ ] Validar resultados com SQL
+- [ ] Executar enriquecimento completo (801 clientes)
+
