@@ -2774,3 +2774,40 @@
 - [x] Implementar Enter para confirmar ações
 - [x] Criar modal de ajuda (Ctrl+?) mostrando todos os atalhos
 - [x] Adicionar indicadores visuais de atalhos nos botões
+
+
+## Fase 56: Funcionalidades Avançadas 🎯
+
+### 56.1 Busca Global Avançada
+- [x] Instalar biblioteca fuse.js para fuzzy search
+- [x] Criar componente GlobalSearch modal
+- [x] Criar query backend para busca unificada (mercados/clientes/concorrentes/leads)
+- [x] Implementar fuzzy search no frontend
+- [x] Adicionar categorização de resultados por tipo
+- [x] Implementar navegação por teclado nos resultados (↑↓)
+- [x] Adicionar highlight de termos encontrados
+- [x] Integrar Ctrl+K para abrir modal
+- [ ] Adicionar histórico de buscas recentes
+
+### 56.2 Onboarding Interativo
+- [x] Instalar biblioteca react-joyride para tour guiado
+- [x] Criar componente OnboardingTour
+- [x] Definir steps do tour (modo compacto, atalhos, filtros, tags, etc)
+- [x] Criar context OnboardingContext para gerenciar estado
+- [x] Persistir status de conclusão do tour no localStorage
+- [x] Adicionar botão "Iniciar Tour" no menu
+- [x] Criar tooltips com destaque visual
+- [x] Implementar skip/next/back navigation
+- [x] Adicionar opção "Não mostrar novamente"
+
+### 56.3 Personalização de Dashboard
+- [x] Instalar biblioteca react-grid-layout para drag & drop
+- [x] Criar DashboardCustomizationContext
+- [x] Implementar grid layout responsivo
+- [x] Criar painel de configuração de widgets
+- [x] Permitir mostrar/ocultar cards individuais
+- [x] Implementar drag & drop de cards
+- [x] Salvar layout personalizado no localStorage
+- [x] Criar botão "Resetar Layout Padrão"
+- [ ] Adicionar preview de layouts pré-definidos
+- [x] Implementar resize de cards

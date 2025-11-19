@@ -5,7 +5,10 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CompactModeProvider } from "./contexts/CompactModeContext";
+import { OnboardingProvider } from "./contexts/OnboardingContext";
+import { DashboardCustomizationProvider } from "./contexts/DashboardCustomizationContext";
 import { GlobalShortcuts } from "./components/GlobalShortcuts";
+import { OnboardingTour } from "./components/OnboardingTour";
 import MainNav from "./components/MainNav";
 import Dashboard from "./pages/Dashboard";
 import DashboardPage from "./pages/DashboardPage";
@@ -63,12 +66,17 @@ function App() {
         defaultTheme="light"
       >
         <CompactModeProvider>
-          <TooltipProvider>
-            <Toaster />
-            <GlobalShortcuts />
-            <MainNav />
-            <Router />
-          </TooltipProvider>
+          <OnboardingProvider>
+            <DashboardCustomizationProvider>
+              <TooltipProvider>
+                <Toaster />
+                <GlobalShortcuts />
+                <OnboardingTour />
+                <MainNav />
+                <Router />
+              </TooltipProvider>
+            </DashboardCustomizationProvider>
+          </OnboardingProvider>
         </CompactModeProvider>
       </ThemeProvider>
     </ErrorBoundary>

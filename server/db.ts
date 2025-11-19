@@ -2460,3 +2460,144 @@ export async function getSegmentationDistribution(projectId: number) {
     return [];
   }
 }
+
+
+// ============================================
+// BUSCA GLOBAL UNIFICADA
+// ============================================
+
+export interface GlobalSearchResult {
+  id: number;
+  type: 'mercado' | 'cliente' | 'concorrente' | 'lead';
+  title: string;
+  subtitle?: string;
+  metadata?: Record<string, any>;
+}
+
+export async function globalSearch(query: string, projectId?: number, limit: number = 20): Promise<GlobalSearchResult[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const searchTerm = `%${query}%`;
+  const results: GlobalSearchResult[] = [];
+
+  try {
+    // Buscar mercados
+    const mercadosConditions = [sql`${mercadosUnicos.nome} LIKE ${searchTerm}`];
+    if (projectId) {
+      mercadosConditions.push(eq(mercadosUnicos.projectId, projectId));
+    }
+    
+    const mercados = await db
+      .select({
+        id: mercadosUnicos.id,
+        nome: mercadosUnicos.nome,
+        segmentacao: mercadosUnicos.segmentacao,
+      })
+      .from(mercadosUnicos)
+      .where(and(...mercadosConditions)!)
+      .limit(limit);
+
+    results.push(...mercados.map(m => ({
+      id: m.id,
+      type: 'mercado' as const,
+      title: m.nome,
+      subtitle: m.segmentacao || undefined,
+      metadata: { segmentacao: m.segmentacao },
+    })));
+
+    // Buscar clientes
+    const clientesConditions = [
+      or(
+        sql`${clientes.nome} LIKE ${searchTerm}`,
+        sql`${clientes.cnpj} LIKE ${searchTerm}`
+      )!
+    ];
+    if (projectId) {
+      clientesConditions.push(eq(clientes.projectId, projectId));
+    }
+
+    const clientesResult = await db
+      .select({
+        id: clientes.id,
+        nome: clientes.nome,
+        cnpj: clientes.cnpj,
+      })
+      .from(clientes)
+      .where(and(...clientesConditions)!)
+      .limit(limit);
+
+    results.push(...clientesResult.map(c => ({
+      id: c.id,
+      type: 'cliente' as const,
+      title: c.nome,
+      subtitle: c.cnpj || undefined,
+      metadata: { cnpj: c.cnpj },
+    })));
+
+    // Buscar concorrentes
+    const concorrentesConditions = [
+      or(
+        sql`${concorrentes.nome} LIKE ${searchTerm}`,
+        sql`${concorrentes.cnpj} LIKE ${searchTerm}`
+      )!
+    ];
+    if (projectId) {
+      concorrentesConditions.push(eq(concorrentes.projectId, projectId));
+    }
+
+    const concorrentesResult = await db
+      .select({
+        id: concorrentes.id,
+        nome: concorrentes.nome,
+        cnpj: concorrentes.cnpj,
+      })
+      .from(concorrentes)
+      .where(and(...concorrentesConditions)!)
+      .limit(limit);
+
+    results.push(...concorrentesResult.map(c => ({
+      id: c.id,
+      type: 'concorrente' as const,
+      title: c.nome,
+      subtitle: c.cnpj || undefined,
+      metadata: { cnpj: c.cnpj },
+    })));
+
+    // Buscar leads
+    const leadsConditions = [
+      or(
+        sql`${leads.nome} LIKE ${searchTerm}`,
+        sql`${leads.email} LIKE ${searchTerm}`,
+        sql`${leads.telefone} LIKE ${searchTerm}`
+      )!
+    ];
+    if (projectId) {
+      leadsConditions.push(eq(leads.projectId, projectId));
+    }
+
+    const leadsResult = await db
+      .select({
+        id: leads.id,
+        nome: leads.nome,
+        email: leads.email,
+        telefone: leads.telefone,
+      })
+      .from(leads)
+      .where(and(...leadsConditions)!)
+      .limit(limit);
+
+    results.push(...leadsResult.map(l => ({
+      id: l.id,
+      type: 'lead' as const,
+      title: l.nome,
+      subtitle: l.email || l.telefone || undefined,
+      metadata: { email: l.email, telefone: l.telefone },
+    })));
+
+    return results.slice(0, limit);
+  } catch (error) {
+    console.error('[Database] Global search failed:', error);
+    return [];
+  }
+}

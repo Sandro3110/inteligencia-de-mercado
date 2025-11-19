@@ -1,5 +1,8 @@
 import { Link, useLocation } from "wouter";
 import { CompactModeToggle } from "./CompactModeToggle";
+import { useOnboarding } from "@/contexts/OnboardingContext";
+import { HelpCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { 
   Home, BarChart3, Database, TrendingUp, 
   Settings, Clock, FileText, Bell, Activity 
@@ -90,6 +93,7 @@ const navItems: NavItem[] = [
 
 export default function MainNav() {
   const [location] = useLocation();
+  const { startOnboarding, hasCompletedOnboarding } = useOnboarding();
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -126,7 +130,20 @@ export default function MainNav() {
         </div>
 
         <div className="flex items-center gap-2">
-          <CompactModeToggle />
+          {!hasCompletedOnboarding && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={startOnboarding}
+              className="text-xs"
+            >
+              <HelpCircle className="h-4 w-4 mr-1" />
+              Tour
+            </Button>
+          )}
+          <div className="compact-mode-toggle">
+            <CompactModeToggle />
+          </div>
           <button
             className="relative p-2 rounded-md hover:bg-accent transition-colors"
             title="Alertas e notificações"

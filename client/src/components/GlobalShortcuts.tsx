@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { GlobalSearch } from "./GlobalSearch";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import {
   Dialog,
@@ -13,6 +14,7 @@ import { Kbd } from "@/components/ui/kbd";
 export function GlobalShortcuts() {
   const [, setLocation] = useLocation();
   const [showHelp, setShowHelp] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
 
   // Listener para evento customizado de mostrar ajuda
   useEffect(() => {
@@ -27,11 +29,7 @@ export function GlobalShortcuts() {
       ctrl: true,
       handler: (e) => {
         e.preventDefault();
-        const searchInput = document.querySelector<HTMLInputElement>('[placeholder*="Buscar"], [placeholder*="buscar"]');
-        if (searchInput) {
-          searchInput.focus();
-          searchInput.select();
-        }
+        setShowSearch(true);
       },
       description: "Busca global"
     },
@@ -124,7 +122,9 @@ export function GlobalShortcuts() {
   ];
 
   return (
-    <Dialog open={showHelp} onOpenChange={setShowHelp}>
+    <>
+      <GlobalSearch open={showSearch} onOpenChange={setShowSearch} />
+      <Dialog open={showHelp} onOpenChange={setShowHelp}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Atalhos de Teclado</DialogTitle>
@@ -154,5 +154,6 @@ export function GlobalShortcuts() {
         </div>
       </DialogContent>
     </Dialog>
+    </>
   );
 }

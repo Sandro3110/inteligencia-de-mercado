@@ -1025,6 +1025,20 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  // Busca global unificada
+  search: router({
+    global: publicProcedure
+      .input(z.object({ 
+        query: z.string(), 
+        projectId: z.number().optional(),
+        limit: z.number().optional().default(20) 
+      }))
+      .query(async ({ input }) => {
+        const { globalSearch } = await import('./db');
+        return globalSearch(input.query, input.projectId, input.limit);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
