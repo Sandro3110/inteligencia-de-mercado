@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { exportToCSV } from "@/lib/export";
 import { toast } from "sonner";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { 
   Building2, 
@@ -124,6 +125,11 @@ export default function Dashboard() {
       </div>
 
       <div className="container py-4 flex-1 overflow-y-auto">
+        {/* Breadcrumbs */}
+        <div className="mb-4">
+          <Breadcrumbs items={[{ label: "Dashboard" }]} />
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
           <Card className="glass-card border-l-4 border-l-primary">

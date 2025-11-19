@@ -18,6 +18,7 @@ import {
   Cell,
 } from "recharts";
 import { useState } from "react";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
 
@@ -51,6 +52,9 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Header */}
       <div className="border-b border-border/40 px-6 py-4">
+        <div className="mb-4">
+          <Breadcrumbs items={[{ label: "Analytics" }]} />
+        </div>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white">Dashboard Avançado</h1>

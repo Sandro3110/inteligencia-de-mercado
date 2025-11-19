@@ -2185,3 +2185,121 @@
 - [ ] Melhorar responsividade
 - [ ] Aplicar padrão visual moderno e sofisticado
 - [ ] Criar checkpoint final
+
+
+---
+
+## Fase 30: Breadcrumbs e Navegação Contextual 🧭
+
+### 30.1 Componente Breadcrumbs
+- [x] Criar componente Breadcrumbs.tsx reutilizável
+- [x] Adicionar suporte a navegação clicável
+- [x] Implementar separadores visuais (/)
+- [x] Adicionar ícone Home no primeiro item
+- [x] Estilizar consistentemente com design system
+
+### 30.2 Integração nas Páginas
+- [x] Adicionar breadcrumbs na página CascadeView
+- [x] Adicionar breadcrumbs na página Dashboard
+- [x] Adicionar breadcrumbs na página EnrichmentProgress
+- [ ] Adicionar breadcrumbs na página EnrichmentReview
+- [x] Adicionar breadcrumbs na página DashboardPage
+- [x] Adicionar breadcrumbs na página EnrichmentFlow
+
+### 30.3 Botão Voltar
+- [ ] Adicionar botão "Voltar" consistente em todas as páginas internas
+- [ ] Implementar navegação com useRouter
+- [ ] Estilizar botão com ícone de seta
+- [ ] Testar navegação contextual
+
+### 30.4 Finalização
+- [ ] Testar breadcrumbs em todas as páginas
+- [ ] Validar navegação clicável
+- [ ] Criar checkpoint
+
+---
+
+## Fase 31: Sistema de Alertas Personalizados 🔔
+
+### 31.1 Backend - Routers tRPC
+- [x] Criar router alert.create (input: name, type, condition, enabled)
+- [x] Criar router alert.list (retorna todas as configurações)
+- [x] Criar router alert.update (input: id, dados atualizados)
+- [x] Criar router alert.delete (input: id)
+- [x] Adicionar validação Zod para tipos de alerta
+
+### 31.2 Frontend - Componente AlertConfig
+- [x] Criar componente AlertConfig.tsx
+- [x] Implementar formulário de configuração
+- [x] Adicionar seletor de tipo de alerta (error_rate, high_quality_lead, market_threshold)
+- [x] Adicionar input de nome e threshold (número)
+- [x] Adicionar toggle enabled/disabled
+- [x] Implementar lista de alertas configurados
+- [x] Adicionar botões de editar/deletar
+
+### 31.3 Integração no Monitor
+- [ ] Integrar verificação no enrichmentMonitor.ts
+- [ ] Implementar lógica de disparo de alertas
+- [ ] Adicionar função checkAlerts() no monitor
+- [ ] Enviar notificação via notifyOwner() quando alerta disparar
+- [ ] Registrar histórico de alertas disparados
+
+### 31.4 Interface
+- [ ] Adicionar botão "Configurar Alertas" na página EnrichmentProgress
+- [x] Criar página dedicada /alertas
+- [x] Adicionar rota no App.tsx
+- [ ] Adicionar item no MainNav
+
+### 31.5 Finalização
+- [ ] Testar criação de alertas
+- [ ] Testar disparo automático
+- [ ] Validar notificações
+- [ ] Criar checkpoint
+
+---
+
+## Fase 32: Relatórios Executivos PDF 📄
+
+### 32.1 Instalação e Setup
+- [x] Instalar biblioteca jsPDF
+- [x] Instalar jspdf-autotable (para tabelas)
+- [x] Configurar imports e tipos
+
+### 32.2 Backend - Função de Geração
+- [x] Criar função generateExecutiveReport() no backend
+- [x] Implementar análise de top 10 mercados (volume, clientes, concorrentes)
+- [x] Implementar análise competitiva (densidade de concorrentes por mercado)
+- [x] Implementar análise de leads prioritários (score > 80)
+- [x] Calcular estatísticas agregadas (médias, totais, percentuais)
+- [x] Gerar insights estratégicos com texto descritivo
+
+### 32.3 Backend - Router tRPC
+- [x] Criar router reports.generate (input: projectId)
+- [x] Retornar dados JSON para geração de PDF no frontend
+- [ ] Adicionar validação de permissões
+- [ ] Implementar cache de relatórios (opcional)
+
+### 32.4 Frontend - Interface
+- [ ] Adicionar botão "Gerar Relatório" na página EnrichmentProgress
+- [x] Criar componente ReportGenerator
+- [ ] Adicionar opções de filtros (período, mercados específicos)
+- [x] Implementar loading state durante geração
+- [x] Adicionar download automático do PDF
+- [x] Mostrar preview do relatório
+
+### 32.5 Layout do PDF
+- [ ] Criar capa com logo e título
+- [ ] Adicionar sumário executivo
+- [ ] Seção: Top 10 Mercados (tabela + gráfico)
+- [ ] Seção: Análise Competitiva (densidade por mercado)
+- [ ] Seção: Leads Prioritários (lista com scores)
+- [ ] Seção: Estatísticas Gerais (KPIs)
+- [ ] Rodapé com data de geração e paginação
+
+### 32.6 Finalização
+- [ ] Testar geração de PDF completo
+- [ ] Validar formatação e layout
+- [ ] Testar download
+- [ ] Criar checkpoint
+
+---

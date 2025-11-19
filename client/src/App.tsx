@@ -13,6 +13,8 @@ import CascadeView from "./pages/CascadeView";
 import EnrichmentFlow from "./pages/EnrichmentFlow";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import EnrichmentProgress from "./pages/EnrichmentProgress";
+import AlertsPage from "./pages/AlertsPage";
+import ReportsPage from "./pages/ReportsPage";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -26,6 +28,8 @@ function Router() {
       <Route path="/enrichment" component={EnrichmentFlow} />
       <Route path="/analytics" component={AnalyticsDashboard} />
       <Route path="/enrichment-progress" component={EnrichmentProgress} />
+      <Route path="/alertas" component={AlertsPage} />
+      <Route path="/relatorios" component={ReportsPage} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

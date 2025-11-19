@@ -11,6 +11,7 @@ import { useEnrichmentProgress } from '@/hooks/useEnrichmentProgress';
 import { TemplateSelector } from '@/components/TemplateSelector';
 import { useLocation } from 'wouter';
 import * as XLSX from 'xlsx';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 
 export default function EnrichmentFlow() {
   const [, setLocation] = useLocation();
@@ -102,6 +103,8 @@ export default function EnrichmentFlow() {
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto space-y-6">
+        <Breadcrumbs items={[{ label: "Enriquecimento" }]} />
+        
         <div>
           <h1 className="text-3xl font-bold">Fluxo de Enriquecimento Automatizado</h1>
           <p className="text-muted-foreground mt-2">

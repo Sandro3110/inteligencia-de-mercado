@@ -11,6 +11,7 @@ import HistoryFilters, { FilterState } from "@/components/HistoryFilters";
 import { exportToCSV, exportToPDF } from "@/lib/exportHistory";
 import { ScheduleEnrichment } from "@/components/ScheduleEnrichment";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function EnrichmentProgress() {
   const { selectedProjectId } = useSelectedProject();
@@ -159,6 +160,9 @@ export default function EnrichmentProgress() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
       <div className="max-w-5xl mx-auto space-y-6">
+        {/* Breadcrumbs */}
+        <Breadcrumbs items={[{ label: "Monitoramento" }]} />
+        
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>

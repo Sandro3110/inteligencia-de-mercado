@@ -769,6 +769,59 @@ export const appRouter = router({
         });
       }),
   }),
+
+  // Sistema de Alertas Personalizados
+  alert: router({
+    list: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getAlertConfigs } = await import('./db');
+        return getAlertConfigs(input.projectId);
+      }),
+    
+    create: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        name: z.string().min(1).max(255),
+        type: z.enum(['error_rate', 'high_quality_lead', 'market_threshold']),
+        condition: z.string(), // JSON stringified: { operator: ">", value: 5 }
+        enabled: z.boolean().default(true),
+      }))
+      .mutation(async ({ input }) => {
+        const { createAlertConfig } = await import('./db');
+        return createAlertConfig(input);
+      }),
+    
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().min(1).max(255).optional(),
+        type: z.enum(['error_rate', 'high_quality_lead', 'market_threshold']).optional(),
+        condition: z.string().optional(),
+        enabled: z.boolean().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateAlertConfig } = await import('./db');
+        return updateAlertConfig(input.id, input);
+      }),
+    
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteAlertConfig } = await import('./db');
+        return deleteAlertConfig(input.id);
+      }),
+  }),
+
+  // Relatórios Executivos
+  reports: router({
+    generate: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { generateExecutiveReportData } = await import('./generateExecutiveReport');
+        return generateExecutiveReportData(input.projectId);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
