@@ -23,7 +23,7 @@ export default function FunnelView() {
 
   if (!funnelData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
         <div className="max-w-7xl mx-auto">
           <Breadcrumbs items={[{ label: "Funil de Vendas" }]} />
           <div className="text-center text-slate-400 mt-12">
@@ -64,31 +64,31 @@ export default function FunnelView() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: "Funil de Vendas" }]} />
 
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-white">Funil de Vendas</h1>
-          <p className="text-slate-400 mt-1">Visualize o fluxo de leads através dos estágios</p>
+          <h1 className="text-3xl font-bold text-slate-900">Funil de Vendas</h1>
+          <p className="text-slate-600 mt-1">Visualize o fluxo de leads através dos estágios</p>
         </div>
 
         {/* Métrica Total */}
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-white">Total de Leads no Funil</CardTitle>
+            <CardTitle className="text-slate-900">Total de Leads no Funil</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold text-white">{funnelData.totalLeads}</div>
+            <div className="text-4xl font-bold text-slate-900">{funnelData.totalLeads}</div>
           </CardContent>
         </Card>
 
         {/* Gráfico de Funil */}
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-white">Visualização do Funil</CardTitle>
+            <CardTitle className="text-slate-900">Visualização do Funil</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={400}>
@@ -106,9 +106,9 @@ export default function FunnelView() {
         </Card>
 
         {/* Taxas de Conversão */}
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-white">Taxas de Conversão Entre Estágios</CardTitle>
+            <CardTitle className="text-slate-900">Taxas de Conversão Entre Estágios</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -138,16 +138,16 @@ export default function FunnelView() {
         </Card>
 
         {/* Detalhamento por Estágio */}
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-white">Detalhamento por Estágio</CardTitle>
+            <CardTitle className="text-slate-900">Detalhamento por Estágio</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {funnelData.funnelData.map((item: any) => (
                 <div key={item.stage} className="p-4 bg-slate-800/50 rounded-lg text-center">
                   <div className="text-sm text-slate-400 mb-2">{getStageName(item.stage)}</div>
-                  <div className="text-2xl font-bold text-white">{item.count}</div>
+                  <div className="text-2xl font-bold text-slate-900">{item.count}</div>
                   <div
                     className="mt-2 h-2 rounded-full"
                     style={{ backgroundColor: getStageColor(item.stage) }}

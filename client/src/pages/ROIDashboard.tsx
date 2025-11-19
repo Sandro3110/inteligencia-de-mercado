@@ -93,7 +93,7 @@ export default function ROIDashboard() {
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: "Dashboard de ROI" }]} />
@@ -112,43 +112,43 @@ export default function ROIDashboard() {
 
         {/* Métricas Principais */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-slate-900/50 border-slate-800">
+          <Card className="bg-white border-slate-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-400">Total de Leads</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-600">Total de Leads</CardTitle>
               <Target className="w-4 h-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{metrics.totalLeads}</div>
+              <div className="text-2xl font-bold text-slate-900">{metrics.totalLeads}</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900/50 border-slate-800">
+          <Card className="bg-white border-slate-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-400">Conversões</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-600">Conversões</CardTitle>
               <Award className="w-4 h-4 text-green-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{metrics.totalConversions}</div>
+              <div className="text-2xl font-bold text-slate-900">{metrics.totalConversions}</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900/50 border-slate-800">
+          <Card className="bg-white border-slate-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-400">Taxa de Conversão</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-600">Taxa de Conversão</CardTitle>
               <TrendingUp className="w-4 h-4 text-orange-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{metrics.conversionRate.toFixed(1)}%</div>
+              <div className="text-2xl font-bold text-slate-900">{metrics.conversionRate.toFixed(1)}%</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900/50 border-slate-800">
+          <Card className="bg-white border-slate-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-400">Valor Médio</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-600">Valor Médio</CardTitle>
               <DollarSign className="w-4 h-4 text-purple-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-slate-900">
                 R$ {metrics.averageDealValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </div>
             </CardContent>
@@ -156,9 +156,9 @@ export default function ROIDashboard() {
         </div>
 
         {/* Gráfico de Conversões por Mercado */}
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-white">Conversões por Mercado</CardTitle>
+            <CardTitle className="text-slate-900">Conversões por Mercado</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -179,9 +179,9 @@ export default function ROIDashboard() {
         </Card>
 
         {/* Tabela de Conversões */}
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-white">Histórico de Conversões</CardTitle>
+            <CardTitle className="text-slate-900">Histórico de Conversões</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -231,13 +231,13 @@ export default function ROIDashboard() {
 
       {/* Dialog de Criar Conversão */}
       <Dialog open={showConversionDialog} onOpenChange={setShowConversionDialog}>
-        <DialogContent className="bg-slate-900 border-slate-800">
+        <DialogContent className="bg-white border-slate-200">
           <DialogHeader>
-            <DialogTitle className="text-white">Registrar Conversão</DialogTitle>
+            <DialogTitle className="text-slate-900">Registrar Conversão</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="lead" className="text-slate-400">Lead</Label>
+              <Label htmlFor="lead" className="text-slate-700">Lead</Label>
               <select
                 id="lead"
                 value={selectedLeadId || ""}
@@ -254,7 +254,7 @@ export default function ROIDashboard() {
             </div>
 
             <div>
-              <Label htmlFor="dealValue" className="text-slate-400">Valor do Deal (R$)</Label>
+              <Label htmlFor="dealValue" className="text-slate-700">Valor do Deal (R$)</Label>
               <Input
                 id="dealValue"
                 type="number"
@@ -266,7 +266,7 @@ export default function ROIDashboard() {
             </div>
 
             <div>
-              <Label htmlFor="status" className="text-slate-400">Status</Label>
+              <Label htmlFor="status" className="text-slate-700">Status</Label>
               <select
                 id="status"
                 value={status}
@@ -279,7 +279,7 @@ export default function ROIDashboard() {
             </div>
 
             <div>
-              <Label htmlFor="notes" className="text-slate-400">Notas</Label>
+              <Label htmlFor="notes" className="text-slate-700">Notas</Label>
               <Textarea
                 id="notes"
                 value={notes}

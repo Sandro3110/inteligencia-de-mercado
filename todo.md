@@ -2709,3 +2709,39 @@
 - [x] Criar componente TagPicker (adicionar/remover tags de entidades)
 - [x] Integrar filtros por tags nas páginas (mercados/clientes/concorrentes/leads)
 - [x] Testar criação, edição e exclusão de tags
+
+
+## Fase 54: Refinamento Visual e Remoção do Modo Dark 🎨
+
+### 54.1 Remover Modo Dark
+- [x] Desabilitar switchable no ThemeProvider (App.tsx)
+- [x] Fixar defaultTheme="light"
+- [x] Remover ThemeToggle de todas as páginas
+- [x] Remover CSS variables do .dark no index.css
+
+### 54.2 Refinar Paleta de Cores Light
+- [x] Ajustar --background para branco/cinza muito claro
+- [x] Ajustar --foreground para cinza escuro/preto
+- [x] Refinar cores de accent, primary, secondary
+- [x] Melhorar cores de border, input, ring
+- [x] Garantir contraste WCAG AA em todos os textos
+
+### 54.3 Polir Componentes
+- [x] Refinar CascadeView (backgrounds, cards, espaçamentos)
+- [x] Polir Dashboard (gradientes sutis, sombras)
+- [x] Melhorar Analytics (cores de gráficos, cards)
+- [x] Ajustar ROIDashboard para tema light
+- [x] Padronizar FunnelView, AtividadePage, AlertsPage
+- [ ] Melhorar MainNav (background, hover states)
+
+### 54.4 Tipografia e Espaçamento
+- [ ] Revisar tamanhos de fonte (hierarquia clara)
+- [ ] Ajustar line-height para melhor legibilidade
+- [ ] Padronizar espaçamentos (padding, margin, gap)
+- [ ] Melhorar font-weight (títulos vs corpo)
+
+### 54.5 Sombras e Bordas
+- [ ] Criar sistema de sombras consistente (sm, md, lg)
+- [ ] Padronizar border-radius
+- [ ] Ajustar opacidade de bordas
+- [ ] Melhorar hover/focus states

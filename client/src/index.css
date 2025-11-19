@@ -68,8 +68,8 @@
   --space-24: 6rem;    /* 96px */
   
   /* Light Theme - Paleta Moderna e Sofisticada */
-  --primary: oklch(0.55 0.22 265); /* Azul vibrante */
-  --primary-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.52 0.24 255); /* Azul vibrante e profundo */
+  --primary-foreground: oklch(0.99 0 0);
   --sidebar-primary: var(--color-blue-600);
   --sidebar-primary-foreground: var(--color-blue-50);
   --chart-1: var(--color-blue-300);
@@ -89,22 +89,22 @@
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.235 0.015 65);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.235 0.015 65);
+  --background: oklch(0.99 0.001 250); /* Branco levemente azulado */
+  --foreground: oklch(0.18 0.01 250); /* Cinza escuro azulado */
+  --card: oklch(1 0 0); /* Branco puro para cards */
+  --card-foreground: oklch(0.18 0.01 250);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.235 0.015 65);
   --secondary: oklch(0.98 0.001 286.375);
   --secondary-foreground: oklch(0.4 0.015 65);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
+  --muted: oklch(0.96 0.002 250); /* Cinza claro azulado */
+  --muted-foreground: oklch(0.48 0.02 250); /* Texto muted mais legível */
   --accent: oklch(0.967 0.001 286.375);
   --accent-foreground: oklch(0.141 0.005 285.823);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
+  --border: oklch(0.88 0.005 250); /* Bordas mais definidas */
+  --input: oklch(0.94 0.003 250); /* Inputs levemente mais claros */
   --ring: oklch(0.623 0.214 259.815);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.235 0.015 65);
@@ -120,60 +120,7 @@
   --error: oklch(0.6 0.22 25);
 }
 
-.dark {
-  /* Dark Theme - Inspirado no MciGlobal */
-  --primary: oklch(0.7 0.19 230); /* sky-400 #38bdf8 */
-  --primary-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.7 0.19 230);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  
-  /* Background com gradiente radial */
-  --background: oklch(0.145 0 0); /* #020617 slate-950 */
-  --foreground: oklch(0.92 0.004 286.32); /* #e5e7eb gray-200 */
-  
-  /* Cards com glassmorphism */
-  --card: oklch(0.18 0.006 250); /* #0f172a slate-900 */
-  --card-foreground: oklch(0.92 0.004 286.32);
-  
-  --popover: oklch(0.18 0.006 250);
-  --popover-foreground: oklch(0.92 0.004 286.32);
-  
-  --secondary: oklch(0.23 0.008 250); /* #1e293b slate-800 */
-  --secondary-foreground: oklch(0.92 0.004 286.32);
-  
-  --muted: oklch(0.28 0.01 250); /* slate-700 */
-  --muted-foreground: oklch(0.65 0.02 250); /* #9ca3af gray-400 */
-  
-  --accent: oklch(0.6 0.22 250); /* #3b82f6 blue-500 */
-  --accent-foreground: oklch(0.92 0.004 286.32);
-  
-  --destructive: oklch(0.6 0.22 25); /* #ef4444 red-500 */
-  --destructive-foreground: oklch(0.92 0.004 286.32);
-  
-  /* Borders sutis com transparência */
-  --border: oklch(0.25 0.008 250 / 90%); /* #1f2937 gray-800 */
-  --input: oklch(0.25 0.008 250 / 90%);
-  --ring: oklch(0.7 0.19 230);
-  
-  --chart-1: var(--color-blue-400);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-green-500);
-  --chart-5: var(--color-yellow-500);
-  
-  --sidebar: oklch(0.18 0.006 250);
-  --sidebar-foreground: oklch(0.92 0.004 286.32);
-  --sidebar-accent: oklch(0.28 0.01 250);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.25 0.008 250 / 90%);
-  --sidebar-ring: oklch(0.7 0.19 230);
-  
-  /* Cores Semânticas Dark */
-  --success: oklch(0.65 0.2 145); /* #22c55e green-500 */
-  --warning: oklch(0.75 0.15 85); /* #eab308 yellow-500 */
-  --info: oklch(0.6 0.22 250); /* #3b82f6 blue-500 */
-  --error: oklch(0.6 0.22 25); /* #ef4444 red-500 */
-}
+/* Modo dark removido - sistema usa apenas tema light */
 
 @layer base {
   * {
@@ -250,9 +197,9 @@
     @apply bg-background text-foreground;
   }
   
-  /* Background radial gradient para dark theme */
-  body.dark {
-    background: radial-gradient(circle at top, oklch(0.17 0.01 250) 0%, oklch(0.145 0 0) 40%, oklch(0.145 0 0) 100%);
+  /* Background limpo e moderno para tema light */
+  body {
+    background: linear-gradient(to bottom right, oklch(0.99 0 0), oklch(0.97 0.002 250));
   }
   
   /* Typography Refinada */
@@ -311,22 +258,7 @@
 }
 
 @layer utilities {
-  /* Glass Card - Tema Dark (Inspirado no MciGlobal) */
-  .dark .glass-card {
-    background: radial-gradient(circle at top left, rgba(248, 250, 252, 0.06), transparent 50%),
-                linear-gradient(to bottom right, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.98));
-    border: 1px solid rgba(148, 163, 184, 0.45);
-    border-radius: 1rem;
-    transition: background 0.12s ease, transform 0.08s ease, border-color 0.12s ease;
-  }
-  
-  .dark .glass-card:hover {
-    background: rgba(30, 64, 175, 0.6);
-    border-color: rgba(129, 140, 248, 0.9);
-    transform: translateY(-1px);
-  }
-  
-  /* Glass Card - Tema Light */
+  /* Glass Card - Tema Light Moderno */
   .glass-card {
     background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.98), rgba(249, 250, 251, 0.96));
     border: 1px solid rgba(226, 232, 240, 0.8);
@@ -340,14 +272,6 @@
     border-color: rgba(147, 197, 253, 0.8);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-  }
-  
-  /* Glass Card Subtle - Tema Dark */
-  .dark .glass-card-subtle {
-    background: radial-gradient(circle at top left, rgba(248, 250, 252, 0.06), transparent 50%),
-                linear-gradient(to bottom right, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.98));
-    border: 1px solid rgba(148, 163, 184, 0.45);
-    border-radius: 1rem;
   }
   
   /* Glass Card Subtle - Tema Light */
@@ -427,9 +351,10 @@
       0 0 0 1px rgba(59, 130, 246, 0.08);
   }
   
-  .dark .card-interactive:hover {
-    background: rgba(59, 130, 246, 0.08);
-    border-color: rgba(59, 130, 246, 0.3);
+  /* Card hover para tema light */
+  .card-interactive:hover {
+    background: rgba(59, 130, 246, 0.02);
+    border-color: rgba(59, 130, 246, 0.2);
   }
   
   .card-interactive:active {

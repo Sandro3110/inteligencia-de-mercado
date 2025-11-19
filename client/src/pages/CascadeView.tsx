@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { pageVariants, pageTransition, listVariants, listItemVariants } from "@/lib/animations";
 import { calculateQualityScore, classifyQuality, isValidCNPJFormat, isValidEmailFormat } from "@shared/qualityScore";
 import { trpc } from "@/lib/trpc";
-import { ThemeToggle } from "@/components/ThemeToggle";
+// ThemeToggle removido - sistema usa apenas tema light
 import { DetailPopup } from "@/components/DetailPopup";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { TagManager } from "@/components/TagManager";
@@ -684,7 +684,7 @@ export default function CascadeView() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-2 border-b border-border/40">
         <div className="flex items-center gap-6">
@@ -756,12 +756,11 @@ export default function CascadeView() {
             </Button>
           </Link>
           <TagManager />
-          <ThemeToggle />
         </div>
       </div>
 
       {/* Barra de Filtros Horizontal */}
-      <div className="border-b border-border/40 px-6 py-3 bg-slate-900/50">
+      <div className="border-b border-border/40 px-6 py-3 bg-white/80 backdrop-blur-sm">
         <div className="flex items-center gap-4 flex-wrap">
           {/* Busca Global *        <div className="flex items-center gap-2">
           <Link href="/enrichment">
@@ -770,7 +769,6 @@ export default function CascadeView() {
               Novo Projeto (Enriquecimento)
             </Button>
           </Link>
-          <ThemeToggle />
         </div>      onSelectSearch={(query) => {
                 setSearchQuery(query);
                 toast.success(`Busca aplicada: "${query}"`);
