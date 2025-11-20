@@ -18,6 +18,7 @@ import {
   ChevronDown,
   ChevronRight,
   ChevronLeft,
+  Download,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -58,6 +59,7 @@ const navSections: NavSection[] = [
       { title: "Research Overview", href: "/research-overview", icon: TrendingUp },
       { title: "Analytics", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+3" },
       { title: "Relatórios", href: "/relatorios", icon: FileText },
+      { title: "Exportação Inteligente", href: "/export", icon: Download, shortcut: "Ctrl+E" },
     ],
   },
   {

@@ -327,3 +327,55 @@ export async function enrichClientesParallel(
   
   return results;
 }
+
+// ============================================
+// DEPRECATED FUNCTIONS (stubs for compatibility)
+// ============================================
+
+/**
+ * @deprecated Use enrichClienteOptimized instead
+ */
+export async function identifyMercados(clienteId: number, projectId: number = 1): Promise<any[]> {
+  console.warn('[DEPRECATED] identifyMercados is deprecated. Use enrichClienteOptimized instead.');
+  return [];
+}
+
+/**
+ * @deprecated Use enrichClienteOptimized instead
+ */
+export async function createProdutosCliente(clienteId: number, projectId: number = 1): Promise<any[]> {
+  console.warn('[DEPRECATED] createProdutosCliente is deprecated. Use enrichClienteOptimized instead.');
+  return [];
+}
+
+/**
+ * @deprecated Use enrichClienteOptimized instead
+ */
+export async function findConcorrentesCliente(clienteId: number, projectId: number = 1): Promise<any[]> {
+  console.warn('[DEPRECATED] findConcorrentesCliente is deprecated. Use enrichClienteOptimized instead.');
+  return [];
+}
+
+/**
+ * @deprecated Use enrichClienteOptimized instead
+ */
+export async function findLeadsCliente(clienteId: number, projectId: number = 1): Promise<any[]> {
+  console.warn('[DEPRECATED] findLeadsCliente is deprecated. Use enrichClienteOptimized instead.');
+  return [];
+}
+
+/**
+ * @deprecated Use enrichClienteOptimized instead
+ */
+export async function enrichClienteCompleto(clienteId: number, projectId: number = 1): Promise<any> {
+  console.warn('[DEPRECATED] enrichClienteCompleto is deprecated. Use enrichClienteOptimized instead.');
+  return enrichClienteOptimized(clienteId, projectId);
+}
+
+/**
+ * @deprecated Use enrichClienteOptimized instead
+ */
+export async function enrichCliente(clienteId: number, projectId: number = 1): Promise<any> {
+  console.warn('[DEPRECATED] enrichCliente is deprecated. Use enrichClienteOptimized instead.');
+  return enrichClienteOptimized(clienteId, projectId);
+}

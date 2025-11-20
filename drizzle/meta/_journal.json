@@ -183,6 +183,13 @@
       "when": 1763636829881,
       "tag": "0025_left_moonstone",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1763647609060,
+      "tag": "0026_shocking_shadow_king",
+      "breakpoints": true
     }
   ]
 }
