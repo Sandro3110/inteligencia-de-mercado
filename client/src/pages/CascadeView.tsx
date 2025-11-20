@@ -716,20 +716,20 @@ export default function CascadeView() {
         </div>
         <div className="flex items-center gap-4">
           <Link href="/dashboard-avancado">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" className="h-10">
               <BarChart3 className="w-4 h-4 mr-2" />
               Dashboard
             </Button>
           </Link>
           <Link href="/enrichment-progress">
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" className="h-10 gap-2">
               <Clock className="w-4 h-4" />
               Monitorar Enriquecimento
             </Button>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" className="h-10">
                 <Download className="w-4 h-4 mr-2" />
                 Exportar Filtrados
               </Button>
@@ -750,7 +750,7 @@ export default function CascadeView() {
             </DropdownMenuContent>
           </DropdownMenu>
           <Link href="/enrichment">
-            <Button variant="default" size="sm" className="gap-2">
+            <Button variant="default" className="h-10 gap-2">
               <TrendingUp className="h-4 w-4" />
               Novo Projeto
             </Button>
@@ -764,7 +764,7 @@ export default function CascadeView() {
         <div className="flex items-center gap-4 flex-wrap">
           {/* Busca Global *        <div className="flex items-center gap-2">
           <Link href="/enrichment">
-            <Button variant="default" size="sm" className="gap-2">
+            <Button variant="default" className="h-10 gap-2">
               <TrendingUp className="h-4 w-4" />
               Novo Projeto (Enriquecimento)
             </Button>
@@ -937,7 +937,7 @@ export default function CascadeView() {
             {/* Botão Salvar Filtros */}
             <Button
               variant="outline"
-              size="sm"
+              className="h-9"
               onClick={() => setSaveFilterDialogOpen(true)}
             >
               <Save className="w-4 h-4 mr-2" />
@@ -947,7 +947,7 @@ export default function CascadeView() {
             {/* Botão Limpar Filtros */}
             <Button
               variant="outline"
-              size="sm"
+              className="h-9"
               onClick={() => {
                 setSearchQuery("");
                 setSearchFields(["nome", "cnpj", "produto"]);
@@ -968,14 +968,14 @@ export default function CascadeView() {
           <div className="flex items-center gap-2">
             <Button
               variant={statusFilter === "all" ? "default" : "outline"}
-              size="sm"
+              className="h-9"
               onClick={() => setStatusFilter("all")}
             >
               Todos
             </Button>
             <Button
               variant={statusFilter === "pending" ? "default" : "outline"}
-              size="sm"
+              className="h-9"
               onClick={() => setStatusFilter("pending")}
             >
               <Clock className="w-4 h-4 mr-2" />
@@ -983,7 +983,7 @@ export default function CascadeView() {
             </Button>
             <Button
               variant={statusFilter === "rich" ? "default" : "outline"}
-              size="sm"
+              className="h-9"
               onClick={() => setStatusFilter("rich")}
             >
               <CheckCircle2 className="w-4 h-4 mr-2" />
@@ -991,7 +991,7 @@ export default function CascadeView() {
             </Button>
             <Button
               variant={statusFilter === "discarded" ? "default" : "outline"}
-              size="sm"
+              className="h-9"
               onClick={() => setStatusFilter("discarded")}
             >
               <XCircle className="w-4 h-4 mr-2" />
@@ -1007,43 +1007,43 @@ export default function CascadeView() {
           {/* Estatísticas */}
           <div>
             <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Estatísticas</h3>
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="glass-card p-4">
                 <div className="flex items-center gap-3">
-                  <Building2 className="w-5 h-5 text-blue-400" />
+                  <Building2 className="w-6 h-6 text-blue-500" />
                   <div>
                     <p className="text-xs text-muted-foreground">Mercados</p>
-                    <p className="text-2xl font-bold">{totalMercados}</p>
+                    <p className="text-xl font-semibold">{totalMercados}</p>
                   </div>
                 </div>
               </div>
 
               <div className="glass-card p-4">
                 <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-green-400" />
+                  <Users className="w-6 h-6 text-green-500" />
                   <div>
                     <p className="text-xs text-muted-foreground">Clientes</p>
-                    <p className="text-2xl font-bold">{totalClientes}</p>
+                    <p className="text-xl font-semibold">{totalClientes}</p>
                   </div>
                 </div>
               </div>
 
               <div className="glass-card p-4">
                 <div className="flex items-center gap-3">
-                  <Target className="w-5 h-5 text-purple-400" />
+                  <Target className="w-6 h-6 text-purple-500" />
                   <div>
                     <p className="text-xs text-muted-foreground">Concorrentes</p>
-                    <p className="text-2xl font-bold">{totalConcorrentes}</p>
+                    <p className="text-xl font-semibold">{totalConcorrentes}</p>
                   </div>
                 </div>
               </div>
 
               <div className="glass-card p-4">
                 <div className="flex items-center gap-3">
-                  <TrendingUp className="w-5 h-5 text-orange-400" />
+                  <TrendingUp className="w-6 h-6 text-orange-500" />
                   <div>
                     <p className="text-xs text-muted-foreground">Leads</p>
-                    <p className="text-2xl font-bold">{totalLeads}</p>
+                    <p className="text-xl font-semibold">{totalLeads}</p>
                   </div>
                 </div>
               </div>
@@ -1103,7 +1103,6 @@ export default function CascadeView() {
                     <div className="flex items-center gap-1 border rounded-md">
                       <Button
                         variant={viewMode === "list" ? "default" : "ghost"}
-                        size="sm"
                         onClick={() => setViewMode("list")}
                         className="h-8 px-3"
                       >
@@ -1111,7 +1110,6 @@ export default function CascadeView() {
                       </Button>
                       <Button
                         variant={viewMode === "kanban" ? "default" : "ghost"}
-                        size="sm"
                         onClick={() => setViewMode("kanban")}
                         className="h-8 px-3"
                       >
@@ -1175,18 +1173,18 @@ export default function CascadeView() {
                                 variants={listItemVariants}
                               >
                                 <div
-                                  className="flex items-center gap-2 p-2 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
+                                  className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:bg-muted/50 hover:border-primary/30 hover:shadow-sm cursor-pointer group transition-all duration-200"
                                   onClick={() => handleSelectMercado(mercado.id)}
                                 >
                                   <div className="flex-1">
-                                    <h3 className="text-sm font-medium group-hover:text-primary transition-colors">
+                                    <h3 className="text-base font-semibold group-hover:text-primary transition-colors line-clamp-1">
                                       {mercado.nome}
                                     </h3>
                                     <div className="flex items-center gap-2 mt-1">
-                                      <Badge variant="outline" className="text-[10px] mt-0.5 px-1.5 py-0">
+                                      <Badge variant="outline" className="text-[11px] px-2 py-0.5">
                                         {mercado.segmentacao}
                                       </Badge>
-                                      <span className="text-sm text-muted-foreground">
+                                      <span className="text-xs text-muted-foreground">
                                         {mercado.quantidadeClientes} clientes
                                       </span>
                                     </div>
