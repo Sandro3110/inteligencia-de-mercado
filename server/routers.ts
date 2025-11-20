@@ -333,6 +333,40 @@ export const appRouter = router({
         const { deleteCliente } = await import('./db');
         return deleteCliente(input.id);
       }),
+    
+    history: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const db = await import('./db').then(m => m.getDb());
+        if (!db) return [];
+        const { clientesHistory } = await import('../drizzle/schema');
+        const { eq, desc } = await import('drizzle-orm');
+        return db.select()
+          .from(clientesHistory)
+          .where(eq(clientesHistory.clienteId, input.id))
+          .orderBy(desc(clientesHistory.changedAt));
+      }),
+    
+    produtos: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const db = await import('./db').then(m => m.getDb());
+        if (!db) return [];
+        const { produtos, mercadosUnicos } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        const produtosList = await db.select({
+          id: produtos.id,
+          nome: produtos.nome,
+          descricao: produtos.descricao,
+          categoria: produtos.categoria,
+          mercadoId: produtos.mercadoId,
+          mercadoNome: mercadosUnicos.nome,
+        })
+        .from(produtos)
+        .leftJoin(mercadosUnicos, eq(produtos.mercadoId, mercadosUnicos.id))
+        .where(eq(produtos.clienteId, input.id));
+        return produtosList;
+      }),
   }),
 
   concorrentes: router({
@@ -405,6 +439,19 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const { deleteConcorrente } = await import('./db');
         return deleteConcorrente(input.id);
+      }),
+    
+    history: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const db = await import('./db').then(m => m.getDb());
+        if (!db) return [];
+        const { concorrentesHistory } = await import('../drizzle/schema');
+        const { eq, desc } = await import('drizzle-orm');
+        return db.select()
+          .from(concorrentesHistory)
+          .where(eq(concorrentesHistory.concorrenteId, input.id))
+          .orderBy(desc(concorrentesHistory.changedAt));
       }),
   }),
 
@@ -564,6 +611,19 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const { deleteLead } = await import('./db');
         return deleteLead(input.id);
+      }),
+    
+    history: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const db = await import('./db').then(m => m.getDb());
+        if (!db) return [];
+        const { leadsHistory } = await import('../drizzle/schema');
+        const { eq, desc } = await import('drizzle-orm');
+        return db.select()
+          .from(leadsHistory)
+          .where(eq(leadsHistory.leadId, input.id))
+          .orderBy(desc(leadsHistory.changedAt));
       }),
     
     advancedSearch: publicProcedure

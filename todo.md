@@ -1486,3 +1486,37 @@ PROJECT (nível 1)
 - [x] Testar com clientes, concorrentes e leads
 - [x] Verificar responsividade do modal
 - [x] Garantir que todos os campos são exibidos corretamente
+
+
+---
+
+## Fase 49: Melhorias Avançadas no Modal de Entidades
+
+### 49.1 Botões de Ação Funcionais
+- [x] Adicionar botão "Editar" com formulário inline
+- [x] Adicionar botão "Validar como Rico" (muda status para "rich")
+- [x] Adicionar botão "Descartar" (muda status para "discarded")
+- [x] Criar mutations tRPC para atualizar status (já existiam)
+- [x] Adicionar confirmação antes de descartar
+- [x] Atualizar cache após ações
+
+### 49.2 Histórico de Alterações
+- [x] Criar query tRPC para buscar histórico (clientes_history, concorrentes_history, leads_history)
+- [x] Adicionar aba "Histórico" no modal
+- [x] Exibir timeline de alterações (campo, valor antigo, valor novo, quem alterou, quando)
+- [x] Mostrar ícones diferentes para cada tipo de mudança (created, updated, deleted)
+- [x] Formatar datas de forma legível
+
+### 49.3 Aba de Produtos Relacionados
+- [x] Criar query tRPC para buscar produtos do cliente
+- [x] Adicionar aba "Produtos" no modal de clientes
+- [x] Exibir lista de produtos com nome, mercado, descrição
+- [x] Mostrar badge com quantidade de produtos
+- [x] Adicionar link para o mercado relacionado
+
+### 49.4 Testar e Validar
+- [x] Testar edição de clientes, concorrentes e leads
+- [x] Testar validação e descarte
+- [x] Testar histórico de alterações
+- [x] Testar aba de produtos
+- [x] Verificar responsividade
