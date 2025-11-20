@@ -3,9 +3,11 @@ import { useState } from "react";
 import { useRoute, Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { ValidationModal } from "@/components/ValidationModal";
+import { Pagination } from "@/components/Pagination";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -29,6 +31,13 @@ import {
   Mail,
   Phone,
   MapPin,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Search,
+  Filter,
+  X,
 } from "lucide-react";
 import { ProjectSelector } from "@/components/ProjectSelector";
 import {
@@ -52,10 +61,117 @@ export default function MercadoDetalhes() {
     currentNotes?: string;
   }>({ open: false, type: 'cliente', id: 0, name: '' });
 
+  // Estados de paginação
+  const [clientesPage, setClientesPage] = useState(1);
+  const [concorrentesPage, setConcorrentesPage] = useState(1);
+  const [leadsPage, setLeadsPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+
+  // Estados de filtros
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [qualidadeFilter, setQualidadeFilter] = useState("all");
+  const [ufFilter, setUfFilter] = useState("all");
+  const [porteFilter, setPorteFilter] = useState("all");
+
   const utils = trpc.useUtils();
   
   // Buscar projeto selecionado do localStorage
   const selectedProjectId = parseInt(localStorage.getItem("selectedProjectId") || "0");
+
+  // Funções de filtragem (definidas antes do uso)
+  const filterClientes = (clientes: any[]) => {
+    return clientes.filter((cliente) => {
+      // Busca global
+      if (searchTerm) {
+        const search = searchTerm.toLowerCase();
+        const matchesSearch = 
+          cliente.nome?.toLowerCase().includes(search) ||
+          cliente.cnpj?.toLowerCase().includes(search) ||
+          cliente.produtoPrincipal?.toLowerCase().includes(search);
+        if (!matchesSearch) return false;
+      }
+
+      // Filtro de status
+      if (statusFilter !== "all") {
+        if (cliente.validationStatus !== statusFilter) return false;
+      }
+
+      // Filtro de UF
+      if (ufFilter !== "all") {
+        if (cliente.uf !== ufFilter) return false;
+      }
+
+      // Filtro de porte
+      if (porteFilter !== "all") {
+        if (cliente.porte !== porteFilter) return false;
+      }
+
+      return true;
+    });
+  };
+
+  const filterConcorrentes = (concorrentes: any[]) => {
+    return concorrentes.filter((conc) => {
+      // Busca global
+      if (searchTerm) {
+        const search = searchTerm.toLowerCase();
+        const matchesSearch = 
+          conc.nome?.toLowerCase().includes(search) ||
+          conc.cnpj?.toLowerCase().includes(search) ||
+          conc.produto?.toLowerCase().includes(search);
+        if (!matchesSearch) return false;
+      }
+
+      // Filtro de status
+      if (statusFilter !== "all") {
+        if (conc.validationStatus !== statusFilter) return false;
+      }
+
+      // Filtro de qualidade
+      if (qualidadeFilter !== "all") {
+        if (conc.qualidadeClassificacao !== qualidadeFilter) return false;
+      }
+
+      // Filtro de porte
+      if (porteFilter !== "all") {
+        if (conc.porte !== porteFilter) return false;
+      }
+
+      return true;
+    });
+  };
+
+  const filterLeads = (leads: any[]) => {
+    return leads.filter((lead) => {
+      // Busca global
+      if (searchTerm) {
+        const search = searchTerm.toLowerCase();
+        const matchesSearch = 
+          lead.nome?.toLowerCase().includes(search) ||
+          lead.cnpj?.toLowerCase().includes(search) ||
+          lead.tipo?.toLowerCase().includes(search);
+        if (!matchesSearch) return false;
+      }
+
+      // Filtro de status
+      if (statusFilter !== "all") {
+        if (lead.validationStatus !== statusFilter) return false;
+      }
+
+      // Filtro de qualidade
+      if (qualidadeFilter !== "all") {
+        if (lead.qualidadeClassificacao !== qualidadeFilter) return false;
+      }
+
+      // Filtro de porte
+      if (porteFilter !== "all") {
+        if (lead.porte !== porteFilter) return false;
+      }
+
+      return true;
+    });
+  };
   
   // Buscar todos os mercados do projeto para o seletor
   const { data: mercados } = trpc.mercados.list.useQuery(
@@ -64,14 +180,18 @@ export default function MercadoDetalhes() {
   );
 
   const { data: mercado, isLoading: loadingMercado } = trpc.mercados.byId.useQuery(mercadoId);
-  const { data: clientesResponse, isLoading: loadingClientes } = trpc.clientes.byMercado.useQuery({ mercadoId, page: 1, pageSize: 100 });
-  const { data: concorrentesResponse, isLoading: loadingConcorrentes } = trpc.concorrentes.byMercado.useQuery({ mercadoId, page: 1, pageSize: 100 });
-  const { data: leadsResponse, isLoading: loadingLeads } = trpc.leads.byMercado.useQuery({ mercadoId, page: 1, pageSize: 100 });
+  const { data: clientesResponse, isLoading: loadingClientes } = trpc.clientes.byMercado.useQuery({ mercadoId, page: clientesPage, pageSize });
+  const { data: concorrentesResponse, isLoading: loadingConcorrentes } = trpc.concorrentes.byMercado.useQuery({ mercadoId, page: concorrentesPage, pageSize });
+  const { data: leadsResponse, isLoading: loadingLeads } = trpc.leads.byMercado.useQuery({ mercadoId, page: leadsPage, pageSize });
   
-  // Extrair arrays dos objetos paginados
-  const clientes = clientesResponse?.data || [];
-  const concorrentes = concorrentesResponse?.data || [];
-  const leads = leadsResponse?.data || [];
+  // Extrair arrays dos objetos paginados e aplicar filtros
+  const clientesRaw = clientesResponse?.data || [];
+  const concorrentesRaw = concorrentesResponse?.data || [];
+  const leadsRaw = leadsResponse?.data || [];
+
+  const clientes = filterClientes(clientesRaw);
+  const concorrentes = filterConcorrentes(concorrentesRaw);
+  const leads = filterLeads(leadsRaw);
 
   const updateClienteMutation = trpc.clientes.updateValidation.useMutation({
     onSuccess: () => {
@@ -148,6 +268,49 @@ export default function MercadoDetalhes() {
       </div>
     );
   }
+
+  // Função para scroll to top ao mudar de página
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Funções de paginação
+  const handleClientesPageChange = (newPage: number) => {
+    setClientesPage(newPage);
+    scrollToTop();
+  };
+
+  const handleConcorrentesPageChange = (newPage: number) => {
+    setConcorrentesPage(newPage);
+    scrollToTop();
+  };
+
+  const handleLeadsPageChange = (newPage: number) => {
+    setLeadsPage(newPage);
+    scrollToTop();
+  };
+
+  const handlePageSizeChange = (newSize: string) => {
+    setPageSize(parseInt(newSize));
+    setClientesPage(1);
+    setConcorrentesPage(1);
+    setLeadsPage(1);
+    scrollToTop();
+  };
+
+  // Função para limpar todos os filtros
+  const clearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+    setQualidadeFilter("all");
+    setUfFilter("all");
+    setPorteFilter("all");
+    setClientesPage(1);
+    setConcorrentesPage(1);
+    setLeadsPage(1);
+  };
+
+  // Funções de filtragem já definidas acima
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -282,6 +445,111 @@ export default function MercadoDetalhes() {
         </div>
       </div>
 
+      {/* Barra de Filtros */}
+      <div className="border-b border-border/50 bg-slate-50">
+        <div className="container py-4">
+          <div className="flex flex-col gap-4">
+            {/* Linha 1: Busca e Botão Limpar */}
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Buscar por nome, CNPJ ou produto..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearFilters}
+                className="gap-2"
+              >
+                <X className="h-4 w-4" />
+                Limpar Filtros
+              </Button>
+            </div>
+
+            {/* Linha 2: Filtros */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">Filtros:</span>
+              </div>
+
+              {/* Filtro de Status */}
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-40 h-9">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="pending">Pendentes</SelectItem>
+                  <SelectItem value="rich">Validados</SelectItem>
+                  <SelectItem value="discarded">Descartados</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Filtro de Qualidade */}
+              <Select value={qualidadeFilter} onValueChange={setQualidadeFilter}>
+                <SelectTrigger className="w-40 h-9">
+                  <SelectValue placeholder="Qualidade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  <SelectItem value="Excelente">Excelente</SelectItem>
+                  <SelectItem value="Bom">Bom</SelectItem>
+                  <SelectItem value="Regular">Regular</SelectItem>
+                  <SelectItem value="Ruim">Ruim</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Filtro de UF */}
+              <Select value={ufFilter} onValueChange={setUfFilter}>
+                <SelectTrigger className="w-32 h-9">
+                  <SelectValue placeholder="UF" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas UFs</SelectItem>
+                  <SelectItem value="SP">SP</SelectItem>
+                  <SelectItem value="RJ">RJ</SelectItem>
+                  <SelectItem value="MG">MG</SelectItem>
+                  <SelectItem value="RS">RS</SelectItem>
+                  <SelectItem value="PR">PR</SelectItem>
+                  <SelectItem value="SC">SC</SelectItem>
+                  <SelectItem value="BA">BA</SelectItem>
+                  <SelectItem value="PE">PE</SelectItem>
+                  <SelectItem value="CE">CE</SelectItem>
+                  <SelectItem value="GO">GO</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Filtro de Porte */}
+              <Select value={porteFilter} onValueChange={setPorteFilter}>
+                <SelectTrigger className="w-40 h-9">
+                  <SelectValue placeholder="Porte" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos Portes</SelectItem>
+                  <SelectItem value="Pequeno">Pequeno</SelectItem>
+                  <SelectItem value="Médio">Médio</SelectItem>
+                  <SelectItem value="Grande">Grande</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Contador de Resultados */}
+              <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
+                <Badge variant="secondary" className="font-normal">
+                  {clientes.length + concorrentes.length + leads.length} resultados
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Tabs */}
       <div className="container py-8">
         <Tabs defaultValue="clientes" className="w-full">
@@ -396,6 +664,17 @@ export default function MercadoDetalhes() {
                     </Table>
                   </div>
                 )}
+                {/* Paginação de Clientes */}
+                {!loadingClientes && clientesResponse && (
+                  <Pagination
+                    currentPage={clientesPage}
+                    totalPages={Math.ceil((clientesResponse.total || 0) / pageSize)}
+                    totalItems={clientesResponse.total || 0}
+                    pageSize={pageSize}
+                    onPageChange={handleClientesPageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                  />
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -482,6 +761,17 @@ export default function MercadoDetalhes() {
                       </TableBody>
                     </Table>
                   </div>
+                )}
+                {/* Paginação de Concorrentes */}
+                {!loadingConcorrentes && concorrentesResponse && (
+                  <Pagination
+                    currentPage={concorrentesPage}
+                    totalPages={Math.ceil((concorrentesResponse.total || 0) / pageSize)}
+                    totalItems={concorrentesResponse.total || 0}
+                    pageSize={pageSize}
+                    onPageChange={handleConcorrentesPageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                  />
                 )}
               </CardContent>
             </Card>
@@ -586,6 +876,17 @@ export default function MercadoDetalhes() {
                       </TableBody>
                     </Table>
                   </div>
+                )}
+                {/* Paginação de Leads */}
+                {!loadingLeads && leadsResponse && (
+                  <Pagination
+                    currentPage={leadsPage}
+                    totalPages={Math.ceil((leadsResponse.total || 0) / pageSize)}
+                    totalItems={leadsResponse.total || 0}
+                    pageSize={pageSize}
+                    onPageChange={handleLeadsPageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                  />
                 )}
               </CardContent>
             </Card>

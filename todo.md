@@ -1549,3 +1549,68 @@ PROJECT (nível 1)
 - [x] Testar navegação entre mercados
 - [x] Verificar contadores de clientes/concorrentes/leads
 - [x] Criar checkpoint final
+
+
+---
+
+## Fase 51: Cockpit Dinâmico de Navegação Macro-Micro 🎯
+
+### 51.1 Paginação na Tela MercadoDetalhes
+- [x] Adicionar controles de paginação (anterior/próxima)
+- [x] Implementar seletor de itens por página (10/25/50/100)
+- [x] Adicionar indicador de página atual (ex: "Página 1 de 10")
+- [x] Manter filtros ao navegar entre páginas
+- [x] Adicionar scroll to top ao mudar de página
+
+### 51.2 Busca e Filtros Avançados em MercadoDetalhes
+- [x] Adicionar campo de busca global (nome, CNPJ, produto)
+- [x] Implementar filtros por status (Todos/Pendentes/Validados/Descartados)
+- [x] Adicionar filtro por qualidade (Excelente/Bom/Regular/Ruim)
+- [x] Implementar filtro por localização (UF, Região)
+- [x] Adicionar filtro por porte (Pequeno/Médio/Grande)
+- [x] Criar botão "Limpar Filtros"
+- [x] Mostrar contador de resultados filtrados
+
+### 51.3 Edição Inline no Modal DetailPopup
+- [ ] Adicionar botão "Editar" no header do modal
+- [ ] Implementar modo de edição com campos editáveis
+- [ ] Validar campos antes de salvar (CNPJ, email, telefone)
+- [ ] Adicionar botões "Salvar" e "Cancelar"
+- [ ] Implementar mutation de update para cada tipo de entidade
+- [ ] Mostrar feedback visual ao salvar (toast de sucesso/erro)
+- [ ] Invalidar cache após salvar
+- [ ] Registrar alteração no histórico
+
+### 51.4 Cards Expansíveis com Abas (CascadeView)
+- [ ] Transformar cards de mercados em Accordion expansível
+- [ ] Adicionar abas dentro do card: Clientes, Concorrentes, Leads
+- [ ] Implementar lazy loading ao expandir card
+- [ ] Adicionar mini-cards para clientes/concorrentes/leads
+- [ ] Permitir clicar em mini-card para abrir DetailPopup
+- [ ] Adicionar contador de itens em cada aba
+- [ ] Implementar animação suave de expansão/colapso
+
+### 51.5 Tags Visuais e Classificação
+- [ ] Adicionar badges de tags coloridos em todos os cards
+- [ ] Implementar filtro por tags (multi-seleção)
+- [ ] Adicionar indicador visual de qualidade (score com cores)
+- [ ] Implementar ordenação: Nome, Qualidade, Data, Status
+- [ ] Adicionar seletor de ordenação no header
+- [ ] Manter ordenação ao navegar entre páginas
+- [ ] Adicionar ícones de status (validado, pendente, descartado)
+
+### 51.6 Navegação Drill-Down Completa
+- [ ] Implementar breadcrumbs dinâmicos em todos os níveis
+- [ ] Adicionar botão "Voltar" em cada nível
+- [ ] Manter estado de filtros ao voltar
+- [ ] Adicionar atalhos de teclado (Esc para voltar)
+- [ ] Implementar histórico de navegação
+- [ ] Adicionar indicador visual de nível atual
+
+### 51.7 Testes e Validação
+- [ ] Testar navegação completa macro-micro
+- [ ] Validar performance com grandes volumes de dados
+- [ ] Testar filtros combinados
+- [ ] Validar edição inline em todos os tipos
+- [ ] Testar paginação com diferentes tamanhos
+- [ ] Criar checkpoint final
