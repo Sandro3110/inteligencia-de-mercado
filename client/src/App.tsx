@@ -29,6 +29,7 @@ import AtividadePage from "./pages/AtividadePage";
 import EnrichmentSettings from "./pages/EnrichmentSettings";
 import OnboardingPage from "./pages/OnboardingPage";
 import ResultadosEnriquecimento from "./pages/ResultadosEnriquecimento";
+import ResearchOverview from "./pages/ResearchOverview";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -53,6 +54,7 @@ function Router() {
       <Route path="/enrichment-settings" component={EnrichmentSettings} />
       <Route path="/onboarding" component={OnboardingPage} />
       <Route path="/resultados-enriquecimento" component={ResultadosEnriquecimento} />
+      <Route path="/research-overview" component={ResearchOverview} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

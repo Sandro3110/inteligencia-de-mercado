@@ -64,6 +64,13 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // Inicializar cron jobs
+    import("../cronJobs").then(({ initializeCronJobs }) => {
+      initializeCronJobs();
+    }).catch(err => {
+      console.error("[Server] Erro ao inicializar cron jobs:", err);
+    });
   });
 }
 

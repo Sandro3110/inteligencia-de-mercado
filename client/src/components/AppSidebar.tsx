@@ -55,6 +55,7 @@ const navSections: NavSection[] = [
     defaultOpen: true,
     items: [
       { title: "Mercados", href: "/mercados", icon: Package, shortcut: "Ctrl+2" },
+      { title: "Research Overview", href: "/research-overview", icon: TrendingUp },
       { title: "Analytics", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+3" },
       { title: "Relatórios", href: "/relatorios", icon: FileText },
     ],

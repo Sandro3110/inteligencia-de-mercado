@@ -553,6 +553,51 @@ PROJECT (nível 1)
 ### 31.5 Validação Final
 - [ ] Testar todos os endpoints tRPC
 - [ ] Testar Dashboard Research Overview
+
+
+## FASE 32: Implementação de Analytics Completo + Consolidação de Documentação
+
+### 32.1 Endpoints tRPC de Analytics
+- [x] Criar router analytics.byMercado (filtros: mercadoId, pesquisaId, dateRange)
+- [x] Criar router analytics.byPesquisa (métricas agregadas por pesquisa)
+- [x] Criar router analytics.byDimensao (filtros: dimensao, valor, dateRange)
+- [x] Criar router analytics.timeline (evolução temporal de métricas)
+- [x] Criar router analytics.researchOverview (métricas consolidadas)
+- [x] Criar router analytics.timelineEvolution (evolução para gráfico)
+- [ ] Testar todos os endpoints com dados reais
+
+### 32.2 Dashboard Research Overview
+- [x] Criar página ResearchOverview.tsx
+- [x] Implementar funil de qualificação interativo (Recharts)
+- [x] Implementar gráfico de distribuição de qualidade
+- [x] Implementar gráfico de evolução temporal
+- [x] Adicionar filtros de pesquisa e período
+- [x] Adicionar rota /research-overview no App.tsx
+- [x] Adicionar item no sidebar
+
+### 32.3 Cron Job de Agregação
+- [x] Instalar node-cron
+- [x] Criar arquivo server/cronJobs.ts
+- [x] Implementar job diário de agregação (00:00)
+- [x] Integrar com analyticsAggregation.ts
+- [x] Adicionar logs de execução
+- [x] Adicionar endpoint runAggregation para testes manuais
+- [x] Integrar inicialização no servidor (server/_core/index.ts)
+- [ ] Testar execução manual
+
+### 32.4 Análise de Documentos
+- [x] Ler e analisar "Painel de Status do Enriquecimento"
+- [x] Ler e analisar "Investigação Aumento de Clientes"
+- [x] Ler e analisar "Guia de Funcionalidades" (48 páginas, 3015 linhas)
+- [ ] Mapear estado atual da aplicação
+- [ ] Identificar discrepâncias e atualizações necessárias
+
+### 32.5 Relatório Consolidado
+- [x] Criar estrutura do relatório (13 partes principais)
+- [x] Consolidar informações dos 3 documentos
+- [x] Atualizar com estado atual da aplicação (23 rotas, 34 tabelas, ~80 endpoints)
+- [x] Adicionar diagramas e fluxos atualizados
+- [x] Gerar documento final consolidado (RELATORIO_CONSOLIDADO_COMPLETO.md)
 - [ ] Testar cron job (execução manual)
 - [ ] Testar navegação do sidebar
 - [ ] Criar checkpoint final

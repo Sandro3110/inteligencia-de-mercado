@@ -80,6 +80,85 @@ export const appRouter = router({
         const { getSegmentationDistribution } = await import('./db');
         return getSegmentationDistribution(input.projectId, input.pesquisaId);
       }),
+    
+    // Novos endpoints de analytics de lead generation
+    byMercado: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        mercadoId: z.number().optional(),
+        pesquisaId: z.number().optional(),
+        dateFrom: z.date().optional(),
+        dateTo: z.date().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getAnalyticsByMercado } = await import('./analyticsQueries');
+        return getAnalyticsByMercado(input);
+      }),
+    
+    byPesquisa: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        pesquisaId: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getAnalyticsByPesquisa } = await import('./analyticsQueries');
+        return getAnalyticsByPesquisa(input);
+      }),
+    
+    byDimensao: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        dimensaoTipo: z.enum(["uf", "porte", "segmentacao", "categoria"]).optional(),
+        dimensaoValor: z.string().optional(),
+        pesquisaId: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getAnalyticsByDimensao } = await import('./analyticsQueries');
+        return getAnalyticsByDimensao(input);
+      }),
+    
+    timeline: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        dateFrom: z.date().optional(),
+        dateTo: z.date().optional(),
+        limit: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getAnalyticsTimeline } = await import('./analyticsQueries');
+        return getAnalyticsTimeline(input);
+      }),
+    
+    researchOverview: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        pesquisaId: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getResearchOverviewMetrics } = await import('./analyticsQueries');
+        return getResearchOverviewMetrics(input);
+      }),
+    
+    timelineEvolution: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        days: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getTimelineEvolution } = await import('./analyticsQueries');
+        return getTimelineEvolution(input);
+      }),
+    
+    // Executar agregação manual (para testes)
+    runAggregation: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        pesquisaId: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { runManualAggregation } = await import('./cronJobs');
+        return runManualAggregation(input.projectId, input.pesquisaId);
+      }),
   }),
 
   dashboard: router({
