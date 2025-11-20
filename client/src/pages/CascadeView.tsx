@@ -47,6 +47,7 @@ import {
   FileText,
   FileSpreadsheet,
   FileDown,
+  List,
 } from "lucide-react";
 import { exportToCSV, exportToExcel, exportToPDF, ExportData } from "@/lib/exportUtils";
 import {
@@ -714,8 +715,7 @@ export default function CascadeView() {
       <div className="flex items-center justify-between px-6 py-2 border-b border-border/40">
         <div className="flex items-center gap-6">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">GESTOR PAV</h1>
-            <p className="text-sm text-muted-foreground">Pesquisa de Mercado</p>
+            <h1 className="text-lg font-bold tracking-tight whitespace-nowrap">Inteligência de Mercado</h1>
           </div>
           <ProjectSelector />
           <div className="mt-2">
@@ -960,68 +960,114 @@ export default function CascadeView() {
             />
             
             {/* Botão Salvar Filtros */}
-            <Button
-              variant="outline"
-              className="h-9"
-              onClick={() => setSaveFilterDialogOpen(true)}
-            >
-              <Save className="w-4 h-4 mr-2" />
-              Salvar Filtros
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => setSaveFilterDialogOpen(true)}
+                >
+                  <Save className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Salvar Filtros</p>
+              </TooltipContent>
+            </Tooltip>
             
             {/* Botão Limpar Filtros */}
-            <Button
-              variant="outline"
-              className="h-9"
-              onClick={() => {
-                setSearchQuery("");
-                setSearchFields(["nome", "cnpj", "produto"]);
-                setSelectedTagIds([]);
-                setStatusFilter("all");
-                setMercadoFilters({ segmentacao: [], categoria: [] });
-                setClienteFilters({ segmentacao: [], cidade: [], uf: [] });
-                setConcorrenteFilters({ porte: [] });
-                setLeadFilters({ tipo: [], porte: [] });
-                toast.success("Todos os filtros foram limpos");
-              }}
-            >
-              <FilterX className="w-4 h-4 mr-2" />
-              Limpar Filtros
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSearchFields(["nome", "cnpj", "produto"]);
+                    setSelectedTagIds([]);
+                    setStatusFilter("all");
+                    setMercadoFilters({ segmentacao: [], categoria: [] });
+                    setClienteFilters({ segmentacao: [], cidade: [], uf: [] });
+                    setConcorrenteFilters({ porte: [] });
+                    setLeadFilters({ tipo: [], porte: [] });
+                    toast.success("Todos os filtros foram limpos");
+                  }}
+                >
+                  <FilterX className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Limpar Filtros</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
           
           <div className="flex items-center gap-2">
-            <Button
-              variant={statusFilter === "all" ? "default" : "outline"}
-              className="h-9"
-              onClick={() => setStatusFilter("all")}
-            >
-              Todos
-            </Button>
-            <Button
-              variant={statusFilter === "pending" ? "default" : "outline"}
-              className="h-9"
-              onClick={() => setStatusFilter("pending")}
-            >
-              <Clock className="w-4 h-4 mr-2" />
-              Pendentes
-            </Button>
-            <Button
-              variant={statusFilter === "rich" ? "default" : "outline"}
-              className="h-9"
-              onClick={() => setStatusFilter("rich")}
-            >
-              <CheckCircle2 className="w-4 h-4 mr-2" />
-              Validados
-            </Button>
-            <Button
-              variant={statusFilter === "discarded" ? "default" : "outline"}
-              className="h-9"
-              onClick={() => setStatusFilter("discarded")}
-            >
-              <XCircle className="w-4 h-4 mr-2" />
-              Descartados
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={statusFilter === "all" ? "default" : "outline"}
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => setStatusFilter("all")}
+                >
+                  <List className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Todos</p>
+              </TooltipContent>
+            </Tooltip>
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={statusFilter === "pending" ? "default" : "outline"}
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => setStatusFilter("pending")}
+                >
+                  <Clock className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Pendentes</p>
+              </TooltipContent>
+            </Tooltip>
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={statusFilter === "rich" ? "default" : "outline"}
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => setStatusFilter("rich")}
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Validados</p>
+              </TooltipContent>
+            </Tooltip>
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={statusFilter === "discarded" ? "default" : "outline"}
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => setStatusFilter("discarded")}
+                >
+                  <XCircle className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Descartados</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>
@@ -1031,7 +1077,7 @@ export default function CascadeView() {
         <div className="w-[280px] border-r border-border/40 p-6 flex flex-col gap-6">
           {/* Estatísticas */}
           <div>
-            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Estatísticas</h3>
+            <h3 className="text-[0.65rem] uppercase tracking-wider text-muted-foreground mb-3">Estatísticas</h3>
             <div className="space-y-2">
               <div className="glass-card p-4">
                 <div className="flex items-center gap-3">
@@ -1096,7 +1142,7 @@ export default function CascadeView() {
           <div className="px-6 py-4 border-b border-border/40">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold">{getPageTitle()}</h2>
+                <h2 className="text-sm font-semibold">{getPageTitle()}</h2>
                 <div className="flex items-center gap-3">
                   <p className="text-sm text-muted-foreground">Página {getPageNumber()} de 4</p>
                   {currentPage === "mercados" && (

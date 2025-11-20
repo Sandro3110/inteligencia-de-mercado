@@ -1,0 +1,34 @@
+{
+  "query": "SELECT \n  p.id,\n  p.nome,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE projectId = p.id) as mercados,\n  (SELECT COUNT(*) FROM clientes WHERE projectId = p.id) as clientes,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = p.id) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE projectId = p.id) as leads\nFROM projects p\nORDER BY p.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  p.id,\n  p.nome,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE projectId = p.id) as mercados,\n  (SELECT COUNT(*) FROM clientes WHERE projectId = p.id) as clientes,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = p.id) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE projectId = p.id) as leads\nFROM projects p\nORDER BY p.id;",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Embalagens",
+      "mercados": "472",
+      "clientes": "806",
+      "concorrentes": "3479",
+      "leads": "2459"
+    },
+    {
+      "id": "300001",
+      "nome": "Agro",
+      "mercados": "0",
+      "clientes": "1",
+      "concorrentes": "0",
+      "leads": "0"
+    },
+    {
+      "id": "300002",
+      "nome": "Agro",
+      "mercados": "0",
+      "clientes": "1",
+      "concorrentes": "0",
+      "leads": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tmercados\tclientes\tconcorrentes\tleads\n1\tEmbalagens\t472\t806\t3479\t2459\n300001\tAgro\t0\t1\t0\t0\n300002\tAgro\t0\t1\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

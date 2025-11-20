@@ -59,3 +59,33 @@ PROJECT (nível 1)
   └─> PESQUISA (nível 2)
       └─> MERCADOS/CLIENTES/CONCORRENTES/LEADS (nível 3)
 ```
+
+
+## Fase 23: Melhorias de UX/UI - Página Inicial 🎨
+
+### 23.1 Título e Textos
+- [x] Alterar "GESTOR PAV" para "Inteligência de Mercado"
+- [x] Mostrar título apenas uma vez no canto superior esquerdo
+- [x] Ajustar tamanho para médio (text-lg ou text-xl)
+- [x] Reduzir "ESTATÍSTICAS" em 60% (de text-2xl para text-sm)
+- [x] Reduzir "Selecione um Mercado" em 60% (de text-3xl para text-lg)
+
+### 23.2 Botões → Ícones com Tooltips
+- [x] Salvar Filtros → ícone Save com tooltip
+- [x] Limpar Filtros → ícone X/Eraser com tooltip
+- [x] Filtrar por Tags → ícone Tag com tooltip (já existia)
+- [x] Segmentação → ícone Filter com tooltip (já existia)
+- [x] Botões de status (Todos, Pendentes, Validados, Descartados) → ícones
+- [x] Usar padrão do Tour (Tooltip component do shadcn/ui)
+
+### 23.3 Seletor de Pesquisa
+- [x] Verificar componente ProjectSelector
+- [x] Corrigir para buscar apenas projetos reais do banco
+- [x] Validar que mostra "Agro", "Embalagens" e terceiro projeto
+- [x] Confirmado: Agro tem 0 dados, Embalagens tem 470/806/3453/2433
+
+### 23.4 Validação
+- [x] Testar visual dos ícones
+- [x] Verificar tooltips funcionando
+- [x] Validar seletor de projetos
+- [x] Criar checkpoint final
