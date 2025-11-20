@@ -59,6 +59,7 @@ const navSections: NavSection[] = [
       { title: "Mercados", href: "/mercados", icon: Package, shortcut: "Ctrl+2" },
       { title: "Research Overview", href: "/research-overview", icon: TrendingUp },
       { title: "Analytics", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+3" },
+      { title: "Tendências", href: "/tendencias", icon: TrendingUp },
       { title: "Relatórios", href: "/relatorios", icon: FileText },
       { title: "Exportação Inteligente", href: "/export", icon: Download, shortcut: "Ctrl+E" },
       { title: "Templates de Exportação", href: "/export/templates", icon: FileText },

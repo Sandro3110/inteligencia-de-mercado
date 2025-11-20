@@ -1,4 +1,4 @@
-import { eq, sql, and, or, like, count, desc, gte } from "drizzle-orm";
+import { eq, sql, and, or, like, count, desc, gte, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users, 
@@ -3180,5 +3180,202 @@ export async function deleteEnrichmentConfig(projectId: number) {
   } catch (error) {
     console.error("[Database] Failed to delete enrichment config:", error);
     return false;
+  }
+}
+
+// ============================================
+// BATCH VALIDATION HELPERS
+// ============================================
+
+/**
+ * Atualiza validação de múltiplos clientes em uma transação
+ */
+export async function batchUpdateClientesValidation(
+  ids: number[],
+  status: string,
+  notes?: string,
+  userId?: string
+) {
+  const db = await getDb();
+  if (!db) return { success: false, count: 0 };
+
+  try {
+    // Usar transação para garantir atomicidade
+    const result = await db
+      .update(clientes)
+      .set({
+        validationStatus: status as any,
+        validationNotes: notes,
+        validatedBy: userId,
+        validatedAt: new Date(),
+      })
+      .where(inArray(clientes.id, ids));
+
+    return { success: true, count: ids.length };
+  } catch (error) {
+    console.error("[Database] Failed to batch update clientes:", error);
+    return { success: false, count: 0 };
+  }
+}
+
+/**
+ * Atualiza validação de múltiplos concorrentes em uma transação
+ */
+export async function batchUpdateConcorrentesValidation(
+  ids: number[],
+  status: string,
+  notes?: string,
+  userId?: string
+) {
+  const db = await getDb();
+  if (!db) return { success: false, count: 0 };
+
+  try {
+    const result = await db
+      .update(concorrentes)
+      .set({
+        validationStatus: status as any,
+        validationNotes: notes,
+        validatedBy: userId,
+        validatedAt: new Date(),
+      })
+      .where(inArray(concorrentes.id, ids));
+
+    return { success: true, count: ids.length };
+  } catch (error) {
+    console.error("[Database] Failed to batch update concorrentes:", error);
+    return { success: false, count: 0 };
+  }
+}
+
+/**
+ * Atualiza validação de múltiplos leads em uma transação
+ */
+export async function batchUpdateLeadsValidation(
+  ids: number[],
+  status: string,
+  notes?: string,
+  userId?: string
+) {
+  const db = await getDb();
+  if (!db) return { success: false, count: 0 };
+
+  try {
+    const result = await db
+      .update(leads)
+      .set({
+        validationStatus: status as any,
+        validationNotes: notes,
+        validatedBy: userId,
+        validatedAt: new Date(),
+      })
+      .where(inArray(leads.id, ids));
+
+    return { success: true, count: ids.length };
+  } catch (error) {
+    console.error("[Database] Failed to batch update leads:", error);
+    return { success: false, count: 0 };
+  }
+}
+
+// ============================================
+// QUALITY TRENDS HELPERS
+// ============================================
+
+/**
+ * Retorna evolução da qualidade por mercado ao longo do tempo
+ */
+export async function getQualityTrends(projectId: number, days: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const dataLimite = new Date();
+    dataLimite.setDate(dataLimite.getDate() - days);
+
+    // Buscar todos os mercados do projeto
+    const mercadosResult = await db
+      .select()
+      .from(mercadosUnicos)
+      .where(eq(mercadosUnicos.projectId, projectId));
+
+    const trends = [];
+
+    for (const mercado of mercadosResult) {
+      // Buscar clientes, concorrentes e leads do mercado
+      const clientesResult = await db
+        .select()
+        .from(clientes)
+        .innerJoin(clientesMercados, eq(clientes.id, clientesMercados.clienteId))
+        .where(
+          and(
+            eq(clientesMercados.mercadoId, mercado.id),
+            gte(clientes.createdAt, dataLimite)
+          )
+        );
+
+      const concorrentesResult = await db
+        .select()
+        .from(concorrentes)
+        .where(
+          and(
+            eq(concorrentes.mercadoId, mercado.id),
+            gte(concorrentes.createdAt, dataLimite)
+          )
+        );
+
+      const leadsResult = await db
+        .select()
+        .from(leads)
+        .where(
+          and(
+            eq(leads.mercadoId, mercado.id),
+            gte(leads.createdAt, dataLimite)
+          )
+        );
+
+      // Agrupar por data e calcular qualidade média
+      const dataPoints: Record<string, { total: number; count: number }> = {};
+
+      const processarEntidades = (entidades: any[]) => {
+        entidades.forEach((e: any) => {
+          const entity = e.clientes || e.concorrentes || e.leads || e;
+          if (!entity.createdAt) return;
+
+          const data = new Date(entity.createdAt).toISOString().split('T')[0];
+          const qualidade = entity.qualidadeScore || 0;
+
+          if (!dataPoints[data]) {
+            dataPoints[data] = { total: 0, count: 0 };
+          }
+
+          dataPoints[data].total += qualidade;
+          dataPoints[data].count += 1;
+        });
+      };
+
+      processarEntidades(clientesResult);
+      processarEntidades(concorrentesResult);
+      processarEntidades(leadsResult);
+
+      // Converter para array ordenado
+      const dataPointsArray = Object.entries(dataPoints)
+        .map(([data, stats]) => ({
+          data,
+          qualidadeMedia: Math.round(stats.total / stats.count),
+        }))
+        .sort((a, b) => a.data.localeCompare(b.data));
+
+      trends.push({
+        mercadoId: mercado.id,
+        mercadoNome: mercado.nome,
+        dataPoints: dataPointsArray,
+      });
+    }
+
+    return trends;
+  } catch (error) {
+    console.error("[Database] Failed to get quality trends:", error);
+    return [];
   }
 }

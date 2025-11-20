@@ -48,6 +48,13 @@ export const appRouter = router({
         return getQualityScoreEvolution(input.projectId, input.days);
       }),
     
+    qualityTrends: publicProcedure
+      .input(z.object({ projectId: z.number(), days: z.number().optional().default(30) }))
+      .query(async ({ input }) => {
+        const { getQualityTrends } = await import('./db');
+        return getQualityTrends(input.projectId, input.days);
+      }),
+    
     leadsGrowth: publicProcedure
       .input(z.object({ projectId: z.number(), days: z.number().optional().default(30) }))
       .query(async ({ input }) => {
@@ -296,6 +303,17 @@ export const appRouter = router({
         return updateClienteValidation(input.id, input.status, input.notes, ctx.user?.id);
       }),
     
+    batchUpdateValidation: publicProcedure
+      .input(z.object({
+        ids: z.array(z.number()),
+        status: z.string(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { batchUpdateClientesValidation } = await import('./db');
+        return batchUpdateClientesValidation(input.ids, input.status, input.notes, ctx.user?.id);
+      }),
+    
     byProject: publicProcedure
       .input(z.object({ projectId: z.number() }))
       .query(async ({ input }) => {
@@ -409,6 +427,17 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         const { updateConcorrenteValidation } = await import('./db');
         return updateConcorrenteValidation(input.id, input.status, input.notes, ctx.user?.id);
+      }),
+    
+    batchUpdateValidation: publicProcedure
+      .input(z.object({
+        ids: z.array(z.number()),
+        status: z.string(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { batchUpdateConcorrentesValidation } = await import('./db');
+        return batchUpdateConcorrentesValidation(input.ids, input.status, input.notes, ctx.user?.id);
       }),
     
     byProject: publicProcedure
@@ -561,6 +590,17 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         const { updateLeadValidation } = await import('./db');
         return updateLeadValidation(input.id, input.status, input.notes, ctx.user?.id);
+      }),
+
+    batchUpdateValidation: publicProcedure
+      .input(z.object({
+        ids: z.array(z.number()),
+        status: z.string(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { batchUpdateLeadsValidation } = await import('./db');
+        return batchUpdateLeadsValidation(input.ids, input.status, input.notes, ctx.user?.id);
       }),
 
     updateStage: publicProcedure

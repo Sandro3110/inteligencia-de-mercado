@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,8 +19,12 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Download, X } from "lucide-react";
+import { Download, X, Filter, Calendar, Sliders } from "lucide-react";
 import { toast } from "sonner";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 
 interface CompararMercadosModalProps {
   isOpen: boolean;
@@ -35,6 +39,13 @@ export function CompararMercadosModal({
   mercadoIds,
   mercados,
 }: CompararMercadosModalProps) {
+  // Estados de filtros
+  const [periodoDias, setPeriodoDias] = useState<number>(30);
+  const [qualidadeMinima, setQualidadeMinima] = useState<number>(0);
+  const [statusFiltro, setStatusFiltro] = useState<string>("todos");
+  const [apenasCompletos, setApenasCompletos] = useState<boolean>(false);
+  const [mostrarFiltros, setMostrarFiltros] = useState<boolean>(false);
+
   // Buscar dados de cada mercado
   const mercadosData = mercadoIds.map((id) => {
     const mercado = mercados.find((m) => m.id === id);
@@ -51,9 +62,38 @@ export function CompararMercadosModal({
       { enabled: isOpen && !!id }
     );
 
-    const clientes = clientesData?.data || [];
-    const concorrentes = concorrentesData?.data || [];
-    const leads = leadsData?.data || [];
+    let clientes = clientesData?.data || [];
+    let concorrentes = concorrentesData?.data || [];
+    let leads = leadsData?.data || [];
+
+    // Aplicar filtros
+    const dataLimite = new Date();
+    dataLimite.setDate(dataLimite.getDate() - periodoDias);
+
+    const aplicarFiltros = (entidades: any[]) => {
+      return entidades.filter((e: any) => {
+        // Filtro de período
+        if (e.createdAt && new Date(e.createdAt) < dataLimite) return false;
+
+        // Filtro de qualidade mínima
+        if ((e.qualidadeScore || 0) < qualidadeMinima) return false;
+
+        // Filtro de status
+        if (statusFiltro !== "todos" && e.validationStatus !== statusFiltro) return false;
+
+        // Filtro de dados completos
+        if (apenasCompletos) {
+          const camposObrigatorios = ['nome', 'cnpj'];
+          if (!camposObrigatorios.every(campo => e[campo])) return false;
+        }
+
+        return true;
+      });
+    };
+
+    clientes = aplicarFiltros(clientes);
+    concorrentes = aplicarFiltros(concorrentes);
+    leads = aplicarFiltros(leads);
 
     // Calcular qualidade média
     const calcularQualidadeMedia = (entidades: any[]) => {
@@ -133,12 +173,118 @@ export function CompararMercadosModal({
                 Comparando {mercadoIds.length} mercados selecionados
               </DialogDescription>
             </div>
-            <Button variant="outline" size="sm" onClick={handleExportPDF}>
-              <Download className="w-4 h-4 mr-2" />
-              Exportar PDF
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setMostrarFiltros(!mostrarFiltros)}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Filtros
+                {(periodoDias !== 30 || qualidadeMinima > 0 || statusFiltro !== "todos" || apenasCompletos) && (
+                  <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                    !
+                  </Badge>
+                )}
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleExportPDF}>
+                <Download className="w-4 h-4 mr-2" />
+                Exportar PDF
+              </Button>
+            </div>
           </div>
         </DialogHeader>
+
+        {/* Painel de Filtros */}
+        {mostrarFiltros && (
+          <div className="bg-muted/50 rounded-lg p-4 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Filtro de Período */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Período
+                </Label>
+                <Select
+                  value={periodoDias.toString()}
+                  onValueChange={(v) => setPeriodoDias(parseInt(v))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">Últimos 7 dias</SelectItem>
+                    <SelectItem value="30">Últimos 30 dias</SelectItem>
+                    <SelectItem value="90">Últimos 90 dias</SelectItem>
+                    <SelectItem value="999999">Todos</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filtro de Qualidade Mínima */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Sliders className="w-4 h-4" />
+                  Qualidade Mínima: {qualidadeMinima}%
+                </Label>
+                <Slider
+                  value={[qualidadeMinima]}
+                  onValueChange={(v) => setQualidadeMinima(v[0])}
+                  max={100}
+                  step={5}
+                  className="mt-2"
+                />
+              </div>
+
+              {/* Filtro de Status */}
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select value={statusFiltro} onValueChange={setStatusFiltro}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    <SelectItem value="pending">Pendentes</SelectItem>
+                    <SelectItem value="rich">Validados</SelectItem>
+                    <SelectItem value="discarded">Descartados</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Toggle Dados Completos */}
+              <div className="space-y-2">
+                <Label>Opções</Label>
+                <div className="flex items-center space-x-2 h-10">
+                  <Switch
+                    checked={apenasCompletos}
+                    onCheckedChange={setApenasCompletos}
+                  />
+                  <Label className="text-sm cursor-pointer" onClick={() => setApenasCompletos(!apenasCompletos)}>
+                    Apenas completos
+                  </Label>
+                </div>
+              </div>
+            </div>
+
+            {/* Botão Limpar Filtros */}
+            <div className="flex justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setPeriodoDias(30);
+                  setQualidadeMinima(0);
+                  setStatusFiltro("todos");
+                  setApenasCompletos(false);
+                }}
+              >
+                <X className="w-4 h-4 mr-2" />
+                Limpar Filtros
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-6 mt-4">
           {/* Cards de Mercados */}

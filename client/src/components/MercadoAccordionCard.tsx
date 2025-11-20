@@ -149,15 +149,59 @@ export function MercadoAccordionCard({
     setSelectedItems(newSet);
   };
 
+  const batchValidateClientes = trpc.clientes.batchUpdateValidation.useMutation({
+    onSuccess: () => {
+      utils.clientes.byMercado.invalidate();
+    },
+  });
+
+  const batchValidateConcorrentes = trpc.concorrentes.batchUpdateValidation.useMutation({
+    onSuccess: () => {
+      utils.concorrentes.byMercado.invalidate();
+    },
+  });
+
+  const batchValidateLeads = trpc.leads.batchUpdateValidation.useMutation({
+    onSuccess: () => {
+      utils.leads.byMercado.invalidate();
+    },
+  });
+
   const handleBatchValidate = async (status: "rich" | "needs_adjustment" | "discarded") => {
     if (selectedItems.size === 0) {
       toast.error("Nenhum item selecionado");
       return;
     }
 
-    // TODO: Implementar validação em lote via tRPC
-    toast.info(`Validação em lote será implementada em breve (${selectedItems.size} itens)`);
-    setSelectedItems(new Set());
+    const ids = Array.from(selectedItems);
+    
+    try {
+      if (currentTab === "clientes") {
+        await batchValidateClientes.mutateAsync({
+          ids,
+          status,
+          notes: `Validação em lote: ${status}`,
+        });
+      } else if (currentTab === "concorrentes") {
+        await batchValidateConcorrentes.mutateAsync({
+          ids,
+          status,
+          notes: `Validação em lote: ${status}`,
+        });
+      } else {
+        await batchValidateLeads.mutateAsync({
+          ids,
+          status,
+          notes: `Validação em lote: ${status}`,
+        });
+      }
+
+      toast.success(`${ids.length} itens validados com sucesso!`);
+      setSelectedItems(new Set());
+    } catch (error) {
+      toast.error("Erro ao validar itens em lote");
+      console.error(error);
+    }
   };
 
   const handleExportTab = (format: "csv" | "excel" | "pdf") => {
@@ -346,10 +390,15 @@ export function MercadoAccordionCard({
                       variant="outline"
                       size="sm"
                       onClick={() => handleBatchValidate("rich")}
+                      disabled={batchValidateClientes.isPending || batchValidateConcorrentes.isPending || batchValidateLeads.isPending}
                       className="h-7 px-2 text-xs"
                     >
-                      <CheckCircle2 className="w-3 h-3 mr-1" />
-                      Validar
+                      {(batchValidateClientes.isPending || batchValidateConcorrentes.isPending || batchValidateLeads.isPending) ? (
+                        <span className="animate-spin mr-1">⏳</span>
+                      ) : (
+                        <CheckCircle2 className="w-3 h-3 mr-1" />
+                      )}
+                      Validar ({selectedItems.size})
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
