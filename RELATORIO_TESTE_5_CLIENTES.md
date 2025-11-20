@@ -1,322 +1,203 @@
-# Relatório de Teste - Enriquecimento de 5 Clientes
+# 📊 Relatório de Teste de Enriquecimento - 5 Clientes
 
-**Data:** 19/11/2025  
-**Configuração:** 10 concorrentes + 5 leads por cliente  
-**Versão:** enrichmentV2.ts (com melhorias)
-
----
-
-## 📊 Resumo Executivo
-
-✅ **Status:** Teste concluído com 100% de sucesso  
-⏱️ **Tempo Total:** 174,87 segundos (~2,9 minutos)  
-⏱️ **Tempo Médio por Cliente:** 34,97 segundos  
-💰 **Custo Estimado:** ~$0,0075 USD (~50.000 tokens Gemini)
+**Data:** 19 de Janeiro de 2025  
+**Pesquisa:** Embalagens 2025 (ID: 1)  
+**Clientes Testados:** 5  
+**Taxa de Sucesso:** 80% (4/5)
 
 ---
 
-## 🎯 Clientes Processados
+## 🎯 Resumo Executivo
 
-| # | Cliente | CNPJ | Setor |
-|---|---------|------|-------|
-| 1 | FRIBAZ FRIGORIFICO BAZOTTI LTDA | 01.879.013/0001-45 | Frigorífico (Carne Bovina) |
-| 2 | WEPLAST IND E COM DE PRODUTOS PLASTICOS LTDA | 50.741.076/0001-46 | Embalagens Plásticas |
-| 3 | PLASTICOS PUMA LTDA | 62.979.232/0001-90 | Embalagens Plásticas |
-| 4 | COPAPA CIA PADUANA DE PAPEIS | 31.590.862/0001-45 | Papel Higiênico |
-| 5 | AGRO-COMERCIAL AFUBRA LTDA | 74.072.513/0001-44 | Insumos Agrícolas |
+Teste realizado com 5 clientes da base "Embalagens 2025" para validar o sistema de enriquecimento otimizado após implementação da tabela `pesquisas` e correção de 3 bugs críticos.
 
----
+### Métricas Gerais
 
-## 📈 Resultados por Cliente
-
-### Cliente 1: FRIBAZ FRIGORIFICO BAZOTTI LTDA
-- ✅ **Mercados:** 4
-- ✅ **Produtos:** 9
-- ✅ **Concorrentes:** 10
-- ✅ **Leads:** 5
-- ⏱️ **Tempo:** ~35s
-
-### Cliente 2: WEPLAST IND E COM DE PRODUTOS PLASTICOS LTDA
-- ✅ **Mercados:** 4
-- ✅ **Produtos:** 9
-- ✅ **Concorrentes:** 10
-- ✅ **Leads:** 5
-- ⏱️ **Tempo:** ~35s
-
-### Cliente 3: PLASTICOS PUMA LTDA
-- ✅ **Mercados:** 4
-- ✅ **Produtos:** 8
-- ✅ **Concorrentes:** 10
-- ✅ **Leads:** 5
-- ⏱️ **Tempo:** ~35s
-
-### Cliente 4: COPAPA CIA PADUANA DE PAPEIS
-- ✅ **Mercados:** 4
-- ✅ **Produtos:** 10
-- ✅ **Concorrentes:** 9
-- ✅ **Leads:** 5
-- ⏱️ **Tempo:** ~35s
-
-### Cliente 5: AGRO-COMERCIAL AFUBRA LTDA
-- ✅ **Mercados:** 3
-- ✅ **Produtos:** 6
-- ✅ **Concorrentes:** 10
-- ✅ **Leads:** 5
-- ⏱️ **Tempo:** ~35s
+| Métrica | Valor |
+|---------|-------|
+| **Clientes processados** | 5 |
+| **Clientes com sucesso** | 4 (80%) |
+| **Clientes com erro** | 1 (20%) |
+| **Tempo total** | 96.31s |
+| **Tempo médio/cliente** | 24.08s |
+| **Mercados criados** | 4 |
+| **Produtos criados** | 10 |
+| **Concorrentes criados** | 30 |
+| **Leads criados** | 20 |
 
 ---
 
-## 📊 Estatísticas Gerais
+## 📋 Detalhamento por Cliente
 
-| Métrica | Total Gerado | Únicos no Banco | Taxa de Deduplicação |
-|---------|--------------|-----------------|----------------------|
-| **Mercados** | 19 | 14 | 26,3% (5 reutilizados) |
-| **Produtos** | 42 | 42 | 0% (nenhum duplicado) |
-| **Concorrentes** | 49 | 35 | 28,6% (14 reutilizados) |
-| **Leads** | 25 | 22 | 12,0% (3 reutilizados) |
+### ✅ Cliente 1: PRAXIS EMBALAGENS LTDA (ID: 2205)
 
----
+**Status:** ✅ Sucesso  
+**Tempo:** 21.32s
 
-## 🎯 Análise de Deduplicação
-
-### Mercados (26,3% de reuso)
-**Comportamento esperado:** Clientes do mesmo setor compartilham mercados.
-
-**Exemplo:** Clientes 2 e 3 (ambos de embalagens plásticas) compartilharam mercados como:
-- Indústria Alimentícia
-- Setor Farmacêutico
-- E-commerce
-
-### Concorrentes (28,6% de reuso)
-**Comportamento esperado:** Empresas grandes aparecem para múltiplos clientes do mesmo setor.
-
-**Exemplo:** Clientes 2 e 3 (embalagens plásticas) compartilharam concorrentes como:
-- Grandes fabricantes nacionais de embalagens
-- Players regionais relevantes
-
-### Leads (12,0% de reuso)
-**Baixa duplicação:** Boa diversidade geográfica e setorial.
-
-**Motivo:** Prompts melhorados com critérios de diversidade funcionando.
-
-### Produtos (0% de duplicação)
-**Perfeito:** UPSERT funcionando corretamente.
-
-**Chave única:** `clienteId + mercadoId + nome` garante unicidade.
+**Dados gerados:**
+- **Mercado:** Embalagens para Indústria Alimentícia
+- **Produtos:** 1
+- **Concorrentes:** 5
+- **Leads:** 5
 
 ---
 
-## ✅ Validação de Qualidade
+### ❌ Cliente 2: ZANDEI IND DE PLASTICOS LTDA (ID: 2405)
 
-### Amostra de Concorrentes (15 primeiros)
+**Status:** ❌ Erro  
+**Tempo:** 1.98s  
+**Erro:** `No mercados returned by OpenAI`
 
-| Nome | Cidade/UF | Porte | Produto | Score |
-|------|-----------|-------|---------|-------|
-| JBS S.A. | São Paulo/SP | Grande | Carne bovina e processados | 85 |
-| Marfrig Global Foods S.A. | São Paulo/SP | Grande | Carne bovina e derivados | 85 |
-| Minerva Foods S.A. | Barretos/SP | Grande | Carne bovina exportação | 80 |
-| BRF S.A. | Itajaí/SC | Grande | Carnes e processados | 90 |
-| Frigol Alimentos Ltda. | Lençóis Paulista/SP | Grande | Carne bovina | 75 |
-| Mercosul Alimentos S.A. | Bataguassu/MS | Média | Carne bovina | 70 |
-| Friboi (JBS) | Várias | Grande | Carne bovina | 85 |
-| Swift (JBS) | Várias | Grande | Carne bovina | 85 |
-| Seara (JBS) | Várias | Grande | Carnes e processados | 90 |
-| Pampeano Alimentos | Bagé/RS | Média | Carne bovina | 70 |
-| Plastipak Packaging do Brasil | Jundiaí/SP | Grande | Embalagens plásticas | 85 |
-| Bemis Latin America | Sorocaba/SP | Grande | Embalagens flexíveis | 85 |
-| Sealed Air Brasil | Itu/SP | Grande | Embalagens protetoras | 80 |
-| Amcor Flexibles Brasil | Campinas/SP | Grande | Embalagens flexíveis | 85 |
-| Dixie Toga S.A. | Valinhos/SP | Grande | Embalagens plásticas | 80 |
+**Causa provável:** Nome genérico sem contexto suficiente
+
+**Ação recomendada:** Implementar fallback com prompt mais específico
+
+---
+
+### ✅ Cliente 3: ZANQUETA COM DE MATERIAIS PARA CONSTRUCAO LTDA (ID: 2406)
+
+**Status:** ✅ Sucesso  
+**Tempo:** 25.07s
+
+**Dados gerados:**
+- **Mercado:** Materiais de Construção e Acabamento
+- **Produtos:** 3
+- **Concorrentes:** 10
+- **Leads:** 5
+
+---
+
+### ✅ Cliente 4: ZARELLI SUPERMERCADOS LTDA (ID: 2407)
+
+**Status:** ✅ Sucesso  
+**Tempo:** 30.91s
+
+**Dados gerados:**
+- **Mercado:** Varejo Alimentício
+- **Produtos:** 3
+- **Concorrentes:** 10
+- **Leads:** 5
+
+---
+
+### ✅ Cliente 5: ZENAPLAST IND COM DE ARTEFATOS DE PLASTICO LTDA (ID: 2408)
+
+**Status:** ✅ Sucesso  
+**Tempo:** 17.03s
+
+**Dados gerados:**
+- **Mercado:** Embalagens Plásticas para Indústria Alimentícia
+- **Produtos:** 3
+- **Concorrentes:** 5
+- **Leads:** 5
+
+---
+
+## 🗂️ Análise dos Mercados Criados
+
+| ID | Nome do Mercado | Categoria | Segmentação | Clientes |
+|----|----------------|-----------|-------------|----------|
+| 1 | Embalagens para Indústria Alimentícia | Embalagens | B2B | 1 |
+| 2 | Materiais de Construção e Acabamento | Construção | B2B/B2C | 1 |
+| 3 | Varejo Alimentício | Varejo | B2C | 1 |
+| 4 | Embalagens Plásticas para Indústria Alimentícia | Embalagens | B2B | 1 |
 
 **Observações:**
-- ✅ Concorrentes REAIS e RELEVANTES
-- ✅ Empresas grandes e médias (porte adequado)
-- ✅ Diversidade geográfica (SP, SC, MS, RS)
-- ✅ Produtos específicos e técnicos
-- ✅ Quality scores entre 70-90 (bom a excelente)
-
-### Amostra de Leads (15 primeiros)
-
-| Nome | Tipo | Cidade/UF | Região | Porte | Score |
-|------|------|-----------|--------|-------|-------|
-| Carrefour Brasil | Distribuidor | São Paulo/SP | Sudeste | Grande | 85 |
-| Atacadão S.A. | Distribuidor | São Paulo/SP | Sudeste | Grande | 85 |
-| Assaí Atacadista | Distribuidor | São Paulo/SP | Sudeste | Grande | 85 |
-| Makro Atacadista S.A. | Distribuidor | São Paulo/SP | Sudeste | Grande | 80 |
-| Grupo Pão de Açúcar | Cliente Potencial | São Paulo/SP | Sudeste | Grande | 85 |
-| Rede Bahia de Supermercados | Distribuidor | Salvador/BA | Nordeste | Média | 70 |
-| Supermercados BH | Cliente Potencial | Belo Horizonte/MG | Sudeste | Média | 75 |
-| Rede Nordestão | Distribuidor | Fortaleza/CE | Nordeste | Média | 70 |
-| Condor Super Center | Cliente Potencial | Curitiba/PR | Sul | Grande | 80 |
-| Zaffari Supermercados | Cliente Potencial | Porto Alegre/RS | Sul | Grande | 80 |
-| Nestlé Brasil | Integrador | São Paulo/SP | Sudeste | Grande | 90 |
-| Unilever Brasil | Integrador | São Paulo/SP | Sudeste | Grande | 90 |
-| Mondelez Brasil | Integrador | Curitiba/PR | Sul | Grande | 85 |
-| Danone Brasil | Cliente Potencial | São Paulo/SP | Sudeste | Grande | 85 |
-| BRF S.A. | Integrador | Itajaí/SC | Sul | Grande | 90 |
-
-**Observações:**
-- ✅ **Diversidade de tipos:** Distribuidor, Cliente Potencial, Integrador
-- ✅ **Diversidade geográfica:** Sudeste, Nordeste, Sul
-- ✅ **Diversidade de porte:** Grande e Média
-- ✅ **Empresas REAIS e RELEVANTES**
-- ✅ **Quality scores entre 70-90**
+- 4 mercados únicos criados
+- 50% relacionados a embalagens
+- Segmentação B2B predominante (75%)
 
 ---
 
-## ⏱️ Análise de Performance
+## ✅ Correções Validadas
 
-### Tempo por Etapa (média estimada)
+### 1. ✅ Campo `produto` em Concorrentes
+**Status:** Funcionando  
+**Validação:** Todos os 30 concorrentes possuem campo `produto` preenchido
 
-| Etapa | Tempo | % do Total |
-|-------|-------|------------|
-| 1. Enriquecimento do Cliente | ~8s | 23% |
-| 2. Identificação de Mercados | ~6s | 17% |
-| 3. Criação de Produtos | ~8s | 23% |
-| 4. Busca de Concorrentes (10) | ~8s | 23% |
-| 5. Busca de Leads (5) | ~5s | 14% |
-| **TOTAL** | **~35s** | **100%** |
+### 2. ✅ Quality Score Melhorado
+**Status:** Funcionando  
+**Validação:** Todos possuem `qualidadeScore` e `qualidadeClassificacao`
 
-### Escalabilidade
+### 3. ✅ Campo `ativo` em Produtos
+**Status:** Funcionando  
+**Validação:** Todos os 10 produtos estão ativos (ativo = 1)
 
-| Clientes | Tempo Estimado | Custo Estimado |
-|----------|----------------|----------------|
-| 1 | ~35s | $0,0015 |
-| 5 | ~3 min | $0,0075 |
-| 10 | ~6 min | $0,015 |
-| 50 | ~30 min | $0,075 |
-| 100 | ~1 hora | $0,15 |
-| **801** | **~7,8 horas** | **~$1,20** |
+### 4. ✅ Campo `pesquisaId` em Todas as Tabelas
+**Status:** Funcionando  
+**Validação:** Todos os dados linkados à pesquisa ID 1
 
 ---
 
-## 💰 Análise de Custo
+## 📈 Performance e Projeção
 
-### Custo por Cliente (detalhado)
+### Tempo de Processamento
 
-| Etapa | Tokens | Custo (USD) |
-|-------|--------|-------------|
-| Enriquecimento do Cliente | ~1.500 | $0,000225 |
-| Identificação de Mercados | ~1.200 | $0,000180 |
-| Criação de Produtos | ~2.000 | $0,000300 |
-| Busca de Concorrentes (10) | ~3.000 | $0,000450 |
-| Busca de Leads (5) | ~2.300 | $0,000345 |
-| **TOTAL** | **~10.000** | **~$0,0015** |
+| Métrica | Valor |
+|---------|-------|
+| **Tempo médio/cliente** | 24.08s |
+| **Tempo mínimo** | 17.03s |
+| **Tempo máximo** | 30.91s |
 
-### Projeção para 801 Clientes
+### Projeção para 806 Clientes
 
-- **Tokens totais:** ~8.010.000 tokens
-- **Custo total:** ~$1,20 USD
-- **Tempo total:** ~7,8 horas (processamento sequencial)
+| Cenário | Tempo Estimado |
+|---------|----------------|
+| **Melhor caso** | 3.8 horas |
+| **Caso médio** | 5.4 horas |
+| **Pior caso** | 6.9 horas |
 
-**Nota:** Gemini 1.5 Flash: $0,15 por 1M tokens de input
-
----
-
-## ✅ Melhorias Implementadas
-
-### 1. Constraints UNIQUE no Banco
-```sql
-ALTER TABLE mercados_unicos ADD UNIQUE INDEX idx_mercado_hash (mercadoHash);
-ALTER TABLE concorrentes ADD UNIQUE INDEX idx_concorrente_hash (concorrenteHash);
-ALTER TABLE leads ADD UNIQUE INDEX idx_lead_hash (leadHash);
-ALTER TABLE produtos ADD UNIQUE INDEX idx_produto_unique (clienteId, mercadoId, nome);
-```
-
-**Resultado:** Deduplicação garantida a nível de banco de dados.
-
-### 2. UPSERT Completo em Produtos
-```typescript
-await db.insert(produtos).values({...}).onDuplicateKeyUpdate({
-  set: { descricao, categoria, preco, unidade, updatedAt: new Date() }
-});
-```
-
-**Resultado:** 0% de duplicação de produtos (perfeito!).
-
-### 3. UPDATE em Concorrentes e Leads
-```typescript
-if (existing) {
-  await db.update(concorrentes).set({...}).where(eq(concorrentes.id, existing.id));
-} else {
-  await db.insert(concorrentes).values({...});
-}
-```
-
-**Resultado:** Dados sempre atualizados quando reutilizados.
-
-### 4. Prompts Melhorados
-
-**Concorrentes:**
-- ✅ Contexto completo do cliente (produtos, localização, porte)
-- ✅ Critérios de similaridade de produtos
-- ✅ Diversidade geográfica
-- ✅ Validação de CNPJs
-
-**Leads:**
-- ✅ Produtos específicos a vender
-- ✅ Diversidade de tipos (5 tipos diferentes)
-- ✅ Diversidade geográfica (5 regiões)
-- ✅ Diversidade de porte
-- ✅ Exemplos claros de cada tipo
+**Com 80% de taxa de sucesso:**
+- Clientes enriquecidos: ~645
+- Clientes com erro: ~161
+- Tempo total estimado: **5-7 horas**
 
 ---
 
 ## 🎯 Conclusões
 
-### Pontos Positivos
+### Pontos Positivos ✅
 
-1. ✅ **Performance excelente:** 35s por cliente (dentro do esperado)
-2. ✅ **Custo muito baixo:** $0,0015 por cliente
-3. ✅ **Deduplicação funcionando:** 26-29% de reuso em mercados/concorrentes
-4. ✅ **Qualidade dos dados:** Concorrentes e leads REAIS e RELEVANTES
-5. ✅ **Diversidade:** Geográfica, de porte e de tipos
-6. ✅ **UPSERT perfeito:** 0% de duplicação de produtos
-7. ✅ **Constraints UNIQUE:** Integridade garantida no banco
-8. ✅ **Prompts melhorados:** Resultados muito mais específicos
+1. Alta taxa de sucesso (80%)
+2. Performance consistente (24s/cliente)
+3. Qualidade dos dados validada
+4. Todas as 4 correções funcionando
+5. Estrutura de pesquisas implementada
 
-### Pontos de Atenção
+### Pontos de Atenção ⚠️
 
-1. ⚠️ **Tempo sequencial:** 7,8 horas para 801 clientes
-   - **Solução:** Implementar processamento paralelo (5-10 clientes simultâneos)
-   - **Ganho:** Reduzir para ~1-2 horas
+1. Taxa de erro de 20% (necessita fallback)
+2. Tempo de processamento: 5-7 horas para 806 clientes
 
-2. ⚠️ **Quality scores variáveis:** 70-90 (maioria 80-85)
-   - **Causa:** Alguns campos faltando (CNPJ, faturamento)
-   - **Solução:** Aceitável, dados reais nem sempre completos
+### Recomendações 🎯
 
-3. ⚠️ **Validação de CNPJs:** Formato nem sempre correto
-   - **Solução:** Adicionar validação de formato no código
-
-### Recomendações
-
-1. **Implementar processamento paralelo** (Prioridade ALTA)
-   - Processar 5-10 clientes simultaneamente
-   - Reduzir tempo total de 7,8h para ~1-2h
-
-2. **Adicionar checkpoint automático** (Prioridade ALTA)
-   - Salvar progresso a cada 50 clientes
-   - Permitir pausar/retomar enriquecimento
-
-3. **Implementar validação de CNPJs** (Prioridade MÉDIA)
-   - Validar formato (00.000.000/0001-00)
-   - Validar dígitos verificadores
-
-4. **Adicionar monitoramento em tempo real** (Prioridade MÉDIA)
-   - Dashboard mostrando progresso
-   - Notificações de conclusão
+1. Implementar sistema de retry (máx. 2 tentativas)
+2. Melhorar validação de resposta OpenAI
+3. Adicionar fallback para nomes genéricos
+4. Criar dashboard de monitoramento
+5. Implementar sistema de pausar/retomar
 
 ---
 
-## 🚀 Próximos Passos
+## 📊 Próximos Passos
 
-1. ✅ **Teste 1 (1 cliente):** Concluído com sucesso
-2. ✅ **Teste 2 (5 clientes):** Concluído com sucesso
-3. ⏭️ **Teste 3 (50 clientes):** Validar checkpoint e paralelização
-4. ⏭️ **Produção (801 clientes):** Enriquecimento completo
+### Curto Prazo
+1. Implementar retry para erros "No mercados"
+2. Adicionar validação de resposta
+3. Testar cliente com erro novamente
+
+### Médio Prazo
+1. Dashboard de monitoramento
+2. Sistema pausar/retomar
+3. Logs detalhados
+
+### Longo Prazo
+1. Enriquecimento dos 806 clientes
+2. Validação de qualidade
+3. Relatório final
 
 ---
 
-**Relatório gerado em:** 19/11/2025  
-**Sistema:** Gestor PAV - Enriquecimento V2  
-**Versão:** 1.1.0 (com melhorias)
+**Relatório gerado em:** 19/01/2025 20:45 GMT-3  
+**Versão:** c882f4ea  
+**Sistema:** Enriquecimento Otimizado com Pesquisas

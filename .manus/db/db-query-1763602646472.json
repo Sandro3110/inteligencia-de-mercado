@@ -1,0 +1,45 @@
+{
+  "query": "\nSELECT \n  id,\n  nome,\n  cnpj,\n  produtoPrincipal,\n  cidade\nFROM clientes\nWHERE projectId = 1 AND pesquisaId = 1\nORDER BY id\nLIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  id,\n  nome,\n  cnpj,\n  produtoPrincipal,\n  cidade\nFROM clientes\nWHERE projectId = 1 AND pesquisaId = 1\nORDER BY id\nLIMIT 5;\n",
+  "rows": [
+    {
+      "id": "2205",
+      "nome": "PRAXIS EMBALAGENS LTDA",
+      "cnpj": "19224389000187",
+      "produtoPrincipal": "NULL",
+      "cidade": "NULL"
+    },
+    {
+      "id": "2405",
+      "nome": "ZANDEI IND DE PLASTICOS LTDA",
+      "cnpj": "92833946000157",
+      "produtoPrincipal": "NULL",
+      "cidade": "NULL"
+    },
+    {
+      "id": "2406",
+      "nome": "ZANQUETA COM DE MATERIAIS PARA CONSTRUCAO LTDA",
+      "cnpj": "63995641000143",
+      "produtoPrincipal": "NULL",
+      "cidade": "NULL"
+    },
+    {
+      "id": "2407",
+      "nome": "ZARELLI SUPERMERCADOS LTDA",
+      "cnpj": "49637127000105",
+      "produtoPrincipal": "NULL",
+      "cidade": "NULL"
+    },
+    {
+      "id": "2408",
+      "nome": "ZENAPLAST IND COM DE ARTEFATOS DE PLASTICO LTDA",
+      "cnpj": "72225683000196",
+      "produtoPrincipal": "NULL",
+      "cidade": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcnpj\tprodutoPrincipal\tcidade\n2205\tPRAXIS EMBALAGENS LTDA\t19224389000187\tNULL\tNULL\n2405\tZANDEI IND DE PLASTICOS LTDA\t92833946000157\tNULL\tNULL\n2406\tZANQUETA COM DE MATERIAIS PARA CONSTRUCAO LTDA\t63995641000143\tNULL\tNULL\n2407\tZARELLI SUPERMERCADOS LTDA\t49637127000105\tNULL\tNULL\n2408\tZENAPLAST IND COM DE ARTEFATOS DE PLASTICO LTDA\t72225683000196\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

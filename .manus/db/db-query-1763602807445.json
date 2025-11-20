@@ -1,0 +1,22 @@
+{
+  "query": "\nSELECT \n  MIN(id) as min_id,\n  MAX(id) as max_id,\n  COUNT(*) as total\nFROM clientes\nWHERE projectId = 1 AND pesquisaId = 1;\n\n-- Pegar 5 IDs reais\nSELECT id, nome\nFROM clientes\nWHERE projectId = 1 AND pesquisaId = 1\nORDER BY id\nLIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  MIN(id) as min_id,\n  MAX(id) as max_id,\n  COUNT(*) as total\nFROM clientes\nWHERE projectId = 1 AND pesquisaId = 1;\n\n-- Pegar 5 IDs reais\nSELECT id, nome\nFROM clientes\nWHERE projectId = 1 AND pesquisaId = 1\nORDER BY id\nLIMIT 5;\n",
+  "rows": [
+    {
+      "min_id": "2205",
+      "max_id": "391955",
+      "total": "806"
+    }
+  ],
+  "messages": [
+    "id\tnome",
+    "2205\tPRAXIS EMBALAGENS LTDA",
+    "2405\tZANDEI IND DE PLASTICOS LTDA",
+    "2406\tZANQUETA COM DE MATERIAIS PARA CONSTRUCAO LTDA",
+    "2407\tZARELLI SUPERMERCADOS LTDA",
+    "2408\tZENAPLAST IND COM DE ARTEFATOS DE PLASTICO LTDA"
+  ],
+  "stdout": "min_id\tmax_id\ttotal\n2205\t391955\t806\nid\tnome\n2205\tPRAXIS EMBALAGENS LTDA\n2405\tZANDEI IND DE PLASTICOS LTDA\n2406\tZANQUETA COM DE MATERIAIS PARA CONSTRUCAO LTDA\n2407\tZARELLI SUPERMERCADOS LTDA\n2408\tZENAPLAST IND COM DE ARTEFATOS DE PLASTICO LTDA\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

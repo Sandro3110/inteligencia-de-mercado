@@ -1,0 +1,25 @@
+{
+  "query": "\nSELECT id FROM clientes WHERE projectId = 1 AND pesquisaId = 1 ORDER BY id LIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT id FROM clientes WHERE projectId = 1 AND pesquisaId = 1 ORDER BY id LIMIT 5;\n",
+  "rows": [
+    {
+      "id": "2205"
+    },
+    {
+      "id": "2405"
+    },
+    {
+      "id": "2406"
+    },
+    {
+      "id": "2407"
+    },
+    {
+      "id": "2408"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\n2205\n2405\n2406\n2407\n2408\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

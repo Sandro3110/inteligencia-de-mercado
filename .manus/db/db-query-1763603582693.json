@@ -1,0 +1,26 @@
+{
+  "query": "\n-- Verificar dados completos do cliente ZANDEI\nSELECT \n  c.id,\n  c.nome,\n  c.validationStatus,\n  c.qualidadeScore,\n  c.qualidadeClassificacao,\n  COUNT(DISTINCT cm.mercadoId) as mercados_associados,\n  COUNT(DISTINCT p.id) as produtos,\n  (SELECT COUNT(*) FROM concorrentes co \n   JOIN mercados_unicos m ON m.id = co.mercadoId \n   JOIN clientes_mercados cm2 ON cm2.mercadoId = m.id \n   WHERE cm2.clienteId = c.id) as concorrentes,\n  (SELECT COUNT(*) FROM leads l \n   JOIN mercados_unicos m ON m.id = l.mercadoId \n   JOIN clientes_mercados cm2 ON cm2.mercadoId = m.id \n   WHERE cm2.clienteId = c.id) as leads\nFROM clientes c\nLEFT JOIN clientes_mercados cm ON cm.clienteId = c.id\nLEFT JOIN produtos p ON p.clienteId = c.id\nWHERE c.id = 2405\nGROUP BY c.id;\n\n-- Ver mercados associados\nSELECT \n  m.id,\n  m.nome,\n  m.categoria,\n  m.segmentacao\nFROM mercados_unicos m\nJOIN clientes_mercados cm ON cm.mercadoId = m.id\nWHERE cm.clienteId = 2405;\n\n-- Ver produtos criados\nSELECT \n  p.id,\n  p.nome,\n  p.categoria,\n  LEFT(p.descricao, 100) as descricao_preview\nFROM produtos p\nWHERE p.clienteId = 2405;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Verificar dados completos do cliente ZANDEI\nSELECT \n  c.id,\n  c.nome,\n  c.validationStatus,\n  c.qualidadeScore,\n  c.qualidadeClassificacao,\n  COUNT(DISTINCT cm.mercadoId) as mercados_associados,\n  COUNT(DISTINCT p.id) as produtos,\n  (SELECT COUNT(*) FROM concorrentes co \n   JOIN mercados_unicos m ON m.id = co.mercadoId \n   JOIN clientes_mercados cm2 ON cm2.mercadoId = m.id \n   WHERE cm2.clienteId = c.id) as concorrentes,\n  (SELECT COUNT(*) FROM leads l \n   JOIN mercados_unicos m ON m.id = l.mercadoId \n   JOIN clientes_mercados cm2 ON cm2.mercadoId = m.id \n   WHERE cm2.clienteId = c.id) as leads\nFROM clientes c\nLEFT JOIN clientes_mercados cm ON cm.clienteId = c.id\nLEFT JOIN produtos p ON p.clienteId = c.id\nWHERE c.id = 2405\nGROUP BY c.id;\n\n-- Ver mercados associados\nSELECT \n  m.id,\n  m.nome,\n  m.categoria,\n  m.segmentacao\nFROM mercados_unicos m\nJOIN clientes_mercados cm ON cm.mercadoId = m.id\nWHERE cm.clienteId = 2405;\n\n-- Ver produtos criados\nSELECT \n  p.id,\n  p.nome,\n  p.categoria,\n  LEFT(p.descricao, 100) as descricao_preview\nFROM produtos p\nWHERE p.clienteId = 2405;\n",
+  "rows": [
+    {
+      "id": "2405",
+      "nome": "ZANDEI IND DE PLASTICOS LTDA",
+      "validationStatus": "NULL",
+      "qualidadeScore": "NULL",
+      "qualidadeClassificacao": "NULL",
+      "mercados_associados": "1",
+      "produtos": "1",
+      "concorrentes": "7",
+      "leads": "6"
+    }
+  ],
+  "messages": [
+    "id\tnome\tcategoria\tsegmentacao",
+    "630005\tEmbalagens Plásticas para Indústria Alimentícia\tB2B\tIndústrias de alimentos que precisam de embalagens",
+    "id\tnome\tcategoria\tdescricao_preview",
+    "270001\tEmbalagens Flexíveis Multicamadas\tEmbalagens Flexíveis\tEmbalagens plásticas com barreira contra umidade e oxigênio, ideais para conservação de alimentos pr"
+  ],
+  "stdout": "id\tnome\tvalidationStatus\tqualidadeScore\tqualidadeClassificacao\tmercados_associados\tprodutos\tconcorrentes\tleads\n2405\tZANDEI IND DE PLASTICOS LTDA\tNULL\tNULL\tNULL\t1\t1\t7\t6\nid\tnome\tcategoria\tsegmentacao\n630005\tEmbalagens Plásticas para Indústria Alimentícia\tB2B\tIndústrias de alimentos que precisam de embalagens\nid\tnome\tcategoria\tdescricao_preview\n270001\tEmbalagens Flexíveis Multicamadas\tEmbalagens Flexíveis\tEmbalagens plásticas com barreira contra umidade e oxigênio, ideais para conservação de alimentos pr\n",
+  "stderr": "",
+  "execution_time_ms": 86
+}

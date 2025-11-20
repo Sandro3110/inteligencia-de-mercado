@@ -68,8 +68,9 @@ interface EnrichmentData {
  * Gera TODOS os dados de enriquecimento em UMA ÚNICA chamada OpenAI
  * Versão V2: Prompt estruturado para máxima qualidade
  */
-export async function generateAllDataOptimized(cliente: Cliente): Promise<EnrichmentData> {
+export async function generateAllDataOptimized(cliente: Cliente, retryCount = 0): Promise<EnrichmentData> {
   const apiKey = process.env.OPENAI_API_KEY;
+  const MAX_RETRIES = 2;
   
   if (!apiKey) {
     throw new Error('OPENAI_API_KEY not configured');
@@ -275,12 +276,23 @@ Para cada mercado, forneça:
     
     // Validar estrutura
     if (!result.mercados || !Array.isArray(result.mercados)) {
+      console.error('[OpenAI] Invalid response structure:', result);
+      // Retry se ainda temos tentativas
+      if (retryCount < MAX_RETRIES) {
+        console.log(`[OpenAI] ⚠️ Invalid structure, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+        return generateAllDataOptimized(cliente, retryCount + 1);
+      }
       throw new Error('Invalid response structure: missing mercados array');
     }
     
     // Garantir que temos pelo menos 1 mercado
     if (result.mercados.length === 0) {
-      throw new Error('No mercados returned by OpenAI');
+      // Retry com prompt melhorado se ainda temos tentativas
+      if (retryCount < MAX_RETRIES) {
+        console.log(`[OpenAI] ⚠️ No mercados returned, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+        return generateAllDataOptimized(cliente, retryCount + 1);
+      }
+      throw new Error('No mercados returned by OpenAI after retries');
     }
     
     // Limitar a 2 mercados (caso retorne mais)

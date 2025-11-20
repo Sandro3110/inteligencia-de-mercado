@@ -1,0 +1,38 @@
+{
+  "query": "\n-- 1. Mercados criados\nSELECT \n  m.id,\n  m.nome,\n  m.categoria,\n  m.segmentacao,\n  COUNT(DISTINCT cm.clienteId) as clientes_associados\nFROM mercados_unicos m\nLEFT JOIN clientes_mercados cm ON cm.mercadoId = m.id\nWHERE m.pesquisaId = 1\nGROUP BY m.id, m.nome, m.categoria, m.segmentacao\nORDER BY m.id;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- 1. Mercados criados\nSELECT \n  m.id,\n  m.nome,\n  m.categoria,\n  m.segmentacao,\n  COUNT(DISTINCT cm.clienteId) as clientes_associados\nFROM mercados_unicos m\nLEFT JOIN clientes_mercados cm ON cm.mercadoId = m.id\nWHERE m.pesquisaId = 1\nGROUP BY m.id, m.nome, m.categoria, m.segmentacao\nORDER BY m.id;\n",
+  "rows": [
+    {
+      "id": "630002",
+      "nome": "Embalagens para Indústria Alimentícia",
+      "categoria": "B2B",
+      "segmentacao": "Indústrias de alimentos e bebidas",
+      "clientes_associados": "1"
+    },
+    {
+      "id": "630003",
+      "nome": "Materiais de Construção e Acabamento",
+      "categoria": "B2B",
+      "segmentacao": "Construtoras e profissionais de obras",
+      "clientes_associados": "1"
+    },
+    {
+      "id": "630004",
+      "nome": "Varejo Alimentício",
+      "categoria": "B2C",
+      "segmentacao": "Consumidores finais em busca de produtos alimentíc",
+      "clientes_associados": "1"
+    },
+    {
+      "id": "630005",
+      "nome": "Embalagens Plásticas para Indústria Alimentícia",
+      "categoria": "B2B",
+      "segmentacao": "Indústrias de alimentos que precisam de embalagens",
+      "clientes_associados": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcategoria\tsegmentacao\tclientes_associados\n630002\tEmbalagens para Indústria Alimentícia\tB2B\tIndústrias de alimentos e bebidas\t1\n630003\tMateriais de Construção e Acabamento\tB2B\tConstrutoras e profissionais de obras\t1\n630004\tVarejo Alimentício\tB2C\tConsumidores finais em busca de produtos alimentíc\t1\n630005\tEmbalagens Plásticas para Indústria Alimentícia\tB2B\tIndústrias de alimentos que precisam de embalagens\t1\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}
