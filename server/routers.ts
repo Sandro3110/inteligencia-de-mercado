@@ -1055,41 +1055,6 @@ export const appRouter = router({
       }),
   }),
 
-  notifications: router({
-    list: publicProcedure.query(async ({ ctx }) => {
-      if (!ctx.user) return [];
-      const { getUserNotifications } = await import('./db');
-      return getUserNotifications(ctx.user.id);
-    }),
-    
-    unreadCount: publicProcedure.query(async ({ ctx }) => {
-      if (!ctx.user) return 0;
-      const { getUnreadNotificationsCount } = await import('./db');
-      return getUnreadNotificationsCount(ctx.user.id);
-    }),
-    
-    markAsRead: publicProcedure
-      .input(z.number())
-      .mutation(async ({ input }) => {
-        const { markNotificationAsRead } = await import('./db');
-        return markNotificationAsRead(input);
-      }),
-    
-    markAllAsRead: publicProcedure
-      .mutation(async ({ ctx }) => {
-        if (!ctx.user) return false;
-        const { markAllNotificationsAsRead } = await import('./db');
-        return markAllNotificationsAsRead(ctx.user.id);
-      }),
-    
-    delete: publicProcedure
-      .input(z.number())
-      .mutation(async ({ input }) => {
-        const { deleteNotification } = await import('./db');
-        return deleteNotification(input);
-      }),
-  }),
-
   enrichment: router({
     progress: publicProcedure
       .input(z.object({ projectId: z.number() }))

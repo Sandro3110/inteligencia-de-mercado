@@ -145,22 +145,22 @@ export const exportRouter = router({
 
         const generationTime = Math.floor((Date.now() - startTime) / 1000);
 
-        // Salva no histórico
-        const db = await getDb();
-        if (db) {
-          await db.insert(exportHistory).values({
-            id: crypto.randomBytes(16).toString('hex'),
-            userId: ctx.user.id,
-            context: input.title || '',
-            filters: input.data.length > 0 ? { count: input.data.length } : {},
-            format: input.format,
-            outputType: input.outputType,
-            recordCount: input.data.length,
-            fileUrl: result.url,
-            fileSize: result.size,
-            generationTime
-          });
-        }
+        // Salva no histórico (TODO: implementar tabela exportHistory)
+        // const db = await getDb();
+        // if (db) {
+        //   await db.insert(exportHistory).values({
+        //     id: crypto.randomBytes(16).toString('hex'),
+        //     userId: ctx.user.id,
+        //     context: input.title || '',
+        //     filters: input.data.length > 0 ? { count: input.data.length } : {},
+        //     format: input.format,
+        //     outputType: input.outputType,
+        //     recordCount: input.data.length,
+        //     fileUrl: result.url,
+        //     fileSize: result.size,
+        //     generationTime
+        //   });
+        // }
 
         return {
           ...result,
@@ -222,13 +222,14 @@ export const exportRouter = router({
       historyId: z.string()
     }))
     .mutation(async ({ input, ctx }) => {
-      const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      // TODO: implementar tabela exportHistory
+      // const db = await getDb();
+      // if (!db) throw new Error('Database not available');
+      // 
+      // await db.delete(exportHistory)
+      //   .where(eq(exportHistory.id, input.historyId));
       
-      await db.delete(exportHistory)
-        .where(eq(exportHistory.id, input.historyId));
-      
-      return { success: true };
+      return { success: false, message: 'Export history not implemented yet' };
     }),
 
   /**

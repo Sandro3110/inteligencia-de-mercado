@@ -352,6 +352,9 @@ export const intelligentAlertsConfigs = mysqlTable("intelligent_alerts_configs",
 	index("intelligent_alerts_configs_projectId_unique").on(table.projectId),
 ]);
 
+export type IntelligentAlertsConfig = typeof intelligentAlertsConfigs.$inferSelect;
+export type InsertIntelligentAlertsConfig = typeof intelligentAlertsConfigs.$inferInsert;
+
 export const intelligentAlertsHistory = mysqlTable("intelligent_alerts_history", {
 	id: int().autoincrement().notNull(),
 	projectId: int().notNull(),
@@ -370,6 +373,9 @@ export const intelligentAlertsHistory = mysqlTable("intelligent_alerts_history",
 	readAt: timestamp({ mode: 'string' }),
 	dismissedAt: timestamp({ mode: 'string' }),
 });
+
+export type IntelligentAlertHistory = typeof intelligentAlertsHistory.$inferSelect;
+export type InsertIntelligentAlertHistory = typeof intelligentAlertsHistory.$inferInsert;
 
 export const leadConversions = mysqlTable("lead_conversions", {
 	id: int().autoincrement().notNull(),
@@ -446,6 +452,9 @@ export const llmProviderConfigs = mysqlTable("llm_provider_configs", {
 	updatedAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
 });
 
+export type LLMProviderConfig = typeof llmProviderConfigs.$inferSelect;
+export type InsertLLMProviderConfig = typeof llmProviderConfigs.$inferInsert;
+
 export const mercadosHistory = mysqlTable("mercados_history", {
 	id: int().autoincrement().notNull(),
 	mercadoId: int().notNull(),
@@ -491,6 +500,9 @@ export const notifications = mysqlTable("notifications", {
 	isRead: int().default(0).notNull(),
 	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
 });
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
 
 export const operationalAlerts = mysqlTable("operational_alerts", {
 	id: int().autoincrement().notNull(),

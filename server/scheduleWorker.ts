@@ -53,7 +53,7 @@ async function checkAndExecuteSchedules() {
       return;
     }
 
-    const now = new Date();
+    const now = new Date().toISOString();
     
     // Buscar agendamentos pendentes que já passaram da hora
     const pendingSchedules = await db
@@ -95,7 +95,7 @@ async function executeSchedule(schedule: any) {
       .update(scheduledEnrichments)
       .set({ 
         status: 'running',
-        lastRunAt: new Date(),
+        lastRunAt: new Date().toISOString(),
       })
       .where(eq(scheduledEnrichments.id, schedule.id));
 
@@ -200,7 +200,7 @@ async function createNextSchedule(schedule: any) {
     // Criar novo agendamento
     await db.insert(scheduledEnrichments).values({
       projectId: schedule.projectId,
-      scheduledAt: nextDate,
+      scheduledAt: nextDate.toISOString(),
       recurrence: schedule.recurrence,
       batchSize: schedule.batchSize,
       maxClients: schedule.maxClients,

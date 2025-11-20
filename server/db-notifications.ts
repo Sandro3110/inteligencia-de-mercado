@@ -112,21 +112,15 @@ export async function listNotifications(filters: ListNotificationsFilters) {
       );
     }
 
-    let query = db
+    const query = db
       .select()
       .from(notifications)
       .where(and(...conditions))
       .orderBy(desc(notifications.createdAt));
 
-    if (filters.limit) {
-      query = query.limit(filters.limit);
-    }
-
-    if (filters.offset) {
-      query = query.offset(filters.offset);
-    }
-
-    const results = await query;
+    const results = await query
+      .limit(filters.limit || 20)
+      .offset(filters.offset || 0);
 
     // Parse metadata JSON
     return results.map((n) => ({

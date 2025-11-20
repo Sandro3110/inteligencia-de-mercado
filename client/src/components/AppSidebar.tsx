@@ -39,6 +39,7 @@ interface NavItem {
   icon: any;
   shortcut?: string;
   badge?: string;
+  dynamicBadge?: boolean;
 }
 
 interface NavSection {
@@ -123,7 +124,7 @@ const navSections: NavSection[] = [
     priority: 'low',
     defaultOpen: false,
     items: [
-      { title: "Notificações", href: "/notificacoes", icon: Bell, badge: "Novo" },
+      { title: "Notificações", href: "/notificacoes", icon: Bell, dynamicBadge: true },
       { title: "Monitoramento", href: "/monitoring", icon: Activity },
       { title: "Atividade de Projetos", href: "/projetos/atividade", icon: FolderOpen, badge: "Novo" },
       { title: "Registro de Atividades", href: "/atividade", icon: Clock },
@@ -153,6 +154,9 @@ export function AppSidebar() {
     { projectId: selectedProjectId ?? undefined },
     { enabled: !!selectedProjectId }
   );
+
+  // Contador de notificações não lidas
+  const { data: unreadCount = 0 } = trpc.notifications.unreadCount.useQuery();
 
   // Listener para evento de toggle sidebar
   useEffect(() => {
@@ -346,7 +350,12 @@ export function AppSidebar() {
                               <ItemIcon className="w-4 h-4" />
                               <span className="text-sm">{item.title}</span>
                             </div>
-                            {item.badge && (
+                            {item.dynamicBadge && unreadCount > 0 && (
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-red-500 text-white font-semibold animate-pulse">
+                                {unreadCount}
+                              </span>
+                            )}
+                            {item.badge && !item.dynamicBadge && (
                               <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold">
                                 {item.badge}
                               </span>
