@@ -1,6 +1,6 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -10,33 +10,45 @@ import { DashboardCustomizationProvider } from "./contexts/DashboardCustomizatio
 import { GlobalShortcuts } from "./components/GlobalShortcuts";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { AppSidebar } from "./components/AppSidebar";
-import Dashboard from "./pages/Dashboard";
-import DashboardPage from "./pages/DashboardPage";
-import Mercados from "./pages/Mercados";
-import MercadoDetalhes from "./pages/MercadoDetalhes";
+
+// Lazy load de páginas principais (carregamento imediato)
 import CascadeView from "./pages/CascadeView";
-import EnrichmentFlow from "./pages/EnrichmentFlow";
-import AnalyticsDashboard from "./pages/AnalyticsDashboard";
-import AnalyticsPage from "./pages/AnalyticsPage";
-import EnrichmentProgress from "./pages/EnrichmentProgress";
-import AlertsPage from "./pages/AlertsPage";
-import AlertHistoryPage from "./pages/AlertHistoryPage";
-import ReportsPage from "./pages/ReportsPage";
-import ROIDashboard from "./pages/ROIDashboard";
-import FunnelView from "./pages/FunnelView";
-import SchedulePage from "./pages/SchedulePage";
-import AtividadePage from "./pages/AtividadePage";
-import EnrichmentSettings from "./pages/EnrichmentSettings";
-import OnboardingPage from "./pages/OnboardingPage";
-import ResultadosEnriquecimento from "./pages/ResultadosEnriquecimento";
-import ResearchOverview from "./pages/ResearchOverview";
-import PrePesquisaTeste from "./pages/PrePesquisaTeste";
-import ExportWizard from "./pages/ExportWizard";
-import TemplateAdmin from "./pages/TemplateAdmin";
-import ResearchWizard from "./pages/ResearchWizard";
-import AdminLLM from "./pages/AdminLLM";
-import MonitoringDashboard from "./pages/MonitoringDashboard";
-import IntelligentAlerts from "./pages/IntelligentAlerts";
+import NotFound from "./pages/NotFound";
+
+// Lazy load de páginas secundárias (carregamento sob demanda)
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const DashboardPage = lazy(() => import("./pages/DashboardPage"));
+const Mercados = lazy(() => import("./pages/Mercados"));
+const MercadoDetalhes = lazy(() => import("./pages/MercadoDetalhes"));
+const EnrichmentFlow = lazy(() => import("./pages/EnrichmentFlow"));
+const AnalyticsDashboard = lazy(() => import("./pages/AnalyticsDashboard"));
+const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
+const EnrichmentProgress = lazy(() => import("./pages/EnrichmentProgress"));
+const AlertsPage = lazy(() => import("./pages/AlertsPage"));
+const AlertHistoryPage = lazy(() => import("./pages/AlertHistoryPage"));
+const ReportsPage = lazy(() => import("./pages/ReportsPage"));
+const ROIDashboard = lazy(() => import("./pages/ROIDashboard"));
+const FunnelView = lazy(() => import("./pages/FunnelView"));
+const SchedulePage = lazy(() => import("./pages/SchedulePage"));
+const AtividadePage = lazy(() => import("./pages/AtividadePage"));
+const EnrichmentSettings = lazy(() => import("./pages/EnrichmentSettings"));
+const OnboardingPage = lazy(() => import("./pages/OnboardingPage"));
+const ResultadosEnriquecimento = lazy(() => import("./pages/ResultadosEnriquecimento"));
+const ResearchOverview = lazy(() => import("./pages/ResearchOverview"));
+const PrePesquisaTeste = lazy(() => import("./pages/PrePesquisaTeste"));
+const ExportWizard = lazy(() => import("./pages/ExportWizard"));
+const TemplateAdmin = lazy(() => import("./pages/TemplateAdmin"));
+const ResearchWizard = lazy(() => import("./pages/ResearchWizard"));
+const AdminLLM = lazy(() => import("./pages/AdminLLM"));
+const MonitoringDashboard = lazy(() => import("./pages/MonitoringDashboard"));
+const IntelligentAlerts = lazy(() => import("./pages/IntelligentAlerts"));
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+);
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -95,7 +107,9 @@ function App() {
                 <GlobalShortcuts />
                 <OnboardingTour />
                 <AppSidebar />
-                <Router />
+                <Suspense fallback={<PageLoader />}>
+                  <Router />
+                </Suspense>
               </TooltipProvider>
             </DashboardCustomizationProvider>
           </OnboardingProvider>

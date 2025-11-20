@@ -1397,3 +1397,25 @@ PROJECT (nível 1)
 - [x] Criar teste E2E: Configuração de alertas
 - [x] Criar teste E2E: Exportação de dados
 - [x] Executar todos os testes e validar 100% de sucesso
+
+
+## Fase 44: Correção de Avisos Não-Críticos ⚡
+
+### 44.1 Otimização de Bundle (Code-Splitting)
+- [x] Implementar lazy loading de rotas com React.lazy()
+- [x] Adicionar dynamic imports para componentes pesados (Charts, PDF, Excel)
+- [x] Configurar manual chunks no Vite
+- [x] Reduzir bundle de 3.4 MB para < 1 MB (inicial)
+- [x] Testar carregamento e performance
+
+### 44.2 Resolver Peer Dependencies Warnings
+- [x] Analisar warnings de react-joyride (React 15-18 vs 19)
+- [x] Analisar warnings de @builder.io/vite-plugin-jsx-loc (Vite 4-5 vs 7)
+- [x] Atualizar ou substituir bibliotecas incompatíveis
+- [x] Verificar se warnings desapareceram
+
+### 44.3 Validação Final
+- [x] Executar build e verificar tamanho do bundle
+- [x] Testar todas as páginas no navegador
+- [x] Verificar que não há novos erros
+- [x] Criar checkpoint final
