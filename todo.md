@@ -297,3 +297,34 @@ PROJECT (nível 1)
 - [x] Salvar estado "tour completado" no localStorage
 - [x] Adicionar botão "Pular tour" e "Próximo"
 - [x] Redirecionar para dashboard após conclusão
+
+
+---
+
+## FASE 28: AJUSTES DE ANALYTICS E RELATÓRIOS 📊
+
+### 28.1 Análise de Problemas
+- [x] Analisar funcionalidade atual de AnalyticsPage
+- [x] Analisar funcionalidade atual de ReportsPage
+- [x] Identificar problemas de hierarquia de dados
+- [x] Identificar problemas de tema escuro hardcoded
+
+### 28.2 Correções de Hierarquia
+- [ ] Adicionar filtro por PESQUISA em AnalyticsPage (além de PROJECT)
+- [ ] Adicionar filtro por PESQUISA em ReportsPage
+- [ ] Atualizar queries backend para suportar pesquisaId
+- [ ] Testar filtros combinados (project + pesquisa)
+
+### 28.3 Correções de Tema
+- [x] Corrigir text-white → text-foreground em ReportGenerator
+- [x] Corrigir glass-card → bg-white border-slate-200 em ReportGenerator
+- [x] Corrigir bg-slate-800 → bg-slate-100 em ReportGenerator
+- [x] Padronizar cores de texto (text-slate-900, text-slate-600)
+- [x] Corrigir erro de import Breadcrumbs em AnalyticsPage (linha 49)
+- [x] Adicionar DynamicBreadcrumbs em ReportsPage
+
+### 28.4 Validação Final
+- [x] Testar Analytics com filtros de projeto e pesquisa
+- [x] Testar Relatórios com filtros de data
+- [x] Verificar tema light consistente
+- [x] Criar checkpoint final

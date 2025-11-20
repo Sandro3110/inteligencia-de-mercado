@@ -46,7 +46,7 @@ export default function AnalyticsPage() {
     <div className="min-h-screen ml-60 bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Breadcrumbs */}
-        <Breadcrumbs items={[{ label: "Analytics" }]} />
+        <DynamicBreadcrumbs />
 
         {/* Header */}
         <div className="flex items-center justify-between">

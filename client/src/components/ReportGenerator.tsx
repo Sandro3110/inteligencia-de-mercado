@@ -58,20 +58,20 @@ export function ReportGenerator() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
             <FileText className="w-6 h-6 text-blue-500" />
             Relatórios Executivos
           </h2>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-600 mt-1">
             Gere relatórios PDF com análise estratégica completa
           </p>
         </div>
       </div>
 
       {/* Card Principal */}
-      <Card className="glass-card border-blue-500/30">
+      <Card className="bg-white border-slate-200 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
+          <CardTitle className="text-slate-900 flex items-center gap-2">
             <FileText className="w-5 h-5 text-blue-500" />
             Relatório Executivo Completo
           </CardTitle>
@@ -92,8 +92,8 @@ export function ReportGenerator() {
             </Button>
 
             {showFilters && (
-              <div className="p-4 rounded-lg bg-slate-800/30 border border-slate-700/50 space-y-4">
-                <h3 className="font-medium text-white mb-3">Filtros do Relatório</h3>
+              <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-4">
+                <h3 className="font-medium text-slate-900 mb-3">Filtros do Relatório</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -118,7 +118,7 @@ export function ReportGenerator() {
                 </div>
 
                 {(dateFrom || dateTo) && (
-                  <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
                     <CheckCircle2 className="w-4 h-4 text-green-500" />
                     <span>
                       Filtros ativos: {dateFrom && `De ${new Date(dateFrom).toLocaleDateString('pt-BR')}`}
@@ -135,7 +135,7 @@ export function ReportGenerator() {
                     setDateFrom("");
                     setDateTo("");
                   }}
-                  className="text-slate-400 hover:text-white"
+                  className="text-slate-600 hover:text-slate-900"
                 >
                   Limpar Filtros
                 </Button>
@@ -145,62 +145,62 @@ export function ReportGenerator() {
 
           {/* Conteúdo do Relatório */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">
+            <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
               <div className="flex items-center gap-3 mb-2">
                 <TrendingUp className="w-5 h-5 text-green-500" />
-                <h3 className="font-medium text-white">Sumário Executivo</h3>
+                <h3 className="font-medium text-slate-900">Sumário Executivo</h3>
               </div>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-600">
                 Estatísticas gerais do projeto com métricas-chave
               </p>
             </div>
 
-            <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">
+            <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
               <div className="flex items-center gap-3 mb-2">
                 <Target className="w-5 h-5 text-blue-500" />
-                <h3 className="font-medium text-white">Top 10 Mercados</h3>
+                <h3 className="font-medium text-slate-900">Top 10 Mercados</h3>
               </div>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-600">
                 Mercados com maior volume de leads e análise competitiva
               </p>
             </div>
 
-            <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">
+            <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
               <div className="flex items-center gap-3 mb-2">
                 <Users className="w-5 h-5 text-purple-500" />
-                <h3 className="font-medium text-white">Leads Prioritários</h3>
+                <h3 className="font-medium text-slate-900">Leads Prioritários</h3>
               </div>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-600">
                 Top 20 leads com score ≥ 80 e informações de contato
               </p>
             </div>
           </div>
 
           {/* Insights Incluídos */}
-          <div className="p-4 rounded-lg bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30">
+          <div className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200">
             <div className="flex items-center gap-2 mb-3">
-              <CheckCircle2 className="w-5 h-5 text-blue-400" />
-              <h3 className="font-medium text-white">Insights Estratégicos Incluídos</h3>
+              <CheckCircle2 className="w-5 h-5 text-blue-600" />
+              <h3 className="font-medium text-slate-900">Insights Estratégicos Incluídos</h3>
             </div>
-            <ul className="space-y-2 text-sm text-slate-300">
+            <ul className="space-y-2 text-sm text-slate-700">
               <li className="flex items-start gap-2">
-                <span className="text-blue-400 mt-1">•</span>
+                <span className="text-blue-600 mt-1">•</span>
                 <span>Percentual de leads de alta qualidade e potencial de conversão</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-400 mt-1">•</span>
+                <span className="text-blue-600 mt-1">•</span>
                 <span>Recomendações de priorização por mercado</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-400 mt-1">•</span>
+                <span className="text-blue-600 mt-1">•</span>
                 <span>Análise de densidade competitiva e estratégias de diferenciação</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-400 mt-1">•</span>
+                <span className="text-blue-600 mt-1">•</span>
                 <span>Identificação de oportunidades de entrada facilitada</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-400 mt-1">•</span>
+                <span className="text-blue-600 mt-1">•</span>
                 <span>Sugestões de expansão de prospecção</span>
               </li>
             </ul>
@@ -229,7 +229,7 @@ export function ReportGenerator() {
           </div>
 
           {!selectedProjectId && (
-            <p className="text-center text-sm text-slate-400">
+            <p className="text-center text-sm text-slate-600">
               Selecione um projeto para gerar o relatório
             </p>
           )}
@@ -238,30 +238,30 @@ export function ReportGenerator() {
 
       {/* Preview de Dados (se disponível) */}
       {reportData && (
-        <Card className="glass-card">
+        <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-white text-sm">Preview dos Dados</CardTitle>
+            <CardTitle className="text-slate-900 text-sm">Preview dos Dados</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
               <div>
-                <p className="text-slate-400">Mercados</p>
-                <p className="text-xl font-bold text-white">{reportData.summary.totalMercados}</p>
+                <p className="text-slate-600">Mercados</p>
+                <p className="text-xl font-bold text-slate-900">{reportData.summary.totalMercados}</p>
               </div>
               <div>
-                <p className="text-slate-400">Clientes</p>
-                <p className="text-xl font-bold text-white">{reportData.summary.totalClientes}</p>
+                <p className="text-slate-600">Clientes</p>
+                <p className="text-xl font-bold text-slate-900">{reportData.summary.totalClientes}</p>
               </div>
               <div>
-                <p className="text-slate-400">Concorrentes</p>
-                <p className="text-xl font-bold text-white">{reportData.summary.totalConcorrentes}</p>
+                <p className="text-slate-600">Concorrentes</p>
+                <p className="text-xl font-bold text-slate-900">{reportData.summary.totalConcorrentes}</p>
               </div>
               <div>
-                <p className="text-slate-400">Leads</p>
-                <p className="text-xl font-bold text-white">{reportData.summary.totalLeads}</p>
+                <p className="text-slate-600">Leads</p>
+                <p className="text-xl font-bold text-slate-900">{reportData.summary.totalLeads}</p>
               </div>
               <div>
-                <p className="text-slate-400">Alta Qualidade</p>
+                <p className="text-slate-600">Alta Qualidade</p>
                 <p className="text-xl font-bold text-green-400">{reportData.summary.leadsHighQuality}</p>
               </div>
             </div>
