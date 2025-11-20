@@ -207,7 +207,7 @@ export default function OnboardingPage() {
               )}
               <Button
                 onClick={handleNext}
-                className="px-8 bg-blue-600 hover:bg-blue-700 text-white"
+                className="px-8"
               >
                 {isLastStep ? (
                   <>

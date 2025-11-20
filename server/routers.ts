@@ -61,24 +61,24 @@ export const appRouter = router({
       }),
     
     evolution: publicProcedure
-      .input(z.object({ projectId: z.number(), months: z.number().optional().default(6) }))
+      .input(z.object({ projectId: z.number(), pesquisaId: z.number().optional(), months: z.number().optional().default(6) }))
       .query(async ({ input }) => {
         const { getEvolutionData } = await import('./db');
-        return getEvolutionData(input.projectId, input.months);
+        return getEvolutionData(input.projectId, input.months, input.pesquisaId);
       }),
     
     geographic: publicProcedure
-      .input(z.object({ projectId: z.number() }))
+      .input(z.object({ projectId: z.number(), pesquisaId: z.number().optional() }))
       .query(async ({ input }) => {
         const { getGeographicDistribution } = await import('./db');
-        return getGeographicDistribution(input.projectId);
+        return getGeographicDistribution(input.projectId, input.pesquisaId);
       }),
     
     segmentation: publicProcedure
-      .input(z.object({ projectId: z.number() }))
+      .input(z.object({ projectId: z.number(), pesquisaId: z.number().optional() }))
       .query(async ({ input }) => {
         const { getSegmentationDistribution } = await import('./db');
-        return getSegmentationDistribution(input.projectId);
+        return getSegmentationDistribution(input.projectId, input.pesquisaId);
       }),
   }),
 
@@ -1004,6 +1004,7 @@ export const appRouter = router({
     generate: publicProcedure
       .input(z.object({ 
         projectId: z.number(),
+        pesquisaId: z.number().optional(),
         dateFrom: z.string().optional(),
         dateTo: z.string().optional(),
         mercadoIds: z.array(z.number()).optional(),
@@ -1013,6 +1014,7 @@ export const appRouter = router({
         return generateExecutiveReportData(
           input.projectId, 
           {
+            pesquisaId: input.pesquisaId,
             dateFrom: input.dateFrom,
             dateTo: input.dateTo,
             mercadoIds: input.mercadoIds,

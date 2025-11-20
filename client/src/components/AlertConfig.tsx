@@ -168,7 +168,7 @@ export function AlertConfig() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
             <Bell className="w-6 h-6 text-blue-500" />
             Alertas Personalizados
           </h2>
@@ -186,9 +186,9 @@ export function AlertConfig() {
 
       {/* Formulário de Criação/Edição */}
       {isCreating && (
-        <Card className="glass-card border-blue-500/30">
+        <Card className="bg-white border-slate-200 shadow-sm border-blue-500/30">
           <CardHeader>
-            <CardTitle className="text-white">
+            <CardTitle className="text-slate-900">
               {editingId ? "Editar Alerta" : "Criar Novo Alerta"}
             </CardTitle>
             <CardDescription>
@@ -286,13 +286,13 @@ export function AlertConfig() {
             const typeInfo = ALERT_TYPES[alert.type as AlertType];
             const condition = JSON.parse(alert.condition);
             return (
-              <Card key={alert.id} className="glass-card">
+              <Card key={alert.id} className="bg-white border-slate-200 shadow-sm">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       {typeInfo.icon}
                       <div>
-                        <h3 className="font-medium text-white">{alert.name}</h3>
+                        <h3 className="font-medium text-slate-900">{alert.name}</h3>
                         <p className="text-sm text-slate-400">
                           {typeInfo.label} - Limite: {condition.value} {typeInfo.thresholdUnit}
                         </p>
@@ -326,7 +326,7 @@ export function AlertConfig() {
             );
           })
         ) : (
-          <Card className="glass-card">
+          <Card className="bg-white border-slate-200 shadow-sm">
             <CardContent className="p-8 text-center">
               <Bell className="w-12 h-12 text-slate-600 mx-auto mb-3" />
               <p className="text-slate-400">

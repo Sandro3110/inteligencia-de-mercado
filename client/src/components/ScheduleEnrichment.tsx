@@ -100,7 +100,7 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
   return (
     <div className="space-y-6">
       {/* Form de Agendamento */}
-      <Card className="bg-slate-900/50 border-slate-700">
+      <Card className="bg-white/50 border-slate-700">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="text-xl text-slate-100">Agendar Enriquecimento</CardTitle>
@@ -127,7 +127,7 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
                   value={scheduledDate}
                   onChange={(e) => setScheduledDate(e.target.value)}
                   required
-                  className="bg-slate-800 border-slate-700"
+                  className="bg-slate-50 border-slate-700"
                 />
               </div>
 
@@ -143,7 +143,7 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
                   value={scheduledTime}
                   onChange={(e) => setScheduledTime(e.target.value)}
                   required
-                  className="bg-slate-800 border-slate-700"
+                  className="bg-slate-50 border-slate-700"
                 />
               </div>
 
@@ -154,7 +154,7 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
                   Recorrência
                 </Label>
                 <Select value={recurrence} onValueChange={(v: any) => setRecurrence(v)}>
-                  <SelectTrigger className="bg-slate-800 border-slate-700">
+                  <SelectTrigger className="bg-slate-50 border-slate-700">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -175,7 +175,7 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
                   max={100}
                   value={batchSize}
                   onChange={(e) => setBatchSize(parseInt(e.target.value))}
-                  className="bg-slate-800 border-slate-700"
+                  className="bg-slate-50 border-slate-700"
                 />
               </div>
 
@@ -189,7 +189,7 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
                   value={maxClients || ''}
                   onChange={(e) => setMaxClients(e.target.value ? parseInt(e.target.value) : undefined)}
                   placeholder="Todos"
-                  className="bg-slate-800 border-slate-700"
+                  className="bg-slate-50 border-slate-700"
                 />
               </div>
             </div>
@@ -206,7 +206,7 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
       </Card>
 
       {/* Lista de Agendamentos */}
-      <Card className="bg-slate-900/50 border-slate-700">
+      <Card className="bg-white/50 border-slate-700">
         <CardHeader>
           <CardTitle className="text-xl text-slate-100">Agendamentos Futuros</CardTitle>
           <CardDescription>Próximas execuções programadas</CardDescription>
@@ -223,7 +223,7 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
               {schedules.map((schedule: any) => (
                 <div 
                   key={schedule.id}
-                  className="flex items-center justify-between p-4 rounded-lg bg-slate-800/50 border border-slate-700"
+                  className="flex items-center justify-between p-4 rounded-lg bg-slate-50/50 border border-slate-700"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-3">

@@ -12,19 +12,26 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 export default function AnalyticsPage() {
   const { selectedProjectId } = useSelectedProject();
   const [months, setMonths] = useState(6);
+  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(null);
+
+  // Buscar pesquisas do projeto selecionado
+  const { data: pesquisas } = trpc.pesquisas.list.useQuery(
+    { projectId: selectedProjectId! },
+    { enabled: !!selectedProjectId }
+  );
 
   const { data: evolutionData, refetch: refetchEvolution } = trpc.analytics.evolution.useQuery(
-    { projectId: selectedProjectId!, months },
+    { projectId: selectedProjectId!, pesquisaId: selectedPesquisaId ?? undefined, months },
     { enabled: !!selectedProjectId }
   );
 
   const { data: geographicData, refetch: refetchGeographic } = trpc.analytics.geographic.useQuery(
-    { projectId: selectedProjectId! },
+    { projectId: selectedProjectId!, pesquisaId: selectedPesquisaId ?? undefined },
     { enabled: !!selectedProjectId }
   );
 
   const { data: segmentationData, refetch: refetchSegmentation } = trpc.analytics.segmentation.useQuery(
-    { projectId: selectedProjectId! },
+    { projectId: selectedProjectId!, pesquisaId: selectedPesquisaId ?? undefined },
     { enabled: !!selectedProjectId }
   );
 
@@ -55,6 +62,18 @@ export default function AnalyticsPage() {
             <p className="text-slate-600 mt-1">Visualizações avançadas de dados</p>
           </div>
           <div className="flex items-center gap-4">
+            <select
+              value={selectedPesquisaId || ""}
+              onChange={(e) => setSelectedPesquisaId(e.target.value ? Number(e.target.value) : null)}
+              className="px-3 py-2 border border-slate-300 rounded-md text-slate-700 bg-white"
+            >
+              <option value="">Todas as Pesquisas</option>
+              {pesquisas?.map((p: any) => (
+                <option key={p.id} value={p.id}>
+                  {p.nome}
+                </option>
+              ))}
+            </select>
             <select
               value={months}
               onChange={(e) => setMonths(Number(e.target.value))}

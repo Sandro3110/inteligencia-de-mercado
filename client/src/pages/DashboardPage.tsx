@@ -52,11 +52,11 @@ export default function DashboardPage() {
       {/* Header Simplificado */}
       <div className="border-b border-border/40 px-6 py-4">
         <div className="mb-4">
-          <Breadcrumbs items={[{ label: "Analytics" }]} />
+          <DynamicBreadcrumbs />
         </div>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Dashboard Avançado</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Dashboard Avançado</h1>
             <p className="text-sm text-muted-foreground">Análise e visualização de dados</p>
           </div>
           <div className="flex items-center gap-4">
@@ -95,38 +95,38 @@ export default function DashboardPage() {
       <div className="p-6">
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card className="p-6 bg-slate-900/50 border-slate-800">
+          <Card className="p-6 bg-white border-slate-200 shadow-sm">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-blue-500/10 rounded-lg">
                 <Target className="w-6 h-6 text-blue-500" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total de Leads</p>
-                <p className="text-2xl font-bold text-white">{funil?.leads || 0}</p>
+                <p className="text-2xl font-bold text-slate-900">{funil?.leads || 0}</p>
               </div>
             </div>
           </Card>
           
-          <Card className="p-6 bg-slate-900/50 border-slate-800">
+          <Card className="p-6 bg-white border-slate-200 shadow-sm">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-green-500/10 rounded-lg">
                 <Users className="w-6 h-6 text-green-500" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total de Clientes</p>
-                <p className="text-2xl font-bold text-white">{funil?.clientes || 0}</p>
+                <p className="text-2xl font-bold text-slate-900">{funil?.clientes || 0}</p>
               </div>
             </div>
           </Card>
           
-          <Card className="p-6 bg-slate-900/50 border-slate-800">
+          <Card className="p-6 bg-white border-slate-200 shadow-sm">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-amber-500/10 rounded-lg">
                 <CheckCircle2 className="w-6 h-6 text-amber-500" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Clientes Validados</p>
-                <p className="text-2xl font-bold text-white">{funil?.validados || 0}</p>
+                <p className="text-2xl font-bold text-slate-900">{funil?.validados || 0}</p>
                 <p className="text-xs text-muted-foreground">
                   {funil?.clientes ? `${((funil.validados / funil.clientes) * 100).toFixed(1)}% do total` : ""}
                 </p>
@@ -138,8 +138,8 @@ export default function DashboardPage() {
         {/* Gráficos */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Distribuição Geográfica */}
-          <Card className="p-6 bg-slate-900/50 border-slate-800">
-            <h3 className="text-lg font-semibold text-white mb-4">Distribuição Geográfica (Top 10 UFs)</h3>
+          <Card className="p-6 bg-white border-slate-200 shadow-sm">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Distribuição Geográfica (Top 10 UFs)</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={distribuicaoGeo?.slice(0, 10)}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -155,8 +155,8 @@ export default function DashboardPage() {
           </Card>
 
           {/* Distribuição por Segmentação */}
-          <Card className="p-6 bg-slate-900/50 border-slate-800">
-            <h3 className="text-lg font-semibold text-white mb-4">Distribuição por Segmentação</h3>
+          <Card className="p-6 bg-white border-slate-200 shadow-sm">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Distribuição por Segmentação</h3>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -180,8 +180,8 @@ export default function DashboardPage() {
           </Card>
 
           {/* Timeline de Validações */}
-          <Card className="p-6 bg-slate-900/50 border-slate-800">
-            <h3 className="text-lg font-semibold text-white mb-4">Timeline de Validações ({days} dias)</h3>
+          <Card className="p-6 bg-white border-slate-200 shadow-sm">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Timeline de Validações ({days} dias)</h3>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={timeline}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -198,8 +198,8 @@ export default function DashboardPage() {
           </Card>
 
           {/* Funil de Conversão */}
-          <Card className="p-6 bg-slate-900/50 border-slate-800">
-            <h3 className="text-lg font-semibold text-white mb-4">Funil de Conversão</h3>
+          <Card className="p-6 bg-white border-slate-200 shadow-sm">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Funil de Conversão</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={funilData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -219,8 +219,8 @@ export default function DashboardPage() {
           </Card>
 
           {/* Top 10 Mercados */}
-          <Card className="p-6 bg-slate-900/50 border-slate-800 lg:col-span-2">
-            <h3 className="text-lg font-semibold text-white mb-4">Top 10 Mercados por Volume de Clientes</h3>
+          <Card className="p-6 bg-white border-slate-200 shadow-sm lg:col-span-2">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Top 10 Mercados por Volume de Clientes</h3>
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={top10} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" />

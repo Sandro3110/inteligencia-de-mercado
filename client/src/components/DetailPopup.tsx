@@ -48,7 +48,7 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
       {/* Pop-up Central */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="glass-card w-full max-w-2xl max-h-[85vh] overflow-hidden pointer-events-auto animate-in zoom-in-95 duration-200"
+          className="bg-white border-slate-200 shadow-sm w-full max-w-2xl max-h-[85vh] overflow-hidden pointer-events-auto animate-in zoom-in-95 duration-200"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}

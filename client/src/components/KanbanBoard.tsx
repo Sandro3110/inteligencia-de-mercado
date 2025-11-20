@@ -133,7 +133,7 @@ function KanbanColumn({ id, label, color, leads, isLoading }: KanbanColumnProps)
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col gap-2 bg-slate-800/30 p-4 rounded-lg min-h-[500px]"
+      className="flex flex-col gap-2 bg-slate-50/30 p-4 rounded-lg min-h-[500px]"
     >
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-semibold text-sm flex items-center gap-2">

@@ -101,8 +101,8 @@ export default function ROIDashboard() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Dashboard de ROI</h1>
-            <p className="text-slate-400 mt-1">Acompanhe conversões e retorno sobre investimento</p>
+            <h1 className="text-3xl font-bold text-slate-900">Dashboard de ROI</h1>
+            <p className="text-slate-600 mt-1">Acompanhe conversões e retorno sobre investimento</p>
           </div>
           <Button onClick={() => setShowConversionDialog(true)} className="gap-2">
             <Plus className="w-4 h-4" />
@@ -198,8 +198,8 @@ export default function ROIDashboard() {
                 <tbody>
                   {conversions?.map((conv: any) => (
                     <tr key={conv.id} className="border-b border-slate-800/50">
-                      <td className="py-3 px-4 text-white">{conv.leadId}</td>
-                      <td className="py-3 px-4 text-white">
+                      <td className="py-3 px-4 text-slate-900">{conv.leadId}</td>
+                      <td className="py-3 px-4 text-slate-900">
                         {conv.dealValue ? `R$ ${parseFloat(conv.dealValue).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-'}
                       </td>
                       <td className="py-3 px-4">
@@ -242,7 +242,7 @@ export default function ROIDashboard() {
                 id="lead"
                 value={selectedLeadId || ""}
                 onChange={(e) => setSelectedLeadId(Number(e.target.value))}
-                className="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white"
+                className="w-full mt-1 px-3 py-2 bg-white border border-slate-300 rounded-md text-slate-900"
               >
                 <option value="">Selecione um lead</option>
                 {allLeads?.map((lead: any) => (
@@ -261,7 +261,7 @@ export default function ROIDashboard() {
                 value={dealValue}
                 onChange={(e) => setDealValue(e.target.value)}
                 placeholder="0.00"
-                className="mt-1 bg-slate-800 border-slate-700 text-white"
+                className="mt-1 bg-white border-slate-300 text-slate-900"
               />
             </div>
 
@@ -271,7 +271,7 @@ export default function ROIDashboard() {
                 id="status"
                 value={status}
                 onChange={(e) => setStatus(e.target.value as "won" | "lost")}
-                className="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white"
+                className="w-full mt-1 px-3 py-2 bg-white border border-slate-300 rounded-md text-slate-900"
               >
                 <option value="won">Ganho</option>
                 <option value="lost">Perdido</option>
@@ -285,7 +285,7 @@ export default function ROIDashboard() {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Observações sobre a conversão..."
-                className="mt-1 bg-slate-800 border-slate-700 text-white"
+                className="mt-1 bg-white border-slate-300 text-slate-900"
                 rows={3}
               />
             </div>

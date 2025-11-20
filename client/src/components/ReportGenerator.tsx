@@ -15,10 +15,18 @@ export function ReportGenerator() {
   const [showFilters, setShowFilters] = useState(false);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(null);
+
+  // Buscar pesquisas do projeto selecionado
+  const { data: pesquisas } = trpc.pesquisas.list.useQuery(
+    { projectId: selectedProjectId! },
+    { enabled: !!selectedProjectId }
+  );
 
   const { data: reportData, refetch, isLoading } = trpc.reports.generate.useQuery(
     { 
       projectId: selectedProjectId!,
+      pesquisaId: selectedPesquisaId ?? undefined,
       dateFrom: dateFrom || undefined,
       dateTo: dateTo || undefined,
     },
@@ -95,6 +103,23 @@ export function ReportGenerator() {
               <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-4">
                 <h3 className="font-medium text-slate-900 mb-3">Filtros do Relatório</h3>
                 
+                <div className="space-y-2">
+                  <Label htmlFor="pesquisa">Pesquisa</Label>
+                  <select
+                    id="pesquisa"
+                    value={selectedPesquisaId || ""}
+                    onChange={(e) => setSelectedPesquisaId(e.target.value ? Number(e.target.value) : null)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-md text-slate-700 bg-white"
+                  >
+                    <option value="">Todas as Pesquisas</option>
+                    {pesquisas?.map((p: any) => (
+                      <option key={p.id} value={p.id}>
+                        {p.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="dateFrom">Data Início</Label>

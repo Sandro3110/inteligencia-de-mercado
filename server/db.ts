@@ -2648,11 +2648,13 @@ export async function getRecentActivities(projectId: number, limit: number = 30)
  */
 
 // Evolução temporal (mercados, clientes, leads por mês)
-export async function getEvolutionData(projectId: number, months: number = 6) {
+export async function getEvolutionData(projectId: number, months: number = 6, pesquisaId?: number) {
   const db = await getDb();
   if (!db) return [];
 
   try {
+    const pesquisaFilter = pesquisaId ? sql`AND pesquisaId = ${pesquisaId}` : sql``;
+    
     const result = await db.execute(sql`
       SELECT 
         DATE_FORMAT(createdAt, '%Y-%m') as month,
@@ -2660,11 +2662,11 @@ export async function getEvolutionData(projectId: number, months: number = 6) {
         COUNT(DISTINCT CASE WHEN table_name = 'clientes' THEN id END) as clientes,
         COUNT(DISTINCT CASE WHEN table_name = 'leads' THEN id END) as leads
       FROM (
-        SELECT id, createdAt, 'mercados' as table_name FROM mercados_unicos WHERE projectId = ${projectId}
+        SELECT id, createdAt, 'mercados' as table_name FROM mercados_unicos WHERE projectId = ${projectId} ${pesquisaFilter}
         UNION ALL
-        SELECT id, createdAt, 'clientes' as table_name FROM clientes WHERE projectId = ${projectId}
+        SELECT id, createdAt, 'clientes' as table_name FROM clientes WHERE projectId = ${projectId} ${pesquisaFilter}
         UNION ALL
-        SELECT id, createdAt, 'leads' as table_name FROM leads WHERE projectId = ${projectId}
+        SELECT id, createdAt, 'leads' as table_name FROM leads WHERE projectId = ${projectId} ${pesquisaFilter}
       ) combined
       WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${months} MONTH)
       GROUP BY month
@@ -2679,21 +2681,23 @@ export async function getEvolutionData(projectId: number, months: number = 6) {
 }
 
 // Distribuição geográfica (top 10 UFs)
-export async function getGeographicDistribution(projectId: number) {
+export async function getGeographicDistribution(projectId: number, pesquisaId?: number) {
   const db = await getDb();
   if (!db) return [];
 
   try {
+    const pesquisaFilter = pesquisaId ? sql`AND pesquisaId = ${pesquisaId}` : sql``;
+    
     const result = await db.execute(sql`
       SELECT 
         uf,
         COUNT(*) as count
       FROM (
-        SELECT uf FROM clientes WHERE projectId = ${projectId} AND uf IS NOT NULL
+        SELECT uf FROM clientes WHERE projectId = ${projectId} ${pesquisaFilter} AND uf IS NOT NULL
         UNION ALL
-        SELECT uf FROM concorrentes WHERE projectId = ${projectId} AND uf IS NOT NULL
+        SELECT uf FROM concorrentes WHERE projectId = ${projectId} ${pesquisaFilter} AND uf IS NOT NULL
         UNION ALL
-        SELECT uf FROM leads WHERE projectId = ${projectId} AND uf IS NOT NULL
+        SELECT uf FROM leads WHERE projectId = ${projectId} ${pesquisaFilter} AND uf IS NOT NULL
       ) combined
       GROUP BY uf
       ORDER BY count DESC
@@ -2708,17 +2712,19 @@ export async function getGeographicDistribution(projectId: number) {
 }
 
 // Distribuição por segmentação (B2B/B2C/Ambos)
-export async function getSegmentationDistribution(projectId: number) {
+export async function getSegmentationDistribution(projectId: number, pesquisaId?: number) {
   const db = await getDb();
   if (!db) return [];
 
   try {
+    const pesquisaFilter = pesquisaId ? sql`AND pesquisaId = ${pesquisaId}` : sql``;
+    
     const result = await db.execute(sql`
       SELECT 
         segmentacao,
         COUNT(*) as count
       FROM mercados_unicos
-      WHERE projectId = ${projectId} AND segmentacao IS NOT NULL
+      WHERE projectId = ${projectId} ${pesquisaFilter} AND segmentacao IS NOT NULL
       GROUP BY segmentacao
       ORDER BY count DESC
     `);

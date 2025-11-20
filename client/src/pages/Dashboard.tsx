@@ -137,7 +137,7 @@ export default function Dashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
-          <Card className="glass-card border-l-4 border-l-primary">
+          <Card className="bg-white border-slate-200 shadow-sm border-l-4 border-l-primary">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Mercados
@@ -152,7 +152,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card border-l-4 border-l-blue-500">
+          <Card className="bg-white border-slate-200 shadow-sm border-l-4 border-l-blue-500">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Clientes
@@ -167,7 +167,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card border-l-4 border-l-orange-500">
+          <Card className="bg-white border-slate-200 shadow-sm border-l-4 border-l-orange-500">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Concorrentes
@@ -182,7 +182,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card border-l-4 border-l-green-500">
+          <Card className="bg-white border-slate-200 shadow-sm border-l-4 border-l-green-500">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Leads
@@ -199,7 +199,7 @@ export default function Dashboard() {
         </div>
 
         {/* Validation Progress */}
-        <Card className="glass-card-subtle mb-6">
+        <Card className="bg-white border-slate-200 shadow-sm-subtle mb-6">
           <CardHeader>
             <CardTitle className="section-title">Progresso da Validação</CardTitle>
           </CardHeader>
@@ -258,7 +258,7 @@ export default function Dashboard() {
         {/* Charts */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* Pie Chart - Status Distribution */}
-          <Card className="glass-card-subtle">
+          <Card className="bg-white border-slate-200 shadow-sm-subtle">
             <CardHeader>
               <CardTitle className="section-title">Distribuição por Status</CardTitle>
             </CardHeader>
@@ -297,7 +297,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Bar Chart - Entity Types */}
-          <Card className="glass-card-subtle">
+          <Card className="bg-white border-slate-200 shadow-sm-subtle">
             <CardHeader>
               <CardTitle className="section-title">Entidades por Tipo</CardTitle>
             </CardHeader>
@@ -322,7 +322,7 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <Card className="glass-card-subtle">
+        <Card className="bg-white border-slate-200 shadow-sm-subtle">
           <CardHeader>
             <CardTitle className="section-title">Ações Rápidas</CardTitle>
           </CardHeader>

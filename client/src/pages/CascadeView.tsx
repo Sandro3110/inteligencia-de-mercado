@@ -1113,7 +1113,7 @@ export default function CascadeView() {
           {/* Conteúdo */}
           <div className="flex-1 overflow-hidden p-6">
             <div className="h-full max-w-6xl mx-auto">
-              <div className="glass-card h-full flex flex-col" ref={scrollAreaRef}>
+              <div className="bg-white border-slate-200 shadow-sm h-full flex flex-col" ref={scrollAreaRef}>
                 <ScrollArea className="flex-1" style={{ height: 'calc(100vh - 280px)' }}>
                   <div className="p-4">
                     <AnimatePresence mode="wait">
@@ -1514,7 +1514,7 @@ export default function CascadeView() {
       {showScrollTop && (
         <Button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 rounded-full w-12 h-12 p-0 shadow-lg glass-card border-border/40 hover:scale-110 transition-all duration-300 z-50"
+          className="fixed bottom-8 right-8 rounded-full w-12 h-12 p-0 shadow-lg bg-white border-slate-200 shadow-sm border-border/40 hover:scale-110 transition-all duration-300 z-50"
           aria-label="Voltar ao topo"
         >
           <ArrowUp className="w-5 h-5" />

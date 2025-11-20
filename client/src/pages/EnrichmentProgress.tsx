@@ -249,7 +249,7 @@ export default function EnrichmentProgress() {
         </div>
 
         {/* Progresso Principal */}
-        <Card className="glass-card">
+        <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-2xl">Progresso Geral</CardTitle>
@@ -298,7 +298,7 @@ export default function EnrichmentProgress() {
         {/* Estatísticas Detalhadas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Mercados */}
-          <Card className="glass-card">
+          <Card className="bg-white border-slate-200 shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-purple-500" />
@@ -316,7 +316,7 @@ export default function EnrichmentProgress() {
           </Card>
 
           {/* Concorrentes */}
-          <Card className="glass-card">
+          <Card className="bg-white border-slate-200 shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-orange-500" />
@@ -339,7 +339,7 @@ export default function EnrichmentProgress() {
           </Card>
 
           {/* Leads */}
-          <Card className="glass-card">
+          <Card className="bg-white border-slate-200 shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-green-500" />
@@ -364,7 +364,7 @@ export default function EnrichmentProgress() {
 
         {/* Gráficos de Evolução */}
         {status?.activeRun && (
-          <Card className="glass-card">
+          <Card className="bg-white border-slate-200 shadow-sm">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-blue-400" />
@@ -391,7 +391,7 @@ export default function EnrichmentProgress() {
 
         {/* Histórico de Execuções */}
         {filteredHistory && filteredHistory.length > 0 && (
-          <Card className="glass-card">
+          <Card className="bg-white border-slate-200 shadow-sm">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <History className="w-5 h-5 text-purple-400" />
@@ -438,7 +438,7 @@ export default function EnrichmentProgress() {
         )}
 
         {/* Informações Adicionais */}
-        <Card className="glass-card">
+        <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
             <CardTitle>Informações do Processamento</CardTitle>
           </CardHeader>

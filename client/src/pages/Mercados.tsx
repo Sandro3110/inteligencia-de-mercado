@@ -174,7 +174,7 @@ export default function Mercados() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {mercados?.map((mercado) => (
             <Link key={mercado.id} href={`/mercado/${mercado.id}`}>
-              <Card className="glass-card cursor-pointer h-full">
+              <Card className="bg-white border-slate-200 shadow-sm cursor-pointer h-full">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="p-3 bg-primary/10 rounded-lg">

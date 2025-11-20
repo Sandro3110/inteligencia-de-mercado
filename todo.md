@@ -328,3 +328,80 @@ PROJECT (nível 1)
 - [x] Testar Relatórios com filtros de data
 - [x] Verificar tema light consistente
 - [x] Criar checkpoint final
+
+
+---
+
+## FASE 29: AUDITORIA COMPLETA + MELHORIAS DE ANALYTICS 🔍📈
+
+### 29.1 Auditoria e Mapeamento (22 páginas)
+- [x] Auditar AlertHistoryPage.tsx
+- [x] Auditar AlertsPage.tsx
+- [x] Auditar AnalyticsDashboard.tsx
+- [x] Auditar AnalyticsPage.tsx (já corrigida)
+- [x] Auditar AtividadePage.tsx
+- [x] Auditar CascadeView.tsx
+- [x] Auditar ComponentShowcase.tsx
+- [x] Auditar Dashboard.tsx
+- [x] Auditar DashboardPage.tsx
+- [x] Auditar EnrichmentFlow.tsx
+- [x] Auditar EnrichmentProgress.tsx
+- [x] Auditar EnrichmentReview.tsx
+- [x] Auditar EnrichmentSettings.tsx
+- [x] Auditar FunnelView.tsx
+- [x] Auditar MercadoDetalhes.tsx
+- [x] Auditar Mercados.tsx
+- [x] Auditar NotFound.tsx
+- [x] Auditar OnboardingPage.tsx
+- [x] Auditar ROIDashboard.tsx
+- [x] Auditar ReportsPage.tsx (já corrigida)
+- [x] Auditar ResultadosEnriquecimento.tsx
+- [x] Auditar SchedulePage.tsx
+- [x] Criar relatório consolidado de problemas
+
+### 29.2 Correções de Tema Light (em lote)
+- [x] Corrigir text-white → text-slate-900/foreground
+- [x] Corrigir glass-card → bg-white border-slate-200
+- [x] Corrigir bg-slate-800/900/950 → bg-slate-50/100
+- [x] Padronizar cores de texto (slate-900, slate-600, slate-700)
+- [x] Padronizar gradientes (from-blue-50 to-purple-50)
+
+### 29.3 Correções de Breadcrumbs (em lote)
+- [x] Substituir Breadcrumbs por DynamicBreadcrumbs
+- [x] Adicionar DynamicBreadcrumbs onde falta
+- [x] Remover imports duplicados
+
+### 29.4 Melhorias de Analytics - Filtro por Pesquisa
+- [x] Adicionar seletor de pesquisa em AnalyticsPage
+- [x] Atualizar backend: analytics.evolution com pesquisaId
+- [x] Atualizar backend: analytics.geographic com pesquisaId
+- [x] Atualizar backend: analytics.segmentation com pesquisaId
+- [x] Testar filtros combinados (project + pesquisa)
+
+### 29.5 Melhorias de Analytics - Exportação de Gráficos
+- [ ] Instalar biblioteca html2canvas ou recharts export
+- [ ] Adicionar botão "Exportar PNG" em cada gráfico
+- [ ] Adicionar botão "Exportar SVG" em cada gráfico
+- [ ] Implementar função de download de imagem
+- [ ] Testar exportação em todos os gráficos
+
+### 29.6 Melhorias de Analytics - Dashboard de Comparação
+- [ ] Criar nova página ComparisonDashboard.tsx
+- [ ] Adicionar seletor de 2+ projetos/pesquisas
+- [ ] Criar gráficos lado a lado (evolução, distribuição)
+- [ ] Adicionar tabela de métricas comparativas
+- [ ] Adicionar rota /comparison no App.tsx
+- [ ] Adicionar item no sidebar
+
+### 29.7 Melhorias de Relatórios - Filtro por Pesquisa
+- [x] Adicionar seletor de pesquisa em ReportGenerator
+- [x] Atualizar backend: reports.generate com pesquisaId
+- [x] Testar geração de PDF com filtro de pesquisa
+
+### 29.8 Validação Final
+- [ ] Testar todas as 22 páginas visualmente
+- [ ] Verificar consistência de tema light
+- [ ] Verificar navegação e breadcrumbs
+- [ ] Testar exportação de gráficos
+- [ ] Testar dashboard de comparação
+- [ ] Criar checkpoint final
