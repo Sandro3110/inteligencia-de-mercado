@@ -601,3 +601,175 @@ PROJECT (nível 1)
 - [ ] Testar cron job (execução manual)
 - [ ] Testar navegação do sidebar
 - [ ] Criar checkpoint final
+
+
+## FASE 33: Refatoração do Relatório - Guia Operacional Completo
+
+### 33.1 Refatoração do Relatório
+- [x] Remover comparações com documentos anteriores
+- [x] Focar exclusivamente no estado atual
+- [x] Criar estrutura de guia operacional
+- [x] Documentar todos os módulos (23 rotas)
+- [x] Documentar todas as tabelas (34 tabelas)
+- [x] Documentar todos os endpoints tRPC (~80 endpoints)
+- [x] Adicionar guias de operação por módulo
+- [x] Adicionar exemplos práticos de uso
+- [x] Gerar novo relatório (GUIA_OPERACIONAL_COMPLETO.md - 1500+ linhas)
+
+
+## FASE 34: Redesenho da Arquitetura de Enriquecimento
+
+### 34.1 Análise da Arquitetura Atual
+- [ ] Mapear fluxo atual de enriquecimento
+- [ ] Identificar pontos de entrada de dados
+- [ ] Identificar regras fixas de concorrentes/leads
+- [ ] Analisar validação de dados atual
+
+### 34.2 Nova Arquitetura de Entrada de Dados
+- [ ] Desenhar fluxo de validação de entrada
+- [ ] Criar política de validação (dados corretos obrigatórios)
+- [ ] Desenhar interface de entrada manual (formulário)
+- [ ] Desenhar interface de entrada por planilha (upload CSV/Excel)
+- [ ] Desenhar interface de pré-pesquisa com OpenAI (nome/site → dados estruturados)
+- [ ] Definir schema de dados padronizados
+
+### 34.3 Flexibilização de Parâmetros
+- [ ] Remover regras fixas de quantidade de concorrentes
+- [ ] Remover regras fixas de quantidade de leads
+- [ ] Adicionar campos de configuração na pesquisa (qtd_concorrentes, qtd_leads)
+- [ ] Ajustar lógica de enriquecimento para ler parâmetros da pesquisa
+- [ ] Criar interface de configuração de parâmetros
+
+### 34.4 Integração com OpenAI para Pré-Pesquisa
+- [ ] Criar endpoint tRPC para pré-pesquisa
+- [ ] Implementar prompt de pesquisa estruturada
+- [ ] Validar output da OpenAI (schema validation)
+- [ ] Criar interface de revisão de dados pré-pesquisados
+
+### 34.5 Fluxo Completo de Criação de Pesquisa
+- [ ] Desenhar wizard multi-step
+- [ ] Step 1: Selecionar/Criar Projeto
+- [ ] Step 2: Nomear Pesquisa
+- [ ] Step 3: Configurar Parâmetros (qtd_concorrentes, qtd_leads)
+- [ ] Step 4: Escolher Método de Entrada (manual/planilha/pré-pesquisa)
+- [ ] Step 5: Validar Dados de Entrada
+- [ ] Step 6: Gravar Dados no Banco
+- [ ] Step 7: Iniciar Enriquecimento
+
+### 34.6 Documentação da Nova Arquitetura
+- [x] Criar diagrama de fluxo completo
+- [x] Documentar cada step do wizard (7 steps detalhados)
+- [x] Documentar schema de validação (Zod + Business Rules)
+- [x] Documentar integração com OpenAI (pré-pesquisa)
+- [x] Criar documento de arquitetura proposta (1324 linhas, 63KB)
+
+
+## FASE 35: Teste de Pré-Pesquisa com OpenAI
+
+### 35.1 Criação do Script de Teste
+- [x] Criar script test-pre-pesquisa.ts
+- [x] Implementar função de pré-pesquisa com OpenAI
+- [x] Implementar validação de output
+- [x] Adicionar casos de teste
+
+### 35.2 Execução dos Testes
+- [x] Testar com "cooperativa de insumos de holambra" - 100% completo
+- [x] Testar com "carga pesada distribuidora" - 100% completo
+- [x] Validar dados retornados - Todos válidos
+- [x] Documentar resultados - 2/2 testes com sucesso
+
+### 35.3 Análise dos Resultados
+- [x] Verificar qualidade dos dados retornados - Excelente (100% completude)
+- [x] Identificar ajustes necessários no prompt - Prompt funcionou perfeitamente
+- [x] Validar schema de output - Todos os dados válidos
+- [x] Criar relatório de análise (ANALISE_TESTE_PRE_PESQUISA.md)
+- [ ] Apresentar resultados ao usuário
+
+
+## FASE 36: Redesenho de Arquitetura - Pré-Pesquisa Inteligente
+
+### 36.1 Avaliação de Viabilidade
+- [x] Avaliar prompt de persistência (retry com refinamento) - Viável e seguro
+- [x] Avaliar processamento multi-cliente em linguagem natural - Viável com validação
+- [x] Avaliar aprovação obrigatória antes de gravar - Essencial
+- [x] Avaliar refinamento de contexto em 3 níveis - Viável com UX cuidadosa
+- [x] Identificar riscos de segurança - 5 riscos mapeados com mitigações
+
+### 36.2 Redesenho da Arquitetura
+- [x] Desenhar fluxo de retry inteligente (3 tentativas progressivas)
+- [x] Desenhar fluxo de separação multi-cliente (IA separa entidades)
+- [x] Desenhar fluxo de aprovação obrigatória (interface de revisão)
+- [x] Desenhar fluxo de refinamento de contexto (wizard 3 níveis)
+- [x] Integrar todos os fluxos na arquitetura principal
+
+### 36.3 Documentação
+- [x] Documentar prompt de persistência (3 níveis de refinamento)
+- [x] Documentar processamento multi-cliente (separação + processamento)
+- [x] Documentar interface de aprovação (cards + validação inline)
+- [x] Documentar wizard de refinamento de contexto (perguntas dinâmicas)
+- [x] Criar exemplos práticos de uso (cooperativas agrícolas)
+- [x] Criar documento completo (1065 linhas, 43KB)
+
+### 36.4 Apresentação
+- [x] Criar documento de arquitetura redesenhada
+- [x] Apresentar ao usuário para validação
+
+
+## FASE 37: Teste Completo End-to-End - Pré-Pesquisa Inteligente 🧪
+
+### 37.1 Backend de Teste
+- [x] Criar módulo de simulação de IA (mock OpenAI responses)
+- [x] Implementar função de retry inteligente com 3 tentativas
+- [x] Implementar função de separação multi-cliente
+- [x] Implementar função de refinamento de contexto (3 níveis)
+- [x] Criar endpoint tRPC de teste
+
+### 37.2 Interface de Teste
+- [x] Criar página de teste interativa
+- [x] Implementar seletor de cenário de teste
+- [x] Implementar interface de revisão obrigatória
+- [x] Implementar wizard de refinamento de contexto
+- [x] Adicionar indicadores de progresso
+
+### 37.3 Cenários de Teste
+- [x] Cenário 1: Retry inteligente (empresa com poucos dados)
+- [x] Cenário 2: Multi-cliente (texto livre com 3 empresas)
+- [x] Cenário 3: Refinamento 3 níveis (implementado, teste visual pendente)
+- [x] Validar completude de dados em cada cenário
+- [x] Validar aprovação obrigatória
+
+### 37.4 Relatório de Teste
+- [x] Gerar métricas de sucesso por cenário
+- [x] Documentar resultados e observações
+- [x] Criar relatório consolidado
+
+### 37.5 Melhoria: Múltipla Escolha no Refinamento
+- [x] Modificar componente para usar checkboxes (múltipla escolha)
+- [x] Implementar geração de combinações cartesianas no backend
+- [x] Implementar cálculo de combinações (N×M×P)
+- [x] Documentar implementação completa
+
+
+## FASE 38: Debug e Teste do Cenário 3 🐛
+
+### 38.1 Diagnóstico
+- [x] Inspecionar componente Tabs do shadcn/ui
+- [x] Verificar estrutura do componente PrePesquisaTeste
+- [x] Identificar causa da não renderização da aba
+
+### 38.2 Correção
+- [x] Corrigir problema de renderização (lazy loading do Radix UI)
+- [x] Validar que todas as 3 abas funcionam
+- [x] Testar navegação entre abas
+
+### 38.3 Teste Completo Cenário 3
+- [x] Iniciar refinamento com contexto genérico
+- [x] Selecionar 2 opções no Nível 1 (Café, Soja)
+- [x] Selecionar 2 opções no Nível 2 (Minas Gerais, São Paulo)
+- [x] Selecionar 2 opções no Nível 3 (Sul de Minas, Cerrado Mineiro)
+- [x] Gerar 2×2×2 = 8 combinações
+- [x] Validar aprovação individual de cada combinação
+- [x] Documentar resultados completos
+- [x] Atualizar relatório final com resultados do Cenário 3
+- [x] Marcar Cenário 3 como 100% testado
+- [ ] Criar checkpoint final

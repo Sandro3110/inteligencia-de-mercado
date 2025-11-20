@@ -97,6 +97,7 @@ const navSections: NavSection[] = [
     items: [
       { title: "Atividades", href: "/atividade", icon: Activity },
       { title: "Histórico de Alertas", href: "/alertas/historico", icon: Clock },
+      { title: "🧪 Teste Pré-Pesquisa", href: "/pre-pesquisa-teste", icon: FileStack },
     ],
   },
 ];

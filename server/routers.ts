@@ -1556,5 +1556,89 @@ export const appRouter = router({
         return results;
       }),
   }),
+
+  // Router de Teste - Pré-Pesquisa Inteligente
+  prePesquisaTeste: router({
+    // Cenário 1: Retry Inteligente
+    retryInteligente: publicProcedure
+      .input(z.object({ query: z.string() }))
+      .mutation(async ({ input }) => {
+        const { simularRetryInteligente } = await import('./prePesquisaSimulator');
+        return simularRetryInteligente(input.query);
+      }),
+
+    // Cenário 2: Separação Multi-Cliente
+    separacaoMultiCliente: publicProcedure
+      .input(z.object({ textoLivre: z.string() }))
+      .mutation(async ({ input }) => {
+        const { simularSeparacaoMultiCliente } = await import('./prePesquisaSimulator');
+        return simularSeparacaoMultiCliente(input.textoLivre);
+      }),
+
+    // Cenário 2: Pré-Pesquisa de Entidade
+    prePesquisaEntidade: publicProcedure
+      .input(z.object({
+        tipo: z.enum(["especifica", "contexto"]),
+        query: z.string(),
+        contexto_adicional: z.string().nullable(),
+      }))
+      .mutation(async ({ input }) => {
+        const { simularPrePesquisaEntidade } = await import('./prePesquisaSimulator');
+        return simularPrePesquisaEntidade(input);
+      }),
+
+    // Cenário 3: Refinamento Nível 1
+    refinamentoNivel1: publicProcedure
+      .input(z.object({ contextoInicial: z.string() }))
+      .mutation(async ({ input }) => {
+        const { simularPerguntaNivel1 } = await import('./prePesquisaSimulator');
+        return simularPerguntaNivel1(input.contextoInicial);
+      }),
+
+    // Cenário 3: Refinamento Nível 2
+    refinamentoNivel2: publicProcedure
+      .input(z.object({
+        contextoInicial: z.string(),
+        respostasNivel1: z.array(z.string()),
+      }))
+      .mutation(async ({ input }) => {
+        const { simularPerguntaNivel2 } = await import('./prePesquisaSimulator');
+        return simularPerguntaNivel2(input.contextoInicial, input.respostasNivel1);
+      }),
+
+    // Cenário 3: Refinamento Nível 3
+    refinamentoNivel3: publicProcedure
+      .input(z.object({
+        contextoInicial: z.string(),
+        respostasNivel1: z.array(z.string()),
+        respostasNivel2: z.array(z.string()),
+      }))
+      .mutation(async ({ input }) => {
+        const { simularPerguntaNivel3 } = await import('./prePesquisaSimulator');
+        return simularPerguntaNivel3(
+          input.contextoInicial,
+          input.respostasNivel1,
+          input.respostasNivel2
+        );
+      }),
+
+    // Cenário 3: Pré-Pesquisa Refinada (com combinações cartesianas)
+    prePesquisaRefinada: publicProcedure
+      .input(z.object({
+        contextoInicial: z.string(),
+        respostasNivel1: z.array(z.string()),
+        respostasNivel2: z.array(z.string()),
+        respostasNivel3: z.array(z.string()),
+      }))
+      .mutation(async ({ input }) => {
+        const { simularPrePesquisaRefinadaMultipla } = await import('./prePesquisaSimulator');
+        return simularPrePesquisaRefinadaMultipla(
+          input.contextoInicial,
+          input.respostasNivel1,
+          input.respostasNivel2,
+          input.respostasNivel3
+        );
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
