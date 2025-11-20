@@ -405,3 +405,107 @@ PROJECT (nível 1)
 - [ ] Testar exportação de gráficos
 - [ ] Testar dashboard de comparação
 - [ ] Criar checkpoint final
+
+
+---
+
+## FASE 30: ANALYTICS DE LEAD GENERATION - INTELIGÊNCIA PRÉ-VENDAS 📊🎯
+
+### 30.1 Fundação - Tabelas de Analytics
+- [x] Criar tabela analytics_mercados (métricas por mercado)
+- [x] Criar tabela analytics_pesquisas (métricas por pesquisa/batch)
+- [x] Criar tabela analytics_dimensoes (eficácia por UF/porte/segmentação)
+- [x] Criar tabela analytics_timeline (evolução temporal diária)
+- [x] Implementar motor de agregação (cron job diário)
+- [ ] Criar índices de performance
+
+### 30.2 Sistema de Scoring e Métricas
+- [ ] Implementar modelo de scoring otimizado (0-100 pontos)
+- [ ] Criar biblioteca de métricas de qualidade
+- [ ] Criar biblioteca de métricas de eficiência operacional
+- [ ] Criar biblioteca de métricas de ROI
+- [ ] Implementar cálculo automático de ROI por mercado/pesquisa
+
+### 30.3 Dashboard 1 - Research Overview
+- [ ] Criar página ResearchOverviewDashboard.tsx
+- [ ] Implementar KPIs (Mercados, Leads, Qualidade Média, Taxa Aprovação)
+- [ ] Criar Funil de Qualificação (Clientes → Leads → Enriquecidos → Validados → Aprovados → Exportados SF)
+- [ ] Criar gráfico de Distribuição de Qualidade (pie chart)
+- [ ] Criar Evolução Temporal (leads gerados, qualidade média)
+- [ ] Criar Top 10 Mercados (volume, qualidade, aprovação)
+- [ ] Adicionar rota /research-overview no App.tsx
+
+### 30.4 Dashboard 2 - Lead Quality Intelligence
+- [ ] Criar página LeadQualityDashboard.tsx
+- [ ] Criar Heatmap de Qualidade por Dimensão (UF x Porte)
+- [ ] Implementar Matriz Qualidade vs Volume (4 quadrantes)
+- [ ] Criar Análise de Correlação (atributos vs qualidade)
+- [ ] Gerar Perfil do Lead Ideal (características score > 90)
+- [ ] Implementar Sistema de Recomendações Automáticas
+- [ ] Adicionar rota /lead-quality no App.tsx
+
+### 30.5 Dashboard 3 - Operational Efficiency
+- [ ] Criar página OperationalEfficiencyDashboard.tsx
+- [ ] Implementar Métricas de Enriquecimento (taxa sucesso, tempo, custo)
+- [ ] Criar Métricas de Validação (tempo, taxa aprovação, backlog)
+- [ ] Implementar Análise de Custos (waterfall chart)
+- [ ] Criar Detecção de Gargalos (etapas lentas)
+- [ ] Implementar Sistema de Alertas Operacionais
+- [ ] Adicionar rota /operational-efficiency no App.tsx
+
+### 30.6 Dashboard 4 - Salesforce Integration & ROI
+- [ ] Criar página SalesforceROIDashboard.tsx
+- [ ] Implementar Métricas de Pipeline Gerado (leads exportados, convertidos)
+- [ ] Criar Análise de ROI por Dimensão (mercado, UF, porte)
+- [ ] Implementar Sankey Diagram (fluxo de leads até venda)
+- [ ] Criar Feedback Loop (SF → PAV)
+- [ ] Implementar Ajuste Automático de Scoring baseado em conversões
+- [ ] Adicionar rota /salesforce-roi no App.tsx
+
+### 30.7 Componentes Reutilizáveis
+- [ ] Criar MetricCard.tsx (KPI card com sparkline e trend)
+- [ ] Criar QualificationFunnel.tsx (funil interativo com drill-down)
+- [ ] Criar QualityMatrix.tsx (matriz qualidade vs volume)
+- [ ] Criar RecommendationCard.tsx (card de recomendação acionável)
+- [ ] Criar ExportButton.tsx (exportar Excel, PDF, PNG)
+- [ ] Criar GlobalFilterPanel.tsx (filtros globais)
+
+### 30.8 Integração Salesforce
+- [ ] Criar interface de exportação para Salesforce
+- [ ] Implementar mapeamento de campos PAV → Salesforce
+- [ ] Criar filtros de exportação (qualidade mínima, status)
+- [ ] Implementar webhook para receber feedback de conversão
+- [ ] Criar tabela salesforce_sync_log (histórico de exportações)
+- [ ] Implementar sincronização automática (cron job)
+
+### 30.9 Alertas Operacionais
+- [ ] Criar tabela operational_alerts
+- [ ] Implementar alerta: Qualidade média baixa (<60)
+- [ ] Implementar alerta: Enriquecimento lento (>10min/lead)
+- [ ] Implementar alerta: Backlog de validação alto (>100 leads)
+- [ ] Implementar alerta: Custo elevado (>1.5x média)
+- [ ] Implementar alerta: Conversão SF baixa (<15%)
+- [ ] Criar página OperationalAlerts.tsx
+
+### 30.10 Sistema de Recomendações
+- [ ] Criar tabela recommendations
+- [ ] Implementar recomendações de mercados prioritários
+- [ ] Implementar recomendações de regiões sub-exploradas
+- [ ] Implementar recomendações de ajuste de filtros
+- [ ] Implementar recomendações de otimização de custos
+- [ ] Criar componente RecommendationsPanel.tsx
+
+### 30.11 Performance & Otimização
+- [ ] Criar índices nas tabelas de analytics
+- [ ] Otimizar queries de agregação
+- [ ] Implementar lazy loading de gráficos
+- [ ] Cache de métricas calculadas (Redis opcional)
+- [ ] Testes de performance
+
+### 30.12 Validação Final
+- [ ] Testar todos os 4 dashboards
+- [ ] Testar sistema de recomendações
+- [ ] Testar alertas operacionais
+- [ ] Testar integração Salesforce (exportação + feedback)
+- [ ] Testar motor de agregação (cron job)
+- [ ] Criar checkpoint final

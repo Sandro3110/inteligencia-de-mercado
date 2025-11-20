@@ -586,3 +586,251 @@ export const enrichmentConfigs = mysqlTable("enrichment_configs", {
 
 export type EnrichmentConfig = typeof enrichmentConfigs.$inferSelect;
 export type InsertEnrichmentConfig = typeof enrichmentConfigs.$inferInsert;
+
+
+/**
+ * ============================================
+ * ANALYTICS TABLES - Lead Generation Intelligence
+ * ============================================
+ */
+
+/**
+ * Analytics por Mercado - Métricas agregadas por mercado
+ */
+export const analyticsMercados = mysqlTable("analytics_mercados", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  pesquisaId: int("pesquisaId"),
+  mercadoId: int("mercadoId").notNull(),
+  periodo: timestamp("periodo").notNull(), // Data de referência
+  
+  // Métricas de Cobertura
+  totalClientes: int("totalClientes").default(0),
+  totalConcorrentes: int("totalConcorrentes").default(0),
+  totalLeadsGerados: int("totalLeadsGerados").default(0),
+  taxaCoberturaMercado: int("taxaCoberturaMercado").default(0), // Percentual * 100
+  
+  // Métricas de Qualidade
+  qualidadeMediaLeads: int("qualidadeMediaLeads").default(0), // Score médio * 100
+  leadsAltaQualidade: int("leadsAltaQualidade").default(0), // score >= 80
+  leadsMediaQualidade: int("leadsMediaQualidade").default(0), // score 50-79
+  leadsBaixaQualidade: int("leadsBaixaQualidade").default(0), // score < 50
+  
+  // Métricas de Enriquecimento
+  leadsEnriquecidos: int("leadsEnriquecidos").default(0),
+  taxaSucessoEnriquecimento: int("taxaSucessoEnriquecimento").default(0), // Percentual * 100
+  tempoMedioEnriquecimentoMin: int("tempoMedioEnriquecimentoMin").default(0), // Minutos * 100
+  custoEnriquecimentoTotal: int("custoEnriquecimentoTotal").default(0), // Centavos
+  
+  // Métricas de Validação
+  leadsValidados: int("leadsValidados").default(0),
+  leadsAprovados: int("leadsAprovados").default(0), // status: rich
+  leadsDescartados: int("leadsDescartados").default(0), // status: discarded
+  taxaAprovacao: int("taxaAprovacao").default(0), // Percentual * 100
+  
+  // Métricas de Exportação Salesforce (preparado para futuro)
+  leadsExportadosSF: int("leadsExportadosSF").default(0),
+  leadsConvertidosSF: int("leadsConvertidosSF").default(0),
+  taxaConversaoSF: int("taxaConversaoSF").default(0), // Percentual * 100
+  
+  // Métricas de Esforço
+  horasPesquisa: int("horasPesquisa").default(0), // Horas * 100
+  custoTotal: int("custoTotal").default(0), // Centavos
+  roi: int("roi").default(0), // ROI * 100 (pode ser negativo)
+  
+  updatedAt: timestamp("updatedAt").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type AnalyticsMercado = typeof analyticsMercados.$inferSelect;
+export type InsertAnalyticsMercado = typeof analyticsMercados.$inferInsert;
+
+/**
+ * Analytics por Pesquisa - Métricas agregadas por batch de pesquisa
+ */
+export const analyticsPesquisas = mysqlTable("analytics_pesquisas", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  pesquisaId: int("pesquisaId").notNull(),
+  
+  // Métricas Gerais
+  totalMercadosMapeados: int("totalMercadosMapeados").default(0),
+  totalClientesBase: int("totalClientesBase").default(0),
+  totalLeadsGerados: int("totalLeadsGerados").default(0),
+  taxaConversaoClienteLead: int("taxaConversaoClienteLead").default(0), // Percentual * 100
+  
+  // Qualidade Agregada
+  qualidadeMediaGeral: int("qualidadeMediaGeral").default(0), // Score médio * 100
+  distribuicaoQualidade: text("distribuicaoQualidade"), // JSON: {alta: X, media: Y, baixa: Z}
+  
+  // Performance de Enriquecimento
+  taxaSucessoEnriquecimento: int("taxaSucessoEnriquecimento").default(0), // Percentual * 100
+  tempoTotalEnriquecimentoHoras: int("tempoTotalEnriquecimentoHoras").default(0), // Horas * 100
+  custoTotalEnriquecimento: int("custoTotalEnriquecimento").default(0), // Centavos
+  
+  // Resultados Salesforce (preparado para futuro)
+  leadsExportadosSF: int("leadsExportadosSF").default(0),
+  leadsConvertidosSF: int("leadsConvertidosSF").default(0),
+  taxaConversaoSF: int("taxaConversaoSF").default(0), // Percentual * 100
+  valorPipelineGerado: int("valorPipelineGerado").default(0), // Centavos
+  
+  // ROI da Pesquisa
+  custoTotalPesquisa: int("custoTotalPesquisa").default(0), // Centavos
+  valorGerado: int("valorGerado").default(0), // Centavos
+  roi: int("roi").default(0), // ROI * 100
+  
+  dataInicio: timestamp("dataInicio"),
+  dataConclusao: timestamp("dataConclusao"),
+  duracaoDias: int("duracaoDias").default(0),
+  
+  updatedAt: timestamp("updatedAt").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type AnalyticsPesquisa = typeof analyticsPesquisas.$inferSelect;
+export type InsertAnalyticsPesquisa = typeof analyticsPesquisas.$inferInsert;
+
+/**
+ * Analytics por Dimensão - Eficácia por UF/Porte/Segmentação
+ */
+export const analyticsDimensoes = mysqlTable("analytics_dimensoes", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  pesquisaId: int("pesquisaId"),
+  
+  dimensaoTipo: mysqlEnum("dimensaoTipo", ["uf", "porte", "segmentacao", "categoria"]).notNull(),
+  dimensaoValor: varchar("dimensaoValor", { length: 100 }).notNull(), // ex: 'SP', 'Médio', 'B2B'
+  
+  totalLeads: int("totalLeads").default(0),
+  qualidadeMedia: int("qualidadeMedia").default(0), // Score médio * 100
+  taxaConversaoSF: int("taxaConversaoSF").default(0), // Percentual * 100
+  custoMedioLead: int("custoMedioLead").default(0), // Centavos
+  roi: int("roi").default(0), // ROI * 100
+  
+  updatedAt: timestamp("updatedAt").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type AnalyticsDimensao = typeof analyticsDimensoes.$inferSelect;
+export type InsertAnalyticsDimensao = typeof analyticsDimensoes.$inferInsert;
+
+/**
+ * Analytics Timeline - Evolução temporal diária
+ */
+export const analyticsTimeline = mysqlTable("analytics_timeline", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  data: timestamp("data").notNull(),
+  
+  // Métricas Diárias
+  leadsGeradosDia: int("leadsGeradosDia").default(0),
+  leadsEnriquecidosDia: int("leadsEnriquecidosDia").default(0),
+  leadsValidadosDia: int("leadsValidadosDia").default(0),
+  leadsExportadosSFDia: int("leadsExportadosSFDia").default(0),
+  
+  qualidadeMediaDia: int("qualidadeMediaDia").default(0), // Score médio * 100
+  custoDia: int("custoDia").default(0), // Centavos
+  
+  // Métricas Acumuladas
+  leadsAcumulados: int("leadsAcumulados").default(0),
+  custoAcumulado: int("custoAcumulado").default(0), // Centavos
+  valorGeradoAcumulado: int("valorGeradoAcumulado").default(0), // Centavos
+  
+  updatedAt: timestamp("updatedAt").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type AnalyticsTimeline = typeof analyticsTimeline.$inferSelect;
+export type InsertAnalyticsTimeline = typeof analyticsTimeline.$inferInsert;
+
+/**
+ * Operational Alerts - Alertas operacionais automáticos
+ */
+export const operationalAlerts = mysqlTable("operational_alerts", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  
+  alertType: mysqlEnum("alertType", [
+    "qualidade_baixa",
+    "enriquecimento_lento",
+    "backlog_validacao",
+    "custo_elevado",
+    "conversao_sf_baixa"
+  ]).notNull(),
+  
+  severity: mysqlEnum("severity", ["low", "medium", "high", "critical"]).default("medium").notNull(),
+  
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  mensagem: text("mensagem").notNull(),
+  acaoRecomendada: text("acaoRecomendada"),
+  
+  valorAtual: text("valorAtual"), // Valor que disparou o alerta
+  valorEsperado: text("valorEsperado"), // Valor de referência
+  
+  isRead: int("isRead").default(0).notNull(), // 0 = não lido, 1 = lido
+  isDismissed: int("isDismissed").default(0).notNull(), // 0 = ativo, 1 = dispensado
+  
+  createdAt: timestamp("createdAt").defaultNow(),
+  readAt: timestamp("readAt"),
+  dismissedAt: timestamp("dismissedAt"),
+});
+
+export type OperationalAlert = typeof operationalAlerts.$inferSelect;
+export type InsertOperationalAlert = typeof operationalAlerts.$inferInsert;
+
+/**
+ * Recommendations - Recomendações automáticas
+ */
+export const recommendations = mysqlTable("recommendations", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  
+  tipo: mysqlEnum("tipo", ["mercado", "regiao", "metodologia", "filtro", "otimizacao"]).notNull(),
+  prioridade: mysqlEnum("prioridade", ["baixa", "media", "alta"]).default("media").notNull(),
+  
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  descricao: text("descricao").notNull(),
+  acao: text("acao").notNull(), // Texto acionável
+  
+  // Impacto Estimado
+  leadsAdicionaisEstimado: int("leadsAdicionaisEstimado").default(0),
+  qualidadeEsperada: int("qualidadeEsperada").default(0), // Score * 100
+  custoEstimado: int("custoEstimado").default(0), // Centavos
+  roiEsperado: int("roiEsperado").default(0), // ROI * 100
+  
+  isApplied: int("isApplied").default(0).notNull(), // 0 = pendente, 1 = aplicada
+  isDismissed: int("isDismissed").default(0).notNull(), // 0 = ativa, 1 = dispensada
+  
+  createdAt: timestamp("createdAt").defaultNow(),
+  appliedAt: timestamp("appliedAt"),
+  dismissedAt: timestamp("dismissedAt"),
+});
+
+export type Recommendation = typeof recommendations.$inferSelect;
+export type InsertRecommendation = typeof recommendations.$inferInsert;
+
+/**
+ * Salesforce Sync Log - Histórico de exportações (preparado para futuro)
+ */
+export const salesforceSyncLog = mysqlTable("salesforce_sync_log", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  pesquisaId: int("pesquisaId"),
+  
+  syncType: mysqlEnum("syncType", ["manual", "automatico"]).default("manual").notNull(),
+  
+  totalLeadsExportados: int("totalLeadsExportados").default(0),
+  totalLeadsSucesso: int("totalLeadsSucesso").default(0),
+  totalLeadsErro: int("totalLeadsErro").default(0),
+  
+  status: mysqlEnum("status", ["em_progresso", "concluido", "erro"]).default("em_progresso").notNull(),
+  errorMessage: text("errorMessage"),
+  
+  leadIds: text("leadIds"), // JSON array de IDs exportados
+  
+  createdAt: timestamp("createdAt").defaultNow(),
+  completedAt: timestamp("completedAt"),
+});
+
+export type SalesforceSyncLog = typeof salesforceSyncLog.$inferSelect;
+export type InsertSalesforceSyncLog = typeof salesforceSyncLog.$inferInsert;
