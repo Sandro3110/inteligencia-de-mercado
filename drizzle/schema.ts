@@ -935,3 +935,104 @@ export const queryCache = mysqlTable('query_cache', {
 
 export type QueryCache = typeof queryCache.$inferSelect;
 export type InsertQueryCache = typeof queryCache.$inferInsert;
+
+// ============================================
+// MÓDULO DE ADMIN LLM E ALERTAS INTELIGENTES
+// ============================================
+
+/**
+ * LLM Provider Configs - Configuração de provedores de IA
+ */
+export const llmProviderConfigs = mysqlTable("llm_provider_configs", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  
+  // Provedor ativo
+  activeProvider: mysqlEnum("activeProvider", ["openai", "gemini", "anthropic"]).default("openai").notNull(),
+  
+  // Configurações OpenAI
+  openaiApiKey: text("openaiApiKey"),
+  openaiModel: varchar("openaiModel", { length: 100 }).default("gpt-4o"),
+  openaiEnabled: int("openaiEnabled").default(1).notNull(),
+  
+  // Configurações Gemini
+  geminiApiKey: text("geminiApiKey"),
+  geminiModel: varchar("geminiModel", { length: 100 }).default("gemini-2.0-flash-exp"),
+  geminiEnabled: int("geminiEnabled").default(0).notNull(),
+  
+  // Configurações Anthropic
+  anthropicApiKey: text("anthropicApiKey"),
+  anthropicModel: varchar("anthropicModel", { length: 100 }).default("claude-3-5-sonnet-20241022"),
+  anthropicEnabled: int("anthropicEnabled").default(0).notNull(),
+  
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type LLMProviderConfig = typeof llmProviderConfigs.$inferSelect;
+export type InsertLLMProviderConfig = typeof llmProviderConfigs.$inferInsert;
+
+/**
+ * Intelligent Alerts Config - Configuração de alertas inteligentes
+ */
+export const intelligentAlertsConfigs = mysqlTable("intelligent_alerts_configs", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull().unique(),
+  
+  // Thresholds
+  circuitBreakerThreshold: int("circuitBreakerThreshold").default(10).notNull(),
+  errorRateThreshold: int("errorRateThreshold").default(10).notNull(), // Percentual
+  processingTimeThreshold: int("processingTimeThreshold").default(60).notNull(), // Segundos
+  
+  // Flags
+  notifyOnCompletion: int("notifyOnCompletion").default(1).notNull(),
+  notifyOnCircuitBreaker: int("notifyOnCircuitBreaker").default(1).notNull(),
+  notifyOnErrorRate: int("notifyOnErrorRate").default(1).notNull(),
+  notifyOnProcessingTime: int("notifyOnProcessingTime").default(1).notNull(),
+  
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type IntelligentAlertsConfig = typeof intelligentAlertsConfigs.$inferSelect;
+export type InsertIntelligentAlertsConfig = typeof intelligentAlertsConfigs.$inferInsert;
+
+/**
+ * Intelligent Alerts History - Histórico de alertas disparados
+ */
+export const intelligentAlertsHistory = mysqlTable("intelligent_alerts_history", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  
+  alertType: mysqlEnum("alertType", [
+    "circuit_breaker",
+    "error_rate",
+    "processing_time",
+    "completion"
+  ]).notNull(),
+  
+  severity: mysqlEnum("severity", ["info", "warning", "critical"]).default("info").notNull(),
+  
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  
+  // Métricas no momento do alerta
+  metricValue: text("metricValue"), // Valor que disparou o alerta
+  threshold: text("threshold"), // Threshold configurado
+  
+  // Contexto adicional
+  jobId: int("jobId"),
+  clientsProcessed: int("clientsProcessed"),
+  totalClients: int("totalClients"),
+  
+  // Status
+  isRead: int("isRead").default(0).notNull(),
+  isDismissed: int("isDismissed").default(0).notNull(),
+  
+  createdAt: timestamp("createdAt").defaultNow(),
+  readAt: timestamp("readAt"),
+  dismissedAt: timestamp("dismissedAt"),
+});
+
+export type IntelligentAlertHistory = typeof intelligentAlertsHistory.$inferSelect;
+export type InsertIntelligentAlertHistory = typeof intelligentAlertsHistory.$inferInsert;

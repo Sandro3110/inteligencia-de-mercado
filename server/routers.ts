@@ -1327,7 +1327,7 @@ export const appRouter = router({
       .input(z.object({ clienteId: z.number(), projectId: z.number(), mercadoIds: z.array(z.number()) }))
       .mutation(async ({ input }) => {
         const { createProdutosCliente } = await import('./enrichmentOptimized');
-        return createProdutosCliente(input.clienteId, input.projectId, input.mercadoIds);
+        return createProdutosCliente(input.clienteId, input.projectId);
       }),
 
     findConcorrentes: publicProcedure
@@ -1583,6 +1583,110 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const { retryWithImprovement } = await import('./services/preResearchService');
         return retryWithImprovement(input.entidade, input.tipo, input.maxRetries);
+      }),
+  }),
+
+  // Admin LLM - Configuração de provedores de IA
+  adminLLM: router({  
+    getConfig: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getLLMConfig } = await import('./llmConfigDb');
+        return getLLMConfig(input.projectId);
+      }),
+
+    saveConfig: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        activeProvider: z.enum(['openai', 'gemini', 'anthropic']),
+        openaiApiKey: z.string().optional(),
+        openaiModel: z.string().optional(),
+        openaiEnabled: z.number().optional(),
+        geminiApiKey: z.string().optional(),
+        geminiModel: z.string().optional(),
+        geminiEnabled: z.number().optional(),
+        anthropicApiKey: z.string().optional(),
+        anthropicModel: z.string().optional(),
+        anthropicEnabled: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { upsertLLMConfig } = await import('./llmConfigDb');
+        await upsertLLMConfig(input);
+        return { success: true };
+      }),
+
+    testConnection: publicProcedure
+      .input(z.object({
+        provider: z.enum(['openai', 'gemini', 'anthropic']),
+        apiKey: z.string(),
+        model: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { testLLMConnection } = await import('./llmConfigDb');
+        return testLLMConnection(input.provider, input.apiKey, input.model);
+      }),
+  }),
+
+  // Intelligent Alerts - Sistema de alertas inteligentes
+  intelligentAlerts: router({
+    getConfig: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getAlertsConfig } = await import('./llmConfigDb');
+        return getAlertsConfig(input.projectId);
+      }),
+
+    saveConfig: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        circuitBreakerThreshold: z.number().optional(),
+        errorRateThreshold: z.number().optional(),
+        processingTimeThreshold: z.number().optional(),
+        notifyOnCompletion: z.number().optional(),
+        notifyOnCircuitBreaker: z.number().optional(),
+        notifyOnErrorRate: z.number().optional(),
+        notifyOnProcessingTime: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { upsertAlertsConfig } = await import('./llmConfigDb');
+        await upsertAlertsConfig(input);
+        return { success: true };
+      }),
+
+    getHistory: publicProcedure
+      .input(z.object({ 
+        projectId: z.number(),
+        limit: z.number().optional().default(50),
+      }))
+      .query(async ({ input }) => {
+        const { getAlertsHistory } = await import('./llmConfigDb');
+        return getAlertsHistory(input.projectId, input.limit);
+      }),
+
+    getStats: publicProcedure
+      .input(z.object({ 
+        projectId: z.number(),
+        hours: z.number().optional().default(24),
+      }))
+      .query(async ({ input }) => {
+        const { getAlertsStats } = await import('./llmConfigDb');
+        return getAlertsStats(input.projectId, input.hours);
+      }),
+
+    markAsRead: publicProcedure
+      .input(z.object({ alertId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { markAlertAsRead } = await import('./llmConfigDb');
+        await markAlertAsRead(input.alertId);
+        return { success: true };
+      }),
+
+    dismiss: publicProcedure
+      .input(z.object({ alertId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { dismissAlert } = await import('./llmConfigDb');
+        await dismissAlert(input.alertId);
+        return { success: true };
       }),
   }),
 

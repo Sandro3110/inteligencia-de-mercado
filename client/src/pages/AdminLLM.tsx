@@ -44,13 +44,16 @@ export default function AdminLLM() {
   });
 
   // Buscar configuração existente
-  const { data: config, isLoading } = trpc.enrichmentConfig.get.useQuery(
+  const { data: config, isLoading } = trpc.adminLLM.getConfig.useQuery(
     { projectId: selectedProjectId! },
     { enabled: !!selectedProjectId }
   );
 
   // Salvar configuração
-  const saveMutation = trpc.enrichmentConfig.save.useMutation();
+  const saveMutation = trpc.adminLLM.saveConfig.useMutation();
+  
+  // Testar conexão
+  const testMutation = trpc.adminLLM.testConnection.useMutation();
 
   // Carregar config quando disponível
   useEffect(() => {
@@ -60,26 +63,29 @@ export default function AdminLLM() {
       // OpenAI
       if (config.openaiApiKey) {
         newProviders[0].apiKey = config.openaiApiKey;
-        newProviders[0].enabled = true;
+        newProviders[0].model = config.openaiModel || 'gpt-4o';
+        newProviders[0].enabled = config.openaiEnabled === 1;
       }
       
-      // Gemini (se existir no config)
-      if ((config as any).geminiApiKey) {
-        newProviders[1].apiKey = (config as any).geminiApiKey;
-        newProviders[1].enabled = true;
+      // Gemini
+      if (config.geminiApiKey) {
+        newProviders[1].apiKey = config.geminiApiKey;
+        newProviders[1].model = config.geminiModel || 'gemini-2.0-flash-exp';
+        newProviders[1].enabled = config.geminiEnabled === 1;
       }
       
-      // Anthropic (se existir no config)
-      if ((config as any).anthropicApiKey) {
-        newProviders[2].apiKey = (config as any).anthropicApiKey;
-        newProviders[2].enabled = true;
+      // Anthropic
+      if (config.anthropicApiKey) {
+        newProviders[2].apiKey = config.anthropicApiKey;
+        newProviders[2].model = config.anthropicModel || 'claude-3-5-sonnet-20241022';
+        newProviders[2].enabled = config.anthropicEnabled === 1;
       }
       
       setProviders(newProviders);
       
       // Definir provedor ativo
-      if ((config as any).activeProvider) {
-        setActiveProvider((config as any).activeProvider);
+      if (config.activeProvider) {
+        setActiveProvider(config.activeProvider);
       }
     }
   }, [config]);
@@ -101,18 +107,22 @@ export default function AdminLLM() {
     setTestResults(prev => ({ ...prev, [provider]: null }));
 
     try {
-      // Simular teste de conexão (você pode implementar endpoint real)
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const result = await testMutation.mutateAsync({
+        provider,
+        apiKey: providerConfig.apiKey,
+        model: providerConfig.model,
+      });
       
-      // Por enquanto, sempre retorna sucesso se tem API key
       setTestResults(prev => ({
         ...prev,
-        [provider]: {
-          success: true,
-          message: "Conexão estabelecida com sucesso",
-        },
+        [provider]: result,
       }));
-      toast.success(`${provider.toUpperCase()} conectado com sucesso!`);
+      
+      if (result.success) {
+        toast.success(`${provider.toUpperCase()} conectado com sucesso!`);
+      } else {
+        toast.error(`Erro: ${result.message}`);
+      }
     } catch (error: any) {
       setTestResults(prev => ({
         ...prev,
@@ -142,22 +152,17 @@ export default function AdminLLM() {
     try {
       await saveMutation.mutateAsync({
         projectId: selectedProjectId,
-        openaiApiKey: providers[0].apiKey || undefined,
-        // Campos extras para outros provedores (você precisa adicionar no schema)
-        ...(providers[1].apiKey && { geminiApiKey: providers[1].apiKey }),
-        ...(providers[2].apiKey && { anthropicApiKey: providers[2].apiKey }),
         activeProvider,
-        // Manter outros campos do config original
-        produtosPorMercado: config?.produtosPorMercado || 3,
-        concorrentesPorMercado: config?.concorrentesPorMercado || 5,
-        leadsPorMercado: config?.leadsPorMercado || 5,
-        batchSize: config?.batchSize || 50,
-        checkpointInterval: config?.checkpointInterval || 100,
-        enableDeduplication: config?.enableDeduplication || 1,
-        enableQualityScore: config?.enableQualityScore || 1,
-        enableAutoRetry: config?.enableAutoRetry || 1,
-        maxRetries: config?.maxRetries || 2,
-      } as any);
+        openaiApiKey: providers[0].apiKey || undefined,
+        openaiModel: providers[0].model,
+        openaiEnabled: providers[0].enabled ? 1 : 0,
+        geminiApiKey: providers[1].apiKey || undefined,
+        geminiModel: providers[1].model,
+        geminiEnabled: providers[1].enabled ? 1 : 0,
+        anthropicApiKey: providers[2].apiKey || undefined,
+        anthropicModel: providers[2].model,
+        anthropicEnabled: providers[2].enabled ? 1 : 0,
+      });
       
       toast.success("Configurações salvas com sucesso!");
     } catch (error: any) {

@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Bell, AlertTriangle, CheckCircle2, Clock, Zap, Loader2 } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 interface AlertConfigState {
   circuitBreakerThreshold: number;
@@ -31,14 +32,32 @@ export default function IntelligentAlerts() {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
-  // Simular carregamento de config (você pode implementar endpoint real)
+  // Buscar configuração existente
+  const { data: loadedConfig, isLoading } = trpc.intelligentAlerts.getConfig.useQuery(
+    { projectId: selectedProjectId! },
+    { enabled: !!selectedProjectId }
+  );
+
+  // Buscar estatísticas de alertas (24h)
+  const { data: stats } = trpc.intelligentAlerts.getStats.useQuery(
+    { projectId: selectedProjectId!, hours: 24 },
+    { enabled: !!selectedProjectId }
+  );
+
+  // Salvar configuração
+  const saveMutation = trpc.intelligentAlerts.saveConfig.useMutation();
+
+  // Carregar config quando disponível
   useEffect(() => {
-    if (selectedProjectId) {
-      // Carregar config do backend
-      // const loadedConfig = await trpc.alerts.getConfig.query({ projectId: selectedProjectId });
-      // setConfig(loadedConfig);
+    if (loadedConfig) {
+      setConfig({
+        circuitBreakerThreshold: loadedConfig.circuitBreakerThreshold,
+        errorRateThreshold: loadedConfig.errorRateThreshold,
+        processingTimeThreshold: loadedConfig.processingTimeThreshold,
+        notifyOnCompletion: loadedConfig.notifyOnCompletion === 1,
+      });
     }
-  }, [selectedProjectId]);
+  }, [loadedConfig]);
 
   const handleSave = async () => {
     if (!selectedProjectId) {
@@ -48,13 +67,16 @@ export default function IntelligentAlerts() {
 
     setIsSaving(true);
     try {
-      // Simular salvamento (você pode implementar endpoint real)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // await trpc.alerts.saveConfig.mutate({
-      //   projectId: selectedProjectId,
-      //   ...config,
-      // });
+      await saveMutation.mutateAsync({
+        projectId: selectedProjectId,
+        circuitBreakerThreshold: config.circuitBreakerThreshold,
+        errorRateThreshold: config.errorRateThreshold,
+        processingTimeThreshold: config.processingTimeThreshold,
+        notifyOnCompletion: config.notifyOnCompletion ? 1 : 0,
+        notifyOnCircuitBreaker: 1,
+        notifyOnErrorRate: 1,
+        notifyOnProcessingTime: 1,
+      });
 
       setLastSaved(new Date());
       toast.success("Configurações de alertas salvas com sucesso!");

@@ -133,10 +133,10 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
           .values({
             projectId,
             pesquisaId: cliente.pesquisaId || null,
-            nome: truncate(mercadoData.nome, 100),
-            categoria: mercadoData.categoria,
-            segmentacao: truncate(mercadoData.segmentacao, 50),
-            tamanhoEstimado: truncate(mercadoData.tamanhoEstimado, 100),
+            nome: truncate(mercadoData.nome, 255),
+            categoria: truncate(mercadoData.categoria || '', 100),
+            segmentacao: truncate(mercadoData.segmentacao || '', 50),
+            tamanhoMercado: truncate(mercadoData.tamanhoEstimado || '', 500),
             mercadoHash,
             createdAt: new Date()
           });
@@ -159,15 +159,17 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
           pesquisaId: cliente.pesquisaId || null,
           clienteId,
           mercadoId,
-          nome: truncate(produtoData.nome, 200),
-          descricao: truncate(produtoData.descricao, 500),
-          categoria: truncate(produtoData.categoria, 100),
-          ativo: 1, // ✅ BUG FIX 3: Campo ativo deve ser 1 (ativo)
+          nome: truncate(produtoData.nome, 255),
+          descricao: truncate(produtoData.descricao || '', 1000),
+          categoria: truncate(produtoData.categoria || '', 100),
+          preco: truncate(produtoData.preco || '', 100),
+          unidade: truncate(produtoData.unidade || '', 50),
+          ativo: 1,
           createdAt: new Date()
         }).onDuplicateKeyUpdate({
           set: {
-            descricao: truncate(produtoData.descricao, 500),
-            categoria: truncate(produtoData.categoria, 100),
+            descricao: truncate(produtoData.descricao || '', 1000),
+            categoria: truncate(produtoData.categoria || '', 100),
             ativo: 1
           }
         });
@@ -204,12 +206,17 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
             projectId,
             pesquisaId: cliente.pesquisaId || null,
             mercadoId,
-            nome: truncate(concorrenteData.nome, 200),
-            produto: truncate(concorrenteData.descricao, 200), // ✅ BUG FIX 1: OpenAI retorna 'descricao'
-            porte: concorrenteData.porte || undefined,
+            nome: truncate(concorrenteData.nome, 255),
+            produto: truncate(concorrenteData.descricao || '', 1000),
+            cnpj: truncate(concorrenteData.cnpj || '', 20),
+            site: truncate(concorrenteData.site || '', 500),
+            cidade: truncate(concorrenteData.cidade || '', 100),
+            uf: truncate(concorrenteData.uf || '', 2),
+            porte: truncate(concorrenteData.porte || '', 50),
+            faturamentoEstimado: truncate(concorrenteData.faturamentoEstimado || '', 200),
             qualidadeScore: qualityScore,
-            qualidadeClassificacao: getQualityClassification(qualityScore), // ✅ BUG FIX 2: Adicionar classificação
-            validationStatus: 'pending', // ✅ BUG FIX 2: Status inicial
+            qualidadeClassificacao: getQualityClassification(qualityScore),
+            validationStatus: 'pending',
             concorrenteHash,
             createdAt: new Date()
           });
@@ -247,14 +254,14 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
             projectId,
             pesquisaId: cliente.pesquisaId || null,
             mercadoId,
-            nome: truncate(leadData.nome, 200),
-            setor: truncate(leadData.segmento, 100),
-            tipo: truncate(leadData.potencial, 50),
-            porte: leadData.porte || undefined,
+            nome: truncate(leadData.nome, 255),
+            setor: truncate(leadData.segmento || '', 100),
+            tipo: truncate(leadData.potencial || '', 20),
+            porte: truncate(leadData.porte || '', 50),
             qualidadeScore: qualityScore,
-            qualidadeClassificacao: getQualityClassification(qualityScore), // ✅ BUG FIX 2: Adicionar classificação
-            validationStatus: 'pending', // ✅ BUG FIX 2: Status inicial
-            stage: 'novo', // ✅ BUG FIX 2: Stage inicial
+            qualidadeClassificacao: getQualityClassification(qualityScore),
+            validationStatus: 'pending',
+            stage: 'novo',
             leadHash,
             createdAt: new Date()
           });

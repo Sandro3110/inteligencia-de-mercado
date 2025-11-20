@@ -38,6 +38,7 @@ export interface ExecutiveReportData {
 }
 
 export interface ReportFilters {
+  pesquisaId?: number;
   dateFrom?: string;
   dateTo?: string;
   mercadoIds?: number[];
