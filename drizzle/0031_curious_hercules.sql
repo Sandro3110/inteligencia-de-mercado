@@ -1,0 +1,1 @@
+ALTER TABLE `projects` ADD `lastActivityAt` timestamp DEFAULT (now());

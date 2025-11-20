@@ -226,3 +226,58 @@
 - [x] Adicionar filtros (todos/ativos/adormecidos)
 - [x] Implementar todas as ações (criar/editar/hibernar/reativar/deletar)
 - [x] Adicionar estatísticas e badges de status
+
+
+---
+
+## FASE 58: MELHORIAS AVANÇADAS DE GERENCIAMENTO DE PROJETOS 🚀 ✅
+
+### 58.1 Arquivamento Automático por Inatividade
+- [x] Adicionar campo `lastActivityAt` na tabela projects
+- [x] Criar função `updateProjectActivity()` no backend
+- [x] Criar função `getInactiveProjects()` para buscar projetos inativos
+- [x] Criar endpoint tRPC `projects.autoHibernate` com parâmetro de dias
+- [x] Criar endpoint tRPC `projects.getInactive` para listar inativos
+- [x] Criar endpoint tRPC `projects.updateActivity` para atualizar timestamp
+
+### 58.2 Histórico de Mudanças e Log de Auditoria
+- [x] Criar tabela `project_audit_log` no banco
+- [x] Adicionar campos: id, projectId, action, userId, changes, createdAt
+- [x] Criar função `logProjectChange()` no backend
+- [x] Criar função `getProjectAuditLog()` com paginação
+- [x] Criar endpoint tRPC `projects.getAuditLog` com paginação
+- [x] Criar modal de histórico na página ProjectManagement
+- [x] Implementar timeline visual com ícones por tipo de ação
+- [x] Adicionar filtros por tipo de ação e período
+- [x] Mostrar diff de mudanças (JSON formatado)
+- [x] Adicionar botão "Histórico" nos cards de projeto
+
+### 58.3 Duplicação de Projetos
+- [x] Criar função `duplicateProject()` no backend
+- [x] Copiar estrutura: nome, descrição, cor, configurações
+- [x] Copiar mercados únicos relacionados (sem dados de pesquisas)
+- [x] Gerar nome automático: "Cópia de [Nome Original]"
+- [x] Criar endpoint tRPC `projects.duplicate`
+- [x] Adicionar botão "Duplicar" nos cards de projeto
+- [x] Criar modal de confirmação com opções de customização
+- [x] Permitir editar nome do projeto duplicado antes de criar
+- [x] Adicionar checkbox para escolher o que copiar (mercados, configs)
+- [x] Mostrar toast de sucesso após duplicação
+
+### 58.4 Reorganização do Menu de Navegação
+- [x] Fazer varredura completa de todas as páginas (34 páginas encontradas)
+- [x] Reorganizar menu por prioridade (Core > Análise > Config > Sistema)
+- [x] Criar seção "🎯 Core" com funcionalidades principais
+- [x] Criar seção "📊 Análise" com inteligência de mercado
+- [x] Criar seção "⚙️ Configurações" com automação
+- [x] Criar seção "📁 Sistema" com histórico
+- [x] Adicionar textos intuitivos em todos os itens
+- [x] Adicionar badges visuais ("Criar", "Novo")
+- [x] Adicionar atalhos de teclado nos principais itens
+
+### 58.5 Testes e Validação
+- [x] Criar testes para arquivamento automático (5 testes)
+- [x] Criar testes para log de auditoria (6 testes)
+- [x] Criar testes para duplicação de projetos (5 testes)
+- [x] Criar testes de integração completa (2 testes)
+- [x] Total: 18 testes criados em server/__tests__/fase58.test.ts

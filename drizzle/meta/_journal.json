@@ -218,6 +218,20 @@
       "when": 1763667954630,
       "tag": "0030_misty_proteus",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "5",
+      "when": 1763668734839,
+      "tag": "0031_curious_hercules",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "5",
+      "when": 1763669340312,
+      "tag": "0032_stormy_lizard",
+      "breakpoints": true
     }
   ]
 }

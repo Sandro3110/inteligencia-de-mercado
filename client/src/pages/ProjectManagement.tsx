@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Dialog, 
   DialogContent, 
@@ -49,7 +50,9 @@ import {
   CheckCircle2,
   AlertCircle,
   Folder,
-  Filter
+  Filter,
+  Copy,
+  History
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -61,12 +64,16 @@ export default function ProjectManagement() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showHibernateDialog, setShowHibernateDialog] = useState(false);
+  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [selectedProject, setSelectedProject] = useState<any>(null);
   
   // Form states
   const [projectName, setProjectName] = useState('');
   const [projectDesc, setProjectDesc] = useState('');
   const [projectColor, setProjectColor] = useState('#3b82f6');
+  const [duplicateName, setDuplicateName] = useState('');
+  const [copyMarkets, setCopyMarkets] = useState(false);
 
   const { data: projects, isLoading, refetch } = trpc.projects.list.useQuery();
 
@@ -128,6 +135,25 @@ export default function ProjectManagement() {
     }
   });
 
+  const duplicateMutation = trpc.projects.duplicate.useMutation({
+    onSuccess: (data) => {
+      toast.success('Projeto duplicado com sucesso!');
+      refetch();
+      setShowDuplicateDialog(false);
+      setDuplicateName('');
+      setCopyMarkets(false);
+      setSelectedProject(null);
+    },
+    onError: (error) => {
+      toast.error(`Erro ao duplicar projeto: ${error.message}`);
+    }
+  });
+
+  const { data: auditLog, isLoading: auditLoading } = trpc.projects.getAuditLog.useQuery(
+    { projectId: selectedProject?.id || 0, limit: 50 },
+    { enabled: showHistoryDialog && !!selectedProject }
+  );
+
   const { data: canDeleteData } = trpc.projects.canDelete.useQuery(
     selectedProject?.id || 0,
     { enabled: showDeleteDialog && !!selectedProject }
@@ -175,6 +201,31 @@ export default function ProjectManagement() {
     setProjectDesc(project.descricao || '');
     setProjectColor(project.cor || '#3b82f6');
     setShowEditDialog(true);
+  };
+
+  const openDuplicateDialog = (project: any) => {
+    setSelectedProject(project);
+    setDuplicateName(`Cópia de ${project.nome}`);
+    setCopyMarkets(false);
+    setShowDuplicateDialog(true);
+  };
+
+  const openHistoryDialog = (project: any) => {
+    setSelectedProject(project);
+    setShowHistoryDialog(true);
+  };
+
+  const handleDuplicate = () => {
+    if (!selectedProject || !duplicateName.trim()) {
+      toast.error('Nome do projeto é obrigatório');
+      return;
+    }
+
+    duplicateMutation.mutate({
+      projectId: selectedProject.id,
+      newName: duplicateName,
+      copyMarkets,
+    });
   };
 
   const openDeleteDialog = (project: any) => {
@@ -387,6 +438,26 @@ export default function ProjectManagement() {
                   <Button
                     variant="outline"
                     size="sm"
+                    onClick={() => openDuplicateDialog(project)}
+                    className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 border-purple-300"
+                  >
+                    <Copy className="w-4 h-4 mr-1" />
+                    Duplicar
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openHistoryDialog(project)}
+                    className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                  >
+                    <History className="w-4 h-4 mr-1" />
+                    Histórico
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => openDeleteDialog(project)}
                     className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300"
                   >
@@ -572,6 +643,156 @@ export default function ProjectManagement() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Duplicate Dialog */}
+      <Dialog open={showDuplicateDialog} onOpenChange={setShowDuplicateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Duplicar Projeto</DialogTitle>
+            <DialogDescription>
+              Crie uma cópia do projeto <strong>{selectedProject?.nome}</strong>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="duplicate-name">Nome do Novo Projeto *</Label>
+              <Input
+                id="duplicate-name"
+                value={duplicateName}
+                onChange={(e) => setDuplicateName(e.target.value)}
+                placeholder="Ex: Cópia de Embalagens"
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="copy-markets"
+                checked={copyMarkets}
+                onChange={(e) => setCopyMarkets(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300"
+              />
+              <Label htmlFor="copy-markets" className="cursor-pointer">
+                Copiar mercados únicos (sem dados de pesquisas)
+              </Label>
+            </div>
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+              <p className="font-semibold mb-1">ℹ️ O que será copiado:</p>
+              <ul className="list-disc list-inside space-y-1 text-xs">
+                <li>Nome, descrição e cor do projeto</li>
+                <li>Configurações gerais</li>
+                {copyMarkets && <li>Mercados únicos (estrutura, sem dados)</li>}
+              </ul>
+              <p className="mt-2 text-xs">
+                <strong>Não será copiado:</strong> Pesquisas, clientes, concorrentes, leads
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setShowDuplicateDialog(false);
+              setDuplicateName('');
+              setCopyMarkets(false);
+            }}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleDuplicate}
+              disabled={duplicateMutation.isPending || !duplicateName.trim()}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              {duplicateMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Duplicando...
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4 mr-2" />
+                  Duplicar Projeto
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* History Dialog */}
+      <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Histórico do Projeto</DialogTitle>
+            <DialogDescription>
+              Todas as mudanças realizadas em <strong>{selectedProject?.nome}</strong>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {auditLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+              </div>
+            ) : auditLog && auditLog.logs.length > 0 ? (
+              <div className="space-y-4">
+                {auditLog.logs.map((log: any) => {
+                  const actionLabels: Record<string, { label: string; color: string; icon: string }> = {
+                    created: { label: 'Criado', color: 'bg-green-100 text-green-800 border-green-300', icon: '➕' },
+                    updated: { label: 'Atualizado', color: 'bg-blue-100 text-blue-800 border-blue-300', icon: '✏️' },
+                    hibernated: { label: 'Adormecido', color: 'bg-purple-100 text-purple-800 border-purple-300', icon: '💤' },
+                    reactivated: { label: 'Reativado', color: 'bg-yellow-100 text-yellow-800 border-yellow-300', icon: '☀️' },
+                    deleted: { label: 'Deletado', color: 'bg-red-100 text-red-800 border-red-300', icon: '🗑️' },
+                  };
+
+                  const actionInfo = actionLabels[log.action] || { label: log.action, color: 'bg-gray-100 text-gray-800', icon: '•' };
+
+                  return (
+                    <div key={log.id} className="border rounded-lg p-4 space-y-2">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge className={actionInfo.color}>
+                            {actionInfo.icon} {actionInfo.label}
+                          </Badge>
+                          <span className="text-sm text-gray-600">
+                            {new Date(log.createdAt).toLocaleString('pt-BR')}
+                          </span>
+                        </div>
+                        {log.userId && (
+                          <span className="text-xs text-gray-500">
+                            Usuário: {log.userId}
+                          </span>
+                        )}
+                      </div>
+
+                      {log.changes && (
+                        <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
+                          <p className="font-semibold mb-1">Mudanças:</p>
+                          <pre className="whitespace-pre-wrap text-gray-700">
+                            {JSON.stringify(JSON.parse(log.changes), null, 2)}
+                          </pre>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {auditLog.total > 50 && (
+                  <p className="text-center text-sm text-gray-500 pt-4">
+                    Mostrando 50 de {auditLog.total} registros
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <History className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                <p>Nenhum histórico encontrado</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowHistoryDialog(false)}>
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

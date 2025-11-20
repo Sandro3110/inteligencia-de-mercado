@@ -10,7 +10,8 @@ import {
   notifications, Notification, InsertNotification,
   MercadoUnico, Cliente, Concorrente, Lead,
   activityLog, ActivityLog, InsertActivityLog,
-  enrichmentConfigs, EnrichmentConfig, InsertEnrichmentConfig
+  enrichmentConfigs, EnrichmentConfig, InsertEnrichmentConfig,
+  projectAuditLog, ProjectAuditLog, InsertProjectAuditLog
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1234,6 +1235,181 @@ export async function reactivateProject(projectId: number): Promise<{ success: b
 export async function isProjectHibernated(projectId: number): Promise<boolean> {
   const project = await getProjectById(projectId);
   return project?.status === 'hibernated';
+}
+
+/**
+ * Atualiza o timestamp de última atividade do projeto
+ * Fase 58.1: Arquivamento Automático por Inatividade
+ */
+export async function updateProjectActivity(projectId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(projects)
+    .set({ lastActivityAt: new Date() })
+    .where(eq(projects.id, projectId));
+}
+
+/**
+ * Busca projetos inativos (sem atividade há X dias)
+ * Fase 58.1: Arquivamento Automático por Inatividade
+ */
+export async function getInactiveProjects(inactiveDays: number): Promise<Project[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - inactiveDays);
+
+  const result = await db
+    .select()
+    .from(projects)
+    .where(
+      and(
+        eq(projects.ativo, 1),
+        eq(projects.status, 'active'),
+        sql`${projects.lastActivityAt} < ${cutoffDate}`
+      )!
+    );
+
+  return result;
+}
+
+/**
+ * Registra uma mudança no log de auditoria de projetos
+ * Fase 58.2: Histórico de Mudanças e Log de Auditoria
+ */
+export async function logProjectChange(
+  projectId: number,
+  userId: string | null,
+  action: 'created' | 'updated' | 'hibernated' | 'reactivated' | 'deleted',
+  changes?: Record<string, { before: any; after: any }>,
+  metadata?: Record<string, any>
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.insert(projectAuditLog).values({
+    projectId,
+    userId: userId || null,
+    action,
+    changes: changes ? JSON.stringify(changes) : null,
+    metadata: metadata ? JSON.stringify(metadata) : null,
+  });
+}
+
+/**
+ * Busca o histórico de auditoria de um projeto
+ * Fase 58.2: Histórico de Mudanças e Log de Auditoria
+ */
+export async function getProjectAuditLog(
+  projectId: number,
+  options?: {
+    action?: 'created' | 'updated' | 'hibernated' | 'reactivated' | 'deleted';
+    limit?: number;
+    offset?: number;
+  }
+): Promise<{ logs: ProjectAuditLog[]; total: number }> {
+  const db = await getDb();
+  if (!db) return { logs: [], total: 0 };
+
+  // Construir condições de filtro
+  const conditions = [eq(projectAuditLog.projectId, projectId)];
+  
+  if (options?.action) {
+    conditions.push(eq(projectAuditLog.action, options.action));
+  }
+
+  const whereClause = conditions.length > 1 ? and(...conditions)! : conditions[0];
+  
+  let query = db.select().from(projectAuditLog).where(whereClause);
+
+  // Contar total
+  const countQuery = db
+    .select({ count: count() })
+    .from(projectAuditLog)
+    .where(eq(projectAuditLog.projectId, projectId));
+
+  const [{ count: total }] = await countQuery as any;
+
+  // Aplicar ordenação e paginação
+  query = query.orderBy(desc(projectAuditLog.createdAt)) as any;
+
+  if (options?.limit) {
+    query = query.limit(options.limit) as any;
+  }
+
+  if (options?.offset) {
+    query = query.offset(options.offset) as any;
+  }
+
+  const logs = await query;
+
+  return { logs, total: Number(total) };
+}
+
+/**
+ * Duplica um projeto (copia estrutura sem dados)
+ * Fase 58.3: Duplicação de Projetos
+ */
+export async function duplicateProject(
+  projectId: number,
+  newName: string,
+  options?: {
+    copyMarkets?: boolean;
+  }
+): Promise<{ success: boolean; newProjectId?: number; error?: string }> {
+  const db = await getDb();
+  if (!db) return { success: false, error: "Database not available" };
+
+  try {
+    // Buscar projeto original
+    const originalProject = await getProjectById(projectId);
+    if (!originalProject) {
+      return { success: false, error: "Projeto não encontrado" };
+    }
+
+    // Criar novo projeto
+    const [result] = await db.insert(projects).values({
+      nome: newName,
+      descricao: originalProject.descricao,
+      cor: originalProject.cor,
+      ativo: 1,
+      status: 'active',
+      lastActivityAt: new Date(),
+    });
+
+    const newProjectId = Number(result.insertId);
+
+    // Copiar mercados únicos se solicitado
+    if (options?.copyMarkets) {
+      const markets = await db
+        .select()
+        .from(mercadosUnicos)
+        .where(eq(mercadosUnicos.projectId, projectId));
+
+      for (const market of markets) {
+        await db.insert(mercadosUnicos).values({
+          projectId: newProjectId,
+          pesquisaId: null, // Não copiar pesquisaId
+          mercadoHash: market.mercadoHash,
+          nome: market.nome,
+          segmentacao: market.segmentacao,
+          categoria: market.categoria,
+          tamanhoMercado: market.tamanhoMercado,
+          crescimentoAnual: market.crescimentoAnual,
+          tendencias: market.tendencias,
+          principaisPlayers: market.principaisPlayers,
+          quantidadeClientes: 0, // Resetar contador
+        });
+      }
+    }
+
+    return { success: true, newProjectId };
+  } catch (error: any) {
+    console.error("[Database] Failed to duplicate project:", error);
+    return { success: false, error: error.message };
+  }
 }
 
 // ============================================

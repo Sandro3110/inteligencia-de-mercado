@@ -800,6 +800,68 @@ export const appRouter = router({
         const { isProjectHibernated } = await import('./db');
         return isProjectHibernated(input);
       }),
+
+    // Fase 58.1: Arquivamento Automático
+    updateActivity: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { updateProjectActivity } = await import('./db');
+        await updateProjectActivity(input);
+        return { success: true };
+      }),
+
+    getInactive: publicProcedure
+      .input(z.object({ days: z.number().default(30) }))
+      .query(async ({ input }) => {
+        const { getInactiveProjects } = await import('./db');
+        return getInactiveProjects(input.days);
+      }),
+
+    autoHibernate: publicProcedure
+      .input(z.object({ days: z.number().default(30) }))
+      .mutation(async ({ input }) => {
+        const { getInactiveProjects, hibernateProject } = await import('./db');
+        const inactiveProjects = await getInactiveProjects(input.days);
+        
+        const results = [];
+        for (const project of inactiveProjects) {
+          const result = await hibernateProject(project.id);
+          results.push({ projectId: project.id, ...result });
+        }
+        
+        return { hibernated: results.filter(r => r.success).length, total: results.length, results };
+      }),
+
+    // Fase 58.2: Log de Auditoria
+    getAuditLog: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        action: z.enum(['created', 'updated', 'hibernated', 'reactivated', 'deleted']).optional(),
+        limit: z.number().optional().default(50),
+        offset: z.number().optional().default(0),
+      }))
+      .query(async ({ input }) => {
+        const { getProjectAuditLog } = await import('./db');
+        return getProjectAuditLog(input.projectId, {
+          action: input.action,
+          limit: input.limit,
+          offset: input.offset,
+        });
+      }),
+
+    // Fase 58.3: Duplicação de Projetos
+    duplicate: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        newName: z.string().min(1).max(255),
+        copyMarkets: z.boolean().optional().default(false),
+      }))
+      .mutation(async ({ input }) => {
+        const { duplicateProject } = await import('./db');
+        return duplicateProject(input.projectId, input.newName, {
+          copyMarkets: input.copyMarkets,
+        });
+      }),
   }),
 
   pesquisas: router({

@@ -26,6 +26,7 @@ export const projects = mysqlTable("projects", {
   cor: varchar("cor", { length: 7 }).default("#3b82f6"), // hex color
   ativo: int("ativo").default(1).notNull(), // 1 = ativo, 0 = inativo (soft delete)
   status: mysqlEnum("status", ["active", "hibernated"]).default("active").notNull(), // Fase 57: Hibernação
+  lastActivityAt: timestamp("lastActivityAt").defaultNow(), // Fase 58: Arquivamento automático
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
@@ -1037,3 +1038,38 @@ export const intelligentAlertsHistory = mysqlTable("intelligent_alerts_history",
 
 export type IntelligentAlertHistory = typeof intelligentAlertsHistory.$inferSelect;
 export type InsertIntelligentAlertHistory = typeof intelligentAlertsHistory.$inferInsert;
+
+
+/**
+ * ============================================
+ * PROJECT AUDIT LOG - Fase 58.2
+ * ============================================
+ */
+
+/**
+ * Project Audit Log - Histórico completo de mudanças em projetos
+ */
+export const projectAuditLog = mysqlTable("project_audit_log", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  userId: varchar("userId", { length: 64 }), // Quem fez a mudança
+  
+  action: mysqlEnum("action", [
+    "created",
+    "updated",
+    "hibernated",
+    "reactivated",
+    "deleted"
+  ]).notNull(),
+  
+  // Mudanças realizadas (JSON com before/after)
+  changes: text("changes"), // JSON: { field: { before: X, after: Y } }
+  
+  // Metadados adicionais
+  metadata: text("metadata"), // JSON com info extra (IP, user agent, etc)
+  
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type ProjectAuditLog = typeof projectAuditLog.$inferSelect;
+export type InsertProjectAuditLog = typeof projectAuditLog.$inferInsert;

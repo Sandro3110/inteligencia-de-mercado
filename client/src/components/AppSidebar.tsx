@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import {
   BarChart3,
   Home,
@@ -6,21 +6,25 @@ import {
   FileText,
   Zap,
   Activity,
-  CheckSquare,
   TrendingUp,
   DollarSign,
   Filter,
   Settings,
   Bell,
   Calendar,
-  Clock,
-  FileStack,
   ChevronDown,
   ChevronRight,
   ChevronLeft,
   Plus,
   Download,
   Folder,
+  PlayCircle,
+  Eye,
+  CheckCircle,
+  FileStack,
+  Clock,
+  Sparkles,
+  FolderOpen,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -34,6 +38,7 @@ interface NavItem {
   href: string;
   icon: any;
   shortcut?: string;
+  badge?: string;
 }
 
 interface NavSection {
@@ -41,74 +46,87 @@ interface NavSection {
   icon: any;
   items: NavItem[];
   defaultOpen?: boolean;
+  priority?: 'core' | 'high' | 'medium' | 'low';
 }
 
+/**
+ * Fase 58: Reorganização completa do menu
+ * Prioridades:
+ * 1. CORE: Enriquecimento, Exportação, Gestão de Projetos
+ * 2. Análise e Inteligência
+ * 3. Configurações e Automação
+ * 4. Sistema e Histórico
+ */
 const navSections: NavSection[] = [
+  // ========================================
+  // 🎯 CORE DO SISTEMA (Prioridade Máxima)
+  // ========================================
   {
-    title: "Início",
-    icon: Home,
-    defaultOpen: true,
-    items: [
-      { title: "Visão Geral", href: "/", icon: Home },
-    ],
-  },
-  {
-    title: "Inteligência",
-    icon: BarChart3,
-    defaultOpen: true,
-    items: [
-      { title: "Mercados", href: "/mercados", icon: Package, shortcut: "Ctrl+2" },
-      { title: "Research Overview", href: "/research-overview", icon: TrendingUp },
-      { title: "Analytics", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+3" },
-      { title: "Tendências", href: "/tendencias", icon: TrendingUp },
-      { title: "Relatórios", href: "/relatorios", icon: FileText },
-      { title: "Exportação Inteligente", href: "/export", icon: Download, shortcut: "Ctrl+E" },
-      { title: "Templates de Exportação", href: "/export/templates", icon: FileText },
-    ],
-  },
-  {
-    title: "Enriquecimento",
+    title: "🎯 Core",
     icon: Zap,
-    defaultOpen: false,
+    priority: 'core',
+    defaultOpen: true,
     items: [
-      { title: "Nova Pesquisa", href: "/research/new", icon: Plus },
-      { title: "Iniciar", href: "/enrichment", icon: Zap },
-      { title: "Acompanhar", href: "/enrichment-progress", icon: Activity },
-      { title: "Monitoramento", href: "/monitoring", icon: Activity },
-      { title: "Resultados", href: "/resultados-enriquecimento", icon: CheckSquare },
+      { title: "Visão Geral", href: "/", icon: Home, shortcut: "Ctrl+H" },
+      { title: "Nova Pesquisa", href: "/research/new", icon: Plus, badge: "Criar" },
+      { title: "Enriquecer Dados", href: "/enrichment", icon: Sparkles, shortcut: "Ctrl+E" },
+      { title: "Acompanhar Progresso", href: "/enrichment-progress", icon: Activity },
+      { title: "Ver Resultados", href: "/resultados-enriquecimento", icon: CheckCircle },
+      { title: "Exportar Dados", href: "/export", icon: Download, shortcut: "Ctrl+X" },
+      { title: "Gerenciar Projetos", href: "/projetos", icon: FolderOpen, badge: "Novo" },
     ],
   },
+
+  // ========================================
+  // 📊 ANÁLISE E INTELIGÊNCIA
+  // ========================================
   {
-    title: "Performance",
-    icon: TrendingUp,
+    title: "📊 Análise",
+    icon: BarChart3,
+    priority: 'high',
     defaultOpen: false,
     items: [
-      { title: "Dashboard", href: "/dashboard", icon: BarChart3, shortcut: "Ctrl+1" },
-      { title: "ROI", href: "/roi", icon: DollarSign, shortcut: "Ctrl+4" },
-      { title: "Funil", href: "/funil", icon: Filter },
+      { title: "Mercados", href: "/mercados", icon: Package, shortcut: "Ctrl+M" },
+      { title: "Analytics Avançado", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+A" },
+      { title: "Tendências", href: "/tendencias", icon: TrendingUp },
+      { title: "ROI e Performance", href: "/roi", icon: DollarSign, shortcut: "Ctrl+R" },
+      { title: "Funil de Conversão", href: "/funil", icon: Filter },
+      { title: "Relatórios", href: "/relatorios", icon: FileText },
+      { title: "Visão Pesquisa", href: "/research-overview", icon: Eye },
     ],
   },
+
+  // ========================================
+  // ⚙️ CONFIGURAÇÕES E AUTOMAÇÃO
+  // ========================================
   {
-    title: "Configurações",
+    title: "⚙️ Configurações",
     icon: Settings,
+    priority: 'medium',
     defaultOpen: false,
     items: [
-      { title: "Projetos", href: "/projetos", icon: Folder },
-      { title: "Enriquecimento", href: "/enrichment-settings", icon: Settings },
-      { title: "Admin LLM", href: "/admin/llm", icon: Zap },
-      { title: "Alertas", href: "/alertas", icon: Bell },
-      { title: "Alertas Inteligentes", href: "/intelligent-alerts", icon: Zap },
+      { title: "Templates Exportação", href: "/export/templates", icon: FileText },
+      { title: "Parâmetros Enriquecimento", href: "/enrichment-settings", icon: Settings },
+      { title: "Alertas Inteligentes", href: "/intelligent-alerts", icon: Sparkles },
+      { title: "Configurar Alertas", href: "/alertas", icon: Bell },
       { title: "Agendamentos", href: "/agendamento", icon: Calendar },
+      { title: "Configurar IA (LLM)", href: "/admin/llm", icon: Zap },
     ],
   },
+
+  // ========================================
+  // 📁 SISTEMA E HISTÓRICO
+  // ========================================
   {
-    title: "Sistema",
+    title: "📁 Sistema",
     icon: FileStack,
+    priority: 'low',
     defaultOpen: false,
     items: [
-      { title: "Atividades", href: "/atividade", icon: Activity },
-      { title: "Histórico de Alertas", href: "/alertas/historico", icon: Clock },
-      { title: "🧪 Teste Pré-Pesquisa", href: "/pre-pesquisa-teste", icon: FileStack },
+      { title: "Monitoramento", href: "/monitoring", icon: Activity },
+      { title: "Registro de Atividades", href: "/atividade", icon: Clock },
+      { title: "Histórico de Alertas", href: "/alertas/historico", icon: Bell },
+      { title: "Dashboard Geral", href: "/dashboard", icon: BarChart3, shortcut: "Ctrl+D" },
     ],
   },
 ];
@@ -163,11 +181,22 @@ export function AppSidebar() {
     return cleanLocation === cleanHref;
   };
 
+  // Cores por prioridade
+  const getPriorityColor = (priority?: string) => {
+    switch (priority) {
+      case 'core': return 'text-blue-600 bg-blue-50 border-blue-200';
+      case 'high': return 'text-green-600 bg-green-50 border-green-200';
+      case 'medium': return 'text-purple-600 bg-purple-50 border-purple-200';
+      case 'low': return 'text-gray-600 bg-gray-50 border-gray-200';
+      default: return 'text-gray-600';
+    }
+  };
+
   return (
     <aside 
       className={cn(
         "fixed left-0 top-0 h-screen bg-white border-r border-slate-200 overflow-y-auto z-50 transition-all duration-300",
-        collapsed ? "w-16" : "w-60"
+        collapsed ? "w-16" : "w-64"
       )}
     >
       {/* Logo + Toggle */}
@@ -177,8 +206,8 @@ export function AppSidebar() {
             <span className="flex items-center gap-2 cursor-pointer">
               <BarChart3 className="w-6 h-6 text-blue-600" />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-slate-900">Inteligência</span>
-                <span className="text-sm font-semibold text-slate-900">de Mercado</span>
+                <span className="text-sm font-semibold text-slate-900">Gestor PAV</span>
+                <span className="text-xs text-slate-500">Inteligência de Mercado</span>
               </div>
             </span>
           </Link>
@@ -200,136 +229,151 @@ export function AppSidebar() {
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">
-            <p>{collapsed ? "Expandir" : "Recolher"} (Ctrl+B)</p>
+            {collapsed ? 'Expandir menu' : 'Recolher menu'}
           </TooltipContent>
         </Tooltip>
       </div>
 
-      {/* Estatísticas Compactas */}
-      {stats && !collapsed && (
+      {/* Project Selector */}
+      {!collapsed && selectedProjectId && stats && (
         <div className="p-3 border-b border-slate-200 bg-slate-50">
-          <div className="text-[0.65rem] font-semibold text-slate-500 mb-2">ESTATÍSTICAS</div>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white rounded-lg p-2 border border-slate-200 hover:border-blue-300 transition-colors">
-              <div className="text-xs text-slate-600">Mercados</div>
-              <div className="text-lg font-bold text-blue-600">{stats.totals?.mercados || 0}</div>
-            </div>
-            <div className="bg-white rounded-lg p-2 border border-slate-200 hover:border-green-300 transition-colors">
-              <div className="text-xs text-slate-600">Clientes</div>
-              <div className="text-lg font-bold text-green-600">{stats.totals?.clientes || 0}</div>
-            </div>
-            <div className="bg-white rounded-lg p-2 border border-slate-200 hover:border-purple-300 transition-colors">
-              <div className="text-xs text-slate-600">Concorrentes</div>
-              <div className="text-lg font-bold text-purple-600">{stats.totals?.concorrentes || 0}</div>
-            </div>
-            <div className="bg-white rounded-lg p-2 border border-slate-200 hover:border-orange-300 transition-colors">
-              <div className="text-xs text-slate-600">Leads</div>
-              <div className="text-lg font-bold text-orange-600">{stats.totals?.leads || 0}</div>
-            </div>
+          <div className="text-xs font-semibold text-slate-600 mb-1">Projeto Ativo</div>
+          <div className="text-sm font-medium text-slate-900">
+            Projeto #{selectedProjectId}
+          </div>
+          <div className="flex gap-2 mt-2 text-xs text-slate-600">
+            <span>{stats.totals.mercados} mercados</span>
+            <span>•</span>
+            <span>{stats.totals.leads} leads</span>
           </div>
         </div>
       )}
 
-      {/* Navigation Sections */}
+      {/* Navigation */}
       <nav className="p-2">
-        {navSections.map((section) => (
-          <div key={section.title} className="mb-1">
-            {/* Section Header */}
-            {collapsed ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => toggleSection(section.title)}
-                    className="w-full flex items-center justify-center p-3 text-slate-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    <section.icon className="w-5 h-5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>{section.title}</p>
-                </TooltipContent>
-              </Tooltip>
-            ) : (
+        {navSections.map((section) => {
+          const isOpen = openSections[section.title];
+          const SectionIcon = section.icon;
+
+          return (
+            <div key={section.title} className="mb-1">
+              {/* Section Header */}
               <button
                 onClick={() => toggleSection(section.title)}
-                className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-blue-50 rounded-lg transition-colors"
+                className={cn(
+                  "w-full flex items-center justify-between px-3 py-2 rounded-md transition-colors",
+                  collapsed ? "justify-center" : "",
+                  section.priority === 'core' ? "hover:bg-blue-50" : "hover:bg-slate-100"
+                )}
               >
-                <div className="flex items-center gap-2">
-                  <section.icon className="w-4 h-4" />
-                  <span>{section.title}</span>
-                </div>
-                {openSections[section.title] ? (
-                  <ChevronDown className="w-3 h-3" />
+                {collapsed ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        <SectionIcon className={cn("w-5 h-5", section.priority === 'core' ? 'text-blue-600' : 'text-slate-600')} />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      {section.title}
+                    </TooltipContent>
+                  </Tooltip>
                 ) : (
-                  <ChevronRight className="w-3 h-3" />
+                  <>
+                    <div className="flex items-center gap-2">
+                      <SectionIcon className={cn("w-4 h-4", section.priority === 'core' ? 'text-blue-600' : 'text-slate-600')} />
+                      <span className={cn(
+                        "text-sm font-semibold",
+                        section.priority === 'core' ? 'text-blue-700' : 'text-slate-700'
+                      )}>
+                        {section.title}
+                      </span>
+                    </div>
+                    {isOpen ? (
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-slate-400" />
+                    )}
+                  </>
                 )}
               </button>
-            )}
 
-            {/* Section Items */}
-            {(openSections[section.title] || collapsed) && (
-              <div className={cn("mt-1 space-y-0.5", collapsed ? "ml-0" : "ml-2")}>
-                {section.items.map((item) => {
-                  const Icon = item.icon;
-                  const active = isActive(item.href);
-                  
-                  if (collapsed) {
+              {/* Section Items */}
+              {(isOpen || collapsed) && (
+                <div className={cn("mt-1", collapsed ? "space-y-1" : "ml-2 space-y-0.5")}>
+                  {section.items.map((item) => {
+                    const ItemIcon = item.icon;
+                    const active = isActive(item.href);
+
                     return (
-                      <Tooltip key={item.href}>
-                        <TooltipTrigger asChild>
-                          <Link href={item.href}>
-                            <span
-                              className={cn(
-                                "flex items-center justify-center p-3 rounded-lg transition-all cursor-pointer",
-                                active
-                                  ? "bg-blue-100 text-blue-700"
-                                  : "text-slate-700 hover:bg-blue-50 hover:text-blue-600"
-                              )}
-                            >
-                              <Icon className="w-5 h-5" />
-                            </span>
-                          </Link>
-                        </TooltipTrigger>
-                        <TooltipContent side="right">
-                          <div className="flex flex-col gap-1">
-                            <p>{item.title}</p>
-                            {item.shortcut && (
-                              <p className="text-xs text-muted-foreground">{item.shortcut}</p>
+                      <Link key={item.href} href={item.href}>
+                        {collapsed ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <a
+                                className={cn(
+                                  "flex items-center justify-center p-2 rounded-md transition-colors",
+                                  active
+                                    ? "bg-blue-100 text-blue-700"
+                                    : "text-slate-600 hover:bg-slate-100"
+                                )}
+                              >
+                                <ItemIcon className="w-5 h-5" />
+                              </a>
+                            </TooltipTrigger>
+                            <TooltipContent side="right">
+                              <div>
+                                {item.title}
+                                {item.shortcut && (
+                                  <div className="text-xs text-slate-400 mt-1">
+                                    {item.shortcut}
+                                  </div>
+                                )}
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <a
+                            className={cn(
+                              "flex items-center justify-between px-3 py-2 rounded-md transition-colors group",
+                              active
+                                ? "bg-blue-100 text-blue-700 font-medium"
+                                : "text-slate-600 hover:bg-slate-100"
                             )}
-                          </div>
-                        </TooltipContent>
-                      </Tooltip>
+                          >
+                            <div className="flex items-center gap-2">
+                              <ItemIcon className="w-4 h-4" />
+                              <span className="text-sm">{item.title}</span>
+                            </div>
+                            {item.badge && (
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold">
+                                {item.badge}
+                              </span>
+                            )}
+                            {item.shortcut && !item.badge && (
+                              <span className="text-xs text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {item.shortcut}
+                              </span>
+                            )}
+                          </a>
+                        )}
+                      </Link>
                     );
-                  }
-
-                  return (
-                    <Link key={item.href} href={item.href}>
-                      <span
-                        className={cn(
-                          "flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-all cursor-pointer group relative",
-                          active
-                            ? "bg-blue-100 text-blue-800 font-medium"
-                            : "text-slate-700 hover:bg-blue-50 hover:text-blue-600"
-                        )}
-                      >
-                        <div className="flex items-center gap-2">
-                          <Icon className="w-4 h-4" />
-                          <span>{item.title}</span>
-                        </div>
-                        {item.shortcut && (
-                          <span className="text-[0.65rem] text-slate-400 group-hover:text-blue-500">
-                            {item.shortcut.replace('Ctrl+', '⌘')}
-                          </span>
-                        )}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        ))}
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </nav>
+
+      {/* Footer */}
+      {!collapsed && (
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 bg-slate-50">
+          <div className="text-xs text-slate-500 text-center">
+            Gestor PAV v2.0
+          </div>
+        </div>
+      )}
     </aside>
   );
 }
