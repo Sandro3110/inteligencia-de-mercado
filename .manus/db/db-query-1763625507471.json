@@ -1,0 +1,26 @@
+{
+  "query": "SELECT \n  p.id as pesquisaId,\n  p.nome as pesquisaNome,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE pesquisaId = p.id) as mercados,\n  (SELECT COUNT(*) FROM clientes WHERE pesquisaId = p.id) as clientes,\n  (SELECT COUNT(*) FROM concorrentes WHERE pesquisaId = p.id) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE pesquisaId = p.id) as leads\nFROM pesquisas p\nORDER BY p.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  p.id as pesquisaId,\n  p.nome as pesquisaNome,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE pesquisaId = p.id) as mercados,\n  (SELECT COUNT(*) FROM clientes WHERE pesquisaId = p.id) as clientes,\n  (SELECT COUNT(*) FROM concorrentes WHERE pesquisaId = p.id) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE pesquisaId = p.id) as leads\nFROM pesquisas p\nORDER BY p.id;",
+  "rows": [
+    {
+      "pesquisaId": "1",
+      "pesquisaNome": "Embalagens 2025",
+      "mercados": "457",
+      "clientes": "806",
+      "concorrentes": "3357",
+      "leads": "2363"
+    },
+    {
+      "pesquisaId": "30001",
+      "pesquisaNome": "Embalagens 2025",
+      "mercados": "0",
+      "clientes": "0",
+      "concorrentes": "0",
+      "leads": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "pesquisaId\tpesquisaNome\tmercados\tclientes\tconcorrentes\tleads\n1\tEmbalagens 2025\t457\t806\t3357\t2363\n30001\tEmbalagens 2025\t0\t0\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 74
+}

@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users, 
   projects, Project, InsertProject,
+  pesquisas, Pesquisa, InsertPesquisa,
   mercadosUnicos, clientes, clientesMercados, 
   concorrentes, leads, produtos,
   projectTemplates, ProjectTemplate, InsertProjectTemplate,
@@ -1078,6 +1079,87 @@ export async function deleteProject(id: number): Promise<boolean> {
     console.error("[Database] Failed to delete project:", error);
     return false;
   }
+}
+
+// ============================================
+// PESQUISA HELPERS
+// ============================================
+
+export async function getPesquisas() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  try {
+    const result = await db
+      .select()
+      .from(pesquisas)
+      .where(eq(pesquisas.ativo, 1))
+      .orderBy(pesquisas.nome);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get pesquisas:", error);
+    return [];
+  }
+}
+
+export async function getPesquisaById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  try {
+    const result = await db
+      .select()
+      .from(pesquisas)
+      .where(eq(pesquisas.id, id))
+      .limit(1);
+    return result[0];
+  } catch (error) {
+    console.error("[Database] Failed to get pesquisa:", error);
+    return undefined;
+  }
+}
+
+export async function getPesquisasByProject(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  try {
+    const result = await db
+      .select()
+      .from(pesquisas)
+      .where(and(eq(pesquisas.projectId, projectId), eq(pesquisas.ativo, 1)))
+      .orderBy(pesquisas.dataImportacao);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get pesquisas by project:", error);
+    return [];
+  }
+}
+
+export async function getDashboardStatsByPesquisa(pesquisaId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const mercadosQuery = db.select({ count: count() }).from(mercadosUnicos).where(eq(mercadosUnicos.pesquisaId, pesquisaId));
+  const [mercadosCount] = await mercadosQuery;
+
+  const clientesQuery = db.select({ count: count() }).from(clientes).where(eq(clientes.pesquisaId, pesquisaId));
+  const [clientesCount] = await clientesQuery;
+
+  const concorrentesQuery = db.select({ count: count() }).from(concorrentes).where(eq(concorrentes.pesquisaId, pesquisaId));
+  const [concorrentesCount] = await concorrentesQuery;
+
+  const leadsQuery = db.select({ count: count() }).from(leads).where(eq(leads.pesquisaId, pesquisaId));
+  const [leadsCount] = await leadsQuery;
+
+  return {
+    totals: {
+      mercados: mercadosCount.count,
+      clientes: clientesCount.count,
+      concorrentes: concorrentesCount.count,
+      leads: leadsCount.count,
+    }
+  };
 }
 
 

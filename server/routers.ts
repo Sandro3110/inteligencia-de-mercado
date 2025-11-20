@@ -586,6 +586,28 @@ export const appRouter = router({
       }),
   }),
 
+  pesquisas: router({
+    list: publicProcedure
+      .query(async () => {
+        const { getPesquisas } = await import('./db');
+        return getPesquisas();
+      }),
+
+    byId: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { getPesquisaById } = await import('./db');
+        return getPesquisaById(input);
+      }),
+
+    stats: publicProcedure
+      .input(z.object({ pesquisaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getDashboardStatsByPesquisa } = await import('./db');
+        return getDashboardStatsByPesquisa(input.pesquisaId);
+      }),
+  }),
+
   templates: router({
     byId: publicProcedure
       .input(z.number())

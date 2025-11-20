@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, nome, descricao, ativo FROM projects ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, descricao, ativo FROM projects ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Embalagens",
+      "descricao": "Projeto de pesquisa de mercado para o setor de embalagens",
+      "ativo": "1"
+    },
+    {
+      "id": "300001",
+      "nome": "Agro",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1"
+    },
+    {
+      "id": "300002",
+      "nome": "Agro",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tdescricao\tativo\n1\tEmbalagens\tProjeto de pesquisa de mercado para o setor de embalagens\t1\n300001\tAgro\tProjeto criado automaticamente via fluxo de enriquecimento\t1\n300002\tAgro\tProjeto criado automaticamente via fluxo de enriquecimento\t1\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

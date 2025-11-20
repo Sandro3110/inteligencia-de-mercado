@@ -1,0 +1,97 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "activity_log"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "alert_configs"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "alert_history"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "clientes"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "clientes_history"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "clientes_mercados"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "concorrentes"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "concorrentes_history"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "enrichment_cache"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "enrichment_configs"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "enrichment_jobs"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "enrichment_queue"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "enrichment_runs"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "entity_tags"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "lead_conversions"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "leads"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "leads_history"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "mercados_history"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "mercados_unicos"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "notifications"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "pesquisas"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "produtos"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "project_templates"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "projects"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "saved_filters"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "scheduled_enrichments"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "tags"
+    },
+    {
+      "Tables_in_XpSHcSiEisTmX38X46V9tQ": "users"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_XpSHcSiEisTmX38X46V9tQ\n__drizzle_migrations\nactivity_log\nalert_configs\nalert_history\nclientes\nclientes_history\nclientes_mercados\nconcorrentes\nconcorrentes_history\nenrichment_cache\nenrichment_configs\nenrichment_jobs\nenrichment_queue\nenrichment_runs\nentity_tags\nlead_conversions\nleads\nleads_history\nmercados_history\nmercados_unicos\nnotifications\npesquisas\nprodutos\nproject_templates\nprojects\nsaved_filters\nscheduled_enrichments\ntags\nusers\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

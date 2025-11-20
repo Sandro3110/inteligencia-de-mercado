@@ -1,0 +1,45 @@
+{
+  "query": "SELECT \n  'projects' as tabela,\n  id,\n  nome,\n  NULL as projectId,\n  NULL as pesquisaId\nFROM projects\nUNION ALL\nSELECT \n  'pesquisas' as tabela,\n  id,\n  nome,\n  projectId,\n  NULL as pesquisaId\nFROM pesquisas\nORDER BY tabela, id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  'projects' as tabela,\n  id,\n  nome,\n  NULL as projectId,\n  NULL as pesquisaId\nFROM projects\nUNION ALL\nSELECT \n  'pesquisas' as tabela,\n  id,\n  nome,\n  projectId,\n  NULL as pesquisaId\nFROM pesquisas\nORDER BY tabela, id;",
+  "rows": [
+    {
+      "tabela": "pesquisas",
+      "id": "1",
+      "nome": "Embalagens 2025",
+      "projectId": "1",
+      "pesquisaId": "NULL"
+    },
+    {
+      "tabela": "pesquisas",
+      "id": "30001",
+      "nome": "Embalagens 2025",
+      "projectId": "1",
+      "pesquisaId": "NULL"
+    },
+    {
+      "tabela": "projects",
+      "id": "1",
+      "nome": "Embalagens",
+      "projectId": "NULL",
+      "pesquisaId": "NULL"
+    },
+    {
+      "tabela": "projects",
+      "id": "300001",
+      "nome": "Agro",
+      "projectId": "NULL",
+      "pesquisaId": "NULL"
+    },
+    {
+      "tabela": "projects",
+      "id": "300002",
+      "nome": "Agro",
+      "projectId": "NULL",
+      "pesquisaId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\tid\tnome\tprojectId\tpesquisaId\npesquisas\t1\tEmbalagens 2025\t1\tNULL\npesquisas\t30001\tEmbalagens 2025\t1\tNULL\nprojects\t1\tEmbalagens\tNULL\tNULL\nprojects\t300001\tAgro\tNULL\tNULL\nprojects\t300002\tAgro\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 88
+}

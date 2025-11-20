@@ -72,7 +72,7 @@ export default function CascadeView() {
   const [currentPage, setCurrentPage] = useState<Page>("mercados");
   const [selectedMercadoId, setSelectedMercadoId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); // Inicia vazio, carrega do cache depois
   const [searchFields, setSearchFields] = useState<SearchField[]>(["nome", "cnpj", "produto"]); // Campos padrão
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
@@ -133,6 +133,12 @@ export default function CascadeView() {
 
   const { data: mercados, isLoading } = trpc.mercados.list.useQuery(
     { projectId: selectedProjectId!, search: "" },
+    { enabled: !!selectedProjectId }
+  );
+  
+  // Buscar estatísticas dinâmicas do banco
+  const { data: dashboardStats } = trpc.dashboard.stats.useQuery(
+    { projectId: selectedProjectId! },
     { enabled: !!selectedProjectId }
   );
   const { data: clientesResponse } = trpc.clientes.byMercado.useQuery(
@@ -235,6 +241,25 @@ export default function CascadeView() {
 
   const mercadoSelecionado = mercados?.find((m) => m.id === selectedMercadoId);
 
+  // Carregar última pesquisa do cache ao montar o componente
+  useEffect(() => {
+    if (selectedProjectId) {
+      const cacheKey = `last-search-${selectedProjectId}`;
+      const lastSearch = localStorage.getItem(cacheKey);
+      if (lastSearch) {
+        setSearchQuery(lastSearch);
+      }
+    }
+  }, [selectedProjectId]);
+
+  // Salvar pesquisa no cache quando mudar
+  useEffect(() => {
+    if (selectedProjectId && searchQuery) {
+      const cacheKey = `last-search-${selectedProjectId}`;
+      localStorage.setItem(cacheKey, searchQuery);
+    }
+  }, [searchQuery, selectedProjectId]);
+
   // Monitorar scroll para mostrar botão voltar ao topo
   useEffect(() => {
     const viewport = scrollAreaRef.current?.querySelector('[data-slot="scroll-area-viewport"]');
@@ -248,11 +273,11 @@ export default function CascadeView() {
     return () => viewport.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Calcular totais gerais
-  const totalMercados = mercados?.length || 0;
-  const totalClientes = mercados?.reduce((sum, m) => sum + (m.quantidadeClientes || 0), 0) || 0;
-  const totalConcorrentes = 591; // Fixo conforme dados
-  const totalLeads = 727; // Fixo conforme dados
+  // Calcular totais gerais a partir das estatísticas do banco
+  const totalMercados = dashboardStats?.totals?.mercados || 0;
+  const totalClientes = dashboardStats?.totals?.clientes || 0;
+  const totalConcorrentes = dashboardStats?.totals?.concorrentes || 0;
+  const totalLeads = dashboardStats?.totals?.leads || 0;
 
   // Filtrar por status
   const filterByStatus = (items: any[]) => {

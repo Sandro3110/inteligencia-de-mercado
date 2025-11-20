@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, nome, descricao, projectId, totalClientes FROM pesquisas LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, descricao, projectId, totalClientes FROM pesquisas LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Embalagens 2025",
+      "descricao": "Base inicial de 806 clientes do setor de embalagens para enriquecimento",
+      "projectId": "1",
+      "totalClientes": "806"
+    },
+    {
+      "id": "30001",
+      "nome": "Embalagens 2025",
+      "descricao": "Pesquisa de mercado do setor de embalagens - 806 clientes",
+      "projectId": "1",
+      "totalClientes": "806"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tdescricao\tprojectId\ttotalClientes\n1\tEmbalagens 2025\tBase inicial de 806 clientes do setor de embalagens para enriquecimento\t1\t806\n30001\tEmbalagens 2025\tPesquisa de mercado do setor de embalagens - 806 clientes\t1\t806\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}
