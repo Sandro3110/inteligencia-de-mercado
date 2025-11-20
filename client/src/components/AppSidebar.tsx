@@ -124,6 +124,7 @@ const navSections: NavSection[] = [
     defaultOpen: false,
     items: [
       { title: "Monitoramento", href: "/monitoring", icon: Activity },
+      { title: "Atividade de Projetos", href: "/projetos/atividade", icon: FolderOpen, badge: "Novo" },
       { title: "Registro de Atividades", href: "/atividade", icon: Clock },
       { title: "Histórico de Alertas", href: "/alertas/historico", icon: Bell },
       { title: "Dashboard Geral", href: "/dashboard", icon: BarChart3, shortcut: "Ctrl+D" },

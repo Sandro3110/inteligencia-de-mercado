@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.enrichmentJobs = exports.leadsHistory = exports.concorrentesHistory = exports.clientesHistory = exports.mercadosHistory = exports.changeTypeEnum = exports.activityLog = exports.leadConversions = exports.conversionStatusEnum = exports.alertHistory = exports.alertConfigs = exports.scheduledEnrichments = exports.enrichmentRuns = exports.enrichmentStatusEnum = exports.enrichmentCache = exports.notifications = exports.projectTemplates = exports.savedFilters = exports.entityTags = exports.tags = exports.leads = exports.leadStageEnum = exports.concorrentes = exports.produtos = exports.clientesMercados = exports.clientes = exports.mercadosUnicos = exports.validationStatusEnum = exports.projects = exports.users = void 0;
+exports.hibernationWarnings = exports.projectAuditLog = exports.intelligentAlertsHistory = exports.intelligentAlertsConfigs = exports.llmProviderConfigs = exports.queryCache = exports.interpretationCache = exports.exportTemplates = exports.savedFiltersExport = exports.exportHistory = exports.salesforceSyncLog = exports.recommendations = exports.operationalAlerts = exports.analyticsTimeline = exports.analyticsDimensoes = exports.analyticsPesquisas = exports.analyticsMercados = exports.enrichmentConfigs = exports.enrichmentJobs = exports.leadsHistory = exports.concorrentesHistory = exports.clientesHistory = exports.mercadosHistory = exports.changeTypeEnum = exports.activityLog = exports.leadConversions = exports.conversionStatusEnum = exports.alertHistory = exports.alertConfigs = exports.scheduledEnrichments = exports.enrichmentRuns = exports.enrichmentStatusEnum = exports.enrichmentCache = exports.notifications = exports.projectTemplates = exports.savedFilters = exports.entityTags = exports.tags = exports.leads = exports.leadStageEnum = exports.concorrentes = exports.produtos = exports.clientesMercados = exports.clientes = exports.mercadosUnicos = exports.validationStatusEnum = exports.pesquisas = exports.projects = exports.users = void 0;
 const mysql_core_1 = require("drizzle-orm/mysql-core");
 /**
  * Core user table backing auth flow.
@@ -22,7 +22,30 @@ exports.projects = (0, mysql_core_1.mysqlTable)("projects", {
     nome: (0, mysql_core_1.varchar)("nome", { length: 255 }).notNull(),
     descricao: (0, mysql_core_1.text)("descricao"),
     cor: (0, mysql_core_1.varchar)("cor", { length: 7 }).default("#3b82f6"), // hex color
-    ativo: (0, mysql_core_1.int)("ativo").default(1).notNull(), // 1 = ativo, 0 = inativo
+    ativo: (0, mysql_core_1.int)("ativo").default(1).notNull(), // 1 = ativo, 0 = inativo (soft delete)
+    status: (0, mysql_core_1.mysqlEnum)("status", ["active", "hibernated"]).default("active").notNull(), // Fase 57: Hibernação
+    lastActivityAt: (0, mysql_core_1.timestamp)("lastActivityAt").defaultNow(), // Fase 58: Arquivamento automático
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+    updatedAt: (0, mysql_core_1.timestamp)("updatedAt").defaultNow(),
+});
+/**
+ * Pesquisas - Research batches/datasets within projects
+ * Each pesquisa represents one client import/enrichment batch
+ */
+exports.pesquisas = (0, mysql_core_1.mysqlTable)("pesquisas", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    nome: (0, mysql_core_1.varchar)("nome", { length: 255 }).notNull(),
+    descricao: (0, mysql_core_1.text)("descricao"),
+    dataImportacao: (0, mysql_core_1.timestamp)("dataImportacao").defaultNow(),
+    totalClientes: (0, mysql_core_1.int)("totalClientes").default(0),
+    clientesEnriquecidos: (0, mysql_core_1.int)("clientesEnriquecidos").default(0),
+    status: (0, mysql_core_1.mysqlEnum)("status", ["importado", "enriquecendo", "concluido", "erro"]).default("importado"),
+    ativo: (0, mysql_core_1.int)("ativo").default(1).notNull(),
+    // Parâmetros flexíveis de enriquecimento (Fase 39.4)
+    qtdConcorrentesPorMercado: (0, mysql_core_1.int)("qtdConcorrentesPorMercado").default(5),
+    qtdLeadsPorMercado: (0, mysql_core_1.int)("qtdLeadsPorMercado").default(10),
+    qtdProdutosPorCliente: (0, mysql_core_1.int)("qtdProdutosPorCliente").default(3),
     createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
     updatedAt: (0, mysql_core_1.timestamp)("updatedAt").defaultNow(),
 });
@@ -41,6 +64,7 @@ exports.validationStatusEnum = (0, mysql_core_1.mysqlEnum)("validationStatus", [
 exports.mercadosUnicos = (0, mysql_core_1.mysqlTable)("mercados_unicos", {
     id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
     projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    pesquisaId: (0, mysql_core_1.int)("pesquisaId"),
     mercadoHash: (0, mysql_core_1.varchar)("mercadoHash", { length: 255 }),
     nome: (0, mysql_core_1.varchar)("nome", { length: 255 }).notNull(),
     segmentacao: (0, mysql_core_1.varchar)("segmentacao", { length: 50 }),
@@ -58,6 +82,7 @@ exports.mercadosUnicos = (0, mysql_core_1.mysqlTable)("mercados_unicos", {
 exports.clientes = (0, mysql_core_1.mysqlTable)("clientes", {
     id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
     projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    pesquisaId: (0, mysql_core_1.int)("pesquisaId"),
     clienteHash: (0, mysql_core_1.varchar)("clienteHash", { length: 255 }),
     nome: (0, mysql_core_1.varchar)("nome", { length: 255 }).notNull(),
     cnpj: (0, mysql_core_1.varchar)("cnpj", { length: 20 }),
@@ -98,6 +123,7 @@ exports.clientesMercados = (0, mysql_core_1.mysqlTable)("clientes_mercados", {
 exports.produtos = (0, mysql_core_1.mysqlTable)("produtos", {
     id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
     projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    pesquisaId: (0, mysql_core_1.int)("pesquisaId"),
     clienteId: (0, mysql_core_1.int)("clienteId").notNull(),
     mercadoId: (0, mysql_core_1.int)("mercadoId").notNull(),
     nome: (0, mysql_core_1.varchar)("nome", { length: 255 }).notNull(),
@@ -115,6 +141,7 @@ exports.produtos = (0, mysql_core_1.mysqlTable)("produtos", {
 exports.concorrentes = (0, mysql_core_1.mysqlTable)("concorrentes", {
     id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
     projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    pesquisaId: (0, mysql_core_1.int)("pesquisaId"),
     concorrenteHash: (0, mysql_core_1.varchar)("concorrenteHash", { length: 255 }),
     mercadoId: (0, mysql_core_1.int)("mercadoId").notNull(),
     nome: (0, mysql_core_1.varchar)("nome", { length: 255 }).notNull(),
@@ -148,6 +175,7 @@ exports.leadStageEnum = (0, mysql_core_1.mysqlEnum)("leadStage", [
 exports.leads = (0, mysql_core_1.mysqlTable)("leads", {
     id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
     projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    pesquisaId: (0, mysql_core_1.int)("pesquisaId"),
     leadHash: (0, mysql_core_1.varchar)("leadHash", { length: 255 }),
     mercadoId: (0, mysql_core_1.int)("mercadoId").notNull(),
     nome: (0, mysql_core_1.varchar)("nome", { length: 255 }).notNull(),
@@ -418,4 +446,402 @@ exports.enrichmentJobs = (0, mysql_core_1.mysqlTable)("enrichment_jobs", {
     errorMessage: (0, mysql_core_1.text)("errorMessage"),
     createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
     updatedAt: (0, mysql_core_1.timestamp)("updatedAt").defaultNow(),
+});
+/**
+ * Enrichment Configs - Configurações de enriquecimento por projeto
+ * Armazena API keys e critérios customizados
+ */
+exports.enrichmentConfigs = (0, mysql_core_1.mysqlTable)("enrichment_configs", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull().unique(),
+    // API Keys (criptografadas no backend antes de salvar)
+    openaiApiKey: (0, mysql_core_1.text)("openaiApiKey"), // opcional
+    geminiApiKey: (0, mysql_core_1.text)("geminiApiKey"), // opcional
+    anthropicApiKey: (0, mysql_core_1.text)("anthropicApiKey"), // opcional
+    serpapiKey: (0, mysql_core_1.text)("serpapiKey"), // opcional
+    receitawsKey: (0, mysql_core_1.text)("receitawsKey"), // opcional
+    // Critérios de enriquecimento
+    produtosPorMercado: (0, mysql_core_1.int)("produtosPorMercado").default(3).notNull(),
+    concorrentesPorMercado: (0, mysql_core_1.int)("concorrentesPorMercado").default(5).notNull(),
+    leadsPorMercado: (0, mysql_core_1.int)("leadsPorMercado").default(5).notNull(),
+    // Configurações de processamento
+    batchSize: (0, mysql_core_1.int)("batchSize").default(50).notNull(),
+    checkpointInterval: (0, mysql_core_1.int)("checkpointInterval").default(100).notNull(),
+    // Flags de funcionalidades
+    enableDeduplication: (0, mysql_core_1.int)("enableDeduplication").default(1).notNull(), // 1 = ativo, 0 = inativo
+    enableQualityScore: (0, mysql_core_1.int)("enableQualityScore").default(1).notNull(),
+    enableAutoRetry: (0, mysql_core_1.int)("enableAutoRetry").default(1).notNull(),
+    maxRetries: (0, mysql_core_1.int)("maxRetries").default(2).notNull(),
+    // Metadata
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+    updatedAt: (0, mysql_core_1.timestamp)("updatedAt").defaultNow(),
+});
+/**
+ * ============================================
+ * ANALYTICS TABLES - Lead Generation Intelligence
+ * ============================================
+ */
+/**
+ * Analytics por Mercado - Métricas agregadas por mercado
+ */
+exports.analyticsMercados = (0, mysql_core_1.mysqlTable)("analytics_mercados", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    pesquisaId: (0, mysql_core_1.int)("pesquisaId"),
+    mercadoId: (0, mysql_core_1.int)("mercadoId").notNull(),
+    periodo: (0, mysql_core_1.timestamp)("periodo").notNull(), // Data de referência
+    // Métricas de Cobertura
+    totalClientes: (0, mysql_core_1.int)("totalClientes").default(0),
+    totalConcorrentes: (0, mysql_core_1.int)("totalConcorrentes").default(0),
+    totalLeadsGerados: (0, mysql_core_1.int)("totalLeadsGerados").default(0),
+    taxaCoberturaMercado: (0, mysql_core_1.int)("taxaCoberturaMercado").default(0), // Percentual * 100
+    // Métricas de Qualidade
+    qualidadeMediaLeads: (0, mysql_core_1.int)("qualidadeMediaLeads").default(0), // Score médio * 100
+    leadsAltaQualidade: (0, mysql_core_1.int)("leadsAltaQualidade").default(0), // score >= 80
+    leadsMediaQualidade: (0, mysql_core_1.int)("leadsMediaQualidade").default(0), // score 50-79
+    leadsBaixaQualidade: (0, mysql_core_1.int)("leadsBaixaQualidade").default(0), // score < 50
+    // Métricas de Enriquecimento
+    leadsEnriquecidos: (0, mysql_core_1.int)("leadsEnriquecidos").default(0),
+    taxaSucessoEnriquecimento: (0, mysql_core_1.int)("taxaSucessoEnriquecimento").default(0), // Percentual * 100
+    tempoMedioEnriquecimentoMin: (0, mysql_core_1.int)("tempoMedioEnriquecimentoMin").default(0), // Minutos * 100
+    custoEnriquecimentoTotal: (0, mysql_core_1.int)("custoEnriquecimentoTotal").default(0), // Centavos
+    // Métricas de Validação
+    leadsValidados: (0, mysql_core_1.int)("leadsValidados").default(0),
+    leadsAprovados: (0, mysql_core_1.int)("leadsAprovados").default(0), // status: rich
+    leadsDescartados: (0, mysql_core_1.int)("leadsDescartados").default(0), // status: discarded
+    taxaAprovacao: (0, mysql_core_1.int)("taxaAprovacao").default(0), // Percentual * 100
+    // Métricas de Exportação Salesforce (preparado para futuro)
+    leadsExportadosSF: (0, mysql_core_1.int)("leadsExportadosSF").default(0),
+    leadsConvertidosSF: (0, mysql_core_1.int)("leadsConvertidosSF").default(0),
+    taxaConversaoSF: (0, mysql_core_1.int)("taxaConversaoSF").default(0), // Percentual * 100
+    // Métricas de Esforço
+    horasPesquisa: (0, mysql_core_1.int)("horasPesquisa").default(0), // Horas * 100
+    custoTotal: (0, mysql_core_1.int)("custoTotal").default(0), // Centavos
+    roi: (0, mysql_core_1.int)("roi").default(0), // ROI * 100 (pode ser negativo)
+    updatedAt: (0, mysql_core_1.timestamp)("updatedAt").defaultNow(),
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+});
+/**
+ * Analytics por Pesquisa - Métricas agregadas por batch de pesquisa
+ */
+exports.analyticsPesquisas = (0, mysql_core_1.mysqlTable)("analytics_pesquisas", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    pesquisaId: (0, mysql_core_1.int)("pesquisaId").notNull(),
+    // Métricas Gerais
+    totalMercadosMapeados: (0, mysql_core_1.int)("totalMercadosMapeados").default(0),
+    totalClientesBase: (0, mysql_core_1.int)("totalClientesBase").default(0),
+    totalLeadsGerados: (0, mysql_core_1.int)("totalLeadsGerados").default(0),
+    taxaConversaoClienteLead: (0, mysql_core_1.int)("taxaConversaoClienteLead").default(0), // Percentual * 100
+    // Qualidade Agregada
+    qualidadeMediaGeral: (0, mysql_core_1.int)("qualidadeMediaGeral").default(0), // Score médio * 100
+    distribuicaoQualidade: (0, mysql_core_1.text)("distribuicaoQualidade"), // JSON: {alta: X, media: Y, baixa: Z}
+    // Performance de Enriquecimento
+    taxaSucessoEnriquecimento: (0, mysql_core_1.int)("taxaSucessoEnriquecimento").default(0), // Percentual * 100
+    tempoTotalEnriquecimentoHoras: (0, mysql_core_1.int)("tempoTotalEnriquecimentoHoras").default(0), // Horas * 100
+    custoTotalEnriquecimento: (0, mysql_core_1.int)("custoTotalEnriquecimento").default(0), // Centavos
+    // Resultados Salesforce (preparado para futuro)
+    leadsExportadosSF: (0, mysql_core_1.int)("leadsExportadosSF").default(0),
+    leadsConvertidosSF: (0, mysql_core_1.int)("leadsConvertidosSF").default(0),
+    taxaConversaoSF: (0, mysql_core_1.int)("taxaConversaoSF").default(0), // Percentual * 100
+    valorPipelineGerado: (0, mysql_core_1.int)("valorPipelineGerado").default(0), // Centavos
+    // ROI da Pesquisa
+    custoTotalPesquisa: (0, mysql_core_1.int)("custoTotalPesquisa").default(0), // Centavos
+    valorGerado: (0, mysql_core_1.int)("valorGerado").default(0), // Centavos
+    roi: (0, mysql_core_1.int)("roi").default(0), // ROI * 100
+    dataInicio: (0, mysql_core_1.timestamp)("dataInicio"),
+    dataConclusao: (0, mysql_core_1.timestamp)("dataConclusao"),
+    duracaoDias: (0, mysql_core_1.int)("duracaoDias").default(0),
+    updatedAt: (0, mysql_core_1.timestamp)("updatedAt").defaultNow(),
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+});
+/**
+ * Analytics por Dimensão - Eficácia por UF/Porte/Segmentação
+ */
+exports.analyticsDimensoes = (0, mysql_core_1.mysqlTable)("analytics_dimensoes", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    pesquisaId: (0, mysql_core_1.int)("pesquisaId"),
+    dimensaoTipo: (0, mysql_core_1.mysqlEnum)("dimensaoTipo", ["uf", "porte", "segmentacao", "categoria"]).notNull(),
+    dimensaoValor: (0, mysql_core_1.varchar)("dimensaoValor", { length: 100 }).notNull(), // ex: 'SP', 'Médio', 'B2B'
+    totalLeads: (0, mysql_core_1.int)("totalLeads").default(0),
+    qualidadeMedia: (0, mysql_core_1.int)("qualidadeMedia").default(0), // Score médio * 100
+    taxaConversaoSF: (0, mysql_core_1.int)("taxaConversaoSF").default(0), // Percentual * 100
+    custoMedioLead: (0, mysql_core_1.int)("custoMedioLead").default(0), // Centavos
+    roi: (0, mysql_core_1.int)("roi").default(0), // ROI * 100
+    updatedAt: (0, mysql_core_1.timestamp)("updatedAt").defaultNow(),
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+});
+/**
+ * Analytics Timeline - Evolução temporal diária
+ */
+exports.analyticsTimeline = (0, mysql_core_1.mysqlTable)("analytics_timeline", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    data: (0, mysql_core_1.timestamp)("data").notNull(),
+    // Métricas Diárias
+    leadsGeradosDia: (0, mysql_core_1.int)("leadsGeradosDia").default(0),
+    leadsEnriquecidosDia: (0, mysql_core_1.int)("leadsEnriquecidosDia").default(0),
+    leadsValidadosDia: (0, mysql_core_1.int)("leadsValidadosDia").default(0),
+    leadsExportadosSFDia: (0, mysql_core_1.int)("leadsExportadosSFDia").default(0),
+    qualidadeMediaDia: (0, mysql_core_1.int)("qualidadeMediaDia").default(0), // Score médio * 100
+    custoDia: (0, mysql_core_1.int)("custoDia").default(0), // Centavos
+    // Métricas Acumuladas
+    leadsAcumulados: (0, mysql_core_1.int)("leadsAcumulados").default(0),
+    custoAcumulado: (0, mysql_core_1.int)("custoAcumulado").default(0), // Centavos
+    valorGeradoAcumulado: (0, mysql_core_1.int)("valorGeradoAcumulado").default(0), // Centavos
+    updatedAt: (0, mysql_core_1.timestamp)("updatedAt").defaultNow(),
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+});
+/**
+ * Operational Alerts - Alertas operacionais automáticos
+ */
+exports.operationalAlerts = (0, mysql_core_1.mysqlTable)("operational_alerts", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    alertType: (0, mysql_core_1.mysqlEnum)("alertType", [
+        "qualidade_baixa",
+        "enriquecimento_lento",
+        "backlog_validacao",
+        "custo_elevado",
+        "conversao_sf_baixa"
+    ]).notNull(),
+    severity: (0, mysql_core_1.mysqlEnum)("severity", ["low", "medium", "high", "critical"]).default("medium").notNull(),
+    titulo: (0, mysql_core_1.varchar)("titulo", { length: 255 }).notNull(),
+    mensagem: (0, mysql_core_1.text)("mensagem").notNull(),
+    acaoRecomendada: (0, mysql_core_1.text)("acaoRecomendada"),
+    valorAtual: (0, mysql_core_1.text)("valorAtual"), // Valor que disparou o alerta
+    valorEsperado: (0, mysql_core_1.text)("valorEsperado"), // Valor de referência
+    isRead: (0, mysql_core_1.int)("isRead").default(0).notNull(), // 0 = não lido, 1 = lido
+    isDismissed: (0, mysql_core_1.int)("isDismissed").default(0).notNull(), // 0 = ativo, 1 = dispensado
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+    readAt: (0, mysql_core_1.timestamp)("readAt"),
+    dismissedAt: (0, mysql_core_1.timestamp)("dismissedAt"),
+});
+/**
+ * Recommendations - Recomendações automáticas
+ */
+exports.recommendations = (0, mysql_core_1.mysqlTable)("recommendations", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    tipo: (0, mysql_core_1.mysqlEnum)("tipo", ["mercado", "regiao", "metodologia", "filtro", "otimizacao"]).notNull(),
+    prioridade: (0, mysql_core_1.mysqlEnum)("prioridade", ["baixa", "media", "alta"]).default("media").notNull(),
+    titulo: (0, mysql_core_1.varchar)("titulo", { length: 255 }).notNull(),
+    descricao: (0, mysql_core_1.text)("descricao").notNull(),
+    acao: (0, mysql_core_1.text)("acao").notNull(), // Texto acionável
+    // Impacto Estimado
+    leadsAdicionaisEstimado: (0, mysql_core_1.int)("leadsAdicionaisEstimado").default(0),
+    qualidadeEsperada: (0, mysql_core_1.int)("qualidadeEsperada").default(0), // Score * 100
+    custoEstimado: (0, mysql_core_1.int)("custoEstimado").default(0), // Centavos
+    roiEsperado: (0, mysql_core_1.int)("roiEsperado").default(0), // ROI * 100
+    isApplied: (0, mysql_core_1.int)("isApplied").default(0).notNull(), // 0 = pendente, 1 = aplicada
+    isDismissed: (0, mysql_core_1.int)("isDismissed").default(0).notNull(), // 0 = ativa, 1 = dispensada
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+    appliedAt: (0, mysql_core_1.timestamp)("appliedAt"),
+    dismissedAt: (0, mysql_core_1.timestamp)("dismissedAt"),
+});
+/**
+ * Salesforce Sync Log - Histórico de exportações (preparado para futuro)
+ */
+exports.salesforceSyncLog = (0, mysql_core_1.mysqlTable)("salesforce_sync_log", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    pesquisaId: (0, mysql_core_1.int)("pesquisaId"),
+    syncType: (0, mysql_core_1.mysqlEnum)("syncType", ["manual", "automatico"]).default("manual").notNull(),
+    totalLeadsExportados: (0, mysql_core_1.int)("totalLeadsExportados").default(0),
+    totalLeadsSucesso: (0, mysql_core_1.int)("totalLeadsSucesso").default(0),
+    totalLeadsErro: (0, mysql_core_1.int)("totalLeadsErro").default(0),
+    status: (0, mysql_core_1.mysqlEnum)("status", ["em_progresso", "concluido", "erro"]).default("em_progresso").notNull(),
+    errorMessage: (0, mysql_core_1.text)("errorMessage"),
+    leadIds: (0, mysql_core_1.text)("leadIds"), // JSON array de IDs exportados
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+    completedAt: (0, mysql_core_1.timestamp)("completedAt"),
+});
+// ============================================
+// MÓDULO DE EXPORTAÇÃO E INTELIGÊNCIA DE DADOS
+// ============================================
+/**
+ * Histórico de exportações realizadas pelos usuários
+ */
+exports.exportHistory = (0, mysql_core_1.mysqlTable)('export_history', {
+    id: (0, mysql_core_1.varchar)('id', { length: 64 }).primaryKey(),
+    userId: (0, mysql_core_1.varchar)('userId', { length: 64 }).notNull(),
+    context: (0, mysql_core_1.text)('context'),
+    filters: (0, mysql_core_1.json)('filters'),
+    format: (0, mysql_core_1.mysqlEnum)('format', ['csv', 'excel', 'pdf', 'json']).notNull(),
+    outputType: (0, mysql_core_1.mysqlEnum)('outputType', ['simple', 'complete', 'report']).notNull(),
+    recordCount: (0, mysql_core_1.int)('recordCount').notNull(),
+    fileUrl: (0, mysql_core_1.text)('fileUrl').notNull(),
+    fileSize: (0, mysql_core_1.int)('fileSize').notNull(),
+    generationTime: (0, mysql_core_1.int)('generationTime'),
+    createdAt: (0, mysql_core_1.timestamp)('createdAt').defaultNow()
+});
+/**
+ * Filtros salvos pelos usuários para reutilização
+ */
+exports.savedFiltersExport = (0, mysql_core_1.mysqlTable)('saved_filters_export', {
+    id: (0, mysql_core_1.varchar)('id', { length: 64 }).primaryKey(),
+    userId: (0, mysql_core_1.varchar)('userId', { length: 64 }).notNull(),
+    name: (0, mysql_core_1.varchar)('name', { length: 255 }).notNull(),
+    description: (0, mysql_core_1.text)('description'),
+    filters: (0, mysql_core_1.json)('filters').notNull(),
+    isPublic: (0, mysql_core_1.boolean)('isPublic').default(false),
+    shareToken: (0, mysql_core_1.varchar)('shareToken', { length: 64 }),
+    usageCount: (0, mysql_core_1.int)('usageCount').default(0),
+    createdAt: (0, mysql_core_1.timestamp)('createdAt').defaultNow(),
+    updatedAt: (0, mysql_core_1.timestamp)('updatedAt').defaultNow()
+});
+/**
+ * Templates de relatórios (sistema e customizados)
+ */
+exports.exportTemplates = (0, mysql_core_1.mysqlTable)('export_templates', {
+    id: (0, mysql_core_1.varchar)('id', { length: 64 }).primaryKey(),
+    name: (0, mysql_core_1.varchar)('name', { length: 255 }).notNull(),
+    description: (0, mysql_core_1.text)('description'),
+    templateType: (0, mysql_core_1.mysqlEnum)('templateType', ['market', 'client', 'competitive', 'lead']).notNull(),
+    config: (0, mysql_core_1.json)('config').notNull(),
+    isSystem: (0, mysql_core_1.boolean)('isSystem').default(false),
+    userId: (0, mysql_core_1.varchar)('userId', { length: 64 }),
+    usageCount: (0, mysql_core_1.int)('usageCount').default(0),
+    createdAt: (0, mysql_core_1.timestamp)('createdAt').defaultNow(),
+    updatedAt: (0, mysql_core_1.timestamp)('updatedAt').defaultNow()
+});
+/**
+ * Cache de interpretações de contexto (otimização)
+ */
+exports.interpretationCache = (0, mysql_core_1.mysqlTable)('interpretation_cache', {
+    id: (0, mysql_core_1.varchar)('id', { length: 64 }).primaryKey(),
+    inputHash: (0, mysql_core_1.varchar)('inputHash', { length: 64 }).notNull().unique(),
+    input: (0, mysql_core_1.text)('input').notNull(),
+    interpretation: (0, mysql_core_1.json)('interpretation').notNull(),
+    hitCount: (0, mysql_core_1.int)('hitCount').default(0),
+    createdAt: (0, mysql_core_1.timestamp)('createdAt').defaultNow(),
+    expiresAt: (0, mysql_core_1.timestamp)('expiresAt').notNull()
+});
+/**
+ * Cache de queries executadas (otimização)
+ */
+exports.queryCache = (0, mysql_core_1.mysqlTable)('query_cache', {
+    id: (0, mysql_core_1.varchar)('id', { length: 64 }).primaryKey(),
+    queryHash: (0, mysql_core_1.varchar)('queryHash', { length: 64 }).notNull().unique(),
+    query: (0, mysql_core_1.text)('query').notNull(),
+    results: (0, mysql_core_1.json)('results').notNull(),
+    recordCount: (0, mysql_core_1.int)('recordCount').notNull(),
+    hitCount: (0, mysql_core_1.int)('hitCount').default(0),
+    createdAt: (0, mysql_core_1.timestamp)('createdAt').defaultNow(),
+    expiresAt: (0, mysql_core_1.timestamp)('expiresAt').notNull()
+});
+// ============================================
+// MÓDULO DE ADMIN LLM E ALERTAS INTELIGENTES
+// ============================================
+/**
+ * LLM Provider Configs - Configuração de provedores de IA
+ */
+exports.llmProviderConfigs = (0, mysql_core_1.mysqlTable)("llm_provider_configs", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    // Provedor ativo
+    activeProvider: (0, mysql_core_1.mysqlEnum)("activeProvider", ["openai", "gemini", "anthropic"]).default("openai").notNull(),
+    // Configurações OpenAI
+    openaiApiKey: (0, mysql_core_1.text)("openaiApiKey"),
+    openaiModel: (0, mysql_core_1.varchar)("openaiModel", { length: 100 }).default("gpt-4o"),
+    openaiEnabled: (0, mysql_core_1.int)("openaiEnabled").default(1).notNull(),
+    // Configurações Gemini
+    geminiApiKey: (0, mysql_core_1.text)("geminiApiKey"),
+    geminiModel: (0, mysql_core_1.varchar)("geminiModel", { length: 100 }).default("gemini-2.0-flash-exp"),
+    geminiEnabled: (0, mysql_core_1.int)("geminiEnabled").default(0).notNull(),
+    // Configurações Anthropic
+    anthropicApiKey: (0, mysql_core_1.text)("anthropicApiKey"),
+    anthropicModel: (0, mysql_core_1.varchar)("anthropicModel", { length: 100 }).default("claude-3-5-sonnet-20241022"),
+    anthropicEnabled: (0, mysql_core_1.int)("anthropicEnabled").default(0).notNull(),
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+    updatedAt: (0, mysql_core_1.timestamp)("updatedAt").defaultNow(),
+});
+/**
+ * Intelligent Alerts Config - Configuração de alertas inteligentes
+ */
+exports.intelligentAlertsConfigs = (0, mysql_core_1.mysqlTable)("intelligent_alerts_configs", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull().unique(),
+    // Thresholds
+    circuitBreakerThreshold: (0, mysql_core_1.int)("circuitBreakerThreshold").default(10).notNull(),
+    errorRateThreshold: (0, mysql_core_1.int)("errorRateThreshold").default(10).notNull(), // Percentual
+    processingTimeThreshold: (0, mysql_core_1.int)("processingTimeThreshold").default(60).notNull(), // Segundos
+    // Flags
+    notifyOnCompletion: (0, mysql_core_1.int)("notifyOnCompletion").default(1).notNull(),
+    notifyOnCircuitBreaker: (0, mysql_core_1.int)("notifyOnCircuitBreaker").default(1).notNull(),
+    notifyOnErrorRate: (0, mysql_core_1.int)("notifyOnErrorRate").default(1).notNull(),
+    notifyOnProcessingTime: (0, mysql_core_1.int)("notifyOnProcessingTime").default(1).notNull(),
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+    updatedAt: (0, mysql_core_1.timestamp)("updatedAt").defaultNow(),
+});
+/**
+ * Intelligent Alerts History - Histórico de alertas disparados
+ */
+exports.intelligentAlertsHistory = (0, mysql_core_1.mysqlTable)("intelligent_alerts_history", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    alertType: (0, mysql_core_1.mysqlEnum)("alertType", [
+        "circuit_breaker",
+        "error_rate",
+        "processing_time",
+        "completion"
+    ]).notNull(),
+    severity: (0, mysql_core_1.mysqlEnum)("severity", ["info", "warning", "critical"]).default("info").notNull(),
+    title: (0, mysql_core_1.varchar)("title", { length: 255 }).notNull(),
+    message: (0, mysql_core_1.text)("message").notNull(),
+    // Métricas no momento do alerta
+    metricValue: (0, mysql_core_1.text)("metricValue"), // Valor que disparou o alerta
+    threshold: (0, mysql_core_1.text)("threshold"), // Threshold configurado
+    // Contexto adicional
+    jobId: (0, mysql_core_1.int)("jobId"),
+    clientsProcessed: (0, mysql_core_1.int)("clientsProcessed"),
+    totalClients: (0, mysql_core_1.int)("totalClients"),
+    // Status
+    isRead: (0, mysql_core_1.int)("isRead").default(0).notNull(),
+    isDismissed: (0, mysql_core_1.int)("isDismissed").default(0).notNull(),
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+    readAt: (0, mysql_core_1.timestamp)("readAt"),
+    dismissedAt: (0, mysql_core_1.timestamp)("dismissedAt"),
+});
+/**
+ * ============================================
+ * PROJECT AUDIT LOG - Fase 58.2
+ * ============================================
+ */
+/**
+ * Project Audit Log - Histórico completo de mudanças em projetos
+ */
+exports.projectAuditLog = (0, mysql_core_1.mysqlTable)("project_audit_log", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    userId: (0, mysql_core_1.varchar)("userId", { length: 64 }), // Quem fez a mudança
+    action: (0, mysql_core_1.mysqlEnum)("action", [
+        "created",
+        "updated",
+        "hibernated",
+        "reactivated",
+        "deleted"
+    ]).notNull(),
+    // Mudanças realizadas (JSON com before/after)
+    changes: (0, mysql_core_1.text)("changes"), // JSON: { field: { before: X, after: Y } }
+    // Metadados adicionais
+    metadata: (0, mysql_core_1.text)("metadata"), // JSON com info extra (IP, user agent, etc)
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
+});
+/**
+ * Hibernation Warnings - Avisos de hibernação automática
+ * Fase 59.3: Sistema de Notificações Antes de Hibernar
+ */
+exports.hibernationWarnings = (0, mysql_core_1.mysqlTable)("hibernation_warnings", {
+    id: (0, mysql_core_1.int)("id").primaryKey().autoincrement(),
+    projectId: (0, mysql_core_1.int)("projectId").notNull(),
+    warningDate: (0, mysql_core_1.timestamp)("warningDate").defaultNow().notNull(),
+    scheduledHibernationDate: (0, mysql_core_1.timestamp)("scheduledHibernationDate").notNull(),
+    daysInactive: (0, mysql_core_1.int)("daysInactive").notNull(),
+    notificationSent: (0, mysql_core_1.int)("notificationSent").default(0).notNull(), // 0 = não enviado, 1 = enviado
+    postponed: (0, mysql_core_1.int)("postponed").default(0).notNull(), // 0 = não adiado, 1 = adiado
+    postponedUntil: (0, mysql_core_1.timestamp)("postponedUntil"),
+    hibernated: (0, mysql_core_1.int)("hibernated").default(0).notNull(), // 0 = não hibernado, 1 = hibernado
+    createdAt: (0, mysql_core_1.timestamp)("createdAt").defaultNow(),
 });

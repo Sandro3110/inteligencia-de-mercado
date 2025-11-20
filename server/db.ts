@@ -11,7 +11,8 @@ import {
   MercadoUnico, Cliente, Concorrente, Lead,
   activityLog, ActivityLog, InsertActivityLog,
   enrichmentConfigs, EnrichmentConfig, InsertEnrichmentConfig,
-  projectAuditLog, ProjectAuditLog, InsertProjectAuditLog
+  projectAuditLog, ProjectAuditLog, InsertProjectAuditLog,
+  hibernationWarnings, HibernationWarning, InsertHibernationWarning
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1035,29 +1036,63 @@ export async function getProjectById(id: number): Promise<Project | undefined> {
   }
 }
 
-export async function createProject(data: InsertProject): Promise<Project | null> {
+export async function createProject(data: InsertProject, userId?: string | null): Promise<Project | null> {
   const db = await getDb();
   if (!db) return null;
   
   try {
     const result = await db.insert(projects).values(data);
     const insertId = Number(result[0].insertId);
-    return await getProjectById(insertId) || null;
+    const project = await getProjectById(insertId) || null;
+    
+    // Log de auditoria
+    if (project) {
+      await logProjectChange(insertId, userId || null, 'created', undefined, {
+        nome: data.nome,
+        descricao: data.descricao,
+        cor: data.cor
+      });
+    }
+    
+    return project;
   } catch (error) {
     console.error("[Database] Failed to create project:", error);
     return null;
   }
 }
 
-export async function updateProject(id: number, data: Partial<InsertProject>): Promise<boolean> {
+export async function updateProject(id: number, data: Partial<InsertProject>, userId?: string | null): Promise<boolean> {
   const db = await getDb();
   if (!db) return false;
   
   try {
+    // Buscar dados antigos para comparação
+    const oldProject = await getProjectById(id);
+    
     await db
       .update(projects)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(projects.id, id));
+    
+    // Log de auditoria com comparação
+    if (oldProject) {
+      const changes: Record<string, { before: any; after: any }> = {};
+      
+      if (data.nome !== undefined && data.nome !== oldProject.nome) {
+        changes.nome = { before: oldProject.nome, after: data.nome };
+      }
+      if (data.descricao !== undefined && data.descricao !== oldProject.descricao) {
+        changes.descricao = { before: oldProject.descricao, after: data.descricao };
+      }
+      if (data.cor !== undefined && data.cor !== oldProject.cor) {
+        changes.cor = { before: oldProject.cor, after: data.cor };
+      }
+      
+      if (Object.keys(changes).length > 0) {
+        await logProjectChange(id, userId || null, 'updated', changes);
+      }
+    }
+    
     return true;
   } catch (error) {
     console.error("[Database] Failed to update project:", error);
@@ -1140,7 +1175,7 @@ export async function canDeleteProject(projectId: number): Promise<{ canDelete: 
  * Deleta permanentemente um projeto vazio (hard delete)
  * Fase 56.2 - Função de Deletar Projetos Não Enriquecidos
  */
-export async function deleteEmptyProject(projectId: number): Promise<{ success: boolean; error?: string }> {
+export async function deleteEmptyProject(projectId: number, userId?: string | null): Promise<{ success: boolean; error?: string }> {
   const db = await getDb();
   if (!db) return { success: false, error: "Database not available" };
   
@@ -1151,8 +1186,20 @@ export async function deleteEmptyProject(projectId: number): Promise<{ success: 
       return { success: false, error: check.reason || "Projeto não pode ser deletado" };
     }
     
+    // Buscar dados do projeto antes de deletar
+    const project = await getProjectById(projectId);
+    
     // Hard delete do projeto
     await db.delete(projects).where(eq(projects.id, projectId));
+    
+    // Log de auditoria
+    if (project) {
+      await logProjectChange(projectId, userId || null, 'deleted', undefined, {
+        nome: project.nome,
+        descricao: project.descricao,
+        reason: 'empty_project'
+      });
+    }
     
     console.log(`[Database] Project ${projectId} deleted successfully`);
     return { success: true };
@@ -1166,7 +1213,7 @@ export async function deleteEmptyProject(projectId: number): Promise<{ success: 
  * Hiberna um projeto (coloca em modo somente leitura)
  * Fase 57: Sistema de Hibernação de Projetos
  */
-export async function hibernateProject(projectId: number): Promise<{ success: boolean; error?: string }> {
+export async function hibernateProject(projectId: number, userId?: string | null): Promise<{ success: boolean; error?: string }> {
   const db = await getDb();
   if (!db) return { success: false, error: "Database not available" };
   
@@ -1187,6 +1234,11 @@ export async function hibernateProject(projectId: number): Promise<{ success: bo
       .set({ status: 'hibernated', updatedAt: new Date() })
       .where(eq(projects.id, projectId));
     
+    // Log de auditoria
+    await logProjectChange(projectId, userId || null, 'hibernated', {
+      status: { before: 'active', after: 'hibernated' }
+    });
+    
     console.log(`[Database] Project ${projectId} hibernated successfully`);
     return { success: true };
   } catch (error) {
@@ -1199,7 +1251,7 @@ export async function hibernateProject(projectId: number): Promise<{ success: bo
  * Reativa um projeto adormecido
  * Fase 57: Sistema de Hibernação de Projetos
  */
-export async function reactivateProject(projectId: number): Promise<{ success: boolean; error?: string }> {
+export async function reactivateProject(projectId: number, userId?: string | null): Promise<{ success: boolean; error?: string }> {
   const db = await getDb();
   if (!db) return { success: false, error: "Database not available" };
   
@@ -1219,6 +1271,11 @@ export async function reactivateProject(projectId: number): Promise<{ success: b
       .update(projects)
       .set({ status: 'active', updatedAt: new Date() })
       .where(eq(projects.id, projectId));
+    
+    // Log de auditoria
+    await logProjectChange(projectId, userId || null, 'reactivated', {
+      status: { before: 'hibernated', after: 'active' }
+    });
     
     console.log(`[Database] Project ${projectId} reactivated successfully`);
     return { success: true };
@@ -1345,7 +1402,14 @@ export async function getProjectAuditLog(
 
   const logs = await query;
 
-  return { logs, total: Number(total) };
+  // Parsear JSON de changes e metadata
+  const parsedLogs = logs.map(log => ({
+    ...log,
+    changes: log.changes ? (typeof log.changes === 'string' ? JSON.parse(log.changes) : log.changes) : null,
+    metadata: log.metadata ? (typeof log.metadata === 'string' ? JSON.parse(log.metadata) : log.metadata) : null
+  }));
+
+  return { logs: parsedLogs, total: Number(total) };
 }
 
 /**
@@ -3708,5 +3772,391 @@ export async function getQualityTrends(projectId: number, days: number = 30) {
   } catch (error) {
     console.error("[Database] Failed to get quality trends:", error);
     return [];
+  }
+}
+
+/**
+ * Busca estatísticas de atividade de projetos
+ * Fase 59.2: Dashboard de Atividade de Projetos
+ */
+export async function getProjectsActivity(): Promise<{
+  totalProjects: number;
+  activeProjects: number;
+  hibernatedProjects: number;
+  inactiveProjects30: number;
+  inactiveProjects60: number;
+  inactiveProjects90: number;
+  projectsWithActivity: Array<{
+    id: number;
+    nome: string;
+    status: 'active' | 'hibernated';
+    lastActivityAt: Date | null;
+    daysSinceActivity: number | null;
+    recentActions: Array<{
+      action: string;
+      createdAt: Date;
+      userName: string | null;
+    }>;
+  }>;
+}> {
+  const db = await getDb();
+  if (!db) {
+    return {
+      totalProjects: 0,
+      activeProjects: 0,
+      hibernatedProjects: 0,
+      inactiveProjects30: 0,
+      inactiveProjects60: 0,
+      inactiveProjects90: 0,
+      projectsWithActivity: []
+    };
+  }
+
+  // Estatísticas gerais
+  const allProjects = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.ativo, 1));
+
+  const totalProjects = allProjects.length;
+  const activeProjects = allProjects.filter(p => p.status === 'active').length;
+  const hibernatedProjects = allProjects.filter(p => p.status === 'hibernated').length;
+
+  // Projetos inativos por período
+  const now = new Date();
+  const cutoff30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const cutoff60 = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+  const cutoff90 = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+
+  const inactiveProjects30 = allProjects.filter(p => 
+    p.status === 'active' && p.lastActivityAt && p.lastActivityAt < cutoff30
+  ).length;
+
+  const inactiveProjects60 = allProjects.filter(p => 
+    p.status === 'active' && p.lastActivityAt && p.lastActivityAt < cutoff60
+  ).length;
+
+  const inactiveProjects90 = allProjects.filter(p => 
+    p.status === 'active' && p.lastActivityAt && p.lastActivityAt < cutoff90
+  ).length;
+
+  // Buscar projetos com suas atividades recentes
+  const projectsWithActivity = await Promise.all(
+    allProjects.map(async (project) => {
+      // Calcular dias desde última atividade
+      let daysSinceActivity: number | null = null;
+      if (project.lastActivityAt) {
+        const diffMs = now.getTime() - project.lastActivityAt.getTime();
+        daysSinceActivity = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      }
+
+      // Buscar últimas 3 ações do log de auditoria
+      const auditLogs = await db
+        .select()
+        .from(projectAuditLog)
+        .where(eq(projectAuditLog.projectId, project.id))
+        .orderBy(desc(projectAuditLog.createdAt))
+        .limit(3);
+
+      // Buscar nomes dos usuários
+      const recentActions = await Promise.all(
+        auditLogs.map(async (log) => {
+          let userName: string | null = null;
+          if (log.userId) {
+            const user = await getUser(log.userId);
+            userName = user?.name || null;
+          }
+          return {
+            action: log.action,
+            createdAt: log.createdAt!,
+            userName
+          };
+        })
+      );
+
+      return {
+        id: project.id,
+        nome: project.nome,
+        status: project.status,
+        lastActivityAt: project.lastActivityAt,
+        daysSinceActivity,
+        recentActions
+      };
+    })
+  );
+
+  // Ordenar por dias de inatividade (mais inativos primeiro)
+  projectsWithActivity.sort((a, b) => {
+    if (a.daysSinceActivity === null) return 1;
+    if (b.daysSinceActivity === null) return -1;
+    return b.daysSinceActivity - a.daysSinceActivity;
+  });
+
+  return {
+    totalProjects,
+    activeProjects,
+    hibernatedProjects,
+    inactiveProjects30,
+    inactiveProjects60,
+    inactiveProjects90,
+    projectsWithActivity
+  };
+}
+
+/**
+ * Verifica projetos que devem receber aviso de hibernação
+ * Fase 59.3: Sistema de Notificações Antes de Hibernar
+ * 
+ * Lógica:
+ * - Projetos ativos sem atividade há (X - 7) dias ou mais
+ * - Ainda não receberam aviso OU aviso foi adiado e prazo expirou
+ * - Serão hibernados em 7 dias se não houver atividade
+ */
+export async function checkProjectsForHibernation(
+  inactiveDays: number = 30
+): Promise<Array<{
+  project: Project;
+  daysSinceActivity: number;
+  scheduledHibernationDate: Date;
+}>> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const now = new Date();
+  const warningThreshold = inactiveDays - 7; // Avisar 7 dias antes
+  const cutoffDate = new Date(now.getTime() - warningThreshold * 24 * 60 * 60 * 1000);
+
+  // Buscar projetos ativos inativos há (inactiveDays - 7) dias ou mais
+  const inactiveProjects = await db
+    .select()
+    .from(projects)
+    .where(
+      and(
+        eq(projects.ativo, 1),
+        eq(projects.status, 'active'),
+        sql`${projects.lastActivityAt} < ${cutoffDate}`
+      )!
+    );
+
+  const projectsToWarn: Array<{
+    project: Project;
+    daysSinceActivity: number;
+    scheduledHibernationDate: Date;
+  }> = [];
+
+  for (const project of inactiveProjects) {
+    if (!project.lastActivityAt) continue;
+
+    // Calcular dias de inatividade
+    const diffMs = now.getTime() - project.lastActivityAt.getTime();
+    const daysSinceActivity = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    // Verificar se já existe aviso recente não adiado
+    const existingWarning = await db
+      .select()
+      .from(hibernationWarnings)
+      .where(
+        and(
+          eq(hibernationWarnings.projectId, project.id),
+          eq(hibernationWarnings.hibernated, 0)
+        )!
+      )
+      .orderBy(desc(hibernationWarnings.createdAt))
+      .limit(1);
+
+    // Se já existe aviso e não foi adiado, pular
+    if (existingWarning.length > 0) {
+      const warning = existingWarning[0];
+      
+      // Se foi adiado, verificar se o prazo expirou
+      if (warning.postponed === 1 && warning.postponedUntil) {
+        if (now < warning.postponedUntil) {
+          continue; // Ainda está dentro do prazo de adiamento
+        }
+      } else if (warning.notificationSent === 1) {
+        continue; // Já foi avisado e não foi adiado
+      }
+    }
+
+    // Data agendada para hibernação (7 dias a partir de hoje)
+    const scheduledHibernationDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    projectsToWarn.push({
+      project,
+      daysSinceActivity,
+      scheduledHibernationDate
+    });
+  }
+
+  return projectsToWarn;
+}
+
+/**
+ * Envia aviso de hibernação para o proprietário do sistema
+ * Fase 59.3: Sistema de Notificações Antes de Hibernar
+ */
+export async function sendHibernationWarning(
+  projectId: number,
+  projectName: string,
+  daysSinceActivity: number,
+  scheduledHibernationDate: Date
+): Promise<{ success: boolean; warningId?: number }> {
+  const db = await getDb();
+  if (!db) return { success: false };
+
+  try {
+    // Registrar aviso no banco
+    const result = await db.insert(hibernationWarnings).values({
+      projectId,
+      warningDate: new Date(),
+      scheduledHibernationDate,
+      daysInactive: daysSinceActivity,
+      notificationSent: 0, // Será marcado como 1 após envio
+      postponed: 0,
+      hibernated: 0
+    });
+
+    const warningId = Number(result[0].insertId);
+
+    // Enviar notificação para o proprietário
+    const { notifyOwner } = await import('./_core/notification');
+    
+    const formattedDate = scheduledHibernationDate.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+
+    const notificationSuccess = await notifyOwner({
+      title: `⚠️ Projeto "${projectName}" será hibernado em 7 dias`,
+      content: `O projeto **${projectName}** está inativo há **${daysSinceActivity} dias** e será hibernado automaticamente em **${formattedDate}** se não houver atividade.\n\n` +
+        `Para evitar a hibernação, acesse o projeto e realize qualquer ação (criar pesquisa, editar dados, etc.).\n\n` +
+        `Você também pode adiar a hibernação por mais 30 dias no Dashboard de Atividade de Projetos.`
+    });
+
+    // Atualizar status de envio
+    if (notificationSuccess) {
+      await db
+        .update(hibernationWarnings)
+        .set({ notificationSent: 1 })
+        .where(eq(hibernationWarnings.id, warningId));
+    }
+
+    return { success: notificationSuccess, warningId };
+  } catch (error) {
+    console.error('[Database] Failed to send hibernation warning:', error);
+    return { success: false };
+  }
+}
+
+/**
+ * Adia a hibernação de um projeto por X dias
+ * Fase 59.3: Sistema de Notificações Antes de Hibernar
+ */
+export async function postponeHibernation(
+  projectId: number,
+  postponeDays: number = 30
+): Promise<{ success: boolean; error?: string }> {
+  const db = await getDb();
+  if (!db) return { success: false, error: "Database not available" };
+
+  try {
+    // Buscar aviso mais recente não hibernado
+    const warnings = await db
+      .select()
+      .from(hibernationWarnings)
+      .where(
+        and(
+          eq(hibernationWarnings.projectId, projectId),
+          eq(hibernationWarnings.hibernated, 0)
+        )!
+      )
+      .orderBy(desc(hibernationWarnings.createdAt))
+      .limit(1);
+
+    if (warnings.length === 0) {
+      return { success: false, error: "Nenhum aviso de hibernação encontrado" };
+    }
+
+    const warning = warnings[0];
+    const postponedUntil = new Date(Date.now() + postponeDays * 24 * 60 * 60 * 1000);
+
+    // Atualizar aviso
+    await db
+      .update(hibernationWarnings)
+      .set({ 
+        postponed: 1, 
+        postponedUntil 
+      })
+      .where(eq(hibernationWarnings.id, warning.id));
+
+    // Atualizar lastActivityAt do projeto
+    await updateProjectActivity(projectId);
+
+    return { success: true };
+  } catch (error) {
+    console.error('[Database] Failed to postpone hibernation:', error);
+    return { success: false, error: "Erro ao adiar hibernação" };
+  }
+}
+
+/**
+ * Executa hibernação automática de projetos com avisos vencidos
+ * Fase 59.3: Sistema de Notificações Antes de Hibernar
+ */
+export async function executeScheduledHibernations(
+  userId?: string | null
+): Promise<{ hibernated: number; errors: number }> {
+  const db = await getDb();
+  if (!db) return { hibernated: 0, errors: 0 };
+
+  const now = new Date();
+  let hibernated = 0;
+  let errors = 0;
+
+  try {
+    // Buscar avisos com data de hibernação vencida
+    const overdueWarnings = await db
+      .select()
+      .from(hibernationWarnings)
+      .where(
+        and(
+          eq(hibernationWarnings.hibernated, 0),
+          eq(hibernationWarnings.postponed, 0),
+          sql`${hibernationWarnings.scheduledHibernationDate} <= ${now}`
+        )!
+      );
+
+    for (const warning of overdueWarnings) {
+      // Verificar se projeto ainda está ativo
+      const project = await getProjectById(warning.projectId);
+      if (!project || project.status !== 'active') {
+        // Marcar aviso como processado
+        await db
+          .update(hibernationWarnings)
+          .set({ hibernated: 1 })
+          .where(eq(hibernationWarnings.id, warning.id));
+        continue;
+      }
+
+      // Hibernar projeto
+      const result = await hibernateProject(warning.projectId, userId);
+      
+      if (result.success) {
+        // Marcar aviso como processado
+        await db
+          .update(hibernationWarnings)
+          .set({ hibernated: 1 })
+          .where(eq(hibernationWarnings.id, warning.id));
+        hibernated++;
+      } else {
+        errors++;
+      }
+    }
+
+    return { hibernated, errors };
+  } catch (error) {
+    console.error('[Database] Failed to execute scheduled hibernations:', error);
+    return { hibernated, errors: errors + 1 };
   }
 }

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `hibernation_warnings` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`projectId` int NOT NULL,\n\t`warningDate` timestamp NOT NULL DEFAULT (now()),\n\t`scheduledHibernationDate` timestamp NOT NULL,\n\t`daysInactive` int NOT NULL,\n\t`notificationSent` int NOT NULL DEFAULT 0,\n\t`postponed` int NOT NULL DEFAULT 0,\n\t`postponedUntil` timestamp,\n\t`hibernated` int NOT NULL DEFAULT 0,\n\t`createdAt` timestamp DEFAULT (now()),\n\tCONSTRAINT `hibernation_warnings_id` PRIMARY KEY(`id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute CREATE TABLE IF NOT EXISTS `hibernation_warnings` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`projectId` int NOT NULL,\n\t`warningDate` timestamp NOT NULL DEFAULT (now()),\n\t`scheduledHibernationDate` timestamp NOT NULL,\n\t`daysInactive` int NOT NULL,\n\t`notificationSent` int NOT NULL DEFAULT 0,\n\t`postponed` int NOT NULL DEFAULT 0,\n\t`postponedUntil` timestamp,\n\t`hibernated` int NOT NULL DEFAULT 0,\n\t`createdAt` timestamp DEFAULT (now()),\n\tCONSTRAINT `hibernation_warnings_id` PRIMARY KEY(`id`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 254
+}

@@ -44,6 +44,7 @@ const MonitoringDashboard = lazy(() => import("./pages/MonitoringDashboard"));
 const IntelligentAlerts = lazy(() => import("./pages/IntelligentAlerts"));
 const TendenciasDashboard = lazy(() => import("./pages/TendenciasDashboard"));
 const ProjectManagement = lazy(() => import("./pages/ProjectManagement"));
+const ProjectActivityDashboard = lazy(() => import("./pages/ProjectActivityDashboard"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -85,6 +86,7 @@ function Router() {
       <Route path="/intelligent-alerts" component={IntelligentAlerts} />
       <Route path="/tendencias" component={TendenciasDashboard} />
       <Route path="/projetos" component={ProjectManagement} />
+      <Route path="/projetos/atividade" component={ProjectActivityDashboard} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

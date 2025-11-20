@@ -741,9 +741,9 @@ export const appRouter = router({
         descricao: z.string().optional(),
         cor: z.string().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const { createProject } = await import('./db');
-        return createProject(input);
+        return createProject(input, ctx.user?.id);
       }),
 
     update: publicProcedure
@@ -753,10 +753,10 @@ export const appRouter = router({
         descricao: z.string().optional(),
         cor: z.string().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const { updateProject } = await import('./db');
         const { id, ...data } = input;
-        return updateProject(id, data);
+        return updateProject(id, data, ctx.user?.id);
       }),
 
     delete: publicProcedure
@@ -775,23 +775,23 @@ export const appRouter = router({
 
     deleteEmpty: publicProcedure
       .input(z.number())
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const { deleteEmptyProject } = await import('./db');
-        return deleteEmptyProject(input);
+        return deleteEmptyProject(input, ctx.user?.id);
       }),
 
     hibernate: publicProcedure
       .input(z.number())
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const { hibernateProject } = await import('./db');
-        return hibernateProject(input);
+        return hibernateProject(input, ctx.user?.id);
       }),
 
     reactivate: publicProcedure
       .input(z.number())
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const { reactivateProject } = await import('./db');
-        return reactivateProject(input);
+        return reactivateProject(input, ctx.user?.id);
       }),
 
     isHibernated: publicProcedure
@@ -819,13 +819,13 @@ export const appRouter = router({
 
     autoHibernate: publicProcedure
       .input(z.object({ days: z.number().default(30) }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const { getInactiveProjects, hibernateProject } = await import('./db');
         const inactiveProjects = await getInactiveProjects(input.days);
         
         const results = [];
         for (const project of inactiveProjects) {
-          const result = await hibernateProject(project.id);
+          const result = await hibernateProject(project.id, ctx.user?.id);
           results.push({ projectId: project.id, ...result });
         }
         
@@ -861,6 +861,61 @@ export const appRouter = router({
         return duplicateProject(input.projectId, input.newName, {
           copyMarkets: input.copyMarkets,
         });
+      }),
+
+    // Fase 59.2: Dashboard de Atividade de Projetos
+    getActivity: publicProcedure
+      .query(async () => {
+        const { getProjectsActivity } = await import('./db');
+        return getProjectsActivity();
+      }),
+
+    // Fase 59.3: Sistema de Notificações Antes de Hibernar
+    checkHibernationWarnings: publicProcedure
+      .input(z.object({ inactiveDays: z.number().default(30) }))
+      .query(async ({ input }) => {
+        const { checkProjectsForHibernation } = await import('./db');
+        return checkProjectsForHibernation(input.inactiveDays);
+      }),
+
+    sendHibernationWarnings: publicProcedure
+      .input(z.object({ inactiveDays: z.number().default(30) }))
+      .mutation(async ({ input }) => {
+        const { checkProjectsForHibernation, sendHibernationWarning } = await import('./db');
+        const projectsToWarn = await checkProjectsForHibernation(input.inactiveDays);
+        
+        const results = [];
+        for (const { project, daysSinceActivity, scheduledHibernationDate } of projectsToWarn) {
+          const result = await sendHibernationWarning(
+            project.id,
+            project.nome,
+            daysSinceActivity,
+            scheduledHibernationDate
+          );
+          results.push({ projectId: project.id, projectName: project.nome, ...result });
+        }
+        
+        return { 
+          sent: results.filter(r => r.success).length, 
+          total: results.length, 
+          results 
+        };
+      }),
+
+    postponeHibernation: publicProcedure
+      .input(z.object({ 
+        projectId: z.number(),
+        postponeDays: z.number().default(30)
+      }))
+      .mutation(async ({ input }) => {
+        const { postponeHibernation } = await import('./db');
+        return postponeHibernation(input.projectId, input.postponeDays);
+      }),
+
+    executeScheduledHibernations: publicProcedure
+      .mutation(async ({ ctx }) => {
+        const { executeScheduledHibernations } = await import('./db');
+        return executeScheduledHibernations(ctx.user?.id);
       }),
   }),
 

@@ -1073,3 +1073,23 @@ export const projectAuditLog = mysqlTable("project_audit_log", {
 
 export type ProjectAuditLog = typeof projectAuditLog.$inferSelect;
 export type InsertProjectAuditLog = typeof projectAuditLog.$inferInsert;
+
+/**
+ * Hibernation Warnings - Avisos de hibernação automática
+ * Fase 59.3: Sistema de Notificações Antes de Hibernar
+ */
+export const hibernationWarnings = mysqlTable("hibernation_warnings", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  warningDate: timestamp("warningDate").defaultNow().notNull(),
+  scheduledHibernationDate: timestamp("scheduledHibernationDate").notNull(),
+  daysInactive: int("daysInactive").notNull(),
+  notificationSent: int("notificationSent").default(0).notNull(), // 0 = não enviado, 1 = enviado
+  postponed: int("postponed").default(0).notNull(), // 0 = não adiado, 1 = adiado
+  postponedUntil: timestamp("postponedUntil"),
+  hibernated: int("hibernated").default(0).notNull(), // 0 = não hibernado, 1 = hibernado
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type HibernationWarning = typeof hibernationWarnings.$inferSelect;
+export type InsertHibernationWarning = typeof hibernationWarnings.$inferInsert;

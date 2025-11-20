@@ -1,6 +1,5 @@
 import { defineConfig } from "vitest/config";
 import path from "path";
-
 export default defineConfig({
   root: path.resolve(import.meta.dirname),
   test: {
@@ -9,4 +8,7 @@ export default defineConfig({
     globals: true,
     testTimeout: 30000,
   },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
+  }
 });
