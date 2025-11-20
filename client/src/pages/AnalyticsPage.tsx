@@ -7,10 +7,13 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Cart
 import { TrendingUp, MapPin, PieChart as PieChartIcon, RefreshCw } from "lucide-react";
 
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
+import { CardSkeleton, ChartSkeleton } from "@/components/skeletons";
+import { useSidebarState } from "@/hooks/useSidebarState";
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
 
 export default function AnalyticsPage() {
   const { selectedProjectId } = useSelectedProject();
+  const { sidebarClass } = useSidebarState();
   const [months, setMonths] = useState(6);
   const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(null);
 
@@ -20,7 +23,7 @@ export default function AnalyticsPage() {
     { enabled: !!selectedProjectId }
   );
 
-  const { data: evolutionData, refetch: refetchEvolution } = trpc.analytics.evolution.useQuery(
+  const { data: evolutionData, refetch: refetchEvolution, isLoading: isLoadingEvolution } = trpc.analytics.evolution.useQuery(
     { projectId: selectedProjectId!, pesquisaId: selectedPesquisaId ?? undefined, months },
     { enabled: !!selectedProjectId }
   );
@@ -30,7 +33,7 @@ export default function AnalyticsPage() {
     { enabled: !!selectedProjectId }
   );
 
-  const { data: segmentationData, refetch: refetchSegmentation } = trpc.analytics.segmentation.useQuery(
+  const { data: segmentationData, refetch: refetchSegmentation, isLoading: isLoadingSegmentation } = trpc.analytics.segmentation.useQuery(
     { projectId: selectedProjectId!, pesquisaId: selectedPesquisaId ?? undefined },
     { enabled: !!selectedProjectId }
   );
@@ -41,16 +44,35 @@ export default function AnalyticsPage() {
     refetchSegmentation();
   };
 
+  const isLoading = isLoadingEvolution || isLoadingSegmentation;
+
   if (!selectedProjectId) {
     return (
-      <div className="min-h-screen ml-60 flex items-center justify-center bg-background">
+      <div className={`min-h-screen ${sidebarClass} flex items-center justify-center bg-background transition-all duration-300`}>
         <p className="text-slate-600">Selecione um projeto para visualizar analytics</p>
       </div>
     );
   }
 
+  if (isLoading) {
+    return (
+      <div className={`min-h-screen ${sidebarClass} bg-background p-6 space-y-6 transition-all duration-300`}>
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <CardSkeleton count={3} showHeader={true} contentHeight="h-20" />
+          </div>
+          <ChartSkeleton type="bar" height="h-96" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ChartSkeleton type="pie" />
+            <ChartSkeleton type="area" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen ml-60 bg-background p-6">
+    <div className={`min-h-screen ${sidebarClass} bg-background p-6 transition-all duration-300`}>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Breadcrumbs */}
         <DynamicBreadcrumbs />

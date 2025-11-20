@@ -1440,3 +1440,27 @@ PROJECT (nível 1)
 - [x] Ajustar scroll e overflow
 - [x] Garantir responsividade (sidebar colapsada/expandida)
 - [x] Testar em diferentes resoluções
+
+
+## Fase 47: Melhorias de UX (Margem Global, Breadcrumbs, Skeletons) 🎨
+
+### 47.1 Aplicar useSidebarMargin Globalmente
+- [x] Identificar todas as páginas que precisam do hook
+- [x] Padronizar uso de useSidebarState (hook existente)
+- [x] Aplicar em Mercados e ResearchOverview
+- [ ] Aplicar em demais páginas conforme necessário (hook disponível)
+- [x] Testar responsividade
+
+### 47.2 Breadcrumbs Clicáveis
+- [x] Adicionar navegação clicável nos breadcrumbs
+- [x] Implementar histórico de navegação (botão voltar)
+- [x] Adicionar ícones de categoria (12 ícones diferentes)
+- [x] Melhorar estilo visual (hover, underline)
+- [x] Testar navegação
+
+### 47.3 Skeleton Screens Aprimorados
+- [x] Criar CardSkeleton component
+- [x] Criar TableSkeleton component
+- [x] Criar ChartSkeleton component
+- [x] Substituir spinners por skeletons em Dashboard e Analytics
+- [x] Testar estados de loading

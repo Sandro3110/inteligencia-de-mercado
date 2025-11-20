@@ -19,6 +19,7 @@ import {
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
+import { CardSkeleton, ChartSkeleton } from "@/components/skeletons";
 export default function Dashboard() {
   const { selectedProjectId } = useSelectedProject();
   const { sidebarClass } = useSidebarState();
@@ -69,8 +70,14 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className={`min-h-screen ${sidebarClass} bg-background p-6 space-y-6 transition-all duration-300`}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <CardSkeleton count={4} showHeader={true} contentHeight="h-16" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ChartSkeleton type="pie" />
+          <ChartSkeleton type="bar" />
+        </div>
       </div>
     );
   }

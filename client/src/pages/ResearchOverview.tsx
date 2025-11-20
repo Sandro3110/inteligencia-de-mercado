@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, FunnelChart, Funnel, LabelList } from "recharts";
 import { Target, Award, TrendingUp, CheckCircle2 } from "lucide-react";
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
-import { useSidebarMargin } from "@/hooks/useSidebarMargin";
+import { useSidebarState } from "@/hooks/useSidebarState";
 
 /**
  * Dashboard Research Overview
@@ -16,7 +16,7 @@ import { useSidebarMargin } from "@/hooks/useSidebarMargin";
 export default function ResearchOverview() {
   const { selectedProjectId } = useSelectedProject();
   const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | undefined>();
-  const sidebarMargin = useSidebarMargin();
+  const { sidebarClass } = useSidebarState();
 
   // Buscar pesquisas do projeto
   const { data: pesquisas } = trpc.pesquisas.list.useQuery(
@@ -38,7 +38,7 @@ export default function ResearchOverview() {
 
   if (!selectedProjectId) {
     return (
-      <div className={`min-h-screen bg-background p-8 ${sidebarMargin} transition-all duration-300`}>
+      <div className={`min-h-screen bg-background p-8 ${sidebarClass} transition-all duration-300`}>
         <div className="text-center text-muted-foreground">
           Selecione um projeto para visualizar o Research Overview
         </div>
@@ -48,7 +48,7 @@ export default function ResearchOverview() {
 
   if (isLoading) {
     return (
-      <div className={`min-h-screen bg-background p-8 space-y-6 ${sidebarMargin} transition-all duration-300`}>
+      <div className={`min-h-screen bg-background p-8 space-y-6 ${sidebarClass} transition-all duration-300`}>
         <Skeleton className="h-12 w-full" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32" />)}
@@ -96,7 +96,7 @@ export default function ResearchOverview() {
   const topMercados = metrics?.topMercados || [];
 
   return (
-    <div className={`min-h-screen bg-background ${sidebarMargin} transition-all duration-300`}>
+    <div className={`min-h-screen bg-background ${sidebarClass} transition-all duration-300`}>
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-8 py-4">
         <DynamicBreadcrumbs />
