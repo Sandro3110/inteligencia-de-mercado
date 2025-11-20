@@ -448,3 +448,34 @@
 - ✅ 5 contadores de pesquisas corrigidos
 - ✅ 0 problemas críticos restantes
 - ✅ Apenas 1 problema baixo (mercados duplicados - OK por design)
+
+
+---
+
+## FASE 64: CORREÇÃO DO ERRO 404 NO WIZARD DE PESQUISA 🐛 ✅
+
+### 64.1 Investigação do Problema
+- [x] Identificar causa do erro 404 ao clicar em "Criar e Iniciar Enriquecimento"
+- [x] Verificar rota /enrichment/progress no App.tsx (não existe)
+- [x] Verificar que wizard estava redirecionando para rota inexistente
+- [x] Identificar que mutation de criar pesquisa não estava implementada
+
+### 64.2 Correção da Rota
+- [x] Criar mutation pesquisas.create no backend (server/routers.ts)
+- [x] Implementar lógica de criação de pesquisa + mercados + clientes
+- [x] Corrigir redirecionamento de `/enrichment/progress` para `/` (Home)
+- [x] Atualizar ResearchWizard.tsx para usar mutation real
+- [x] Adicionar loading states e error handling
+
+### 64.3 Teste e Validação
+- [x] Testar fluxo completo do wizard (7 passos)
+- [x] Validar criação de pesquisa "Pesquisa Teste Wizard Correção 404"
+- [x] Validar criação de mercado "Mercado Teste A"
+- [x] Validar redirecionamento correto para Home
+- [x] Confirmar que erro 404 foi eliminado
+
+**Resultado Final:**
+- ✅ Wizard funcionando 100%!
+- ✅ Pesquisa criada com sucesso no banco
+- ✅ Redirecionamento correto implementado
+- ✅ Erro 404 completamente eliminado

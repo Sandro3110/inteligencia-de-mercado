@@ -947,6 +947,69 @@ export const appRouter = router({
         const { getDashboardStatsByPesquisa } = await import('./db');
         return getDashboardStatsByPesquisa(input.pesquisaId);
       }),
+
+    create: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        nome: z.string().min(3).max(200),
+        descricao: z.string().optional(),
+        qtdConcorrentesPorMercado: z.number().min(1).max(50).default(5),
+        qtdLeadsPorMercado: z.number().min(1).max(100).default(10),
+        qtdProdutosPorCliente: z.number().min(1).max(20).default(3),
+        mercados: z.array(z.object({
+          nome: z.string(),
+          descricao: z.string().optional(),
+        })).optional().default([]),
+        clientes: z.array(z.object({
+          nome: z.string(),
+          cnpj: z.string().optional(),
+          mercadoNome: z.string().optional(),
+        })).optional().default([]),
+      }))
+      .mutation(async ({ input }) => {
+        const { createPesquisa, createMercado, createCliente } = await import('./db');
+        
+        // 1. Criar pesquisa
+        const pesquisa = await createPesquisa({
+          projectId: input.projectId,
+          nome: input.nome,
+          descricao: input.descricao,
+          totalClientes: input.clientes.length,
+          status: 'importado',
+          qtdConcorrentesPorMercado: input.qtdConcorrentesPorMercado,
+          qtdLeadsPorMercado: input.qtdLeadsPorMercado,
+          qtdProdutosPorCliente: input.qtdProdutosPorCliente,
+        });
+
+        if (!pesquisa) {
+          throw new Error('Falha ao criar pesquisa');
+        }
+
+        // 2. Criar mercados
+        const mercadosMap = new Map<string, number>();
+        for (const mercado of input.mercados) {
+          const created = await createMercado({
+            projectId: input.projectId,
+            pesquisaId: pesquisa.id,
+            nome: mercado.nome,
+          });
+          if (created) {
+            mercadosMap.set(mercado.nome, created.id);
+          }
+        }
+
+        // 3. Criar clientes (sem mercadoId por enquanto, apenas projectId e pesquisaId)
+        for (const cliente of input.clientes) {
+          await createCliente({
+            projectId: input.projectId,
+            pesquisaId: pesquisa.id,
+            nome: cliente.nome,
+            cnpj: cliente.cnpj || null,
+          });
+        }
+
+        return pesquisa;
+      }),
   }),
 
   templates: router({

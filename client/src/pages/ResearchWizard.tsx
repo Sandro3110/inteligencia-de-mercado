@@ -8,8 +8,9 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { trpc } from '@/lib/trpc';
 
 // Steps
 import {
@@ -85,6 +86,16 @@ export default function ResearchWizard() {
     validatedData: {
       mercados: [],
       clientes: [],
+    },
+  });
+
+  const createPesquisaMutation = trpc.pesquisas.create.useMutation({
+    onSuccess: (pesquisa) => {
+      toast.success(`Pesquisa "${pesquisa.nome}" criada com sucesso!`);
+      setLocation('/');
+    },
+    onError: (error) => {
+      toast.error(`Erro ao criar pesquisa: ${error.message}`);
     },
   });
 
@@ -258,13 +269,43 @@ export default function ResearchWizard() {
             ) : (
               <Button
                 onClick={() => {
-                  toast.success('Pesquisa criada com sucesso!');
-                  setLocation('/enrichment/progress');
+                  if (!wizardData.projectId) {
+                    toast.error('Projeto não selecionado');
+                    return;
+                  }
+
+                  createPesquisaMutation.mutate({
+                    projectId: wizardData.projectId,
+                    nome: wizardData.researchName,
+                    descricao: wizardData.researchDescription || undefined,
+                    qtdConcorrentesPorMercado: wizardData.qtdConcorrentes,
+                    qtdLeadsPorMercado: wizardData.qtdLeads,
+                    qtdProdutosPorCliente: wizardData.qtdProdutos,
+                    mercados: wizardData.validatedData.mercados.map(m => ({
+                      nome: m.nome,
+                      descricao: m.descricao,
+                    })),
+                    clientes: wizardData.validatedData.clientes.map(c => ({
+                      nome: c.nome,
+                      cnpj: c.cnpj,
+                      mercadoNome: c.mercadoNome,
+                    })),
+                  });
                 }}
+                disabled={createPesquisaMutation.isPending}
                 className="bg-green-600 hover:bg-green-700"
               >
-                <Check className="w-4 h-4 mr-2" />
-                Criar e Iniciar Enriquecimento
+                {createPesquisaMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Criando...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Criar e Iniciar Enriquecimento
+                  </>
+                )}
               </Button>
             )}
           </div>
