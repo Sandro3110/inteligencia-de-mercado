@@ -91,8 +91,8 @@ export default function ResearchWizard() {
 
   const createPesquisaMutation = trpc.pesquisas.create.useMutation({
     onSuccess: (pesquisa) => {
-      toast.success(`Pesquisa "${pesquisa.nome}" criada com sucesso!`);
-      setLocation('/');
+      toast.success(`Pesquisa "${pesquisa.nome}" criada com sucesso! Iniciando enriquecimento...`);
+      setLocation('/enrichment-progress');
     },
     onError: (error) => {
       toast.error(`Erro ao criar pesquisa: ${error.message}`);

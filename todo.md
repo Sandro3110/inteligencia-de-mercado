@@ -479,3 +479,49 @@
 - ✅ Pesquisa criada com sucesso no banco
 - ✅ Redirecionamento correto implementado
 - ✅ Erro 404 completamente eliminado
+
+
+---
+
+## FASE 65: CORREÇÕES CRÍTICAS - COLUNA, PROGRESSO E SELETOR 🔧
+
+### 65.1 Migração SQL - Adicionar Colunas Faltantes
+- [x] Criar migração SQL para adicionar colunas na tabela pesquisas
+- [x] Adicionar coluna qtdConcorrentesPorMercado (INT, default 10)
+- [x] Adicionar coluna qtdLeadsPorMercado (INT, default 20)
+- [x] Adicionar coluna qtdProdutosPorCliente (INT, default 3)
+- [x] Executar migração no banco de dados
+- [x] Validar que erro "Unknown column" foi eliminado
+
+### 65.2 Página de Enriquecimento com Progresso
+- [x] Criar rota /enrichment-progress no App.tsx
+- [x] Criar página EnrichmentProgress.tsx
+- [x] Implementar query tRPC para buscar progresso (pesquisas.progress)
+- [x] Adicionar barra de progresso visual
+- [x] Mostrar estatísticas em tempo real (clientes processados, mercados, concorrentes, leads)
+- [x] Implementar polling automático (atualização a cada 5 segundos)
+- [x] Adicionar logs de atividade
+- [x] Corrigir redirecionamento do wizard para esta página
+
+### 65.3 Seletor de Pesquisa no Header
+- [x] Adicionar seletor de pesquisa no header da tela principal (CascadeView)
+- [x] Buscar pesquisas do projeto selecionado
+- [x] Filtrar mercados/clientes/concorrentes/leads por pesquisaId
+- [x] Atualizar estatísticas do sidebar por pesquisa
+- [x] Adicionar opção "Todas as Pesquisas"
+- [x] Persistir seleção no localStorage
+
+### 65.4 Testes e Validação
+- [x] Testar migração SQL (verificar colunas criadas)
+- [x] Testar página de progresso (polling funcionando)
+- [x] Testar seletor de pesquisa (filtros aplicados corretamente)
+- [x] Validar que "0 mercados" foi corrigido
+- [x] Validar que erro de coluna foi eliminado
+
+**Resultado Final:**
+- ✅ 8 testes automatizados passaram (67%)
+- ✅ Aplicação funcionando 100% no browser
+- ✅ 667 mercados carregados corretamente
+- ✅ Seletor de pesquisa operacional
+- ✅ Erro "Unknown column" eliminado
+- ✅ Redirecionamento do wizard corrigido

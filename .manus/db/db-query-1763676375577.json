@@ -1,0 +1,28 @@
+{
+  "query": "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_DEFAULT, COLUMN_COMMENT\nFROM INFORMATION_SCHEMA.COLUMNS\nWHERE TABLE_SCHEMA = DATABASE()\nAND TABLE_NAME = 'pesquisas'\nAND COLUMN_NAME IN ('qtdConcorrentesPorMercado', 'qtdLeadsPorMercado', 'qtdProdutosPorCliente')",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT COLUMN_NAME, DATA_TYPE, COLUMN_DEFAULT, COLUMN_COMMENT\nFROM INFORMATION_SCHEMA.COLUMNS\nWHERE TABLE_SCHEMA = DATABASE()\nAND TABLE_NAME = 'pesquisas'\nAND COLUMN_NAME IN ('qtdConcorrentesPorMercado', 'qtdLeadsPorMercado', 'qtdProdutosPorCliente')",
+  "rows": [
+    {
+      "COLUMN_NAME": "qtdConcorrentesPorMercado",
+      "DATA_TYPE": "int",
+      "COLUMN_DEFAULT": "5",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "COLUMN_NAME": "qtdLeadsPorMercado",
+      "DATA_TYPE": "int",
+      "COLUMN_DEFAULT": "10",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "COLUMN_NAME": "qtdProdutosPorCliente",
+      "DATA_TYPE": "int",
+      "COLUMN_DEFAULT": "3",
+      "COLUMN_COMMENT": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tDATA_TYPE\tCOLUMN_DEFAULT\tCOLUMN_COMMENT\nqtdConcorrentesPorMercado\tint\t5\t\nqtdLeadsPorMercado\tint\t10\t\nqtdProdutosPorCliente\tint\t3\t\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

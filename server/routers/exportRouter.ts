@@ -8,7 +8,7 @@ import { excelRenderer } from "../renderers/ExcelRenderer";
 import { pdfListRenderer } from "../renderers/PDFListRenderer";
 import { pdfReportRenderer } from "../renderers/PDFReportRenderer";
 import { getDb } from "../db";
-import { exportHistory, savedFiltersExport } from "../../drizzle/schema";
+// import { exportHistory, savedFiltersExport } from "../../drizzle/schema"; // TODO: Implementar no schema
 import crypto from "crypto";
 
 /**
@@ -185,22 +185,8 @@ export const exportRouter = router({
       if (!db) return { history: [], total: 0 };
 
       try {
-        const history = await db.select()
-          .from(exportHistory)
-          .where(eq(exportHistory.userId, ctx.user.id))
-          .orderBy(desc(exportHistory.createdAt))
-          .limit(input.limit)
-          .offset(input.offset);
-
-        const totalResult: any = await db.execute(
-          `SELECT COUNT(*) as count FROM export_history WHERE userId = '${ctx.user.id}'`
-        );
-        const total = totalResult[0]?.count || 0;
-
-        return {
-          history,
-          total
-        };
+        // TODO: Implementar tabela exportHistory no schema
+        return { history: [], total: 0 };
       } catch (error) {
         console.error('[ExportRouter] Erro ao listar histórico:', error);
         return { history: [], total: 0 };

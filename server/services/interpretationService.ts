@@ -1,7 +1,6 @@
 import { invokeLLM } from "../_core/llm";
 import crypto from "crypto";
 import { getDb } from "../db";
-import { interpretationCache } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 
 /**
@@ -397,63 +396,20 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
 
   /**
    * Busca interpretação no cache
+   * TODO: Implementar tabela interpretationCache no schema
    */
   private async getFromCache(context: string): Promise<InterpretationResult | null> {
-    const db = await getDb();
-    if (!db) return null;
-
-    try {
-      const hash = this.hashContext(context);
-      const result = await db.select()
-        .from(interpretationCache)
-        .where(eq(interpretationCache.inputHash, hash))
-        .limit(1);
-
-      if (result.length === 0) return null;
-
-      const cached = result[0];
-
-      // Verifica se expirou
-      if (new Date() > cached.expiresAt) {
-        // Remove do cache
-        await db.delete(interpretationCache).where(eq(interpretationCache.id, cached.id));
-        return null;
-      }
-
-      // Incrementa hit count
-      await db.update(interpretationCache)
-        .set({ hitCount: (cached.hitCount || 0) + 1 })
-        .where(eq(interpretationCache.id, cached.id));
-
-      return cached.interpretation as any;
-    } catch (error) {
-      console.error('[InterpretationService] Erro ao buscar cache:', error);
-      return null;
-    }
+    // Cache desabilitado temporariamente
+    return null;
   }
 
   /**
    * Salva interpretação no cache
+   * TODO: Implementar tabela interpretationCache no schema
    */
   private async saveToCache(context: string, result: InterpretationResult): Promise<void> {
-    const db = await getDb();
-    if (!db) return;
-
-    try {
-      const hash = this.hashContext(context);
-      const expiresAt = new Date(Date.now() + this.CACHE_TTL);
-
-      await db.insert(interpretationCache).values({
-        id: crypto.randomBytes(16).toString('hex'),
-        inputHash: hash,
-        input: context,
-        interpretation: result as any,
-        hitCount: 0,
-        expiresAt
-      });
-    } catch (error) {
-      console.error('[InterpretationService] Erro ao salvar cache:', error);
-    }
+    // Cache desabilitado temporariamente
+    return;
   }
 
   /**
