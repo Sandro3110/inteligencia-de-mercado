@@ -106,7 +106,7 @@ export default function MainNav() {
       <div className="container flex h-16 items-center">
         <div className="mr-8 flex items-center space-x-2">
           <FileText className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold">Gestor PAV</span>
+          <span className="text-xl font-bold">Inteligência de Mercado</span>
         </div>
         
         <div className="flex flex-1 items-center space-x-1">

@@ -710,13 +710,10 @@ export default function CascadeView() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100 overflow-x-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-2 border-b border-border/40">
+      <div className="flex items-center justify-between px-6 py-2 border-b border-border/40 flex-wrap gap-2">
         <div className="flex items-center gap-6">
-          <div>
-            <h1 className="text-lg font-bold tracking-tight whitespace-nowrap">Inteligência de Mercado</h1>
-          </div>
           <ProjectSelector />
           <div className="mt-2">
             <Breadcrumbs
@@ -1077,7 +1074,7 @@ export default function CascadeView() {
         <div className="w-[280px] border-r border-border/40 p-6 flex flex-col gap-6">
           {/* Estatísticas */}
           <div>
-            <h3 className="text-[0.65rem] uppercase tracking-wider text-muted-foreground mb-3">Estatísticas</h3>
+            <h3 className="text-[0.5rem] uppercase tracking-wider text-muted-foreground mb-3">Estatísticas</h3>
             <div className="space-y-2">
               <div className="glass-card p-4">
                 <div className="flex items-center gap-3">
@@ -1142,7 +1139,7 @@ export default function CascadeView() {
           <div className="px-6 py-4 border-b border-border/40">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-sm font-semibold">{getPageTitle()}</h2>
+                <h2 className="text-xs font-semibold">{getPageTitle()}</h2>
                 <div className="flex items-center gap-3">
                   <p className="text-sm text-muted-foreground">Página {getPageNumber()} de 4</p>
                   {currentPage === "mercados" && (

@@ -89,3 +89,24 @@ PROJECT (nível 1)
 - [x] Verificar tooltips funcionando
 - [x] Validar seletor de projetos
 - [x] Criar checkpoint final
+
+
+## Fase 24: Correções de Layout e Responsividade 🔧
+
+### 24.1 Logo Principal
+- [x] Substituir "Gestor PAV" por "Inteligência de Mercado" no logo/cabeçalho principal (MainNav.tsx)
+- [x] Remover box duplicado "Inteligência de Mercado" do CascadeView
+
+### 24.2 Scroll Horizontal
+- [x] Adicionar overflow-x-hidden no container principal
+- [x] Adicionar flex-wrap no header para responsividade
+- [x] Ajustar larguras para caber na tela
+
+### 24.3 Redução Adicional de Textos
+- [x] Reduzir "ESTATÍSTICAS" mais 50% (de text-[0.65rem] para text-[0.5rem])
+- [x] Reduzir "Selecione um Mercado" mais 50% (de text-sm para text-xs)
+
+### 24.4 Validação
+- [x] Testar responsividade
+- [x] Verificar sem scroll horizontal
+- [x] Criar checkpoint
