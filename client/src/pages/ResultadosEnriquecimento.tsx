@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { trpc } from '@/lib/trpc';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

@@ -1,17 +1,12 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Button } from "@/components/ui/button";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { TrendingUp, MapPin, PieChart as PieChartIcon, RefreshCw } from "lucide-react";
 
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
 
 export default function AnalyticsPage() {

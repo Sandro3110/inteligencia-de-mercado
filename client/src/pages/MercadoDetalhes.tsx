@@ -29,7 +29,6 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ProjectSelector } from "@/components/ProjectSelector";
 
 export default function MercadoDetalhes() {

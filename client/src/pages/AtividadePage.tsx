@@ -1,5 +1,4 @@
 import { useSelectedProject } from "@/hooks/useSelectedProject";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ProjectSelector } from "@/components/ProjectSelector";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";

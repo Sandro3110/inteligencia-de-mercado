@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { useEnrichmentConfig } from "@/hooks/useEnrichmentConfig";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ProjectSelector } from "@/components/ProjectSelector";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";

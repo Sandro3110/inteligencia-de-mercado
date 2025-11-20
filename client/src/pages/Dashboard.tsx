@@ -1,19 +1,11 @@
 import { trpc } from "@/lib/trpc";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSidebarState } from "@/hooks/useSidebarState";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Button } from "@/components/ui/button";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Link } from "wouter";
 import { exportToCSV } from "@/lib/export";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { toast } from "sonner";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { 
   Building2, 
   Users, 
@@ -26,6 +18,7 @@ import {
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 export default function Dashboard() {
   const { selectedProjectId } = useSelectedProject();
   const { sidebarClass } = useSidebarState();

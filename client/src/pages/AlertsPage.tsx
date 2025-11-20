@@ -1,12 +1,9 @@
 import { AlertConfig } from "@/components/AlertConfig";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Button } from "@/components/ui/button";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Clock } from "lucide-react";
 import { Link } from "wouter";
 
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 export default function AlertsPage() {
   return (
     <div className="min-h-screen ml-60 bg-background p-6">

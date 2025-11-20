@@ -1,14 +1,10 @@
 import { trpc } from "@/lib/trpc";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
-import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { FunnelChart, Funnel, LabelList, Tooltip, ResponsiveContainer } from "recharts";
 
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 export default function FunnelView() {
   const { selectedProjectId } = useSelectedProject();
 
