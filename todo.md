@@ -1464,3 +1464,25 @@ PROJECT (nível 1)
 - [x] Criar ChartSkeleton component
 - [x] Substituir spinners por skeletons em Dashboard e Analytics
 - [x] Testar estados de loading
+
+
+---
+
+## Fase 48: Melhorar Visualização de Entidades (Clientes/Concorrentes/Leads)
+
+### 48.1 Atualizar Cards para Mostrar Nome da Empresa
+- [x] Modificar CascadeView para exibir nome da empresa nos cards
+- [x] Ajustar layout dos cards (nome em destaque, badges secundários)
+- [x] Manter informações relevantes visíveis (score, status, badges)
+
+### 48.2 Criar Modal Detalhado de Entidade
+- [x] Criar componente EntityDetailModal (DetailPopup melhorado)
+- [x] Exibir todos os campos do banco (CNPJ, site, email, telefone, cidade, UF, etc.)
+- [x] Organizar informações em seções (Básicas, Contato, Localização, Produtos)
+- [x] Adicionar botões de ação (Editar, Validar, Descartar)
+- [x] Integrar modal ao clicar no card
+
+### 48.3 Testar e Validar
+- [x] Testar com clientes, concorrentes e leads
+- [x] Verificar responsividade do modal
+- [x] Garantir que todos os campos são exibidos corretamente
