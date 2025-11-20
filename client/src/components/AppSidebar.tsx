@@ -60,6 +60,7 @@ const navSections: NavSection[] = [
       { title: "Analytics", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+3" },
       { title: "Relatórios", href: "/relatorios", icon: FileText },
       { title: "Exportação Inteligente", href: "/export", icon: Download, shortcut: "Ctrl+E" },
+      { title: "Templates de Exportação", href: "/export/templates", icon: FileText },
     ],
   },
   {

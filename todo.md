@@ -983,3 +983,85 @@ PROJECT (nível 1)
 - [ ] 13. Página de administração de templates
 - [ ] 14. Formato JSON com estrutura hierárquica
 - [ ] 15. Formato Word (.docx) editável
+
+
+---
+
+## FASE 28: COMPLETAR MÓDULO DE EXPORTAÇÃO INTELIGENTE - 100% 🎯
+
+### 28.1 Item 6: Estimativa de Tamanho de Arquivo
+- [x] Criar função estimateFileSize() no backend
+- [x] Calcular baseado em número de registros × tamanho médio por formato
+- [x] Mostrar estimativa em Step3 (seleção de campos)
+- [x] Adicionar badge com tamanho estimado (KB/MB)
+
+### 28.2 Item 7: Melhorar UI de Profundidade
+- [x] Adicionar ícones para cada nível (Zap, Clock, Target)
+- [x] Criar cards visuais ao invés de select simples
+- [x] Mostrar tempo estimado e qualidade esperada
+- [x] Adicionar tooltips explicativos
+
+### 28.3 Item 8: Validação de Limites
+- [x] Implementar verificação de tamanho no backend
+- [x] Criar modal de aviso quando exportação > 100MB
+- [x] Oferecer opções: reduzir campos, adicionar filtros, dividir em lotes
+- [x] Adicionar progress bar para exportações grandes
+
+### 28.4 Item 9: Salvar Configurações
+- [x] Criar botão "Salvar como Template" no Step4
+- [x] Modal para nomear configuração
+- [x] Salvar em saved_filters_export
+- [x] Adicionar dropdown "Carregar Template" no Step1
+- [x] Listar templates salvos com preview
+
+### 28.5 Item 10: Autocomplete Inteligente
+- [x] Implementar debounce no input de contexto
+- [x] Criar endpoint suggestions.autocomplete
+- [x] Buscar entidades no banco que correspondem ao texto
+- [x] Mostrar dropdown com sugestões (nome + tipo)
+- [x] Permitir clicar para inserir
+
+### 28.6 Item 11: Sugestões Contextuais
+- [x] Analisar dados disponíveis no projeto selecionado
+- [x] Gerar sugestões baseadas em: mercados populares, clientes com mais leads, etc
+- [x] Mostrar cards de sugestões abaixo do input
+- [x] Permitir clicar para aplicar sugestão
+- [x] Atualizar sugestões dinamicamente
+
+### 28.7 Item 12: Modos de Relacionamento
+- [x] Criar seletor de profundidade de joins no Step2
+- [x] Opções: Direto (1 nível), Estendido (2 níveis), Completo (3+ níveis)
+- [x] Atualizar QueryBuilderService para respeitar profundidade
+- [x] Mostrar preview de quais tabelas serão incluídas
+- [x] Adicionar tooltip explicativo
+
+### 28.8 Item 13: Admin de Templates
+- [x] Criar página /export/templates
+- [x] Listar todos os templates do sistema
+- [x] CRUD completo: criar, editar, deletar, duplicar
+- [x] Editor JSON para configuração avançada
+- [x] Preview de template antes de aplicar
+- [x] Adicionar link no sidebar
+
+### 28.9 Item 14: Formato JSON
+- [x] Criar JSONRenderer em server/services/export/renderers/
+- [x] Implementar formatação hierárquica
+- [x] Suportar JSON flat e nested
+- [x] Adicionar opção de pretty print
+- [x] Integrar no ExportRouter
+
+### 28.10 Item 15: Formato Word/DOCX
+- [x] Instalar biblioteca docx (npm install docx)
+- [x] Criar WordRenderer em server/services/export/renderers/
+- [x] Implementar formatação de tabelas
+- [x] Adicionar cabeçalho e rodapé
+- [x] Suportar estilos (títulos, parágrafos, listas)
+- [x] Integrar no ExportRouter
+
+### 28.11 Validação e Testes
+- [x] Testar cada item individualmente
+- [x] Testar fluxo completo end-to-end
+- [x] Validar performance com datasets grandes
+- [x] Verificar responsividade mobile
+- [x] Criar checkpoint final 100%
+
