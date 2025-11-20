@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Settings, Key, CheckCircle, XCircle, Loader2, Zap, Brain, Sparkles } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { adminLLMSchema, type AdminLLMFormData } from "@shared/formSchemas";
 
 type LLMProvider = "openai" | "gemini" | "anthropic";
 
@@ -98,6 +99,19 @@ export default function AdminLLM() {
 
   const testProvider = async (provider: LLMProvider) => {
     const providerConfig = providers.find(p => p.provider === provider);
+    
+    // Validar com Zod
+    try {
+      adminLLMSchema.parse({
+        provider: providerConfig?.provider,
+        apiKey: providerConfig?.apiKey,
+        model: providerConfig?.model
+      });
+    } catch (error: any) {
+      const firstError = error.errors?.[0];
+      toast.error(firstError?.message || 'Dados inválidos');
+      return;
+    }
     if (!providerConfig?.apiKey) {
       toast.error("API Key é obrigatória");
       return;

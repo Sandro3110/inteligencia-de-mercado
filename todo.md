@@ -1374,3 +1374,26 @@ PROJECT (nível 1)
 - [ ] Testar Alertas Inteligentes no navegador
 - [ ] Testar Dashboard de Monitoramento no navegador
 - [ ] Criar checkpoint final
+
+
+## Fase 43: Melhorias Finais - 3 Passos Solicitados 🚀
+
+### 43.1 Implementar Endpoints Faltantes
+- [x] Criar endpoint export.mercados (exportar mercados para Excel)
+- [x] Criar endpoint export.deleteHistory (deletar histórico de exportação)
+- [x] Criar endpoint spreadsheet.parse (parser de planilhas CSV/Excel)
+- [x] Testar endpoints com dados reais
+
+### 43.2 Validação de Formulários com Zod
+- [x] Adicionar schema Zod para Admin LLM (provider, apiKey, model)
+- [x] Adicionar schema Zod para Intelligent Alerts (type, threshold, enabled)
+- [x] Integrar validação no frontend (AdminLLM.tsx)
+- [x] Integrar validação no frontend (IntelligentAlerts.tsx)
+- [x] Exibir mensagens de erro amigáveis
+
+### 43.3 Testes E2E com Playwright
+- [x] Instalar Playwright e dependências
+- [x] Criar teste E2E: Fluxo de enriquecimento completo
+- [x] Criar teste E2E: Configuração de alertas
+- [x] Criar teste E2E: Exportação de dados
+- [x] Executar todos os testes e validar 100% de sucesso

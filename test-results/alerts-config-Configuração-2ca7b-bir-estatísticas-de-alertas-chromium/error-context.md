@@ -1,0 +1,214 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications alt+T"
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - link "Inteligência de Mercado" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]:
+          - img [ref=e7]
+          - generic [ref=e9]:
+            - generic [ref=e10]: Inteligência
+            - generic [ref=e11]: de Mercado
+      - button [ref=e12] [cursor=pointer]:
+        - img
+    - generic [ref=e13]:
+      - generic [ref=e14]: ESTATÍSTICAS
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]: Mercados
+          - generic [ref=e18]: "667"
+        - generic [ref=e19]:
+          - generic [ref=e20]: Clientes
+          - generic [ref=e21]: "806"
+        - generic [ref=e22]:
+          - generic [ref=e23]: Concorrentes
+          - generic [ref=e24]: "4974"
+        - generic [ref=e25]:
+          - generic [ref=e26]: Leads
+          - generic [ref=e27]: "3607"
+    - navigation [ref=e28]:
+      - generic [ref=e29]:
+        - button "Início" [ref=e30] [cursor=pointer]:
+          - generic [ref=e31]:
+            - img [ref=e32]
+            - generic [ref=e35]: Início
+          - img [ref=e36]
+        - link "Visão Geral ⌘1" [ref=e39] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e40]:
+            - generic [ref=e41]:
+              - img [ref=e42]
+              - generic [ref=e45]: Visão Geral
+            - generic [ref=e46]: ⌘1
+      - generic [ref=e47]:
+        - button "Inteligência" [ref=e48] [cursor=pointer]:
+          - generic [ref=e49]:
+            - img [ref=e50]
+            - generic [ref=e52]: Inteligência
+          - img [ref=e53]
+        - generic [ref=e55]:
+          - link "Mercados ⌘2" [ref=e56] [cursor=pointer]:
+            - /url: /mercados
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - img [ref=e59]
+                - generic [ref=e63]: Mercados
+              - generic [ref=e64]: ⌘2
+          - link "Research Overview" [ref=e65] [cursor=pointer]:
+            - /url: /research-overview
+            - generic [ref=e67]:
+              - img [ref=e68]
+              - generic [ref=e71]: Research Overview
+          - link "Analytics ⌘3" [ref=e72] [cursor=pointer]:
+            - /url: /analytics
+            - generic [ref=e73]:
+              - generic [ref=e74]:
+                - img [ref=e75]
+                - generic [ref=e77]: Analytics
+              - generic [ref=e78]: ⌘3
+          - link "Relatórios" [ref=e79] [cursor=pointer]:
+            - /url: /relatorios
+            - generic [ref=e81]:
+              - img [ref=e82]
+              - generic [ref=e85]: Relatórios
+          - link "Exportação Inteligente ⌘E" [ref=e86] [cursor=pointer]:
+            - /url: /export
+            - generic [ref=e87]:
+              - generic [ref=e88]:
+                - img [ref=e89]
+                - generic [ref=e92]: Exportação Inteligente
+              - generic [ref=e93]: ⌘E
+          - link "Templates de Exportação" [ref=e94] [cursor=pointer]:
+            - /url: /export/templates
+            - generic [ref=e96]:
+              - img [ref=e97]
+              - generic [ref=e100]: Templates de Exportação
+      - button "Enriquecimento" [ref=e102] [cursor=pointer]:
+        - generic [ref=e103]:
+          - img [ref=e104]
+          - generic [ref=e106]: Enriquecimento
+        - img [ref=e107]
+      - button "Performance" [ref=e110] [cursor=pointer]:
+        - generic [ref=e111]:
+          - img [ref=e112]
+          - generic [ref=e115]: Performance
+        - img [ref=e116]
+      - button "Configurações" [ref=e119] [cursor=pointer]:
+        - generic [ref=e120]:
+          - img [ref=e121]
+          - generic [ref=e124]: Configurações
+        - img [ref=e125]
+      - button "Sistema" [ref=e128] [cursor=pointer]:
+        - generic [ref=e129]:
+          - img [ref=e130]
+          - generic [ref=e135]: Sistema
+        - img [ref=e136]
+  - generic [ref=e139]:
+    - generic [ref=e140]:
+      - generic [ref=e141]:
+        - navigation [ref=e142]:
+          - link "Início" [ref=e144] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e145]:
+              - img [ref=e146]
+              - text: Início
+          - generic [ref=e149]:
+            - img [ref=e150]
+            - generic [ref=e152]: Intelligent-alerts
+        - heading "Alertas Inteligentes" [level=1] [ref=e153]:
+          - img [ref=e154]
+          - text: Alertas Inteligentes
+        - paragraph [ref=e157]: Configure alertas automáticos para monitorar o enriquecimento
+      - generic [ref=e158]:
+        - img [ref=e159]
+        - combobox [ref=e162] [cursor=pointer]:
+          - generic:
+            - generic:
+              - generic: Embalagens
+          - img
+    - generic [ref=e163]:
+      - generic [ref=e164]:
+        - generic [ref=e166]: Alertas Ativos
+        - generic [ref=e167]:
+          - generic [ref=e168]:
+            - img [ref=e169]
+            - generic [ref=e172]: "4"
+          - paragraph [ref=e173]: Tipos de alerta configurados
+      - generic [ref=e174]:
+        - generic [ref=e176]: Alertas Enviados (24h)
+        - generic [ref=e177]:
+          - generic [ref=e178]:
+            - img [ref=e179]
+            - generic [ref=e182]: "12"
+          - paragraph [ref=e183]: Últimas 24 horas
+      - generic [ref=e184]:
+        - generic [ref=e186]: Última Atualização
+        - generic [ref=e187]:
+          - generic [ref=e188]:
+            - img [ref=e189]
+            - generic [ref=e192]: Nunca
+          - paragraph [ref=e193]: Configurações salvas
+    - generic [ref=e194]:
+      - generic [ref=e195]:
+        - generic [ref=e196]:
+          - generic [ref=e197]:
+            - img [ref=e198]
+            - generic [ref=e200]: Circuit Breaker
+          - generic [ref=e201]: Crítico
+        - generic [ref=e202]: Alerta quando o circuit breaker é ativado por falhas consecutivas
+      - generic [ref=e203]:
+        - generic [ref=e204]:
+          - generic [ref=e205]: Threshold de Falhas Consecutivas
+          - spinbutton "Threshold de Falhas Consecutivas" [ref=e206]: "10"
+          - paragraph [ref=e207]: Alerta será disparado após 10 falhas consecutivas
+        - button "Testar Alerta" [ref=e208] [cursor=pointer]
+    - generic [ref=e209]:
+      - generic [ref=e210]:
+        - generic [ref=e211]:
+          - generic [ref=e212]:
+            - img [ref=e213]
+            - generic [ref=e215]: Taxa de Erro Elevada
+          - generic [ref=e216]: Importante
+        - generic [ref=e217]: Alerta quando a taxa de erro ultrapassa o threshold definido
+      - generic [ref=e218]:
+        - generic [ref=e219]:
+          - generic [ref=e220]: Threshold de Taxa de Erro (%)
+          - spinbutton "Threshold de Taxa de Erro (%)" [ref=e221]: "10"
+          - paragraph [ref=e222]: Alerta será disparado quando taxa de erro ultrapassar 10%
+        - button "Testar Alerta" [ref=e223] [cursor=pointer]
+    - generic [ref=e224]:
+      - generic [ref=e225]:
+        - generic [ref=e226]:
+          - generic [ref=e227]:
+            - img [ref=e228]
+            - generic [ref=e231]: Tempo de Processamento Longo
+          - generic [ref=e232]: Informativo
+        - generic [ref=e233]: Alerta quando o tempo médio de processamento excede o threshold
+      - generic [ref=e234]:
+        - generic [ref=e235]:
+          - generic [ref=e236]: Threshold de Tempo Médio (segundos)
+          - spinbutton "Threshold de Tempo Médio (segundos)" [ref=e237]: "60"
+          - paragraph [ref=e238]: Alerta será disparado quando tempo médio ultrapassar 60s
+        - button "Testar Alerta" [ref=e239] [cursor=pointer]
+    - generic [ref=e240]:
+      - generic [ref=e241]:
+        - generic [ref=e242]:
+          - generic [ref=e243]:
+            - img [ref=e244]
+            - generic [ref=e247]: Conclusão de Enriquecimento
+          - generic [ref=e248]: Ativo
+        - generic [ref=e249]: Notificação quando o enriquecimento é concluído com estatísticas
+      - generic [ref=e250]:
+        - generic [ref=e251]:
+          - generic [ref=e252]:
+            - generic [ref=e253]: Notificar ao Concluir
+            - paragraph [ref=e254]: Enviar alerta com estatísticas quando enriquecimento terminar
+          - switch "Notificar ao Concluir" [checked] [ref=e255] [cursor=pointer]
+        - button "Testar Alerta" [ref=e256] [cursor=pointer]
+    - button "Salvar Configurações" [ref=e258] [cursor=pointer]:
+      - img
+      - text: Salvar Configurações
+```

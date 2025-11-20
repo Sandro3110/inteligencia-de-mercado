@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Bell, AlertTriangle, CheckCircle2, Clock, Zap, Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { intelligentAlertsSchema } from "@shared/formSchemas";
 
 interface AlertConfigState {
   circuitBreakerThreshold: number;
@@ -62,6 +63,29 @@ export default function IntelligentAlerts() {
   const handleSave = async () => {
     if (!selectedProjectId) {
       toast.error("Selecione um projeto primeiro");
+      return;
+    }
+
+    // Validar com Zod antes de salvar
+    try {
+      intelligentAlertsSchema.parse({
+        type: 'circuit_breaker',
+        threshold: config.circuitBreakerThreshold,
+        enabled: true
+      });
+      intelligentAlertsSchema.parse({
+        type: 'error_rate',
+        threshold: config.errorRateThreshold,
+        enabled: true
+      });
+      intelligentAlertsSchema.parse({
+        type: 'processing_time',
+        threshold: config.processingTimeThreshold,
+        enabled: true
+      });
+    } catch (error: any) {
+      const firstError = error.errors?.[0];
+      toast.error(firstError?.message || 'Configurações inválidas');
       return;
     }
 

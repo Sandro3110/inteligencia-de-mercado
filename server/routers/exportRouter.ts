@@ -208,6 +208,44 @@ export const exportRouter = router({
     }),
 
   /**
+   * Exporta mercados para Excel
+   */
+  mercados: protectedProcedure
+    .input(z.object({
+      projectId: z.number(),
+      pesquisaId: z.number().optional()
+    }))
+    .mutation(async ({ input }) => {
+      const { getMercados } = await import('../db');
+      const mercados = await getMercados({ projectId: input.projectId });
+      
+      const result = await excelRenderer.render(mercados, [
+        'id', 'nome', 'descricao', 'categoria', 'segmentacao', 
+        'tamanhoEstimado', 'crescimentoAnual', 'tendencias', 
+        'principaisPlayers', 'createdAt'
+      ]);
+      
+      return result;
+    }),
+
+  /**
+   * Deleta histórico de exportação
+   */
+  deleteHistory: protectedProcedure
+    .input(z.object({
+      historyId: z.string()
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+      
+      await db.delete(exportHistory)
+        .where(eq(exportHistory.id, input.historyId));
+      
+      return { success: true };
+    }),
+
+  /**
    * Busca campos disponíveis para uma entidade
    */
   getAvailableFields: protectedProcedure
