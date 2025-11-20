@@ -1430,3 +1430,13 @@ PROJECT (nível 1)
 - [x] Corrigir Ctrl+3 → Analytics (rota correta)
 - [x] Corrigir Ctrl+4 → ROI (rota correta)
 - [x] Testar todos os atalhos no navegador
+
+
+## Fase 46: Correção de Layout (Mercados e Research Overview) 🎨
+
+### 46.1 Corrigir Layout das Páginas
+- [x] Adicionar margem esquerda adequada para Mercados.tsx
+- [x] Adicionar margem esquerda adequada para ResearchOverview.tsx
+- [x] Ajustar scroll e overflow
+- [x] Garantir responsividade (sidebar colapsada/expandida)
+- [x] Testar em diferentes resoluções

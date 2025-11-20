@@ -10,12 +10,14 @@ import { toast } from "sonner";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { ProjectSelector } from "@/components/ProjectSelector";
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
+import { useSidebarMargin } from "@/hooks/useSidebarMargin";
 export default function Mercados() {
   const [search, setSearch] = useState("");
   const [categoria, setCategoria] = useState("");
   const [segmentacao, setSegmentacao] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const { selectedProjectId } = useSelectedProject();
+  const sidebarMargin = useSidebarMargin();
   const { data: mercados, isLoading } = trpc.mercados.list.useQuery({ 
     search, 
     categoria: categoria || undefined,
@@ -59,14 +61,14 @@ export default function Mercados() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen ml-60 flex items-center justify-center">
+      <div className={`min-h-screen ${sidebarMargin} flex items-center justify-center transition-all duration-300`}>
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${sidebarMargin} transition-all duration-300`}>
       {/* Header */}
       <div className="border-b border-border/50">        <div className="container py-2 border-b border-border/30">
           <DynamicBreadcrumbs />
