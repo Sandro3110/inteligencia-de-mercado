@@ -145,7 +145,7 @@ export default function EnrichmentProgress() {
 
   if (isLoading || !progress) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <div className="min-h-screen ml-60 bg-background flex items-center justify-center p-6">
         <div className="text-center">
           <RefreshCw className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
           <p className="text-muted-foreground">Carregando progresso...</p>
@@ -158,7 +158,7 @@ export default function EnrichmentProgress() {
   const isInProgress = progress.processed > 0 && progress.percentage < 100;
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen ml-60 bg-background p-6">
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: "Monitoramento" }]} />

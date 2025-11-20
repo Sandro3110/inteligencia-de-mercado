@@ -15,7 +15,7 @@ export default function FunnelView() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen ml-60 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
@@ -23,7 +23,7 @@ export default function FunnelView() {
 
   if (!funnelData) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen ml-60 bg-background p-6">
         <div className="max-w-7xl mx-auto">
           <Breadcrumbs items={[{ label: "Funil de Vendas" }]} />
           <div className="text-center text-slate-400 mt-12">
@@ -64,7 +64,7 @@ export default function FunnelView() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen ml-60 bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: "Funil de Vendas" }]} />

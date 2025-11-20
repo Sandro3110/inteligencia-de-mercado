@@ -103,17 +103,17 @@ export default function Dashboard() {
   const validationProgress = Math.round((totalValidated / totalRecords) * 100);
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col">
-      {/* Header */}
+    <div className="h-screen overflow-hidden flex flex-col ml-60">
+      {/* Header Simplificado */}
       <div className="border-b border-border/50">
         <div className="container py-3">
           <div className="flex justify-between items-center flex-wrap gap-4">
             <div>
-              <h1 className="text-2xl font-semibold tracking-ultra-wide uppercase text-foreground mb-1">
-                Gestor PAV
+              <h1 className="text-xl font-semibold text-foreground mb-1">
+                Dashboard Principal
               </h1>
               <p className="text-sm text-muted-foreground">
-                Gestão completa de pesquisa de mercado · 73 mercados · 2.991 registros
+                Visão geral do sistema
               </p>
             </div>
             <div className="pill-badge">

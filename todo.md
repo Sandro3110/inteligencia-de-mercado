@@ -148,26 +148,33 @@ PROJECT (nível 1)
 - [x] Testar scroll e responsividade
 
 ### 25.4 Validação com Usuário ⚠️ CHECKPOINT
-- [ ] Capturar screenshot da nova interface
-- [ ] Apresentar para aprovação do usuário
-- [ ] Coletar feedback detalhado
-- [ ] Ajustar conforme necessário
-- [ ] **AGUARDAR APROVAÇÃO ANTES DE CONTINUAR**
+- [x] Capturar screenshot da nova interface
+- [x] Apresentar para aprovação do usuário
+- [x] Coletar feedback detalhado
+- [x] Ajustar conforme necessário
+- [x] **APROVADO PELO USUÁRIO**
 
 ### 25.5 Adaptar Outras Páginas (SOMENTE APÓS APROVAÇÃO)
-- [ ] Dashboard.tsx
-- [ ] DashboardPage.tsx (Analytics)
-- [ ] ROIDashboard.tsx
-- [ ] FunnelView.tsx
-- [ ] AnalyticsPage.tsx
-- [ ] EnrichmentProgress.tsx
-- [ ] AlertsPage.tsx
-- [ ] ReportsPage.tsx
-- [ ] Mercados.tsx
-- [ ] MercadoDetalhes.tsx
-- [ ] AtividadePage.tsx
-- [ ] ResultadosEnriquecimento.tsx
-- [ ] Remover MainNav.tsx (substituído por AppSidebar)
+- [x] Dashboard.tsx
+- [x] DashboardPage.tsx (Analytics)
+- [x] ROIDashboard.tsx
+- [x] FunnelView.tsx
+- [x] AnalyticsPage.tsx
+- [x] EnrichmentProgress.tsx
+- [x] AlertsPage.tsx
+- [x] AlertHistoryPage.tsx
+- [x] ReportsPage.tsx
+- [x] Mercados.tsx
+- [x] MercadoDetalhes.tsx
+- [x] AtividadePage.tsx
+- [x] ResultadosEnriquecimento.tsx
+- [x] EnrichmentFlow.tsx
+- [x] SchedulePage.tsx
+- [x] EnrichmentSettings.tsx
+- [x] EnrichmentReview.tsx
+- [x] Remover MainNav.tsx (substituído por AppSidebar)
+- [x] Corrigir ordenação de projetos (por ID em vez de nome)
+- [x] Deletar projetos Agro duplicados do banco
 
 ### 25.6 Polimento Final
 - [ ] Animações de transição entre páginas (fade-in)

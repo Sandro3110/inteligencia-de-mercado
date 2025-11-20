@@ -61,7 +61,7 @@ export default function AlertHistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen ml-60 bg-background p-6">
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs

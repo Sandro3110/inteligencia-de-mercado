@@ -108,7 +108,7 @@ export default function MercadoDetalhes() {
 
   if (loadingMercado) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen ml-60 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
@@ -116,7 +116,7 @@ export default function MercadoDetalhes() {
 
   if (!mercado) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen ml-60 flex items-center justify-center">
         <div className="text-center">
           <p className="text-lg font-medium text-foreground mb-2">Mercado não encontrado</p>
           <Link href="/mercados">

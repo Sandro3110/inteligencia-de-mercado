@@ -1009,7 +1009,7 @@ export async function getProjects(): Promise<Project[]> {
       .select()
       .from(projects)
       .where(eq(projects.ativo, 1))
-      .orderBy(projects.nome);
+      .orderBy(projects.id);
     return result;
   } catch (error) {
     console.error("[Database] Failed to get projects:", error);

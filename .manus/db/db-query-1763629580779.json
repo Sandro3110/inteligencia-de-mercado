@@ -1,0 +1,25 @@
+{
+  "query": "SELECT p.id, p.nome, COUNT(m.id) as total_mercados FROM projects p LEFT JOIN mercados_unicos m ON p.id = m.projectId GROUP BY p.id, p.nome ORDER BY p.id",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT p.id, p.nome, COUNT(m.id) as total_mercados FROM projects p LEFT JOIN mercados_unicos m ON p.id = m.projectId GROUP BY p.id, p.nome ORDER BY p.id",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Embalagens",
+      "total_mercados": "575"
+    },
+    {
+      "id": "300001",
+      "nome": "Agro",
+      "total_mercados": "0"
+    },
+    {
+      "id": "300002",
+      "nome": "Agro",
+      "total_mercados": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\ttotal_mercados\n1\tEmbalagens\t575\n300001\tAgro\t0\n300002\tAgro\t0\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

@@ -79,7 +79,7 @@ export default function ROIDashboard() {
 
   if (!metrics) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen ml-60 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
@@ -93,7 +93,7 @@ export default function ROIDashboard() {
   }));
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen ml-60 bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: "Dashboard de ROI" }]} />

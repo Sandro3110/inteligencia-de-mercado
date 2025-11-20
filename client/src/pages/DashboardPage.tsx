@@ -49,8 +49,8 @@ export default function DashboardPage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
+    <div className="min-h-screen bg-background ml-60">
+      {/* Header Simplificado */}
       <div className="border-b border-border/40 px-6 py-4">
         <div className="mb-4">
           <Breadcrumbs items={[{ label: "Analytics" }]} />

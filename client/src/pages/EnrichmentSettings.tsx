@@ -94,7 +94,7 @@ export default function EnrichmentSettings() {
 
   if (!selectedProjectId) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen ml-60 bg-background p-6">
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <Breadcrumbs items={[{ label: "Configurações de Enriquecimento" }]} />
@@ -111,7 +111,7 @@ export default function EnrichmentSettings() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen ml-60 bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

@@ -41,7 +41,7 @@ export default function AtividadePage() {
   }
 
   return (
-    <div className="container py-8">
+    <div className="container py-8 ml-60">
       <div className="flex items-center justify-between mb-6">
         <Breadcrumbs items={[{ label: "Atividades" }]} />
         <ProjectSelector />

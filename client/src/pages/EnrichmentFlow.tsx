@@ -108,7 +108,7 @@ export default function EnrichmentFlow() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div className="min-h-screen ml-60 bg-background p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         <Breadcrumbs items={[{ label: "Enriquecimento" }]} />
         

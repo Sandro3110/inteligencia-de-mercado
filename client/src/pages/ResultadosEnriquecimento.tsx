@@ -23,7 +23,7 @@ export default function ResultadosEnriquecimento() {
   const { data: qualityEvolution } = trpc.analytics.qualityEvolution.useQuery({ projectId, days: 30 });
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen ml-60 bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <Breadcrumbs items={[{ label: "Resultados do Enriquecimento" }]} />
         {/* Header */}
