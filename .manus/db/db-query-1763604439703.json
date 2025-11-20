@@ -1,0 +1,82 @@
+{
+  "query": "\n-- Verificar estrutura das tabelas\nSHOW COLUMNS FROM clientes LIKE '%pesquisa%';\nSHOW COLUMNS FROM mercados_unicos LIKE '%pesquisa%';\nSHOW COLUMNS FROM produtos LIKE '%pesquisa%';\nSHOW COLUMNS FROM concorrentes LIKE '%pesquisa%';\nSHOW COLUMNS FROM leads LIKE '%pesquisa%';\nSHOW COLUMNS FROM clientes_mercados LIKE '%pesquisa%';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Verificar estrutura das tabelas\nSHOW COLUMNS FROM clientes LIKE '%pesquisa%';\nSHOW COLUMNS FROM mercados_unicos LIKE '%pesquisa%';\nSHOW COLUMNS FROM produtos LIKE '%pesquisa%';\nSHOW COLUMNS FROM concorrentes LIKE '%pesquisa%';\nSHOW COLUMNS FROM leads LIKE '%pesquisa%';\nSHOW COLUMNS FROM clientes_mercados LIKE '%pesquisa%';\n",
+  "rows": [
+    {
+      "Field": "pesquisaId",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "Field",
+      "Type": "Type",
+      "Null": "Null",
+      "Key": "Key",
+      "Default": "Default",
+      "Extra": "Extra"
+    },
+    {
+      "Field": "pesquisaId",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "Field",
+      "Type": "Type",
+      "Null": "Null",
+      "Key": "Key",
+      "Default": "Default",
+      "Extra": "Extra"
+    },
+    {
+      "Field": "pesquisaId",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "Field",
+      "Type": "Type",
+      "Null": "Null",
+      "Key": "Key",
+      "Default": "Default",
+      "Extra": "Extra"
+    },
+    {
+      "Field": "pesquisaId",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "Field",
+      "Type": "Type",
+      "Null": "Null",
+      "Key": "Key",
+      "Default": "Default",
+      "Extra": "Extra"
+    },
+    {
+      "Field": "pesquisaId",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\npesquisaId\tint(11)\tYES\t\tNULL\t\nField\tType\tNull\tKey\tDefault\tExtra\npesquisaId\tint(11)\tYES\t\tNULL\t\nField\tType\tNull\tKey\tDefault\tExtra\npesquisaId\tint(11)\tYES\t\tNULL\t\nField\tType\tNull\tKey\tDefault\tExtra\npesquisaId\tint(11)\tYES\t\tNULL\t\nField\tType\tNull\tKey\tDefault\tExtra\npesquisaId\tint(11)\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

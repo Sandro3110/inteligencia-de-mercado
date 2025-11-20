@@ -1,0 +1,32 @@
+{
+  "query": "\nSELECT \n  p.id,\n  p.nome,\n  p.totalClientes,\n  p.status,\n  (SELECT COUNT(*) FROM clientes WHERE pesquisaId = p.id) as clientes_linkados,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE pesquisaId = p.id) as mercados_linkados,\n  (SELECT COUNT(*) FROM produtos WHERE pesquisaId = p.id) as produtos_linkados,\n  (SELECT COUNT(*) FROM concorrentes WHERE pesquisaId = p.id) as concorrentes_linkados,\n  (SELECT COUNT(*) FROM leads WHERE pesquisaId = p.id) as leads_linkados\nFROM pesquisas p;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  p.id,\n  p.nome,\n  p.totalClientes,\n  p.status,\n  (SELECT COUNT(*) FROM clientes WHERE pesquisaId = p.id) as clientes_linkados,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE pesquisaId = p.id) as mercados_linkados,\n  (SELECT COUNT(*) FROM produtos WHERE pesquisaId = p.id) as produtos_linkados,\n  (SELECT COUNT(*) FROM concorrentes WHERE pesquisaId = p.id) as concorrentes_linkados,\n  (SELECT COUNT(*) FROM leads WHERE pesquisaId = p.id) as leads_linkados\nFROM pesquisas p;\n",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Embalagens 2025",
+      "totalClientes": "806",
+      "status": "importado",
+      "clientes_linkados": "806",
+      "mercados_linkados": "100",
+      "produtos_linkados": "280",
+      "concorrentes_linkados": "691",
+      "leads_linkados": "480"
+    },
+    {
+      "id": "30001",
+      "nome": "Embalagens 2025",
+      "totalClientes": "806",
+      "status": "enriquecendo",
+      "clientes_linkados": "0",
+      "mercados_linkados": "0",
+      "produtos_linkados": "0",
+      "concorrentes_linkados": "0",
+      "leads_linkados": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\ttotalClientes\tstatus\tclientes_linkados\tmercados_linkados\tprodutos_linkados\tconcorrentes_linkados\tleads_linkados\n1\tEmbalagens 2025\t806\timportado\t806\t100\t280\t691\t480\n30001\tEmbalagens 2025\t806\tenriquecendo\t0\t0\t0\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

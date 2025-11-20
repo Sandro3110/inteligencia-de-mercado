@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `clientes` ADD COLUMN IF NOT EXISTS `pesquisaId` int;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute ALTER TABLE `clientes` ADD COLUMN IF NOT EXISTS `pesquisaId` int;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 53
+}

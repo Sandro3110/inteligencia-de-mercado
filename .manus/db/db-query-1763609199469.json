@@ -1,0 +1,210 @@
+{
+  "query": "\nSELECT DISTINCT c.id, c.nome\nFROM clientes c\nINNER JOIN produtos p ON c.id = p.clienteId\nWHERE c.projectId = 1 AND c.pesquisaId = 1\nORDER BY c.id\nLIMIT 50;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT DISTINCT c.id, c.nome\nFROM clientes c\nINNER JOIN produtos p ON c.id = p.clienteId\nWHERE c.projectId = 1 AND c.pesquisaId = 1\nORDER BY c.id\nLIMIT 50;\n",
+  "rows": [
+    {
+      "id": "2205",
+      "nome": "PRAXIS EMBALAGENS LTDA"
+    },
+    {
+      "id": "2405",
+      "nome": "ZANDEI IND DE PLASTICOS LTDA"
+    },
+    {
+      "id": "2406",
+      "nome": "ZANQUETA COM DE MATERIAIS PARA CONSTRUCAO LTDA"
+    },
+    {
+      "id": "2407",
+      "nome": "ZARELLI SUPERMERCADOS LTDA"
+    },
+    {
+      "id": "2408",
+      "nome": "ZENAPLAST IND COM DE ARTEFATOS DE PLASTICO LTDA"
+    },
+    {
+      "id": "2409",
+      "nome": "ZEVIPLAST IND E COM DE PLASTICOS EIRELI"
+    },
+    {
+      "id": "2410",
+      "nome": "ZIONI IONILY CEOTTO PILAR PAPEIS EIRELI"
+    },
+    {
+      "id": "301633",
+      "nome": "AGRO INDUSTRIAL ITUBERA LTDA"
+    },
+    {
+      "id": "301634",
+      "nome": "AGRO-COMERCIAL AFUBRA LTDA"
+    },
+    {
+      "id": "301635",
+      "nome": "AGRONILSEN COMERCIO DE PRODUTOS AGRICOLAS LTDA"
+    },
+    {
+      "id": "301636",
+      "nome": "AGROPECUARIA FAZENDA ALIANCA LTDA"
+    },
+    {
+      "id": "301637",
+      "nome": "AGROPONTO COM AGRICOLA LTDA"
+    },
+    {
+      "id": "301638",
+      "nome": "AGUA MINERAL NATURAL SERRA DE FLORES LTDA"
+    },
+    {
+      "id": "301639",
+      "nome": "AGUAS PRATA LTDA"
+    },
+    {
+      "id": "301640",
+      "nome": "AGUAS PRATA LTDA"
+    },
+    {
+      "id": "301641",
+      "nome": "AGUINALDO A BRANDIELLI E CIA LTDA"
+    },
+    {
+      "id": "301642",
+      "nome": "ALDEVAM ESAU DOS SANTOS"
+    },
+    {
+      "id": "301643",
+      "nome": "ALEMOLDE IND E COM DE EMBAL DE MATERIAL PLASTICO LTDA"
+    },
+    {
+      "id": "301644",
+      "nome": "ALEXANDRE SEVERINO TESSER"
+    },
+    {
+      "id": "301645",
+      "nome": "ALFA IND E COM LTDA"
+    },
+    {
+      "id": "301646",
+      "nome": "ALFAPET PRODUTOS PARA ANIMAIS LIMITADA"
+    },
+    {
+      "id": "301647",
+      "nome": "ALFAPEX PLASTICOS LTDA"
+    },
+    {
+      "id": "301648",
+      "nome": "ALFAPLAST COM DE PRODUTOS PARA LABORATORIOS LTDA"
+    },
+    {
+      "id": "301649",
+      "nome": "ALPHAPET IND DE EMBALAGENS LTDA"
+    },
+    {
+      "id": "301650",
+      "nome": "ALTENBURG TEXTIL LTDA/ NAO USAR"
+    },
+    {
+      "id": "301651",
+      "nome": "AMBAR TECH PARTICIPACOES S.A"
+    },
+    {
+      "id": "301652",
+      "nome": "AMCOR EMBALAGENS DA AMAZONIA  S/A"
+    },
+    {
+      "id": "301653",
+      "nome": "AMERICA IND E COM DE EMBALAGENS S/A"
+    },
+    {
+      "id": "301654",
+      "nome": "AMERICA SERVE LIMPEZA E SERVICOS LTDA"
+    },
+    {
+      "id": "301655",
+      "nome": "AMERICANFLEX IND REUNIDAS LTDA"
+    },
+    {
+      "id": "301656",
+      "nome": "AMEV IMPORTADORA E DISTRIBUIDORA LTDA"
+    },
+    {
+      "id": "301657",
+      "nome": "AMX COLCHOES MG LTDA"
+    },
+    {
+      "id": "301658",
+      "nome": "ANDERSON ALVES RIBEIRO"
+    },
+    {
+      "id": "301659",
+      "nome": "ANDRE SOARES DA SILVA"
+    },
+    {
+      "id": "301660",
+      "nome": "ANDREVET COM DE PRODUTOS AGRO VETERINARIOS LTDA"
+    },
+    {
+      "id": "301661",
+      "nome": "ANHUR LTDA"
+    },
+    {
+      "id": "301662",
+      "nome": "ANIN IND E COM DE PAPEL LTDA"
+    },
+    {
+      "id": "301663",
+      "nome": "ANTONIO TAVARES DE LIMA METAIS"
+    },
+    {
+      "id": "301664",
+      "nome": "APPA PRODUTOS ALIMENTICIOS"
+    },
+    {
+      "id": "301665",
+      "nome": "APTAR DO BRASIL EMBAL LTDA"
+    },
+    {
+      "id": "301666",
+      "nome": "ARI DONISETE GONCALVES FONTES E OUTROS"
+    },
+    {
+      "id": "301667",
+      "nome": "ARLA COOPERATIVA LTDA"
+    },
+    {
+      "id": "301668",
+      "nome": "ARMACELL BRASIL LTDA"
+    },
+    {
+      "id": "301669",
+      "nome": "ARROZEIRA SAO PEDRO LTDA"
+    },
+    {
+      "id": "301670",
+      "nome": "ARSAN IMPORTACAO E EXPORTACAO DE ESPUMAS LTDA"
+    },
+    {
+      "id": "301671",
+      "nome": "ARTE CUBICA INDUSTRIA DE MOVEIS LTDA"
+    },
+    {
+      "id": "301672",
+      "nome": "ARTE INDUSTRIA DE ESPUMAS E COLCHOES LTDA"
+    },
+    {
+      "id": "301673",
+      "nome": "ARTIS MATRIZ INDUSTRIA DE MATRIZES LTDA"
+    },
+    {
+      "id": "301674",
+      "nome": "ARTUS MAT DE CONSTR E FERRAGENS LTDA"
+    },
+    {
+      "id": "301675",
+      "nome": "ASM TRANSPORTES E MUDANCAS LIMITADA"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\n2205\tPRAXIS EMBALAGENS LTDA\n2405\tZANDEI IND DE PLASTICOS LTDA\n2406\tZANQUETA COM DE MATERIAIS PARA CONSTRUCAO LTDA\n2407\tZARELLI SUPERMERCADOS LTDA\n2408\tZENAPLAST IND COM DE ARTEFATOS DE PLASTICO LTDA\n2409\tZEVIPLAST IND E COM DE PLASTICOS EIRELI\n2410\tZIONI IONILY CEOTTO PILAR PAPEIS EIRELI\n301633\tAGRO INDUSTRIAL ITUBERA LTDA\n301634\tAGRO-COMERCIAL AFUBRA LTDA\n301635\tAGRONILSEN COMERCIO DE PRODUTOS AGRICOLAS LTDA\n301636\tAGROPECUARIA FAZENDA ALIANCA LTDA\n301637\tAGROPONTO COM AGRICOLA LTDA\n301638\tAGUA MINERAL NATURAL SERRA DE FLORES LTDA\n301639\tAGUAS PRATA LTDA\n301640\tAGUAS PRATA LTDA\n301641\tAGUINALDO A BRANDIELLI E CIA LTDA\n301642\tALDEVAM ESAU DOS SANTOS\n301643\tALEMOLDE IND E COM DE EMBAL DE MATERIAL PLASTICO LTDA\n301644\tALEXANDRE SEVERINO TESSER\n301645\tALFA IND E COM LTDA\n301646\tALFAPET PRODUTOS PARA ANIMAIS LIMITADA\n301647\tALFAPEX PLASTICOS LTDA\n301648\tALFAPLAST COM DE PRODUTOS PARA LABORATORIOS LTDA\n301649\tALPHAPET IND DE EMBALAGENS LTDA\n301650\tALTENBURG TEXTIL LTDA/ NAO USAR\n301651\tAMBAR TECH PARTICIPACOES S.A\n301652\tAMCOR EMBALAGENS DA AMAZONIA  S/A\n301653\tAMERICA IND E COM DE EMBALAGENS S/A\n301654\tAMERICA SERVE LIMPEZA E SERVICOS LTDA\n301655\tAMERICANFLEX IND REUNIDAS LTDA\n301656\tAMEV IMPORTADORA E DISTRIBUIDORA LTDA\n301657\tAMX COLCHOES MG LTDA\n301658\tANDERSON ALVES RIBEIRO\n301659\tANDRE SOARES DA SILVA\n301660\tANDREVET COM DE PRODUTOS AGRO VETERINARIOS LTDA\n301661\tANHUR LTDA\n301662\tANIN IND E COM DE PAPEL LTDA\n301663\tANTONIO TAVARES DE LIMA METAIS\n301664\tAPPA PRODUTOS ALIMENTICIOS\n301665\tAPTAR DO BRASIL EMBAL LTDA\n301666\tARI DONISETE GONCALVES FONTES E OUTROS\n301667\tARLA COOPERATIVA LTDA\n301668\tARMACELL BRASIL LTDA\n301669\tARROZEIRA SAO PEDRO LTDA\n301670\tARSAN IMPORTACAO E EXPORTACAO DE ESPUMAS LTDA\n301671\tARTE CUBICA INDUSTRIA DE MOVEIS LTDA\n301672\tARTE INDUSTRIA DE ESPUMAS E COLCHOES LTDA\n301673\tARTIS MATRIZ INDUSTRIA DE MATRIZES LTDA\n301674\tARTUS MAT DE CONSTR E FERRAGENS LTDA\n301675\tASM TRANSPORTES E MUDANCAS LIMITADA\n",
+  "stderr": "",
+  "execution_time_ms": 74
+}

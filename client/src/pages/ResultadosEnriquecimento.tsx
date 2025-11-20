@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { trpc } from '@/lib/trpc';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +25,7 @@ export default function ResultadosEnriquecimento() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
+        <Breadcrumbs items={[{ label: "Resultados do Enriquecimento" }]} />
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>

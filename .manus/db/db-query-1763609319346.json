@@ -1,0 +1,17 @@
+{
+  "query": "\nSELECT \n  COUNT(*) as total_clientes,\n  COUNT(CASE WHEN validationStatus = 'pending' THEN 1 END) as pending,\n  COUNT(CASE WHEN validationStatus = 'rich' THEN 1 END) as rich,\n  COUNT(CASE WHEN pesquisaId = 1 THEN 1 END) as com_pesquisa_1,\n  COUNT(CASE WHEN pesquisaId IS NULL THEN 1 END) as sem_pesquisa\nFROM clientes \nWHERE projectId = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  COUNT(*) as total_clientes,\n  COUNT(CASE WHEN validationStatus = 'pending' THEN 1 END) as pending,\n  COUNT(CASE WHEN validationStatus = 'rich' THEN 1 END) as rich,\n  COUNT(CASE WHEN pesquisaId = 1 THEN 1 END) as com_pesquisa_1,\n  COUNT(CASE WHEN pesquisaId IS NULL THEN 1 END) as sem_pesquisa\nFROM clientes \nWHERE projectId = 1;\n",
+  "rows": [
+    {
+      "total_clientes": "806",
+      "pending": "657",
+      "rich": "149",
+      "com_pesquisa_1": "806",
+      "sem_pesquisa": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_clientes\tpending\trich\tcom_pesquisa_1\tsem_pesquisa\n806\t657\t149\t806\t0\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

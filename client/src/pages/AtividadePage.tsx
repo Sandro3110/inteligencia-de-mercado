@@ -1,4 +1,6 @@
 import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { ProjectSelector } from "@/components/ProjectSelector";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { Activity, AlertCircle, CheckCircle, TrendingUp, Users } from "lucide-react";
@@ -29,6 +31,10 @@ export default function AtividadePage() {
   if (isLoading) {
     return (
       <div className="container py-8">
+      <div className="flex items-center justify-between mb-6">
+        <Breadcrumbs items={[{ label: "Atividades" }]} />
+        <ProjectSelector />
+      </div>
         <p className="text-muted-foreground">Carregando atividades...</p>
       </div>
     );
@@ -36,6 +42,10 @@ export default function AtividadePage() {
 
   return (
     <div className="container py-8">
+      <div className="flex items-center justify-between mb-6">
+        <Breadcrumbs items={[{ label: "Atividades" }]} />
+        <ProjectSelector />
+      </div>
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Atividade Recente</h1>
         <p className="text-muted-foreground">Últimas 50 atividades do sistema</p>

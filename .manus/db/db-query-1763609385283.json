@@ -1,0 +1,20 @@
+{
+  "query": "\nSELECT \n  pesquisaId,\n  validationStatus,\n  COUNT(*) as total\nFROM clientes \nWHERE projectId = 1\nGROUP BY pesquisaId, validationStatus\nORDER BY pesquisaId, validationStatus;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  pesquisaId,\n  validationStatus,\n  COUNT(*) as total\nFROM clientes \nWHERE projectId = 1\nGROUP BY pesquisaId, validationStatus\nORDER BY pesquisaId, validationStatus;\n",
+  "rows": [
+    {
+      "pesquisaId": "1",
+      "validationStatus": "pending",
+      "total": "657"
+    },
+    {
+      "pesquisaId": "1",
+      "validationStatus": "rich",
+      "total": "149"
+    }
+  ],
+  "messages": [],
+  "stdout": "pesquisaId\tvalidationStatus\ttotal\n1\tpending\t657\n1\trich\t149\n",
+  "stderr": "",
+  "execution_time_ms": 48
+}

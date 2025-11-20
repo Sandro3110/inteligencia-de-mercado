@@ -1,0 +1,14 @@
+{
+  "query": "\nSELECT \n  validationStatus,\n  COUNT(*) as total\nFROM clientes \nWHERE projectId = 1\nGROUP BY validationStatus;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  validationStatus,\n  COUNT(*) as total\nFROM clientes \nWHERE projectId = 1\nGROUP BY validationStatus;\n",
+  "rows": [
+    {
+      "validationStatus": "pending",
+      "total": "806"
+    }
+  ],
+  "messages": [],
+  "stdout": "validationStatus\ttotal\npending\t806\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

@@ -1315,5 +1315,71 @@ export const appRouter = router({
         return listProjectJobs(input.projectId);
       }),
   }),
+
+  // Batch Processor - Sistema de blocos de 50 clientes
+  batchProcessor: router({
+    // Iniciar processamento em blocos
+    start: publicProcedure
+      .input(z.object({ 
+        pesquisaId: z.number(),
+        batchSize: z.number().optional().default(50)
+      }))
+      .mutation(async ({ input }) => {
+        const { startBatchEnrichment } = await import('./enrichmentBatchProcessor');
+        
+        // Executar em background
+        startBatchEnrichment({
+          pesquisaId: input.pesquisaId,
+          batchSize: input.batchSize,
+        }).catch(error => {
+          console.error('[BatchProcessor] Error:', error);
+        });
+        
+        return { success: true, message: 'Processamento iniciado em background' };
+      }),
+
+    // Pausar processamento
+    pause: publicProcedure
+      .mutation(async () => {
+        const { pauseBatchEnrichment } = await import('./enrichmentBatchProcessor');
+        const paused = pauseBatchEnrichment();
+        return { success: paused };
+      }),
+
+    // Retomar processamento
+    resume: publicProcedure
+      .input(z.object({ 
+        pesquisaId: z.number(),
+        batchSize: z.number().optional().default(50)
+      }))
+      .mutation(async ({ input }) => {
+        const { resumeBatchEnrichment } = await import('./enrichmentBatchProcessor');
+        
+        // Executar em background
+        resumeBatchEnrichment({
+          pesquisaId: input.pesquisaId,
+          batchSize: input.batchSize,
+        }).catch(error => {
+          console.error('[BatchProcessor] Error:', error);
+        });
+        
+        return { success: true, message: 'Processamento retomado' };
+      }),
+
+    // Cancelar processamento
+    cancel: publicProcedure
+      .mutation(async () => {
+        const { cancelBatchEnrichment } = await import('./enrichmentBatchProcessor');
+        const cancelled = cancelBatchEnrichment();
+        return { success: cancelled };
+      }),
+
+    // Obter status atual
+    status: publicProcedure
+      .query(async () => {
+        const { getBatchStatus } = await import('./enrichmentBatchProcessor');
+        return getBatchStatus();
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

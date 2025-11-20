@@ -152,7 +152,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
         mercadoId
       }).onDuplicateKeyUpdate({ set: { clienteId } });
       
-      // 3.3 Inserir produtos
+      // 3.3 Inserir produtos (com UPSERT para evitar duplicação)
       for (const produtoData of mercadoItem.produtos) {
         await db.insert(produtos).values({
           projectId,
@@ -164,6 +164,12 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
           categoria: truncate(produtoData.categoria, 100),
           ativo: 1, // ✅ BUG FIX 3: Campo ativo deve ser 1 (ativo)
           createdAt: new Date()
+        }).onDuplicateKeyUpdate({
+          set: {
+            descricao: truncate(produtoData.descricao, 500),
+            categoria: truncate(produtoData.categoria, 100),
+            ativo: 1
+          }
         });
         result.produtosCreated++;
       }

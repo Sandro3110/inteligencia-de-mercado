@@ -1,0 +1,18 @@
+{
+  "query": "\nSELECT \n  (SELECT COUNT(*) FROM pesquisas) as total_pesquisas,\n  (SELECT COUNT(*) FROM clientes WHERE pesquisaId = 1) as clientes_com_pesquisa,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE pesquisaId = 1) as mercados_com_pesquisa,\n  (SELECT COUNT(*) FROM produtos WHERE pesquisaId = 1) as produtos_com_pesquisa,\n  (SELECT COUNT(*) FROM concorrentes WHERE pesquisaId = 1) as concorrentes_com_pesquisa,\n  (SELECT COUNT(*) FROM leads WHERE pesquisaId = 1) as leads_com_pesquisa;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  (SELECT COUNT(*) FROM pesquisas) as total_pesquisas,\n  (SELECT COUNT(*) FROM clientes WHERE pesquisaId = 1) as clientes_com_pesquisa,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE pesquisaId = 1) as mercados_com_pesquisa,\n  (SELECT COUNT(*) FROM produtos WHERE pesquisaId = 1) as produtos_com_pesquisa,\n  (SELECT COUNT(*) FROM concorrentes WHERE pesquisaId = 1) as concorrentes_com_pesquisa,\n  (SELECT COUNT(*) FROM leads WHERE pesquisaId = 1) as leads_com_pesquisa;\n",
+  "rows": [
+    {
+      "total_pesquisas": "2",
+      "clientes_com_pesquisa": "806",
+      "mercados_com_pesquisa": "99",
+      "produtos_com_pesquisa": "277",
+      "concorrentes_com_pesquisa": "681",
+      "leads_com_pesquisa": "475"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_pesquisas\tclientes_com_pesquisa\tmercados_com_pesquisa\tprodutos_com_pesquisa\tconcorrentes_com_pesquisa\tleads_com_pesquisa\n2\t806\t99\t277\t681\t475\n",
+  "stderr": "",
+  "execution_time_ms": 71
+}

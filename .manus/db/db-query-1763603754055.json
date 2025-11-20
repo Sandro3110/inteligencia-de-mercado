@@ -1,0 +1,34 @@
+{
+  "query": "\n-- Limpar todos os dados de enriquecimento mantendo os 806 clientes originais\n\n-- 1. Deletar associações clientes-mercados\nDELETE FROM clientes_mercados;\n\n-- 2. Deletar leads\nDELETE FROM leads;\n\n-- 3. Deletar concorrentes\nDELETE FROM concorrentes;\n\n-- 4. Deletar produtos\nDELETE FROM produtos;\n\n-- 5. Deletar mercados\nDELETE FROM mercados_unicos;\n\n-- 6. Resetar status dos clientes\nUPDATE clientes \nSET validationStatus = 'pending',\n    qualidadeScore = NULL,\n    qualidadeClassificacao = NULL;\n\n-- Verificar resultado\nSELECT \n  'Clientes' as tabela, COUNT(*) as total FROM clientes\nUNION ALL\nSELECT 'Mercados', COUNT(*) FROM mercados_unicos\nUNION ALL\nSELECT 'Produtos', COUNT(*) FROM produtos\nUNION ALL\nSELECT 'Concorrentes', COUNT(*) FROM concorrentes\nUNION ALL\nSELECT 'Leads', COUNT(*) FROM leads\nUNION ALL\nSELECT 'Associações', COUNT(*) FROM clientes_mercados;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Limpar todos os dados de enriquecimento mantendo os 806 clientes originais\n\n-- 1. Deletar associações clientes-mercados\nDELETE FROM clientes_mercados;\n\n-- 2. Deletar leads\nDELETE FROM leads;\n\n-- 3. Deletar concorrentes\nDELETE FROM concorrentes;\n\n-- 4. Deletar produtos\nDELETE FROM produtos;\n\n-- 5. Deletar mercados\nDELETE FROM mercados_unicos;\n\n-- 6. Resetar status dos clientes\nUPDATE clientes \nSET validationStatus = 'pending',\n    qualidadeScore = NULL,\n    qualidadeClassificacao = NULL;\n\n-- Verificar resultado\nSELECT \n  'Clientes' as tabela, COUNT(*) as total FROM clientes\nUNION ALL\nSELECT 'Mercados', COUNT(*) FROM mercados_unicos\nUNION ALL\nSELECT 'Produtos', COUNT(*) FROM produtos\nUNION ALL\nSELECT 'Concorrentes', COUNT(*) FROM concorrentes\nUNION ALL\nSELECT 'Leads', COUNT(*) FROM leads\nUNION ALL\nSELECT 'Associações', COUNT(*) FROM clientes_mercados;\n",
+  "rows": [
+    {
+      "tabela": "Mercados",
+      "total": "0"
+    },
+    {
+      "tabela": "Produtos",
+      "total": "0"
+    },
+    {
+      "tabela": "Clientes",
+      "total": "808"
+    },
+    {
+      "tabela": "Associações",
+      "total": "0"
+    },
+    {
+      "tabela": "Concorrentes",
+      "total": "0"
+    },
+    {
+      "tabela": "Leads",
+      "total": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\ttotal\nMercados\t0\nProdutos\t0\nClientes\t808\nAssociações\t0\nConcorrentes\t0\nLeads\t0\n",
+  "stderr": "",
+  "execution_time_ms": 176
+}

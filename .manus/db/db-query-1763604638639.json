@@ -1,0 +1,18 @@
+{
+  "query": "\nSELECT \n  (SELECT COUNT(*) FROM clientes WHERE validationStatus = 'validated') as clientes_enriquecidos,\n  (SELECT COUNT(*) FROM mercados_unicos) as mercados,\n  (SELECT COUNT(*) FROM produtos) as produtos,\n  (SELECT COUNT(*) FROM concorrentes) as concorrentes,\n  (SELECT COUNT(*) FROM leads) as leads,\n  (SELECT COUNT(*) FROM clientes_mercados) as associacoes;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  (SELECT COUNT(*) FROM clientes WHERE validationStatus = 'validated') as clientes_enriquecidos,\n  (SELECT COUNT(*) FROM mercados_unicos) as mercados,\n  (SELECT COUNT(*) FROM produtos) as produtos,\n  (SELECT COUNT(*) FROM concorrentes) as concorrentes,\n  (SELECT COUNT(*) FROM leads) as leads,\n  (SELECT COUNT(*) FROM clientes_mercados) as associacoes;\n",
+  "rows": [
+    {
+      "clientes_enriquecidos": "0",
+      "mercados": "22",
+      "produtos": "62",
+      "concorrentes": "166",
+      "leads": "109",
+      "associacoes": "28"
+    }
+  ],
+  "messages": [],
+  "stdout": "clientes_enriquecidos\tmercados\tprodutos\tconcorrentes\tleads\tassociacoes\n0\t22\t62\t166\t109\t28\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

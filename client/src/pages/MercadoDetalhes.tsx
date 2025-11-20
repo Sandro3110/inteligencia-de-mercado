@@ -29,6 +29,8 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { ProjectSelector } from "@/components/ProjectSelector";
 
 export default function MercadoDetalhes() {
   const [, params] = useRoute("/mercado/:id");
@@ -175,15 +177,12 @@ export default function MercadoDetalhes() {
                 <h1 className="text-2xl font-semibold text-foreground">{mercado.nome}</h1>
               </div>
             </div>
-            {/* Breadcrumbs */}
-            <div className="text-sm text-muted-foreground hidden md:block">
-              <Link href="/"><span className="hover:text-foreground cursor-pointer">Dashboard</span></Link>
-              <span className="mx-2">·</span>
-              <Link href="/mercados"><span className="hover:text-foreground cursor-pointer">Mercados</span></Link>
-              <span className="mx-2">·</span>
-              <span className="font-semibold text-foreground">Detalhes</span>
-            </div>
+            <ProjectSelector />
           </div>
+          <Breadcrumbs items={[
+            { label: "Mercados", href: "/mercados" },
+            { label: mercado.nome }
+          ]} />
           
           {/* Segmentação e Categoria */}
           <div className="flex items-center gap-2 mb-4">

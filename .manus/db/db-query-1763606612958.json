@@ -1,0 +1,9 @@
+{
+  "query": "\n-- Criar pesquisa\nINSERT INTO pesquisas (projectId, nome, descricao, totalClientes, status)\nVALUES (1, 'Embalagens 2025', 'Pesquisa de mercado do setor de embalagens - 806 clientes', 806, 'enriquecendo');\n\n-- Atualizar clientes com pesquisaId\nUPDATE clientes SET pesquisaId = 1 WHERE projectId = 1;\n\n-- Atualizar mercados com pesquisaId\nUPDATE mercados_unicos SET pesquisaId = 1 WHERE projectId = 1;\n\n-- Atualizar produtos com pesquisaId\nUPDATE produtos SET pesquisaId = 1 WHERE projectId = 1;\n\n-- Atualizar concorrentes com pesquisaId\nUPDATE concorrentes SET pesquisaId = 1 WHERE projectId = 1;\n\n-- Atualizar leads com pesquisaId\nUPDATE leads SET pesquisaId = 1 WHERE projectId = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Criar pesquisa\nINSERT INTO pesquisas (projectId, nome, descricao, totalClientes, status)\nVALUES (1, 'Embalagens 2025', 'Pesquisa de mercado do setor de embalagens - 806 clientes', 806, 'enriquecendo');\n\n-- Atualizar clientes com pesquisaId\nUPDATE clientes SET pesquisaId = 1 WHERE projectId = 1;\n\n-- Atualizar mercados com pesquisaId\nUPDATE mercados_unicos SET pesquisaId = 1 WHERE projectId = 1;\n\n-- Atualizar produtos com pesquisaId\nUPDATE produtos SET pesquisaId = 1 WHERE projectId = 1;\n\n-- Atualizar concorrentes com pesquisaId\nUPDATE concorrentes SET pesquisaId = 1 WHERE projectId = 1;\n\n-- Atualizar leads com pesquisaId\nUPDATE leads SET pesquisaId = 1 WHERE projectId = 1;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 169
+}

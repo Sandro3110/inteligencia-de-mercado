@@ -7,6 +7,8 @@ import { Link } from "wouter";
 import { Search, Building2, ArrowLeft, TrendingUp, Users, Download, Filter, X } from "lucide-react";
 import { toast } from "sonner";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { ProjectSelector } from "@/components/ProjectSelector";
 
 export default function Mercados() {
   const [search, setSearch] = useState("");
@@ -65,7 +67,8 @@ export default function Mercados() {
       {/* Header */}
       <div className="border-b border-border/50">
         <div className="container py-6">
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-4">
             <Link href="/">
               <Button variant="ghost" size="icon" className="hover-lift">
                 <ArrowLeft className="h-5 w-5" />
@@ -77,7 +80,10 @@ export default function Mercados() {
                 {mercados?.length || 0} Mercados Únicos
               </h1>
             </div>
+            </div>
+            <ProjectSelector />
           </div>
+          <Breadcrumbs items={[{ label: "Mercados" }]} />
 
           {/* Search e Exportar */}
           <div className="flex flex-col gap-4">

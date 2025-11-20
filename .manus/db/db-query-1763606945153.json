@@ -1,0 +1,17 @@
+{
+  "query": "\nSELECT \n  (SELECT COUNT(*) FROM clientes WHERE pesquisaId = 1) as total_clientes,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE pesquisaId = 1) as mercados,\n  (SELECT COUNT(*) FROM produtos WHERE pesquisaId = 1) as produtos,\n  (SELECT COUNT(*) FROM concorrentes WHERE pesquisaId = 1) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE pesquisaId = 1) as leads;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  (SELECT COUNT(*) FROM clientes WHERE pesquisaId = 1) as total_clientes,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE pesquisaId = 1) as mercados,\n  (SELECT COUNT(*) FROM produtos WHERE pesquisaId = 1) as produtos,\n  (SELECT COUNT(*) FROM concorrentes WHERE pesquisaId = 1) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE pesquisaId = 1) as leads;\n",
+  "rows": [
+    {
+      "total_clientes": "806",
+      "mercados": "115",
+      "produtos": "321",
+      "concorrentes": "750",
+      "leads": "534"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_clientes\tmercados\tprodutos\tconcorrentes\tleads\n806\t115\t321\t750\t534\n",
+  "stderr": "",
+  "execution_time_ms": 76
+}

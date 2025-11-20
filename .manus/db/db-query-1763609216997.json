@@ -1,0 +1,9 @@
+{
+  "query": "\nUPDATE clientes c\nINNER JOIN produtos p ON c.id = p.clienteId\nSET c.validationStatus = 'rich'\nWHERE c.projectId = 1 \n  AND c.pesquisaId = 1\n  AND c.validationStatus = 'pending';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nUPDATE clientes c\nINNER JOIN produtos p ON c.id = p.clienteId\nSET c.validationStatus = 'rich'\nWHERE c.projectId = 1 \n  AND c.pesquisaId = 1\n  AND c.validationStatus = 'pending';\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 73
+}

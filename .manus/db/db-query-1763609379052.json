@@ -1,0 +1,16 @@
+{
+  "query": "\nSELECT \n  COUNT(*) as total,\n  MIN(id) as primeiro_id,\n  MAX(id) as ultimo_id,\n  GROUP_CONCAT(DISTINCT validationStatus) as status\nFROM clientes \nWHERE projectId = 1 AND (pesquisaId IS NULL OR pesquisaId != 1);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  COUNT(*) as total,\n  MIN(id) as primeiro_id,\n  MAX(id) as ultimo_id,\n  GROUP_CONCAT(DISTINCT validationStatus) as status\nFROM clientes \nWHERE projectId = 1 AND (pesquisaId IS NULL OR pesquisaId != 1);\n",
+  "rows": [
+    {
+      "total": "0",
+      "primeiro_id": "NULL",
+      "ultimo_id": "NULL",
+      "status": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tprimeiro_id\tultimo_id\tstatus\n0\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}
