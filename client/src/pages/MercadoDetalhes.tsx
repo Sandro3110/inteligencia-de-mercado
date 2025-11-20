@@ -1,6 +1,6 @@
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useState } from "react";
-import { useRoute, Link } from "wouter";
+import { useRoute, Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { ValidationModal } from "@/components/ValidationModal";
 import { toast } from "sonner";
@@ -31,9 +31,17 @@ import {
   MapPin,
 } from "lucide-react";
 import { ProjectSelector } from "@/components/ProjectSelector";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function MercadoDetalhes() {
   const [, params] = useRoute("/mercado/:id");
+  const [, setLocation] = useLocation();
   const mercadoId = params?.id ? parseInt(params.id) : 0;
   const [validationModal, setValidationModal] = useState<{
     open: boolean;
@@ -45,11 +53,25 @@ export default function MercadoDetalhes() {
   }>({ open: false, type: 'cliente', id: 0, name: '' });
 
   const utils = trpc.useUtils();
+  
+  // Buscar projeto selecionado do localStorage
+  const selectedProjectId = parseInt(localStorage.getItem("selectedProjectId") || "0");
+  
+  // Buscar todos os mercados do projeto para o seletor
+  const { data: mercados } = trpc.mercados.list.useQuery(
+    { projectId: selectedProjectId, search: "" },
+    { enabled: !!selectedProjectId }
+  );
 
   const { data: mercado, isLoading: loadingMercado } = trpc.mercados.byId.useQuery(mercadoId);
-  const { data: clientes, isLoading: loadingClientes } = trpc.clientes.byMercado.useQuery({ mercadoId });
-  const { data: concorrentes, isLoading: loadingConcorrentes } = trpc.concorrentes.byMercado.useQuery({ mercadoId });
-  const { data: leads, isLoading: loadingLeads } = trpc.leads.byMercado.useQuery({ mercadoId });
+  const { data: clientesResponse, isLoading: loadingClientes } = trpc.clientes.byMercado.useQuery({ mercadoId, page: 1, pageSize: 100 });
+  const { data: concorrentesResponse, isLoading: loadingConcorrentes } = trpc.concorrentes.byMercado.useQuery({ mercadoId, page: 1, pageSize: 100 });
+  const { data: leadsResponse, isLoading: loadingLeads } = trpc.leads.byMercado.useQuery({ mercadoId, page: 1, pageSize: 100 });
+  
+  // Extrair arrays dos objetos paginados
+  const clientes = clientesResponse?.data || [];
+  const concorrentes = concorrentesResponse?.data || [];
+  const leads = leadsResponse?.data || [];
 
   const updateClienteMutation = trpc.clientes.updateValidation.useMutation({
     onSuccess: () => {
@@ -166,15 +188,37 @@ export default function MercadoDetalhes() {
       <div className="border-b border-border/50">
         <div className="container py-6">
           <div className="flex items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-1">
               <Link href="/mercados">
                 <Button variant="ghost" size="icon" className="hover-lift">
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
               </Link>
-              <div>
-                <h2 className="section-title">Detalhes do Mercado</h2>
-                <h1 className="text-2xl font-semibold text-foreground">{mercado.nome}</h1>
+              <div className="flex-1">
+                <h2 className="section-title mb-2">Detalhes do Mercado</h2>
+                {/* Seletor de Mercados */}
+                <Select
+                  value={mercadoId.toString()}
+                  onValueChange={(value) => setLocation(`/mercado/${value}`)}
+                >
+                  <SelectTrigger className="w-full max-w-2xl">
+                    <SelectValue placeholder="Selecione um mercado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mercados?.map((m) => (
+                      <SelectItem key={m.id} value={m.id.toString()}>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{m.nome}</span>
+                          {m.segmentacao && (
+                            <Badge variant="outline" className="text-xs">
+                              {m.segmentacao}
+                            </Badge>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <ProjectSelector />
@@ -205,7 +249,7 @@ export default function MercadoDetalhes() {
                   <Users className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{Array.isArray(clientes) ? clientes.length : 0}</p>
+                  <p className="text-2xl font-bold">{clientesResponse?.total || 0}</p>
                   <p className="text-sm text-muted-foreground">Clientes</p>
                 </div>
               </CardContent>
@@ -217,7 +261,7 @@ export default function MercadoDetalhes() {
                   <Target className="h-5 w-5 text-orange-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{Array.isArray(concorrentes) ? concorrentes.length : 0}</p>
+                  <p className="text-2xl font-bold">{concorrentesResponse?.total || 0}</p>
                   <p className="text-sm text-muted-foreground">Concorrentes</p>
                 </div>
               </CardContent>
@@ -229,7 +273,7 @@ export default function MercadoDetalhes() {
                   <TrendingUp className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{Array.isArray(leads) ? leads.length : 0}</p>
+                  <p className="text-2xl font-bold">{leadsResponse?.total || 0}</p>
                   <p className="text-sm text-muted-foreground">Leads</p>
                 </div>
               </CardContent>

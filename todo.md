@@ -1520,3 +1520,32 @@ PROJECT (nível 1)
 - [x] Testar histórico de alterações
 - [x] Testar aba de produtos
 - [x] Verificar responsividade
+
+
+---
+
+## Fase 50: Correções Críticas - Tags e Navegação de Mercados
+
+### 50.1 Corrigir Gestão de Tags (Validação em Lote)
+- [x] Corrigir modal de validação em lote (todos vêm como "Rico") - Modal já estava correto, "Rico" é apenas valor padrão
+- [x] Permitir escolher entre Rico, Precisa Ajuste e Descartado - Já implementado
+- [x] Adicionar campo de observações opcional - Já implementado
+- [x] Testar validação em lote de clientes, concorrentes e leads
+
+### 50.2 Corrigir Tela de Mercados (MercadoDetalhes)
+- [x] Investigar por que mostra "0 Clientes, 0 Concorrentes, 0 Leads" - Queries retornavam objeto paginado, não array
+- [x] Corrigir queries para buscar dados vinculados ao mercado - Adicionado extração de .data dos objetos paginados
+- [x] Exibir lista de clientes, concorrentes e leads do mercado - Corrigido
+- [x] Adicionar filtros e busca na tela de mercados - Já existem nas abas
+
+### 50.3 Adicionar Navegação Dinâmica de Mercados
+- [x] Adicionar seletor de mercados na página Mercados - Select com todos os mercados do projeto
+- [x] Permitir trocar de mercado sem voltar à tela anterior - useLocation para navegação dinâmica
+- [x] Manter estado do mercado selecionado - Gerenciado pela URL
+- [x] Adicionar breadcrumbs com navegação - Já existia
+
+### 50.4 Testar e Validar
+- [x] Testar validação em lote com diferentes status
+- [x] Testar navegação entre mercados
+- [x] Verificar contadores de clientes/concorrentes/leads
+- [x] Criar checkpoint final
