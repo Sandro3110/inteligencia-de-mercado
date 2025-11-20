@@ -144,6 +144,56 @@ export default function Step4Output({ state, setState }: Step4OutputProps) {
         </RadioGroup>
       </div>
 
+      {/* Profundidade (se relatório) */}
+      {state.outputType === 'report' && (
+        <div className="space-y-3">
+          <Label>Profundidade da Análise</Label>
+          <RadioGroup
+            value={state.depth || 'standard'}
+            onValueChange={(value: any) => setState(prev => ({ ...prev, depth: value }))}
+          >
+            <div className="grid grid-cols-3 gap-3">
+              <label
+                htmlFor="quick"
+                className={`flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                  (state.depth || 'standard') === 'quick'
+                    ? 'border-blue-600 bg-blue-50'
+                    : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <RadioGroupItem value="quick" id="quick" className="mb-2" />
+                <div className="font-semibold mb-1">Rápida</div>
+                <p className="text-xs text-slate-600">~30s, 2-3 páginas</p>
+              </label>
+              <label
+                htmlFor="standard"
+                className={`flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                  (state.depth || 'standard') === 'standard'
+                    ? 'border-blue-600 bg-blue-50'
+                    : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <RadioGroupItem value="standard" id="standard" className="mb-2" />
+                <div className="font-semibold mb-1">Padrão</div>
+                <p className="text-xs text-slate-600">~60s, 5-7 páginas</p>
+              </label>
+              <label
+                htmlFor="deep"
+                className={`flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                  (state.depth || 'standard') === 'deep'
+                    ? 'border-blue-600 bg-blue-50'
+                    : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <RadioGroupItem value="deep" id="deep" className="mb-2" />
+                <div className="font-semibold mb-1">Profunda</div>
+                <p className="text-xs text-slate-600">~120s, 10-15 páginas</p>
+              </label>
+            </div>
+          </RadioGroup>
+        </div>
+      )}
+
       {/* Template (se relatório) */}
       {state.outputType === 'report' && (
         <div className="space-y-3">

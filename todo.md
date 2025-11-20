@@ -965,3 +965,21 @@ PROJECT (nível 1)
 - [x] Documentação de API dos serviços (JSDoc nos arquivos)
 
 **Status:** ✅ **100% COMPLETO E FUNCIONAL** - Backend, Frontend, Integração, Migração de BD, Menu, Rotas. Pronto para uso!
+
+
+### 31.9 Completude 100% - Refinamentos de UX
+- [x] 1. Histórico de exportações (página /export/history)
+- [x] 2. Preview e resumo antes de gerar
+- [x] 3. Interface de progresso detalhada com etapas
+- [x] 4. Highlight colorido de entidades no Step 1
+- [x] 5. Botão "Exemplos" com contextos pré-definidos
+- [ ] 6. Estimativa de tamanho do arquivo (MB) no Step 3
+- [x] 7. Opções de profundidade (Rápida/Padrão/Profunda) no Step 4
+- [ ] 8. Validação de limites (alerta se > 100MB)
+- [ ] 9. Salvar configuração para reutilização
+- [ ] 10. Autocomplete inteligente no campo de contexto
+- [ ] 11. Sugestões contextuais baseadas em histórico
+- [ ] 12. Modos de relacionamento (Coluna Única, Linhas Separadas, Arquivo Separado)
+- [ ] 13. Página de administração de templates
+- [ ] 14. Formato JSON com estrutura hierárquica
+- [ ] 15. Formato Word (.docx) editável

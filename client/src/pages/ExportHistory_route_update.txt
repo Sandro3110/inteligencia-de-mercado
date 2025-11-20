@@ -1,0 +1,18 @@
+Adicionar no App.tsx:
+
+import ExportHistory from "./pages/ExportHistory";
+
+<Route path="/export/history" component={ExportHistory} />
+
+E no AppSidebar.tsx, adicionar submenu:
+
+{
+  label: "Exportação Inteligente",
+  href: "/export",
+  icon: Download,
+  shortcut: "⌘E",
+  submenu: [
+    { label: "Nova Exportação", href: "/export" },
+    { label: "Histórico", href: "/export/history" }
+  ]
+}
