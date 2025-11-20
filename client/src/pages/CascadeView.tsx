@@ -62,6 +62,7 @@ import { Link } from "wouter";
 import SearchHistory, { addToSearchHistory } from "@/components/SearchHistory";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { ProjectSelector } from "@/components/ProjectSelector";
+import { AppSidebar } from "@/components/AppSidebar";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
 type Page = "mercados" | "clientes" | "concorrentes" | "leads";
@@ -710,8 +711,8 @@ export default function CascadeView() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100 overflow-x-hidden">
-      {/* Header */}
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100 overflow-x-hidden ml-60">
+      {/* Header Simplificado */}
       <div className="flex items-center justify-between px-6 py-2 border-b border-border/40 flex-wrap gap-2">
         <div className="flex items-center gap-6">
           <ProjectSelector />
@@ -737,18 +738,6 @@ export default function CascadeView() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/dashboard-avancado">
-            <Button variant="outline" className="h-10">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Dashboard
-            </Button>
-          </Link>
-          <Link href="/enrichment-progress">
-            <Button variant="outline" className="h-10 gap-2">
-              <Clock className="w-4 h-4" />
-              Monitorar Enriquecimento
-            </Button>
-          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="h-10">
@@ -771,12 +760,6 @@ export default function CascadeView() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link href="/enrichment">
-            <Button variant="default" className="h-10 gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Novo Projeto
-            </Button>
-          </Link>
           <TagManager />
         </div>
       </div>
@@ -1070,70 +1053,7 @@ export default function CascadeView() {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-[280px] border-r border-border/40 p-6 flex flex-col gap-6">
-          {/* Estatísticas */}
-          <div>
-            <h3 className="text-[0.5rem] uppercase tracking-wider text-muted-foreground mb-3">Estatísticas</h3>
-            <div className="space-y-2">
-              <div className="glass-card p-4">
-                <div className="flex items-center gap-3">
-                  <Building2 className="w-6 h-6 text-blue-500" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Mercados</p>
-                    <p className="text-xl font-semibold">{totalMercados}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass-card p-4">
-                <div className="flex items-center gap-3">
-                  <Users className="w-6 h-6 text-green-500" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Clientes</p>
-                    <p className="text-xl font-semibold">{totalClientes}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass-card p-4">
-                <div className="flex items-center gap-3">
-                  <Target className="w-6 h-6 text-purple-500" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Concorrentes</p>
-                    <p className="text-xl font-semibold">{totalConcorrentes}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass-card p-4">
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="w-6 h-6 text-orange-500" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Leads</p>
-                    <p className="text-xl font-semibold">{totalLeads}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-          {/* Mercado Atual */}
-          {mercadoSelecionado && (
-            <div>
-              <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Mercado Atual</h3>
-              <div className="glass-card p-3">
-                <p className="text-sm font-medium truncate">{mercadoSelecionado.nome}</p>
-                <Badge variant="outline" className="text-xs mt-2">
-                  {mercadoSelecionado.segmentacao}
-                </Badge>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Área Principal */}
+        {/* Área Principal (sidebar antigo removido) */}
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Header da Página */}
           <div className="px-6 py-4 border-b border-border/40">

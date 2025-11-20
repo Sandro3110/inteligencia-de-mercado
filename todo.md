@@ -110,3 +110,112 @@ PROJECT (nível 1)
 - [x] Testar responsividade
 - [x] Verificar sem scroll horizontal
 - [x] Criar checkpoint
+
+
+---
+
+
+## FASE 25: REFATORAÇÃO COM SIDEBAR LATERAL FIXO 🎯
+
+### 25.1 Análise e Planejamento
+- [x] Mapear todas as funcionalidades da página inicial
+- [x] Definir estrutura de temas do sidebar (6 seções)
+- [x] Criar mockup visual da nova estrutura
+- [x] Definir plano de implementação em fases
+
+### 25.2 Criar Componente AppSidebar
+- [x] Criar client/src/components/AppSidebar.tsx
+- [x] Implementar 6 seções temáticas:
+  - [x] 📊 Visão Geral (Dashboard, Estatísticas)
+  - [x] 🗂️ Dados (Mercados, Clientes, Concorrentes, Leads, Produtos)
+  - [x] 🔍 Busca & Filtros (Busca Global, Filtros, Tags)
+  - [x] ⚙️ Ações (Novo Projeto, Exportar, Comparar, Validação)
+  - [x] 📈 Análise (Analytics, ROI, Funil, Relatórios, Atividades)
+  - [x] 🔧 Configurações (Enriquecimento, Alertas, Agendamentos, Cache)
+- [x] Adicionar estatísticas compactas no sidebar (4 cards)
+- [x] Implementar indicador de página ativa (highlight)
+- [x] Adicionar ícones Lucide para cada item
+- [x] Estilizar com tema light moderno (bg-white, borders sutis)
+- [x] Largura fixa 240px
+
+### 25.3 Refatorar Página Inicial (CascadeView)
+- [x] Simplificar header (apenas logo + seletor de projeto + ícones essenciais)
+- [x] Remover sidebar esquerdo antigo de estatísticas
+- [x] Mover filtros para dentro da área principal (abaixo do header)
+- [x] Integrar AppSidebar no layout (posição fixa à esquerda)
+- [x] Ajustar largura da área principal: calc(100% - 240px)
+- [x] Manter navegação Mercados → Clientes → Concorrentes → Leads
+- [x] Testar scroll e responsividade
+
+### 25.4 Validação com Usuário ⚠️ CHECKPOINT
+- [ ] Capturar screenshot da nova interface
+- [ ] Apresentar para aprovação do usuário
+- [ ] Coletar feedback detalhado
+- [ ] Ajustar conforme necessário
+- [ ] **AGUARDAR APROVAÇÃO ANTES DE CONTINUAR**
+
+### 25.5 Adaptar Outras Páginas (SOMENTE APÓS APROVAÇÃO)
+- [ ] Dashboard.tsx
+- [ ] DashboardPage.tsx (Analytics)
+- [ ] ROIDashboard.tsx
+- [ ] FunnelView.tsx
+- [ ] AnalyticsPage.tsx
+- [ ] EnrichmentProgress.tsx
+- [ ] AlertsPage.tsx
+- [ ] ReportsPage.tsx
+- [ ] Mercados.tsx
+- [ ] MercadoDetalhes.tsx
+- [ ] AtividadePage.tsx
+- [ ] ResultadosEnriquecimento.tsx
+- [ ] Remover MainNav.tsx (substituído por AppSidebar)
+
+### 25.6 Polimento Final
+- [ ] Animações de transição entre páginas (fade-in)
+- [ ] Estados hover/active no sidebar (bg-slate-100)
+- [ ] Atalho de teclado Ctrl+B para toggle sidebar
+- [ ] Responsividade mobile (sidebar colapsável com overlay)
+- [ ] Testar em diferentes resoluções (1920x1080, 1366x768, mobile)
+- [ ] Criar checkpoint final
+
+**Estrutura Visual do Sidebar:**
+```
+┌─────────────────────┐
+│ 📊 Inteligência    │ ← Logo compacto
+│    de Mercado      │
+├─────────────────────┤
+│ 📊 VISÃO GERAL     │
+│   • Dashboard       │
+│   • Estatísticas    │
+│                     │
+│ 🗂️ DADOS           │
+│   • Mercados ◄      │ ← Ativo
+│   • Clientes        │
+│   • Concorrentes    │
+│   • Leads           │
+│   • Produtos        │
+│                     │
+│ 🔍 BUSCA & FILTROS │
+│   • Busca Global    │
+│   • Filtros         │
+│   • Tags            │
+│                     │
+│ ⚙️ AÇÕES           │
+│   • Novo Projeto    │
+│   • Exportar        │
+│   • Comparar        │
+│   • Validação       │
+│                     │
+│ 📈 ANÁLISE         │
+│   • Analytics       │
+│   • ROI             │
+│   • Funil           │
+│   • Relatórios      │
+│   • Atividades      │
+│                     │
+│ 🔧 CONFIGURAÇÕES   │
+│   • Enriquecimento  │
+│   • Alertas         │
+│   • Agendamentos    │
+│   • Cache           │
+└─────────────────────┘
+```

@@ -9,7 +9,7 @@ import { OnboardingProvider } from "./contexts/OnboardingContext";
 import { DashboardCustomizationProvider } from "./contexts/DashboardCustomizationContext";
 import { GlobalShortcuts } from "./components/GlobalShortcuts";
 import { OnboardingTour } from "./components/OnboardingTour";
-import MainNav from "./components/MainNav";
+import { AppSidebar } from "./components/AppSidebar";
 import Dashboard from "./pages/Dashboard";
 import DashboardPage from "./pages/DashboardPage";
 import Mercados from "./pages/Mercados";
@@ -78,7 +78,7 @@ function App() {
                 <Toaster />
                 <GlobalShortcuts />
                 <OnboardingTour />
-                <MainNav />
+                <AppSidebar />
                 <Router />
               </TooltipProvider>
             </DashboardCustomizationProvider>
