@@ -25,7 +25,7 @@ export function Step1SelectProject({ data, updateData }: {
   data: ResearchWizardData;
   updateData: (d: Partial<ResearchWizardData>) => void;
 }) {
-  const { data: projects } = trpc.projects.list.useQuery();
+  const { data: projects, isLoading, error } = trpc.projects.list.useQuery();
 
   return (
     <div className="space-y-6">
@@ -37,8 +37,35 @@ export function Step1SelectProject({ data, updateData }: {
       </div>
 
       <div className="space-y-4">
-        <Label>Projeto *</Label>
+        <div className="flex items-center justify-between">
+          <Label>Projeto *</Label>
+          {!isLoading && projects && projects.length > 0 && (
+            <span className="text-sm text-muted-foreground">
+              {projects.length} projeto{projects.length > 1 ? 's' : ''} disponível{projects.length > 1 ? 'eis' : ''}
+            </span>
+          )}
+        </div>
+        
+        {isLoading && (
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">Carregando projetos...</p>
+          </div>
+        )}
+        
+        {error && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-800">Erro ao carregar projetos: {error.message}</p>
+          </div>
+        )}
+        
+        {!isLoading && !error && (!projects || projects.length === 0) && (
+          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-yellow-800">Nenhum projeto encontrado. Crie um projeto primeiro.</p>
+          </div>
+        )}
+        
         <Select
+          disabled={isLoading || !projects || projects.length === 0}
           value={data.projectId?.toString() || ''}
           onValueChange={(value) => {
             const project = projects?.find(p => p.id === parseInt(value));
@@ -52,11 +79,15 @@ export function Step1SelectProject({ data, updateData }: {
             <SelectValue placeholder="Selecione um projeto" />
           </SelectTrigger>
           <SelectContent>
-            {projects?.map(project => (
+            {projects && projects.length > 0 ? projects.map(project => (
               <SelectItem key={project.id} value={project.id.toString()}>
                 {project.nome}
               </SelectItem>
-            ))}
+            )) : (
+              <SelectItem value="none" disabled>
+                Nenhum projeto disponível
+              </SelectItem>
+            )}
           </SelectContent>
         </Select>
 

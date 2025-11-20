@@ -110,3 +110,20 @@
 - [x] Testar filtros no modal de comparação
 - [x] Testar dashboard de tendências com diferentes períodos
 - [x] Validar performance das queries
+
+
+---
+
+## FASE 55: CORREÇÃO DO WIZARD DE NOVA PESQUISA ✅
+
+### 55.1 Investigar e Corrigir
+- [x] Verificar query de projetos no ResearchWizard
+- [x] Corrigir carregamento de projetos no Step1
+- [x] Validar navegação entre passos (botão Próximo)
+- [x] Testar criação completa de pesquisa end-to-end
+
+**Resultado**: Wizard funcionando 100%! Melhorias aplicadas:
+- Adicionado contador de projetos disponíveis
+- Estados de loading/erro/vazio implementados
+- Select desabilitado quando não há projetos
+- Navegação entre steps validada (Steps 1-4 testados)
