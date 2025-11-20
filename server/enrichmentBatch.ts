@@ -2,7 +2,7 @@
  * Sistema de enriquecimento em lote com processamento paralelo
  */
 
-import { enrichClienteCompleto } from './enrichmentV2';
+// import { enrichClienteCompleto } from './enrichmentOptimized'; // OBSOLETO
 import { getDb } from './db';
 import { clientes } from '../drizzle/schema';
 import { eq } from 'drizzle-orm';

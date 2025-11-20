@@ -3074,3 +3074,83 @@ Redefinir completamente o fluxo de enriquecimento de dados com base nos 801 clie
 - [x] Desenvolver dashboard de resultados consolidados (ResultadosEnriquecimento.tsx)
 - [x] Adicionar routers tRPC para job management (createJob, startJob, pauseJob, cancelJob, getJobProgress, listJobs)
 
+
+
+---
+
+## 🚀 FASE CRÍTICA: Integração de APIs Reais para Produção
+
+### Configuração de APIs
+- [x] Configurar chave SerpAPI no ambiente
+- [x] Testar conexão SerpAPI
+- [x] Configurar OpenAI GPT-4o-mini
+- [x] Validar todas as chaves de API
+
+### Implementação de Integrações
+- [x] Criar módulo de integração SerpAPI
+- [x] Criar módulo de integração OpenAI
+- [x] Implementar busca real de concorrentes via OpenAI
+- [x] Implementar identificação real de mercados via OpenAI
+- [x] Implementar geração real de produtos via OpenAI
+- [x] Implementar geração real de leads via OpenAI
+- [x] Corrigir mapeamento de colunas do banco
+
+### Sistema de Controle
+- [ ] Implementar sistema de checkpoint automático
+- [ ] Implementar sistema de pausa/retomar
+- [ ] Implementar retry logic com backoff exponencial
+- [ ] Implementar rate limiting para APIs
+- [ ] Implementar logging detalhado
+
+### Testes
+- [ ] Testar com 1 cliente real
+- [ ] Testar com 5 clientes reais
+- [ ] Validar qualidade dos dados
+- [ ] Calcular custo real por cliente
+- [ ] Testar com 50 clientes
+- [ ] Validar sistema de controle
+
+### Produção
+- [ ] Executar enriquecimento completo (801 clientes)
+- [ ] Monitorar progresso em tempo real
+- [ ] Gerar relatório final de qualidade
+- [ ] Validar resultados
+
+
+---
+
+## 🚀 OPÇÃO A: Otimização Agressiva (20x mais rápido)
+
+### Implementação
+- [ ] Criar módulo OpenAI otimizado (1 chamada por cliente)
+- [ ] Criar prompt unificado que retorna JSON completo
+- [ ] Implementar processamento paralelo (Promise.all com limite)
+- [ ] Remover dependência de SerpAPI do fluxo principal
+- [ ] Adicionar validação de CNPJs via ReceitaWS (batch, async)
+- [ ] Implementar controle de concorrência (5-10 clientes simultâneos)
+
+### Testes
+- [ ] Testar com 5 clientes (versão otimizada)
+- [ ] Comparar performance: tempo, custo, qualidade
+- [ ] Validar quality scores
+- [ ] Validar consistência dos dados
+
+### Produção
+- [ ] Executar enriquecimento completo (801 clientes)
+- [ ] Monitorar progresso em tempo real
+- [ ] Gerar relatório final comparativo
+
+
+### Teste com 10 Clientes (Otimizado)
+- [ ] Criar script de teste com 10 clientes
+- [ ] Executar teste otimizado (OpenAI apenas)
+- [ ] Validar performance e qualidade
+- [ ] Gerar relatório comparativo completo
+
+
+### Otimização Final (Remover ReceitaWS + Melhorar Prompt)
+- [ ] Remover validação ReceitaWS de concorrentes e leads
+- [ ] Criar prompt estruturado e detalhado para OpenAI
+- [ ] Adicionar contexto regional, porte e nicho
+- [ ] Testar com 5 clientes
+- [ ] Validar qualidade dos dados gerados

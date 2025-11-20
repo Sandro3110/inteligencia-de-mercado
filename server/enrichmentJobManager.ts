@@ -5,7 +5,7 @@
 import { getDb } from './db';
 import { enrichmentJobs } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
-import { enrichClienteCompleto } from './enrichmentV2';
+// import { enrichClienteCompleto } from './enrichmentOptimized'; // OBSOLETO
 import { clientes } from '../drizzle/schema';
 import { notifyOwner } from './_core/notification';
 
