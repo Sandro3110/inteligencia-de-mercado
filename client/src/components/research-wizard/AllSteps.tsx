@@ -11,7 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, FileSpreadsheet, Sparkles, Plus, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Upload, FileSpreadsheet, Sparkles, Plus, Trash2, CheckCircle2, AlertCircle, FolderPlus, X } from 'lucide-react';
+import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
 import type { ResearchWizardData } from '@/types/research-wizard';
 import PreResearchInterface from './PreResearchInterface';
@@ -25,7 +26,50 @@ export function Step1SelectProject({ data, updateData }: {
   data: ResearchWizardData;
   updateData: (d: Partial<ResearchWizardData>) => void;
 }) {
-  const { data: projects, isLoading, error } = trpc.projects.list.useQuery();
+  const [showCreateProject, setShowCreateProject] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectDesc, setNewProjectDesc] = useState('');
+  const [projectToDelete, setProjectToDelete] = useState<number | null>(null);
+  
+  const { data: projects, isLoading, error, refetch } = trpc.projects.list.useQuery();
+  
+  const createProject = trpc.projects.create.useMutation({
+    onSuccess: (newProject) => {
+      if (newProject) {
+        refetch();
+        updateData({
+          projectId: newProject.id,
+          projectName: newProject.nome
+        });
+        setShowCreateProject(false);
+        setNewProjectName('');
+        setNewProjectDesc('');
+        toast.success(`Projeto "${newProject.nome}" criado com sucesso!`);
+      }
+    },
+    onError: (error: any) => {
+      toast.error(`Erro ao criar projeto: ${error.message}`);
+    }
+  });
+  
+  const canDeleteQuery = trpc.projects.canDelete.useQuery(
+    projectToDelete || 0,
+    { enabled: projectToDelete !== null }
+  );
+  
+  const deleteProject = trpc.projects.deleteEmpty.useMutation({
+    onSuccess: () => {
+      refetch();
+      toast.success('Projeto deletado com sucesso!');
+      if (data.projectId === projectToDelete) {
+        updateData({ projectId: undefined, projectName: '' });
+      }
+      setProjectToDelete(null);
+    },
+    onError: (error: any) => {
+      toast.error(`Erro ao deletar projeto: ${error.message}`);
+    }
+  });
 
   return (
     <div className="space-y-6">
@@ -59,9 +103,91 @@ export function Step1SelectProject({ data, updateData }: {
         )}
         
         {!isLoading && !error && (!projects || projects.length === 0) && (
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg space-y-3">
             <p className="text-sm text-yellow-800">Nenhum projeto encontrado. Crie um projeto primeiro.</p>
+            <Button
+              onClick={() => setShowCreateProject(true)}
+              variant="outline"
+              size="sm"
+              className="w-full"
+            >
+              <FolderPlus className="w-4 h-4 mr-2" />
+              Criar Novo Projeto
+            </Button>
           </div>
+        )}
+        
+        {/* Modal de Criação Rápida de Projeto */}
+        {showCreateProject && (
+          <Card className="p-4 space-y-4 border-2 border-blue-200 bg-blue-50/50">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-lg">Criar Novo Projeto</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowCreateProject(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            <div className="space-y-3">
+              <div>
+                <Label>Nome do Projeto *</Label>
+                <Input
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  placeholder="Ex: Embalagens 2025"
+                />
+              </div>
+              
+              <div>
+                <Label>Descrição (opcional)</Label>
+                <Textarea
+                  value={newProjectDesc}
+                  onChange={(e) => setNewProjectDesc(e.target.value)}
+                  placeholder="Breve descrição do projeto..."
+                  rows={2}
+                />
+              </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    if (newProjectName.trim()) {
+                      createProject.mutate({
+                        nome: newProjectName.trim(),
+                        descricao: newProjectDesc.trim() || undefined
+                      });
+                    }
+                  }}
+                  disabled={!newProjectName.trim() || createProject.isPending}
+                  className="flex-1"
+                >
+                  {createProject.isPending ? 'Criando...' : 'Criar Projeto'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCreateProject(false)}
+                  disabled={createProject.isPending}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
+        
+        {!showCreateProject && projects && projects.length > 0 && (
+          <Button
+            onClick={() => setShowCreateProject(true)}
+            variant="outline"
+            size="sm"
+            className="w-full mb-2"
+          >
+            <FolderPlus className="w-4 h-4 mr-2" />
+            Criar Novo Projeto
+          </Button>
         )}
         
         <Select
@@ -97,6 +223,102 @@ export function Step1SelectProject({ data, updateData }: {
               ✓ Projeto selecionado: <strong>{data.projectName}</strong>
             </p>
           </div>
+        )}
+        
+        {/* Botão de deletar projeto vazio */}
+        {data.projectId && (
+          <Button
+            onClick={() => setProjectToDelete(data.projectId!)}
+            variant="ghost"
+            size="sm"
+            className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Deletar Projeto (se vazio)
+          </Button>
+        )}
+        
+        {/* Modal de Confirmação de Deleção */}
+        {projectToDelete && (
+          <Card className="p-4 space-y-4 border-2 border-red-200 bg-red-50/50">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-lg text-red-800">Deletar Projeto?</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setProjectToDelete(null)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {canDeleteQuery.isLoading && (
+              <p className="text-sm text-gray-600">Verificando se o projeto pode ser deletado...</p>
+            )}
+            
+            {canDeleteQuery.data && (
+              <div className="space-y-3">
+                {canDeleteQuery.data.canDelete ? (
+                  <>
+                    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
+                      <p className="text-sm text-yellow-800 font-semibold mb-2">
+                        ⚠️ Este projeto está vazio e pode ser deletado permanentemente.
+                      </p>
+                      <p className="text-xs text-yellow-700">
+                        Pesquisas: {canDeleteQuery.data.stats?.pesquisas || 0} | 
+                        Clientes: {canDeleteQuery.data.stats?.clientes || 0} | 
+                        Mercados: {canDeleteQuery.data.stats?.mercados || 0}
+                      </p>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => deleteProject.mutate(projectToDelete)}
+                        disabled={deleteProject.isPending}
+                        variant="destructive"
+                        className="flex-1"
+                      >
+                        {deleteProject.isPending ? 'Deletando...' : 'Confirmar Deleção'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setProjectToDelete(null)}
+                        disabled={deleteProject.isPending}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="p-3 bg-red-50 border border-red-200 rounded">
+                      <p className="text-sm text-red-800 font-semibold mb-2">
+                        ❌ Este projeto NÃO pode ser deletado.
+                      </p>
+                      <p className="text-xs text-red-700">
+                        {canDeleteQuery.data.reason}
+                      </p>
+                      {canDeleteQuery.data.stats && (
+                        <p className="text-xs text-red-700 mt-1">
+                          Pesquisas: {canDeleteQuery.data.stats.pesquisas} | 
+                          Clientes: {canDeleteQuery.data.stats.clientes} | 
+                          Mercados: {canDeleteQuery.data.stats.mercados}
+                        </p>
+                      )}
+                    </div>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={() => setProjectToDelete(null)}
+                      className="w-full"
+                    >
+                      Fechar
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
+          </Card>
         )}
       </div>
     </div>

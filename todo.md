@@ -127,3 +127,45 @@
 - Estados de loading/erro/vazio implementados
 - Select desabilitado quando não há projetos
 - Navegação entre steps validada (Steps 1-4 testados)
+
+
+---
+
+## FASE 56: MELHORIAS AVANÇADAS NO WIZARD DE NOVA PESQUISA 🚀
+
+### 56.1 Botão "Criar Novo Projeto" no Step 1
+- [x] Criar modal de criação rápida de projeto
+- [x] Adicionar botão no Step 1 quando não há projetos
+- [x] Adicionar botão adicional quando já existem projetos
+- [x] Integrar com mutation projects.create
+- [x] Atualizar lista de projetos após criação
+- [x] Seleção automática do projeto recém-criado
+
+### 56.2 Função de Deletar Projetos Não Enriquecidos
+- [x] Criar função canDeleteProject no backend (verifica se projeto está vazio)
+- [x] Criar função deleteEmptyProject no backend
+- [x] Adicionar router tRPC projects.canDelete e projects.deleteEmpty
+- [x] Adicionar botão de deletar no Step 1 (apenas projetos vazios)
+- [x] Modal de confirmação com estatísticas antes de deletar
+- [x] Validação de projeto vazio (pesquisas, clientes, mercados)
+
+### 56.3 Sistema de Salvamento Automático (Drafts)
+- [ ] Criar tabela research_drafts no banco
+- [ ] Implementar funções saveDraft, getDraft, deleteDraft
+- [ ] Adicionar router tRPC draft.save, draft.get, draft.delete
+- [ ] Auto-save a cada mudança de step (debounce 2s)
+- [ ] Botão "Retomar Rascunho" na página inicial
+
+### 56.4 Preview/Resumo ao Final de Cada Step
+- [ ] Criar componente StepSummary reutilizável
+- [ ] Adicionar resumo no Step 2 (parâmetros configurados)
+- [ ] Adicionar resumo no Step 3 (método escolhido)
+- [ ] Adicionar resumo no Step 4 (dados inseridos)
+- [ ] Resumo final antes de criar pesquisa
+
+### 56.5 Testes e Validação
+- [ ] Testar criação de projeto inline
+- [ ] Testar deleção de projeto vazio
+- [ ] Testar salvamento e recuperação de rascunho
+- [ ] Testar navegação com resumos
+- [ ] Validar UX completa end-to-end

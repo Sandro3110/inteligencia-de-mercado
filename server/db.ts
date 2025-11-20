@@ -1081,6 +1081,86 @@ export async function deleteProject(id: number): Promise<boolean> {
   }
 }
 
+/**
+ * Verifica se um projeto pode ser deletado (está vazio/não enriquecido)
+ * Fase 56.2 - Função de Deletar Projetos Não Enriquecidos
+ */
+export async function canDeleteProject(projectId: number): Promise<{ canDelete: boolean; reason?: string; stats?: any }> {
+  const db = await getDb();
+  if (!db) return { canDelete: false, reason: "Database not available" };
+  
+  try {
+    // Contar pesquisas do projeto
+    const pesquisasCount = await db.select({ count: sql<number>`COUNT(*)` })
+      .from(pesquisas)
+      .where(eq(pesquisas.projectId, projectId));
+    
+    const totalPesquisas = Number(pesquisasCount[0]?.count || 0);
+    
+    // Contar clientes do projeto
+    const clientesCount = await db.select({ count: sql<number>`COUNT(*)` })
+      .from(clientes)
+      .where(eq(clientes.projectId, projectId));
+    
+    const totalClientes = Number(clientesCount[0]?.count || 0);
+    
+    // Contar mercados do projeto
+    const mercadosCount = await db.select({ count: sql<number>`COUNT(*)` })
+      .from(mercadosUnicos)
+      .where(eq(mercadosUnicos.projectId, projectId));
+    
+    const totalMercados = Number(mercadosCount[0]?.count || 0);
+    
+    const stats = {
+      pesquisas: totalPesquisas,
+      clientes: totalClientes,
+      mercados: totalMercados
+    };
+    
+    // Projeto pode ser deletado se não tiver nenhum dado
+    const isEmpty = totalPesquisas === 0 && totalClientes === 0 && totalMercados === 0;
+    
+    if (!isEmpty) {
+      return {
+        canDelete: false,
+        reason: "Projeto contém dados (pesquisas, clientes ou mercados)",
+        stats
+      };
+    }
+    
+    return { canDelete: true, stats };
+  } catch (error) {
+    console.error("[Database] Failed to check if project can be deleted:", error);
+    return { canDelete: false, reason: "Erro ao verificar projeto" };
+  }
+}
+
+/**
+ * Deleta permanentemente um projeto vazio (hard delete)
+ * Fase 56.2 - Função de Deletar Projetos Não Enriquecidos
+ */
+export async function deleteEmptyProject(projectId: number): Promise<{ success: boolean; error?: string }> {
+  const db = await getDb();
+  if (!db) return { success: false, error: "Database not available" };
+  
+  try {
+    // Verificar se pode deletar
+    const check = await canDeleteProject(projectId);
+    if (!check.canDelete) {
+      return { success: false, error: check.reason || "Projeto não pode ser deletado" };
+    }
+    
+    // Hard delete do projeto
+    await db.delete(projects).where(eq(projects.id, projectId));
+    
+    console.log(`[Database] Project ${projectId} deleted successfully`);
+    return { success: true };
+  } catch (error) {
+    console.error("[Database] Failed to delete empty project:", error);
+    return { success: false, error: "Erro ao deletar projeto" };
+  }
+}
+
 // ============================================
 // PESQUISA HELPERS
 // ============================================

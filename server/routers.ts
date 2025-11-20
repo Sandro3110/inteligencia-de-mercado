@@ -765,6 +765,20 @@ export const appRouter = router({
         const { deleteProject } = await import('./db');
         return deleteProject(input);
       }),
+
+    canDelete: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { canDeleteProject } = await import('./db');
+        return canDeleteProject(input);
+      }),
+
+    deleteEmpty: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { deleteEmptyProject } = await import('./db');
+        return deleteEmptyProject(input);
+      }),
   }),
 
   pesquisas: router({
