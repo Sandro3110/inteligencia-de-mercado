@@ -16,6 +16,7 @@ import { SaveFilterDialog } from "@/components/SaveFilterDialog";
 import { SavedFilters } from "@/components/SavedFilters";
 import { SkeletonMercado, SkeletonCliente, SkeletonConcorrente, SkeletonLead } from "@/components/SkeletonLoading";
 import { MercadoAccordionCard } from "@/components/MercadoAccordionCard";
+import { CompararMercadosModal } from "@/components/CompararMercadosModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -49,6 +50,7 @@ import {
   FileSpreadsheet,
   FileDown,
   List,
+  GitCompare,
 } from "lucide-react";
 import { exportToCSV, exportToExcel, exportToPDF, ExportData } from "@/lib/exportUtils";
 import {
@@ -83,6 +85,8 @@ export default function CascadeView() {
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [sortBy, setSortBy] = useState<"nome" | "qualidade" | "data" | "status">("nome");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [selectedMercadosForComparison, setSelectedMercadosForComparison] = useState<Set<number>>(new Set());
+  const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
   
   // Estados para filtros avançados
   const [mercadoFilters, setMercadoFilters] = useState<{
@@ -1093,6 +1097,29 @@ export default function CascadeView() {
 
           {/* Filtro de Status */}
           <div className="flex items-center gap-2 ml-auto">
+            {/* Botão Comparar Mercados (apenas na página de mercados) */}
+            {currentPage === "mercados" && selectedMercadosForComparison.size > 0 && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => {
+                  if (selectedMercadosForComparison.size < 2) {
+                    toast.error("Selecione pelo menos 2 mercados para comparar");
+                    return;
+                  }
+                  if (selectedMercadosForComparison.size > 3) {
+                    toast.error("Selecione no máximo 3 mercados para comparar");
+                    return;
+                  }
+                  setComparisonModalOpen(true);
+                }}
+                className="h-9"
+              >
+                <GitCompare className="w-4 h-4 mr-2" />
+                Comparar ({selectedMercadosForComparison.size})
+              </Button>
+            )}
+            
             {/* Seletor de Ordenação */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -1367,6 +1394,20 @@ export default function CascadeView() {
                                 <MercadoAccordionCard 
                                   mercado={mercado} 
                                   selectedProjectId={selectedProjectId}
+                                  isSelected={selectedMercadosForComparison.has(mercado.id)}
+                                  onToggleSelection={(id) => {
+                                    const newSet = new Set(selectedMercadosForComparison);
+                                    if (newSet.has(id)) {
+                                      newSet.delete(id);
+                                    } else {
+                                      if (newSet.size >= 3) {
+                                        toast.error("Você pode selecionar no máximo 3 mercados");
+                                        return;
+                                      }
+                                      newSet.add(id);
+                                    }
+                                    setSelectedMercadosForComparison(newSet);
+                                  }}
                                 />
                               </motion.div>
                             ))}
@@ -1706,6 +1747,14 @@ export default function CascadeView() {
         item={detailPopupItem}
         type={detailPopupType}
         onClose={() => setDetailPopupOpen(false)}
+      />
+
+      {/* Modal de Comparação de Mercados */}
+      <CompararMercadosModal
+        isOpen={comparisonModalOpen}
+        onClose={() => setComparisonModalOpen(false)}
+        mercadoIds={Array.from(selectedMercadosForComparison)}
+        mercados={filteredMercados}
       />
 
       {/* Botão Voltar ao Topo */}
