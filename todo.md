@@ -1419,3 +1419,14 @@ PROJECT (nível 1)
 - [x] Testar todas as páginas no navegador
 - [x] Verificar que não há novos erros
 - [x] Criar checkpoint final
+
+
+## Fase 45: Correção de Rotas dos Atalhos de Teclado 🔧
+
+### 45.1 Corrigir Mapeamento de Rotas
+- [x] Verificar rotas atuais no App.tsx
+- [x] Corrigir Ctrl+1 → Dashboard (rota correta)
+- [x] Corrigir Ctrl+2 → Mercados (rota correta)
+- [x] Corrigir Ctrl+3 → Analytics (rota correta)
+- [x] Corrigir Ctrl+4 → ROI (rota correta)
+- [x] Testar todos os atalhos no navegador

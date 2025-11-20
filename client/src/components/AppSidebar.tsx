@@ -48,7 +48,7 @@ const navSections: NavSection[] = [
     icon: Home,
     defaultOpen: true,
     items: [
-      { title: "Visão Geral", href: "/", icon: Home, shortcut: "Ctrl+1" },
+      { title: "Visão Geral", href: "/", icon: Home },
     ],
   },
   {
@@ -81,8 +81,8 @@ const navSections: NavSection[] = [
     icon: TrendingUp,
     defaultOpen: false,
     items: [
-      { title: "Dashboard", href: "/dashboard", icon: BarChart3, shortcut: "Ctrl+4" },
-      { title: "ROI", href: "/roi", icon: DollarSign },
+      { title: "Dashboard", href: "/dashboard", icon: BarChart3, shortcut: "Ctrl+1" },
+      { title: "ROI", href: "/roi", icon: DollarSign, shortcut: "Ctrl+4" },
       { title: "Funil", href: "/funil", icon: Filter },
     ],
   },
@@ -131,39 +131,12 @@ export function AppSidebar() {
     { enabled: !!selectedProjectId }
   );
 
-  // Atalhos de teclado
+  // Listener para evento de toggle sidebar
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        switch (e.key) {
-          case '1':
-            e.preventDefault();
-            setLocation('/');
-            break;
-          case '2':
-            e.preventDefault();
-            setLocation('/mercados');
-            break;
-          case '3':
-            e.preventDefault();
-            setLocation('/analytics');
-            break;
-          case '4':
-            e.preventDefault();
-            setLocation('/dashboard');
-            break;
-          case 'b':
-          case 'B':
-            e.preventDefault();
-            toggleSidebar();
-            break;
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [setLocation]);
+    const handleToggle = () => toggleSidebar();
+    window.addEventListener('toggle-sidebar' as any, handleToggle);
+    return () => window.removeEventListener('toggle-sidebar' as any, handleToggle);
+  }, []);
 
   const toggleSidebar = () => {
     setCollapsed(prev => {

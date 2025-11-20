@@ -60,65 +60,64 @@ export function GlobalShortcuts() {
       description: "Mostrar atalhos disponíveis"
     },
     {
-      key: "h",
-      ctrl: true,
-      handler: (e) => {
-        e.preventDefault();
-        setLocation("/");
-      },
-      description: "Ir para Início"
-    },
-    {
-      key: "d",
+      key: "1",
       ctrl: true,
       handler: (e) => {
         e.preventDefault();
         setLocation("/dashboard");
       },
-      description: "Ir para Dashboard"
+      description: "Navegar para Dashboard"
     },
     {
-      key: "a",
+      key: "2",
+      ctrl: true,
+      handler: (e) => {
+        e.preventDefault();
+        setLocation("/mercados");
+      },
+      description: "Navegar para Mercados"
+    },
+    {
+      key: "3",
       ctrl: true,
       handler: (e) => {
         e.preventDefault();
         setLocation("/analytics");
       },
-      description: "Ir para Analytics"
+      description: "Navegar para Analytics"
     },
     {
-      key: "r",
+      key: "4",
       ctrl: true,
       handler: (e) => {
         e.preventDefault();
         setLocation("/roi");
       },
-      description: "Ir para ROI"
+      description: "Navegar para ROI"
     },
     {
-      key: "f",
+      key: "b",
       ctrl: true,
       handler: (e) => {
         e.preventDefault();
-        setLocation("/funil");
+        const event = new CustomEvent('toggle-sidebar');
+        window.dispatchEvent(event);
       },
-      description: "Ir para Funil"
+      description: "Toggle sidebar (expandir/colapsar)"
     },
   ]);
 
   const shortcuts = [
+    { keys: ["Ctrl", "1"], description: "Navegar para Dashboard" },
+    { keys: ["Ctrl", "2"], description: "Navegar para Mercados" },
+    { keys: ["Ctrl", "3"], description: "Navegar para Analytics" },
+    { keys: ["Ctrl", "4"], description: "Navegar para ROI" },
+    { keys: ["Ctrl", "B"], description: "Toggle sidebar (expandir/colapsar)" },
     { keys: ["Ctrl", "K"], description: "Busca global" },
     { keys: ["Ctrl", "N"], description: "Novo projeto de enriquecimento" },
-    { keys: ["Ctrl", "H"], description: "Ir para Início" },
-    { keys: ["Ctrl", "D"], description: "Ir para Dashboard" },
-    { keys: ["Ctrl", "A"], description: "Ir para Analytics" },
-    { keys: ["Ctrl", "R"], description: "Ir para ROI" },
-    { keys: ["Ctrl", "F"], description: "Ir para Funil" },
     { keys: ["Ctrl", "/"], description: "Mostrar atalhos" },
     { keys: ["?"], description: "Mostrar atalhos" },
     { keys: ["Esc"], description: "Fechar modal/dialog" },
-    { keys: ["↑", "↓"], description: "Navegar em listas" },
-    { keys: ["Enter"], description: "Confirmar ação" },
   ];
 
   return (
