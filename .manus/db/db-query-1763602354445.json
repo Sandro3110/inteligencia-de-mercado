@@ -1,0 +1,16 @@
+{
+  "query": "\n-- 1. Criar pesquisa inicial\nINSERT INTO pesquisas (projectId, nome, descricao, totalClientes, clientesEnriquecidos, status)\nVALUES (\n  1,\n  'Base Inicial - 806 Clientes',\n  'Primeira base de clientes importada para enriquecimento',\n  806,\n  0,\n  'importado'\n);\n\n-- 2. Obter ID da pesquisa criada\nSET @pesquisaId = LAST_INSERT_ID();\n\n-- 3. Linkar todos os 806 clientes à pesquisa\nUPDATE clientes \nSET pesquisaId = @pesquisaId\nWHERE projectId = 1 AND pesquisaId IS NULL;\n\n-- 4. Verificar resultado\nSELECT \n  p.id as pesquisaId,\n  p.nome as pesquisaNome,\n  p.totalClientes,\n  COUNT(c.id) as clientesLinkados\nFROM pesquisas p\nLEFT JOIN clientes c ON c.pesquisaId = p.id\nWHERE p.id = @pesquisaId\nGROUP BY p.id;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- 1. Criar pesquisa inicial\nINSERT INTO pesquisas (projectId, nome, descricao, totalClientes, clientesEnriquecidos, status)\nVALUES (\n  1,\n  'Base Inicial - 806 Clientes',\n  'Primeira base de clientes importada para enriquecimento',\n  806,\n  0,\n  'importado'\n);\n\n-- 2. Obter ID da pesquisa criada\nSET @pesquisaId = LAST_INSERT_ID();\n\n-- 3. Linkar todos os 806 clientes à pesquisa\nUPDATE clientes \nSET pesquisaId = @pesquisaId\nWHERE projectId = 1 AND pesquisaId IS NULL;\n\n-- 4. Verificar resultado\nSELECT \n  p.id as pesquisaId,\n  p.nome as pesquisaNome,\n  p.totalClientes,\n  COUNT(c.id) as clientesLinkados\nFROM pesquisas p\nLEFT JOIN clientes c ON c.pesquisaId = p.id\nWHERE p.id = @pesquisaId\nGROUP BY p.id;\n",
+  "rows": [
+    {
+      "pesquisaId": "1",
+      "pesquisaNome": "Base Inicial - 806 Clientes",
+      "totalClientes": "806",
+      "clientesLinkados": "806"
+    }
+  ],
+  "messages": [],
+  "stdout": "pesquisaId\tpesquisaNome\ttotalClientes\tclientesLinkados\n1\tBase Inicial - 806 Clientes\t806\t806\n",
+  "stderr": "",
+  "execution_time_ms": 131
+}

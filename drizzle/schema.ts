@@ -33,6 +33,27 @@ export type Project = typeof projects.$inferSelect;
 export type InsertProject = typeof projects.$inferInsert;
 
 /**
+ * Pesquisas - Research batches/datasets within projects
+ * Each pesquisa represents one client import/enrichment batch
+ */
+export const pesquisas = mysqlTable("pesquisas", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  dataImportacao: timestamp("dataImportacao").defaultNow(),
+  totalClientes: int("totalClientes").default(0),
+  clientesEnriquecidos: int("clientesEnriquecidos").default(0),
+  status: mysqlEnum("status", ["importado", "enriquecendo", "concluido", "erro"]).default("importado"),
+  ativo: int("ativo").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type Pesquisa = typeof pesquisas.$inferSelect;
+export type InsertPesquisa = typeof pesquisas.$inferInsert;
+
+/**
  * Validation status enum for all validatable entities
  */
 export const validationStatusEnum = mysqlEnum("validationStatus", [
@@ -48,6 +69,7 @@ export const validationStatusEnum = mysqlEnum("validationStatus", [
 export const mercadosUnicos = mysqlTable("mercados_unicos", {
   id: int("id").primaryKey().autoincrement(),
   projectId: int("projectId").notNull(),
+  pesquisaId: int("pesquisaId"),
   mercadoHash: varchar("mercadoHash", { length: 255 }),
   nome: varchar("nome", { length: 255 }).notNull(),
   segmentacao: varchar("segmentacao", { length: 50 }),
@@ -69,6 +91,7 @@ export type InsertMercadoUnico = typeof mercadosUnicos.$inferInsert;
 export const clientes = mysqlTable("clientes", {
   id: int("id").primaryKey().autoincrement(),
   projectId: int("projectId").notNull(),
+  pesquisaId: int("pesquisaId"),
   clienteHash: varchar("clienteHash", { length: 255 }),
   nome: varchar("nome", { length: 255 }).notNull(),
   cnpj: varchar("cnpj", { length: 20 }),
@@ -117,6 +140,7 @@ export type InsertClienteMercado = typeof clientesMercados.$inferInsert;
 export const produtos = mysqlTable("produtos", {
   id: int("id").primaryKey().autoincrement(),
   projectId: int("projectId").notNull(),
+  pesquisaId: int("pesquisaId"),
   clienteId: int("clienteId").notNull(),
   mercadoId: int("mercadoId").notNull(),
   nome: varchar("nome", { length: 255 }).notNull(),
@@ -138,6 +162,7 @@ export type InsertProduto = typeof produtos.$inferInsert;
 export const concorrentes = mysqlTable("concorrentes", {
   id: int("id").primaryKey().autoincrement(),
   projectId: int("projectId").notNull(),
+  pesquisaId: int("pesquisaId"),
   concorrenteHash: varchar("concorrenteHash", { length: 255 }),
   mercadoId: int("mercadoId").notNull(),
   nome: varchar("nome", { length: 255 }).notNull(),
@@ -176,6 +201,7 @@ export const leadStageEnum = mysqlEnum("leadStage", [
 export const leads = mysqlTable("leads", {
   id: int("id").primaryKey().autoincrement(),
   projectId: int("projectId").notNull(),
+  pesquisaId: int("pesquisaId"),
   leadHash: varchar("leadHash", { length: 255 }),
   mercadoId: int("mercadoId").notNull(),
   nome: varchar("nome", { length: 255 }).notNull(),

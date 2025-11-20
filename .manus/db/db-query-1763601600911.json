@@ -1,0 +1,55 @@
+{
+  "query": "\n-- Análise detalhada dos clientes\nSELECT \n  'Total clientes' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1\n\nUNION ALL\n\nSELECT \n  'Com CNPJ' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND cnpj IS NOT NULL AND cnpj != ''\n\nUNION ALL\n\nSELECT \n  'Com Site' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND siteOficial IS NOT NULL AND siteOficial != ''\n\nUNION ALL\n\nSELECT \n  'Com Produto Principal' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND produtoPrincipal IS NOT NULL AND produtoPrincipal != ''\n\nUNION ALL\n\nSELECT \n  'Com Cidade' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND cidade IS NOT NULL AND cidade != ''\n\nUNION ALL\n\nSELECT \n  'Com Email' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND email IS NOT NULL AND email != ''\n\nUNION ALL\n\nSELECT \n  'Com Telefone' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND telefone IS NOT NULL AND telefone != ''\n\nUNION ALL\n\nSELECT \n  'Com Quality Score' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND qualidadeScore IS NOT NULL\n\nUNION ALL\n\nSELECT \n  'Com Classificação' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND qualidadeClassificacao IS NOT NULL;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Análise detalhada dos clientes\nSELECT \n  'Total clientes' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1\n\nUNION ALL\n\nSELECT \n  'Com CNPJ' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND cnpj IS NOT NULL AND cnpj != ''\n\nUNION ALL\n\nSELECT \n  'Com Site' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND siteOficial IS NOT NULL AND siteOficial != ''\n\nUNION ALL\n\nSELECT \n  'Com Produto Principal' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND produtoPrincipal IS NOT NULL AND produtoPrincipal != ''\n\nUNION ALL\n\nSELECT \n  'Com Cidade' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND cidade IS NOT NULL AND cidade != ''\n\nUNION ALL\n\nSELECT \n  'Com Email' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND email IS NOT NULL AND email != ''\n\nUNION ALL\n\nSELECT \n  'Com Telefone' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND telefone IS NOT NULL AND telefone != ''\n\nUNION ALL\n\nSELECT \n  'Com Quality Score' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND qualidadeScore IS NOT NULL\n\nUNION ALL\n\nSELECT \n  'Com Classificação' as metrica,\n  COUNT(*) as valor,\n  ROUND(COUNT(*) * 100.0 / 806, 1) as percentual\nFROM clientes\nWHERE projectId = 1 AND qualidadeClassificacao IS NOT NULL;\n",
+  "rows": [
+    {
+      "metrica": "Total clientes",
+      "valor": "806",
+      "percentual": "100.0"
+    },
+    {
+      "metrica": "Com Site",
+      "valor": "11",
+      "percentual": "1.4"
+    },
+    {
+      "metrica": "Com Cidade",
+      "valor": "11",
+      "percentual": "1.4"
+    },
+    {
+      "metrica": "Com CNPJ",
+      "valor": "805",
+      "percentual": "99.9"
+    },
+    {
+      "metrica": "Com Produto Principal",
+      "valor": "796",
+      "percentual": "98.8"
+    },
+    {
+      "metrica": "Com Email",
+      "valor": "11",
+      "percentual": "1.4"
+    },
+    {
+      "metrica": "Com Classificação",
+      "valor": "11",
+      "percentual": "1.4"
+    },
+    {
+      "metrica": "Com Quality Score",
+      "valor": "11",
+      "percentual": "1.4"
+    },
+    {
+      "metrica": "Com Telefone",
+      "valor": "11",
+      "percentual": "1.4"
+    }
+  ],
+  "messages": [],
+  "stdout": "metrica\tvalor\tpercentual\nTotal clientes\t806\t100.0\nCom Site\t11\t1.4\nCom Cidade\t11\t1.4\nCom CNPJ\t805\t99.9\nCom Produto Principal\t796\t98.8\nCom Email\t11\t1.4\nCom Classificação\t11\t1.4\nCom Quality Score\t11\t1.4\nCom Telefone\t11\t1.4\n",
+  "stderr": "",
+  "execution_time_ms": 83
+}

@@ -1,0 +1,70 @@
+{
+  "query": "\n-- Listar todas as tabelas e contagem de registros\nSELECT \n  'users' as tabela,\n  COUNT(*) as registros,\n  'Usuários do sistema (autenticação)' as funcao\nFROM users\nUNION ALL\nSELECT \n  'projects' as tabela,\n  COUNT(*) as registros,\n  'Projetos/workspaces separados' as funcao\nFROM projects\nUNION ALL\nSELECT \n  'clientes' as tabela,\n  COUNT(*) as registros,\n  'Base de clientes (806 originais)' as funcao\nFROM clientes\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'mercados_unicos' as tabela,\n  COUNT(*) as registros,\n  'Mercados identificados (enriquecimento)' as funcao\nFROM mercados_unicos\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'clientes_mercados' as tabela,\n  COUNT(*) as registros,\n  'Associação clientes ↔ mercados' as funcao\nFROM clientes_mercados\nUNION ALL\nSELECT \n  'produtos' as tabela,\n  COUNT(*) as registros,\n  'Produtos dos clientes por mercado' as funcao\nFROM produtos\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'concorrentes' as tabela,\n  COUNT(*) as registros,\n  'Concorrentes por mercado' as funcao\nFROM concorrentes\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'leads' as tabela,\n  COUNT(*) as registros,\n  'Leads potenciais por mercado' as funcao\nFROM leads\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'tags' as tabela,\n  COUNT(*) as registros,\n  'Tags personalizadas' as funcao\nFROM tags\nUNION ALL\nSELECT \n  'entity_tags' as tabela,\n  COUNT(*) as registros,\n  'Associação entidades ↔ tags' as funcao\nFROM entity_tags\nUNION ALL\nSELECT \n  'saved_filters' as tabela,\n  COUNT(*) as registros,\n  'Filtros salvos por usuário' as funcao\nFROM saved_filters\nUNION ALL\nSELECT \n  'notifications' as tabela,\n  COUNT(*) as registros,\n  'Notificações e alertas' as funcao\nFROM notifications;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Listar todas as tabelas e contagem de registros\nSELECT \n  'users' as tabela,\n  COUNT(*) as registros,\n  'Usuários do sistema (autenticação)' as funcao\nFROM users\nUNION ALL\nSELECT \n  'projects' as tabela,\n  COUNT(*) as registros,\n  'Projetos/workspaces separados' as funcao\nFROM projects\nUNION ALL\nSELECT \n  'clientes' as tabela,\n  COUNT(*) as registros,\n  'Base de clientes (806 originais)' as funcao\nFROM clientes\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'mercados_unicos' as tabela,\n  COUNT(*) as registros,\n  'Mercados identificados (enriquecimento)' as funcao\nFROM mercados_unicos\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'clientes_mercados' as tabela,\n  COUNT(*) as registros,\n  'Associação clientes ↔ mercados' as funcao\nFROM clientes_mercados\nUNION ALL\nSELECT \n  'produtos' as tabela,\n  COUNT(*) as registros,\n  'Produtos dos clientes por mercado' as funcao\nFROM produtos\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'concorrentes' as tabela,\n  COUNT(*) as registros,\n  'Concorrentes por mercado' as funcao\nFROM concorrentes\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'leads' as tabela,\n  COUNT(*) as registros,\n  'Leads potenciais por mercado' as funcao\nFROM leads\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'tags' as tabela,\n  COUNT(*) as registros,\n  'Tags personalizadas' as funcao\nFROM tags\nUNION ALL\nSELECT \n  'entity_tags' as tabela,\n  COUNT(*) as registros,\n  'Associação entidades ↔ tags' as funcao\nFROM entity_tags\nUNION ALL\nSELECT \n  'saved_filters' as tabela,\n  COUNT(*) as registros,\n  'Filtros salvos por usuário' as funcao\nFROM saved_filters\nUNION ALL\nSELECT \n  'notifications' as tabela,\n  COUNT(*) as registros,\n  'Notificações e alertas' as funcao\nFROM notifications;\n",
+  "rows": [
+    {
+      "tabela": "users",
+      "registros": "3",
+      "funcao": "Usuários do sistema (autenticação)"
+    },
+    {
+      "tabela": "clientes",
+      "registros": "806",
+      "funcao": "Base de clientes (806 originais)"
+    },
+    {
+      "tabela": "projects",
+      "registros": "3",
+      "funcao": "Projetos/workspaces separados"
+    },
+    {
+      "tabela": "clientes_mercados",
+      "registros": "0",
+      "funcao": "Associação clientes ↔ mercados"
+    },
+    {
+      "tabela": "mercados_unicos",
+      "registros": "0",
+      "funcao": "Mercados identificados (enriquecimento)"
+    },
+    {
+      "tabela": "produtos",
+      "registros": "0",
+      "funcao": "Produtos dos clientes por mercado"
+    },
+    {
+      "tabela": "tags",
+      "registros": "1",
+      "funcao": "Tags personalizadas"
+    },
+    {
+      "tabela": "entity_tags",
+      "registros": "1",
+      "funcao": "Associação entidades ↔ tags"
+    },
+    {
+      "tabela": "notifications",
+      "registros": "0",
+      "funcao": "Notificações e alertas"
+    },
+    {
+      "tabela": "saved_filters",
+      "registros": "0",
+      "funcao": "Filtros salvos por usuário"
+    },
+    {
+      "tabela": "concorrentes",
+      "registros": "0",
+      "funcao": "Concorrentes por mercado"
+    },
+    {
+      "tabela": "leads",
+      "registros": "0",
+      "funcao": "Leads potenciais por mercado"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\tregistros\tfuncao\nusers\t3\tUsuários do sistema (autenticação)\nclientes\t806\tBase de clientes (806 originais)\nprojects\t3\tProjetos/workspaces separados\nclientes_mercados\t0\tAssociação clientes ↔ mercados\nmercados_unicos\t0\tMercados identificados (enriquecimento)\nprodutos\t0\tProdutos dos clientes por mercado\ntags\t1\tTags personalizadas\nentity_tags\t1\tAssociação entidades ↔ tags\nnotifications\t0\tNotificações e alertas\nsaved_filters\t0\tFiltros salvos por usuário\nconcorrentes\t0\tConcorrentes por mercado\nleads\t0\tLeads potenciais por mercado\n",
+  "stderr": "",
+  "execution_time_ms": 70
+}

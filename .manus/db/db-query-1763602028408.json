@@ -1,0 +1,36 @@
+{
+  "query": "\n-- Verificar projetos existentes\nSELECT \n  id,\n  nome,\n  descricao,\n  ativo,\n  createdAt\nFROM projects;\n\n-- Verificar distribuição de clientes por projeto\nSELECT \n  projectId,\n  COUNT(*) as total_clientes,\n  COUNT(CASE WHEN validationStatus IS NOT NULL THEN 1 END) as enriquecidos\nFROM clientes\nGROUP BY projectId;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Verificar projetos existentes\nSELECT \n  id,\n  nome,\n  descricao,\n  ativo,\n  createdAt\nFROM projects;\n\n-- Verificar distribuição de clientes por projeto\nSELECT \n  projectId,\n  COUNT(*) as total_clientes,\n  COUNT(CASE WHEN validationStatus IS NOT NULL THEN 1 END) as enriquecidos\nFROM clientes\nGROUP BY projectId;\n",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Embalagens",
+      "descricao": "Projeto de pesquisa de mercado para o setor de embalagens",
+      "ativo": "1",
+      "createdAt": "2025-11-18 18:29:46"
+    },
+    {
+      "id": "300001",
+      "nome": "Agro",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-19 14:24:30"
+    },
+    {
+      "id": "300002",
+      "nome": "Agro",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "ativo": "1",
+      "createdAt": "2025-11-19 14:24:34"
+    }
+  ],
+  "messages": [
+    "projectId\ttotal_clientes\tenriquecidos",
+    "300002\t1\t1",
+    "1\t806\t0",
+    "300001\t1\t1"
+  ],
+  "stdout": "id\tnome\tdescricao\tativo\tcreatedAt\n1\tEmbalagens\tProjeto de pesquisa de mercado para o setor de embalagens\t1\t2025-11-18 18:29:46\n300001\tAgro\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-19 14:24:30\n300002\tAgro\tProjeto criado automaticamente via fluxo de enriquecimento\t1\t2025-11-19 14:24:34\nprojectId\ttotal_clientes\tenriquecidos\n300002\t1\t1\n1\t806\t0\n300001\t1\t1\n",
+  "stderr": "",
+  "execution_time_ms": 731
+}

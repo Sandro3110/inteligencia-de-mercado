@@ -1,0 +1,24 @@
+{
+  "query": "\n-- Validar estrutura completa\nSELECT \n  'Pesquisa' as entidade,\n  p.id,\n  p.nome,\n  p.totalClientes,\n  NULL as pesquisaId\nFROM pesquisas p\nWHERE p.id = 1\n\nUNION ALL\n\nSELECT \n  'Clientes' as entidade,\n  COUNT(*) as id,\n  'Total linkados' as nome,\n  NULL as totalClientes,\n  pesquisaId\nFROM clientes\nWHERE projectId = 1\nGROUP BY pesquisaId\n\nUNION ALL\n\nSELECT \n  'Mercados' as entidade,\n  COUNT(*) as id,\n  'Total' as nome,\n  NULL as totalClientes,\n  pesquisaId\nFROM mercados_unicos\nWHERE projectId = 1\nGROUP BY pesquisaId\n\nUNION ALL\n\nSELECT \n  'Produtos' as entidade,\n  COUNT(*) as id,\n  'Total' as nome,\n  NULL as totalClientes,\n  pesquisaId\nFROM produtos\nWHERE projectId = 1\nGROUP BY pesquisaId\n\nUNION ALL\n\nSELECT \n  'Concorrentes' as entidade,\n  COUNT(*) as id,\n  'Total' as nome,\n  NULL as totalClientes,\n  pesquisaId\nFROM concorrentes\nWHERE projectId = 1\nGROUP BY pesquisaId\n\nUNION ALL\n\nSELECT \n  'Leads' as entidade,\n  COUNT(*) as id,\n  'Total' as nome,\n  NULL as totalClientes,\n  pesquisaId\nFROM leads\nWHERE projectId = 1\nGROUP BY pesquisaId;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Validar estrutura completa\nSELECT \n  'Pesquisa' as entidade,\n  p.id,\n  p.nome,\n  p.totalClientes,\n  NULL as pesquisaId\nFROM pesquisas p\nWHERE p.id = 1\n\nUNION ALL\n\nSELECT \n  'Clientes' as entidade,\n  COUNT(*) as id,\n  'Total linkados' as nome,\n  NULL as totalClientes,\n  pesquisaId\nFROM clientes\nWHERE projectId = 1\nGROUP BY pesquisaId\n\nUNION ALL\n\nSELECT \n  'Mercados' as entidade,\n  COUNT(*) as id,\n  'Total' as nome,\n  NULL as totalClientes,\n  pesquisaId\nFROM mercados_unicos\nWHERE projectId = 1\nGROUP BY pesquisaId\n\nUNION ALL\n\nSELECT \n  'Produtos' as entidade,\n  COUNT(*) as id,\n  'Total' as nome,\n  NULL as totalClientes,\n  pesquisaId\nFROM produtos\nWHERE projectId = 1\nGROUP BY pesquisaId\n\nUNION ALL\n\nSELECT \n  'Concorrentes' as entidade,\n  COUNT(*) as id,\n  'Total' as nome,\n  NULL as totalClientes,\n  pesquisaId\nFROM concorrentes\nWHERE projectId = 1\nGROUP BY pesquisaId\n\nUNION ALL\n\nSELECT \n  'Leads' as entidade,\n  COUNT(*) as id,\n  'Total' as nome,\n  NULL as totalClientes,\n  pesquisaId\nFROM leads\nWHERE projectId = 1\nGROUP BY pesquisaId;\n",
+  "rows": [
+    {
+      "entidade": "Pesquisa",
+      "id": "1",
+      "nome": "Embalagens 2025",
+      "totalClientes": "806",
+      "pesquisaId": "NULL"
+    },
+    {
+      "entidade": "Clientes",
+      "id": "806",
+      "nome": "Total linkados",
+      "totalClientes": "NULL",
+      "pesquisaId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "entidade\tid\tnome\ttotalClientes\tpesquisaId\nPesquisa\t1\tEmbalagens 2025\t806\tNULL\nClientes\t806\tTotal linkados\tNULL\t1\n",
+  "stderr": "",
+  "execution_time_ms": 86
+}

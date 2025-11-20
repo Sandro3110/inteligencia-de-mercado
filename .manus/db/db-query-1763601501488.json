@@ -1,0 +1,40 @@
+{
+  "query": "\nSELECT \n  'clientes' as tabela,\n  COUNT(*) as total,\n  COUNT(CASE WHEN validationStatus IS NOT NULL THEN 1 END) as enriquecidos\nFROM clientes\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'mercados_unicos' as tabela,\n  COUNT(*) as total,\n  NULL as enriquecidos\nFROM mercados_unicos\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'produtos' as tabela,\n  COUNT(*) as total,\n  NULL as enriquecidos\nFROM produtos\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'concorrentes' as tabela,\n  COUNT(*) as total,\n  NULL as enriquecidos\nFROM concorrentes\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'leads' as tabela,\n  COUNT(*) as total,\n  NULL as enriquecidos\nFROM leads\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'clientes_mercados' as tabela,\n  COUNT(*) as total,\n  NULL as enriquecidos\nFROM clientes_mercados;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  'clientes' as tabela,\n  COUNT(*) as total,\n  COUNT(CASE WHEN validationStatus IS NOT NULL THEN 1 END) as enriquecidos\nFROM clientes\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'mercados_unicos' as tabela,\n  COUNT(*) as total,\n  NULL as enriquecidos\nFROM mercados_unicos\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'produtos' as tabela,\n  COUNT(*) as total,\n  NULL as enriquecidos\nFROM produtos\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'concorrentes' as tabela,\n  COUNT(*) as total,\n  NULL as enriquecidos\nFROM concorrentes\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'leads' as tabela,\n  COUNT(*) as total,\n  NULL as enriquecidos\nFROM leads\nWHERE projectId = 1\nUNION ALL\nSELECT \n  'clientes_mercados' as tabela,\n  COUNT(*) as total,\n  NULL as enriquecidos\nFROM clientes_mercados;\n",
+  "rows": [
+    {
+      "tabela": "mercados_unicos",
+      "total": "192",
+      "enriquecidos": "NULL"
+    },
+    {
+      "tabela": "clientes",
+      "total": "806",
+      "enriquecidos": "806"
+    },
+    {
+      "tabela": "produtos",
+      "total": "416",
+      "enriquecidos": "NULL"
+    },
+    {
+      "tabela": "concorrentes",
+      "total": "713",
+      "enriquecidos": "NULL"
+    },
+    {
+      "tabela": "clientes_mercados",
+      "total": "177",
+      "enriquecidos": "NULL"
+    },
+    {
+      "tabela": "leads",
+      "total": "360",
+      "enriquecidos": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\ttotal\tenriquecidos\nmercados_unicos\t192\tNULL\nclientes\t806\t806\nprodutos\t416\tNULL\nconcorrentes\t713\tNULL\nclientes_mercados\t177\tNULL\nleads\t360\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 122
+}

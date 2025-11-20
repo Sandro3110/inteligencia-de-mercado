@@ -1,0 +1,20 @@
+{
+  "query": "\n-- 1. Deletar associações clientes-mercados\nDELETE FROM clientes_mercados;\n\n-- 2. Deletar leads\nDELETE FROM leads WHERE projectId = 1;\n\n-- 3. Deletar concorrentes\nDELETE FROM concorrentes WHERE projectId = 1;\n\n-- 4. Deletar produtos\nDELETE FROM produtos WHERE projectId = 1;\n\n-- 5. Deletar mercados\nDELETE FROM mercados_unicos WHERE projectId = 1;\n\n-- 6. Resetar status de validação dos clientes (manter dados originais)\nUPDATE clientes \nSET \n  validationStatus = NULL,\n  validatedAt = NULL,\n  validatedBy = NULL\nWHERE projectId = 1;\n\n-- Verificar resultado\nSELECT \n  'APÓS LIMPEZA' as status,\n  (SELECT COUNT(*) FROM clientes WHERE projectId = 1) as clientes_total,\n  (SELECT COUNT(*) FROM clientes WHERE projectId = 1 AND validationStatus IS NOT NULL) as clientes_enriquecidos,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE projectId = 1) as mercados,\n  (SELECT COUNT(*) FROM produtos WHERE projectId = 1) as produtos,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = 1) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE projectId = 1) as leads,\n  (SELECT COUNT(*) FROM clientes_mercados) as associacoes;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- 1. Deletar associações clientes-mercados\nDELETE FROM clientes_mercados;\n\n-- 2. Deletar leads\nDELETE FROM leads WHERE projectId = 1;\n\n-- 3. Deletar concorrentes\nDELETE FROM concorrentes WHERE projectId = 1;\n\n-- 4. Deletar produtos\nDELETE FROM produtos WHERE projectId = 1;\n\n-- 5. Deletar mercados\nDELETE FROM mercados_unicos WHERE projectId = 1;\n\n-- 6. Resetar status de validação dos clientes (manter dados originais)\nUPDATE clientes \nSET \n  validationStatus = NULL,\n  validatedAt = NULL,\n  validatedBy = NULL\nWHERE projectId = 1;\n\n-- Verificar resultado\nSELECT \n  'APÓS LIMPEZA' as status,\n  (SELECT COUNT(*) FROM clientes WHERE projectId = 1) as clientes_total,\n  (SELECT COUNT(*) FROM clientes WHERE projectId = 1 AND validationStatus IS NOT NULL) as clientes_enriquecidos,\n  (SELECT COUNT(*) FROM mercados_unicos WHERE projectId = 1) as mercados,\n  (SELECT COUNT(*) FROM produtos WHERE projectId = 1) as produtos,\n  (SELECT COUNT(*) FROM concorrentes WHERE projectId = 1) as concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE projectId = 1) as leads,\n  (SELECT COUNT(*) FROM clientes_mercados) as associacoes;\n",
+  "rows": [
+    {
+      "status": "APÓS LIMPEZA",
+      "clientes_total": "806",
+      "clientes_enriquecidos": "0",
+      "mercados": "0",
+      "produtos": "0",
+      "concorrentes": "0",
+      "leads": "0",
+      "associacoes": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "status\tclientes_total\tclientes_enriquecidos\tmercados\tprodutos\tconcorrentes\tleads\tassociacoes\nAPÓS LIMPEZA\t806\t0\t0\t0\t0\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 268
+}

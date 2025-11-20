@@ -1,0 +1,19 @@
+{
+  "query": "\nUPDATE pesquisas \nSET \n  nome = 'Embalagens 2025',\n  descricao = 'Base inicial de 806 clientes do setor de embalagens para enriquecimento'\nWHERE id = 1;\n\nSELECT \n  id,\n  projectId,\n  nome,\n  descricao,\n  totalClientes,\n  clientesEnriquecidos,\n  status\nFROM pesquisas\nWHERE id = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nUPDATE pesquisas \nSET \n  nome = 'Embalagens 2025',\n  descricao = 'Base inicial de 806 clientes do setor de embalagens para enriquecimento'\nWHERE id = 1;\n\nSELECT \n  id,\n  projectId,\n  nome,\n  descricao,\n  totalClientes,\n  clientesEnriquecidos,\n  status\nFROM pesquisas\nWHERE id = 1;\n",
+  "rows": [
+    {
+      "id": "1",
+      "projectId": "1",
+      "nome": "Embalagens 2025",
+      "descricao": "Base inicial de 806 clientes do setor de embalagens para enriquecimento",
+      "totalClientes": "806",
+      "clientesEnriquecidos": "0",
+      "status": "importado"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tprojectId\tnome\tdescricao\ttotalClientes\tclientesEnriquecidos\tstatus\n1\t1\tEmbalagens 2025\tBase inicial de 806 clientes do setor de embalagens para enriquecimento\t806\t0\timportado\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

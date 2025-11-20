@@ -7,9 +7,23 @@
 
 interface Cliente {
   nome: string;
+  cnpj?: string;
   produtoPrincipal?: string;
   siteOficial?: string;
   cidade?: string;
+}
+
+interface ClienteEnriquecidoData {
+  siteOficial?: string;
+  produtoPrincipal?: string;
+  cidade?: string;
+  uf?: string;
+  regiao?: string;
+  porte?: string;
+  email?: string;
+  telefone?: string;
+  linkedin?: string;
+  instagram?: string;
 }
 
 interface MercadoData {
@@ -41,6 +55,7 @@ interface LeadData {
 }
 
 interface EnrichmentData {
+  clienteEnriquecido: ClienteEnriquecidoData;
   mercados: Array<{
     mercado: MercadoData;
     produtos: ProdutoData[];
@@ -79,13 +94,21 @@ Sempre retorne JSON válido e estruturado conforme especificado.`;
   const userPrompt = `**EMPRESA PARA ANÁLISE:**
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 Nome: ${cliente.nome}
-🏭 Produto Principal: ${cliente.produtoPrincipal || 'Não informado'}
-🌐 Site: ${cliente.siteOficial || 'Não informado'}
-📍 Cidade: ${cliente.cidade || 'Brasil'}
+${cliente.cnpj ? `🆔 CNPJ: ${cliente.cnpj}` : ''}
+🏭 Produto Principal: ${cliente.produtoPrincipal || 'Não informado - PESQUISE'}
+🌐 Site: ${cliente.siteOficial || 'Não informado - PESQUISE'}
+📍 Cidade: ${cliente.cidade || 'Brasil - PESQUISE'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 **TAREFA:**
-Gere um relatório completo de inteligência de mercado identificando:
+Gere um relatório completo de inteligência de mercado:
+
+0️⃣ **PRIMEIRO: ENRIQUECER DADOS DO CLIENTE**
+   - Pesquise informações reais sobre esta empresa
+   - Se não informado, pesquise: site oficial, produto principal, cidade, UF, região
+   - Estime: porte (Pequeno/Médio/Grande)
+   - Se possível, encontre: email, telefone, LinkedIn, Instagram
+   - NÃO invente dados - se não encontrar, deixe em branco
 
 1️⃣ **2 MERCADOS PRINCIPAIS** onde esta empresa atua ou pode atuar
 
@@ -135,6 +158,18 @@ Para cada mercado, forneça:
 
 **FORMATO JSON ESPERADO:**
 {
+  "clienteEnriquecido": {
+    "siteOficial": "https://www.site-real-da-empresa.com.br",
+    "produtoPrincipal": "Descrição do produto/serviço principal",
+    "cidade": "São Paulo",
+    "uf": "SP",
+    "regiao": "Sudeste",
+    "porte": "Médio",
+    "email": "contato@empresa.com.br",
+    "telefone": "(11) 1234-5678",
+    "linkedin": "https://linkedin.com/company/empresa",
+    "instagram": "@empresa"
+  },
   "mercados": [
     {
       "mercado": {

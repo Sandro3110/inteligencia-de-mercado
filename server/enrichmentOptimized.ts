@@ -132,6 +132,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
           .insert(mercadosUnicos)
           .values({
             projectId,
+            pesquisaId: cliente.pesquisaId || null,
             nome: truncate(mercadoData.nome, 100),
             categoria: mercadoData.categoria,
             segmentacao: truncate(mercadoData.segmentacao, 50),
@@ -155,6 +156,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
       for (const produtoData of mercadoItem.produtos) {
         await db.insert(produtos).values({
           projectId,
+          pesquisaId: cliente.pesquisaId || null,
           clienteId,
           mercadoId,
           nome: truncate(produtoData.nome, 200),
@@ -194,6 +196,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
         if (!existing) {
           await db.insert(concorrentes).values({
             projectId,
+            pesquisaId: cliente.pesquisaId || null,
             mercadoId,
             nome: truncate(concorrenteData.nome, 200),
             produto: truncate(concorrenteData.descricao, 200), // ✅ BUG FIX 1: OpenAI retorna 'descricao'
@@ -236,6 +239,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
         if (!existing) {
           await db.insert(leads).values({
             projectId,
+            pesquisaId: cliente.pesquisaId || null,
             mercadoId,
             nome: truncate(leadData.nome, 200),
             setor: truncate(leadData.segmento, 100),
@@ -244,7 +248,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
             qualidadeScore: qualityScore,
             qualidadeClassificacao: getQualityClassification(qualityScore), // ✅ BUG FIX 2: Adicionar classificação
             validationStatus: 'pending', // ✅ BUG FIX 2: Status inicial
-            leadStage: 'novo', // ✅ BUG FIX 2: Stage inicial
+            stage: 'novo', // ✅ BUG FIX 2: Stage inicial
             leadHash,
             createdAt: new Date()
           });

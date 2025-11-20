@@ -1,0 +1,50 @@
+{
+  "query": "\n-- Validação completa\nSELECT \n  'Clientes' as item,\n  COUNT(*) as quantidade,\n  'Mantidos intactos' as status\nFROM clientes \nWHERE projectId = 1\n\nUNION ALL\n\nSELECT \n  'Clientes com nome' as item,\n  COUNT(*) as quantidade,\n  'OK' as status\nFROM clientes \nWHERE projectId = 1 AND nome IS NOT NULL AND nome != ''\n\nUNION ALL\n\nSELECT \n  'Clientes enriquecidos' as item,\n  COUNT(*) as quantidade,\n  'Deve ser 0' as status\nFROM clientes \nWHERE projectId = 1 AND validationStatus IS NOT NULL\n\nUNION ALL\n\nSELECT \n  'Mercados' as item,\n  COUNT(*) as quantidade,\n  'Deve ser 0' as status\nFROM mercados_unicos \nWHERE projectId = 1\n\nUNION ALL\n\nSELECT \n  'Produtos' as item,\n  COUNT(*) as quantidade,\n  'Deve ser 0' as status\nFROM produtos \nWHERE projectId = 1\n\nUNION ALL\n\nSELECT \n  'Concorrentes' as item,\n  COUNT(*) as quantidade,\n  'Deve ser 0' as status\nFROM concorrentes \nWHERE projectId = 1\n\nUNION ALL\n\nSELECT \n  'Leads' as item,\n  COUNT(*) as quantidade,\n  'Deve ser 0' as status\nFROM leads \nWHERE projectId = 1\n\nUNION ALL\n\nSELECT \n  'Associações' as item,\n  COUNT(*) as quantidade,\n  'Deve ser 0' as status\nFROM clientes_mercados;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \n-- Validação completa\nSELECT \n  'Clientes' as item,\n  COUNT(*) as quantidade,\n  'Mantidos intactos' as status\nFROM clientes \nWHERE projectId = 1\n\nUNION ALL\n\nSELECT \n  'Clientes com nome' as item,\n  COUNT(*) as quantidade,\n  'OK' as status\nFROM clientes \nWHERE projectId = 1 AND nome IS NOT NULL AND nome != ''\n\nUNION ALL\n\nSELECT \n  'Clientes enriquecidos' as item,\n  COUNT(*) as quantidade,\n  'Deve ser 0' as status\nFROM clientes \nWHERE projectId = 1 AND validationStatus IS NOT NULL\n\nUNION ALL\n\nSELECT \n  'Mercados' as item,\n  COUNT(*) as quantidade,\n  'Deve ser 0' as status\nFROM mercados_unicos \nWHERE projectId = 1\n\nUNION ALL\n\nSELECT \n  'Produtos' as item,\n  COUNT(*) as quantidade,\n  'Deve ser 0' as status\nFROM produtos \nWHERE projectId = 1\n\nUNION ALL\n\nSELECT \n  'Concorrentes' as item,\n  COUNT(*) as quantidade,\n  'Deve ser 0' as status\nFROM concorrentes \nWHERE projectId = 1\n\nUNION ALL\n\nSELECT \n  'Leads' as item,\n  COUNT(*) as quantidade,\n  'Deve ser 0' as status\nFROM leads \nWHERE projectId = 1\n\nUNION ALL\n\nSELECT \n  'Associações' as item,\n  COUNT(*) as quantidade,\n  'Deve ser 0' as status\nFROM clientes_mercados;\n",
+  "rows": [
+    {
+      "item": "Clientes",
+      "quantidade": "806",
+      "status": "Mantidos intactos"
+    },
+    {
+      "item": "Produtos",
+      "quantidade": "0",
+      "status": "Deve ser 0"
+    },
+    {
+      "item": "Clientes enriquecidos",
+      "quantidade": "0",
+      "status": "Deve ser 0"
+    },
+    {
+      "item": "Mercados",
+      "quantidade": "0",
+      "status": "Deve ser 0"
+    },
+    {
+      "item": "Clientes com nome",
+      "quantidade": "806",
+      "status": "OK"
+    },
+    {
+      "item": "Associações",
+      "quantidade": "0",
+      "status": "Deve ser 0"
+    },
+    {
+      "item": "Concorrentes",
+      "quantidade": "0",
+      "status": "Deve ser 0"
+    },
+    {
+      "item": "Leads",
+      "quantidade": "0",
+      "status": "Deve ser 0"
+    }
+  ],
+  "messages": [],
+  "stdout": "item\tquantidade\tstatus\nClientes\t806\tMantidos intactos\nProdutos\t0\tDeve ser 0\nClientes enriquecidos\t0\tDeve ser 0\nMercados\t0\tDeve ser 0\nClientes com nome\t806\tOK\nAssociações\t0\tDeve ser 0\nConcorrentes\t0\tDeve ser 0\nLeads\t0\tDeve ser 0\n",
+  "stderr": "",
+  "execution_time_ms": 81
+}
