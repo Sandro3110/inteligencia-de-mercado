@@ -1,6 +1,9 @@
 import { trpc } from "@/lib/trpc";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Card } from "@/components/ui/card";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Button } from "@/components/ui/button";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { RefreshCw, TrendingUp, Users, Target, CheckCircle2 } from "lucide-react";
 import {
   BarChart,
@@ -19,6 +22,7 @@ import {
 } from "recharts";
 import { useState } from "react";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
 

@@ -27,7 +27,7 @@ import FunnelView from "./pages/FunnelView";
 import SchedulePage from "./pages/SchedulePage";
 import AtividadePage from "./pages/AtividadePage";
 import EnrichmentSettings from "./pages/EnrichmentSettings";
-
+import OnboardingPage from "./pages/OnboardingPage";
 import ResultadosEnriquecimento from "./pages/ResultadosEnriquecimento";
 
 function Router() {
@@ -51,7 +51,7 @@ function Router() {
       <Route path="/agendamento" component={SchedulePage} />
       <Route path="/atividade" component={AtividadePage} />
       <Route path="/enrichment-settings" component={EnrichmentSettings} />
-
+      <Route path="/onboarding" component={OnboardingPage} />
       <Route path="/resultados-enriquecimento" component={ResultadosEnriquecimento} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

@@ -6,7 +6,7 @@ import { calculateQualityScore, classifyQuality, isValidCNPJFormat, isValidEmail
 import { trpc } from "@/lib/trpc";
 // ThemeToggle removido - sistema usa apenas tema light
 import { DetailPopup } from "@/components/DetailPopup";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { TagManager } from "@/components/TagManager";
 import { EntityTagPicker } from "@/components/EntityTagPicker";
 import { TagFilter } from "@/components/TagFilter";
@@ -719,24 +719,7 @@ export default function CascadeView() {
         <div className="flex items-center gap-6">
           <ProjectSelector />
           <div className="mt-2">
-            <Breadcrumbs
-              items={[
-                { label: "Início", onClick: () => { setCurrentPage("mercados"); setSelectedMercadoId(null); } },
-                ...(currentPage !== "mercados" && selectedMercadoId
-                  ? [
-                      {
-                        label: mercados?.find((m: any) => m.id === selectedMercadoId)?.nome || "Mercado",
-                        onClick: () => setCurrentPage("clientes"),
-                      },
-                    ]
-                  : []),
-                ...(currentPage !== "mercados" && currentPage !== "clientes"
-                  ? [{ label: currentPage === "concorrentes" ? "Concorrentes" : "Leads" }]
-                  : currentPage === "clientes"
-                  ? [{ label: "Clientes" }]
-                  : []),
-              ]}
-            />
+            <DynamicBreadcrumbs />
           </div>
         </div>
         <div className="flex items-center gap-4">

@@ -1,12 +1,19 @@
 import { trpc } from "@/lib/trpc";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSidebarState } from "@/hooks/useSidebarState";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Button } from "@/components/ui/button";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Link } from "wouter";
 import { exportToCSV } from "@/lib/export";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { toast } from "sonner";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { 
   Building2, 
   Users, 
@@ -108,6 +115,9 @@ export default function Dashboard() {
     <div className={`h-screen overflow-hidden flex flex-col transition-all duration-300 ${sidebarClass}`}>
       {/* Header Simplificado */}
       <div className="border-b border-border/50">
+        <div className="container py-2 border-b border-border/30">
+          <DynamicBreadcrumbs />
+        </div>
         <div className="container py-3">
           <div className="flex justify-between items-center flex-wrap gap-4">
             <div>

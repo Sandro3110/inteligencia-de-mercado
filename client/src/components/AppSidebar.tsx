@@ -324,9 +324,9 @@ export function AppSidebar() {
                     <Link key={item.href} href={item.href}>
                       <span
                         className={cn(
-                          "flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-all cursor-pointer group",
+                          "flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-all cursor-pointer group relative",
                           active
-                            ? "bg-blue-100 text-blue-700 font-medium shadow-sm"
+                            ? "bg-blue-200 text-blue-800 font-semibold shadow-md border-l-4 border-blue-600"
                             : "text-slate-700 hover:bg-blue-50 hover:text-blue-600 hover:shadow-sm"
                         )}
                       >

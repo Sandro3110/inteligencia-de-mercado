@@ -272,3 +272,28 @@ PROJECT (nível 1)
 
 ### 26.6 Adicionar Analytics Dashboard ao Menu
 - [x] Adicionar rota /analytics-dashboard na seção "Análise" do sidebar
+
+
+---
+
+## FASE 27: MELHORIAS DE NAVEGAÇÃO E ONBOARDING 🎯
+
+### 27.1 Breadcrumbs Dinâmicos
+- [x] Criar componente DynamicBreadcrumbs que detecta rota atual
+- [x] Mapear rotas para títulos legíveis
+- [x] Adicionar breadcrumbs no header de todas as páginas principais
+- [x] Suportar navegação clicável nos breadcrumbs
+
+### 27.2 Indicadores de Página Atual
+- [x] Adicionar borda lateral colorida (border-l-4) no item ativo
+- [x] Aumentar contraste do background ativo (bg-blue-100 → bg-blue-200)
+- [x] Adicionar sombra mais forte no item ativo
+- [x] Melhorar transição de estados (hover → active)
+
+### 27.3 Onboarding/Tour Guiado
+- [x] Criar página /onboarding com tour interativo
+- [x] Implementar steps do tour (Início → Dados → Enriquecimento → Análise)
+- [x] Adicionar highlights visuais nos elementos importantes
+- [x] Salvar estado "tour completado" no localStorage
+- [x] Adicionar botão "Pular tour" e "Próximo"
+- [x] Redirecionar para dashboard após conclusão

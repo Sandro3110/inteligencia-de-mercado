@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Card, CardContent } from "@/components/ui/card";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Input } from "@/components/ui/input";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Button } from "@/components/ui/button";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Link } from "wouter";
 import { Search, Building2, ArrowLeft, TrendingUp, Users, Download, Filter, X } from "lucide-react";
 import { toast } from "sonner";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { ProjectSelector } from "@/components/ProjectSelector";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 
 export default function Mercados() {
   const [search, setSearch] = useState("");
@@ -65,7 +72,10 @@ export default function Mercados() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="border-b border-border/50">
+      <div className="border-b border-border/50">        <div className="container py-2 border-b border-border/30">
+          <DynamicBreadcrumbs />
+        </div>
+
         <div className="container py-6">
           <div className="flex items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-4">

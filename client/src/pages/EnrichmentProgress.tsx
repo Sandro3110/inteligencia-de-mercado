@@ -1,17 +1,29 @@
 import { useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Progress } from "@/components/ui/progress";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Badge } from "@/components/ui/badge";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Button } from "@/components/ui/button";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { RefreshCw, CheckCircle2, Clock, TrendingUp, Pause, Play, History, CalendarPlus } from "lucide-react";
 import EvolutionCharts from "@/components/EvolutionCharts";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import HistoryFilters, { FilterState } from "@/components/HistoryFilters";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { exportToCSV, exportToPDF } from "@/lib/exportHistory";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { ScheduleEnrichment } from "@/components/ScheduleEnrichment";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 
 export default function EnrichmentProgress() {
   const { selectedProjectId } = useSelectedProject();

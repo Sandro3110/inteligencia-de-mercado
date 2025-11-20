@@ -1,5 +1,7 @@
 import { ReportGenerator } from "@/components/ReportGenerator";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 
 export default function ReportsPage() {
   return (
