@@ -564,7 +564,9 @@ export const enrichmentConfigs = mysqlTable("enrichment_configs", {
   projectId: int("projectId").notNull().unique(),
   
   // API Keys (criptografadas no backend antes de salvar)
-  openaiApiKey: text("openaiApiKey"), // obrigatória
+  openaiApiKey: text("openaiApiKey"), // opcional
+  geminiApiKey: text("geminiApiKey"), // opcional
+  anthropicApiKey: text("anthropicApiKey"), // opcional
   serpapiKey: text("serpapiKey"), // opcional
   receitawsKey: text("receitawsKey"), // opcional
   

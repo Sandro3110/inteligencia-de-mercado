@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, FileSpreadsheet, Sparkles, Plus, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
-import type { ResearchWizardData } from '@/pages/ResearchWizard';
+import type { ResearchWizardData } from '@/types/research-wizard';
 import PreResearchInterface from './PreResearchInterface';
 import FileUploadZone from './FileUploadZone';
 

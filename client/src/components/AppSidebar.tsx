@@ -18,6 +18,7 @@ import {
   ChevronDown,
   ChevronRight,
   ChevronLeft,
+  Plus,
   Download,
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -71,6 +72,7 @@ const navSections: NavSection[] = [
       { title: "Nova Pesquisa", href: "/research/new", icon: Plus },
       { title: "Iniciar", href: "/enrichment", icon: Zap },
       { title: "Acompanhar", href: "/enrichment-progress", icon: Activity },
+      { title: "Monitoramento", href: "/monitoring", icon: Activity },
       { title: "Resultados", href: "/resultados-enriquecimento", icon: CheckSquare },
     ],
   },
@@ -90,7 +92,9 @@ const navSections: NavSection[] = [
     defaultOpen: false,
     items: [
       { title: "Enriquecimento", href: "/enrichment-settings", icon: Settings },
+      { title: "Admin LLM", href: "/admin/llm", icon: Zap },
       { title: "Alertas", href: "/alertas", icon: Bell },
+      { title: "Alertas Inteligentes", href: "/intelligent-alerts", icon: Zap },
       { title: "Agendamentos", href: "/agendamento", icon: Calendar },
     ],
   },

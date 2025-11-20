@@ -34,6 +34,9 @@ import PrePesquisaTeste from "./pages/PrePesquisaTeste";
 import ExportWizard from "./pages/ExportWizard";
 import TemplateAdmin from "./pages/TemplateAdmin";
 import ResearchWizard from "./pages/ResearchWizard";
+import AdminLLM from "./pages/AdminLLM";
+import MonitoringDashboard from "./pages/MonitoringDashboard";
+import IntelligentAlerts from "./pages/IntelligentAlerts";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -63,6 +66,9 @@ function Router() {
       <Route path="/export" component={ExportWizard} />
       <Route path="/export/templates" component={TemplateAdmin} />
       <Route path="/research/new" component={ResearchWizard} />
+      <Route path="/admin/llm" component={AdminLLM} />
+      <Route path="/monitoring" component={MonitoringDashboard} />
+      <Route path="/intelligent-alerts" component={IntelligentAlerts} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

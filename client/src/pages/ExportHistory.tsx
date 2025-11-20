@@ -27,7 +27,7 @@ export default function ExportHistory() {
   const [selectedType, setSelectedType] = useState<string>("all");
 
   // Buscar histórico
-  const { data: history, isLoading, refetch } = trpc.export.listHistory.useQuery();
+  const { data: history, isLoading, refetch } = trpc.export.listHistory.useQuery({});
 
   // Mutation para deletar
   const deleteMutation = trpc.export.deleteHistory.useMutation({
@@ -37,7 +37,7 @@ export default function ExportHistory() {
   });
 
   // Filtrar histórico
-  const filteredHistory = history?.filter(item => {
+  const filteredHistory = history?.filter((item: any) => {
     if (selectedFormat !== "all" && item.format !== selectedFormat) return false;
     if (selectedType !== "all" && item.outputType !== selectedType) return false;
     return true;

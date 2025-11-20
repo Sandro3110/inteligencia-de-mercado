@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useState } from "react";
 import { useRoute, Link } from "wouter";
 import { trpc } from "@/lib/trpc";

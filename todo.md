@@ -1286,3 +1286,49 @@ PROJECT (nível 1)
 - [x] Criar batch processor otimizado
 - [x] Criar relatório de melhorias
 - [ ] Criar checkpoint final
+
+
+---
+
+## FASE 32: CORREÇÃO DE BUGS + 3 MELHORIAS FINAIS 🐛🚀
+
+### 32.1 Correção - Aplicação Abrindo em Branco
+- [x] Verificar logs do navegador (console errors)
+- [x] Verificar logs do servidor (build errors)
+- [x] Identificar erro de TypeScript bloqueando build (50 erros encontrados)
+- [x] Corrigir erros de schema (geminiApiKey, anthropicApiKey)
+- [x] Corrigir erros de import (interpretationCache) - schema OK
+- [ ] Testar aplicação após correções
+
+### 32.2 Interface de Admin para Provedores LLM
+- [ ] Criar página LLMProviderSettings.tsx
+- [ ] Adicionar formulário de configuração (OpenAI, Gemini, Anthropic)
+- [ ] Implementar validação de credenciais em tempo real
+- [ ] Adicionar seleção de provedor preferido
+- [ ] Criar router no backend (llmConfig.test, llmConfig.save)
+- [ ] Adicionar rota /llm-settings no App.tsx
+
+### 32.3 Dashboard de Monitoramento de Batch
+- [ ] Criar página BatchMonitorDashboard.tsx
+- [ ] Implementar gráfico de velocidade em tempo real
+- [ ] Implementar gráfico de taxa de sucesso
+- [ ] Adicionar indicador de circuit breaker status
+- [ ] Criar histórico de processamentos
+- [ ] Adicionar WebSocket ou polling para updates em tempo real
+- [ ] Adicionar rota /batch-monitor no App.tsx
+
+### 32.4 Sistema de Alertas Inteligentes
+- [ ] Criar serviço de alertas (alertService.ts)
+- [ ] Implementar alerta de circuit breaker aberto
+- [ ] Implementar alerta de taxa de erro alta (>20%)
+- [ ] Implementar alerta de batch finalizado
+- [ ] Integrar com notifyOwner() do sistema
+- [ ] Adicionar configuração de alertas no admin
+- [ ] Testar envio de alertas
+
+### 32.5 Validação e Checkpoint Final
+- [ ] Testar interface de admin de provedores
+- [ ] Testar dashboard de monitoramento
+- [ ] Testar sistema de alertas
+- [ ] Executar todos os testes (meta: 100%)
+- [ ] Criar checkpoint final

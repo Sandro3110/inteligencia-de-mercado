@@ -22,7 +22,14 @@ import {
   Step7Summary
 } from '@/components/research-wizard';
 
-export interface ResearchWizardData {
+import type { ResearchWizardData } from '@/types/research-wizard';
+
+// Re-export para compatibilidade
+export type { ResearchWizardData };
+
+// Removido: interface movida para @/types/research-wizard
+/*
+interface ResearchWizardData {
   // Step 1
   projectId: number | null;
   projectName: string;
@@ -49,6 +56,7 @@ export interface ResearchWizardData {
     clientes: any[];
   };
 }
+*/
 
 const STEPS = [
   { id: 1, title: 'Projeto', description: 'Selecionar ou criar projeto' },

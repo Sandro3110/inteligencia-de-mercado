@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Upload, FileSpreadsheet, Loader2, AlertCircle, CheckCircle2, X } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
-import type { ResearchWizardData } from './AllSteps';
+import type { ResearchWizardData } from '@/types/research-wizard';
 
 interface FileUploadZoneProps {
   data: ResearchWizardData;

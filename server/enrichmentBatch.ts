@@ -2,7 +2,7 @@
  * Sistema de enriquecimento em lote com processamento paralelo
  */
 
-// import { enrichClienteCompleto } from './enrichmentOptimized'; // OBSOLETO
+// import { enrichClienteOptimized } from './enrichmentOptimized'; // OBSOLETO
 import { getDb } from './db';
 import { clientes } from '../drizzle/schema';
 import { eq } from 'drizzle-orm';
@@ -95,7 +95,7 @@ export async function enrichClientesBatch(
       const startTime = Date.now();
       
       try {
-        const result = await enrichClienteCompleto(cliente.id, projectId);
+        const result = await enrichClienteOptimized(cliente.id, projectId);
         const duration = Date.now() - startTime;
         
         return {

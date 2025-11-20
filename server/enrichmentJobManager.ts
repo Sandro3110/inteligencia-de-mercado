@@ -5,7 +5,7 @@
 import { getDb } from './db';
 import { enrichmentJobs } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
-// import { enrichClienteCompleto } from './enrichmentOptimized'; // OBSOLETO
+// import { enrichClienteOptimized } from './enrichmentOptimized'; // OBSOLETO
 import { clientes } from '../drizzle/schema';
 import { notifyOwner } from './_core/notification';
 
@@ -271,7 +271,7 @@ async function processJob(jobId: number): Promise<void> {
     // Processar clientes em paralelo
     const batchPromises = batch.map(async (cliente) => {
       try {
-        const result = await enrichClienteCompleto(cliente.id, job.projectId);
+        const result = await enrichClienteOptimized(cliente.id, job.projectId);
         return { success: result.success, clienteId: cliente.id };
       } catch (error: any) {
         console.error(`[Job ${jobId}] Erro ao processar cliente ${cliente.id}:`, error.message);

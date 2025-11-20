@@ -30,7 +30,7 @@ export function startAnalyticsAggregationJob() {
       const activeProjects = await db
         .select()
         .from(projects)
-        .where(projects.ativo === 1);
+        .where(eq(projects.ativo, 1));
 
       console.log(`[Cron] Encontrados ${activeProjects.length} projetos ativos`);
 

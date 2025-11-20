@@ -57,6 +57,8 @@ export type ToolChoice =
 
 export type InvokeParams = {
   messages: Message[];
+  model?: string;
+  temperature?: number;
   tools?: Tool[];
   toolChoice?: ToolChoice;
   tool_choice?: ToolChoice;
@@ -79,6 +81,7 @@ export type ToolCall = {
 
 export type InvokeResult = {
   id: string;
+  object?: string;
   created: number;
   model: string;
   choices: Array<{

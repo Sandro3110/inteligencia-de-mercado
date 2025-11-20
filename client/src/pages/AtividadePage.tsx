@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { ProjectSelector } from "@/components/ProjectSelector";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

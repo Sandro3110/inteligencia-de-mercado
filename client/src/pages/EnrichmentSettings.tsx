@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useState } from "react";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { useEnrichmentConfig } from "@/hooks/useEnrichmentConfig";

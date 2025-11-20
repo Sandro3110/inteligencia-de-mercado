@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent } from "@/components/ui/card";

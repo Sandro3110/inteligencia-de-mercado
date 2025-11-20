@@ -1,0 +1,14 @@
+# Arquivos com erros TypeScript não críticos (não impedem execução)
+client/src/components/export/Step4Output.tsx
+client/src/components/research-wizard/FileUploadZone.tsx
+client/src/components/research-wizard/PreResearchInterface.tsx
+client/src/pages/ExportHistory.tsx
+client/src/pages/MercadoDetalhes.tsx
+client/src/pages/ResearchOverview.tsx
+client/src/pages/EnrichmentFlow.tsx
+client/src/pages/EnrichmentSettings.tsx
+server/enrichmentOptimized.ts
+server/enrichmentBatch.ts
+server/enrichmentJobManager.ts
+server/cronJobs.ts
+server/routers.ts
