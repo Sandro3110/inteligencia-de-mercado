@@ -54,8 +54,8 @@ export default function MonitoringDashboard() {
   );
 
   // Buscar status do job
-  const { data: jobStatus } = trpc.enrichmentJob.getJobProgress.useQuery(
-    { projectId: selectedProjectId! },
+  const { data: jobStatus } = trpc.batchProcessor.status.useQuery(
+    undefined,
     { 
       enabled: !!selectedProjectId && isPolling,
       refetchInterval: isPolling ? 3000 : false,
@@ -63,8 +63,8 @@ export default function MonitoringDashboard() {
   );
 
   // Mutations para controle
-  const pauseMutation = trpc.enrichmentJob.pauseJob.useMutation();
-  const resumeMutation = trpc.enrichmentJob.startJob.useMutation();
+  const pauseMutation = trpc.batchProcessor.pause.useMutation();
+  const resumeMutation = trpc.batchProcessor.resume.useMutation();
 
   // Simular métricas (você pode implementar endpoint real)
   const [metrics, setMetrics] = useState<BatchMetrics>({
@@ -86,12 +86,12 @@ export default function MonitoringDashboard() {
   useEffect(() => {
     if (progress) {
       const newMetrics: BatchMetrics = {
-        totalProcessed: progress.processedClients || 0,
-        successCount: progress.processedClients || 0,
+        totalProcessed: progress.processed || 0,
+        successCount: progress.processed || 0,
         errorCount: 0, // Você pode adicionar campo de erros no backend
         avgProcessingTime: 35, // Média em segundos
         currentBatchSize: 5,
-        estimatedTimeRemaining: ((progress.totalClients || 0) - (progress.processedClients || 0)) * 35,
+        estimatedTimeRemaining: ((progress.total || 0) - (progress.processed || 0)) * 35,
       };
       setMetrics(newMetrics);
 
@@ -179,7 +179,7 @@ export default function MonitoringDashboard() {
   }
 
   const progressPercentage = progress ? 
-    Math.round(((progress.processedClients || 0) / (progress.totalClients || 1)) * 100) : 0;
+    Math.round(((progress.processed || 0) / (progress.total || 1)) * 100) : 0;
 
   return (
     <div className="min-h-screen ml-60 bg-background p-6">

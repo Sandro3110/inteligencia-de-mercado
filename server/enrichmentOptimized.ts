@@ -26,8 +26,8 @@ interface EnrichmentResult {
 /**
  * Trunca string para tamanho máximo
  */
-function truncate(str: string | undefined | null, maxLength: number): string | undefined {
-  if (!str) return undefined;
+function truncate(str: string | undefined | null, maxLength: number): string | null {
+  if (!str) return null;
   return str.length > maxLength ? str.substring(0, maxLength) : str;
 }
 
@@ -133,7 +133,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
           .values({
             projectId,
             pesquisaId: cliente.pesquisaId || null,
-            nome: truncate(mercadoData.nome, 255),
+            nome: truncate(mercadoData.nome, 255) || '',
             categoria: truncate(mercadoData.categoria || '', 100),
             segmentacao: truncate(mercadoData.segmentacao || '', 50),
             tamanhoMercado: truncate(mercadoData.tamanhoEstimado || '', 500),
@@ -159,11 +159,11 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
           pesquisaId: cliente.pesquisaId || null,
           clienteId,
           mercadoId,
-          nome: truncate(produtoData.nome, 255),
+          nome: truncate(produtoData.nome, 255) || '',
           descricao: truncate(produtoData.descricao || '', 1000),
           categoria: truncate(produtoData.categoria || '', 100),
-          preco: truncate(produtoData.preco || '', 100),
-          unidade: truncate(produtoData.unidade || '', 50),
+          preco: null,
+          unidade: null,
           ativo: 1,
           createdAt: new Date()
         }).onDuplicateKeyUpdate({
@@ -206,14 +206,14 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
             projectId,
             pesquisaId: cliente.pesquisaId || null,
             mercadoId,
-            nome: truncate(concorrenteData.nome, 255),
+            nome: truncate(concorrenteData.nome, 255) || '',
             produto: truncate(concorrenteData.descricao || '', 1000),
-            cnpj: truncate(concorrenteData.cnpj || '', 20),
-            site: truncate(concorrenteData.site || '', 500),
-            cidade: truncate(concorrenteData.cidade || '', 100),
-            uf: truncate(concorrenteData.uf || '', 2),
             porte: truncate(concorrenteData.porte || '', 50),
-            faturamentoEstimado: truncate(concorrenteData.faturamentoEstimado || '', 200),
+            cnpj: null,
+            site: null,
+            cidade: null,
+            uf: null,
+            faturamentoEstimado: null,
             qualidadeScore: qualityScore,
             qualidadeClassificacao: getQualityClassification(qualityScore),
             validationStatus: 'pending',
@@ -254,7 +254,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
             projectId,
             pesquisaId: cliente.pesquisaId || null,
             mercadoId,
-            nome: truncate(leadData.nome, 255),
+            nome: truncate(leadData.nome, 255) || '',
             setor: truncate(leadData.segmento || '', 100),
             tipo: truncate(leadData.potencial || '', 20),
             porte: truncate(leadData.porte || '', 50),

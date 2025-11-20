@@ -1332,3 +1332,44 @@ PROJECT (nível 1)
 - [ ] Testar sistema de alertas
 - [ ] Executar todos os testes (meta: 100%)
 - [ ] Criar checkpoint final
+
+
+---
+
+## FASE 33: FINALIZAÇÃO - TIPOS, ALERTAS E TESTES 🎯✅
+
+### 33.1 Corrigir Tipos TypeScript (enrichmentOptimized.ts)
+- [x] Definir interface ProdutoData com campos corretos
+- [x] Definir interface ConcorrenteData com campos corretos
+- [x] Definir interface LeadData com campos corretos
+- [x] Remover campos inexistentes das inserções no banco
+- [ ] Corrigir 34 erros TypeScript restantes (Breadcrumbs, tipos, imports)
+- [ ] Validar compilação 100% limpa (0 erros)
+
+### 33.2 Integrar Alertas ao Enriquecimento
+- [ ] Conectar intelligentAlerts.ts ao enrichmentBatchProcessor
+- [ ] Disparar alerta quando circuit breaker abrir
+- [ ] Disparar alerta quando taxa de erro > threshold
+- [ ] Disparar alerta quando tempo de processamento > threshold
+- [ ] Disparar alerta quando enriquecimento concluir
+- [ ] Salvar alertas no histórico (intelligent_alerts_history)
+- [ ] Testar disparo de alertas em cenários reais
+
+### 33.3 Testes de Integração
+- [ ] Criar server/__tests__/adminLLM.test.ts
+- [ ] Testar adminLLM.getConfig
+- [ ] Testar adminLLM.saveConfig
+- [ ] Testar adminLLM.testConnection
+- [ ] Criar server/__tests__/intelligentAlerts.test.ts
+- [ ] Testar intelligentAlerts.getConfig
+- [ ] Testar intelligentAlerts.saveConfig
+- [ ] Testar intelligentAlerts.getHistory
+- [ ] Testar intelligentAlerts.getStats
+- [ ] Executar todos os testes (meta: 100% pass)
+
+### 33.4 Validação Final
+- [ ] Verificar código 100% limpo (0 erros TypeScript)
+- [ ] Testar Admin LLM no navegador
+- [ ] Testar Alertas Inteligentes no navegador
+- [ ] Testar Dashboard de Monitoramento no navegador
+- [ ] Criar checkpoint final

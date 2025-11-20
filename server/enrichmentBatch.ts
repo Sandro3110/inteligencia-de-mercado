@@ -2,7 +2,7 @@
  * Sistema de enriquecimento em lote com processamento paralelo
  */
 
-// import { enrichClienteOptimized } from './enrichmentOptimized'; // OBSOLETO
+import { enrichClienteOptimized } from './enrichmentOptimized';
 import { getDb } from './db';
 import { clientes } from '../drizzle/schema';
 import { eq } from 'drizzle-orm';
@@ -102,10 +102,10 @@ export async function enrichClientesBatch(
           clienteId: cliente.id,
           nome: cliente.nome,
           success: result.success,
-          mercados: result.mercados,
-          produtos: result.produtos,
-          concorrentes: result.concorrentes,
-          leads: result.leads,
+          mercados: result.mercadosCreated,
+          produtos: result.produtosCreated,
+          concorrentes: result.concorrentesCreated,
+          leads: result.leadsCreated,
           duration,
         };
       } catch (error: any) {

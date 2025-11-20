@@ -1,4 +1,5 @@
 import cron from "node-cron";
+import { eq } from "drizzle-orm";
 import { runFullAggregation } from "./analyticsAggregation";
 import { getDb } from "./db";
 import { projects } from "../drizzle/schema";
