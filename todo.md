@@ -1137,3 +1137,74 @@ PROJECT (nível 1)
 - [x] Criar checkpoint 100%
 - [x] Atualizar ANALISE_MODULOS_CORE.md
 
+
+
+---
+
+## FASE 40: INTEGRAÇÃO FINAL DOS MÓDULOS CORE 🔗
+
+### 40.1 Integrar Pré-Pesquisa ao Wizard
+- [ ] Mover lógica de PrePesquisaTeste.tsx para serviço reutilizável
+- [ ] Criar server/services/preResearchService.ts
+- [ ] Integrar no Step 5 quando método = 'pre-research'
+- [ ] Adicionar interface de entrada de prompt
+- [ ] Mostrar resultados com aprovação obrigatória
+- [ ] Converter resultados aprovados em dados do wizard
+
+### 40.2 Upload Drag & Drop Funcional
+- [ ] Criar componente FileUploadZone.tsx
+- [ ] Implementar drag & drop com react-dropzone ou nativo
+- [ ] Adicionar preview de dados importados (tabela)
+- [ ] Implementar correção inline de erros
+- [ ] Adicionar mapeamento manual de colunas
+- [ ] Integrar com spreadsheetParser.ts
+- [ ] Substituir placeholder no Step 5
+
+### 40.3 Conectar Batch Processor aos Parâmetros
+- [ ] Ler parâmetros da pesquisa no enrichmentBatchProcessor
+- [ ] Remover constantes fixas (QTD_CONCORRENTES, QTD_LEADS)
+- [ ] Ajustar lógica de enriquecimento de mercados
+- [ ] Ajustar lógica de enriquecimento de clientes
+- [ ] Testar com diferentes valores de parâmetros
+- [ ] Validar que os limites são respeitados
+
+### 40.4 Testes e Validação
+- [ ] Testar wizard com pré-pesquisa end-to-end
+- [ ] Testar upload de CSV com 50 registros
+- [ ] Testar upload de Excel com múltiplas abas
+- [ ] Testar batch processor com parâmetros customizados
+- [ ] Validar fluxo completo: wizard → validação → banco → enriquecimento
+
+### 40.5 Checkpoint Final
+- [ ] Marcar todos os itens como completos
+- [ ] Criar checkpoint de integração final
+- [ ] Atualizar documentação
+
+
+
+---
+
+## FASE 41: AJUSTES CRÍTICOS DE INTEGRAÇÃO 🔧
+
+### 41.1 Batch Processor - Ler Parâmetros do Wizard
+- [x] Modificar enrichmentBatchProcessor para ler pesquisa do banco
+- [x] Extrair qtdConcorrentesPorMercado da pesquisa
+- [x] Extrair qtdLeadsPorMercado da pesquisa
+- [x] Extrair qtdProdutosPorCliente da pesquisa
+- [x] Remover constantes fixas (QTD_CONCORRENTES = 5, etc)
+- [x] Validar que os limites são respeitados durante enriquecimento
+
+### 41.2 Credenciais Configuráveis
+- [x] Modificar invokeLLM para ler credenciais do banco
+- [x] Buscar enrichment_configs por projectId
+- [x] Usar openaiApiKey configurada (ou fallback para env)
+- [x] Adicionar suporte para múltiplos provedores (OpenAI, Gemini)
+- [x] Permitir usuário trocar provedor sem quebrar funcionalidade
+- [x] Validar credenciais antes de iniciar enriquecimento
+
+### 41.3 Validação e Testes
+- [ ] Testar batch processor com parâmetros customizados
+- [ ] Testar com diferentes valores (3 concorrentes, 20 leads, etc)
+- [ ] Testar com credenciais diferentes (OpenAI vs Gemini)
+- [ ] Validar que wizard → banco → batch processor funciona end-to-end
+

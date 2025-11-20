@@ -7,7 +7,7 @@
 
 import { eq, and, isNull } from 'drizzle-orm';
 import { getDb } from './db';
-import { clientes } from '../drizzle/schema';
+import { clientes, pesquisas } from '../drizzle/schema';
 import { enrichClienteOptimized } from './enrichmentOptimized';
 
 interface BatchProcessorOptions {
@@ -71,8 +71,25 @@ export async function startBatchEnrichment(options: BatchProcessorOptions): Prom
     throw new Error('Já existe um job de enriquecimento em execução');
   }
   
+  // FASE 41.1: Buscar parâmetros da pesquisa do banco
+  const pesquisaResult = await db
+    .select()
+    .from(pesquisas)
+    .where(eq(pesquisas.id, pesquisaId))
+    .limit(1);
+  
+  if (pesquisaResult.length === 0) {
+    throw new Error(`Pesquisa ${pesquisaId} não encontrada`);
+  }
+  
+  const pesquisa = pesquisaResult[0];
+  const qtdConcorrentes = pesquisa.qtdConcorrentesPorMercado || 5;
+  const qtdLeads = pesquisa.qtdLeadsPorMercado || 10;
+  const qtdProdutos = pesquisa.qtdProdutosPorCliente || 3;
+  
   console.log(`[BatchProcessor] 🚀 Iniciando enriquecimento em blocos de ${batchSize} clientes`);
   console.log(`[BatchProcessor] Pesquisa ID: ${pesquisaId}`);
+  console.log(`[BatchProcessor] Parâmetros: ${qtdConcorrentes} concorrentes, ${qtdLeads} leads, ${qtdProdutos} produtos`);
   
   // Buscar clientes pendentes
   const clientesPendentes = await db

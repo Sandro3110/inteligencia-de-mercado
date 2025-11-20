@@ -1559,6 +1559,33 @@ export const appRouter = router({
       }),
   }),
 
+  // Router de Pré-Pesquisa Integrada (Fase 40.1)
+  preResearch: router({
+    execute: publicProcedure
+      .input(z.object({
+        prompt: z.string().min(3),
+        tipo: z.enum(['mercado', 'cliente']),
+        quantidade: z.number().optional(),
+        contextoAdicional: z.string().optional(),
+        projectId: z.number().optional(), // FASE 41.2: Para credenciais configuráveis
+      }))
+      .mutation(async ({ input }) => {
+        const { executePreResearch } = await import('./services/preResearchService');
+        return executePreResearch(input);
+      }),
+
+    retry: publicProcedure
+      .input(z.object({
+        entidade: z.any(),
+        tipo: z.enum(['mercado', 'cliente']),
+        maxRetries: z.number().optional().default(2),
+      }))
+      .mutation(async ({ input }) => {
+        const { retryWithImprovement } = await import('./services/preResearchService');
+        return retryWithImprovement(input.entidade, input.tipo, input.maxRetries);
+      }),
+  }),
+
   // Router de Teste - Pré-Pesquisa Inteligente
   prePesquisaTeste: router({
     // Cenário 1: Retry Inteligente

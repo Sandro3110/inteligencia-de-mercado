@@ -350,15 +350,7 @@ export function Step5InsertData({ data, updateData }: {
       )}
 
       {data.inputMethod === 'pre-research' && (
-        <div className="text-center p-12 border-2 border-blue-200 bg-blue-50 rounded-lg">
-          <Sparkles className="w-12 h-12 mx-auto mb-4 text-blue-600" />
-          <p className="text-blue-800 mb-4">
-            Funcionalidade de Pré-Pesquisa com IA será integrada aqui
-          </p>
-          <Button variant="outline">
-            Configurar Pré-Pesquisa
-          </Button>
-        </div>
+        <PreResearchInterface data={data} updateData={updateData} />
       )}
     </div>
   );
