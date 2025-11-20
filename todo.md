@@ -268,3 +268,7 @@ PROJECT (nível 1)
 - [x] Remover rotas inexistentes (Clientes, Concorrentes, Leads standalone)
 - [x] Simplificar navegação para rotas funcionais
 - [x] Ajustar atalhos de teclado para rotas corretas
+
+
+### 26.6 Adicionar Analytics Dashboard ao Menu
+- [x] Adicionar rota /analytics-dashboard na seção "Análise" do sidebar

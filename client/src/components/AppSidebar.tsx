@@ -83,6 +83,7 @@ const navSections: NavSection[] = [
     defaultOpen: false,
     items: [
       { title: "Analytics", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+3" },
+      { title: "Analytics Dashboard", href: "/analytics-dashboard", icon: PieChart },
       { title: "Dashboard Avançado", href: "/dashboard-avancado", icon: BarChart3 },
       { title: "ROI & Conversão", href: "/roi", icon: DollarSign, shortcut: "Ctrl+4" },
       { title: "Funil de Vendas", href: "/funil", icon: TrendingUp },
