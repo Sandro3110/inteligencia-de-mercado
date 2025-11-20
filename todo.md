@@ -226,3 +226,45 @@ PROJECT (nível 1)
 │   • Cache           │
 └─────────────────────┘
 ```
+
+
+---
+
+## FASE 26: POLIMENTO FINAL - ANIMAÇÕES E UX 🎨
+
+### 26.1 Animações e Estados Visuais
+- [x] Adicionar transições suaves entre páginas (fade-in)
+- [x] Melhorar estados hover no sidebar (bg-blue-50)
+- [x] Adicionar estados active mais destacados (bg-blue-100 + shadow)
+- [x] Animação de abertura/fechamento de seções colápsáveis
+
+### 26.2 Sidebar Colápsável
+- [x] Adicionar botão toggle no topo do sidebar
+- [x] Implementar estado collapsed (apenas ícones, 60px/ml-16)
+- [x] Implementar estado expanded (completo, 240px/ml-60)
+- [x] Salvar preferência no localStorage
+- [x] Ajustar margem das páginas dinamicamente (CascadeView e Dashboard)
+- [x] Adicionar tooltips nos ícones quando collapsed
+
+### 26.3 Atalhos de Teclado
+- [x] Implementar Ctrl+1 → Dashboard
+- [x] Implementar Ctrl+2 → Mercados (Dados)
+- [x] Implementar Ctrl+3 → Analytics
+- [x] Implementar Ctrl+4 → ROI
+- [x] Implementar Ctrl+B → Toggle sidebar
+- [x] Adicionar indicador visual de atalhos no sidebar (⌘ symbols)
+- [ ] Criar modal de ajuda (Ctrl+?) com lista de atalhos (opcional)
+
+### 26.4 Validação Final
+- [ ] Testar todas as animações
+- [ ] Testar sidebar colapsável em todas as páginas
+- [ ] Testar atalhos de teclado
+- [ ] Verificar responsividade
+- [ ] Criar checkpoint final
+
+
+### 26.5 Correção de Rotas do Sidebar
+- [x] Corrigir rotas do sidebar para corresponder às rotas reais do App.tsx
+- [x] Remover rotas inexistentes (Clientes, Concorrentes, Leads standalone)
+- [x] Simplificar navegação para rotas funcionais
+- [x] Ajustar atalhos de teclado para rotas corretas

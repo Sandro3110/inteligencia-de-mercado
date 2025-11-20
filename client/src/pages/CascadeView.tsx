@@ -63,6 +63,7 @@ import SearchHistory, { addToSearchHistory } from "@/components/SearchHistory";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { ProjectSelector } from "@/components/ProjectSelector";
 import { AppSidebar } from "@/components/AppSidebar";
+import { useSidebarState } from "@/hooks/useSidebarState";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
 type Page = "mercados" | "clientes" | "concorrentes" | "leads";
@@ -71,6 +72,7 @@ type ViewMode = "list" | "kanban";
 
 export default function CascadeView() {
   const { selectedProjectId } = useSelectedProject();
+  const { sidebarClass } = useSidebarState();
   const [currentPage, setCurrentPage] = useState<Page>("mercados");
   const [selectedMercadoId, setSelectedMercadoId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -711,7 +713,7 @@ export default function CascadeView() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100 overflow-x-hidden ml-60">
+    <div className={`h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100 overflow-x-hidden transition-all duration-300 ${sidebarClass}`}>
       {/* Header Simplificado */}
       <div className="flex items-center justify-between px-6 py-2 border-b border-border/40 flex-wrap gap-2">
         <div className="flex items-center gap-6">

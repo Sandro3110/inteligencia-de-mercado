@@ -1,4 +1,5 @@
 import { trpc } from "@/lib/trpc";
+import { useSidebarState } from "@/hooks/useSidebarState";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -20,6 +21,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Ba
 
 export default function Dashboard() {
   const { selectedProjectId } = useSelectedProject();
+  const { sidebarClass } = useSidebarState();
   
   const { data: stats, isLoading } = trpc.dashboard.stats.useQuery(
     { projectId: selectedProjectId! },
@@ -103,7 +105,7 @@ export default function Dashboard() {
   const validationProgress = Math.round((totalValidated / totalRecords) * 100);
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col ml-60">
+    <div className={`h-screen overflow-hidden flex flex-col transition-all duration-300 ${sidebarClass}`}>
       {/* Header Simplificado */}
       <div className="border-b border-border/50">
         <div className="container py-3">
