@@ -14,6 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Upload, FileSpreadsheet, Sparkles, Plus, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import type { ResearchWizardData } from '@/pages/ResearchWizard';
+import PreResearchInterface from './PreResearchInterface';
+import FileUploadZone from './FileUploadZone';
 
 // ============================================
 // STEP 1: SELECIONAR PROJETO
@@ -337,16 +339,7 @@ export function Step5InsertData({ data, updateData }: {
       )}
 
       {data.inputMethod === 'spreadsheet' && (
-        <div className="text-center p-12 border-2 border-dashed rounded-lg">
-          <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground mb-4">
-            Arraste um arquivo CSV ou Excel aqui, ou clique para selecionar
-          </p>
-          <Button>
-            <FileSpreadsheet className="w-4 h-4 mr-2" />
-            Selecionar Arquivo
-          </Button>
-        </div>
+        <FileUploadZone data={data} updateData={updateData} tipo="mercado" />
       )}
 
       {data.inputMethod === 'pre-research' && (

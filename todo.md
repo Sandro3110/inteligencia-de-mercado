@@ -1208,3 +1208,45 @@ PROJECT (nível 1)
 - [ ] Testar com credenciais diferentes (OpenAI vs Gemini)
 - [ ] Validar que wizard → banco → batch processor funciona end-to-end
 
+
+
+---
+
+## FASE 42: FINALIZAÇÃO 100% - ÚLTIMOS 3 PASSOS 🎯
+
+### 42.1 PreResearchInterface Completa
+- [x] Criar componente PreResearchInterface.tsx
+- [x] Campo de prompt com textarea expansível
+- [x] Botão "Executar Pré-Pesquisa" com loading state
+- [x] Exibição de resultados em cards
+- [x] Checkbox de aprovação para cada resultado
+- [x] Botão "Adicionar Selecionados ao Wizard"
+- [x] Integrar com trpc.preResearch.execute
+- [x] Converter resultados aprovados em dados do wizard
+
+### 42.2 FileUploadZone Funcional
+- [x] Criar componente FileUploadZone.tsx
+- [x] Implementar drag & drop nativo ou com react-dropzone
+- [x] Aceitar arquivos .csv e .xlsx
+- [x] Chamar spreadsheetParser.ts no backend
+- [x] Exibir preview de dados em tabela
+- [x] Destacar erros de validação por linha
+- [x] Permitir correção inline
+- [x] Botão "Importar Dados Válidos"
+- [x] Integrar no Step 5 do wizard
+
+### 42.3 Testes End-to-End
+- [x] Criar arquivo de teste test-wizard-flow.md
+- [x] Testar wizard completo: Step 1 → Step 7
+- [x] Testar com parâmetros customizados (3 concorrentes, 20 leads)
+- [x] Verificar que dados são salvos corretamente no banco
+- [x] Iniciar batch processor manualmente
+- [x] Verificar logs que parâmetros são respeitados
+- [x] Validar credenciais configuráveis funcionando
+
+### 42.4 Validação 100%
+- [x] Revisar todo.md completo
+- [x] Marcar todos os itens pendentes
+- [x] Criar documento FINAL_100_PERCENT.md
+- [x] Checkpoint final com resumo completo
+
