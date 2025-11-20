@@ -1,0 +1,178 @@
+{
+  "query": "\nSELECT \n  p.id as project_id,\n  p.nome as project_name,\n  COUNT(DISTINCT ps.id) as pesquisas_count,\n  COUNT(DISTINCT m.id) as mercados_count,\n  COUNT(DISTINCT c.id) as clientes_count\nFROM projects p\nLEFT JOIN pesquisas ps ON ps.projectId = p.id AND ps.ativo = 1\nLEFT JOIN mercados_unicos m ON m.projectId = p.id\nLEFT JOIN clientes c ON c.projectId = p.id\nGROUP BY p.id, p.nome\nORDER BY p.id;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  p.id as project_id,\n  p.nome as project_name,\n  COUNT(DISTINCT ps.id) as pesquisas_count,\n  COUNT(DISTINCT m.id) as mercados_count,\n  COUNT(DISTINCT c.id) as clientes_count\nFROM projects p\nLEFT JOIN pesquisas ps ON ps.projectId = p.id AND ps.ativo = 1\nLEFT JOIN mercados_unicos m ON m.projectId = p.id\nLEFT JOIN clientes c ON c.projectId = p.id\nGROUP BY p.id, p.nome\nORDER BY p.id;\n",
+  "rows": [
+    {
+      "project_id": "1",
+      "project_name": "Embalagens",
+      "pesquisas_count": "2",
+      "mercados_count": "667",
+      "clientes_count": "806"
+    },
+    {
+      "project_id": "330001",
+      "project_name": "Ground",
+      "pesquisas_count": "1",
+      "mercados_count": "1",
+      "clientes_count": "1"
+    },
+    {
+      "project_id": "330002",
+      "project_name": "TechGround",
+      "pesquisas_count": "1",
+      "mercados_count": "0",
+      "clientes_count": "1"
+    },
+    {
+      "project_id": "420001",
+      "project_name": "Projeto Teste Adiamento 1763671149623",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420002",
+      "project_name": "Projeto Teste 7 dias 1763671149928",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420003",
+      "project_name": "Projeto Teste 15 dias 1763671149980",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420004",
+      "project_name": "Projeto Teste 30 dias 1763671150031",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420005",
+      "project_name": "Projeto Sem Aviso 1763671150086",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420006",
+      "project_name": "Projeto Teste Remoção 1763671150111",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420007",
+      "project_name": "Projeto Teste Data 1763671150257",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420008",
+      "project_name": "Projeto Teste Adiamento 1763671192338",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420009",
+      "project_name": "Projeto Teste 7 dias 1763671192636",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420010",
+      "project_name": "Projeto Teste 15 dias 1763671192680",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420011",
+      "project_name": "Projeto Teste 30 dias 1763671192723",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420012",
+      "project_name": "Projeto Sem Aviso 1763671192767",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420013",
+      "project_name": "Projeto Teste Remoção 1763671192781",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420014",
+      "project_name": "Projeto Teste Data 1763671192903",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420015",
+      "project_name": "Projeto Teste Adiamento 1763671242016",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420016",
+      "project_name": "Projeto Teste 7 dias 1763671242336",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420017",
+      "project_name": "Projeto Teste 15 dias 1763671242379",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420018",
+      "project_name": "Projeto Teste 30 dias 1763671242424",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420019",
+      "project_name": "Projeto Sem Aviso 1763671242467",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420020",
+      "project_name": "Projeto Teste Remoção 1763671242481",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    },
+    {
+      "project_id": "420021",
+      "project_name": "Projeto Teste Data 1763671242597",
+      "pesquisas_count": "0",
+      "mercados_count": "0",
+      "clientes_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "project_id\tproject_name\tpesquisas_count\tmercados_count\tclientes_count\n1\tEmbalagens\t2\t667\t806\n330001\tGround\t1\t1\t1\n330002\tTechGround\t1\t0\t1\n420001\tProjeto Teste Adiamento 1763671149623\t0\t0\t0\n420002\tProjeto Teste 7 dias 1763671149928\t0\t0\t0\n420003\tProjeto Teste 15 dias 1763671149980\t0\t0\t0\n420004\tProjeto Teste 30 dias 1763671150031\t0\t0\t0\n420005\tProjeto Sem Aviso 1763671150086\t0\t0\t0\n420006\tProjeto Teste Remoção 1763671150111\t0\t0\t0\n420007\tProjeto Teste Data 1763671150257\t0\t0\t0\n420008\tProjeto Teste Adiamento 1763671192338\t0\t0\t0\n420009\tProjeto Teste 7 dias 1763671192636\t0\t0\t0\n420010\tProjeto Teste 15 dias 1763671192680\t0\t0\t0\n420011\tProjeto Teste 30 dias 1763671192723\t0\t0\t0\n420012\tProjeto Sem Aviso 1763671192767\t0\t0\t0\n420013\tProjeto Teste Remoção 1763671192781\t0\t0\t0\n420014\tProjeto Teste Data 1763671192903\t0\t0\t0\n420015\tProjeto Teste Adiamento 1763671242016\t0\t0\t0\n420016\tProjeto Teste 7 dias 1763671242336\t0\t0\t0\n420017\tProjeto Teste 15 dias 1763671242379\t0\t0\t0\n420018\tProjeto Teste 30 dias 1763671242424\t0\t0\t0\n420019\tProjeto Sem Aviso 1763671242467\t0\t0\t0\n420020\tProjeto Teste Remoção 1763671242481\t0\t0\t0\n420021\tProjeto Teste Data 1763671242597\t0\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 596
+}

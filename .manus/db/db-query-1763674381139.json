@@ -1,0 +1,34 @@
+{
+  "query": "\nSELECT \n  'clientes' as tabela,\n  COUNT(*) as total,\n  SUM(CASE WHEN pesquisaId IS NULL THEN 1 ELSE 0 END) as sem_pesquisaId,\n  SUM(CASE WHEN pesquisaId IS NOT NULL THEN 1 ELSE 0 END) as com_pesquisaId\nFROM clientes\nUNION ALL\nSELECT \n  'mercados_unicos',\n  COUNT(*),\n  SUM(CASE WHEN pesquisaId IS NULL THEN 1 ELSE 0 END),\n  SUM(CASE WHEN pesquisaId IS NOT NULL THEN 1 ELSE 0 END)\nFROM mercados_unicos\nUNION ALL\nSELECT \n  'concorrentes',\n  COUNT(*),\n  SUM(CASE WHEN pesquisaId IS NULL THEN 1 ELSE 0 END),\n  SUM(CASE WHEN pesquisaId IS NOT NULL THEN 1 ELSE 0 END)\nFROM concorrentes\nUNION ALL\nSELECT \n  'leads',\n  COUNT(*),\n  SUM(CASE WHEN pesquisaId IS NULL THEN 1 ELSE 0 END),\n  SUM(CASE WHEN pesquisaId IS NOT NULL THEN 1 ELSE 0 END)\nFROM leads;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  'clientes' as tabela,\n  COUNT(*) as total,\n  SUM(CASE WHEN pesquisaId IS NULL THEN 1 ELSE 0 END) as sem_pesquisaId,\n  SUM(CASE WHEN pesquisaId IS NOT NULL THEN 1 ELSE 0 END) as com_pesquisaId\nFROM clientes\nUNION ALL\nSELECT \n  'mercados_unicos',\n  COUNT(*),\n  SUM(CASE WHEN pesquisaId IS NULL THEN 1 ELSE 0 END),\n  SUM(CASE WHEN pesquisaId IS NOT NULL THEN 1 ELSE 0 END)\nFROM mercados_unicos\nUNION ALL\nSELECT \n  'concorrentes',\n  COUNT(*),\n  SUM(CASE WHEN pesquisaId IS NULL THEN 1 ELSE 0 END),\n  SUM(CASE WHEN pesquisaId IS NOT NULL THEN 1 ELSE 0 END)\nFROM concorrentes\nUNION ALL\nSELECT \n  'leads',\n  COUNT(*),\n  SUM(CASE WHEN pesquisaId IS NULL THEN 1 ELSE 0 END),\n  SUM(CASE WHEN pesquisaId IS NOT NULL THEN 1 ELSE 0 END)\nFROM leads;\n",
+  "rows": [
+    {
+      "tabela": "clientes",
+      "total": "810",
+      "sem_pesquisaId": "2",
+      "com_pesquisaId": "808"
+    },
+    {
+      "tabela": "mercados_unicos",
+      "total": "668",
+      "sem_pesquisaId": "0",
+      "com_pesquisaId": "668"
+    },
+    {
+      "tabela": "leads",
+      "total": "3607",
+      "sem_pesquisaId": "0",
+      "com_pesquisaId": "3607"
+    },
+    {
+      "tabela": "concorrentes",
+      "total": "4976",
+      "sem_pesquisaId": "0",
+      "com_pesquisaId": "4976"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\ttotal\tsem_pesquisaId\tcom_pesquisaId\nclientes\t810\t2\t808\nmercados_unicos\t668\t0\t668\nleads\t3607\t0\t3607\nconcorrentes\t4976\t0\t4976\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

@@ -1,0 +1,26 @@
+{
+  "query": "\nSELECT \n  c.id,\n  c.nome,\n  c.projectId,\n  c.pesquisaId,\n  p.nome as project_name,\n  ps.nome as pesquisa_name\nFROM clientes c\nLEFT JOIN projects p ON p.id = c.projectId\nLEFT JOIN pesquisas ps ON ps.id = c.pesquisaId\nWHERE c.nome LIKE '%Veolia%'\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  c.id,\n  c.nome,\n  c.projectId,\n  c.pesquisaId,\n  p.nome as project_name,\n  ps.nome as pesquisa_name\nFROM clientes c\nLEFT JOIN projects p ON p.id = c.projectId\nLEFT JOIN pesquisas ps ON ps.id = c.pesquisaId\nWHERE c.nome LIKE '%Veolia%'\nLIMIT 10;\n",
+  "rows": [
+    {
+      "id": "421612",
+      "nome": "VEOLIA SERVICOS AMBIENTAIS BRASIL",
+      "projectId": "330001",
+      "pesquisaId": "60001",
+      "project_name": "Ground",
+      "pesquisa_name": "Ground"
+    },
+    {
+      "id": "421613",
+      "nome": "Quero encontrar clientes potenciais para a compra de geomembrana com aplicação premium para obras ambientais, com tecnologia 7 camadas em todo Brasil. São clientes potenciais já em minha base: Veolia, Solvi, Orizon",
+      "projectId": "330002",
+      "pesquisaId": "60002",
+      "project_name": "TechGround",
+      "pesquisa_name": "TechGround"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tprojectId\tpesquisaId\tproject_name\tpesquisa_name\n421612\tVEOLIA SERVICOS AMBIENTAIS BRASIL\t330001\t60001\tGround\tGround\n421613\tQuero encontrar clientes potenciais para a compra de geomembrana com aplicação premium para obras ambientais, com tecnologia 7 camadas em todo Brasil. São clientes potenciais já em minha base: Veolia, Solvi, Orizon\t330002\t60002\tTechGround\tTechGround\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

@@ -186,6 +186,7 @@ export async function getDashboardStats(projectId?: number) {
 
 export async function getMercados(params?: {
   projectId?: number;
+  pesquisaId?: number;
   search?: string;
   categoria?: string;
   segmentacao?: string;
@@ -197,9 +198,11 @@ export async function getMercados(params?: {
 
   let query = db.select().from(mercadosUnicos);
 
-  // Filtrar por projeto se fornecido
+  // Filtrar por pesquisa (prioridade) ou projeto
   const conditions = [];
-  if (params?.projectId) {
+  if (params?.pesquisaId) {
+    conditions.push(eq(mercadosUnicos.pesquisaId, params.pesquisaId));
+  } else if (params?.projectId) {
     conditions.push(eq(mercadosUnicos.projectId, params.projectId));
   }
   if (params?.search) {
@@ -249,12 +252,14 @@ export async function getMercadoById(id: number) {
 // CLIENTE HELPERS
 // ============================================
 
-export async function getAllClientes(params?: { projectId?: number; validationStatus?: string }) {
+export async function getAllClientes(params?: { projectId?: number; pesquisaId?: number; validationStatus?: string }) {
   const db = await getDb();
   if (!db) return [];
 
   const conditions = [];
-  if (params?.projectId) {
+  if (params?.pesquisaId) {
+    conditions.push(eq(clientes.pesquisaId, params.pesquisaId));
+  } else if (params?.projectId) {
     conditions.push(eq(clientes.projectId, params.projectId));
   }
   if (params?.validationStatus) {
@@ -377,12 +382,14 @@ export async function updateClienteValidation(
 // CONCORRENTE HELPERS
 // ============================================
 
-export async function getAllConcorrentes(params?: { projectId?: number; validationStatus?: string }) {
+export async function getAllConcorrentes(params?: { projectId?: number; pesquisaId?: number; validationStatus?: string }) {
   const db = await getDb();
   if (!db) return [];
 
   const conditions = [];
-  if (params?.projectId) {
+  if (params?.pesquisaId) {
+    conditions.push(eq(concorrentes.pesquisaId, params.pesquisaId));
+  } else if (params?.projectId) {
     conditions.push(eq(concorrentes.projectId, params.projectId));
   }
   if (params?.validationStatus) {
@@ -474,12 +481,14 @@ export async function updateConcorrenteValidation(
 // LEAD HELPERS
 // ============================================
 
-export async function getAllLeads(params?: { projectId?: number; validationStatus?: string }) {
+export async function getAllLeads(params?: { projectId?: number; pesquisaId?: number; validationStatus?: string }) {
   const db = await getDb();
   if (!db) return [];
 
   const conditions = [];
-  if (params?.projectId) {
+  if (params?.pesquisaId) {
+    conditions.push(eq(leads.pesquisaId, params.pesquisaId));
+  } else if (params?.projectId) {
     conditions.push(eq(leads.projectId, params.projectId));
   }
   if (params?.validationStatus) {
@@ -1480,15 +1489,20 @@ export async function duplicateProject(
 // PESQUISA HELPERS
 // ============================================
 
-export async function getPesquisas() {
+export async function getPesquisas(projectId?: number) {
   const db = await getDb();
   if (!db) return [];
   
   try {
-    const result = await db
-      .select()
-      .from(pesquisas)
-      .where(eq(pesquisas.ativo, 1))
+    let query = db.select().from(pesquisas);
+    
+    const conditions = [eq(pesquisas.ativo, 1)];
+    if (projectId) {
+      conditions.push(eq(pesquisas.projectId, projectId));
+    }
+    
+    const result = await query
+      .where(and(...conditions)!)
       .orderBy(pesquisas.nome);
     return result;
   } catch (error) {
@@ -3403,13 +3417,20 @@ export async function getProdutosByMercado(mercadoId: number) {
   }
 }
 
-export async function getProdutosByProject(projectId: number) {
+export async function getProdutosByProject(projectId: number, pesquisaId?: number) {
   const db = await getDb();
   if (!db) return [];
 
   try {
+    const conditions = [];
+    if (pesquisaId) {
+      conditions.push(eq(produtos.pesquisaId, pesquisaId));
+    } else {
+      conditions.push(eq(produtos.projectId, projectId));
+    }
+
     const result = await db.select().from(produtos)
-      .where(eq(produtos.projectId, projectId))
+      .where(and(...conditions)!)
       .orderBy(desc(produtos.createdAt));
     return result;
   } catch (error) {

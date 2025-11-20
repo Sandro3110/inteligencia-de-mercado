@@ -1,0 +1,24 @@
+{
+  "query": "\nSELECT id, nome, projectId, pesquisaId, createdAt\nFROM mercados_unicos\nWHERE nome LIKE '%Teste%'\nORDER BY id DESC\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT id, nome, projectId, pesquisaId, createdAt\nFROM mercados_unicos\nWHERE nome LIKE '%Teste%'\nORDER BY id DESC\nLIMIT 10;\n",
+  "rows": [
+    {
+      "id": "780003",
+      "nome": "Mercado Teste 2",
+      "projectId": "1",
+      "pesquisaId": "90002",
+      "createdAt": "2025-11-20 21:34:36"
+    },
+    {
+      "id": "780002",
+      "nome": "Mercado Teste 1",
+      "projectId": "1",
+      "pesquisaId": "90001",
+      "createdAt": "2025-11-20 21:34:35"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tprojectId\tpesquisaId\tcreatedAt\n780003\tMercado Teste 2\t1\t90002\t2025-11-20 21:34:36\n780002\tMercado Teste 1\t1\t90001\t2025-11-20 21:34:35\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

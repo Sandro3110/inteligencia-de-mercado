@@ -1,0 +1,9 @@
+{
+  "query": "\nALTER TABLE pesquisas \nADD COLUMN IF NOT EXISTS qtdConcorrentesPorMercado INT DEFAULT 5,\nADD COLUMN IF NOT EXISTS qtdLeadsPorMercado INT DEFAULT 10,\nADD COLUMN IF NOT EXISTS qtdProdutosPorCliente INT DEFAULT 3;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nALTER TABLE pesquisas \nADD COLUMN IF NOT EXISTS qtdConcorrentesPorMercado INT DEFAULT 5,\nADD COLUMN IF NOT EXISTS qtdLeadsPorMercado INT DEFAULT 10,\nADD COLUMN IF NOT EXISTS qtdProdutosPorCliente INT DEFAULT 3;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 936
+}

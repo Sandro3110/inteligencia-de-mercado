@@ -64,7 +64,9 @@ import { LayoutList, LayoutGrid, BarChart3, FilterX } from "lucide-react";
 import { Link } from "wouter";
 import SearchHistory, { addToSearchHistory } from "@/components/SearchHistory";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { useSelectedPesquisa } from "@/hooks/useSelectedPesquisa";
 import { ProjectSelector } from "@/components/ProjectSelector";
+import { PesquisaSelector } from "@/components/PesquisaSelector";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useSidebarState } from "@/hooks/useSidebarState";
 
@@ -75,6 +77,7 @@ type ViewMode = "list" | "kanban";
 
 export default function CascadeView() {
   const { selectedProjectId } = useSelectedProject();
+  const { selectedPesquisaId, pesquisas, selectPesquisa } = useSelectedPesquisa(selectedProjectId);
   const { sidebarClass } = useSidebarState();
   const [currentPage, setCurrentPage] = useState<Page>("mercados");
   const [selectedMercadoId, setSelectedMercadoId] = useState<number | null>(null);
@@ -143,7 +146,11 @@ export default function CascadeView() {
   const pageSize = 20;
 
   const { data: mercados, isLoading } = trpc.mercados.list.useQuery(
-    { projectId: selectedProjectId!, search: "" },
+    { 
+      projectId: selectedProjectId!, 
+      pesquisaId: selectedPesquisaId || undefined,
+      search: "" 
+    },
     { enabled: !!selectedProjectId }
   );
   
@@ -883,6 +890,7 @@ export default function CascadeView() {
       <div className="flex items-center justify-between px-6 py-2 border-b border-border/40 flex-wrap gap-2">
         <div className="flex items-center gap-6">
           <ProjectSelector />
+          <PesquisaSelector projectId={selectedProjectId} />
           <div className="mt-2">
             <DynamicBreadcrumbs />
           </div>

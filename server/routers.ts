@@ -210,6 +210,7 @@ export const appRouter = router({
     list: publicProcedure
       .input(z.object({
         projectId: z.number().optional(),
+        pesquisaId: z.number().optional(),
         search: z.string().optional(),
         categoria: z.string().optional(),
         segmentacao: z.string().optional(),
@@ -265,12 +266,14 @@ export const appRouter = router({
     list: publicProcedure
       .input(z.object({
         projectId: z.number().optional(),
+        pesquisaId: z.number().optional(),
         validationStatus: z.string().optional(),
       }))
       .query(async ({ input }) => {
         const { getAllClientes } = await import('./db');
         return getAllClientes({ 
           projectId: input.projectId,
+          pesquisaId: input.pesquisaId,
           validationStatus: input.validationStatus 
         });
       }),
@@ -391,12 +394,14 @@ export const appRouter = router({
     list: publicProcedure
       .input(z.object({
         projectId: z.number().optional(),
+        pesquisaId: z.number().optional(),
         validationStatus: z.string().optional(),
       }))
       .query(async ({ input }) => {
         const { getAllConcorrentes } = await import('./db');
         return getAllConcorrentes({ 
           projectId: input.projectId,
+          pesquisaId: input.pesquisaId,
           validationStatus: input.validationStatus 
         });
       }),
@@ -554,12 +559,14 @@ export const appRouter = router({
     list: publicProcedure
       .input(z.object({
         projectId: z.number().optional(),
+        pesquisaId: z.number().optional(),
         validationStatus: z.string().optional(),
       }))
       .query(async ({ input }) => {
         const { getAllLeads } = await import('./db');
         return getAllLeads({ 
           projectId: input.projectId,
+          pesquisaId: input.pesquisaId,
           validationStatus: input.validationStatus 
         });
       }),
@@ -921,9 +928,10 @@ export const appRouter = router({
 
   pesquisas: router({
     list: publicProcedure
-      .query(async () => {
+      .input(z.object({ projectId: z.number() }).optional())
+      .query(async ({ input }) => {
         const { getPesquisas } = await import('./db');
-        return getPesquisas();
+        return getPesquisas(input?.projectId);
       }),
 
     byId: publicProcedure
@@ -1498,10 +1506,10 @@ export const appRouter = router({
       }),
 
     byProject: publicProcedure
-      .input(z.object({ projectId: z.number() }))
+      .input(z.object({ projectId: z.number(), pesquisaId: z.number().optional() }))
       .query(async ({ input }) => {
         const { getProdutosByProject } = await import('./db');
-        return getProdutosByProject(input.projectId);
+        return getProdutosByProject(input.projectId, input.pesquisaId);
       }),
 
     byId: publicProcedure

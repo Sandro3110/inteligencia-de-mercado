@@ -360,27 +360,32 @@
 
 ---
 
-## FASE 61: INVESTIGAÇÃO E CORREÇÃO DO FLUXO DE ENRIQUECIMENTO 🔍
+## FASE 61: CORREÇÃO COMPLETA DO PROBLEMA VEOLIA - FILTROS POR PESQUISAID 🔍
 
-### 61.1 Rastrear Fluxo Completo da Veolia
-- [ ] Verificar como cliente Veolia foi criado
-- [ ] Verificar pesquisaId associada ao cliente
-- [ ] Verificar se enriquecimento foi executado
-- [ ] Verificar se dados foram gravados no banco
-- [ ] Verificar como tela busca e exibe dados
+### 61.1 Backend - Adicionar Parâmetro pesquisaId nas Queries
+- [x] Adicionar pesquisaId em getMercados()
+- [x] Adicionar pesquisaId em getClientes()
+- [x] Adicionar pesquisaId em getConcorrentes()
+- [x] Adicionar pesquisaId em getLeads()
+- [x] Adicionar pesquisaId em getProdutos()
 
-### 61.2 Identificar Pontos de Falha
-- [ ] Verificar associação pesquisaId em todas as tabelas
-- [ ] Verificar filtros nas queries do frontend
-- [ ] Verificar se há problema de cache
-- [ ] Verificar se há problema de projectId
+### 61.2 Backend - Atualizar Routers tRPC
+- [x] Atualizar mercados.list para aceitar pesquisaId
+- [x] Atualizar clientes.list para aceitar pesquisaId
+- [x] Atualizar concorrentes.list para aceitar pesquisaId
+- [x] Atualizar leads.list para aceitar pesquisaId
+- [x] Atualizar produtos.byProject para aceitar pesquisaId
 
-### 61.3 Corrigir Problemas Encontrados
-- [ ] Corrigir associação de pesquisaId se necessário
-- [ ] Corrigir queries do frontend se necessário
-- [ ] Adicionar logs detalhados no processo
+### 61.3 Frontend - Atualizar Queries
+- [x] Criar hook useSelectedPesquisa
+- [x] Criar componente PesquisaSelector
+- [x] Atualizar CascadeView para passar pesquisaId
+- [x] Adicionar seletor de pesquisa no header do CascadeView
+- [ ] Atualizar MercadoDetalhes para passar pesquisaId
+- [ ] Atualizar outras telas que precisam do filtro
 
 ### 61.4 Testar e Validar
-- [ ] Testar enriquecimento completo end-to-end
-- [ ] Validar exibição de dados na tela
-- [ ] Criar testes automatizados
+- [x] Criar testes automatizados (7 testes criados)
+- [x] Corrigir schema do banco (colunas faltantes)
+- [x] Validar que filtros funcionam corretamente
+- [x] Testar filtros com projeto Embalagens
