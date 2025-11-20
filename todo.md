@@ -389,3 +389,62 @@
 - [x] Corrigir schema do banco (colunas faltantes)
 - [x] Validar que filtros funcionam corretamente
 - [x] Testar filtros com projeto Embalagens
+
+
+---
+
+## FASE 63: LIMPEZA DE PROJETOS E PESQUISAS VAZIOS 🧹 ✅
+
+### 63.1 Script de Verificação
+- [x] Criar script clean-empty-projects.ts
+- [x] Identificar projetos sem pesquisas
+- [x] Identificar pesquisas sem clientes/mercados/concorrentes/leads
+- [x] Listar projetos e pesquisas candidatos à exclusão
+
+### 63.2 Execução da Limpeza
+- [x] Deletar pesquisas vazias (3 pesquisas deletadas)
+- [x] Deletar projetos vazios (21 projetos de teste deletados)
+- [x] Gerar relatório de limpeza
+- [x] Validar integridade após limpeza
+
+**Resultado Final:**
+- ✅ 3 pesquisas vazias deletadas
+- ✅ 21 projetos vazios deletados (projetos de teste)
+- ✅ Banco limpo: 3 projetos ativos, 7 pesquisas ativas
+- ✅ Todos os dados mantidos: 670 mercados, 810 clientes, 4.978 concorrentes, 3.609 leads, 2.240 produtos
+
+---
+
+## FASE 62: AUDITORIA COMPLETA DO BANCO DE DADOS 🔍 ✅
+
+### 62.1 Script de Auditoria SQL
+- [x] Criar script audit-database.ts
+- [x] Verificar dados órfãos (sem projectId ou pesquisaId)
+- [x] Verificar integridade referencial (FKs inválidas)
+- [x] Verificar consistência de contadores
+- [x] Verificar duplicatas por hash
+
+### 62.2 Executar Auditoria
+- [x] Rodar queries de verificação em todas as tabelas
+- [x] Coletar estatísticas de cada tabela
+- [x] Identificar problemas críticos vs avisos
+- [x] Gerar lista de dados órfãos
+
+### 62.3 Relatório de Auditoria
+- [x] Gerar relatório detalhado (RELATORIO_AUDITORIA_BANCO.md)
+- [x] Listar todos os problemas encontrados
+- [x] Priorizar por severidade (crítico/alto/médio/baixo)
+- [x] Sugerir correções para cada problema
+
+### 62.4 Correções
+- [x] Propor correções para dados órfãos
+- [x] Criar script de migração (fix-database-issues.ts)
+- [x] Executar correções (2 clientes órfãos deletados)
+- [x] Validar correções com queries de verificação
+- [x] Atualizar 5 contadores inconsistentes
+
+**Resultado Final:**
+- ✅ 2 clientes órfãos deletados
+- ✅ 5 contadores de pesquisas corrigidos
+- ✅ 0 problemas críticos restantes
+- ✅ Apenas 1 problema baixo (mercados duplicados - OK por design)
