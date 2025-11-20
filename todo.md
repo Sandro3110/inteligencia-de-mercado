@@ -578,3 +578,57 @@
 - ✅ Recebimento de notificação broadcast
 - ✅ Marcar notificação como lida
 - ✅ Contagem de usuários conectados
+
+---
+
+## Fase 67: Sistema Completo de Notificações com Histórico e Integração Total
+
+### 67.1 Backend - Histórico Persistente
+- [x] Criar tabela `notifications` no banco de dados
+- [x] Implementar funções CRUD (create, list, markAsRead, delete)
+- [x] Adicionar filtros (tipo, lido/não lido, período)
+- [x] Criar endpoints tRPC (notifications.list, markAsRead, markAllAsRead, delete)
+
+### 67.2 Notificações de Leads de Alta Qualidade
+- [x] Integrar notificação no enrichmentFlow ao criar lead com score > 80
+- [x] Incluir dados do lead na notificação (nome, score, mercado)
+- [ ] Testar notificação em tempo real
+
+### 67.3 Frontend - Filtros e Categorias
+- [x] Adicionar filtro por tipo (enrichment, alert, lead, system)
+- [x] Adicionar filtro por status (lidas/não lidas)
+- [x] Adicionar ordenação (mais recentes, mais antigas)
+- [x] Adicionar botão "Marcar todas como lidas"
+- [x] Adicionar botão "Limpar todas"
+
+### 67.4 Página de Notificações
+- [x] Criar página `/notificacoes` com lista completa
+- [x] Adicionar paginação (20 itens por página)
+- [x] Adicionar item "Notificações" no menu (seção Sistema)
+- [x] Badge de contador de não lidas no menu
+
+### 67.5 Varredura e Integração Completa
+- [x] Varrer todos os arquivos da aplicação
+- [x] Identificar eventos que devem gerar notificações
+- [ ] Integrar notificações em:
+  - [x] Criação de projeto
+  - [ ] Criação de pesquisa
+  - [ ] Início de enriquecimento
+  - [ ] Conclusão de enriquecimento
+  - [ ] Erro em enriquecimento
+  - [x] Lead de alta qualidade criado
+  - [ ] Alerta de qualidade disparado
+  - [ ] Circuit breaker ativado
+  - [ ] Projeto hibernado
+  - [ ] Projeto reativado
+  - [ ] Validação em lote concluída
+  - [ ] Exportação concluída
+  - [ ] Relatório gerado
+
+### 67.6 Testes e Validação
+- [ ] Testar criação de notificações
+- [ ] Testar persistência no banco
+- [ ] Testar filtros e ordenação
+- [ ] Testar página de notificações
+- [ ] Validar integração em todos os eventos
+- [x] Criar testes automatizados

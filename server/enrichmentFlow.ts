@@ -815,6 +815,33 @@ async function findLeadsForMarkets(
                 totalProcessed: leads.length,
                 newLeadScore: qualidadeScore,
               });
+              
+              // Criar notificação de lead de alta qualidade
+              try {
+                const { createNotification } = await import('./db-notifications');
+                const { ENV } = await import('./_core/env');
+                
+                await createNotification({
+                  userId: ENV.ownerId,
+                  projectId,
+                  type: 'lead_high_quality',
+                  title: `🎯 Lead de Alta Qualidade Identificado!`,
+                  message: `Novo lead com score excelente: ${lead.nome} (${qualidadeScore} pontos) no mercado ${mercadoNome}`,
+                  metadata: {
+                    leadId: novoLead.id,
+                    leadNome: lead.nome,
+                    score: qualidadeScore,
+                    mercadoNome,
+                    mercadoId,
+                    cnpj: lead.cnpj,
+                    site: lead.site,
+                  },
+                  entityType: 'lead',
+                  entityId: novoLead.id,
+                });
+              } catch (error) {
+                console.error('[Notifications] Erro ao criar notificação de lead:', error);
+              }
             }
           }
         } catch (error) {

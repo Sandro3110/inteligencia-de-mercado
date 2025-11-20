@@ -4,10 +4,12 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { exportRouter } from "./routers/exportRouter";
+import { notificationsRouter } from "./routers/notificationsRouter";
 
 export const appRouter = router({
   system: systemRouter,
   export: exportRouter,
+  notifications: notificationsRouter,
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

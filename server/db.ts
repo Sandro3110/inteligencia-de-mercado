@@ -1063,6 +1063,26 @@ export async function createProject(data: InsertProject, userId?: string | null)
       });
     }
     
+    // Criar notificação
+    if (project && userId) {
+      try {
+        const { createNotification } = await import('./db-notifications');
+        await createNotification({
+          userId,
+          projectId: project.id,
+          type: 'project_created',
+          title: '🎯 Novo Projeto Criado',
+          message: `O projeto "${project.nome}" foi criado com sucesso`,
+          metadata: {
+            projectId: project.id,
+            projectName: project.nome,
+          },
+        });
+      } catch (error) {
+        console.error('[Notifications] Erro ao criar notificação de projeto:', error);
+      }
+    }
+    
     return project;
   } catch (error) {
     console.error("[Database] Failed to create project:", error);
