@@ -1161,6 +1161,81 @@ export async function deleteEmptyProject(projectId: number): Promise<{ success: 
   }
 }
 
+/**
+ * Hiberna um projeto (coloca em modo somente leitura)
+ * Fase 57: Sistema de Hibernação de Projetos
+ */
+export async function hibernateProject(projectId: number): Promise<{ success: boolean; error?: string }> {
+  const db = await getDb();
+  if (!db) return { success: false, error: "Database not available" };
+  
+  try {
+    // Verificar se projeto existe e está ativo
+    const project = await getProjectById(projectId);
+    if (!project) {
+      return { success: false, error: "Projeto não encontrado" };
+    }
+    
+    if (project.status === 'hibernated') {
+      return { success: false, error: "Projeto já está adormecido" };
+    }
+    
+    // Atualizar status para hibernated
+    await db
+      .update(projects)
+      .set({ status: 'hibernated', updatedAt: new Date() })
+      .where(eq(projects.id, projectId));
+    
+    console.log(`[Database] Project ${projectId} hibernated successfully`);
+    return { success: true };
+  } catch (error) {
+    console.error("[Database] Failed to hibernate project:", error);
+    return { success: false, error: "Erro ao adormecer projeto" };
+  }
+}
+
+/**
+ * Reativa um projeto adormecido
+ * Fase 57: Sistema de Hibernação de Projetos
+ */
+export async function reactivateProject(projectId: number): Promise<{ success: boolean; error?: string }> {
+  const db = await getDb();
+  if (!db) return { success: false, error: "Database not available" };
+  
+  try {
+    // Verificar se projeto existe e está hibernado
+    const project = await getProjectById(projectId);
+    if (!project) {
+      return { success: false, error: "Projeto não encontrado" };
+    }
+    
+    if (project.status === 'active') {
+      return { success: false, error: "Projeto já está ativo" };
+    }
+    
+    // Atualizar status para active
+    await db
+      .update(projects)
+      .set({ status: 'active', updatedAt: new Date() })
+      .where(eq(projects.id, projectId));
+    
+    console.log(`[Database] Project ${projectId} reactivated successfully`);
+    return { success: true };
+  } catch (error) {
+    console.error("[Database] Failed to reactivate project:", error);
+    return { success: false, error: "Erro ao reativar projeto" };
+  }
+}
+
+/**
+ * Verifica se um projeto está adormecido
+ * Fase 57: Sistema de Hibernação de Projetos
+ */
+export async function isProjectHibernated(projectId: number): Promise<boolean> {
+  const project = await getProjectById(projectId);
+  return project?.status === 'hibernated';
+}
+
 // ============================================
 // PESQUISA HELPERS
 // ============================================

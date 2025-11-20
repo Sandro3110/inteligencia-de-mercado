@@ -169,3 +169,60 @@
 - [ ] Testar salvamento e recuperação de rascunho
 - [ ] Testar navegação com resumos
 - [ ] Validar UX completa end-to-end
+
+
+---
+
+## FASE 57: SISTEMA DE HIBERNAÇÃO DE PROJETOS 💤
+
+### 57.1 Schema e Migração
+- [x] Adicionar campo `status` ao schema de projetos (enum: active, hibernated)
+- [x] Criar migração SQL para adicionar coluna status
+- [x] Atualizar tipos TypeScript
+
+### 57.2 Backend - Funções de Hibernação
+- [x] Criar função hibernateProject() no db.ts
+- [x] Criar função reactivateProject() no db.ts
+- [x] Validar que projetos adormecidos não podem ser modificados
+- [x] Adicionar filtro por status nas queries
+
+### 57.3 Backend - Endpoints tRPC
+- [x] Adicionar projects.hibernate mutation
+- [x] Adicionar projects.reactivate mutation
+- [x] Adicionar projects.isHibernated query
+- [x] Atualizar projects.list para incluir status
+
+### 57.4 Frontend - UI de Hibernação
+- [x] Adicionar botão "Adormecer Projeto" no Step 1
+- [x] Adicionar botão "Reativar Projeto" para projetos adormecidos
+- [x] Modal de confirmação de hibernação
+- [x] Badge visual de status (Ativo/Adormecido)
+
+### 57.5 Proteção de Somente Leitura
+- [x] Desabilitar edição de projetos adormecidos
+- [x] Desabilitar criação de pesquisas em projetos adormecidos
+- [x] Permitir visualização de dados (somente leitura)
+- [x] Mensagens de feedback claras
+
+### 57.6 Filtros e Indicadores
+- [x] Filtro de projetos por status na lista
+- [x] Indicador visual na seleção de projetos
+- [x] Contador de projetos ativos vs adormecidos
+- [x] Tooltip explicativo
+
+### 57.7 Testes e Validação
+- [x] Testar hibernação de projeto (11 testes passaram)
+- [x] Testar reativação de projeto
+- [x] Testar proteção de somente leitura
+- [x] Validar UX completa
+
+
+### 57.8 Página de Gerenciamento de Projetos
+- [x] Fazer varredura completa de funcionalidades de projetos
+- [x] Criar página ProjectManagement.tsx com todas as opções
+- [x] Adicionar rota no App.tsx (/projetos)
+- [x] Adicionar item no menu lateral (Configurações > Projetos)
+- [x] Implementar listagem com cards de projetos
+- [x] Adicionar filtros (todos/ativos/adormecidos)
+- [x] Implementar todas as ações (criar/editar/hibernar/reativar/deletar)
+- [x] Adicionar estatísticas e badges de status

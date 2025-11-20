@@ -779,6 +779,27 @@ export const appRouter = router({
         const { deleteEmptyProject } = await import('./db');
         return deleteEmptyProject(input);
       }),
+
+    hibernate: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { hibernateProject } = await import('./db');
+        return hibernateProject(input);
+      }),
+
+    reactivate: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { reactivateProject } = await import('./db');
+        return reactivateProject(input);
+      }),
+
+    isHibernated: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const { isProjectHibernated } = await import('./db');
+        return isProjectHibernated(input);
+      }),
   }),
 
   pesquisas: router({

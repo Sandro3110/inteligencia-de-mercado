@@ -211,6 +211,13 @@
       "when": 1763654192891,
       "tag": "0029_misty_starfox",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1763667954630,
+      "tag": "0030_misty_proteus",
+      "breakpoints": true
     }
   ]
 }

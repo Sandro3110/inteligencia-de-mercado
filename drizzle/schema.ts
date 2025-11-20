@@ -24,7 +24,8 @@ export const projects = mysqlTable("projects", {
   nome: varchar("nome", { length: 255 }).notNull(),
   descricao: text("descricao"),
   cor: varchar("cor", { length: 7 }).default("#3b82f6"), // hex color
-  ativo: int("ativo").default(1).notNull(), // 1 = ativo, 0 = inativo
+  ativo: int("ativo").default(1).notNull(), // 1 = ativo, 0 = inativo (soft delete)
+  status: mysqlEnum("status", ["active", "hibernated"]).default("active").notNull(), // Fase 57: Hibernação
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });

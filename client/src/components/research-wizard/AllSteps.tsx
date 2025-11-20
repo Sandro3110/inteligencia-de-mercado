@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, FileSpreadsheet, Sparkles, Plus, Trash2, CheckCircle2, AlertCircle, FolderPlus, X } from 'lucide-react';
+import { Upload, FileSpreadsheet, Sparkles, Plus, Trash2, CheckCircle2, AlertCircle, FolderPlus, X, Moon, Sun } from 'lucide-react';
 import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
 import type { ResearchWizardData } from '@/types/research-wizard';
@@ -30,6 +30,7 @@ export function Step1SelectProject({ data, updateData }: {
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectDesc, setNewProjectDesc] = useState('');
   const [projectToDelete, setProjectToDelete] = useState<number | null>(null);
+  const [projectToHibernate, setProjectToHibernate] = useState<number | null>(null);
   
   const { data: projects, isLoading, error, refetch } = trpc.projects.list.useQuery();
   
@@ -68,6 +69,27 @@ export function Step1SelectProject({ data, updateData }: {
     },
     onError: (error: any) => {
       toast.error(`Erro ao deletar projeto: ${error.message}`);
+    }
+  });
+  
+  const hibernateProject = trpc.projects.hibernate.useMutation({
+    onSuccess: () => {
+      refetch();
+      toast.success('Projeto adormecido com sucesso!');
+      setProjectToHibernate(null);
+    },
+    onError: (error: any) => {
+      toast.error(`Erro ao adormecer projeto: ${error.message}`);
+    }
+  });
+  
+  const reactivateProject = trpc.projects.reactivate.useMutation({
+    onSuccess: () => {
+      refetch();
+      toast.success('Projeto reativado com sucesso!');
+    },
+    onError: (error: any) => {
+      toast.error(`Erro ao reativar projeto: ${error.message}`);
     }
   });
 
@@ -207,7 +229,14 @@ export function Step1SelectProject({ data, updateData }: {
           <SelectContent>
             {projects && projects.length > 0 ? projects.map(project => (
               <SelectItem key={project.id} value={project.id.toString()}>
-                {project.nome}
+                <div className="flex items-center gap-2">
+                  <span>{project.nome}</span>
+                  {project.status === 'hibernated' && (
+                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-300">
+                      💤 Adormecido
+                    </Badge>
+                  )}
+                </div>
               </SelectItem>
             )) : (
               <SelectItem value="none" disabled>
@@ -218,24 +247,114 @@ export function Step1SelectProject({ data, updateData }: {
         </Select>
 
         {data.projectId && (
-          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-sm text-green-800">
-              ✓ Projeto selecionado: <strong>{data.projectName}</strong>
-            </p>
+          <div className={`p-4 border rounded-lg ${
+            projects?.find(p => p.id === data.projectId)?.status === 'hibernated'
+              ? 'bg-blue-50 border-blue-200'
+              : 'bg-green-50 border-green-200'
+          }`}>
+            <div className="flex items-center justify-between">
+              <p className={`text-sm ${
+                projects?.find(p => p.id === data.projectId)?.status === 'hibernated'
+                  ? 'text-blue-800'
+                  : 'text-green-800'
+              }`}>
+                ✓ Projeto selecionado: <strong>{data.projectName}</strong>
+              </p>
+              {projects?.find(p => p.id === data.projectId)?.status === 'hibernated' && (
+                <Badge className="bg-blue-100 text-blue-800 border-blue-300">
+                  💤 Somente Leitura
+                </Badge>
+              )}
+            </div>
           </div>
         )}
         
-        {/* Botão de deletar projeto vazio */}
+        {/* Botões de ações do projeto */}
         {data.projectId && (
-          <Button
-            onClick={() => setProjectToDelete(data.projectId!)}
-            variant="ghost"
-            size="sm"
-            className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Deletar Projeto (se vazio)
-          </Button>
+          <div className="flex gap-2">
+            {/* Verificar status do projeto */}
+            {projects?.find(p => p.id === data.projectId)?.status === 'hibernated' ? (
+              <Button
+                onClick={() => reactivateProject.mutate(data.projectId!)}
+                disabled={reactivateProject.isPending}
+                variant="outline"
+                size="sm"
+                className="flex-1 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
+              >
+                <Sun className="w-4 h-4 mr-2" />
+                {reactivateProject.isPending ? 'Reativando...' : 'Reativar Projeto'}
+              </Button>
+            ) : (
+              <Button
+                onClick={() => setProjectToHibernate(data.projectId!)}
+                variant="outline"
+                size="sm"
+                className="flex-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-300"
+              >
+                <Moon className="w-4 h-4 mr-2" />
+                Adormecer Projeto
+              </Button>
+            )}
+            
+            <Button
+              onClick={() => setProjectToDelete(data.projectId!)}
+              variant="ghost"
+              size="sm"
+              className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Deletar (se vazio)
+            </Button>
+          </div>
+        )}
+        
+        {/* Modal de Confirmação de Hibernação */}
+        {projectToHibernate && (
+          <Card className="p-4 space-y-4 border-2 border-blue-200 bg-blue-50/50">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-lg text-blue-800">Adormecer Projeto?</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setProjectToHibernate(null)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded">
+                <p className="text-sm text-blue-800 font-semibold mb-2">
+                  💤 O projeto ficará em modo somente leitura.
+                </p>
+                <ul className="text-xs text-blue-700 space-y-1 ml-4 list-disc">
+                  <li>Você poderá visualizar todos os dados</li>
+                  <li>Não será possível criar novas pesquisas</li>
+                  <li>Não será possível editar dados existentes</li>
+                  <li>Você pode reativar o projeto a qualquer momento</li>
+                </ul>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    hibernateProject.mutate(projectToHibernate);
+                  }}
+                  disabled={hibernateProject.isPending}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  {hibernateProject.isPending ? 'Adormecendo...' : 'Confirmar'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setProjectToHibernate(null)}
+                  disabled={hibernateProject.isPending}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </Card>
         )}
         
         {/* Modal de Confirmação de Deleção */}

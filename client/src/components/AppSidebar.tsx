@@ -20,6 +20,7 @@ import {
   ChevronLeft,
   Plus,
   Download,
+  Folder,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -92,6 +93,7 @@ const navSections: NavSection[] = [
     icon: Settings,
     defaultOpen: false,
     items: [
+      { title: "Projetos", href: "/projetos", icon: Folder },
       { title: "Enriquecimento", href: "/enrichment-settings", icon: Settings },
       { title: "Admin LLM", href: "/admin/llm", icon: Zap },
       { title: "Alertas", href: "/alertas", icon: Bell },

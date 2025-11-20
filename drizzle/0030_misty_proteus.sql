@@ -1,0 +1,1 @@
+ALTER TABLE `projects` ADD `status` enum('active','hibernated') DEFAULT 'active' NOT NULL;
