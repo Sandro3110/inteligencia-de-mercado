@@ -1381,5 +1381,77 @@ export const appRouter = router({
         return getBatchStatus();
       }),
   }),
+
+  // Enrichment Config - Configurações de enriquecimento
+  enrichmentConfig: router({
+    // Buscar configuração do projeto
+    get: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const { getEnrichmentConfig } = await import('./db');
+        return getEnrichmentConfig(input.projectId);
+      }),
+
+    // Salvar configuração
+    save: publicProcedure
+      .input(z.object({
+        projectId: z.number(),
+        openaiApiKey: z.string().optional(),
+        serpapiKey: z.string().optional(),
+        receitawsKey: z.string().optional(),
+        produtosPorMercado: z.number().optional(),
+        concorrentesPorMercado: z.number().optional(),
+        leadsPorMercado: z.number().optional(),
+        batchSize: z.number().optional(),
+        checkpointInterval: z.number().optional(),
+        enableDeduplication: z.number().optional(),
+        enableQualityScore: z.number().optional(),
+        enableAutoRetry: z.number().optional(),
+        maxRetries: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { saveEnrichmentConfig } = await import('./db');
+        return saveEnrichmentConfig(input);
+      }),
+
+    // Testar API keys
+    testKeys: publicProcedure
+      .input(z.object({
+        openaiApiKey: z.string(),
+        serpapiKey: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const results: any = { openai: false, serpapi: false };
+        
+        // Testar OpenAI
+        try {
+          const response = await fetch('https://api.openai.com/v1/models', {
+            headers: {
+              'Authorization': `Bearer ${input.openaiApiKey}`,
+            },
+          });
+          results.openai = response.ok;
+          results.openaiMessage = response.ok ? 'Chave válida' : 'Chave inválida';
+        } catch (error: any) {
+          results.openai = false;
+          results.openaiMessage = error.message;
+        }
+
+        // Testar SerpAPI (se fornecida)
+        if (input.serpapiKey) {
+          try {
+            const response = await fetch(`https://serpapi.com/account.json?api_key=${input.serpapiKey}`);
+            const data = await response.json();
+            results.serpapi = !!data.account_id;
+            results.serpapiMessage = results.serpapi ? 'Chave válida' : 'Chave inválida';
+          } catch (error: any) {
+            results.serpapi = false;
+            results.serpapiMessage = error.message;
+          }
+        }
+
+        return results;
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

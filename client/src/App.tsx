@@ -26,6 +26,7 @@ import ROIDashboard from "./pages/ROIDashboard";
 import FunnelView from "./pages/FunnelView";
 import SchedulePage from "./pages/SchedulePage";
 import AtividadePage from "./pages/AtividadePage";
+import EnrichmentSettings from "./pages/EnrichmentSettings";
 
 import ResultadosEnriquecimento from "./pages/ResultadosEnriquecimento";
 
@@ -49,6 +50,7 @@ function Router() {
       <Route path="/funil" component={FunnelView} />
       <Route path="/agendamento" component={SchedulePage} />
       <Route path="/atividade" component={AtividadePage} />
+      <Route path="/enrichment-settings" component={EnrichmentSettings} />
 
       <Route path="/resultados-enriquecimento" component={ResultadosEnriquecimento} />
       <Route path={"/404"} component={NotFound} />

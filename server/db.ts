@@ -8,7 +8,8 @@ import {
   projectTemplates, ProjectTemplate, InsertProjectTemplate,
   notifications, Notification, InsertNotification,
   MercadoUnico, Cliente, Concorrente, Lead,
-  activityLog, ActivityLog, InsertActivityLog
+  activityLog, ActivityLog, InsertActivityLog,
+  enrichmentConfigs, EnrichmentConfig, InsertEnrichmentConfig
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -2923,6 +2924,173 @@ export async function deleteProduto(id: number) {
     return true;
   } catch (error) {
     console.error("[Database] Failed to delete produto:", error);
+    return false;
+  }
+}
+
+
+// ============================================================================
+// ENRICHMENT CONFIGS
+// ============================================================================
+
+import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+
+// Chave de criptografia (deve estar em variável de ambiente em produção)
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'default-32-char-key-change-me!!'; // 32 caracteres
+const ALGORITHM = 'aes-256-cbc';
+
+/**
+ * Criptografa uma string (API key)
+ */
+export function encryptApiKey(text: string): string {
+  if (!text) return '';
+  
+  try {
+    const iv = randomBytes(16);
+    const key = Buffer.from(ENCRYPTION_KEY.padEnd(32, '0').slice(0, 32));
+    const cipher = createCipheriv(ALGORITHM, key, iv);
+    
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    
+    // Retorna IV + encrypted (separados por :)
+    return iv.toString('hex') + ':' + encrypted;
+  } catch (error) {
+    console.error('[Encryption] Failed to encrypt:', error);
+    return '';
+  }
+}
+
+/**
+ * Descriptografa uma string (API key)
+ */
+export function decryptApiKey(encrypted: string): string {
+  if (!encrypted) return '';
+  
+  try {
+    const parts = encrypted.split(':');
+    if (parts.length !== 2) return '';
+    
+    const iv = Buffer.from(parts[0], 'hex');
+    const encryptedText = parts[1];
+    const key = Buffer.from(ENCRYPTION_KEY.padEnd(32, '0').slice(0, 32));
+    
+    const decipher = createDecipheriv(ALGORITHM, key, iv);
+    let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    
+    return decrypted;
+  } catch (error) {
+    console.error('[Decryption] Failed to decrypt:', error);
+    return '';
+  }
+}
+
+/**
+ * Busca configuração de enriquecimento por projeto
+ */
+export async function getEnrichmentConfig(projectId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.select().from(enrichmentConfigs)
+      .where(eq(enrichmentConfigs.projectId, projectId))
+      .limit(1);
+    
+    if (result.length === 0) return null;
+    
+    const config = result[0];
+    
+    // Descriptografar API keys antes de retornar
+    return {
+      ...config,
+      openaiApiKey: config.openaiApiKey ? decryptApiKey(config.openaiApiKey) : null,
+      serpapiKey: config.serpapiKey ? decryptApiKey(config.serpapiKey) : null,
+      receitawsKey: config.receitawsKey ? decryptApiKey(config.receitawsKey) : null,
+    };
+  } catch (error) {
+    console.error("[Database] Failed to get enrichment config:", error);
+    return null;
+  }
+}
+
+/**
+ * Salva ou atualiza configuração de enriquecimento
+ */
+export async function saveEnrichmentConfig(data: {
+  projectId: number;
+  openaiApiKey?: string | null;
+  serpapiKey?: string | null;
+  receitawsKey?: string | null;
+  produtosPorMercado?: number;
+  concorrentesPorMercado?: number;
+  leadsPorMercado?: number;
+  batchSize?: number;
+  checkpointInterval?: number;
+  enableDeduplication?: number;
+  enableQualityScore?: number;
+  enableAutoRetry?: number;
+  maxRetries?: number;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    // Criptografar API keys antes de salvar
+    const encryptedData: any = { ...data };
+    
+    if (data.openaiApiKey) {
+      encryptedData.openaiApiKey = encryptApiKey(data.openaiApiKey);
+    }
+    if (data.serpapiKey) {
+      encryptedData.serpapiKey = encryptApiKey(data.serpapiKey);
+    }
+    if (data.receitawsKey) {
+      encryptedData.receitawsKey = encryptApiKey(data.receitawsKey);
+    }
+
+    // Verificar se já existe config para este projeto
+    const existing = await db.select().from(enrichmentConfigs)
+      .where(eq(enrichmentConfigs.projectId, data.projectId))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update
+      await db.update(enrichmentConfigs)
+        .set({
+          ...encryptedData,
+          updatedAt: new Date(),
+        })
+        .where(eq(enrichmentConfigs.projectId, data.projectId));
+    } else {
+      // Insert
+      await db.insert(enrichmentConfigs).values({
+        ...encryptedData,
+        projectId: data.projectId,
+      });
+    }
+
+    return await getEnrichmentConfig(data.projectId);
+  } catch (error) {
+    console.error("[Database] Failed to save enrichment config:", error);
+    return null;
+  }
+}
+
+/**
+ * Deleta configuração de enriquecimento
+ */
+export async function deleteEnrichmentConfig(projectId: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.delete(enrichmentConfigs)
+      .where(eq(enrichmentConfigs.projectId, projectId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete enrichment config:", error);
     return false;
   }
 }

@@ -48,6 +48,12 @@ const navItems: NavItem[] = [
     description: "Configurar e executar enriquecimento"
   },
   {
+    title: "Configurações",
+    href: "/enrichment-settings",
+    icon: Settings,
+    description: "API keys e critérios de enriquecimento"
+  },
+  {
     title: "Monitoramento",
     href: "/enrichment-progress",
     icon: Clock,

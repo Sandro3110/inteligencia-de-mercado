@@ -12,9 +12,16 @@ import { TemplateSelector } from '@/components/TemplateSelector';
 import { useLocation } from 'wouter';
 import * as XLSX from 'xlsx';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { CostEstimator } from '@/components/CostEstimator';
+import { useSelectedProject } from '@/hooks/useSelectedProject';
+import { useEnrichmentConfig } from '@/hooks/useEnrichmentConfig';
+import { Link } from 'wouter';
+import { Settings as SettingsIcon } from 'lucide-react';
 
 export default function EnrichmentFlow() {
   const [, setLocation] = useLocation();
+  const { selectedProjectId } = useSelectedProject();
+  const { config } = useEnrichmentConfig(selectedProjectId);
   const [projectName, setProjectName] = useState('');
   const [clientesText, setClientesText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -111,6 +118,32 @@ export default function EnrichmentFlow() {
             Insira uma lista de clientes e crie automaticamente um novo projeto com dados enriquecidos
           </p>
         </div>
+
+        {/* Aviso sobre configuração */}
+        {!config?.openaiApiKey && (
+          <Alert>
+            <SettingsIcon className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Configure suas API keys primeiro!</strong>
+              {' '}
+              <Link href="/enrichment-settings">
+                <Button variant="link" className="p-0 h-auto">
+                  Ir para Configurações
+                </Button>
+              </Link>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Estimativa de Custos */}
+        {clientesText && (
+          <CostEstimator
+            totalClientes={clientesText.split('\n').filter(l => l.trim()).length}
+            produtosPorMercado={config?.produtosPorMercado || 3}
+            concorrentesPorMercado={config?.concorrentesPorMercado || 5}
+            leadsPorMercado={config?.leadsPorMercado || 5}
+          />
+        )}
 
         <Card>
           <CardHeader>

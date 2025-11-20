@@ -550,3 +550,39 @@ export const enrichmentJobs = mysqlTable("enrichment_jobs", {
 
 export type EnrichmentJob = typeof enrichmentJobs.$inferSelect;
 export type InsertEnrichmentJob = typeof enrichmentJobs.$inferInsert;
+
+/**
+ * Enrichment Configs - Configurações de enriquecimento por projeto
+ * Armazena API keys e critérios customizados
+ */
+export const enrichmentConfigs = mysqlTable("enrichment_configs", {
+  id: int("id").primaryKey().autoincrement(),
+  projectId: int("projectId").notNull().unique(),
+  
+  // API Keys (criptografadas no backend antes de salvar)
+  openaiApiKey: text("openaiApiKey"), // obrigatória
+  serpapiKey: text("serpapiKey"), // opcional
+  receitawsKey: text("receitawsKey"), // opcional
+  
+  // Critérios de enriquecimento
+  produtosPorMercado: int("produtosPorMercado").default(3).notNull(),
+  concorrentesPorMercado: int("concorrentesPorMercado").default(5).notNull(),
+  leadsPorMercado: int("leadsPorMercado").default(5).notNull(),
+  
+  // Configurações de processamento
+  batchSize: int("batchSize").default(50).notNull(),
+  checkpointInterval: int("checkpointInterval").default(100).notNull(),
+  
+  // Flags de funcionalidades
+  enableDeduplication: int("enableDeduplication").default(1).notNull(), // 1 = ativo, 0 = inativo
+  enableQualityScore: int("enableQualityScore").default(1).notNull(),
+  enableAutoRetry: int("enableAutoRetry").default(1).notNull(),
+  maxRetries: int("maxRetries").default(2).notNull(),
+  
+  // Metadata
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type EnrichmentConfig = typeof enrichmentConfigs.$inferSelect;
+export type InsertEnrichmentConfig = typeof enrichmentConfigs.$inferInsert;
