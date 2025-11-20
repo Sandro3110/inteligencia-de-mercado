@@ -15,6 +15,7 @@ import { SearchFieldSelector, SearchField } from "@/components/SearchFieldSelect
 import { SaveFilterDialog } from "@/components/SaveFilterDialog";
 import { SavedFilters } from "@/components/SavedFilters";
 import { SkeletonMercado, SkeletonCliente, SkeletonConcorrente, SkeletonLead } from "@/components/SkeletonLoading";
+import { MercadoAccordionCard } from "@/components/MercadoAccordionCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -80,6 +81,8 @@ export default function CascadeView() {
   const [searchFields, setSearchFields] = useState<SearchField[]>(["nome", "cnpj", "produto"]); // Campos padrão
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [sortBy, setSortBy] = useState<"nome" | "qualidade" | "data" | "status">("nome");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   
   // Estados para filtros avançados
   const [mercadoFilters, setMercadoFilters] = useState<{
@@ -344,6 +347,44 @@ export default function CascadeView() {
     });
   };
 
+  // Função de ordenação
+  const sortEntities = (entities: any[]) => {
+    const sorted = [...entities];
+    sorted.sort((a, b) => {
+      let compareValue = 0;
+      
+      switch (sortBy) {
+        case "nome":
+          const nameA = a.nome || a.empresa || "";
+          const nameB = b.nome || b.empresa || "";
+          compareValue = nameA.localeCompare(nameB);
+          break;
+        
+        case "qualidade":
+          const scoreA = calculateQualityScore(a);
+          const scoreB = calculateQualityScore(b);
+          compareValue = scoreB - scoreA; // Maior qualidade primeiro
+          break;
+        
+        case "data":
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          compareValue = dateB - dateA; // Mais recente primeiro
+          break;
+        
+        case "status":
+          const statusOrder = { rich: 0, needs_adjustment: 1, pending: 2, discarded: 3 };
+          const statusA = statusOrder[a.validationStatus as keyof typeof statusOrder] ?? 4;
+          const statusB = statusOrder[b.validationStatus as keyof typeof statusOrder] ?? 4;
+          compareValue = statusA - statusB;
+          break;
+      }
+      
+      return sortOrder === "asc" ? compareValue : -compareValue;
+    });
+    return sorted;
+  };
+
   const filteredMercados = useMemo(() => {
     if (!mercados) return [];
     let filtered = filterByStatus(mercados);
@@ -360,8 +401,9 @@ export default function CascadeView() {
       );
     }
     
-    return filtered;
-  }, [mercados, statusFilter, searchQuery, searchFields, mercadoFilters]);
+    // Aplicar ordenação
+    return sortEntities(filtered);
+  }, [mercados, statusFilter, searchQuery, searchFields, mercadoFilters, sortBy, sortOrder]);
 
   const filteredClientes = useMemo(() => {
     if (!clientes) return [];
@@ -388,8 +430,9 @@ export default function CascadeView() {
         clienteFilters.uf.includes(c.uf || "")
       );
     }
-    return filtered;
-  }, [clientes, statusFilter, searchQuery, selectedTagIds, clientesComTags, clienteFilters]);
+    // Aplicar ordenação
+    return sortEntities(filtered);
+  }, [clientes, statusFilter, searchQuery, selectedTagIds, clientesComTags, clienteFilters, sortBy, sortOrder]);
 
   const filteredConcorrentes = useMemo(() => {
     if (!concorrentes) return [];
@@ -410,8 +453,9 @@ export default function CascadeView() {
         concorrenteFilters.porte.includes(c.porte || "")
       );
     }
-    return filtered;
-  }, [concorrentes, statusFilter, searchQuery, selectedTagIds, concorrentesComTags, concorrenteFilters]);
+    // Aplicar ordenação
+    return sortEntities(filtered);
+  }, [concorrentes, statusFilter, searchQuery, selectedTagIds, concorrentesComTags, concorrenteFilters, sortBy, sortOrder]);
 
   const filteredLeads = useMemo(() => {
     if (!leads) return [];
@@ -438,8 +482,9 @@ export default function CascadeView() {
         leadFilters.porte.includes(l.porte || "")
       );
     }
-    return filtered;
-  }, [leads, statusFilter, searchQuery, selectedTagIds, leadsComTags, leadFilters]);
+    // Aplicar ordenação
+    return sortEntities(filtered);
+  }, [leads, statusFilter, searchQuery, selectedTagIds, leadsComTags, leadFilters, sortBy, sortOrder]);
 
   // Contador de resultados de busca
   const searchResultsCount = useMemo(() => {
@@ -599,22 +644,22 @@ export default function CascadeView() {
       data = filteredMercados;
       totalData = mercados?.length || 0;
       entityType = "mercados";
-      headers = ["ID", "Nome", "Segmentação", "Categoria", "Tamanho", "Crescimento", "Status"];
+      headers = ["ID", "Nome", "Segmentação", "Categoria", "Tamanho", "Crescimento", "Qualidade (%)", "Status"];
     } else if (currentPage === "clientes") {
       data = filteredClientes;
       totalData = clientes?.length || 0;
       entityType = "clientes";
-      headers = ["ID", "Empresa", "CNPJ", "Produto", "Segmentação", "Cidade", "UF", "Status"];
+      headers = ["ID", "Empresa", "CNPJ", "Produto", "Segmentação", "Cidade", "UF", "Qualidade (%)", "Status"];
     } else if (currentPage === "concorrentes") {
       data = filteredConcorrentes;
       totalData = concorrentes?.length || 0;
       entityType = "concorrentes";
-      headers = ["ID", "Nome", "CNPJ", "Produto", "Porte", "Score", "Status"];
+      headers = ["ID", "Nome", "CNPJ", "Produto", "Porte", "Qualidade (%)", "Status"];
     } else if (currentPage === "leads") {
       data = filteredLeads;
       totalData = leads?.length || 0;
       entityType = "leads";
-      headers = ["ID", "Nome", "CNPJ", "Tipo", "Porte", "Região", "Status"];
+      headers = ["ID", "Nome", "CNPJ", "Tipo", "Porte", "Região", "Qualidade (%)", "Status"];
     } else {
       toast.error("Selecione uma página com dados para exportar");
       return null;
@@ -629,6 +674,8 @@ export default function CascadeView() {
 
     // Preparar linhas
     const rows = data.map((item): (string | number)[] => {
+        const qualityScore = calculateQualityScore(item);
+        
         if (currentPage === "mercados") {
           return [
             item.id,
@@ -637,6 +684,7 @@ export default function CascadeView() {
             `"${item.categoria || ""}"`,
             item.tamanhoMercado || "",
             item.crescimentoAnual || "",
+            qualityScore,
             item.validationStatus || "pending",
           ];
         } else if (currentPage === "clientes") {
@@ -648,6 +696,7 @@ export default function CascadeView() {
             item.segmentacaoB2bB2c || "",
             item.cidade || "",
             item.uf || "",
+            qualityScore,
             item.validationStatus || "pending",
           ];
         } else if (currentPage === "concorrentes") {
@@ -657,7 +706,7 @@ export default function CascadeView() {
             item.cnpj || "",
             `"${item.produto || ""}"`,
             item.porte || "",
-            item.qualidadeScore || "",
+            qualityScore,
             item.validationStatus || "pending",
           ];
         } else {
@@ -668,6 +717,7 @@ export default function CascadeView() {
             item.tipo || "",
             item.porte || "",
             item.regiao || "",
+            qualityScore,
             item.validationStatus || "pending",
           ];
         }
@@ -680,6 +730,13 @@ export default function CascadeView() {
       Object.values(concorrenteFilters).some(arr => arr.length > 0) ||
       Object.values(leadFilters).some(arr => arr.length > 0);
 
+    // Construir descrição dos filtros ativos
+    const activeFilters: string[] = [];
+    if (searchQuery) activeFilters.push(`Busca: "${searchQuery}"`);
+    if (selectedTagIds.length > 0) activeFilters.push(`Tags: ${selectedTagIds.length} selecionadas`);
+    if (statusFilter !== "all") activeFilters.push(`Status: ${statusFilter}`);
+    if (sortBy !== "nome") activeFilters.push(`Ordenado por: ${sortBy}`);
+
     return {
       headers,
       rows,
@@ -689,6 +746,91 @@ export default function CascadeView() {
         "Data de Geração": new Date().toLocaleString("pt-BR"),
         "Total de Registros": `${data.length} de ${totalData}`,
         "Filtros Aplicados": hasFiltersActive ? "Sim" : "Não",
+        "Detalhes dos Filtros": activeFilters.length > 0 ? activeFilters.join(", ") : "Nenhum",
+        "Ordenação": `${sortBy} (${sortOrder === "asc" ? "crescente" : "decrescente"})`,
+      },
+    };
+  };
+
+  // Exportação de itens selecionados
+  const prepareSelectedExportData = (): ExportData | null => {
+    if (selectedItems.size === 0) {
+      toast.error("Nenhum item selecionado para exportar");
+      return null;
+    }
+
+    let data: any[] = [];
+    let headers: string[] = [];
+    let entityType = "";
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
+
+    if (currentPage === "clientes") {
+      data = filteredClientes.filter(c => selectedItems.has(c.id));
+      entityType = "clientes_selecionados";
+      headers = ["ID", "Empresa", "CNPJ", "Produto", "Segmentação", "Cidade", "UF", "Qualidade (%)", "Status"];
+    } else if (currentPage === "concorrentes") {
+      data = filteredConcorrentes.filter(c => selectedItems.has(c.id));
+      entityType = "concorrentes_selecionados";
+      headers = ["ID", "Nome", "CNPJ", "Produto", "Porte", "Qualidade (%)", "Status"];
+    } else if (currentPage === "leads") {
+      data = filteredLeads.filter(l => selectedItems.has(l.id));
+      entityType = "leads_selecionados";
+      headers = ["ID", "Nome", "CNPJ", "Tipo", "Porte", "Região", "Qualidade (%)", "Status"];
+    } else {
+      toast.error("Seleção não disponível nesta página");
+      return null;
+    }
+
+    const rows = data.map((item): (string | number)[] => {
+      const qualityScore = calculateQualityScore(item);
+      
+      if (currentPage === "clientes") {
+        return [
+          item.id,
+          `"${item.empresa || ""}"`,
+          item.cnpj || "",
+          `"${item.produtoPrincipal || ""}"`,
+          item.segmentacaoB2bB2c || "",
+          item.cidade || "",
+          item.uf || "",
+          qualityScore,
+          item.validationStatus || "pending",
+        ];
+      } else if (currentPage === "concorrentes") {
+        return [
+          item.id,
+          `"${item.nome || ""}"`,
+          item.cnpj || "",
+          `"${item.produto || ""}"`,
+          item.porte || "",
+          qualityScore,
+          item.validationStatus || "pending",
+        ];
+      } else {
+        return [
+          item.id,
+          `"${item.nome || ""}"`,
+          item.cnpj || "",
+          item.tipo || "",
+          item.porte || "",
+          item.regiao || "",
+          qualityScore,
+          item.validationStatus || "pending",
+        ];
+      }
+    });
+
+    const filename = `${entityType}_${timestamp}`;
+
+    return {
+      headers,
+      rows,
+      filename,
+      title: `Relatório de ${entityType.charAt(0).toUpperCase() + entityType.slice(1).replace("_", " ")}`,
+      metadata: {
+        "Data de Geração": new Date().toLocaleString("pt-BR"),
+        "Total de Registros": `${data.length} itens selecionados`,
+        "Tipo de Exportação": "Itens Selecionados",
       },
     };
   };
@@ -706,6 +848,25 @@ export default function CascadeView() {
         exportToPDF(exportData);
       }
       toast.success(`Exportado com sucesso em formato ${format.toUpperCase()}!`);
+    } catch (error) {
+      console.error("Erro ao exportar:", error);
+      toast.error("Erro ao exportar dados");
+    }
+  };
+
+  const handleExportSelected = (format: "csv" | "excel" | "pdf") => {
+    const exportData = prepareSelectedExportData();
+    if (!exportData) return;
+
+    try {
+      if (format === "csv") {
+        exportToCSV(exportData);
+      } else if (format === "excel") {
+        exportToExcel(exportData);
+      } else if (format === "pdf") {
+        exportToPDF(exportData);
+      }
+      toast.success(`${selectedItems.size} itens exportados em formato ${format.toUpperCase()}!`);
     } catch (error) {
       console.error("Erro ao exportar:", error);
       toast.error("Erro ao exportar dados");
@@ -745,6 +906,33 @@ export default function CascadeView() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          
+          {/* Exportar Selecionados */}
+          {selectedItems.size > 0 && currentPage !== "mercados" && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="default" className="h-10">
+                  <Download className="w-4 h-4 mr-2" />
+                  Exportar Selecionados ({selectedItems.size})
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleExportSelected("csv")}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExportSelected("excel")}>
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Excel (.xlsx)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExportSelected("pdf")}>
+                  <FileDown className="w-4 h-4 mr-2" />
+                  PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          
           <TagManager />
         </div>
       </div>
@@ -905,6 +1093,37 @@ export default function CascadeView() {
 
           {/* Filtro de Status */}
           <div className="flex items-center gap-2 ml-auto">
+            {/* Seletor de Ordenação */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9">
+                  <ArrowUp className="w-4 h-4 mr-2" />
+                  Ordenar
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setSortBy("nome")}>
+                  {sortBy === "nome" && "✓ "}
+                  Nome
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("qualidade")}>
+                  {sortBy === "qualidade" && "✓ "}
+                  Qualidade
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("data")}>
+                  {sortBy === "data" && "✓ "}
+                  Data
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("status")}>
+                  {sortBy === "status" && "✓ "}
+                  Status
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
+                  {sortOrder === "asc" ? "↑ Crescente" : "↓ Decrescente"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
             {/* Filtros Salvos */}
             <SavedFilters
               onApply={(filtersJson) => {
@@ -1145,31 +1364,10 @@ export default function CascadeView() {
                                 key={`mercado-item-${mercado.id}`}
                                 variants={listItemVariants}
                               >
-                                <div
-                                  className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:bg-muted/50 hover:border-primary/30 hover:shadow-sm cursor-pointer group transition-all duration-200"
-                                  onClick={() => handleSelectMercado(mercado.id)}
-                                >
-                                  <div className="flex-1">
-                                    <h3 className="text-base font-semibold group-hover:text-primary transition-colors line-clamp-1">
-                                      {mercado.nome}
-                                    </h3>
-                                    <div className="flex items-center gap-2 mt-1">
-                                      <Badge variant="outline" className="text-[11px] px-2 py-0.5">
-                                        {mercado.segmentacao}
-                                      </Badge>
-                                      <span className="text-xs text-muted-foreground">
-                                        {mercado.quantidadeClientes} clientes
-                                      </span>
-                                    </div>
-                                    <div className="mt-2" onClick={(e) => e.stopPropagation()}>
-                                      <EntityTagPicker
-                                        entityType="mercado"
-                                        entityId={mercado.id}
-                                      />
-                                    </div>
-                                  </div>
-                                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                                </div>
+                                <MercadoAccordionCard 
+                                  mercado={mercado} 
+                                  selectedProjectId={selectedProjectId}
+                                />
                               </motion.div>
                             ))}
                           </motion.div>

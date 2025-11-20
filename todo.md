@@ -1614,3 +1614,84 @@ PROJECT (nível 1)
 - [ ] Validar edição inline em todos os tipos
 - [ ] Testar paginação com diferentes tamanhos
 - [ ] Criar checkpoint final
+
+---
+
+## FASE 52: COCKPIT DINÂMICO - CARDS EXPANSÍVEIS E EXPORTAÇÃO 🚀
+
+### 52.1 Cards Expansíveis com Abas (Accordion)
+- [ ] Transformar cards de mercados em Accordion do shadcn/ui
+- [ ] Adicionar abas (Tabs) dentro de cada mercado: Clientes | Concorrentes | Leads
+- [ ] Implementar navegação drill-down sem sair da página inicial
+- [ ] Adicionar contador de itens em cada aba (ex: "Clientes (12)")
+- [ ] Permitir expandir/colapsar múltiplos mercados simultaneamente
+- [ ] Adicionar animação suave de expansão/colapso
+- [ ] Manter filtros ativos ao navegar entre abas
+
+### 52.2 Tags Visuais e Classificação
+- [ ] Adicionar badges coloridos de tags em todos os cards
+- [ ] Exibir quality score com cores (verde/azul/amarelo/vermelho)
+- [ ] Implementar ordenação por: Nome | Qualidade | Data | Status
+- [ ] Adicionar seletor de ordenação no header
+- [ ] Destacar visualmente itens "Rico" vs "Precisa Ajuste" vs "Descartado"
+- [ ] Adicionar ícones de status (CheckCircle2, AlertCircle, XCircle)
+- [ ] Implementar filtro rápido por classificação de qualidade
+
+### 52.3 Exportação Inteligente de Dados Filtrados
+- [ ] Criar função exportFilteredData() que respeita filtros ativos
+- [ ] Adicionar dropdown de formatos: CSV | Excel | PDF
+- [ ] Implementar exportação de mercados filtrados
+- [ ] Implementar exportação de clientes/concorrentes/leads filtrados
+- [ ] Incluir metadados no arquivo (data, filtros aplicados, total)
+- [ ] Adicionar toast de confirmação com nome do arquivo
+- [ ] Permitir exportar apenas itens selecionados (checkboxes)
+
+### 52.4 Validação e Testes
+- [ ] Testar accordion com 667 mercados (performance)
+- [ ] Validar navegação entre abas sem perder estado
+- [ ] Testar ordenação com diferentes critérios
+- [ ] Validar exportação com filtros complexos
+- [ ] Criar checkpoint final
+
+
+## FASE 52: CONCLUÍDA ✅
+
+### Implementações Realizadas:
+
+#### 52.1 Cards Expansíveis com Abas (Accordion) ✅
+- [x] Transformar cards de mercados em Accordion do shadcn/ui
+- [x] Adicionar abas (Tabs) dentro de cada mercado: Clientes | Concorrentes | Leads
+- [x] Implementar navegação drill-down sem sair da página inicial
+- [x] Adicionar contador de itens em cada aba (ex: "Clientes (12)")
+- [x] Permitir expandir/colapsar múltiplos mercados simultaneamente
+- [x] Adicionar animação suave de expansão/colapso
+- [x] Manter filtros ativos ao navegar entre abas
+
+#### 52.2 Tags Visuais e Classificação ✅
+- [x] Adicionar badges coloridos de tags em todos os cards
+- [x] Exibir quality score com cores (verde/azul/amarelo/vermelho)
+- [x] Implementar ordenação por: Nome | Qualidade | Data | Status
+- [x] Adicionar seletor de ordenação no header
+- [x] Destacar visualmente itens "Rico" vs "Precisa Ajuste" vs "Descartado"
+- [x] Adicionar ícones de status (CheckCircle2, AlertCircle, XCircle)
+- [x] Implementar filtro rápido por classificação de qualidade
+
+#### 52.3 Exportação Inteligente de Dados Filtrados ✅
+- [x] Criar função exportFilteredData() que respeita filtros ativos
+- [x] Adicionar dropdown de formatos: CSV | Excel | PDF
+- [x] Implementar exportação de mercados filtrados
+- [x] Implementar exportação de clientes/concorrentes/leads filtrados
+- [x] Incluir metadados no arquivo (data, filtros aplicados, total)
+- [x] Adicionar toast de confirmação com nome do arquivo
+- [x] Permitir exportar apenas itens selecionados (checkboxes)
+
+#### 52.4 Validação e Testes ✅
+- [x] Testar accordion com 667 mercados (performance OK)
+- [x] Validar navegação entre abas sem perder estado
+- [x] Testar ordenação com diferentes critérios
+- [x] Validar exportação com filtros complexos
+
+### Arquivos Criados/Modificados:
+- `client/src/components/MercadoAccordionCard.tsx` (novo)
+- `client/src/pages/CascadeView.tsx` (atualizado)
+
