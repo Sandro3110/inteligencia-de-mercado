@@ -326,3 +326,33 @@
 - [x] Criar testes para sistema de notificações (6 testes)
 - [x] Validar integração completa end-to-end (2 testes)
 - [x] Total: 17 testes criados e passando 100%
+
+
+---
+
+## FASE 60: BOTÃO "ADIAR HIBERNAÇÃO" NO DASHBOARD 🔔
+
+### 60.1 Implementar Botão de Adiamento
+- [x] Adicionar botão "Adiar Hibernação" nos cards de projetos inativos
+- [x] Verificar se projeto tem aviso de hibernação pendente
+- [x] Mostrar badge visual indicando aviso pendente
+- [x] Integrar com mutation postponeHibernation
+
+### 60.2 Modal de Confirmação com Opções de Prazo
+- [x] Criar componente PostponeHibernationDialog
+- [x] Adicionar opções de prazo: 7, 15, 30 dias
+- [x] Exibir data prevista de hibernação após adiamento
+- [x] Botão de confirmação e cancelamento
+
+### 60.3 Feedback Visual e Atualização
+- [x] Toast de sucesso após adiamento
+- [x] Invalidar cache e recarregar lista automaticamente
+- [x] Atualizar badge de aviso no card
+- [x] Mostrar nova data de inatividade
+
+### 60.4 Testes e Validação
+- [x] Testar adiamento de 7 dias
+- [x] Testar adiamento de 15 dias
+- [x] Testar adiamento de 30 dias
+- [x] Validar atualização de lastActivityAt
+- [x] Verificar remoção de aviso pendente

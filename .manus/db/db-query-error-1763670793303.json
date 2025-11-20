@@ -1,0 +1,8 @@
+{
+  "query": "-- Atualizar lastActivityAt de 2 projetos para 25 dias atrás\nUPDATE projects \nSET lastActivityAt = DATE_SUB(NOW(), INTERVAL 25 DAY)\nWHERE id IN (\n  SELECT id FROM (\n    SELECT id FROM projects WHERE status = 'active' LIMIT 2\n  ) AS temp\n);\n\n-- Inserir avisos de hibernação\nINSERT INTO hibernation_warnings (projectId, scheduledFor, notified, hibernated, createdAt)\nSELECT \n  id,\n  DATE_ADD(NOW(), INTERVAL 5 DAY) as scheduledFor,\n  1 as notified,\n  0 as hibernated,\n  NOW() as createdAt\nFROM projects \nWHERE status = 'active' \n  AND lastActivityAt < DATE_SUB(NOW(), INTERVAL 20 DAY)\nLIMIT 2;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute -- Atualizar lastActivityAt de 2 projetos para 25 dias atrás\nUPDATE projects \nSET lastActivityAt = DATE_SUB(NOW(), INTERVAL 25 DAY)\nWHERE id IN (\n  SELECT id FROM (\n    SELECT id FROM projects WHERE status = 'active' LIMIT 2\n  ) AS temp\n);\n\n-- Inserir avisos de hibernação\nINSERT INTO hibernation_warnings (projectId, scheduledFor, notified, hibernated, createdAt)\nSELECT \n  id,\n  DATE_ADD(NOW(), INTERVAL 5 DAY) as scheduledFor,\n  1 as notified,\n  0 as hibernated,\n  NOW() as createdAt\nFROM projects \nWHERE status = 'active' \n  AND lastActivityAt < DATE_SUB(NOW(), INTERVAL 20 DAY)\nLIMIT 2;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 11: Unknown column 'scheduledFor' in 'field list'"
+  ]
+}

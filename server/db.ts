@@ -3792,6 +3792,7 @@ export async function getProjectsActivity(): Promise<{
     status: 'active' | 'hibernated';
     lastActivityAt: Date | null;
     daysSinceActivity: number | null;
+    hasWarning: boolean;
     recentActions: Array<{
       action: string;
       createdAt: Date;
@@ -3850,6 +3851,21 @@ export async function getProjectsActivity(): Promise<{
         daysSinceActivity = Math.floor(diffMs / (1000 * 60 * 60 * 24));
       }
 
+      // Verificar se há aviso de hibernação pendente (não hibernado E não adiado)
+      const warnings = await db
+        .select()
+        .from(hibernationWarnings)
+        .where(
+          and(
+            eq(hibernationWarnings.projectId, project.id),
+            eq(hibernationWarnings.hibernated, 0),
+            eq(hibernationWarnings.postponed, 0)
+          )!
+        )
+        .limit(1);
+      
+      const hasWarning = warnings.length > 0;
+
       // Buscar últimas 3 ações do log de auditoria
       const auditLogs = await db
         .select()
@@ -3880,6 +3896,7 @@ export async function getProjectsActivity(): Promise<{
         status: project.status,
         lastActivityAt: project.lastActivityAt,
         daysSinceActivity,
+        hasWarning,
         recentActions
       };
     })

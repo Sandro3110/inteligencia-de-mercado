@@ -19,9 +19,12 @@ import {
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { PostponeHibernationDialog } from "@/components/PostponeHibernationDialog";
 
 export default function ProjectActivityDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState<30 | 60 | 90>(30);
+  const [postponeDialogOpen, setPostponeDialogOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<{ id: number; nome: string } | null>(null);
   const utils = trpc.useUtils();
 
   const { data: activityData, isLoading } = trpc.projects.getActivity.useQuery();
@@ -37,11 +40,34 @@ export default function ProjectActivityDashboard() {
     }
   });
 
+  const postponeMutation = trpc.projects.postponeHibernation.useMutation({
+    onSuccess: () => {
+      toast.success(`Hibernação adiada com sucesso!`);
+      utils.projects.getActivity.invalidate();
+      utils.projects.list.invalidate();
+      setPostponeDialogOpen(false);
+      setSelectedProject(null);
+    },
+    onError: (error) => {
+      toast.error(`Erro ao adiar hibernação: ${error.message}`);
+    }
+  });
+
   const handleAutoHibernate = () => {
     if (!confirm(`Deseja hibernar todos os projetos inativos há mais de ${selectedPeriod} dias?`)) {
       return;
     }
     autoHibernateMutation.mutate({ days: selectedPeriod });
+  };
+
+  const handlePostpone = (projectId: number, projectName: string) => {
+    setSelectedProject({ id: projectId, nome: projectName });
+    setPostponeDialogOpen(true);
+  };
+
+  const handleConfirmPostpone = (days: number) => {
+    if (!selectedProject) return;
+    postponeMutation.mutate({ projectId: selectedProject.id, postponeDays: days });
   };
 
   const getActionIcon = (action: string) => {
@@ -97,8 +123,9 @@ export default function ProjectActivityDashboard() {
     : activityData.inactiveProjects90;
 
   const inactiveProjects = activityData.projectsWithActivity.filter(p => {
-    if (p.status !== 'active' || !p.daysSinceActivity) return false;
-    return p.daysSinceActivity >= selectedPeriod;
+    if (p.status !== 'active') return false;
+    // Incluir projetos com avisos pendentes OU inativos pelo período selecionado
+    return p.hasWarning || (p.daysSinceActivity && p.daysSinceActivity >= selectedPeriod);
   });
 
   return (
@@ -245,6 +272,22 @@ export default function ProjectActivityDashboard() {
                     </div>
                   </CardHeader>
                   <CardContent>
+                    {project.hasWarning && (
+                      <div className="flex items-center justify-between mb-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handlePostpone(project.id, project.nome)}
+                          className="flex items-center gap-2"
+                        >
+                          <Clock className="h-4 w-4" />
+                          Adiar Hibernação
+                        </Button>
+                        <Badge variant="destructive" className="text-xs">
+                          Aviso Pendente
+                        </Badge>
+                      </div>
+                    )}
                     {project.recentActions.length > 0 ? (
                       <div className="space-y-2">
                         <p className="text-sm font-medium text-muted-foreground mb-2">Últimas ações:</p>
@@ -326,6 +369,17 @@ export default function ProjectActivityDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal de Adiamento */}
+      {selectedProject && (
+        <PostponeHibernationDialog
+          open={postponeDialogOpen}
+          onOpenChange={setPostponeDialogOpen}
+          projectName={selectedProject.nome}
+          onConfirm={handleConfirmPostpone}
+          isLoading={postponeMutation.isPending}
+        />
+      )}
     </div>
   );
 }

@@ -1,0 +1,60 @@
+{
+  "query": "SELECT p.id, p.nome, p.lastActivityAt, p.status,\n       hw.id as warning_id, hw.scheduledHibernationDate, hw.notificationSent, hw.hibernated\nFROM projects p\nLEFT JOIN hibernation_warnings hw ON p.id = hw.projectId AND hw.hibernated = 0\nWHERE p.status = 'active'\nORDER BY p.lastActivityAt ASC\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT p.id, p.nome, p.lastActivityAt, p.status,\n       hw.id as warning_id, hw.scheduledHibernationDate, hw.notificationSent, hw.hibernated\nFROM projects p\nLEFT JOIN hibernation_warnings hw ON p.id = hw.projectId AND hw.hibernated = 0\nWHERE p.status = 'active'\nORDER BY p.lastActivityAt ASC\nLIMIT 5;",
+  "rows": [
+    {
+      "id": "330001",
+      "nome": "Ground",
+      "lastActivityAt": "2025-10-26 20:33:25",
+      "status": "active",
+      "warning_id": "30002",
+      "scheduledHibernationDate": "2025-11-25 20:33:25",
+      "notificationSent": "1",
+      "hibernated": "0"
+    },
+    {
+      "id": "1",
+      "nome": "Embalagens",
+      "lastActivityAt": "2025-10-26 20:33:25",
+      "status": "active",
+      "warning_id": "30001",
+      "scheduledHibernationDate": "2025-11-25 20:33:25",
+      "notificationSent": "1",
+      "hibernated": "0"
+    },
+    {
+      "id": "360002",
+      "nome": "Projeto Sem Descrição",
+      "lastActivityAt": "2025-11-20 19:59:08",
+      "status": "active",
+      "warning_id": "NULL",
+      "scheduledHibernationDate": "NULL",
+      "notificationSent": "NULL",
+      "hibernated": "NULL"
+    },
+    {
+      "id": "360005",
+      "nome": "Projeto Sem Descrição",
+      "lastActivityAt": "2025-11-20 19:59:08",
+      "status": "active",
+      "warning_id": "NULL",
+      "scheduledHibernationDate": "NULL",
+      "notificationSent": "NULL",
+      "hibernated": "NULL"
+    },
+    {
+      "id": "390001",
+      "nome": "Projeto Teste Log Update",
+      "lastActivityAt": "2025-11-20 20:24:33",
+      "status": "active",
+      "warning_id": "NULL",
+      "scheduledHibernationDate": "NULL",
+      "notificationSent": "NULL",
+      "hibernated": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tlastActivityAt\tstatus\twarning_id\tscheduledHibernationDate\tnotificationSent\thibernated\n330001\tGround\t2025-10-26 20:33:25\tactive\t30002\t2025-11-25 20:33:25\t1\t0\n1\tEmbalagens\t2025-10-26 20:33:25\tactive\t30001\t2025-11-25 20:33:25\t1\t0\n360002\tProjeto Sem Descrição\t2025-11-20 19:59:08\tactive\tNULL\tNULL\tNULL\tNULL\n360005\tProjeto Sem Descrição\t2025-11-20 19:59:08\tactive\tNULL\tNULL\tNULL\tNULL\n390001\tProjeto Teste Log Update\t2025-11-20 20:24:33\tactive\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}
