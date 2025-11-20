@@ -14,7 +14,7 @@ import { Settings, Key, CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 export default function EnrichmentSettings() {
   const { selectedProjectId } = useSelectedProject();
-  const { config, isLoading, saveConfig, isSaving, testKeys, isTesting, testResults } = useEnrichmentConfig(selectedProjectId);
+  const { config, isLoading, saveConfig, isSaving, testKeys, isTesting, testResults } = useEnrichmentConfig(selectedProjectId || undefined);
 
   // Form state
   const [openaiApiKey, setOpenaiApiKey] = useState("");

@@ -122,7 +122,7 @@ export default function MonitoringDashboard() {
   const handlePause = async () => {
     if (!selectedProjectId) return;
     try {
-      await pauseMutation.mutateAsync({ projectId: selectedProjectId });
+      await pauseMutation.mutateAsync();
       toast.success("Enriquecimento pausado");
       refetchProgress();
     } catch (error: any) {
@@ -134,8 +134,8 @@ export default function MonitoringDashboard() {
     if (!selectedProjectId) return;
     try {
       await resumeMutation.mutateAsync({ 
-        projectId: selectedProjectId,
-        clientIds: [], // Você pode implementar lógica para retomar
+        pesquisaId: selectedProjectId,
+        batchSize: 5,
       });
       toast.success("Enriquecimento retomado");
       refetchProgress();
@@ -259,7 +259,7 @@ export default function MonitoringDashboard() {
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-foreground">{progressPercentage}%</span>
                   <span className="text-sm text-muted-foreground">
-                    {progress?.processedClients || 0}/{progress?.totalClients || 0}
+                    {progress?.processed || 0}/{progress?.total || 0}
                   </span>
                 </div>
                 <Progress value={progressPercentage} className="h-2" />

@@ -130,10 +130,6 @@ export default function Dashboard() {
       </div>
 
       <div className="container py-4 flex-1 overflow-y-auto">
-        {/* Breadcrumbs */}
-        <div className="mb-4">
-          <Breadcrumbs items={[{ label: "Dashboard" }]} />
-        </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mb-4">

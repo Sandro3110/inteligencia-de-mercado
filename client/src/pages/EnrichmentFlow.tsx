@@ -21,7 +21,7 @@ import { Settings as SettingsIcon } from 'lucide-react';
 export default function EnrichmentFlow() {
   const [, setLocation] = useLocation();
   const { selectedProjectId } = useSelectedProject();
-  const { config } = useEnrichmentConfig(selectedProjectId);
+  const { config } = useEnrichmentConfig(selectedProjectId || undefined);
   const [projectName, setProjectName] = useState('');
   const [clientesText, setClientesText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);

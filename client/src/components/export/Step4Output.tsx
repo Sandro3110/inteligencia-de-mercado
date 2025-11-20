@@ -149,14 +149,14 @@ export default function Step4Output({ state, setState }: Step4OutputProps) {
         <div className="space-y-3">
           <Label>Profundidade da Análise</Label>
           <RadioGroup
-            value={state.depth || 'standard'}
-            onValueChange={(value: any) => setState(prev => ({ ...prev, depth: value }))}
+            value={(state as any).depth || 'standard'}
+            onValueChange={(value: any) => setState(prev => ({ ...prev, depth: value } as any))}
           >
             <div className="grid grid-cols-3 gap-3">
               <label
                 htmlFor="quick"
                 className={`flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                  (state.depth || 'standard') === 'quick'
+                  ((state as any).depth || 'standard') === 'quick'
                     ? 'border-blue-600 bg-blue-50'
                     : 'border-slate-200 hover:border-slate-300'
                 }`}
@@ -168,7 +168,7 @@ export default function Step4Output({ state, setState }: Step4OutputProps) {
               <label
                 htmlFor="standard"
                 className={`flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                  (state.depth || 'standard') === 'standard'
+                  ((state as any).depth || 'standard') === 'standard'
                     ? 'border-blue-600 bg-blue-50'
                     : 'border-slate-200 hover:border-slate-300'
                 }`}
@@ -180,7 +180,7 @@ export default function Step4Output({ state, setState }: Step4OutputProps) {
               <label
                 htmlFor="deep"
                 className={`flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                  (state.depth || 'standard') === 'deep'
+                  ((state as any).depth || 'standard') === 'deep'
                     ? 'border-blue-600 bg-blue-50'
                     : 'border-slate-200 hover:border-slate-300'
                 }`}

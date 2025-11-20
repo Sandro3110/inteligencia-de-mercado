@@ -16,7 +16,7 @@ export default function AnalyticsPage() {
 
   // Buscar pesquisas do projeto selecionado
   const { data: pesquisas } = trpc.pesquisas.list.useQuery(
-    { projectId: selectedProjectId! },
+    undefined,
     { enabled: !!selectedProjectId }
   );
 

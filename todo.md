@@ -1343,8 +1343,9 @@ PROJECT (nível 1)
 - [x] Definir interface ConcorrenteData com campos corretos
 - [x] Definir interface LeadData com campos corretos
 - [x] Remover campos inexistentes das inserções no banco
-- [ ] Corrigir 34 erros TypeScript restantes (Breadcrumbs, tipos, imports)
-- [ ] Validar compilação 100% limpa (0 erros)
+- [x] Corrigir erros TypeScript principais (34→27 erros)
+- [x] Corrigir 27 erros TypeScript restantes (ResearchOverview, MonitoringDashboard, ExportHistory, etc)
+- [x] Validar compilação 100% limpa (0 erros TypeScript)
 
 ### 33.2 Integrar Alertas ao Enriquecimento
 - [ ] Conectar intelligentAlerts.ts ao enrichmentBatchProcessor

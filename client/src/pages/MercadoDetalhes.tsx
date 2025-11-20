@@ -180,7 +180,7 @@ export default function MercadoDetalhes() {
             <ProjectSelector />
           </div>
           <Breadcrumbs items={[
-            { label: "Mercados", href: "/mercados" },
+            { label: "Mercados" },
             { label: mercado.nome }
           ]} />
           

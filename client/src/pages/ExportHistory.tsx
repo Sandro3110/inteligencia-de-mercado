@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import DynamicBreadcrumbs from "@/components/DynamicBreadcrumbs";
+import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 
 /**
  * Página de histórico de exportações
@@ -29,15 +29,15 @@ export default function ExportHistory() {
   // Buscar histórico
   const { data: history, isLoading, refetch } = trpc.export.listHistory.useQuery({});
 
-  // Mutation para deletar
-  const deleteMutation = trpc.export.deleteHistory.useMutation({
-    onSuccess: () => {
-      refetch();
-    }
-  });
+  // Mutation para deletar (endpoint não implementado ainda)
+  // const deleteMutation = trpc.export.deleteHistory.useMutation({
+  //   onSuccess: () => {
+  //     refetch();
+  //   }
+  // });
 
   // Filtrar histórico
-  const filteredHistory = history?.filter((item: any) => {
+  const filteredHistory = (history as any)?.history?.filter((item: any) => {
     if (selectedFormat !== "all" && item.format !== selectedFormat) return false;
     if (selectedType !== "all" && item.outputType !== selectedType) return false;
     return true;
@@ -157,7 +157,7 @@ export default function ExportHistory() {
           </Card>
         ) : (
           <div className="space-y-3">
-            {filteredHistory.map((item) => (
+            {filteredHistory.map((item: any) => (
               <Card key={item.id} className="p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-start gap-4">
                   {/* Ícone */}
@@ -229,7 +229,7 @@ export default function ExportHistory() {
                       <RefreshCw className="w-4 h-4 mr-1" />
                       Reexecutar
                     </Button>
-                    <Button
+                    {/* <Button
                       size="sm"
                       variant="ghost"
                       onClick={() => {
@@ -239,7 +239,7 @@ export default function ExportHistory() {
                       }}
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </Card>

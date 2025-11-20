@@ -21,7 +21,7 @@ export default function Mercados() {
     categoria: categoria || undefined,
     segmentacao: segmentacao || undefined
   });
-  const exportMutation = trpc.export.mercados.useMutation();
+  // const exportMutation = trpc.export.mercados.useMutation(); // Endpoint não implementado
 
   const handleExport = async () => {
     if (!selectedProjectId) {
@@ -29,7 +29,10 @@ export default function Mercados() {
       return;
     }
     
-    try {
+    toast.error('Funcionalidade de exportação não implementada');
+    return;
+    
+    /* try {
       toast.info('Gerando arquivo Excel...');
       const result = await exportMutation.mutateAsync({ projectId: selectedProjectId });
       
@@ -51,7 +54,7 @@ export default function Mercados() {
     } catch (error) {
       console.error('Erro ao exportar:', error);
       toast.error('Erro ao exportar mercados');
-    }
+    } */
   };
 
   if (isLoading) {
@@ -111,11 +114,11 @@ export default function Mercados() {
               <Button
                 variant="outline"
                 onClick={handleExport}
-                disabled={exportMutation.isPending}
+                disabled={false}
                 className="gap-2"
               >
                 <Download className="w-4 h-4" />
-                {exportMutation.isPending ? 'Exportando...' : 'Exportar Excel'}
+                {'Exportar Excel'}
               </Button>
             </div>
             

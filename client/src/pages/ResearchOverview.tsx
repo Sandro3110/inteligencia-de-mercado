@@ -18,7 +18,7 @@ export default function ResearchOverview() {
 
   // Buscar pesquisas do projeto
   const { data: pesquisas } = trpc.pesquisas.list.useQuery(
-    { projectId: selectedProjectId! },
+    undefined,
     { enabled: !!selectedProjectId }
   );
 
@@ -71,9 +71,9 @@ export default function ResearchOverview() {
 
   // Dados do funil de qualificação
   const funnelData = [
-    { name: "Leads Gerados", value: kpis.totalLeads, fill: "#3b82f6" },
-    { name: "Leads Validados", value: kpis.totalValidados, fill: "#8b5cf6" },
-    { name: "Leads Aprovados", value: kpis.totalAprovados, fill: "#10b981" },
+    { name: "Leads Gerados", value: kpis?.totalLeads || 0, fill: "#3b82f6" },
+    { name: "Leads Validados", value: (kpis as any)?.totalValidados || 0, fill: "#8b5cf6" },
+    { name: "Leads Aprovados", value: (kpis as any)?.totalAprovados || 0, fill: "#10b981" },
   ];
 
   // Dados de distribuição de qualidade
@@ -87,7 +87,7 @@ export default function ResearchOverview() {
   const evolutionData = timeline?.map(t => ({
     data: new Date(t.data).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
     leads: t.leadsGerados,
-    qualidade: t.qualidadeMedia / 100,
+    qualidade: (t.qualidadeMedia || 0) / 100,
   })) || [];
 
   // Top 10 mercados

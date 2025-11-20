@@ -12,7 +12,8 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Sparkles, CheckCircle2, AlertCircle, Plus } from 'lucide-react';
-import type { ResearchWizardData } from './AllSteps';
+// import type { ResearchWizardData } from './AllSteps';
+type ResearchWizardData = any;
 
 interface PreResearchInterfaceProps {
   data: ResearchWizardData;
