@@ -9,6 +9,7 @@
  */
 
 import { notifyOwner } from "./_core/notification";
+import { getWebSocketManager } from "./websocket";
 
 export interface AlertConfig {
   projectId: number;
@@ -66,6 +67,21 @@ export async function checkAndSendAlerts(
         title: "⚠️ Circuit Breaker Ativado",
         content: `O circuit breaker foi ativado no projeto ${projectId} após ${metrics.circuitBreakerFailures} falhas consecutivas. O enriquecimento foi pausado automaticamente para evitar sobrecarga.`,
       });
+      
+      // Enviar via WebSocket
+      const wsManager = getWebSocketManager();
+      if (wsManager) {
+        wsManager.broadcast({
+          id: `circuit-breaker-${projectId}-${Date.now()}`,
+          type: 'quality_alert',
+          title: '⚠️ Circuit Breaker Ativado',
+          message: `Circuit breaker ativado no projeto ${projectId} após ${metrics.circuitBreakerFailures} falhas consecutivas.`,
+          timestamp: new Date(),
+          data: { projectId, failures: metrics.circuitBreakerFailures },
+          read: false,
+        });
+      }
+      
       markAlertSent(alertKey);
       console.log(`[IntelligentAlerts] Circuit breaker alert sent for project ${projectId}`);
     }
@@ -83,6 +99,21 @@ export async function checkAndSendAlerts(
         title: "⚠️ Taxa de Erro Elevada",
         content: `A taxa de erro no projeto ${projectId} atingiu ${errorRate.toFixed(1)}% (${metrics.errorCount} erros em ${metrics.processedClients} processados). Verifique os logs para identificar o problema.`,
       });
+      
+      // Enviar via WebSocket
+      const wsManager = getWebSocketManager();
+      if (wsManager) {
+        wsManager.broadcast({
+          id: `error-rate-${projectId}-${Date.now()}`,
+          type: 'quality_alert',
+          title: '⚠️ Taxa de Erro Elevada',
+          message: `Taxa de erro no projeto ${projectId}: ${errorRate.toFixed(1)}% (${metrics.errorCount} erros).`,
+          timestamp: new Date(),
+          data: { projectId, errorRate, errorCount: metrics.errorCount },
+          read: false,
+        });
+      }
+      
       markAlertSent(alertKey);
       console.log(`[IntelligentAlerts] Error rate alert sent for project ${projectId}: ${errorRate.toFixed(1)}%`);
     }

@@ -263,6 +263,29 @@ export async function executeEnrichmentFlow(
         title: `✅ Enriquecimento Concluído - ${project.nome}`,
         content: `O enriquecimento foi concluído com sucesso!\n\n• ${clientesEnriquecidos.length} clientes processados\n• ${mercadosMap.size} mercados identificados\n• ${concorrentes.length} concorrentes encontrados\n• ${leadsEncontrados.length} leads gerados\n• Tempo total: ${Math.floor(durationSeconds / 60)} minutos`,
       });
+      
+      // Enviar notificação em tempo real via WebSocket
+      const { getWebSocketManager } = await import('./websocket');
+      const wsManager = getWebSocketManager();
+      if (wsManager) {
+        // TODO: Obter userId do contexto quando disponível
+        // Por enquanto, broadcast para todos os usuários conectados
+        wsManager.broadcast({
+          id: `enrichment-${project.id}-${Date.now()}`,
+          type: 'enrichment_complete',
+          title: '✅ Enriquecimento Concluído',
+          message: `Projeto "${project.nome}" processado! ${clientesEnriquecidos.length} clientes, ${mercadosMap.size} mercados, ${concorrentes.length} concorrentes, ${leadsEncontrados.length} leads.`,
+          timestamp: new Date(),
+          data: {
+            pesquisaId: project.id,
+            pesquisaNome: project.nome,
+            totalProcessed: clientesEnriquecidos.length,
+            duration: durationSeconds,
+          },
+          read: false,
+        });
+      }
+      
       console.log(`[Enrichment] Run ${runId} concluído com sucesso`);
     }
 
