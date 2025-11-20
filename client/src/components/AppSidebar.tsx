@@ -1,31 +1,23 @@
-import { Link, useLocation, useRoute } from "wouter";
+import { Link, useLocation } from "wouter";
 import {
   BarChart3,
-  Database,
-  Users,
-  Target,
-  TrendingUp,
+  Home,
   Package,
-  Search,
-  Filter,
-  Tag,
-  Plus,
-  Download,
-  GitCompare,
-  CheckSquare,
-  PieChart,
-  DollarSign,
   FileText,
+  Zap,
   Activity,
+  CheckSquare,
+  TrendingUp,
+  DollarSign,
+  Filter,
   Settings,
   Bell,
   Calendar,
-  HardDrive,
-  Home,
+  Clock,
+  FileStack,
   ChevronDown,
   ChevronRight,
   ChevronLeft,
-  Menu,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -50,45 +42,41 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   {
-    title: "Visão Geral",
+    title: "Início",
     icon: Home,
     defaultOpen: true,
     items: [
-      { title: "Início", href: "/", icon: Home },
-      { title: "Dashboard", href: "/dashboard", icon: BarChart3, shortcut: "Ctrl+1" },
+      { title: "Visão Geral", href: "/", icon: Home, shortcut: "Ctrl+1" },
     ],
   },
   {
-    title: "Dados",
-    icon: Database,
+    title: "Inteligência",
+    icon: BarChart3,
     defaultOpen: true,
     items: [
-      { title: "Visão Geral", href: "/", icon: Target, shortcut: "Ctrl+2" },
-      { title: "Mercados", href: "/mercados", icon: Package },
+      { title: "Mercados", href: "/mercados", icon: Package, shortcut: "Ctrl+2" },
+      { title: "Analytics", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+3" },
+      { title: "Relatórios", href: "/relatorios", icon: FileText },
     ],
   },
   {
-    title: "Ações",
-    icon: Settings,
+    title: "Enriquecimento",
+    icon: Zap,
     defaultOpen: false,
     items: [
-      { title: "Novo Enriquecimento", href: "/enrichment", icon: Plus },
-      { title: "Monitorar Progresso", href: "/enrichment-progress", icon: Activity },
+      { title: "Iniciar", href: "/enrichment", icon: Zap },
+      { title: "Acompanhar", href: "/enrichment-progress", icon: Activity },
       { title: "Resultados", href: "/resultados-enriquecimento", icon: CheckSquare },
     ],
   },
   {
-    title: "Análise",
-    icon: PieChart,
+    title: "Performance",
+    icon: TrendingUp,
     defaultOpen: false,
     items: [
-      { title: "Analytics", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+3" },
-      { title: "Analytics Dashboard", href: "/analytics-dashboard", icon: PieChart },
-      { title: "Dashboard Avançado", href: "/dashboard-avancado", icon: BarChart3 },
-      { title: "ROI & Conversão", href: "/roi", icon: DollarSign, shortcut: "Ctrl+4" },
-      { title: "Funil de Vendas", href: "/funil", icon: TrendingUp },
-      { title: "Relatórios", href: "/relatorios", icon: FileText },
-      { title: "Atividades", href: "/atividade", icon: Activity },
+      { title: "Dashboard", href: "/dashboard", icon: BarChart3, shortcut: "Ctrl+4" },
+      { title: "ROI", href: "/roi", icon: DollarSign },
+      { title: "Funil", href: "/funil", icon: Filter },
     ],
   },
   {
@@ -98,8 +86,16 @@ const navSections: NavSection[] = [
     items: [
       { title: "Enriquecimento", href: "/enrichment-settings", icon: Settings },
       { title: "Alertas", href: "/alertas", icon: Bell },
-      { title: "Histórico Alertas", href: "/alertas/historico", icon: Clock },
       { title: "Agendamentos", href: "/agendamento", icon: Calendar },
+    ],
+  },
+  {
+    title: "Sistema",
+    icon: FileStack,
+    defaultOpen: false,
+    items: [
+      { title: "Atividades", href: "/atividade", icon: Activity },
+      { title: "Histórico de Alertas", href: "/alertas/historico", icon: Clock },
     ],
   },
 ];
@@ -132,11 +128,11 @@ export function AppSidebar() {
         switch (e.key) {
           case '1':
             e.preventDefault();
-            setLocation('/dashboard');
+            setLocation('/');
             break;
           case '2':
             e.preventDefault();
-            setLocation('/');
+            setLocation('/mercados');
             break;
           case '3':
             e.preventDefault();
@@ -144,7 +140,7 @@ export function AppSidebar() {
             break;
           case '4':
             e.preventDefault();
-            setLocation('/roi');
+            setLocation('/dashboard');
             break;
           case 'b':
           case 'B':
@@ -326,8 +322,8 @@ export function AppSidebar() {
                         className={cn(
                           "flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-all cursor-pointer group relative",
                           active
-                            ? "bg-blue-200 text-blue-800 font-semibold shadow-md border-l-4 border-blue-600"
-                            : "text-slate-700 hover:bg-blue-50 hover:text-blue-600 hover:shadow-sm"
+                            ? "bg-blue-100 text-blue-800 font-medium"
+                            : "text-slate-700 hover:bg-blue-50 hover:text-blue-600"
                         )}
                       >
                         <div className="flex items-center gap-2">

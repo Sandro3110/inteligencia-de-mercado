@@ -509,3 +509,50 @@ PROJECT (nível 1)
 - [ ] Testar integração Salesforce (exportação + feedback)
 - [ ] Testar motor de agregação (cron job)
 - [ ] Criar checkpoint final
+
+
+---
+
+## FASE 31: IMPLEMENTAÇÃO DE ANALYTICS + REORGANIZAÇÃO DE SIDEBAR 🎯📊
+
+### 31.1 Endpoints tRPC de Analytics
+- [ ] Criar router analytics em server/routers.ts
+- [ ] Endpoint: analytics.getMercadoMetrics (filtros: projectId, pesquisaId, mercadoId, periodo)
+- [ ] Endpoint: analytics.getPesquisaMetrics (filtros: projectId, pesquisaId)
+- [ ] Endpoint: analytics.getDimensaoMetrics (filtros: projectId, pesquisaId, dimensaoTipo)
+- [ ] Endpoint: analytics.getTimelineMetrics (filtros: projectId, dataInicio, dataFim)
+- [ ] Endpoint: analytics.runAggregation (trigger manual de agregação)
+
+### 31.2 Dashboard Research Overview
+- [ ] Criar página ResearchOverviewDashboard.tsx
+- [ ] Implementar KPI cards (Mercados, Leads, Qualidade Média, Taxa Aprovação)
+- [ ] Criar componente QualificationFunnel.tsx (funil interativo)
+- [ ] Criar gráfico de Distribuição de Qualidade (pie chart com Recharts)
+- [ ] Criar gráfico de Evolução Temporal (line chart)
+- [ ] Criar tabela Top 10 Mercados (com ordenação)
+- [ ] Implementar filtros globais (projeto, pesquisa, período)
+- [ ] Adicionar rota /analytics/research no App.tsx
+
+### 31.3 Cron Job de Agregação
+- [ ] Instalar node-cron (pnpm add node-cron @types/node-cron)
+- [ ] Criar server/cron/analyticsJob.ts
+- [ ] Configurar job diário (0 2 * * * - 2h da manhã)
+- [ ] Integrar cron job no server/index.ts
+- [ ] Adicionar logs de execução
+- [ ] Testar execução manual
+
+### 31.4 Reorganização do Sidebar
+- [x] Auditar itens atuais do sidebar
+- [x] Definir nova estrutura lógica (máx 6-8 itens principais)
+- [x] Agrupar funcionalidades relacionadas
+- [x] Renomear itens com linguagem moderna e intuitiva
+- [x] Atualizar AppSidebar.tsx com novo menu
+- [x] Adicionar ícones apropriados (lucide-react)
+- [x] Testar navegação completa
+
+### 31.5 Validação Final
+- [ ] Testar todos os endpoints tRPC
+- [ ] Testar Dashboard Research Overview
+- [ ] Testar cron job (execução manual)
+- [ ] Testar navegação do sidebar
+- [ ] Criar checkpoint final
