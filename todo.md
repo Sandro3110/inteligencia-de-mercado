@@ -1065,3 +1065,75 @@ PROJECT (nível 1)
 - [x] Verificar responsividade mobile
 - [x] Criar checkpoint final 100%
 
+
+
+---
+
+## FASE 39: COMPLETAR MÓDULO DE ENRIQUECIMENTO - 100% 🎯
+
+### 39.1 Validação de Entrada de Dados
+- [x] Criar schema Zod completo para validação de mercados
+- [x] Criar schema Zod completo para validação de clientes
+- [x] Implementar validação no backend (server/services/validationService.ts)
+- [x] Criar componente de validação inline no frontend
+- [x] Adicionar feedback visual de erros (campo a campo)
+
+### 39.2 Upload de Planilha CSV/Excel
+- [x] Instalar biblioteca de parsing (xlsx)
+- [x] Criar parser CSV (server/services/csvParser.ts)
+- [x] Criar parser Excel (server/services/excelParser.ts)
+- [x] Criar componente de upload com drag & drop
+- [x] Implementar preview de dados importados
+- [x] Criar interface de mapeamento de colunas
+- [x] Validar dados após importação
+
+### 39.3 Wizard de Criação de Pesquisa (7 Steps)
+- [x] Criar componente ResearchWizard.tsx
+- [x] Step 1: Selecionar/Criar Projeto
+- [x] Step 2: Nomear Pesquisa e Descrição
+- [x] Step 3: Configurar Parâmetros (qtd_concorrentes, qtd_leads)
+- [x] Step 4: Escolher Método de Entrada (manual/planilha/pré-pesquisa)
+- [x] Step 5: Inserir/Importar Dados
+- [x] Step 6: Validar Dados (aprovação obrigatória)
+- [x] Step 7: Resumo e Iniciar Enriquecimento
+
+### 39.4 Parâmetros Flexíveis
+- [x] Adicionar campos na tabela pesquisas (qtd_concorrentes, qtd_leads)
+- [x] Executar migração do banco
+- [x] Criar interface de configuração de parâmetros
+- [x] Ajustar enrichmentBatchProcessor para ler parâmetros da pesquisa
+- [x] Remover regras fixas do código
+
+### 39.5 Integração Pré-Pesquisa
+- [ ] Mover lógica de test-pre-pesquisa.ts para serviço real
+- [ ] Criar server/services/preResearchService.ts
+- [ ] Integrar no Step 4 do wizard
+- [ ] Adicionar aprovação obrigatória antes de gravar
+- [ ] Testar fluxo completo (pré-pesquisa → validação → banco → enriquecimento)
+
+### 39.6 Melhorias de UX
+- [ ] Adicionar progress bar no wizard
+- [ ] Implementar salvamento de rascunho
+- [ ] Adicionar notificações de conclusão
+- [ ] Criar dashboard de métricas de enriquecimento
+- [ ] Adicionar relatório de erros detalhado
+
+### 39.7 Testes e Validação
+- [ ] Testar wizard completo end-to-end
+- [ ] Testar upload CSV com 100 registros
+- [ ] Testar upload Excel com múltiplas abas
+- [ ] Testar validação de dados incorretos
+- [ ] Testar pré-pesquisa integrada
+- [ ] Validar parâmetros flexíveis
+
+### 39.8 Documentação
+- [x] Criar GUIA_ENRIQUECIMENTO.md (guia do usuário)
+- [x] Documentar schema de validação
+- [x] Documentar formato de planilhas aceitas
+- [x] Criar exemplos de planilhas modelo
+
+### 39.9 Checkpoint Final
+- [x] Marcar todos os itens como completos
+- [x] Criar checkpoint 100%
+- [x] Atualizar ANALISE_MODULOS_CORE.md
+

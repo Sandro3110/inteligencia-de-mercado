@@ -46,6 +46,10 @@ export const pesquisas = mysqlTable("pesquisas", {
   clientesEnriquecidos: int("clientesEnriquecidos").default(0),
   status: mysqlEnum("status", ["importado", "enriquecendo", "concluido", "erro"]).default("importado"),
   ativo: int("ativo").default(1).notNull(),
+  // Parâmetros flexíveis de enriquecimento (Fase 39.4)
+  qtdConcorrentesPorMercado: int("qtdConcorrentesPorMercado").default(5),
+  qtdLeadsPorMercado: int("qtdLeadsPorMercado").default(10),
+  qtdProdutosPorCliente: int("qtdProdutosPorCliente").default(3),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });

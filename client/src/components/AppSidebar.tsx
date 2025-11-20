@@ -68,6 +68,7 @@ const navSections: NavSection[] = [
     icon: Zap,
     defaultOpen: false,
     items: [
+      { title: "Nova Pesquisa", href: "/research/new", icon: Plus },
       { title: "Iniciar", href: "/enrichment", icon: Zap },
       { title: "Acompanhar", href: "/enrichment-progress", icon: Activity },
       { title: "Resultados", href: "/resultados-enriquecimento", icon: CheckSquare },

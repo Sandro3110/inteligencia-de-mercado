@@ -33,6 +33,7 @@ import ResearchOverview from "./pages/ResearchOverview";
 import PrePesquisaTeste from "./pages/PrePesquisaTeste";
 import ExportWizard from "./pages/ExportWizard";
 import TemplateAdmin from "./pages/TemplateAdmin";
+import ResearchWizard from "./pages/ResearchWizard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -61,6 +62,7 @@ function Router() {
       <Route path="/pre-pesquisa-teste" component={PrePesquisaTeste} />
       <Route path="/export" component={ExportWizard} />
       <Route path="/export/templates" component={TemplateAdmin} />
+      <Route path="/research/new" component={ResearchWizard} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
