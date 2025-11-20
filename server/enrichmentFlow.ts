@@ -68,7 +68,7 @@ export async function executeEnrichmentFlow(
   const startTime = Date.now();
   
   try {
-    const totalSteps = 7;
+    const totalSteps = 8;
     let currentStep = 0;
     
     // Criar job no manager se jobId fornecido
@@ -122,7 +122,30 @@ export async function executeEnrichmentFlow(
       }
     }
 
-    // Passo 2: Identificar mercados únicos
+    // Passo 2: Criar pesquisa dentro do projeto
+    onProgress({
+      status: 'processing',
+      message: 'Criando pesquisa dentro do projeto...',
+      currentStep: ++currentStep,
+      totalSteps,
+    });
+
+    const { createPesquisa } = await import('./db');
+    const pesquisaNome = input.projectName || project.nome;
+    const pesquisa = await createPesquisa({
+      projectId: project.id,
+      nome: pesquisaNome,
+      descricao: `Pesquisa criada automaticamente via fluxo de enriquecimento`,
+      totalClientes: input.clientes.length,
+      status: 'em_andamento',
+    });
+
+    if (!pesquisa) {
+      throw new Error('Falha ao criar pesquisa');
+    }
+    console.log(`[Enrichment] Pesquisa ID ${pesquisa.id} criada para projeto ${project.id}`);
+
+    // Passo 3: Identificar mercados únicos
     onProgress({
       status: 'processing',
       message: 'Identificando mercados a partir dos produtos dos clientes...',
@@ -139,9 +162,9 @@ export async function executeEnrichmentFlow(
     const { startProgressMonitoring, stopProgressMonitoring } = await import('./enrichmentMonitor');
     const monitorInterval = startProgressMonitoring(project.id, runId, project.nome);
 
-    const mercadosMap = await identifyMarkets(input.clientes, project.id);
+    const mercadosMap = await identifyMarkets(input.clientes, project.id, pesquisa.id);
 
-    // Passo 3: Processar e enriquecer clientes
+    // Passo 4: Processar e enriquecer clientes
     onProgress({
       status: 'processing',
       message: `Enriquecendo dados de ${input.clientes.length} clientes...`,
@@ -152,10 +175,11 @@ export async function executeEnrichmentFlow(
     const clientesEnriquecidos = await enrichClientes(
       input.clientes,
       project.id,
+      pesquisa.id,
       mercadosMap
     );
 
-    // Passo 4: Buscar concorrentes
+    // Passo 5: Buscar concorrentes
     onProgress({
       status: 'processing',
       message: 'Identificando concorrentes por mercado...',
@@ -166,10 +190,11 @@ export async function executeEnrichmentFlow(
     const concorrentes = await findCompetitorsForMarkets(
       mercadosMap,
       project.id,
+      pesquisa.id,
       clientesEnriquecidos.map(c => ({ nome: c.nome, cnpj: c.cnpj || undefined })) // Passar clientes para exclusão
     );
 
-    // Passo 5: Buscar leads
+    // Passo 6: Buscar leads
     onProgress({
       status: 'processing',
       message: 'Buscando leads qualificados...',
@@ -180,11 +205,12 @@ export async function executeEnrichmentFlow(
     const leadsEncontrados = await findLeadsForMarkets(
       mercadosMap,
       project.id,
+      pesquisa.id,
       clientesEnriquecidos.map(c => ({ nome: c.nome, cnpj: c.cnpj || undefined })), // Passar clientes para exclusão
       concorrentes.map(c => ({ nome: c.nome, cnpj: c.cnpj || undefined })) // Passar concorrentes para exclusão
     );
 
-    // Passo 6: Calcular estatísticas
+    // Passo 7: Calcular estatísticas
     onProgress({
       status: 'processing',
       message: 'Calculando métricas de qualidade...',
@@ -197,7 +223,7 @@ export async function executeEnrichmentFlow(
         clientesEnriquecidos.length
     );
 
-    // Passo 7: Finalizar
+    // Passo 8: Finalizar
     onProgress({
       status: 'completed',
       message: 'Processamento concluído com sucesso!',
@@ -310,7 +336,8 @@ export async function executeEnrichmentFlow(
  */
 async function identifyMarkets(
   clientes: EnrichmentInput['clientes'],
-  projectId: number
+  projectId: number,
+  pesquisaId: number
 ): Promise<Map<string, number>> {
   const { invokeLLM } = await import('./_core/llm');
   const { createMercado } = await import('./db');
@@ -364,6 +391,7 @@ async function identifyMarkets(
     if (!mercadosMap.has(data.mercado)) {
       const mercado = await createMercado({
         projectId,
+        pesquisaId,
         nome: data.mercado,
         categoria: data.categoria,
         segmentacao: data.segmentacao as any,
@@ -384,6 +412,7 @@ async function identifyMarkets(
 async function enrichClientes(
   clientes: EnrichmentInput['clientes'],
   projectId: number,
+  pesquisaId: number,
   mercadosMap: Map<string, number>
 ) {
   const { createCliente, associateClienteToMercado } = await import('./db');
@@ -475,6 +504,7 @@ async function enrichClientes(
     // Criar cliente
     const novoCliente = await createCliente({
       projectId,
+      pesquisaId,
       nome: dadosEnriquecidos?.nome || cliente.nome,
       cnpj: cliente.cnpj || null,
       siteOficial: dadosEnriquecidos?.site || cliente.site || null,
@@ -515,6 +545,7 @@ async function enrichClientes(
 async function findCompetitorsForMarkets(
   mercadosMap: Map<string, number>,
   projectId: number,
+  pesquisaId: number,
   clientes: Array<{ nome: string; cnpj?: string }> = []
 ) {
   const { searchCompetitors } = await import('./_core/serpApi');
@@ -602,6 +633,7 @@ async function findCompetitorsForMarkets(
           // Criar concorrente
           const novoConcorrente = await createConcorrente({
             projectId,
+            pesquisaId,
             mercadoId,
             nome: comp.nome,
             cnpj: null, // CNPJ será enriquecido posteriormente
@@ -633,6 +665,7 @@ async function findCompetitorsForMarkets(
 async function findLeadsForMarkets(
   mercadosMap: Map<string, number>,
   projectId: number,
+  pesquisaId: number,
   clientes: Array<{ nome: string; cnpj?: string }> = [],
   concorrentes: Array<{ nome: string; cnpj?: string }> = []
 ) {
@@ -724,6 +757,7 @@ async function findLeadsForMarkets(
           // Criar lead
           const novoLead = await createLead({
             projectId,
+            pesquisaId,
             mercadoId,
             nome: lead.nome,
             cnpj: null, // CNPJ será enriquecido posteriormente

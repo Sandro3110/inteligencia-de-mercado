@@ -356,3 +356,31 @@
 - [x] Testar adiamento de 30 dias
 - [x] Validar atualização de lastActivityAt
 - [x] Verificar remoção de aviso pendente
+
+
+---
+
+## FASE 61: INVESTIGAÇÃO E CORREÇÃO DO FLUXO DE ENRIQUECIMENTO 🔍
+
+### 61.1 Rastrear Fluxo Completo da Veolia
+- [ ] Verificar como cliente Veolia foi criado
+- [ ] Verificar pesquisaId associada ao cliente
+- [ ] Verificar se enriquecimento foi executado
+- [ ] Verificar se dados foram gravados no banco
+- [ ] Verificar como tela busca e exibe dados
+
+### 61.2 Identificar Pontos de Falha
+- [ ] Verificar associação pesquisaId em todas as tabelas
+- [ ] Verificar filtros nas queries do frontend
+- [ ] Verificar se há problema de cache
+- [ ] Verificar se há problema de projectId
+
+### 61.3 Corrigir Problemas Encontrados
+- [ ] Corrigir associação de pesquisaId se necessário
+- [ ] Corrigir queries do frontend se necessário
+- [ ] Adicionar logs detalhados no processo
+
+### 61.4 Testar e Validar
+- [ ] Testar enriquecimento completo end-to-end
+- [ ] Validar exibição de dados na tela
+- [ ] Criar testes automatizados

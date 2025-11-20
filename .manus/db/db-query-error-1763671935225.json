@@ -1,0 +1,8 @@
+{
+  "query": "SELECT \n  ej.*,\n  p.nome as pesquisa_nome\nFROM enrichment_jobs ej\nLEFT JOIN pesquisas p ON ej.pesquisaId = p.id\nWHERE p.projectId = 330001\nORDER BY ej.createdAt DESC",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  ej.*,\n  p.nome as pesquisa_nome\nFROM enrichment_jobs ej\nLEFT JOIN pesquisas p ON ej.pesquisaId = p.id\nWHERE p.projectId = 330001\nORDER BY ej.createdAt DESC",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'ej.pesquisaid' in 'on clause'"
+  ]
+}

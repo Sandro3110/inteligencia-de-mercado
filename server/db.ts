@@ -1531,6 +1531,60 @@ export async function getPesquisasByProject(projectId: number) {
   }
 }
 
+export async function createPesquisa(data: {
+  projectId: number;
+  nome: string;
+  descricao?: string | null;
+  totalClientes?: number;
+  status?: 'importado' | 'enriquecendo' | 'em_andamento' | 'concluido' | 'erro';
+  qtdConcorrentesPorMercado?: number;
+  qtdLeadsPorMercado?: number;
+  qtdProdutosPorCliente?: number;
+}): Promise<Pesquisa | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const [result] = await db.insert(pesquisas).values({
+      projectId: data.projectId,
+      nome: data.nome,
+      descricao: data.descricao || null,
+      totalClientes: data.totalClientes || 0,
+      status: data.status || 'importado',
+      qtdConcorrentesPorMercado: data.qtdConcorrentesPorMercado || 5,
+      qtdLeadsPorMercado: data.qtdLeadsPorMercado || 10,
+      qtdProdutosPorCliente: data.qtdProdutosPorCliente || 3,
+    });
+
+    if (!result.insertId) return null;
+
+    const pesquisa = await getPesquisaById(Number(result.insertId));
+    console.log(`[Pesquisa] Criada: ${data.nome} (ID: ${result.insertId})`);
+    return pesquisa || null;
+  } catch (error) {
+    console.error('[Database] Failed to create pesquisa:', error);
+    return null;
+  }
+}
+
+export async function updatePesquisaStatus(
+  pesquisaId: number,
+  status: 'importado' | 'enriquecendo' | 'em_andamento' | 'concluido' | 'erro'
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    await db
+      .update(pesquisas)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(pesquisas.id, pesquisaId));
+    console.log(`[Pesquisa] Status atualizado: ${pesquisaId} -> ${status}`);
+  } catch (error) {
+    console.error('[Database] Failed to update pesquisa status:', error);
+  }
+}
+
 export async function getDashboardStatsByPesquisa(pesquisaId: number) {
   const db = await getDb();
   if (!db) return null;
@@ -1564,6 +1618,7 @@ export async function getDashboardStatsByPesquisa(pesquisaId: number) {
 
 export async function createMercado(data: {
   projectId: number;
+  pesquisaId?: number | null;
   nome: string;
   categoria?: string | null;
   segmentacao?: 'B2B' | 'B2C' | 'B2B2C' | null;
@@ -1623,6 +1678,7 @@ export async function createMercado(data: {
   // Criar novo mercado
   const [result] = await db.insert(mercadosUnicos).values({
     projectId: data.projectId,
+    pesquisaId: data.pesquisaId || null,
     mercadoHash,
     nome: data.nome,
     categoria: data.categoria || null,
@@ -1696,6 +1752,7 @@ export async function deleteMercado(id: number) {
 
 export async function createCliente(data: {
   projectId: number;
+  pesquisaId?: number | null;
   nome: string;
   cnpj?: string | null;
   siteOficial?: string | null;
@@ -1778,6 +1835,7 @@ export async function createCliente(data: {
   // Criar novo cliente
   const [result] = await db.insert(clientes).values({
     projectId: data.projectId,
+    pesquisaId: data.pesquisaId || null,
     clienteHash: normalizedHash,
     nome: data.nome,
     cnpj: data.cnpj || null,
@@ -1890,6 +1948,7 @@ export async function deleteCliente(id: number) {
 
 export async function createConcorrente(data: {
   projectId: number;
+  pesquisaId?: number | null;
   mercadoId: number;
   nome: string;
   cnpj?: string | null;
@@ -1955,6 +2014,7 @@ export async function createConcorrente(data: {
   // Criar novo concorrente
   const [result] = await db.insert(concorrentes).values({
     projectId: data.projectId,
+    pesquisaId: data.pesquisaId || null,
     mercadoId: data.mercadoId,
     concorrenteHash,
     nome: data.nome,
@@ -2023,6 +2083,7 @@ export async function deleteConcorrente(id: number) {
 
 export async function createLead(data: {
   projectId: number;
+  pesquisaId?: number | null;
   mercadoId: number;
   nome: string;
   cnpj?: string | null;
@@ -2095,11 +2156,11 @@ export async function createLead(data: {
   // Criar novo lead
   const result = await db.execute(sql`
     INSERT INTO leads (
-      projectId, mercadoId, leadHash, nome, cnpj, site, email, telefone,
+      projectId, pesquisaId, mercadoId, leadHash, nome, cnpj, site, email, telefone,
       tipo, porte, regiao, setor, qualidadeScore, qualidadeClassificacao,
       validationStatus, stage
     ) VALUES (
-      ${data.projectId}, ${data.mercadoId}, ${leadHash}, ${data.nome},
+      ${data.projectId}, ${data.pesquisaId || null}, ${data.mercadoId}, ${leadHash}, ${data.nome},
       ${data.cnpj || null}, ${data.site || null}, ${data.email || null}, ${data.telefone || null},
       ${data.tipo || null}, ${data.porte || null}, ${data.regiao || null}, ${data.setor || null},
       ${data.qualidadeScore || 0}, ${data.qualidadeClassificacao || 'Ruim'},

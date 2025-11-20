@@ -1,0 +1,25 @@
+{
+  "query": "SELECT \n  'concorrentes' as tipo,\n  COUNT(*) as total,\n  GROUP_CONCAT(DISTINCT mercadoId) as mercados_ids\nFROM concorrentes \nWHERE projectId = 330001\nUNION ALL\nSELECT \n  'leads' as tipo,\n  COUNT(*) as total,\n  GROUP_CONCAT(DISTINCT mercadoId) as mercados_ids\nFROM leads \nWHERE projectId = 330001\nUNION ALL\nSELECT \n  'produtos' as tipo,\n  COUNT(*) as total,\n  NULL as mercados_ids\nFROM produtos \nWHERE projectId = 330001",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  'concorrentes' as tipo,\n  COUNT(*) as total,\n  GROUP_CONCAT(DISTINCT mercadoId) as mercados_ids\nFROM concorrentes \nWHERE projectId = 330001\nUNION ALL\nSELECT \n  'leads' as tipo,\n  COUNT(*) as total,\n  GROUP_CONCAT(DISTINCT mercadoId) as mercados_ids\nFROM leads \nWHERE projectId = 330001\nUNION ALL\nSELECT \n  'produtos' as tipo,\n  COUNT(*) as total,\n  NULL as mercados_ids\nFROM produtos \nWHERE projectId = 330001",
+  "rows": [
+    {
+      "tipo": "leads",
+      "total": "0",
+      "mercados_ids": "NULL"
+    },
+    {
+      "tipo": "concorrentes",
+      "total": "2",
+      "mercados_ids": "750002"
+    },
+    {
+      "tipo": "produtos",
+      "total": "0",
+      "mercados_ids": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "tipo\ttotal\tmercados_ids\nleads\t0\tNULL\nconcorrentes\t2\t750002\nprodutos\t0\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

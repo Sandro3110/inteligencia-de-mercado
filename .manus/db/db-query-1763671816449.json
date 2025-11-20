@@ -1,0 +1,39 @@
+{
+  "query": "SELECT * FROM clientes WHERE projectId = 330001 LIMIT 1",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT * FROM clientes WHERE projectId = 330001 LIMIT 1",
+  "rows": [
+    {
+      "id": "421612",
+      "clienteHash": "veolia-servicos-ambientais-brasil-01-600-200-0001-48-330001",
+      "nome": "VEOLIA SERVICOS AMBIENTAIS BRASIL",
+      "cnpj": "01.600.200/0001-48",
+      "siteOficial": "https://www.latinoamerica.veolia.com/pt",
+      "produtoPrincipal": "Geomembrana",
+      "segmentacaoB2bB2c": "NULL",
+      "email": "br.fiscal.groups@veolia.com",
+      "telefone": "(11) 3046-9000 / (11) 3046-9001",
+      "linkedin": "NULL",
+      "instagram": "NULL",
+      "cidade": "NULL",
+      "uf": "NULL",
+      "cnae": "NULL",
+      "porte": "NULL",
+      "qualidadeScore": "77",
+      "qualidadeClassificacao": "Bom",
+      "validationStatus": "pending",
+      "validationNotes": "NULL",
+      "validatedBy": "NULL",
+      "validatedAt": "NULL",
+      "createdAt": "2025-11-20 18:54:06",
+      "projectId": "330001",
+      "regiao": "NULL",
+      "faturamentoDeclarado": "NULL",
+      "numeroEstabelecimentos": "NULL",
+      "pesquisaId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclienteHash\tnome\tcnpj\tsiteOficial\tprodutoPrincipal\tsegmentacaoB2bB2c\temail\ttelefone\tlinkedin\tinstagram\tcidade\tuf\tcnae\tporte\tqualidadeScore\tqualidadeClassificacao\tvalidationStatus\tvalidationNotes\tvalidatedBy\tvalidatedAt\tcreatedAt\tprojectId\tregiao\tfaturamentoDeclarado\tnumeroEstabelecimentos\tpesquisaId\n421612\tveolia-servicos-ambientais-brasil-01-600-200-0001-48-330001\tVEOLIA SERVICOS AMBIENTAIS BRASIL\t01.600.200/0001-48\thttps://www.latinoamerica.veolia.com/pt\tGeomembrana\tNULL\tbr.fiscal.groups@veolia.com\t(11) 3046-9000 / (11) 3046-9001\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\t77\tBom\tpending\tNULL\tNULL\tNULL\t2025-11-20 18:54:06\t330001\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

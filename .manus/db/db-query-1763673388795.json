@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COUNT(*) as total, projectId FROM mercados_unicos WHERE pesquisaId IS NULL GROUP BY projectId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT COUNT(*) as total, projectId FROM mercados_unicos WHERE pesquisaId IS NULL GROUP BY projectId;",
+  "rows": [
+    {
+      "total": "1",
+      "projectId": "330001"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tprojectId\n1\t330001\n",
+  "stderr": "",
+  "execution_time_ms": 85
+}

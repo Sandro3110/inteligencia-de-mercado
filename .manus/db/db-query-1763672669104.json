@@ -1,0 +1,170 @@
+{
+  "query": "SELECT id, nome, pesquisaId, projectId, cnpj, createdAt \nFROM clientes \nWHERE projectId = 1\nORDER BY createdAt DESC \nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, pesquisaId, projectId, cnpj, createdAt \nFROM clientes \nWHERE projectId = 1\nORDER BY createdAt DESC \nLIMIT 20;",
+  "rows": [
+    {
+      "id": "391955",
+      "nome": "AGRO COML DA VARGEM LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "29160000163",
+      "createdAt": "2025-11-19 20:26:11"
+    },
+    {
+      "id": "391945",
+      "nome": "A LUIZ NETO EIRELI",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "2891966000191",
+      "createdAt": "2025-11-19 20:24:37"
+    },
+    {
+      "id": "391943",
+      "nome": "A DA CRUZ GOUVEIA NETO",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "7537577000186",
+      "createdAt": "2025-11-19 20:23:33"
+    },
+    {
+      "id": "391937",
+      "nome": "4MMD GESSO PISO E REVESTIMENTO EIRELI",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "20953721000123",
+      "createdAt": "2025-11-19 20:22:21"
+    },
+    {
+      "id": "391805",
+      "nome": "Teste Cliente Sem CNPJ",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "NULL",
+      "createdAt": "2025-11-19 20:13:15"
+    },
+    {
+      "id": "361957",
+      "nome": "AGRO COML SAO PAULO LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "4696061000196",
+      "createdAt": "2025-11-19 19:51:28"
+    },
+    {
+      "id": "361955",
+      "nome": "AGRO COMERCIO LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "11460310000105",
+      "createdAt": "2025-11-19 19:49:16"
+    },
+    {
+      "id": "361954",
+      "nome": "AGRO COMERCIAL KIST E HEEMANN LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "90582990000106",
+      "createdAt": "2025-11-19 19:48:21"
+    },
+    {
+      "id": "361953",
+      "nome": "AGRICOLA HORIZONTE LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "77837979001587",
+      "createdAt": "2025-11-19 19:48:13"
+    },
+    {
+      "id": "361952",
+      "nome": "AGENFLEX IND E COM DE EMBALAGENS LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "7348604000172",
+      "createdAt": "2025-11-19 19:47:06"
+    },
+    {
+      "id": "361951",
+      "nome": "ADEMIR LANDI DE QUEIROZ EMBAL",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "13646490000140",
+      "createdAt": "2025-11-19 19:46:10"
+    },
+    {
+      "id": "361950",
+      "nome": "ADAMA PISOS E REVESTIMENTOS LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "21204150000197",
+      "createdAt": "2025-11-19 19:45:12"
+    },
+    {
+      "id": "361949",
+      "nome": "ACOMIX METALURGICA LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "21969045000149",
+      "createdAt": "2025-11-19 19:44:12"
+    },
+    {
+      "id": "361948",
+      "nome": "ABARCA MOVEIS LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "50212224000135",
+      "createdAt": "2025-11-19 19:43:21"
+    },
+    {
+      "id": "361947",
+      "nome": "A MUNDIAL FERRAGENS LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "19674019000141",
+      "createdAt": "2025-11-19 19:42:17"
+    },
+    {
+      "id": "361945",
+      "nome": "A E G IND E COM LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "12414789000106",
+      "createdAt": "2025-11-19 19:40:26"
+    },
+    {
+      "id": "361943",
+      "nome": "A C RIBAS COMERCIO TEXTIL LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "10664147000130",
+      "createdAt": "2025-11-19 19:38:14"
+    },
+    {
+      "id": "361942",
+      "nome": "A C PENTEADO NETO & CIA LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "5918064000190",
+      "createdAt": "2025-11-19 19:37:15"
+    },
+    {
+      "id": "361941",
+      "nome": "A C P IND DE MOVEIS LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "30746945000118",
+      "createdAt": "2025-11-19 19:36:09"
+    },
+    {
+      "id": "361939",
+      "nome": "1001 EMBALAGEM ADESIVOS E ENVELOPES LTDA",
+      "pesquisaId": "1",
+      "projectId": "1",
+      "cnpj": "33265973000101",
+      "createdAt": "2025-11-19 19:33:56"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tpesquisaId\tprojectId\tcnpj\tcreatedAt\n391955\tAGRO COML DA VARGEM LTDA\t1\t1\t29160000163\t2025-11-19 20:26:11\n391945\tA LUIZ NETO EIRELI\t1\t1\t2891966000191\t2025-11-19 20:24:37\n391943\tA DA CRUZ GOUVEIA NETO\t1\t1\t7537577000186\t2025-11-19 20:23:33\n391937\t4MMD GESSO PISO E REVESTIMENTO EIRELI\t1\t1\t20953721000123\t2025-11-19 20:22:21\n391805\tTeste Cliente Sem CNPJ\t1\t1\tNULL\t2025-11-19 20:13:15\n361957\tAGRO COML SAO PAULO LTDA\t1\t1\t4696061000196\t2025-11-19 19:51:28\n361955\tAGRO COMERCIO LTDA\t1\t1\t11460310000105\t2025-11-19 19:49:16\n361954\tAGRO COMERCIAL KIST E HEEMANN LTDA\t1\t1\t90582990000106\t2025-11-19 19:48:21\n361953\tAGRICOLA HORIZONTE LTDA\t1\t1\t77837979001587\t2025-11-19 19:48:13\n361952\tAGENFLEX IND E COM DE EMBALAGENS LTDA\t1\t1\t7348604000172\t2025-11-19 19:47:06\n361951\tADEMIR LANDI DE QUEIROZ EMBAL\t1\t1\t13646490000140\t2025-11-19 19:46:10\n361950\tADAMA PISOS E REVESTIMENTOS LTDA\t1\t1\t21204150000197\t2025-11-19 19:45:12\n361949\tACOMIX METALURGICA LTDA\t1\t1\t21969045000149\t2025-11-19 19:44:12\n361948\tABARCA MOVEIS LTDA\t1\t1\t50212224000135\t2025-11-19 19:43:21\n361947\tA MUNDIAL FERRAGENS LTDA\t1\t1\t19674019000141\t2025-11-19 19:42:17\n361945\tA E G IND E COM LTDA\t1\t1\t12414789000106\t2025-11-19 19:40:26\n361943\tA C RIBAS COMERCIO TEXTIL LTDA\t1\t1\t10664147000130\t2025-11-19 19:38:14\n361942\tA C PENTEADO NETO & CIA LTDA\t1\t1\t5918064000190\t2025-11-19 19:37:15\n361941\tA C P IND DE MOVEIS LTDA\t1\t1\t30746945000118\t2025-11-19 19:36:09\n361939\t1001 EMBALAGEM ADESIVOS E ENVELOPES LTDA\t1\t1\t33265973000101\t2025-11-19 19:33:56\n",
+  "stderr": "",
+  "execution_time_ms": 48
+}

@@ -1,0 +1,18 @@
+{
+  "query": "SELECT \n  m.id, m.nome, m.segmentacao, m.categoria, m.tamanhoMercado,\n  cm.clienteId\nFROM mercados_unicos m\nLEFT JOIN clientes_mercados cm ON m.id = cm.mercadoId\nWHERE m.projectId = 330001",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  m.id, m.nome, m.segmentacao, m.categoria, m.tamanhoMercado,\n  cm.clienteId\nFROM mercados_unicos m\nLEFT JOIN clientes_mercados cm ON m.id = cm.mercadoId\nWHERE m.projectId = 330001",
+  "rows": [
+    {
+      "id": "750002",
+      "nome": "Engenharia Civil e Ambiental",
+      "segmentacao": "B2B",
+      "categoria": "Materiais de Construção e Geossintéticos",
+      "tamanhoMercado": "NULL",
+      "clienteId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tsegmentacao\tcategoria\ttamanhoMercado\tclienteId\n750002\tEngenharia Civil e Ambiental\tB2B\tMateriais de Construção e Geossintéticos\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

@@ -1,0 +1,26 @@
+{
+  "query": "SELECT \n  id, nome, cnpj, siteOficial, produtoPrincipal, segmentacaoB2bB2c,\n  cidade, uf, cnae, porte,\n  qualidadeScore, qualidadeClassificacao, validationStatus,\n  createdAt\nFROM clientes \nWHERE projectId = 330001",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  id, nome, cnpj, siteOficial, produtoPrincipal, segmentacaoB2bB2c,\n  cidade, uf, cnae, porte,\n  qualidadeScore, qualidadeClassificacao, validationStatus,\n  createdAt\nFROM clientes \nWHERE projectId = 330001",
+  "rows": [
+    {
+      "id": "421612",
+      "nome": "VEOLIA SERVICOS AMBIENTAIS BRASIL",
+      "cnpj": "01.600.200/0001-48",
+      "siteOficial": "https://www.latinoamerica.veolia.com/pt",
+      "produtoPrincipal": "Geomembrana",
+      "segmentacaoB2bB2c": "NULL",
+      "cidade": "NULL",
+      "uf": "NULL",
+      "cnae": "NULL",
+      "porte": "NULL",
+      "qualidadeScore": "77",
+      "qualidadeClassificacao": "Bom",
+      "validationStatus": "pending",
+      "createdAt": "2025-11-20 18:54:06"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcnpj\tsiteOficial\tprodutoPrincipal\tsegmentacaoB2bB2c\tcidade\tuf\tcnae\tporte\tqualidadeScore\tqualidadeClassificacao\tvalidationStatus\tcreatedAt\n421612\tVEOLIA SERVICOS AMBIENTAIS BRASIL\t01.600.200/0001-48\thttps://www.latinoamerica.veolia.com/pt\tGeomembrana\tNULL\tNULL\tNULL\tNULL\tNULL\t77\tBom\tpending\t2025-11-20 18:54:06\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

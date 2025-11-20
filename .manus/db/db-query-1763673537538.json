@@ -1,0 +1,22 @@
+{
+  "query": "SELECT p.id as pesquisa_id, p.nome as pesquisa_nome, proj.id as project_id, proj.nome as project_nome FROM pesquisas p JOIN projects proj ON p.projectId = proj.id WHERE p.nome != proj.nome;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT p.id as pesquisa_id, p.nome as pesquisa_nome, proj.id as project_id, proj.nome as project_nome FROM pesquisas p JOIN projects proj ON p.projectId = proj.id WHERE p.nome != proj.nome;",
+  "rows": [
+    {
+      "pesquisa_id": "30001",
+      "pesquisa_nome": "Embalagens 2025",
+      "project_id": "1",
+      "project_nome": "Embalagens"
+    },
+    {
+      "pesquisa_id": "1",
+      "pesquisa_nome": "Embalagens 2025",
+      "project_id": "1",
+      "project_nome": "Embalagens"
+    }
+  ],
+  "messages": [],
+  "stdout": "pesquisa_id\tpesquisa_nome\tproject_id\tproject_nome\n30001\tEmbalagens 2025\t1\tEmbalagens\n1\tEmbalagens 2025\t1\tEmbalagens\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, nome, pesquisaId, projectId, createdAt \nFROM clientes \nWHERE LOWER(nome) LIKE '%veol%' OR LOWER(nome) LIKE '%veo%'\nORDER BY createdAt DESC \nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, pesquisaId, projectId, createdAt \nFROM clientes \nWHERE LOWER(nome) LIKE '%veol%' OR LOWER(nome) LIKE '%veo%'\nORDER BY createdAt DESC \nLIMIT 10;",
+  "rows": [
+    {
+      "id": "421613",
+      "nome": "Quero encontrar clientes potenciais para a compra de geomembrana com aplicação premium para obras ambientais, com tecnologia 7 camadas em todo Brasil. São clientes potenciais já em minha base: Veolia, Solvi, Orizon",
+      "pesquisaId": "NULL",
+      "projectId": "330002",
+      "createdAt": "2025-11-20 18:56:13"
+    },
+    {
+      "id": "421612",
+      "nome": "VEOLIA SERVICOS AMBIENTAIS BRASIL",
+      "pesquisaId": "NULL",
+      "projectId": "330001",
+      "createdAt": "2025-11-20 18:54:06"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tpesquisaId\tprojectId\tcreatedAt\n421613\tQuero encontrar clientes potenciais para a compra de geomembrana com aplicação premium para obras ambientais, com tecnologia 7 camadas em todo Brasil. São clientes potenciais já em minha base: Veolia, Solvi, Orizon\tNULL\t330002\t2025-11-20 18:56:13\n421612\tVEOLIA SERVICOS AMBIENTAIS BRASIL\tNULL\t330001\t2025-11-20 18:54:06\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

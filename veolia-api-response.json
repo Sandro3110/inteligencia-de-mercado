@@ -1,0 +1,110 @@
+{
+  "clienteEnriquecido": {
+    "siteOficial": "https://www.veolia.com.br",
+    "produtoPrincipal": "Gestão de resíduos e serviços ambientais",
+    "cidade": "São Paulo",
+    "uf": "SP",
+    "regiao": "Sudeste",
+    "porte": "Grande",
+    "email": "contato@veolia.com.br",
+    "telefone": "(11) 1234-5678",
+    "linkedin": "https://www.linkedin.com/company/veolia/",
+    "instagram": "@veoliabrasil"
+  },
+  "mercados": [
+    {
+      "mercado": {
+        "nome": "Gestão de Resíduos Sólidos",
+        "categoria": "B2B",
+        "segmentacao": "Indústrias e municípios que necessitam de soluções para resíduos",
+        "tamanhoEstimado": "R$ 10 bilhões/ano no Brasil"
+      },
+      "produtos": [
+        {
+          "nome": "Coleta e Destinação de Resíduos",
+          "descricao": "Serviço completo de coleta, transporte e destinação final de resíduos, garantindo conformidade ambiental e eficiência operacional.",
+          "categoria": "Serviços Ambientais"
+        },
+        {
+          "nome": "Reciclagem de Materiais",
+          "descricao": "Processo de transformação de resíduos em novos produtos, reduzindo a necessidade de matéria-prima virgem e promovendo a economia circular.",
+          "categoria": "Reciclagem"
+        },
+        {
+          "nome": "Consultoria Ambiental",
+          "descricao": "Serviços de consultoria para empresas que buscam otimizar sua gestão de resíduos e atender à legislação ambiental.",
+          "categoria": "Consultoria"
+        }
+      ],
+      "concorrentes": [
+        {
+          "nome": "Ambipar",
+          "descricao": "Foco em gestão de resíduos e soluções ambientais para indústrias.",
+          "porte": "Grande",
+          "regiao": "Nacional"
+        },
+        {
+          "nome": "EcoUrbis",
+          "descricao": "Atua na coleta e destinação de resíduos sólidos urbanos.",
+          "porte": "Médio",
+          "regiao": "São Paulo"
+        },
+        {
+          "nome": "Loga",
+          "descricao": "Especializada em gestão de resíduos e limpeza urbana.",
+          "porte": "Médio",
+          "regiao": "São Paulo"
+        },
+        {
+          "nome": "ReciclaBR",
+          "descricao": "Foco em soluções de reciclagem e gestão de resíduos para empresas.",
+          "porte": "Pequeno",
+          "regiao": "São Paulo"
+        },
+        {
+          "nome": "Sustentare",
+          "descricao": "Oferece serviços de gestão de resíduos e consultoria ambiental.",
+          "porte": "Pequeno",
+          "regiao": "Minas Gerais"
+        }
+      ],
+      "leads": [
+        {
+          "nome": "Indústria de Alimentos XYZ",
+          "segmento": "Alimentos e Bebidas",
+          "potencial": "Alto",
+          "justificativa": "Busca soluções para gestão de resíduos orgânicos e recicláveis, visando atender à legislação ambiental.",
+          "porte": "Médio"
+        },
+        {
+          "nome": "Construtora ABC",
+          "segmento": "Construção Civil",
+          "potencial": "Médio",
+          "justificativa": "Necessita de serviços de destinação de resíduos de construção e demolição, em conformidade com normas ambientais.",
+          "porte": "Médio"
+        },
+        {
+          "nome": "Prefeitura de São Paulo",
+          "segmento": "Administração Pública",
+          "potencial": "Alto",
+          "justificativa": "Busca parcerias para melhorar a gestão de resíduos urbanos e aumentar a eficiência na coleta.",
+          "porte": "Grande"
+        },
+        {
+          "nome": "Fábrica de Papel e Celulose ABC",
+          "segmento": "Papel e Celulose",
+          "potencial": "Médio",
+          "justificativa": "Precisa de soluções para tratamento de efluentes e gestão de resíduos industriais.",
+          "porte": "Grande"
+        },
+        {
+          "nome": "Rede de Supermercados XYZ",
+          "segmento": "Varejo",
+          "potencial": "Médio",
+          "justificativa": "Busca otimizar a gestão de resíduos orgânicos e embalagens, visando redução de custos e impacto ambiental.",
+          "porte": "Grande"
+        }
+      ]
+    }
+  ]
+}

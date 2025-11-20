@@ -1,0 +1,27 @@
+{
+  "query": "SELECT \n  m.*,\n  (SELECT COUNT(*) FROM concorrentes WHERE mercadoId = m.id) as qtd_concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE mercadoId = m.id) as qtd_leads\nFROM mercados_unicos m\nWHERE m.projectId = 330001",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  m.*,\n  (SELECT COUNT(*) FROM concorrentes WHERE mercadoId = m.id) as qtd_concorrentes,\n  (SELECT COUNT(*) FROM leads WHERE mercadoId = m.id) as qtd_leads\nFROM mercados_unicos m\nWHERE m.projectId = 330001",
+  "rows": [
+    {
+      "id": "750002",
+      "mercadoHash": "engenharia-civil-e-ambiental-330001",
+      "nome": "Engenharia Civil e Ambiental",
+      "segmentacao": "B2B",
+      "categoria": "Materiais de Construção e Geossintéticos",
+      "tamanhoMercado": "NULL",
+      "crescimentoAnual": "NULL",
+      "tendencias": "NULL",
+      "principaisPlayers": "NULL",
+      "quantidadeClientes": "0",
+      "createdAt": "2025-11-20 18:53:59",
+      "projectId": "330001",
+      "pesquisaId": "NULL",
+      "qtd_concorrentes": "2",
+      "qtd_leads": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tmercadoHash\tnome\tsegmentacao\tcategoria\ttamanhoMercado\tcrescimentoAnual\ttendencias\tprincipaisPlayers\tquantidadeClientes\tcreatedAt\tprojectId\tpesquisaId\tqtd_concorrentes\tqtd_leads\n750002\tengenharia-civil-e-ambiental-330001\tEngenharia Civil e Ambiental\tB2B\tMateriais de Construção e Geossintéticos\tNULL\tNULL\tNULL\tNULL\t0\t2025-11-20 18:53:59\t330001\tNULL\t2\t0\n",
+  "stderr": "",
+  "execution_time_ms": 104
+}

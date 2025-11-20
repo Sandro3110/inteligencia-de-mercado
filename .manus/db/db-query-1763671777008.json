@@ -1,0 +1,24 @@
+{
+  "query": "SELECT * FROM projects WHERE nome LIKE '%Ground%' OR nome LIKE '%ground%' LIMIT 1",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT * FROM projects WHERE nome LIKE '%Ground%' OR nome LIKE '%ground%' LIMIT 1",
+  "rows": [
+    {
+      "id": "330001",
+      "nome": "Ground",
+      "descricao": "Projeto criado automaticamente via fluxo de enriquecimento",
+      "cor": "#3b82f6",
+      "ativo": "1",
+      "status": "hibernated",
+      "createdAt": "2025-11-20 18:53:55",
+      "updatedAt": "2025-11-20 20:38:20",
+      "executionMode": "sequential",
+      "maxParallelJobs": "3",
+      "isPaused": "0",
+      "lastActivityAt": "2025-11-20 20:37:27"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tdescricao\tcor\tativo\tstatus\tcreatedAt\tupdatedAt\texecutionMode\tmaxParallelJobs\tisPaused\tlastActivityAt\n330001\tGround\tProjeto criado automaticamente via fluxo de enriquecimento\t#3b82f6\t1\thibernated\t2025-11-20 18:53:55\t2025-11-20 20:38:20\tsequential\t3\t0\t2025-11-20 20:37:27\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}

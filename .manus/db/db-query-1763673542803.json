@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE pesquisas p JOIN projects proj ON p.projectId = proj.id SET p.nome = proj.nome WHERE p.nome != proj.nome;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute UPDATE pesquisas p JOIN projects proj ON p.projectId = proj.id SET p.nome = proj.nome WHERE p.nome != proj.nome;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 64
+}
