@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { GlobalSearch } from "./GlobalSearch";
+import { QuickPesquisaSelector } from "./QuickPesquisaSelector";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useGlobalRefresh } from "@/hooks/useGlobalRefresh";
 import {
@@ -16,6 +17,7 @@ export function GlobalShortcuts() {
   const [, setLocation] = useLocation();
   const [showHelp, setShowHelp] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [showQuickPesquisa, setShowQuickPesquisa] = useState(false);
   const { refreshAll } = useGlobalRefresh({ enableKeyboardShortcut: false }); // Desabilita Ctrl+R interno do hook
 
   // Listener para evento customizado de mostrar ajuda
@@ -139,6 +141,16 @@ export function GlobalShortcuts() {
       description: "Abrir seletor de pesquisas"
     },
     {
+      key: "p",
+      ctrl: true,
+      shift: true,
+      handler: (e) => {
+        e.preventDefault();
+        setShowQuickPesquisa(true);
+      },
+      description: "Seleção rápida de pesquisa"
+    },
+    {
       key: "m",
       ctrl: true,
       handler: (e) => {
@@ -182,6 +194,7 @@ export function GlobalShortcuts() {
     { keys: ["Ctrl", "N"], description: "Novo projeto de enriquecimento", category: "Ações" },
     { keys: ["Ctrl", "P"], description: "Abrir seletor de projetos", category: "Ações" },
     { keys: ["Ctrl", "S"], description: "Abrir seletor de pesquisas", category: "Ações" },
+    { keys: ["Ctrl", "Shift", "P"], description: "Seleção rápida de pesquisa", category: "Ações" },
     
     // Interface
     { keys: ["Ctrl", "B"], description: "Toggle sidebar (expandir/colapsar)", category: "Interface" },
@@ -193,6 +206,7 @@ export function GlobalShortcuts() {
   return (
     <>
       <GlobalSearch open={showSearch} onOpenChange={setShowSearch} />
+      <QuickPesquisaSelector open={showQuickPesquisa} onOpenChange={setShowQuickPesquisa} />
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>

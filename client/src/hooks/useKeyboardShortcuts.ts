@@ -115,6 +115,7 @@ export function useListNavigation(options: {
  */
 export const KEYBOARD_SHORTCUTS = [
   { key: 'k', ctrl: true, description: 'Abrir busca rápida' },
+  { key: 'p', ctrl: true, shift: true, description: 'Seleção rápida de pesquisa' },
   { key: '/', description: 'Focar no campo de busca' },
   { key: 'Escape', description: 'Fechar modals e popups' },
   { key: '?', description: 'Mostrar ajuda de atalhos' },

@@ -54,7 +54,8 @@ export default function ExportHistory() {
     return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("pt-BR", {
       day: "2-digit",
@@ -209,7 +210,7 @@ export default function ExportHistory() {
                           <Calendar className="h-3 w-3" />
                           {formatDate(item.createdAt)}
                         </div>
-                        {item.generationTime > 0 && (
+                        {item.generationTime && item.generationTime > 0 && (
                           <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                             <Clock className="h-3 w-3" />
                             {item.generationTime}s
@@ -222,7 +223,7 @@ export default function ExportHistory() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => window.open(item.fileUrl, "_blank")}
+                              onClick={() => item.fileUrl && window.open(item.fileUrl, "_blank")}
                             >
                               <Download className="h-4 w-4" />
                             </Button>

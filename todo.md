@@ -1221,3 +1221,48 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [x] Confirmar que não há seletores duplicados visíveis em nenhuma página
 - [x] Testar navegação entre páginas mantendo contexto
 - [x] Validar que Ctrl+B ainda funciona para toggle do sidebar
+
+
+---
+
+## FASE 78: MELHORIAS DE UX DO SIDEBAR E NAVEGAÇÃO
+
+### 78.1 Correção do Botão de Toggle do Sidebar
+- [x] Mover botão de toggle para o topo do sidebar (ao lado do logo)
+- [x] Evitar que sidebar recolhido cause scroll horizontal
+- [x] Garantir que botão seja sempre visível e acessível
+- [x] Melhorar posicionamento e estilo do botão
+
+### 78.2 Indicador Visual de Projeto Selecionado
+- [x] Adicionar destaque visual no ProjectSelector quando projeto está selecionado
+- [x] Implementar cor de fundo diferenciada para projeto ativo
+- [x] Adicionar ícone de "check" ou "star" no projeto selecionado
+- [x] Melhorar contraste visual do item selecionado
+
+### 78.3 Breadcrumbs Clicáveis para Navegação
+- [x] Criar componente Breadcrumbs reutilizável
+- [x] Adicionar breadcrumbs no topo das páginas principais
+- [x] Implementar navegação clicável (Projeto > Pesquisa > Página Atual)
+- [x] Adicionar ícones nos breadcrumbs para melhor identificação
+- [x] Integrar com hooks useSelectedProject e useSelectedPesquisa
+
+### 78.4 Atalho Ctrl+Shift+P para Seleção Rápida
+- [x] Criar modal de seleção rápida de pesquisa
+- [x] Implementar atalho Ctrl+Shift+P para abrir modal
+- [x] Adicionar busca/filtro dentro do modal
+- [x] Permitir navegação por teclado (setas + Enter)
+- [x] Adicionar indicador visual de pesquisa atualmente selecionada
+- [x] Atualizar documentação de atalhos
+
+### 78.5 Correções de Erros TypeScript
+- [x] Corrigir erro em ExportHistory.tsx linha 212 (generationTime possibly null)
+- [x] Corrigir erro em ExportHistory.tsx linha 225 (string | null não atribuível)
+- [x] Adicionar validações de null/undefined onde necessário
+- [x] Garantir que todos os tipos estão corretos
+
+### 78.6 Testes e Validação
+- [ ] Testar botão de toggle em diferentes resoluções
+- [ ] Validar indicador visual de projeto selecionado
+- [ ] Testar breadcrumbs em todas as páginas principais
+- [ ] Validar atalho Ctrl+Shift+P e navegação por teclado
+- [ ] Confirmar que não há erros TypeScript

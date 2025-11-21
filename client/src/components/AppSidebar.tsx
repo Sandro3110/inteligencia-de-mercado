@@ -262,10 +262,20 @@ export function AppSidebar() {
         </Tooltip>
       </div>
 
-      {/* Seção de Seleção de Pesquisa - Simplificada */}
+      {/* Seção de Seleção de Projeto e Pesquisa */}
       {!collapsed && (
         <div className="p-4 border-b-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
           <div className="space-y-3">
+            {/* Seletor de Projeto */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-700">
+                  📁 Projeto
+                </label>
+              </div>
+              <ProjectSelector />
+            </div>
+
             {/* Seletor de Pesquisa */}
             {selectedProjectId ? (
               <div className="space-y-1.5">
