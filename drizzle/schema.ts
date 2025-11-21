@@ -37,6 +37,22 @@ export const alertHistory = mysqlTable("alert_history", {
 	triggeredAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 });
 
+export const apiHealthLog = mysqlTable("api_health_log", {
+	id: int().autoincrement().primaryKey(),
+	apiName: varchar({ length: 50 }).notNull(),
+	status: varchar({ length: 20 }).notNull(),
+	responseTime: int().notNull(),
+	errorMessage: text(),
+	endpoint: varchar({ length: 255 }),
+	requestData: text(),
+	createdAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+},
+(table) => [
+	index("idx_api_name").on(table.apiName),
+	index("idx_status").on(table.status),
+	index("idx_created_at").on(table.createdAt),
+]);
+
 export const analyticsDimensoes = mysqlTable("analytics_dimensoes", {
 	id: int().autoincrement().notNull(),
 	projectId: int().notNull(),

@@ -1443,4 +1443,43 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [x] Executar teste completo end-to-end (23 testes passando)
 - [x] Validar todos os avisos funcionando (12 testes de avisos + 11 testes de retry)
 - [x] Criar documentação de troubleshooting (logs detalhados implementados)
-- [ ] Salvar checkpoint final
+- [x] Salvar checkpoint final (v327ccecb)
+
+
+---
+
+## FASE 83: DASHBOARD DE SAÚDE DAS APIs + ALERTAS VISUAIS NA UI 📊⚠️
+
+### 83.1 Backend - Dashboard de Saúde das APIs
+- [x] Criar tabela `api_health_log` no schema (api_name, status, response_time, error_message, timestamp)
+- [x] Criar funções de registro: logAPICall(), getAPIHealthStats(), getAPIHealthHistory()
+- [x] Criar endpoints tRPC: apiHealth.stats, apiHealth.history, apiHealth.test
+- [ ] Integrar logging em todas as chamadas de API (LLM, ReceitaWS, SERPAPI)
+
+### 83.2 Frontend - Página de Dashboard de Saúde
+- [x] Criar página /api-health com 3 cards de status (OpenAI, SERPAPI, ReceitaWS)
+- [x] Adicionar gráfico de linha com histórico de taxa de sucesso (últimos 7 dias)
+- [x] Adicionar tabela de últimas 20 chamadas com detalhes
+- [x] Adicionar botão "Testar Conexão" para cada API
+- [x] Adicionar link no menu lateral (Sistema > Saúde das APIs)
+
+### 83.3 Sistema de Alertas Visuais na UI
+- [ ] Criar componente EnrichmentErrorAlert (toast/banner)
+- [ ] Criar hook useEnrichmentErrors para gerenciar estado de erros
+- [ ] Adicionar lógica para detectar falhas parciais durante enriquecimento
+- [ ] Exibir detalhes: quais APIs falharam, quantos itens afetados
+
+### 83.4 Integração com Fluxo de Enriquecimento
+- [ ] Modificar enrichmentFlow para coletar erros de API
+- [ ] Retornar objeto com { success, errors, stats } ao invés de apenas dados
+- [ ] Disparar evento de erro quando houver falhas parciais
+- [ ] Atualizar página de progresso para mostrar alertas
+
+### 83.5 Testes e Validação
+- [x] Criar testes para logAPICall e getAPIHealthStats (11 testes passando)
+- [x] Testar dashboard com dados simulados
+- [ ] Testar alertas visuais com falhas simuladas
+- [ ] Validar integração completa end-to-end
+
+### 83.6 Checkpoint Final
+- [ ] Salvar checkpoint com todas as implementações

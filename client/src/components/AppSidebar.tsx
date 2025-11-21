@@ -134,6 +134,7 @@ const navSections: NavSection[] = [
     defaultOpen: false,
     items: [
       { title: "Notificações", href: "/notificacoes", icon: Bell, badge: "Novo" },
+      { title: "Saúde das APIs", href: "/api-health", icon: Activity, badge: "Novo" },
       { title: "Histórico de Notificações", href: "/notificacoes/historico", icon: FileText },
       { title: "Histórico de Exportações", href: "/export/historico", icon: Download },
       { title: "Geocodificação", href: "/geocodificacao", icon: MapPin, badge: "Novo" },

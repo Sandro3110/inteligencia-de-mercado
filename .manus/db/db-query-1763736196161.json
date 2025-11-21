@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `api_health_log` (\n  `id` INT AUTO_INCREMENT PRIMARY KEY,\n  `apiName` VARCHAR(50) NOT NULL,\n  `status` VARCHAR(20) NOT NULL,\n  `responseTime` INT NOT NULL,\n  `errorMessage` TEXT,\n  `endpoint` VARCHAR(255),\n  `requestData` TEXT,\n  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX `idx_api_name` (`apiName`),\n  INDEX `idx_status` (`status`),\n  INDEX `idx_created_at` (`createdAt`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute CREATE TABLE IF NOT EXISTS `api_health_log` (\n  `id` INT AUTO_INCREMENT PRIMARY KEY,\n  `apiName` VARCHAR(50) NOT NULL,\n  `status` VARCHAR(20) NOT NULL,\n  `responseTime` INT NOT NULL,\n  `errorMessage` TEXT,\n  `endpoint` VARCHAR(255),\n  `requestData` TEXT,\n  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX `idx_api_name` (`apiName`),\n  INDEX `idx_status` (`status`),\n  INDEX `idx_created_at` (`createdAt`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1505
+}

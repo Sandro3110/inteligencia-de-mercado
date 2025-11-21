@@ -5,11 +5,13 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { exportRouter } from "./routers/exportRouter";
 import { geocodingRouter } from "./routers/geocodingRouter";
+import { apiHealthRouter } from "./routers/apiHealthRouter";
 
 export const appRouter = router({
   system: systemRouter,
   export: exportRouter,
   geo: geocodingRouter,
+  apiHealth: apiHealthRouter,
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
