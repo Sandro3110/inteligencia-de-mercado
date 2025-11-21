@@ -29,6 +29,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
@@ -161,15 +162,16 @@ export function AppSidebar() {
     return stored === 'true';
   });
   const [hovering, setHovering] = useState(false);
-
   // Sidebar está expandida se estiver fixada OU em hover
   const isExpanded = pinned || hovering;
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>(
-    navSections.reduce((acc, section) => {
+  const [peekLabel, setPeekLabel] = useState<string | null>(null);
+  const [peekTimeout, setPeekTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
+    return navSections.reduce((acc, section) => {
       acc[section.title] = section.defaultOpen ?? false;
       return acc;
-    }, {} as Record<string, boolean>)
-  );
+    }, {} as Record<string, boolean>);
+  });
 
   const { selectedProjectId } = useSelectedProject();
   const { 
@@ -472,17 +474,38 @@ export function AppSidebar() {
                     return (
                       <Link key={item.href} href={item.href}>
                         {!isExpanded ? (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <a
-                                className={cn(
-                                  "flex items-center justify-center p-2 rounded-md transition-colors relative",
-                                  active
-                                    ? "bg-blue-100 text-blue-700"
-                                    : "text-slate-600 hover:bg-slate-100"
-                                )}
-                              >
-                                <ItemIcon className="w-5 h-5" />
+                          <div className="relative">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <a
+                                  onClick={(e) => {
+                                    // Mostrar peek animation
+                                    e.preventDefault();
+                                    setPeekLabel(item.title);
+                                    
+                                    // Limpar timeout anterior se existir
+                                    if (peekTimeout) clearTimeout(peekTimeout);
+                                    
+                                    // Navegar após 1.2 segundos
+                                    const timeout = setTimeout(() => {
+                                      setLocation(item.href);
+                                      setPeekLabel(null);
+                                    }, 1200);
+                                    
+                                    setPeekTimeout(timeout);
+                                  }}
+                                  className={cn(
+                                    "flex items-center justify-center p-2 rounded-md transition-colors relative cursor-pointer",
+                                    active
+                                      ? "bg-blue-100 text-blue-700"
+                                      : "text-slate-600 hover:bg-slate-100"
+                                  )}
+                                >
+                                  {/* Dot colorido quando item está ativo */}
+                                  {active && (
+                                    <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                                  )}
+                                  <ItemIcon className="w-5 h-5" />
                                 {/* Badge de notificações não lidas (collapsed) */}
                                 {item.href === "/notificacoes" && unreadCount > 0 && (
                                   <span className="absolute -top-1 -right-1 flex h-4 w-4">
@@ -505,6 +528,24 @@ export function AppSidebar() {
                               </div>
                             </TooltipContent>
                           </Tooltip>
+                          
+                          {/* Peek animation - tooltip expandido */}
+                          <AnimatePresence>
+                            {peekLabel === item.title && (
+                              <motion.div
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-50 pointer-events-none"
+                              >
+                                <div className="bg-popover text-popover-foreground px-3 py-2 rounded-md shadow-lg border whitespace-nowrap">
+                                  {item.title}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
                         ) : (
                           <a
                             className={cn(

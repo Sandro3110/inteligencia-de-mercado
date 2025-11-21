@@ -212,13 +212,14 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
-const resolveApiUrl = () =>
-  ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
-    ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-    : "https://forge.manus.im/v1/chat/completions";
+const resolveApiUrl = () => {
+  // Usar OpenAI diretamente
+  return "https://api.openai.com/v1/chat/completions";
+};
 
 const assertApiKey = () => {
-  if (!ENV.forgeApiKey) {
+  // Verificar se OPENAI_API_KEY está configurada
+  if (!process.env.OPENAI_API_KEY) {
     throw new Error("OPENAI_API_KEY is not configured");
   }
 };
@@ -283,7 +284,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   } = params;
 
   const payload: Record<string, unknown> = {
-    model: "gemini-2.5-flash",
+    model: params.model || "gpt-4o-mini", // Usar gpt-4o-mini por padrão
     messages: messages.map(normalizeMessage),
   };
 
@@ -299,9 +300,14 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     payload.tool_choice = normalizedToolChoice;
   }
 
-  payload.max_tokens = 32768
-  payload.thinking = {
-    "budget_tokens": 128
+  // Configurar max_tokens se fornecido
+  if (params.maxTokens || params.max_tokens) {
+    payload.max_tokens = params.maxTokens || params.max_tokens;
+  }
+  
+  // Configurar temperature se fornecido
+  if (params.temperature !== undefined) {
+    payload.temperature = params.temperature;
   }
 
   const normalizedResponseFormat = normalizeResponseFormat({
@@ -319,7 +325,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${ENV.forgeApiKey}`,
+      authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     body: JSON.stringify(payload),
   });
