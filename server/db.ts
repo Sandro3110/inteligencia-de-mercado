@@ -3499,6 +3499,7 @@ export async function deleteProduto(id: number) {
 // ============================================================================
 
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+import { toMySQLTimestamp, toMySQLTimestampOrNull, now } from './dateUtils';
 
 // Chave de criptografia (deve estar em variável de ambiente em produção)
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'default-32-char-key-change-me!!'; // 32 caracteres

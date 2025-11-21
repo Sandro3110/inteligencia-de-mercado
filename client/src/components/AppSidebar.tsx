@@ -89,6 +89,8 @@ const navSections: NavSection[] = [
     items: [
       { title: "Mercados", href: "/mercados", icon: Package, shortcut: "Ctrl+M" },
       { title: "Analytics Avançado", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+A" },
+      { title: "Dashboard Avançado", href: "/dashboard-avancado", icon: BarChart3 },
+      { title: "Analytics Dashboard", href: "/analytics-dashboard", icon: BarChart3 },
       { title: "Tendências", href: "/tendencias", icon: TrendingUp },
       { title: "ROI e Performance", href: "/roi", icon: DollarSign, shortcut: "Ctrl+R" },
       { title: "Funil de Conversão", href: "/funil", icon: Filter },
@@ -125,6 +127,8 @@ const navSections: NavSection[] = [
     defaultOpen: false,
     items: [
       { title: "Notificações", href: "/notificacoes", icon: Bell, badge: "Novo" },
+      { title: "Histórico de Notificações", href: "/notificacoes/historico", icon: FileText },
+      { title: "Preferências de Notificações", href: "/configuracoes/notificacoes", icon: Settings },
       { title: "Monitoramento", href: "/monitoring", icon: Activity },
       { title: "Atividade de Projetos", href: "/projetos/atividade", icon: FolderOpen, badge: "Novo" },
       { title: "Registro de Atividades", href: "/atividade", icon: Clock },

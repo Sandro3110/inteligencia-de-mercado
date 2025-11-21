@@ -41,6 +41,10 @@ async function startServer() {
   // SSE endpoint for enrichment progress
   app.get("/api/enrichment/progress/:jobId", setupSSE);
   
+  // SSE endpoint for real-time notifications
+  const { handleNotificationStream } = await import('../notificationStream');
+  app.get("/api/notifications/stream", handleNotificationStream);
+  
   // tRPC API
   app.use(
     "/api/trpc",

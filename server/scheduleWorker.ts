@@ -7,6 +7,7 @@ import { getDb } from './db';
 import { scheduledEnrichments } from '../drizzle/schema';
 import { eq, and, lte } from 'drizzle-orm';
 import { executeEnrichmentFlow } from './enrichmentFlow';
+import { toMySQLTimestamp, toMySQLTimestampOrNull, now } from './dateUtils';
 
 let workerInterval: NodeJS.Timeout | null = null;
 let isProcessing = false;
@@ -95,7 +96,7 @@ async function executeSchedule(schedule: any) {
       .update(scheduledEnrichments)
       .set({ 
         status: 'running',
-        lastRunAt: new Date(),
+        lastRunAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
       })
       .where(eq(scheduledEnrichments.id, schedule.id));
 
@@ -200,7 +201,7 @@ async function createNextSchedule(schedule: any) {
     // Criar novo agendamento
     await db.insert(scheduledEnrichments).values({
       projectId: schedule.projectId,
-      scheduledAt: nextDate,
+      scheduledAt: nextDate.toISOString().slice(0, 19).replace('T', ' '),
       recurrence: schedule.recurrence,
       batchSize: schedule.batchSize,
       maxClients: schedule.maxClients,

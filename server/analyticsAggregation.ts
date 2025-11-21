@@ -1,5 +1,6 @@
 import { eq, and, sql, gte, lte, desc } from "drizzle-orm";
 import { getDb } from "./db";
+import { toMySQLTimestamp, toMySQLTimestampOrNull, now } from './dateUtils';
 import {
   analyticsMercados,
   analyticsPesquisas,
@@ -259,6 +260,10 @@ export async function aggregateTimelineMetrics(
   inicioDia.setHours(0, 0, 0, 0);
   const fimDia = new Date(dataRef);
   fimDia.setHours(23, 59, 59, 999);
+  
+  // Converter para strings ISO para comparação com timestamp do banco
+  const inicioDiaStr = inicioDia.toISOString().slice(0, 19).replace('T', ' ');
+  const fimDiaStr = fimDia.toISOString().slice(0, 19).replace('T', ' ');
 
   // Leads gerados no dia
   const leadsGeradosDia = await db
@@ -267,8 +272,8 @@ export async function aggregateTimelineMetrics(
     .where(
       and(
         eq(leads.projectId, projectId),
-        gte(leads.createdAt, inicioDia),
-        lte(leads.createdAt, fimDia)
+        gte(leads.createdAt, inicioDiaStr),
+        lte(leads.createdAt, fimDiaStr)
       )
     );
 
@@ -279,8 +284,8 @@ export async function aggregateTimelineMetrics(
     .where(
       and(
         eq(leads.projectId, projectId),
-        gte(leads.validatedAt, inicioDia),
-        lte(leads.validatedAt, fimDia)
+        gte(leads.validatedAt, inicioDiaStr),
+        lte(leads.validatedAt, fimDiaStr)
       )
     );
 
@@ -291,8 +296,8 @@ export async function aggregateTimelineMetrics(
     .where(
       and(
         eq(leads.projectId, projectId),
-        gte(leads.createdAt, inicioDia),
-        lte(leads.createdAt, fimDia)
+        gte(leads.createdAt, inicioDiaStr),
+        lte(leads.createdAt, fimDiaStr)
       )
     );
 

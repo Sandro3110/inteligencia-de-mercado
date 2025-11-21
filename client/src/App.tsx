@@ -10,6 +10,7 @@ import { DashboardCustomizationProvider } from "./contexts/DashboardCustomizatio
 import { GlobalShortcuts } from "./components/GlobalShortcuts";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { AppSidebar } from "./components/AppSidebar";
+import { useRealtimeNotifications } from "./hooks/useRealtimeNotifications";
 
 // Lazy load de páginas principais (carregamento imediato)
 import CascadeView from "./pages/CascadeView";
@@ -32,10 +33,10 @@ const FunnelView = lazy(() => import("./pages/FunnelView"));
 const SchedulePage = lazy(() => import("./pages/SchedulePage"));
 const AtividadePage = lazy(() => import("./pages/AtividadePage"));
 const EnrichmentSettings = lazy(() => import("./pages/EnrichmentSettings"));
-const OnboardingPage = lazy(() => import("./pages/OnboardingPage"));
+
 const ResultadosEnriquecimento = lazy(() => import("./pages/ResultadosEnriquecimento"));
 const ResearchOverview = lazy(() => import("./pages/ResearchOverview"));
-const PrePesquisaTeste = lazy(() => import("./pages/PrePesquisaTeste"));
+
 const ExportWizard = lazy(() => import("./pages/ExportWizard"));
 const TemplateAdmin = lazy(() => import("./pages/TemplateAdmin"));
 const ResearchWizard = lazy(() => import("./pages/ResearchWizard"));
@@ -46,6 +47,8 @@ const TendenciasDashboard = lazy(() => import("./pages/TendenciasDashboard"));
 const ProjectManagement = lazy(() => import("./pages/ProjectManagement"));
 const ProjectActivityDashboard = lazy(() => import("./pages/ProjectActivityDashboard"));
 const Notificacoes = lazy(() => import("./pages/Notificacoes"));
+const NotificationPreferences = lazy(() => import("./pages/NotificationPreferences"));
+const NotificationHistory = lazy(() => import("./pages/NotificationHistory"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -75,10 +78,10 @@ function Router() {
       <Route path="/agendamento" component={SchedulePage} />
       <Route path="/atividade" component={AtividadePage} />
       <Route path="/enrichment-settings" component={EnrichmentSettings} />
-      <Route path="/onboarding" component={OnboardingPage} />
+
       <Route path="/resultados-enriquecimento" component={ResultadosEnriquecimento} />
       <Route path="/research-overview" component={ResearchOverview} />
-      <Route path="/pre-pesquisa-teste" component={PrePesquisaTeste} />
+
       <Route path="/export" component={ExportWizard} />
       <Route path="/export/templates" component={TemplateAdmin} />
       <Route path="/research/new" component={ResearchWizard} />
@@ -89,6 +92,8 @@ function Router() {
       <Route path="/projetos" component={ProjectManagement} />
       <Route path="/projetos/atividade" component={ProjectActivityDashboard} />
       <Route path="/notificacoes" component={Notificacoes} />
+      <Route path="/configuracoes/notificacoes" component={NotificationPreferences} />
+      <Route path="/notificacoes/historico" component={NotificationHistory} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -102,6 +107,9 @@ function Router() {
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
+  // Conectar ao stream de notificações em tempo real
+  useRealtimeNotifications();
+  
   return (
     <ErrorBoundary>
       <ThemeProvider

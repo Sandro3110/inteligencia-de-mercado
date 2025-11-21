@@ -8,6 +8,7 @@ import { eq, and } from 'drizzle-orm';
 import { enrichClienteOptimized } from './enrichmentOptimized';
 import { clientes } from '../drizzle/schema';
 import { notifyOwner } from './_core/notification';
+import { toMySQLTimestamp, toMySQLTimestampOrNull, now } from './dateUtils';
 
 export interface JobProgress {
   jobId: number;
