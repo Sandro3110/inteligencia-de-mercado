@@ -1,0 +1,2 @@
+# Som de notificação será gerado via Web Audio API no frontend
+# Arquivo placeholder para referência

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { exportRouter } from "./routers/exportRouter";
 import { notificationsRouter } from "./routers/notificationsRouter";
 
@@ -10,6 +10,30 @@ export const appRouter = router({
   system: systemRouter,
   export: exportRouter,
   notifications: notificationsRouter,
+
+  // Preferências de Usuário
+  preferences: router({
+    get: protectedProcedure.query(async ({ ctx }) => {
+      const { getUserPreferences } = await import('./userPreferences');
+      return getUserPreferences(ctx.user.id);
+    }),
+    
+    update: protectedProcedure
+      .input(z.object({
+        notificationSoundEnabled: z.boolean().optional(),
+        notificationVolume: z.number().min(0).max(100).optional(),
+        desktopNotificationsEnabled: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { updateUserPreferences } = await import('./userPreferences');
+        return updateUserPreferences(ctx.user.id, input);
+      }),
+    
+    reset: protectedProcedure.mutation(async ({ ctx }) => {
+      const { resetUserPreferences } = await import('./userPreferences');
+      return resetUserPreferences(ctx.user.id);
+    }),
+  }),
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -316,7 +340,22 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const { batchUpdateClientesValidation } = await import('./db');
-        return batchUpdateClientesValidation(input.ids, input.status, input.notes, ctx.user?.id);
+        const result = await batchUpdateClientesValidation(input.ids, input.status, input.notes, ctx.user?.id);
+        
+        // Enviar notificação de validação em lote via SSE
+        const { broadcastNotificationSSE } = await import('./notificationSSEEndpoint');
+        broadcastNotificationSSE({
+          type: 'validation_batch_complete',
+          title: '✅ Validação em Lote Concluída',
+          message: `${input.ids.length} clientes validados como "${input.status}"`,
+          data: {
+            entityType: 'clientes',
+            count: input.ids.length,
+            status: input.status,
+          },
+        });
+        
+        return result;
       }),
     
     byProject: publicProcedure
@@ -444,7 +483,22 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const { batchUpdateConcorrentesValidation } = await import('./db');
-        return batchUpdateConcorrentesValidation(input.ids, input.status, input.notes, ctx.user?.id);
+        const result = await batchUpdateConcorrentesValidation(input.ids, input.status, input.notes, ctx.user?.id);
+        
+        // Enviar notificação de validação em lote via SSE
+        const { broadcastNotificationSSE } = await import('./notificationSSEEndpoint');
+        broadcastNotificationSSE({
+          type: 'validation_batch_complete',
+          title: '✅ Validação em Lote Concluída',
+          message: `${input.ids.length} concorrentes validados como "${input.status}"`,
+          data: {
+            entityType: 'concorrentes',
+            count: input.ids.length,
+            status: input.status,
+          },
+        });
+        
+        return result;
       }),
     
     byProject: publicProcedure
@@ -609,7 +663,22 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const { batchUpdateLeadsValidation } = await import('./db');
-        return batchUpdateLeadsValidation(input.ids, input.status, input.notes, ctx.user?.id);
+        const result = await batchUpdateLeadsValidation(input.ids, input.status, input.notes, ctx.user?.id);
+        
+        // Enviar notificação de validação em lote via SSE
+        const { broadcastNotificationSSE } = await import('./notificationSSEEndpoint');
+        broadcastNotificationSSE({
+          type: 'validation_batch_complete',
+          title: '✅ Validação em Lote Concluída',
+          message: `${input.ids.length} leads validados como "${input.status}"`,
+          data: {
+            entityType: 'leads',
+            count: input.ids.length,
+            status: input.status,
+          },
+        });
+        
+        return result;
       }),
 
     updateStage: publicProcedure
@@ -1010,6 +1079,20 @@ export const appRouter = router({
           });
         }
 
+        // Enviar notificação de pesquisa criada via SSE
+        const { broadcastNotificationSSE } = await import('./notificationSSEEndpoint');
+        broadcastNotificationSSE({
+          type: 'pesquisa_created',
+          title: '🎯 Nova Pesquisa Criada',
+          message: `Pesquisa "${pesquisa.nome}" criada com ${input.clientes.length} clientes e ${input.mercados.length} mercados`,
+          data: {
+            pesquisaId: pesquisa.id,
+            pesquisaNome: pesquisa.nome,
+            clientesCount: input.clientes.length,
+            mercadosCount: input.mercados.length,
+          },
+        });
+
         return pesquisa;
       }),
   }),
@@ -1382,7 +1465,7 @@ export const appRouter = router({
       }))
       .query(async ({ input }) => {
         const { generateExecutiveReportData } = await import('./generateExecutiveReport');
-        return generateExecutiveReportData(
+        const report = await generateExecutiveReportData(
           input.projectId, 
           {
             pesquisaId: input.pesquisaId,
@@ -1391,6 +1474,20 @@ export const appRouter = router({
             mercadoIds: input.mercadoIds,
           }
         );
+        
+        // Enviar notificação de relatório gerado via SSE
+        const { broadcastNotificationSSE } = await import('./notificationSSEEndpoint');
+        broadcastNotificationSSE({
+          type: 'report_generated',
+          title: '📊 Relatório Gerado',
+          message: `Relatório executivo do projeto ${input.projectId} foi gerado com sucesso`,
+          data: {
+            projectId: input.projectId,
+            pesquisaId: input.pesquisaId,
+          },
+        });
+        
+        return report;
       }),
   }),
 

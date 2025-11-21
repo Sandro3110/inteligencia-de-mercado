@@ -1268,6 +1268,18 @@ export async function hibernateProject(projectId: number, userId?: string | null
       status: { before: 'active', after: 'hibernated' }
     });
     
+    // Enviar notificação de projeto hibernado via SSE
+    const { broadcastNotificationSSE } = await import('./notificationSSEEndpoint');
+    broadcastNotificationSSE({
+      type: 'project_hibernated',
+      title: '💤 Projeto Hibernado',
+      message: `Projeto "${project.nome}" foi colocado em modo somente leitura`,
+      data: {
+        projectId,
+        projectName: project.nome,
+      },
+    });
+    
     console.log(`[Database] Project ${projectId} hibernated successfully`);
     return { success: true };
   } catch (error) {
@@ -1304,6 +1316,18 @@ export async function reactivateProject(projectId: number, userId?: string | nul
     // Log de auditoria
     await logProjectChange(projectId, userId || null, 'reactivated', {
       status: { before: 'hibernated', after: 'active' }
+    });
+    
+    // Enviar notificação de projeto reativado via SSE
+    const { broadcastNotificationSSE } = await import('./notificationSSEEndpoint');
+    broadcastNotificationSSE({
+      type: 'project_reactivated',
+      title: '✅ Projeto Reativado',
+      message: `Projeto "${project.nome}" foi reativado e está disponível para edição`,
+      data: {
+        projectId,
+        projectName: project.nome,
+      },
     });
     
     console.log(`[Database] Project ${projectId} reactivated successfully`);

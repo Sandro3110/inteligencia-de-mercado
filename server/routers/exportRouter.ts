@@ -145,6 +145,21 @@ export const exportRouter = router({
 
         const generationTime = Math.floor((Date.now() - startTime) / 1000);
 
+        // Enviar notificação de exportação concluída via SSE
+        const { broadcastNotificationSSE } = await import('../notificationSSEEndpoint');
+        broadcastNotificationSSE({
+          type: 'export_complete',
+          title: '💾 Exportação Concluída',
+          message: `Arquivo ${input.format.toUpperCase()} gerado com sucesso! ${input.data.length} registros exportados.`,
+          data: {
+            format: input.format,
+            recordCount: input.data.length,
+            fileUrl: result.url,
+            fileSize: result.size,
+            generationTime,
+          },
+        });
+
         // Salva no histórico (TODO: implementar tabela exportHistory)
         // const db = await getDb();
         // if (db) {

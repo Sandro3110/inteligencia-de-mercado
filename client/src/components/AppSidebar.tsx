@@ -106,6 +106,7 @@ const navSections: NavSection[] = [
     priority: 'medium',
     defaultOpen: false,
     items: [
+      { title: "Notificações", href: "/configuracoes/notificacoes", icon: Bell },
       { title: "Templates Exportação", href: "/export/templates", icon: FileText },
       { title: "Parâmetros Enriquecimento", href: "/enrichment-settings", icon: Settings },
       { title: "Alertas Inteligentes", href: "/intelligent-alerts", icon: Sparkles },

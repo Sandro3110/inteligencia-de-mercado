@@ -9,6 +9,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { setupSSE } from "./sseEndpoint";
 import { initializeWebSocket } from "../websocket";
+import { handleNotificationStream } from "../notificationSSEEndpoint";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -40,6 +41,9 @@ async function startServer() {
   
   // SSE endpoint for enrichment progress
   app.get("/api/enrichment/progress/:jobId", setupSSE);
+  
+  // SSE endpoint for real-time notifications
+  app.get("/api/notifications/stream", handleNotificationStream);
   
   // tRPC API
   app.use(

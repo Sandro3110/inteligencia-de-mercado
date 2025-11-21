@@ -669,3 +669,16 @@ export const users = mysqlTable("users", {
 	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
 	lastSignedIn: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
 });
+
+export const userPreferences = mysqlTable("user_preferences", {
+	id: int().autoincrement().notNull(),
+	userId: varchar({ length: 64 }).notNull(),
+	notificationSoundEnabled: tinyint().default(1).notNull(),
+	notificationVolume: int().default(50).notNull(), // 0-100
+	desktopNotificationsEnabled: tinyint().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow(),
+},
+(table) => [
+	index("idx_user").on(table.userId),
+]);
