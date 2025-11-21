@@ -2755,9 +2755,15 @@ export async function updateEnrichmentRun(
 
   const { enrichmentRuns } = await import("../drizzle/schema");
   
+  // Convert Date to MySQL timestamp string
+  const updateData: any = { ...data };
+  if (data.completedAt) {
+    updateData.completedAt = toMySQLTimestamp(data.completedAt);
+  }
+  
   await db
     .update(enrichmentRuns)
-    .set(data)
+    .set(updateData)
     .where(eq(enrichmentRuns.id, runId));
 }
 
@@ -3769,8 +3775,9 @@ export async function getQualityTrends(projectId: number, days: number = 30) {
   if (!db) return [];
 
   try {
-    const dataLimite = now();
-    dataLimite.setDate(dataLimite.getDate() - days);
+    const dataLimiteDate = new Date();
+    dataLimiteDate.setDate(dataLimiteDate.getDate() - days);
+    const dataLimite = toMySQLTimestamp(dataLimiteDate);
 
     // Buscar todos os mercados do projeto
     const mercadosResult = await db
@@ -3983,10 +3990,13 @@ export async function getProjectsActivity(): Promise<{
         id: project.id,
         nome: project.nome,
         status: project.status,
-        lastActivityAt: project.lastActivityAt,
+        lastActivityAt: project.lastActivityAt ? new Date(project.lastActivityAt) : null,
         daysSinceActivity,
         hasWarning,
-        recentActions
+        recentActions: recentActions.map(action => ({
+          ...action,
+          createdAt: new Date(action.createdAt)
+        }))
       };
     })
   );
@@ -4028,9 +4038,9 @@ export async function checkProjectsForHibernation(
   const db = await getDb();
   if (!db) return [];
 
-  const now = now();
+  const nowDate = new Date();
   const warningThreshold = inactiveDays - 7; // Avisar 7 dias antes
-  const cutoffDate = new Date(now.getTime() - warningThreshold * 24 * 60 * 60 * 1000);
+  const cutoffDate = new Date(nowDate.getTime() - warningThreshold * 24 * 60 * 60 * 1000);
 
   // Buscar projetos ativos inativos há (inactiveDays - 7) dias ou mais
   const inactiveProjects = await db
@@ -4054,7 +4064,8 @@ export async function checkProjectsForHibernation(
     if (!project.lastActivityAt) continue;
 
     // Calcular dias de inatividade
-    const diffMs = now.getTime() - project.lastActivityAt.getTime();
+    const lastActivity = new Date(project.lastActivityAt);
+    const diffMs = nowDate.getTime() - lastActivity.getTime();
     const daysSinceActivity = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
     // Verificar se já existe aviso recente não adiado
@@ -4076,7 +4087,8 @@ export async function checkProjectsForHibernation(
       
       // Se foi adiado, verificar se o prazo expirou
       if (warning.postponed === 1 && warning.postponedUntil) {
-        if (now < warning.postponedUntil) {
+        const postponedUntilDate = new Date(warning.postponedUntil);
+        if (nowDate < postponedUntilDate) {
           continue; // Ainda está dentro do prazo de adiamento
         }
       } else if (warning.notificationSent === 1) {
@@ -4085,7 +4097,7 @@ export async function checkProjectsForHibernation(
     }
 
     // Data agendada para hibernação (7 dias a partir de hoje)
-    const scheduledHibernationDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const scheduledHibernationDate = new Date(nowDate.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     projectsToWarn.push({
       project,
@@ -4115,7 +4127,7 @@ export async function sendHibernationWarning(
     const result = await db.insert(hibernationWarnings).values({
       projectId,
       warningDate: now(),
-      scheduledHibernationDate,
+      scheduledHibernationDate: toMySQLTimestamp(scheduledHibernationDate),
       daysInactive: daysSinceActivity,
       notificationSent: 0, // Será marcado como 1 após envio
       postponed: 0,
@@ -4192,7 +4204,7 @@ export async function postponeHibernation(
       .update(hibernationWarnings)
       .set({ 
         postponed: 1, 
-        postponedUntil 
+        postponedUntil: toMySQLTimestamp(postponedUntil) 
       })
       .where(eq(hibernationWarnings.id, warning.id));
 
@@ -4216,7 +4228,7 @@ export async function executeScheduledHibernations(
   const db = await getDb();
   if (!db) return { hibernated: 0, errors: 0 };
 
-  const now = now();
+  const nowTimestamp = now();
   let hibernated = 0;
   let errors = 0;
 
@@ -4229,7 +4241,7 @@ export async function executeScheduledHibernations(
         and(
           eq(hibernationWarnings.hibernated, 0),
           eq(hibernationWarnings.postponed, 0),
-          sql`${hibernationWarnings.scheduledHibernationDate} <= ${now}`
+          sql`${hibernationWarnings.scheduledHibernationDate} <= ${nowTimestamp}`
         )!
       );
 
@@ -4333,7 +4345,7 @@ export async function upsertNotificationPreference(data: {
       });
 
       return {
-        id: Number(result.insertId),
+        id: Number(result[0].insertId),
         userId: data.userId,
         type: data.type,
         enabled: data.enabled ? 1 : 0,

@@ -46,7 +46,7 @@ export async function checkAlerts(
       let message = '';
       
       // Verificar tipo de alerta
-      switch (alert.type) {
+      switch (alert.alertType) {
         case 'error_rate': {
           const errorRate = (stats.errorCount / stats.totalProcessed) * 100;
           if (errorRate >= condition.value) {
@@ -89,7 +89,7 @@ export async function checkAlerts(
         await createAlertHistory({
           alertConfigId: alert.id,
           projectId,
-          alertType: alert.type,
+          alertType: alert.alertType,
           condition: alert.condition,
           message,
         });
@@ -100,7 +100,7 @@ export async function checkAlerts(
           projectId,
           activityType: 'alert',
           description: `Alerta disparado: ${alert.name}`,
-          metadata: JSON.stringify({ alertId: alert.id, type: alert.type }),
+          metadata: JSON.stringify({ alertId: alert.id, type: alert.alertType }),
         });
         
         console.log(`[Alertas] Disparado: ${alert.name} - Projeto ${projectId}`);

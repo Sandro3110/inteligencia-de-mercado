@@ -2,7 +2,7 @@ import { z } from "zod";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { exportRouter } from "./routers/exportRouter";
 
 export const appRouter = router({
@@ -1121,20 +1121,18 @@ export const appRouter = router({
       }),
     
     // Endpoint de teste para disparar notificação
-    sendTestNotification: publicProcedure
+    sendTestNotification: protectedProcedure
       .input(z.object({
         title: z.string().optional().default('🧪 Notificação de Teste'),
         message: z.string().optional().default('Sistema de notificações em tempo real funcionando perfeitamente!'),
       }))
       .mutation(async ({ ctx, input }) => {
-        if (!ctx.user) throw new Error('Usuário não autenticado');
-        
         const { createNotification } = await import('./db');
         
         // Criar notificação no banco
         const notification = await createNotification({
           userId: ctx.user.id,
-          type: 'all',
+          type: 'validation',
           title: input.title,
           message: input.message,
           priority: 'normal',
@@ -1298,7 +1296,8 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { createAlertConfig } = await import('./db');
-        return createAlertConfig(input);
+        const { type, ...rest } = input;
+        return createAlertConfig({ ...rest, alertType: type });
       }),
     
     update: publicProcedure
@@ -1311,7 +1310,9 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { updateAlertConfig } = await import('./db');
-        return updateAlertConfig(input.id, input);
+        const { id, type, ...rest } = input;
+        const updateData = type ? { ...rest, alertType: type } : rest;
+        return updateAlertConfig(id, updateData);
       }),
     
     delete: publicProcedure

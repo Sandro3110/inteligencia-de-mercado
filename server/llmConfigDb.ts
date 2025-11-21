@@ -109,7 +109,7 @@ export async function upsertAlertsConfig(data: InsertIntelligentAlertsConfig): P
 // Intelligent Alerts History Helpers
 // ============================================
 
-export async function createAlertHistory(data: InsertIntelligentAlertHistory): Promise<number> {
+export async function createAlertHistory(data: InsertIntelligentAlertsHistory): Promise<number> {
   const db = await getDb();
   if (!db) throw new Error('Database not available');
 
@@ -120,7 +120,7 @@ export async function createAlertHistory(data: InsertIntelligentAlertHistory): P
 export async function getAlertsHistory(
   projectId: number,
   limit: number = 50
-): Promise<IntelligentAlertHistory[]> {
+): Promise<IntelligentAlertsHistory[]> {
   const db = await getDb();
   if (!db) return [];
 
