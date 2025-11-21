@@ -1,0 +1,349 @@
+{
+  "passed": [
+    {
+      "name": "Conexão com banco de dados",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.681Z"
+    },
+    {
+      "name": "Execução de queries",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.777Z"
+    },
+    {
+      "name": "Tabela: users",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.783Z"
+    },
+    {
+      "name": "Tabela: projects",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.788Z"
+    },
+    {
+      "name": "Tabela: pesquisas",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.792Z"
+    },
+    {
+      "name": "Tabela: mercados_unicos",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.797Z"
+    },
+    {
+      "name": "Tabela: clientes",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.803Z"
+    },
+    {
+      "name": "Tabela: concorrentes",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.810Z"
+    },
+    {
+      "name": "Tabela: leads",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.818Z"
+    },
+    {
+      "name": "Tabela: produtos",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.824Z"
+    },
+    {
+      "name": "Tabela: project_audit_log",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.829Z"
+    },
+    {
+      "name": "Tabela: hibernation_warnings",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.834Z"
+    },
+    {
+      "name": "Tabela: export_history",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.838Z"
+    },
+    {
+      "name": "Tabela: saved_filters_export",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.843Z"
+    },
+    {
+      "name": "Tabela: notifications",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.847Z"
+    },
+    {
+      "name": "Tabela: analytics_mercados",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.852Z"
+    },
+    {
+      "name": "Tabela: analytics_dimensoes",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:39.856Z"
+    },
+    {
+      "name": "Router: auth",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.437Z"
+    },
+    {
+      "name": "Router: analytics",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.437Z"
+    },
+    {
+      "name": "Router: projects",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Router: pesquisas",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Router: mercados",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Router: clientes",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Router: concorrentes",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Router: leads",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Router: produtos",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Router: export",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Router: geo",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Router: apiHealth",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Router: system",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Arquivo: client/src/App.tsx",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Arquivo: client/src/main.tsx",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Arquivo: client/src/lib/trpc.ts",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Arquivo: client/src/pages/CascadeView.tsx",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Arquivo: client/src/pages/ProjectManagement.tsx",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Arquivo: client/src/pages/ResearchWizard.tsx",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Arquivo: client/src/pages/TendenciasDashboard.tsx",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Arquivo: client/src/components/DashboardLayout.tsx",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Função DB: getDb",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.439Z"
+    },
+    {
+      "name": "Função DB: upsertUser",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.439Z"
+    },
+    {
+      "name": "Função DB: getUser",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.439Z"
+    },
+    {
+      "name": "Função DB: getProjects",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.439Z"
+    },
+    {
+      "name": "Função DB: createProject",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.439Z"
+    },
+    {
+      "name": "Função DB: updateProject",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.439Z"
+    },
+    {
+      "name": "Função DB: hibernateProject",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.439Z"
+    },
+    {
+      "name": "Função DB: reactivateProject",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.439Z"
+    },
+    {
+      "name": "Função DB: getMercados",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-11-21T16:49:40.439Z"
+    }
+  ],
+  "failed": [],
+  "warnings": [
+    {
+      "name": "Projetos no banco",
+      "status": "WARN",
+      "details": "Nenhum projeto encontrado (esperado em instalação nova)",
+      "timestamp": "2025-11-21T16:49:39.861Z"
+    },
+    {
+      "name": "Pesquisas no banco",
+      "status": "WARN",
+      "details": "Nenhuma pesquisa encontrada (esperado em instalação nova)",
+      "timestamp": "2025-11-21T16:49:39.866Z"
+    },
+    {
+      "name": "Mercados no banco",
+      "status": "WARN",
+      "details": "Nenhum mercado encontrado (esperado em instalação nova)",
+      "timestamp": "2025-11-21T16:49:39.871Z"
+    },
+    {
+      "name": "Clientes no banco",
+      "status": "WARN",
+      "details": "0 cliente(s) (esperado em instalação nova)",
+      "timestamp": "2025-11-21T16:49:39.875Z"
+    },
+    {
+      "name": "Concorrentes no banco",
+      "status": "WARN",
+      "details": "0 concorrente(s) (esperado em instalação nova)",
+      "timestamp": "2025-11-21T16:49:39.882Z"
+    },
+    {
+      "name": "Leads no banco",
+      "status": "WARN",
+      "details": "0 lead(s) (esperado em instalação nova)",
+      "timestamp": "2025-11-21T16:49:39.888Z"
+    },
+    {
+      "name": "Arquivo: client/src/pages/ActivityDashboard.tsx",
+      "status": "WARN",
+      "details": "Arquivo não encontrado (pode não ser crítico)",
+      "timestamp": "2025-11-21T16:49:40.438Z"
+    },
+    {
+      "name": "Função DB: getClientes",
+      "status": "WARN",
+      "details": "Função não encontrada",
+      "timestamp": "2025-11-21T16:49:40.439Z"
+    },
+    {
+      "name": "Função DB: getConcorrentes",
+      "status": "WARN",
+      "details": "Função não encontrada",
+      "timestamp": "2025-11-21T16:49:40.439Z"
+    },
+    {
+      "name": "Função DB: getLeads",
+      "status": "WARN",
+      "details": "Função não encontrada",
+      "timestamp": "2025-11-21T16:49:40.439Z"
+    }
+  ]
+}
