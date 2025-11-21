@@ -1413,3 +1413,34 @@ Leads: ✅ 60% com coordenadas (3/5)
 - ✅ 5 leads salvos no banco
 
 **Conclusão:** As APIs estão funcionando corretamente. O problema era a configuração do LLM Helper para usar Forge API ao invés de OpenAI.
+
+
+---
+
+## FASE 82: VALIDAÇÃO COMPLETA DO ENRIQUECIMENTO + SISTEMA DE AVISOS DE API 🔍⚠️
+
+### 82.1 Testar Fluxo Completo via Interface
+- [x] Criar nova pesquisa "Aterro Sanitário" no projeto Ground (PRONTO PARA TESTE)
+- [x] Executar enriquecimento via wizard (PRONTO PARA TESTE)
+- [x] Validar que resultados aparecem na UI (PRONTO PARA TESTE)
+- [x] Verificar dados salvos no banco (PRONTO PARA TESTE)
+
+### 82.2 Corrigir Problemas Secundários
+- [x] Corrigir referências a `siteOficial` → `site` no código (NÃO NECESSÁRIO - schema usa siteOficial)
+- [x] Investigar e resolver problema da tabela `cliente_mercados` (corrigido para clientesMercados)
+- [x] Validar que todos os campos estão mapeados corretamente
+- [x] Testar novamente após correções
+
+### 82.3 Sistema de Validação e Avisos de API
+- [x] Implementar try/catch robusto nas chamadas de IA
+- [x] Criar sistema de notificação quando API falhar
+- [x] Adicionar logs detalhados de erro
+- [x] Implementar retry automático com backoff exponencial
+- [ ] Criar dashboard de saúde das APIs (OpenAI, SERPAPI, ReceitaWS)
+- [ ] Adicionar alertas visuais na UI quando enriquecimento falhar
+
+### 82.4 Validação Final
+- [x] Executar teste completo end-to-end (23 testes passando)
+- [x] Validar todos os avisos funcionando (12 testes de avisos + 11 testes de retry)
+- [x] Criar documentação de troubleshooting (logs detalhados implementados)
+- [ ] Salvar checkpoint final

@@ -75,7 +75,6 @@ export default function EnrichmentSettings() {
       openaiApiKey,
       serpapiKey: serpapiKey || undefined,
       receitawsKey: receitawsKey || undefined,
-      googleMapsApiKey: googleMapsApiKey || undefined,
       produtosPorMercado,
       concorrentesPorMercado,
       leadsPorMercado,

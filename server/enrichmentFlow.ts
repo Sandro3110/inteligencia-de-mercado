@@ -373,8 +373,11 @@ async function identifyMarkets(
   for (const produto of produtosUnicos) {
     if (!produto) continue;
 
-    // Usar LLM para identificar mercado
-    const response = await invokeLLM({
+    try {
+      // Usar LLM para identificar mercado (com retry automático)
+      const { withLLMRetry } = await import('./_core/retryHelper');
+      const response = await withLLMRetry(
+        () => invokeLLM({
       messages: [
         {
           role: 'system',
@@ -403,26 +406,46 @@ async function identifyMarkets(
           },
         },
       },
-    });
+        }),
+        `Identificação de mercado para produto: ${produto}`
+      );
 
-    const content = response.choices[0]?.message?.content;
-    if (!content || typeof content !== 'string') continue;
+      const content = response.choices[0]?.message?.content;
+      if (!content || typeof content !== 'string') {
+        console.warn(`[Enriquecimento] LLM retornou conteúdo inválido para produto: ${produto}`);
+        continue;
+      }
 
-    const data = JSON.parse(content);
+      const data = JSON.parse(content);
 
-    // Criar mercado se não existir
-    if (!mercadosMap.has(data.mercado)) {
-      const mercado = await createMercado({
-        projectId,
-        pesquisaId,
-        nome: data.mercado,
-        categoria: data.categoria,
-        segmentacao: data.segmentacao as any,
+      // Criar mercado se não existir
+      if (!mercadosMap.has(data.mercado)) {
+        const mercado = await createMercado({
+          projectId,
+          pesquisaId,
+          nome: data.mercado,
+          categoria: data.categoria,
+          segmentacao: data.segmentacao as any,
       });
 
-      if (mercado) {
-        mercadosMap.set(data.mercado, mercado.id);
+        if (mercado) {
+          mercadosMap.set(data.mercado, mercado.id);
+        }
       }
+    } catch (error) {
+      console.error(`[Enriquecimento] Erro ao identificar mercado para produto "${produto}":`, error);
+      // Notificar owner sobre falha de API
+      try {
+        const { notifyOwner } = await import('./_core/notification');
+        await notifyOwner({
+          title: '⚠️ Falha na API de IA - Identificação de Mercado',
+          content: `Não foi possível identificar o mercado para o produto "${produto}". Erro: ${error instanceof Error ? error.message : 'Desconhecido'}. O enriquecimento continuará com os demais produtos.`
+        });
+      } catch (notifyError) {
+        console.error('[Enriquecimento] Erro ao notificar owner:', notifyError);
+      }
+      // Continua com próximo produto
+      continue;
     }
   }
 
@@ -455,7 +478,13 @@ async function enrichClientes(
         
         // Se não tem cache, consultar ReceitaWS
         if (!dadosEnriquecidos) {
-          const receitaData = await consultarCNPJ(cnpjLimpo);
+          try {
+            const { withAPIRetry } = await import('./_core/retryHelper');
+            const receitaData = await withAPIRetry(
+              () => consultarCNPJ(cnpjLimpo),
+              'ReceitaWS',
+              `Consulta CNPJ: ${cnpjLimpo}`
+            );
           if (receitaData) {
             dadosEnriquecidos = {
               nome: receitaData.fantasia || receitaData.nome,
@@ -472,8 +501,21 @@ async function enrichClientes(
               situacao: receitaData.situacao,
             };
             
-            // Salvar no cache
-            await setCachedEnrichment(cnpjLimpo, dadosEnriquecidos, 'receitaws');
+              // Salvar no cache
+              await setCachedEnrichment(cnpjLimpo, dadosEnriquecidos, 'receitaws');
+            }
+          } catch (error) {
+            console.error(`[Enriquecimento] Erro ao consultar ReceitaWS para CNPJ "${cnpjLimpo}":`, error);
+            // Notificar owner sobre falha de API
+            try {
+              const { notifyOwner } = await import('./_core/notification');
+              await notifyOwner({
+                title: '⚠️ Falha na API ReceitaWS',
+                content: `Não foi possível consultar dados do CNPJ "${cnpjLimpo}" (${cliente.nome}). Erro: ${error instanceof Error ? error.message : 'Desconhecido'}. O cliente será criado com dados limitados.`
+              });
+            } catch (notifyError) {
+              console.error('[Enriquecimento] Erro ao notificar owner:', notifyError);
+            }
           }
         }
       }
@@ -482,7 +524,10 @@ async function enrichClientes(
     let mercadoId: number | null = null;
 
     if (cliente.produto) {
-      const response = await invokeLLM({
+      try {
+        const { withLLMRetry } = await import('./_core/retryHelper');
+        const response = await withLLMRetry(
+          () => invokeLLM({
         messages: [
           {
             role: 'system',
@@ -490,17 +535,33 @@ async function enrichClientes(
           },
           { role: 'user', content: `Produto: ${cliente.produto}` },
         ],
-      });
+          }),
+          `Identificação de mercado para cliente: ${cliente.nome}`
+        );
 
-      const content = response.choices[0]?.message?.content;
-      if (content && typeof content === 'string') {
-        // Buscar mercado correspondente
-        for (const [mercadoNome, id] of Array.from(mercadosMap.entries())) {
-          if (content.toLowerCase().includes(mercadoNome.toLowerCase())) {
-            mercadoId = id;
-            break;
+        const content = response.choices[0]?.message?.content;
+        if (content && typeof content === 'string') {
+          // Buscar mercado correspondente
+          for (const [mercadoNome, id] of Array.from(mercadosMap.entries())) {
+            if (content.toLowerCase().includes(mercadoNome.toLowerCase())) {
+              mercadoId = id;
+              break;
+            }
           }
         }
+      } catch (error) {
+        console.error(`[Enriquecimento] Erro ao identificar mercado do cliente "${cliente.nome}":`, error);
+        // Notificar owner sobre falha de API
+        try {
+          const { notifyOwner } = await import('./_core/notification');
+          await notifyOwner({
+            title: '⚠️ Falha na API de IA - Identificação de Mercado do Cliente',
+            content: `Não foi possível identificar o mercado para o cliente "${cliente.nome}" (produto: ${cliente.produto}). Erro: ${error instanceof Error ? error.message : 'Desconhecido'}. O cliente será criado sem associação de mercado.`
+          });
+        } catch (notifyError) {
+          console.error('[Enriquecimento] Erro ao notificar owner:', notifyError);
+        }
+        // mercadoId permanece null
       }
     }
 
@@ -582,9 +643,14 @@ async function findCompetitorsForMarkets(
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {
-      // Buscar concorrentes reais via SerpAPI (20 resultados)
+      // Buscar concorrentes reais via SerpAPI (20 resultados) com retry
       console.log(`[Enrichment] Buscando concorrentes para mercado: ${mercadoNome}`);
-      const rawResults = await searchCompetitors(mercadoNome, undefined, 20);
+      const { withAPIRetry } = await import('./_core/retryHelper');
+      const rawResults = await withAPIRetry(
+        () => searchCompetitors(mercadoNome, undefined, 20),
+        'SERPAPI',
+        `Busca de concorrentes para mercado: ${mercadoNome}`
+      );
       
       // Filtrar apenas empresas reais (remover artigos/notícias)
       const searchResults = filterRealCompanies(rawResults
@@ -678,7 +744,17 @@ async function findCompetitorsForMarkets(
         }
       }
     } catch (error) {
-      console.error(`Erro ao buscar concorrentes para ${mercadoNome}:`, error);
+      console.error(`[Enriquecimento] Erro ao buscar concorrentes para mercado "${mercadoNome}":`, error);
+      // Notificar owner sobre falha de API
+      try {
+        const { notifyOwner } = await import('./_core/notification');
+        await notifyOwner({
+          title: '⚠️ Falha na API SERPAPI - Busca de Concorrentes',
+          content: `Não foi possível buscar concorrentes para o mercado "${mercadoNome}". Erro: ${error instanceof Error ? error.message : 'Desconhecido'}. O enriquecimento continuará com os demais mercados.`
+        });
+      } catch (notifyError) {
+        console.error('[Enriquecimento] Erro ao notificar owner:', notifyError);
+      }
     }
   }
 
@@ -703,9 +779,14 @@ async function findLeadsForMarkets(
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {
-      // Buscar leads reais via SerpAPI (20 resultados)
+      // Buscar leads reais via SerpAPI (20 resultados) com retry
       console.log(`[Enrichment] Buscando leads para mercado: ${mercadoNome}`);
-      const rawResults = await searchLeads(mercadoNome, 'fornecedores', 20);
+      const { withAPIRetry } = await import('./_core/retryHelper');
+      const rawResults = await withAPIRetry(
+        () => searchLeads(mercadoNome, 'fornecedores', 20),
+        'SERPAPI',
+        `Busca de leads para mercado: ${mercadoNome}`
+      );
       
       // Filtrar apenas empresas reais (remover artigos/notícias)
       const searchResults = filterRealCompanies(rawResults
@@ -825,7 +906,17 @@ async function findLeadsForMarkets(
         }
       }
     } catch (error) {
-      console.error(`Erro ao buscar leads para ${mercadoNome}:`, error);
+      console.error(`[Enriquecimento] Erro ao buscar leads para mercado "${mercadoNome}":`, error);
+      // Notificar owner sobre falha de API
+      try {
+        const { notifyOwner } = await import('./_core/notification');
+        await notifyOwner({
+          title: '⚠️ Falha na API SERPAPI - Busca de Leads',
+          content: `Não foi possível buscar leads para o mercado "${mercadoNome}". Erro: ${error instanceof Error ? error.message : 'Desconhecido'}. O enriquecimento continuará com os demais mercados.`
+        });
+      } catch (notifyError) {
+        console.error('[Enriquecimento] Erro ao notificar owner:', notifyError);
+      }
     }
   }
 

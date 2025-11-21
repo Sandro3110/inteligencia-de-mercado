@@ -1897,7 +1897,7 @@ export async function associateClienteToMercado(clienteId: number, mercadoId: nu
     await db.execute(sql`
       UPDATE mercados_unicos 
       SET quantidadeClientes = (
-        SELECT COUNT(*) FROM clientes_mercados WHERE mercadoId = ${mercadoId}
+        SELECT COUNT(*) FROM clientesMercados WHERE mercadoId = ${mercadoId}
       )
       WHERE id = ${mercadoId}
     `);

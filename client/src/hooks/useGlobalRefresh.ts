@@ -89,7 +89,7 @@ export function useGlobalRefresh(options?: {
    * Alterna auto-refresh e salva preferência
    */
   const toggleAutoRefresh = useCallback(() => {
-    setAutoRefreshEnabled((prev) => {
+    setAutoRefreshEnabled((prev: boolean) => {
       const newValue = !prev;
       localStorage.setItem("gestor-pav:auto-refresh", JSON.stringify(newValue));
       toast.info(

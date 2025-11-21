@@ -328,7 +328,7 @@ export function AppSidebar() {
 
             {/* Botão de Atualização */}
             <Button
-              onClick={refreshAll}
+              onClick={() => refreshAll()}
               disabled={isRefreshing}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               size="sm"
