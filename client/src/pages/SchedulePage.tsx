@@ -5,13 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { Calendar, Clock, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -20,9 +14,7 @@ export default function SchedulePage() {
   const { selectedProjectId } = useSelectedProject();
   const [showForm, setShowForm] = useState(false);
   const [scheduledAt, setScheduledAt] = useState("");
-  const [recurrence, setRecurrence] = useState<"once" | "daily" | "weekly">(
-    "once"
-  );
+  const [recurrence, setRecurrence] = useState<"once" | "daily" | "weekly">("once");
   const [batchSize, setBatchSize] = useState("50");
 
   const { data: schedules, refetch } = trpc.schedule.list.useQuery(
@@ -39,7 +31,7 @@ export default function SchedulePage() {
       setBatchSize("50");
       refetch();
     },
-    onError: error => {
+    onError: (error) => {
       toast.error(`Erro ao criar agendamento: ${error.message}`);
     },
   });
@@ -60,9 +52,7 @@ export default function SchedulePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedProjectId || !scheduledAt) {
-      return;
-    }
+    if (!selectedProjectId || !scheduledAt) return;
 
     createMutation.mutate({
       projectId: selectedProjectId,
@@ -112,9 +102,7 @@ export default function SchedulePage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">
-              Agendamentos de Enriquecimento
-            </h1>
+            <h1 className="text-3xl font-bold">Agendamentos de Enriquecimento</h1>
             <p className="text-muted-foreground mt-1">
               Configure execuções automáticas de enriquecimento
             </p>
@@ -149,16 +137,13 @@ export default function SchedulePage() {
                       id="scheduledAt"
                       type="datetime-local"
                       value={scheduledAt}
-                      onChange={e => setScheduledAt(e.target.value)}
+                      onChange={(e) => setScheduledAt(e.target.value)}
                       required
                     />
                   </div>
                   <div>
                     <Label htmlFor="recurrence">Recorrência</Label>
-                    <Select
-                      value={recurrence}
-                      onValueChange={(v: any) => setRecurrence(v)}
-                    >
+                    <Select value={recurrence} onValueChange={(v: any) => setRecurrence(v)}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -175,16 +160,14 @@ export default function SchedulePage() {
                       id="batchSize"
                       type="number"
                       value={batchSize}
-                      onChange={e => setBatchSize(e.target.value)}
+                      onChange={(e) => setBatchSize(e.target.value)}
                       min="1"
                       max="200"
                     />
                   </div>
                 </div>
                 <Button type="submit" disabled={createMutation.isPending}>
-                  {createMutation.isPending
-                    ? "Criando..."
-                    : "Criar Agendamento"}
+                  {createMutation.isPending ? "Criando..." : "Criar Agendamento"}
                 </Button>
               </form>
             </CardContent>
@@ -214,20 +197,14 @@ export default function SchedulePage() {
                       </div>
                       <div>
                         <div className="font-medium">
-                          {new Date(schedule.scheduledAt).toLocaleString(
-                            "pt-BR"
-                          )}
+                          {new Date(schedule.scheduledAt).toLocaleString("pt-BR")}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          {getRecurrenceLabel(schedule.recurrence)} • Lote:{" "}
-                          {schedule.batchSize}
+                          {getRecurrenceLabel(schedule.recurrence)} • Lote: {schedule.batchSize}
                         </div>
                         {schedule.lastRunAt && (
                           <div className="text-xs text-muted-foreground mt-1">
-                            Última execução:{" "}
-                            {new Date(schedule.lastRunAt).toLocaleString(
-                              "pt-BR"
-                            )}
+                            Última execução: {new Date(schedule.lastRunAt).toLocaleString("pt-BR")}
                           </div>
                         )}
                       </div>
@@ -244,9 +221,7 @@ export default function SchedulePage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() =>
-                            cancelMutation.mutate({ id: schedule.id })
-                          }
+                          onClick={() => cancelMutation.mutate({ id: schedule.id })}
                         >
                           <X className="w-4 h-4 mr-1" />
                           Cancelar
@@ -255,9 +230,7 @@ export default function SchedulePage() {
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() =>
-                          deleteMutation.mutate({ id: schedule.id })
-                        }
+                        onClick={() => deleteMutation.mutate({ id: schedule.id })}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>

@@ -7,35 +7,34 @@ import { eq } from "drizzle-orm";
  * Entidades extraídas do contexto em linguagem natural
  */
 export interface ExtractedEntities {
-  entityType: "mercados" | "clientes" | "concorrentes" | "leads" | "produtos";
+  entityType: 'mercados' | 'clientes' | 'concorrentes' | 'leads' | 'produtos';
   geography?: {
-    states?: string[]; // ["SP", "MG"]
-    cities?: string[]; // ["São Paulo", "Campinas"]
-    regions?: string[]; // ["Sudeste", "Sul"]
+    states?: string[];      // ["SP", "MG"]
+    cities?: string[];      // ["São Paulo", "Campinas"]
+    regions?: string[];     // ["Sudeste", "Sul"]
   };
   quality?: {
-    minScore?: number; // 80
-    status?: string[]; // ["validados"]
-    completeness?: number; // 70
+    minScore?: number;      // 80
+    status?: string[];      // ["validados"]
+    completeness?: number;  // 70
   };
   size?: {
-    porte?: string[]; // ["média", "grande"]
-    revenue?: {
-      // Faturamento
+    porte?: string[];       // ["média", "grande"]
+    revenue?: {             // Faturamento
       min?: number;
       max?: number;
     };
   };
   segmentation?: {
-    type?: string[]; // ["B2B", "B2C"]
-    cnae?: string[]; // ["1013-9"]
+    type?: string[];        // ["B2B", "B2C"]
+    cnae?: string[];        // ["1013-9"]
   };
   temporal?: {
     createdAfter?: Date;
     createdBefore?: Date;
     updatedWithin?: number; // dias
   };
-  keywords: string[]; // ["embalagens", "alta qualidade"]
+  keywords: string[];       // ["embalagens", "alta qualidade"]
 }
 
 /**
@@ -43,11 +42,11 @@ export interface ExtractedEntities {
  */
 export interface InterpretationResult {
   entities: ExtractedEntities;
-  confidence: number; // 0-100
-  estimatedRecords: number; // Estimativa de registros
-  suggestions: string[]; // Sugestões de refinamento
-  warnings: string[]; // Alertas
-  cached: boolean; // Se veio do cache
+  confidence: number;               // 0-100
+  estimatedRecords: number;         // Estimativa de registros
+  suggestions: string[];            // Sugestões de refinamento
+  warnings: string[];               // Alertas
+  cached: boolean;                  // Se veio do cache
 }
 
 /**
@@ -59,16 +58,13 @@ export class InterpretationService {
   /**
    * Interpreta contexto em linguagem natural e extrai entidades
    */
-  async interpret(
-    context: string,
-    projectId?: string
-  ): Promise<InterpretationResult> {
+  async interpret(context: string, projectId?: string): Promise<InterpretationResult> {
     // Verifica cache primeiro
     const cached = await this.getFromCache(context);
     if (cached) {
       return {
         ...cached,
-        cached: true,
+        cached: true
       };
     }
 
@@ -91,7 +87,7 @@ export class InterpretationService {
       estimatedRecords,
       suggestions,
       warnings,
-      cached: false,
+      cached: false
     };
 
     // Salva no cache
@@ -110,13 +106,12 @@ export class InterpretationService {
       messages: [
         {
           role: "system",
-          content:
-            "Você é um assistente especializado em análise de dados de mercado. Responda APENAS com JSON válido, sem texto adicional.",
+          content: "Você é um assistente especializado em análise de dados de mercado. Responda APENAS com JSON válido, sem texto adicional."
         },
         {
           role: "user",
-          content: prompt,
-        },
+          content: prompt
+        }
       ],
       response_format: {
         type: "json_schema",
@@ -128,31 +123,25 @@ export class InterpretationService {
             properties: {
               entityType: {
                 type: "string",
-                enum: [
-                  "mercados",
-                  "clientes",
-                  "concorrentes",
-                  "leads",
-                  "produtos",
-                ],
+                enum: ["mercados", "clientes", "concorrentes", "leads", "produtos"]
               },
               geography: {
                 type: "object",
                 properties: {
                   states: { type: "array", items: { type: "string" } },
                   cities: { type: "array", items: { type: "string" } },
-                  regions: { type: "array", items: { type: "string" } },
+                  regions: { type: "array", items: { type: "string" } }
                 },
-                additionalProperties: false,
+                additionalProperties: false
               },
               quality: {
                 type: "object",
                 properties: {
                   minScore: { type: "number" },
                   status: { type: "array", items: { type: "string" } },
-                  completeness: { type: "number" },
+                  completeness: { type: "number" }
                 },
-                additionalProperties: false,
+                additionalProperties: false
               },
               size: {
                 type: "object",
@@ -162,42 +151,41 @@ export class InterpretationService {
                     type: "object",
                     properties: {
                       min: { type: "number" },
-                      max: { type: "number" },
+                      max: { type: "number" }
                     },
-                    additionalProperties: false,
-                  },
+                    additionalProperties: false
+                  }
                 },
-                additionalProperties: false,
+                additionalProperties: false
               },
               segmentation: {
                 type: "object",
                 properties: {
                   type: { type: "array", items: { type: "string" } },
-                  cnae: { type: "array", items: { type: "string" } },
+                  cnae: { type: "array", items: { type: "string" } }
                 },
-                additionalProperties: false,
+                additionalProperties: false
               },
               temporal: {
                 type: "object",
                 properties: {
                   createdAfter: { type: "string" },
                   createdBefore: { type: "string" },
-                  updatedWithin: { type: "number" },
+                  updatedWithin: { type: "number" }
                 },
-                additionalProperties: false,
+                additionalProperties: false
               },
-              keywords: { type: "array", items: { type: "string" } },
+              keywords: { type: "array", items: { type: "string" } }
             },
             required: ["entityType", "keywords"],
-            additionalProperties: false,
-          },
-        },
-      },
+            additionalProperties: false
+          }
+        }
+      }
     });
 
     const content = response.choices[0].message.content;
-    const contentStr =
-      typeof content === "string" ? content : JSON.stringify(content);
+    const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
     const parsed = JSON.parse(contentStr || "{}");
 
     // Converte datas de string para Date
@@ -257,33 +245,28 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
   /**
    * Estima número de registros que atendem aos filtros
    */
-  private async estimateRecords(
-    entities: ExtractedEntities,
-    projectId?: string
-  ): Promise<number> {
+  private async estimateRecords(entities: ExtractedEntities, projectId?: string): Promise<number> {
     const db = await getDb();
-    if (!db) {
-      return 0;
-    }
+    if (!db) return 0;
 
     try {
       // Monta query de contagem simples baseada na entidade
-      let tableName = "";
+      let tableName = '';
       switch (entities.entityType) {
-        case "mercados":
-          tableName = "mercados";
+        case 'mercados':
+          tableName = 'mercados';
           break;
-        case "clientes":
-          tableName = "clientes";
+        case 'clientes':
+          tableName = 'clientes';
           break;
-        case "concorrentes":
-          tableName = "concorrentes";
+        case 'concorrentes':
+          tableName = 'concorrentes';
           break;
-        case "leads":
-          tableName = "leads";
+        case 'leads':
+          tableName = 'leads';
           break;
-        case "produtos":
-          tableName = "produtos_cliente";
+        case 'produtos':
+          tableName = 'produtos_cliente';
           break;
       }
 
@@ -298,7 +281,7 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
 
       // Adiciona filtros geográficos
       if (entities.geography?.states && entities.geography.states.length > 0) {
-        query += ` AND uf IN (${entities.geography.states.map(() => "?").join(",")})`;
+        query += ` AND uf IN (${entities.geography.states.map(() => '?').join(',')})`;
         params.push(...entities.geography.states);
       }
 
@@ -309,22 +292,19 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
       }
 
       if (entities.quality?.status && entities.quality.status.length > 0) {
-        query += ` AND status IN (${entities.quality.status.map(() => "?").join(",")})`;
+        query += ` AND status IN (${entities.quality.status.map(() => '?').join(',')})`;
         params.push(...entities.quality.status);
       }
 
       // Adiciona filtros de porte
       if (entities.size?.porte && entities.size.porte.length > 0) {
-        query += ` AND porte IN (${entities.size.porte.map(() => "?").join(",")})`;
+        query += ` AND porte IN (${entities.size.porte.map(() => '?').join(',')})`;
         params.push(...entities.size.porte);
       }
 
       // Adiciona filtros de segmentação
-      if (
-        entities.segmentation?.type &&
-        entities.segmentation.type.length > 0
-      ) {
-        query += ` AND segmentacao IN (${entities.segmentation.type.map(() => "?").join(",")})`;
+      if (entities.segmentation?.type && entities.segmentation.type.length > 0) {
+        query += ` AND segmentacao IN (${entities.segmentation.type.map(() => '?').join(',')})`;
         params.push(...entities.segmentation.type);
       }
 
@@ -332,10 +312,7 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
       const result: any = await db.execute(query);
       return result[0]?.count || 0;
     } catch (error) {
-      console.error(
-        "[InterpretationService] Erro ao estimar registros:",
-        error
-      );
+      console.error('[InterpretationService] Erro ao estimar registros:', error);
       return 0;
     }
   }
@@ -347,37 +324,23 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
     const suggestions: string[] = [];
 
     // Sugestão de filtro geográfico
-    if (
-      !entities.geography ||
-      (!entities.geography.states && !entities.geography.cities)
-    ) {
-      suggestions.push(
-        "Considere adicionar filtro geográfico (estado ou cidade) para maior precisão"
-      );
+    if (!entities.geography || (!entities.geography.states && !entities.geography.cities)) {
+      suggestions.push("Considere adicionar filtro geográfico (estado ou cidade) para maior precisão");
     }
 
     // Sugestão de filtro de qualidade
     if (!entities.quality || !entities.quality.minScore) {
-      suggestions.push(
-        "Adicione filtro de quality score para focar em dados de alta qualidade"
-      );
+      suggestions.push("Adicione filtro de quality score para focar em dados de alta qualidade");
     }
 
     // Sugestão de filtro temporal
     if (!entities.temporal) {
-      suggestions.push(
-        "Considere filtrar por período para obter dados mais recentes"
-      );
+      suggestions.push("Considere filtrar por período para obter dados mais recentes");
     }
 
     // Sugestão de CNAE
-    if (
-      entities.entityType === "clientes" &&
-      (!entities.segmentation || !entities.segmentation.cnae)
-    ) {
-      suggestions.push(
-        "Adicione filtro por CNAE para segmentar por setor específico"
-      );
+    if (entities.entityType === 'clientes' && (!entities.segmentation || !entities.segmentation.cnae)) {
+      suggestions.push("Adicione filtro por CNAE para segmentar por setor específico");
     }
 
     return suggestions;
@@ -391,16 +354,12 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
 
     // Warning sobre faturamento
     if (entities.size?.revenue) {
-      warnings.push(
-        "Faturamento estimado pode ter baixa precisão para alguns registros"
-      );
+      warnings.push("Faturamento estimado pode ter baixa precisão para alguns registros");
     }
 
     // Warning sobre keywords genéricas
     if (entities.keywords.length === 0) {
-      warnings.push(
-        "Nenhuma palavra-chave identificada - resultados podem ser muito amplos"
-      );
+      warnings.push("Nenhuma palavra-chave identificada - resultados podem ser muito amplos");
     }
 
     return warnings;
@@ -413,10 +372,7 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
     let confidence = 50; // Base
 
     // +20 se tem filtro geográfico
-    if (
-      entities.geography &&
-      (entities.geography.states || entities.geography.cities)
-    ) {
+    if (entities.geography && (entities.geography.states || entities.geography.cities)) {
       confidence += 20;
     }
 
@@ -442,9 +398,7 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
    * Busca interpretação no cache
    * TODO: Implementar tabela interpretationCache no schema
    */
-  private async getFromCache(
-    context: string
-  ): Promise<InterpretationResult | null> {
+  private async getFromCache(context: string): Promise<InterpretationResult | null> {
     // Cache desabilitado temporariamente
     return null;
   }
@@ -453,10 +407,7 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
    * Salva interpretação no cache
    * TODO: Implementar tabela interpretationCache no schema
    */
-  private async saveToCache(
-    context: string,
-    result: InterpretationResult
-  ): Promise<void> {
+  private async saveToCache(context: string, result: InterpretationResult): Promise<void> {
     // Cache desabilitado temporariamente
     return;
   }
@@ -465,10 +416,7 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
    * Gera hash MD5 do contexto
    */
   private hashContext(context: string): string {
-    return crypto
-      .createHash("md5")
-      .update(context.toLowerCase().trim())
-      .digest("hex");
+    return crypto.createHash('md5').update(context.toLowerCase().trim()).digest('hex');
   }
 }
 

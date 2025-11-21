@@ -1,25 +1,10 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Download,
-  Trash2,
-  FileText,
-  FileSpreadsheet,
-  FileIcon,
-  Calendar,
-  Clock,
-  HardDrive,
-} from "lucide-react";
+import { Download, Trash2, FileText, FileSpreadsheet, FileIcon, Calendar, Clock, HardDrive } from "lucide-react";
 import { toast } from "sonner";
 import {
   Table,
@@ -56,15 +41,13 @@ export default function ExportHistory() {
       refetch();
       setDeleteId(null);
     },
-    onError: error => {
+    onError: (error) => {
       toast.error(`Erro ao deletar: ${error.message}`);
     },
   });
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) {
-      return "0 B";
-    }
+    if (bytes === 0) return "0 B";
     const k = 1024;
     const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -72,9 +55,7 @@ export default function ExportHistory() {
   };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) {
-      return "N/A";
-    }
+    if (!dateString) return "-";
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("pt-BR", {
       day: "2-digit",
@@ -137,9 +118,7 @@ export default function ExportHistory() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">
-              Total de Exportações
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total de Exportações</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{total}</div>
@@ -148,30 +127,22 @@ export default function ExportHistory() {
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">
-              Registros Exportados
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Registros Exportados</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {history
-                .reduce((sum, item) => sum + (item.recordCount || 0), 0)
-                .toLocaleString()}
+              {history.reduce((sum, item) => sum + (item.recordCount || 0), 0).toLocaleString()}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">
-              Espaço Utilizado
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Espaço Utilizado</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatFileSize(
-                history.reduce((sum, item) => sum + (item.fileSize || 0), 0)
-              )}
+              {formatFileSize(history.reduce((sum, item) => sum + (item.fileSize || 0), 0))}
             </div>
           </CardContent>
         </Card>
@@ -182,9 +153,7 @@ export default function ExportHistory() {
         <CardHeader>
           <CardTitle>Exportações Recentes</CardTitle>
           <CardDescription>
-            {total > 0
-              ? `Mostrando ${page * pageSize + 1}-${Math.min((page + 1) * pageSize, total)} de ${total}`
-              : "Nenhuma exportação encontrada"}
+            {total > 0 ? `Mostrando ${page * pageSize + 1}-${Math.min((page + 1) * pageSize, total)} de ${total}` : "Nenhuma exportação encontrada"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -209,7 +178,7 @@ export default function ExportHistory() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {history.map(item => (
+                  {history.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
@@ -225,9 +194,7 @@ export default function ExportHistory() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">
-                          {getTypeBadge(item.outputType)}
-                        </Badge>
+                        <Badge variant="outline">{getTypeBadge(item.outputType)}</Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         {item.recordCount.toLocaleString()}
@@ -256,10 +223,7 @@ export default function ExportHistory() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() =>
-                                item.fileUrl &&
-                                window.open(item.fileUrl, "_blank")
-                              }
+                              onClick={() => item.fileUrl && window.open(item.fileUrl, "_blank")}
                             >
                               <Download className="h-4 w-4" />
                             </Button>
@@ -313,16 +277,13 @@ export default function ExportHistory() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja deletar este histórico de exportação? Esta
-              ação não pode ser desfeita.
+              Tem certeza que deseja deletar este histórico de exportação? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() =>
-                deleteId && deleteMutation.mutate({ historyId: deleteId })
-              }
+              onClick={() => deleteId && deleteMutation.mutate({ historyId: deleteId })}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Deletar

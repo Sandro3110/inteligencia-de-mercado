@@ -3,7 +3,7 @@ import { invokeLLM } from "../_core/llm";
 /**
  * Tipo de template de análise
  */
-export type AnalysisTemplateType = "market" | "client" | "competitive" | "lead";
+export type AnalysisTemplateType = 'market' | 'client' | 'competitive' | 'lead';
 
 /**
  * Insight gerado pela IA
@@ -11,8 +11,8 @@ export type AnalysisTemplateType = "market" | "client" | "competitive" | "lead";
 export interface Insight {
   title: string;
   description: string;
-  impact: "high" | "medium" | "low";
-  category: "opportunity" | "risk" | "trend" | "recommendation";
+  impact: 'high' | 'medium' | 'low';
+  category: 'opportunity' | 'risk' | 'trend' | 'recommendation';
   supportingData?: Record<string, any>;
 }
 
@@ -30,9 +30,9 @@ export interface SWOTAnalysis {
  * Recomendações estratégicas
  */
 export interface StrategicRecommendations {
-  immediate: string[]; // Ações imediatas (0-30 dias)
-  shortTerm: string[]; // Curto prazo (1-3 meses)
-  longTerm: string[]; // Longo prazo (3-12 meses)
+  immediate: string[];      // Ações imediatas (0-30 dias)
+  shortTerm: string[];      // Curto prazo (1-3 meses)
+  longTerm: string[];       // Longo prazo (3-12 meses)
 }
 
 /**
@@ -63,15 +63,10 @@ export class AnalysisService {
     const metrics = this.calculateMetrics(data, templateType);
 
     // Gera insights com IA
-    const insights = await this.generateInsights(
-      data,
-      metrics,
-      templateType,
-      context
-    );
+    const insights = await this.generateInsights(data, metrics, templateType, context);
 
     // Gera análise SWOT (apenas para alguns templates)
-    const swot = ["market", "competitive"].includes(templateType)
+    const swot = ['market', 'competitive'].includes(templateType)
       ? await this.generateSWOT(data, metrics, templateType, context)
       : undefined;
 
@@ -85,12 +80,7 @@ export class AnalysisService {
     );
 
     // Gera sumário executivo
-    const summary = await this.generateSummary(
-      data,
-      metrics,
-      insights,
-      templateType
-    );
+    const summary = await this.generateSummary(data, metrics, insights, templateType);
 
     return {
       summary,
@@ -98,51 +88,45 @@ export class AnalysisService {
       swot,
       recommendations,
       metrics,
-      generatedAt: new Date(),
+      generatedAt: new Date()
     };
   }
 
   /**
    * Calcula métricas básicas dos dados
    */
-  private calculateMetrics(
-    data: any[],
-    templateType: AnalysisTemplateType
-  ): Record<string, any> {
+  private calculateMetrics(data: any[], templateType: AnalysisTemplateType): Record<string, any> {
     const metrics: Record<string, any> = {
       totalRecords: data.length,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toISOString()
     };
 
     switch (templateType) {
-      case "market":
-        metrics.avgQualityScore = this.average(data, "quality_score");
-        metrics.topStates = this.topN(data, "uf", 5);
-        metrics.topCities = this.topN(data, "cidade", 5);
-        metrics.portDistribution = this.distribution(data, "porte");
+      case 'market':
+        metrics.avgQualityScore = this.average(data, 'quality_score');
+        metrics.topStates = this.topN(data, 'uf', 5);
+        metrics.topCities = this.topN(data, 'cidade', 5);
+        metrics.portDistribution = this.distribution(data, 'porte');
         break;
 
-      case "client":
-        metrics.avgQualityScore = this.average(data, "quality_score");
-        metrics.statusDistribution = this.distribution(data, "status");
-        metrics.avgRevenue = this.average(data, "faturamento_estimado");
-        metrics.topSegments = this.topN(data, "segmentacao", 5);
+      case 'client':
+        metrics.avgQualityScore = this.average(data, 'quality_score');
+        metrics.statusDistribution = this.distribution(data, 'status');
+        metrics.avgRevenue = this.average(data, 'faturamento_estimado');
+        metrics.topSegments = this.topN(data, 'segmentacao', 5);
         break;
 
-      case "competitive":
-        metrics.avgQualityScore = this.average(data, "quality_score");
-        metrics.topCompetitors = this.topN(data, "nome", 10);
-        metrics.marketShareEstimate = this.distribution(data, "porte");
+      case 'competitive':
+        metrics.avgQualityScore = this.average(data, 'quality_score');
+        metrics.topCompetitors = this.topN(data, 'nome', 10);
+        metrics.marketShareEstimate = this.distribution(data, 'porte');
         break;
 
-      case "lead":
-        metrics.avgQualityScore = this.average(data, "quality_score");
-        metrics.highQualityCount = data.filter(
-          d => (d.quality_score || 0) >= 80
-        ).length;
-        metrics.statusDistribution = this.distribution(data, "status");
-        metrics.conversionPotential =
-          (metrics.highQualityCount / data.length) * 100;
+      case 'lead':
+        metrics.avgQualityScore = this.average(data, 'quality_score');
+        metrics.highQualityCount = data.filter(d => (d.quality_score || 0) >= 80).length;
+        metrics.statusDistribution = this.distribution(data, 'status');
+        metrics.conversionPotential = (metrics.highQualityCount / data.length) * 100;
         break;
     }
 
@@ -158,25 +142,19 @@ export class AnalysisService {
     templateType: AnalysisTemplateType,
     context?: string
   ): Promise<Insight[]> {
-    const prompt = this.buildInsightsPrompt(
-      data,
-      metrics,
-      templateType,
-      context
-    );
+    const prompt = this.buildInsightsPrompt(data, metrics, templateType, context);
 
     try {
       const response = await invokeLLM({
         messages: [
           {
             role: "system",
-            content:
-              "Você é um analista de mercado sênior especializado em inteligência competitiva e análise de dados. Responda APENAS com JSON válido.",
+            content: "Você é um analista de mercado sênior especializado em inteligência competitiva e análise de dados. Responda APENAS com JSON válido."
           },
           {
             role: "user",
-            content: prompt,
-          },
+            content: prompt
+          }
         ],
         response_format: {
           type: "json_schema",
@@ -193,40 +171,28 @@ export class AnalysisService {
                     properties: {
                       title: { type: "string" },
                       description: { type: "string" },
-                      impact: {
-                        type: "string",
-                        enum: ["high", "medium", "low"],
-                      },
-                      category: {
-                        type: "string",
-                        enum: [
-                          "opportunity",
-                          "risk",
-                          "trend",
-                          "recommendation",
-                        ],
-                      },
+                      impact: { type: "string", enum: ["high", "medium", "low"] },
+                      category: { type: "string", enum: ["opportunity", "risk", "trend", "recommendation"] }
                     },
                     required: ["title", "description", "impact", "category"],
-                    additionalProperties: false,
-                  },
-                },
+                    additionalProperties: false
+                  }
+                }
               },
               required: ["insights"],
-              additionalProperties: false,
-            },
-          },
-        },
+              additionalProperties: false
+            }
+          }
+        }
       });
 
       const content = response.choices[0].message.content;
-      const contentStr =
-        typeof content === "string" ? content : JSON.stringify(content);
+      const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
       const parsed = JSON.parse(contentStr || "{}");
 
       return parsed.insights || [];
     } catch (error) {
-      console.error("[AnalysisService] Erro ao gerar insights:", error);
+      console.error('[AnalysisService] Erro ao gerar insights:', error);
       return this.generateFallbackInsights(metrics, templateType);
     }
   }
@@ -247,13 +213,12 @@ export class AnalysisService {
         messages: [
           {
             role: "system",
-            content:
-              "Você é um consultor estratégico especializado em análise SWOT. Responda APENAS com JSON válido.",
+            content: "Você é um consultor estratégico especializado em análise SWOT. Responda APENAS com JSON válido."
           },
           {
             role: "user",
-            content: prompt,
-          },
+            content: prompt
+          }
         ],
         response_format: {
           type: "json_schema",
@@ -266,21 +231,20 @@ export class AnalysisService {
                 strengths: { type: "array", items: { type: "string" } },
                 weaknesses: { type: "array", items: { type: "string" } },
                 opportunities: { type: "array", items: { type: "string" } },
-                threats: { type: "array", items: { type: "string" } },
+                threats: { type: "array", items: { type: "string" } }
               },
               required: ["strengths", "weaknesses", "opportunities", "threats"],
-              additionalProperties: false,
-            },
-          },
-        },
+              additionalProperties: false
+            }
+          }
+        }
       });
 
       const content = response.choices[0].message.content;
-      const contentStr =
-        typeof content === "string" ? content : JSON.stringify(content);
+      const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
       return JSON.parse(contentStr || "{}");
     } catch (error) {
-      console.error("[AnalysisService] Erro ao gerar SWOT:", error);
+      console.error('[AnalysisService] Erro ao gerar SWOT:', error);
       return this.generateFallbackSWOT(metrics, templateType);
     }
   }
@@ -295,26 +259,19 @@ export class AnalysisService {
     templateType: AnalysisTemplateType,
     context?: string
   ): Promise<StrategicRecommendations> {
-    const prompt = this.buildRecommendationsPrompt(
-      data,
-      metrics,
-      insights,
-      templateType,
-      context
-    );
+    const prompt = this.buildRecommendationsPrompt(data, metrics, insights, templateType, context);
 
     try {
       const response = await invokeLLM({
         messages: [
           {
             role: "system",
-            content:
-              "Você é um consultor de negócios especializado em estratégia e execução. Responda APENAS com JSON válido.",
+            content: "Você é um consultor de negócios especializado em estratégia e execução. Responda APENAS com JSON válido."
           },
           {
             role: "user",
-            content: prompt,
-          },
+            content: prompt
+          }
         ],
         response_format: {
           type: "json_schema",
@@ -326,21 +283,20 @@ export class AnalysisService {
               properties: {
                 immediate: { type: "array", items: { type: "string" } },
                 shortTerm: { type: "array", items: { type: "string" } },
-                longTerm: { type: "array", items: { type: "string" } },
+                longTerm: { type: "array", items: { type: "string" } }
               },
               required: ["immediate", "shortTerm", "longTerm"],
-              additionalProperties: false,
-            },
-          },
-        },
+              additionalProperties: false
+            }
+          }
+        }
       });
 
       const content = response.choices[0].message.content;
-      const contentStr =
-        typeof content === "string" ? content : JSON.stringify(content);
+      const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
       return JSON.parse(contentStr || "{}");
     } catch (error) {
-      console.error("[AnalysisService] Erro ao gerar recomendações:", error);
+      console.error('[AnalysisService] Erro ao gerar recomendações:', error);
       return this.generateFallbackRecommendations(metrics, templateType);
     }
   }
@@ -363,10 +319,7 @@ MÉTRICAS:
 ${JSON.stringify(metrics, null, 2)}
 
 PRINCIPAIS INSIGHTS:
-${insights
-  .slice(0, 3)
-  .map(i => `- ${i.title}: ${i.description}`)
-  .join("\n")}
+${insights.slice(0, 3).map(i => `- ${i.title}: ${i.description}`).join('\n')}
 
 Escreva um sumário executivo conciso, objetivo e profissional que destaque os pontos mais importantes para tomada de decisão.
 `;
@@ -376,20 +329,19 @@ Escreva um sumário executivo conciso, objetivo e profissional que destaque os p
         messages: [
           {
             role: "system",
-            content:
-              "Você é um analista executivo especializado em comunicação estratégica.",
+            content: "Você é um analista executivo especializado em comunicação estratégica."
           },
           {
             role: "user",
-            content: prompt,
-          },
-        ],
+            content: prompt
+          }
+        ]
       });
 
       const content = response.choices[0].message.content;
-      return typeof content === "string" ? content : JSON.stringify(content);
+      return typeof content === 'string' ? content : JSON.stringify(content);
     } catch (error) {
-      console.error("[AnalysisService] Erro ao gerar sumário:", error);
+      console.error('[AnalysisService] Erro ao gerar sumário:', error);
       return this.generateFallbackSummary(metrics, templateType);
     }
   }
@@ -410,7 +362,7 @@ Analise os dados fornecidos e gere 5-7 insights estratégicos.
 TIPO DE ANÁLISE: ${this.getTemplateLabel(templateType)}
 
 CONTEXTO ADICIONAL:
-${context || "Não fornecido"}
+${context || 'Não fornecido'}
 
 MÉTRICAS:
 ${JSON.stringify(metrics, null, 2)}
@@ -441,7 +393,7 @@ Realize uma análise SWOT profissional baseada nos dados fornecidos.
 TIPO DE ANÁLISE: ${this.getTemplateLabel(templateType)}
 
 CONTEXTO:
-${context || "Não fornecido"}
+${context || 'Não fornecido'}
 
 MÉTRICAS:
 ${JSON.stringify(metrics, null, 2)}
@@ -469,13 +421,13 @@ Com base na análise realizada, gere recomendações estratégicas acionáveis.
 TIPO DE ANÁLISE: ${this.getTemplateLabel(templateType)}
 
 CONTEXTO:
-${context || "Não fornecido"}
+${context || 'Não fornecido'}
 
 MÉTRICAS:
 ${JSON.stringify(metrics, null, 2)}
 
 INSIGHTS IDENTIFICADOS:
-${insights.map(i => `- ${i.title} (${i.impact})`).join("\n")}
+${insights.map(i => `- ${i.title} (${i.impact})`).join('\n')}
 
 Gere recomendações em 3 horizontes temporais:
 
@@ -492,20 +444,12 @@ Seja específico, prático e priorize ações com maior ROI.
   // ============================================
 
   private average(data: any[], field: string): number {
-    const values = data
-      .map(d => d[field])
-      .filter(v => v !== null && v !== undefined);
-    if (values.length === 0) {
-      return 0;
-    }
+    const values = data.map(d => d[field]).filter(v => v !== null && v !== undefined);
+    if (values.length === 0) return 0;
     return values.reduce((a, b) => a + b, 0) / values.length;
   }
 
-  private topN(
-    data: any[],
-    field: string,
-    n: number
-  ): Array<{ value: string; count: number }> {
+  private topN(data: any[], field: string, n: number): Array<{ value: string; count: number }> {
     const counts: Record<string, number> = {};
     data.forEach(d => {
       const value = d[field];
@@ -523,7 +467,7 @@ Seja específico, prático e priorize ações com maior ROI.
   private distribution(data: any[], field: string): Record<string, number> {
     const dist: Record<string, number> = {};
     data.forEach(d => {
-      const value = d[field] || "N/A";
+      const value = d[field] || 'N/A';
       dist[value] = (dist[value] || 0) + 1;
     });
     return dist;
@@ -531,10 +475,10 @@ Seja específico, prático e priorize ações com maior ROI.
 
   private getTemplateLabel(type: AnalysisTemplateType): string {
     const labels: Record<AnalysisTemplateType, string> = {
-      market: "Análise de Mercado",
-      client: "Análise de Clientes",
-      competitive: "Análise Competitiva",
-      lead: "Análise de Leads",
+      market: 'Análise de Mercado',
+      client: 'Análise de Clientes',
+      competitive: 'Análise Competitiva',
+      lead: 'Análise de Leads'
     };
     return labels[type];
   }
@@ -549,17 +493,17 @@ Seja específico, prático e priorize ações com maior ROI.
   ): Insight[] {
     return [
       {
-        title: "Volume de Dados",
+        title: 'Volume de Dados',
         description: `Foram analisados ${metrics.totalRecords} registros nesta exportação.`,
-        impact: "medium",
-        category: "trend",
+        impact: 'medium',
+        category: 'trend'
       },
       {
-        title: "Qualidade Média",
+        title: 'Qualidade Média',
         description: `A qualidade média dos dados é de ${(metrics.avgQualityScore || 0).toFixed(1)} pontos.`,
-        impact: "medium",
-        category: "trend",
-      },
+        impact: 'medium',
+        category: 'trend'
+      }
     ];
   }
 
@@ -568,13 +512,10 @@ Seja específico, prático e priorize ações com maior ROI.
     templateType: AnalysisTemplateType
   ): SWOTAnalysis {
     return {
-      strengths: [
-        "Volume significativo de dados",
-        "Dados estruturados e organizados",
-      ],
-      weaknesses: ["Análise automática indisponível"],
-      opportunities: ["Potencial de expansão baseado nos dados"],
-      threats: ["Necessidade de validação manual dos insights"],
+      strengths: ['Volume significativo de dados', 'Dados estruturados e organizados'],
+      weaknesses: ['Análise automática indisponível'],
+      opportunities: ['Potencial de expansão baseado nos dados'],
+      threats: ['Necessidade de validação manual dos insights']
     };
   }
 
@@ -583,15 +524,9 @@ Seja específico, prático e priorize ações com maior ROI.
     templateType: AnalysisTemplateType
   ): StrategicRecommendations {
     return {
-      immediate: [
-        "Revisar dados exportados",
-        "Validar qualidade dos registros",
-      ],
-      shortTerm: ["Implementar filtros adicionais", "Expandir coleta de dados"],
-      longTerm: [
-        "Desenvolver estratégia baseada em dados",
-        "Automatizar processos",
-      ],
+      immediate: ['Revisar dados exportados', 'Validar qualidade dos registros'],
+      shortTerm: ['Implementar filtros adicionais', 'Expandir coleta de dados'],
+      longTerm: ['Desenvolver estratégia baseada em dados', 'Automatizar processos']
     };
   }
 

@@ -62,7 +62,7 @@ export function TagManager() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="h-9 gap-1.5 whitespace-nowrap">
+        <Button variant="outline" size="sm" className="gap-2">
           <Plus className="w-4 h-4" />
           Gerenciar Tags
         </Button>

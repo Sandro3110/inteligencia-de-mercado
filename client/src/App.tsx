@@ -11,7 +11,6 @@ import { GlobalShortcuts } from "./components/GlobalShortcuts";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { AppSidebar } from "./components/AppSidebar";
 import { useRealtimeNotifications } from "./hooks/useRealtimeNotifications";
-import { APIHealthAlerts } from "./components/APIHealthAlerts";
 
 // Lazy load de páginas principais (carregamento imediato)
 import CascadeView from "./pages/CascadeView";
@@ -53,7 +52,6 @@ const TestNotifications = lazy(() => import("./pages/TestNotifications"));
 const NotificationHistory = lazy(() => import("./pages/NotificationHistory"));
 const ExportHistory = lazy(() => import("./pages/ExportHistory"));
 const Geocodificacao = lazy(() => import("./pages/Geocodificacao"));
-const APIHealthDashboard = lazy(() => import("./pages/APIHealthDashboard"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -102,7 +100,6 @@ function Router() {
       <Route path="/notificacoes/teste" component={TestNotifications} />
       <Route path="/export/historico" component={ExportHistory} />
       <Route path="/geocodificacao" component={Geocodificacao} />
-      <Route path="/api-health" component={APIHealthDashboard} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -132,7 +129,6 @@ function App() {
                 <GlobalShortcuts />
                 <OnboardingTour />
                 <AppSidebar />
-                <APIHealthAlerts />
                 <Suspense fallback={<PageLoader />}>
                   <Router />
                 </Suspense>

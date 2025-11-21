@@ -1,21 +1,9 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import {
   LineChart,
@@ -36,9 +24,7 @@ import {
 } from "lucide-react";
 
 export default function TendenciasDashboard() {
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
-    null
-  );
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [periodoDias, setPeriodoDias] = useState<number>(30);
 
   const { data: projects } = trpc.projects.list.useQuery();
@@ -57,50 +43,33 @@ export default function TendenciasDashboard() {
 
   // Calcular insights
   const calcularInsights = () => {
-    if (!trends || trends.length === 0) {
-      return null;
-    }
+    if (!trends || trends.length === 0) return null;
 
     const mercadosComQueda = trends.filter((t: any) => {
-      if (t.dataPoints.length < 2) {
-        return false;
-      }
+      if (t.dataPoints.length < 2) return false;
       const primeiro = t.dataPoints[0].qualidadeMedia;
       const ultimo = t.dataPoints[t.dataPoints.length - 1].qualidadeMedia;
       return ((ultimo - primeiro) / primeiro) * 100 < -10;
     });
 
     const melhorTendencia = trends.reduce((best: any, current: any) => {
-      if (!current.dataPoints || current.dataPoints.length < 2) {
-        return best;
-      }
-      const currentTrend =
-        current.dataPoints[current.dataPoints.length - 1].qualidadeMedia -
-        current.dataPoints[0].qualidadeMedia;
-      const bestTrend =
-        best?.dataPoints?.[best.dataPoints.length - 1]?.qualidadeMedia -
-          best?.dataPoints?.[0]?.qualidadeMedia || -Infinity;
+      if (!current.dataPoints || current.dataPoints.length < 2) return best;
+      const currentTrend = current.dataPoints[current.dataPoints.length - 1].qualidadeMedia - current.dataPoints[0].qualidadeMedia;
+      const bestTrend = best?.dataPoints?.[best.dataPoints.length - 1]?.qualidadeMedia - best?.dataPoints?.[0]?.qualidadeMedia || -Infinity;
       return currentTrend > bestTrend ? current : best;
     }, null);
 
     const piorTendencia = trends.reduce((worst: any, current: any) => {
-      if (!current.dataPoints || current.dataPoints.length < 2) {
-        return worst;
-      }
-      const currentTrend =
-        current.dataPoints[current.dataPoints.length - 1].qualidadeMedia -
-        current.dataPoints[0].qualidadeMedia;
-      const worstTrend =
-        worst?.dataPoints?.[worst.dataPoints.length - 1]?.qualidadeMedia -
-          worst?.dataPoints?.[0]?.qualidadeMedia || Infinity;
+      if (!current.dataPoints || current.dataPoints.length < 2) return worst;
+      const currentTrend = current.dataPoints[current.dataPoints.length - 1].qualidadeMedia - current.dataPoints[0].qualidadeMedia;
+      const worstTrend = worst?.dataPoints?.[worst.dataPoints.length - 1]?.qualidadeMedia - worst?.dataPoints?.[0]?.qualidadeMedia || Infinity;
       return currentTrend < worstTrend ? current : worst;
     }, null);
 
-    const qualidadeMediaGeral =
-      trends.reduce((sum: number, t: any) => {
-        const ultimoPonto = t.dataPoints[t.dataPoints.length - 1];
-        return sum + (ultimoPonto?.qualidadeMedia || 0);
-      }, 0) / trends.length;
+    const qualidadeMediaGeral = trends.reduce((sum: number, t: any) => {
+      const ultimoPonto = t.dataPoints[t.dataPoints.length - 1];
+      return sum + (ultimoPonto?.qualidadeMedia || 0);
+    }, 0) / trends.length;
 
     return {
       mercadosComQueda,
@@ -114,9 +83,7 @@ export default function TendenciasDashboard() {
 
   // Preparar dados para o gráfico
   const prepararDadosGrafico = () => {
-    if (!trends || trends.length === 0) {
-      return [];
-    }
+    if (!trends || trends.length === 0) return [];
 
     const todasDatas = new Set<string>();
     trends.forEach((t: any) => {
@@ -125,7 +92,7 @@ export default function TendenciasDashboard() {
 
     const datasOrdenadas = Array.from(todasDatas).sort();
 
-    return datasOrdenadas.map(data => {
+    return datasOrdenadas.map((data) => {
       const ponto: any = { data };
       trends.forEach((t: any) => {
         const dp = t.dataPoints?.find((d: any) => d.data === data);
@@ -136,23 +103,14 @@ export default function TendenciasDashboard() {
   };
 
   const dadosGrafico = prepararDadosGrafico();
-  const cores = [
-    "#3b82f6",
-    "#10b981",
-    "#f59e0b",
-    "#ef4444",
-    "#8b5cf6",
-    "#ec4899",
-  ];
+  const cores = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Dashboard de Tendências
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard de Tendências</h1>
           <p className="text-muted-foreground mt-2">
             Acompanhe a evolução da qualidade dos dados ao longo do tempo
           </p>
@@ -163,7 +121,7 @@ export default function TendenciasDashboard() {
           <div className="w-64">
             <Select
               value={selectedProjectId?.toString() || ""}
-              onValueChange={v => setSelectedProjectId(parseInt(v))}
+              onValueChange={(v) => setSelectedProjectId(parseInt(v))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um projeto" />
@@ -181,7 +139,7 @@ export default function TendenciasDashboard() {
           <div className="w-48">
             <Select
               value={periodoDias.toString()}
-              onValueChange={v => setPeriodoDias(parseInt(v))}
+              onValueChange={(v) => setPeriodoDias(parseInt(v))}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -330,16 +288,14 @@ export default function TendenciasDashboard() {
                 <CardHeader>
                   <CardTitle>Mercados com Queda de Qualidade</CardTitle>
                   <CardDescription>
-                    Mercados que apresentaram queda superior a 10% nos últimos 7
-                    dias
+                    Mercados que apresentaram queda superior a 10% nos últimos 7 dias
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     {insights.mercadosComQueda.map((m: any) => {
                       const primeiro = m.dataPoints[0].qualidadeMedia;
-                      const ultimo =
-                        m.dataPoints[m.dataPoints.length - 1].qualidadeMedia;
+                      const ultimo = m.dataPoints[m.dataPoints.length - 1].qualidadeMedia;
                       const variacao = ((ultimo - primeiro) / primeiro) * 100;
 
                       return (

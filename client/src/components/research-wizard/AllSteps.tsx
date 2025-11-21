@@ -3,129 +3,94 @@
  * Fase 39.3 - Wizard de Criação de Pesquisa
  */
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  FileSpreadsheet,
-  Sparkles,
-  Plus,
-  Trash2,
-  CheckCircle2,
-  AlertCircle,
-  FolderPlus,
-  X,
-  Moon,
-  Sun,
-} from "lucide-react";
-import { toast } from "sonner";
-import { trpc } from "@/lib/trpc";
-import type { ResearchWizardData } from "@/types/research-wizard";
-import PreResearchInterface from "./PreResearchInterface";
-import FileUploadZone from "./FileUploadZone";
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Upload, FileSpreadsheet, Sparkles, Plus, Trash2, CheckCircle2, AlertCircle, FolderPlus, X, Moon, Sun } from 'lucide-react';
+import { toast } from 'sonner';
+import { trpc } from '@/lib/trpc';
+import type { ResearchWizardData } from '@/types/research-wizard';
+import PreResearchInterface from './PreResearchInterface';
+import FileUploadZone from './FileUploadZone';
 
 // ============================================
 // STEP 1: SELECIONAR PROJETO
 // ============================================
 
-export function Step1SelectProject({
-  data,
-  updateData,
-}: {
+export function Step1SelectProject({ data, updateData }: {
   data: ResearchWizardData;
   updateData: (d: Partial<ResearchWizardData>) => void;
 }) {
   const [showCreateProject, setShowCreateProject] = useState(false);
-  const [newProjectName, setNewProjectName] = useState("");
-  const [newProjectDesc, setNewProjectDesc] = useState("");
+  const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectDesc, setNewProjectDesc] = useState('');
   const [projectToDelete, setProjectToDelete] = useState<number | null>(null);
-  const [projectToHibernate, setProjectToHibernate] = useState<number | null>(
-    null
-  );
-
-  const {
-    data: projects,
-    isLoading,
-    error,
-    refetch,
-  } = trpc.projects.list.useQuery();
-
+  const [projectToHibernate, setProjectToHibernate] = useState<number | null>(null);
+  
+  const { data: projects, isLoading, error, refetch } = trpc.projects.list.useQuery();
+  
   const createProject = trpc.projects.create.useMutation({
-    onSuccess: newProject => {
+    onSuccess: (newProject) => {
       if (newProject) {
         refetch();
         updateData({
           projectId: newProject.id,
-          projectName: newProject.nome,
+          projectName: newProject.nome
         });
         setShowCreateProject(false);
-        setNewProjectName("");
-        setNewProjectDesc("");
+        setNewProjectName('');
+        setNewProjectDesc('');
         toast.success(`Projeto "${newProject.nome}" criado com sucesso!`);
       }
     },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      toast.error(`Erro ao criar projeto: ${errorMessage}`);
-    },
+    onError: (error: any) => {
+      toast.error(`Erro ao criar projeto: ${error.message}`);
+    }
   });
-
+  
   const canDeleteQuery = trpc.projects.canDelete.useQuery(
     projectToDelete || 0,
     { enabled: projectToDelete !== null }
   );
-
+  
   const deleteProject = trpc.projects.deleteEmpty.useMutation({
     onSuccess: () => {
       refetch();
-      toast.success("Projeto deletado com sucesso!");
+      toast.success('Projeto deletado com sucesso!');
       if (data.projectId === projectToDelete) {
-        updateData({ projectId: undefined, projectName: "" });
+        updateData({ projectId: undefined, projectName: '' });
       }
       setProjectToDelete(null);
     },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      toast.error(`Erro ao deletar projeto: ${errorMessage}`);
-    },
+    onError: (error: any) => {
+      toast.error(`Erro ao deletar projeto: ${error.message}`);
+    }
   });
-
+  
   const hibernateProject = trpc.projects.hibernate.useMutation({
     onSuccess: () => {
       refetch();
-      toast.success("Projeto adormecido com sucesso!");
+      toast.success('Projeto adormecido com sucesso!');
       setProjectToHibernate(null);
     },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      toast.error(`Erro ao adormecer projeto: ${errorMessage}`);
-    },
+    onError: (error: any) => {
+      toast.error(`Erro ao adormecer projeto: ${error.message}`);
+    }
   });
-
+  
   const reactivateProject = trpc.projects.reactivate.useMutation({
     onSuccess: () => {
       refetch();
-      toast.success("Projeto reativado com sucesso!");
+      toast.success('Projeto reativado com sucesso!');
     },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      toast.error(`Erro ao reativar projeto: ${errorMessage}`);
-    },
+    onError: (error: any) => {
+      toast.error(`Erro ao reativar projeto: ${error.message}`);
+    }
   });
 
   return (
@@ -142,31 +107,26 @@ export function Step1SelectProject({
           <Label>Projeto *</Label>
           {!isLoading && projects && projects.length > 0 && (
             <span className="text-sm text-muted-foreground">
-              {projects.length} projeto{projects.length > 1 ? "s" : ""}{" "}
-              disponível{projects.length > 1 ? "eis" : ""}
+              {projects.length} projeto{projects.length > 1 ? 's' : ''} disponível{projects.length > 1 ? 'eis' : ''}
             </span>
           )}
         </div>
-
+        
         {isLoading && (
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">Carregando projetos...</p>
           </div>
         )}
-
+        
         {error && (
           <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-800">
-              Erro ao carregar projetos: {error.message}
-            </p>
+            <p className="text-sm text-red-800">Erro ao carregar projetos: {error.message}</p>
           </div>
         )}
-
+        
         {!isLoading && !error && (!projects || projects.length === 0) && (
           <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg space-y-3">
-            <p className="text-sm text-yellow-800">
-              Nenhum projeto encontrado. Crie um projeto primeiro.
-            </p>
+            <p className="text-sm text-yellow-800">Nenhum projeto encontrado. Crie um projeto primeiro.</p>
             <Button
               onClick={() => setShowCreateProject(true)}
               variant="outline"
@@ -178,7 +138,7 @@ export function Step1SelectProject({
             </Button>
           </div>
         )}
-
+        
         {/* Modal de Criação Rápida de Projeto */}
         {showCreateProject && (
           <Card className="p-4 space-y-4 border-2 border-blue-200 bg-blue-50/50">
@@ -192,41 +152,41 @@ export function Step1SelectProject({
                 <X className="w-4 h-4" />
               </Button>
             </div>
-
+            
             <div className="space-y-3">
               <div>
                 <Label>Nome do Projeto *</Label>
                 <Input
                   value={newProjectName}
-                  onChange={e => setNewProjectName(e.target.value)}
+                  onChange={(e) => setNewProjectName(e.target.value)}
                   placeholder="Ex: Embalagens 2025"
                 />
               </div>
-
+              
               <div>
                 <Label>Descrição (opcional)</Label>
                 <Textarea
                   value={newProjectDesc}
-                  onChange={e => setNewProjectDesc(e.target.value)}
+                  onChange={(e) => setNewProjectDesc(e.target.value)}
                   placeholder="Breve descrição do projeto..."
                   rows={2}
                 />
               </div>
-
+              
               <div className="flex gap-2">
                 <Button
                   onClick={() => {
                     if (newProjectName.trim()) {
                       createProject.mutate({
                         nome: newProjectName.trim(),
-                        descricao: newProjectDesc.trim() || undefined,
+                        descricao: newProjectDesc.trim() || undefined
                       });
                     }
                   }}
                   disabled={!newProjectName.trim() || createProject.isPending}
                   className="flex-1"
                 >
-                  {createProject.isPending ? "Criando..." : "Criar Projeto"}
+                  {createProject.isPending ? 'Criando...' : 'Criar Projeto'}
                 </Button>
                 <Button
                   variant="outline"
@@ -239,7 +199,7 @@ export function Step1SelectProject({
             </div>
           </Card>
         )}
-
+        
         {!showCreateProject && projects && projects.length > 0 && (
           <Button
             onClick={() => setShowCreateProject(true)}
@@ -251,15 +211,15 @@ export function Step1SelectProject({
             Criar Novo Projeto
           </Button>
         )}
-
+        
         <Select
           disabled={isLoading || !projects || projects.length === 0}
-          value={data.projectId?.toString() || ""}
-          onValueChange={value => {
+          value={data.projectId?.toString() || ''}
+          onValueChange={(value) => {
             const project = projects?.find(p => p.id === parseInt(value));
             updateData({
               projectId: parseInt(value),
-              projectName: project?.nome || "",
+              projectName: project?.nome || ''
             });
           }}
         >
@@ -267,23 +227,18 @@ export function Step1SelectProject({
             <SelectValue placeholder="Selecione um projeto" />
           </SelectTrigger>
           <SelectContent>
-            {projects && projects.length > 0 ? (
-              projects.map(project => (
-                <SelectItem key={project.id} value={project.id.toString()}>
-                  <div className="flex items-center gap-2">
-                    <span>{project.nome}</span>
-                    {project.status === "hibernated" && (
-                      <Badge
-                        variant="outline"
-                        className="text-xs bg-blue-50 text-blue-700 border-blue-300"
-                      >
-                        💤 Adormecido
-                      </Badge>
-                    )}
-                  </div>
-                </SelectItem>
-              ))
-            ) : (
+            {projects && projects.length > 0 ? projects.map(project => (
+              <SelectItem key={project.id} value={project.id.toString()}>
+                <div className="flex items-center gap-2">
+                  <span>{project.nome}</span>
+                  {project.status === 'hibernated' && (
+                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-300">
+                      💤 Adormecido
+                    </Badge>
+                  )}
+                </div>
+              </SelectItem>
+            )) : (
               <SelectItem value="none" disabled>
                 Nenhum projeto disponível
               </SelectItem>
@@ -292,27 +247,20 @@ export function Step1SelectProject({
         </Select>
 
         {data.projectId && (
-          <div
-            className={`p-4 border rounded-lg ${
-              projects?.find(p => p.id === data.projectId)?.status ===
-              "hibernated"
-                ? "bg-blue-50 border-blue-200"
-                : "bg-green-50 border-green-200"
-            }`}
-          >
+          <div className={`p-4 border rounded-lg ${
+            projects?.find(p => p.id === data.projectId)?.status === 'hibernated'
+              ? 'bg-blue-50 border-blue-200'
+              : 'bg-green-50 border-green-200'
+          }`}>
             <div className="flex items-center justify-between">
-              <p
-                className={`text-sm ${
-                  projects?.find(p => p.id === data.projectId)?.status ===
-                  "hibernated"
-                    ? "text-blue-800"
-                    : "text-green-800"
-                }`}
-              >
+              <p className={`text-sm ${
+                projects?.find(p => p.id === data.projectId)?.status === 'hibernated'
+                  ? 'text-blue-800'
+                  : 'text-green-800'
+              }`}>
                 ✓ Projeto selecionado: <strong>{data.projectName}</strong>
               </p>
-              {projects?.find(p => p.id === data.projectId)?.status ===
-                "hibernated" && (
+              {projects?.find(p => p.id === data.projectId)?.status === 'hibernated' && (
                 <Badge className="bg-blue-100 text-blue-800 border-blue-300">
                   💤 Somente Leitura
                 </Badge>
@@ -320,13 +268,12 @@ export function Step1SelectProject({
             </div>
           </div>
         )}
-
+        
         {/* Botões de ações do projeto */}
         {data.projectId && (
           <div className="flex gap-2">
             {/* Verificar status do projeto */}
-            {projects?.find(p => p.id === data.projectId)?.status ===
-            "hibernated" ? (
+            {projects?.find(p => p.id === data.projectId)?.status === 'hibernated' ? (
               <Button
                 onClick={() => reactivateProject.mutate(data.projectId!)}
                 disabled={reactivateProject.isPending}
@@ -335,9 +282,7 @@ export function Step1SelectProject({
                 className="flex-1 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
               >
                 <Sun className="w-4 h-4 mr-2" />
-                {reactivateProject.isPending
-                  ? "Reativando..."
-                  : "Reativar Projeto"}
+                {reactivateProject.isPending ? 'Reativando...' : 'Reativar Projeto'}
               </Button>
             ) : (
               <Button
@@ -350,7 +295,7 @@ export function Step1SelectProject({
                 Adormecer Projeto
               </Button>
             )}
-
+            
             <Button
               onClick={() => setProjectToDelete(data.projectId!)}
               variant="ghost"
@@ -362,14 +307,12 @@ export function Step1SelectProject({
             </Button>
           </div>
         )}
-
+        
         {/* Modal de Confirmação de Hibernação */}
         {projectToHibernate && (
           <Card className="p-4 space-y-4 border-2 border-blue-200 bg-blue-50/50">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-lg text-blue-800">
-                Adormecer Projeto?
-              </h3>
+              <h3 className="font-semibold text-lg text-blue-800">Adormecer Projeto?</h3>
               <Button
                 variant="ghost"
                 size="sm"
@@ -378,7 +321,7 @@ export function Step1SelectProject({
                 <X className="w-4 h-4" />
               </Button>
             </div>
-
+            
             <div className="space-y-3">
               <div className="p-3 bg-blue-50 border border-blue-200 rounded">
                 <p className="text-sm text-blue-800 font-semibold mb-2">
@@ -391,7 +334,7 @@ export function Step1SelectProject({
                   <li>Você pode reativar o projeto a qualquer momento</li>
                 </ul>
               </div>
-
+              
               <div className="flex gap-2">
                 <Button
                   onClick={() => {
@@ -400,7 +343,7 @@ export function Step1SelectProject({
                   disabled={hibernateProject.isPending}
                   className="flex-1 bg-blue-600 hover:bg-blue-700"
                 >
-                  {hibernateProject.isPending ? "Adormecendo..." : "Confirmar"}
+                  {hibernateProject.isPending ? 'Adormecendo...' : 'Confirmar'}
                 </Button>
                 <Button
                   variant="outline"
@@ -413,14 +356,12 @@ export function Step1SelectProject({
             </div>
           </Card>
         )}
-
+        
         {/* Modal de Confirmação de Deleção */}
         {projectToDelete && (
           <Card className="p-4 space-y-4 border-2 border-red-200 bg-red-50/50">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-lg text-red-800">
-                Deletar Projeto?
-              </h3>
+              <h3 className="font-semibold text-lg text-red-800">Deletar Projeto?</h3>
               <Button
                 variant="ghost"
                 size="sm"
@@ -429,29 +370,26 @@ export function Step1SelectProject({
                 <X className="w-4 h-4" />
               </Button>
             </div>
-
+            
             {canDeleteQuery.isLoading && (
-              <p className="text-sm text-gray-600">
-                Verificando se o projeto pode ser deletado...
-              </p>
+              <p className="text-sm text-gray-600">Verificando se o projeto pode ser deletado...</p>
             )}
-
+            
             {canDeleteQuery.data && (
               <div className="space-y-3">
                 {canDeleteQuery.data.canDelete ? (
                   <>
                     <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
                       <p className="text-sm text-yellow-800 font-semibold mb-2">
-                        ⚠️ Este projeto está vazio e pode ser deletado
-                        permanentemente.
+                        ⚠️ Este projeto está vazio e pode ser deletado permanentemente.
                       </p>
                       <p className="text-xs text-yellow-700">
-                        Pesquisas: {canDeleteQuery.data.stats?.pesquisas || 0} |
-                        Clientes: {canDeleteQuery.data.stats?.clientes || 0} |
+                        Pesquisas: {canDeleteQuery.data.stats?.pesquisas || 0} | 
+                        Clientes: {canDeleteQuery.data.stats?.clientes || 0} | 
                         Mercados: {canDeleteQuery.data.stats?.mercados || 0}
                       </p>
                     </div>
-
+                    
                     <div className="flex gap-2">
                       <Button
                         onClick={() => deleteProject.mutate(projectToDelete)}
@@ -459,9 +397,7 @@ export function Step1SelectProject({
                         variant="destructive"
                         className="flex-1"
                       >
-                        {deleteProject.isPending
-                          ? "Deletando..."
-                          : "Confirmar Deleção"}
+                        {deleteProject.isPending ? 'Deletando...' : 'Confirmar Deleção'}
                       </Button>
                       <Button
                         variant="outline"
@@ -483,13 +419,13 @@ export function Step1SelectProject({
                       </p>
                       {canDeleteQuery.data.stats && (
                         <p className="text-xs text-red-700 mt-1">
-                          Pesquisas: {canDeleteQuery.data.stats.pesquisas} |
-                          Clientes: {canDeleteQuery.data.stats.clientes} |
+                          Pesquisas: {canDeleteQuery.data.stats.pesquisas} | 
+                          Clientes: {canDeleteQuery.data.stats.clientes} | 
                           Mercados: {canDeleteQuery.data.stats.mercados}
                         </p>
                       )}
                     </div>
-
+                    
                     <Button
                       variant="outline"
                       onClick={() => setProjectToDelete(null)}
@@ -512,10 +448,7 @@ export function Step1SelectProject({
 // STEP 2: NOMEAR PESQUISA
 // ============================================
 
-export function Step2NameResearch({
-  data,
-  updateData,
-}: {
+export function Step2NameResearch({ data, updateData }: {
   data: ResearchWizardData;
   updateData: (d: Partial<ResearchWizardData>) => void;
 }) {
@@ -534,7 +467,7 @@ export function Step2NameResearch({
           <Input
             placeholder="Ex: Pesquisa de Embalagens Plásticas Q4 2025"
             value={data.researchName}
-            onChange={e => updateData({ researchName: e.target.value })}
+            onChange={(e) => updateData({ researchName: e.target.value })}
             className="mt-2"
           />
         </div>
@@ -544,7 +477,7 @@ export function Step2NameResearch({
           <Textarea
             placeholder="Descreva o objetivo e escopo desta pesquisa..."
             value={data.researchDescription}
-            onChange={e => updateData({ researchDescription: e.target.value })}
+            onChange={(e) => updateData({ researchDescription: e.target.value })}
             className="mt-2"
             rows={4}
           />
@@ -558,10 +491,7 @@ export function Step2NameResearch({
 // STEP 3: CONFIGURAR PARÂMETROS
 // ============================================
 
-export function Step3ConfigureParams({
-  data,
-  updateData,
-}: {
+export function Step3ConfigureParams({ data, updateData }: {
   data: ResearchWizardData;
   updateData: (d: Partial<ResearchWizardData>) => void;
 }) {
@@ -582,9 +512,7 @@ export function Step3ConfigureParams({
             min={0}
             max={50}
             value={data.qtdConcorrentes}
-            onChange={e =>
-              updateData({ qtdConcorrentes: parseInt(e.target.value) || 0 })
-            }
+            onChange={(e) => updateData({ qtdConcorrentes: parseInt(e.target.value) || 0 })}
             className="mt-2"
           />
           <p className="text-xs text-muted-foreground mt-2">
@@ -599,9 +527,7 @@ export function Step3ConfigureParams({
             min={0}
             max={100}
             value={data.qtdLeads}
-            onChange={e =>
-              updateData({ qtdLeads: parseInt(e.target.value) || 0 })
-            }
+            onChange={(e) => updateData({ qtdLeads: parseInt(e.target.value) || 0 })}
             className="mt-2"
           />
           <p className="text-xs text-muted-foreground mt-2">
@@ -616,19 +542,18 @@ export function Step3ConfigureParams({
             min={0}
             max={20}
             value={data.qtdProdutos}
-            onChange={e =>
-              updateData({ qtdProdutos: parseInt(e.target.value) || 0 })
-            }
+            onChange={(e) => updateData({ qtdProdutos: parseInt(e.target.value) || 0 })}
             className="mt-2"
           />
-          <p className="text-xs text-muted-foreground mt-2">Recomendado: 3-5</p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Recomendado: 3-5
+          </p>
         </Card>
       </div>
 
       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-800">
-          💡 <strong>Dica:</strong> Valores maiores resultam em pesquisas mais
-          completas, mas levam mais tempo para processar.
+          💡 <strong>Dica:</strong> Valores maiores resultam em pesquisas mais completas, mas levam mais tempo para processar.
         </p>
       </div>
     </div>
@@ -639,36 +564,32 @@ export function Step3ConfigureParams({
 // STEP 4: ESCOLHER MÉTODO DE ENTRADA
 // ============================================
 
-export function Step4ChooseMethod({
-  data,
-  updateData,
-}: {
+export function Step4ChooseMethod({ data, updateData }: {
   data: ResearchWizardData;
   updateData: (d: Partial<ResearchWizardData>) => void;
 }) {
   const methods = [
     {
-      id: "manual",
+      id: 'manual',
       icon: Plus,
-      title: "Entrada Manual",
-      description:
-        "Adicione mercados e clientes um por um através de formulários",
-      recommended: "Ideal para 1-10 registros",
+      title: 'Entrada Manual',
+      description: 'Adicione mercados e clientes um por um através de formulários',
+      recommended: 'Ideal para 1-10 registros'
     },
     {
-      id: "spreadsheet",
+      id: 'spreadsheet',
       icon: FileSpreadsheet,
-      title: "Upload de Planilha",
-      description: "Importe dados em massa via CSV ou Excel",
-      recommended: "Ideal para 10+ registros",
+      title: 'Upload de Planilha',
+      description: 'Importe dados em massa via CSV ou Excel',
+      recommended: 'Ideal para 10+ registros'
     },
     {
-      id: "pre-research",
+      id: 'pre-research',
       icon: Sparkles,
-      title: "Pré-Pesquisa com IA",
-      description: "Descreva em linguagem natural e a IA busca os dados",
-      recommended: "Ideal para pesquisas exploratórias",
-    },
+      title: 'Pré-Pesquisa com IA',
+      description: 'Descreva em linguagem natural e a IA busca os dados',
+      recommended: 'Ideal para pesquisas exploratórias'
+    }
   ];
 
   return (
@@ -681,7 +602,7 @@ export function Step4ChooseMethod({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {methods.map(method => {
+        {methods.map((method) => {
           const Icon = method.icon;
           const isSelected = data.inputMethod === method.id;
 
@@ -690,24 +611,20 @@ export function Step4ChooseMethod({
               key={method.id}
               className={`
                 p-6 cursor-pointer transition-all
-                ${isSelected ? "border-2 border-blue-500 bg-blue-50" : "hover:border-gray-400"}
+                ${isSelected ? 'border-2 border-blue-500 bg-blue-50' : 'hover:border-gray-400'}
               `}
               onClick={() => updateData({ inputMethod: method.id as any })}
             >
               <div className="flex flex-col items-center text-center space-y-3">
-                <div
-                  className={`
+                <div className={`
                   p-3 rounded-full
-                  ${isSelected ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"}
-                `}
-                >
+                  ${isSelected ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}
+                `}>
                   <Icon className="w-6 h-6" />
                 </div>
                 <h3 className="font-semibold">{method.title}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {method.description}
-                </p>
-                <Badge variant={isSelected ? "default" : "outline"}>
+                <p className="text-sm text-muted-foreground">{method.description}</p>
+                <Badge variant={isSelected ? 'default' : 'outline'}>
                   {method.recommended}
                 </Badge>
               </div>
@@ -723,21 +640,18 @@ export function Step4ChooseMethod({
 // STEP 5: INSERIR DADOS (SIMPLIFICADO)
 // ============================================
 
-export function Step5InsertData({
-  data,
-  updateData,
-}: {
+export function Step5InsertData({ data, updateData }: {
   data: ResearchWizardData;
   updateData: (d: Partial<ResearchWizardData>) => void;
 }) {
-  const [newMercado, setNewMercado] = useState("");
+  const [newMercado, setNewMercado] = useState('');
 
   const addMercado = () => {
     if (newMercado.trim()) {
       updateData({
-        mercados: [...data.mercados, { nome: newMercado, segmentacao: "B2B" }],
+        mercados: [...data.mercados, { nome: newMercado, segmentacao: 'B2B' }]
       });
-      setNewMercado("");
+      setNewMercado('');
     }
   };
 
@@ -746,25 +660,22 @@ export function Step5InsertData({
       <div>
         <h2 className="text-2xl font-bold mb-2">Inserir Dados</h2>
         <p className="text-muted-foreground">
-          Método selecionado:{" "}
-          <strong>
-            {data.inputMethod === "manual"
-              ? "Entrada Manual"
-              : data.inputMethod === "spreadsheet"
-                ? "Upload de Planilha"
-                : "Pré-Pesquisa com IA"}
-          </strong>
+          Método selecionado: <strong>{
+            data.inputMethod === 'manual' ? 'Entrada Manual' :
+            data.inputMethod === 'spreadsheet' ? 'Upload de Planilha' :
+            'Pré-Pesquisa com IA'
+          }</strong>
         </p>
       </div>
 
-      {data.inputMethod === "manual" && (
+      {data.inputMethod === 'manual' && (
         <div className="space-y-4">
           <div className="flex gap-2">
             <Input
               placeholder="Nome do mercado..."
               value={newMercado}
-              onChange={e => setNewMercado(e.target.value)}
-              onKeyPress={e => e.key === "Enter" && addMercado()}
+              onChange={(e) => setNewMercado(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && addMercado()}
             />
             <Button onClick={addMercado}>
               <Plus className="w-4 h-4 mr-2" />
@@ -774,17 +685,14 @@ export function Step5InsertData({
 
           <div className="space-y-2">
             {data.mercados.map((m, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-              >
+              <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <span>{m.nome}</span>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => {
                     updateData({
-                      mercados: data.mercados.filter((_, idx) => idx !== i),
+                      mercados: data.mercados.filter((_, idx) => idx !== i)
                     });
                   }}
                 >
@@ -802,11 +710,11 @@ export function Step5InsertData({
         </div>
       )}
 
-      {data.inputMethod === "spreadsheet" && (
+      {data.inputMethod === 'spreadsheet' && (
         <FileUploadZone data={data} updateData={updateData} tipo="mercado" />
       )}
 
-      {data.inputMethod === "pre-research" && (
+      {data.inputMethod === 'pre-research' && (
         <PreResearchInterface data={data} updateData={updateData} />
       )}
     </div>
@@ -817,17 +725,12 @@ export function Step5InsertData({
 // STEP 6: VALIDAR DADOS
 // ============================================
 
-export function Step6ValidateData({
-  data,
-  updateData,
-}: {
+export function Step6ValidateData({ data, updateData }: {
   data: ResearchWizardData;
   updateData: (d: Partial<ResearchWizardData>) => void;
 }) {
   const validMercados = data.mercados.filter(m => m.nome?.trim().length >= 3);
-  const invalidMercados = data.mercados.filter(
-    m => !m.nome || m.nome.trim().length < 3
-  );
+  const invalidMercados = data.mercados.filter(m => !m.nome || m.nome.trim().length < 3);
 
   return (
     <div className="space-y-6">
@@ -842,9 +745,7 @@ export function Step6ValidateData({
         <Card className="p-4 bg-green-50 border-green-200">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle2 className="w-5 h-5 text-green-600" />
-            <h3 className="font-semibold text-green-800">
-              Dados Válidos ({validMercados.length})
-            </h3>
+            <h3 className="font-semibold text-green-800">Dados Válidos ({validMercados.length})</h3>
           </div>
           <div className="space-y-2">
             {validMercados.map((m, i) => (
@@ -859,14 +760,12 @@ export function Step6ValidateData({
           <Card className="p-4 bg-red-50 border-red-200">
             <div className="flex items-center gap-2 mb-2">
               <AlertCircle className="w-5 h-5 text-red-600" />
-              <h3 className="font-semibold text-red-800">
-                Dados Inválidos ({invalidMercados.length})
-              </h3>
+              <h3 className="font-semibold text-red-800">Dados Inválidos ({invalidMercados.length})</h3>
             </div>
             <div className="space-y-2">
               {invalidMercados.map((m, i) => (
                 <div key={i} className="text-sm text-red-700">
-                  ✗ {m.nome || "(vazio)"} - Nome muito curto
+                  ✗ {m.nome || '(vazio)'} - Nome muito curto
                 </div>
               ))}
             </div>
@@ -878,8 +777,8 @@ export function Step6ValidateData({
             updateData({
               validatedData: {
                 mercados: validMercados,
-                clientes: [],
-              },
+                clientes: []
+              }
             });
           }}
           className="w-full"
@@ -895,9 +794,7 @@ export function Step6ValidateData({
 // STEP 7: RESUMO
 // ============================================
 
-export function Step7Summary({
-  data,
-}: {
+export function Step7Summary({ data }: {
   data: ResearchWizardData;
   updateData: (d: Partial<ResearchWizardData>) => void;
 }) {
@@ -920,9 +817,7 @@ export function Step7Summary({
           <h3 className="font-semibold mb-2">Nome da Pesquisa</h3>
           <p>{data.researchName}</p>
           {data.researchDescription && (
-            <p className="text-sm text-muted-foreground mt-2">
-              {data.researchDescription}
-            </p>
+            <p className="text-sm text-muted-foreground mt-2">{data.researchDescription}</p>
           )}
         </Card>
 
@@ -952,8 +847,7 @@ export function Step7Summary({
 
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <p className="text-sm text-yellow-800">
-            ⚠️ <strong>Atenção:</strong> O processo de enriquecimento pode levar
-            vários minutos dependendo da quantidade de dados.
+            ⚠️ <strong>Atenção:</strong> O processo de enriquecimento pode levar vários minutos dependendo da quantidade de dados.
           </p>
         </div>
       </div>

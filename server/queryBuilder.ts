@@ -1,34 +1,10 @@
-import {
-  SQL,
-  sql,
-  and,
-  or,
-  eq,
-  ne,
-  gt,
-  lt,
-  gte,
-  lte,
-  like,
-  inArray,
-  notInArray,
-  isNull,
-  isNotNull,
-} from "drizzle-orm";
-import type {
-  FilterCondition,
-  FilterGroup,
-  AdvancedFilter,
-  FilterOperator,
-} from "../shared/advancedFilters";
+import { SQL, sql, and, or, eq, ne, gt, lt, gte, lte, like, inArray, notInArray, isNull, isNotNull } from 'drizzle-orm';
+import type { FilterCondition, FilterGroup, AdvancedFilter, FilterOperator } from '../shared/advancedFilters';
 
 /**
  * Constrói uma condição SQL a partir de um FilterCondition
  */
-function buildCondition(
-  table: any,
-  condition: FilterCondition
-): SQL | undefined {
+function buildCondition(table: any, condition: FilterCondition): SQL | undefined {
   const { field, operator, value } = condition;
   const column = table[field];
 
@@ -38,45 +14,45 @@ function buildCondition(
   }
 
   switch (operator) {
-    case "eq":
+    case 'eq':
       return eq(column, value);
-
-    case "ne":
+    
+    case 'ne':
       return ne(column, value);
-
-    case "gt":
+    
+    case 'gt':
       return gt(column, value);
-
-    case "lt":
+    
+    case 'lt':
       return lt(column, value);
-
-    case "gte":
+    
+    case 'gte':
       return gte(column, value);
-
-    case "lte":
+    
+    case 'lte':
       return lte(column, value);
-
-    case "contains":
+    
+    case 'contains':
       return like(column, `%${value}%`);
-
-    case "startsWith":
+    
+    case 'startsWith':
       return like(column, `${value}%`);
-
-    case "endsWith":
+    
+    case 'endsWith':
       return like(column, `%${value}`);
-
-    case "in":
+    
+    case 'in':
       return inArray(column, Array.isArray(value) ? value : [value]);
-
-    case "notIn":
+    
+    case 'notIn':
       return notInArray(column, Array.isArray(value) ? value : [value]);
-
-    case "isNull":
+    
+    case 'isNull':
       return isNull(column);
-
-    case "isNotNull":
+    
+    case 'isNotNull':
       return isNotNull(column);
-
+    
     default:
       console.warn(`Operador ${operator} não suportado`);
       return undefined;
@@ -91,88 +67,52 @@ function buildGroup(table: any, group: FilterGroup): SQL | undefined {
     .map(condition => buildCondition(table, condition))
     .filter((c): c is SQL => c !== undefined);
 
-  if (conditions.length === 0) {
-    return undefined;
-  }
-  if (conditions.length === 1) {
-    return conditions[0];
-  }
+  if (conditions.length === 0) return undefined;
+  if (conditions.length === 1) return conditions[0];
 
-  return group.logicalOperator === "AND"
-    ? and(...conditions)
+  return group.logicalOperator === 'AND' 
+    ? and(...conditions) 
     : or(...conditions);
 }
 
 /**
  * Constrói query SQL completa a partir de AdvancedFilter
  */
-export function buildDynamicQuery(
-  table: any,
-  filter: AdvancedFilter
-): SQL | undefined {
+export function buildDynamicQuery(table: any, filter: AdvancedFilter): SQL | undefined {
   const groups = filter.groups
     .map(group => buildGroup(table, group))
     .filter((g): g is SQL => g !== undefined);
 
-  if (groups.length === 0) {
-    return undefined;
-  }
-  if (groups.length === 1) {
-    return groups[0];
-  }
+  if (groups.length === 0) return undefined;
+  if (groups.length === 1) return groups[0];
 
-  return filter.globalOperator === "AND" ? and(...groups) : or(...groups);
+  return filter.globalOperator === 'AND'
+    ? and(...groups)
+    : or(...groups);
 }
 
 /**
  * Valida se um filtro é válido
  */
-export function validateFilter(filter: AdvancedFilter): {
-  valid: boolean;
-  error?: string;
-} {
+export function validateFilter(filter: AdvancedFilter): { valid: boolean; error?: string } {
   if (!filter.groups || filter.groups.length === 0) {
-    return { valid: false, error: "Filtro deve ter pelo menos um grupo" };
+    return { valid: false, error: 'Filtro deve ter pelo menos um grupo' };
   }
 
   for (const group of filter.groups) {
     if (!group.conditions || group.conditions.length === 0) {
-      return {
-        valid: false,
-        error: "Cada grupo deve ter pelo menos uma condição",
-      };
+      return { valid: false, error: 'Cada grupo deve ter pelo menos uma condição' };
     }
 
     for (const condition of group.conditions) {
       if (!condition.field || !condition.operator) {
-        return {
-          valid: false,
-          error: "Cada condição deve ter campo e operador",
-        };
+        return { valid: false, error: 'Cada condição deve ter campo e operador' };
       }
 
       // Validar valor para operadores que requerem valor
-      const requiresValue: FilterOperator[] = [
-        "eq",
-        "ne",
-        "gt",
-        "lt",
-        "gte",
-        "lte",
-        "contains",
-        "startsWith",
-        "endsWith",
-        "in",
-        "notIn",
-      ];
-      if (
-        requiresValue.includes(condition.operator) &&
-        condition.value === undefined
-      ) {
-        return {
-          valid: false,
-          error: `Operador ${condition.operator} requer um valor`,
-        };
+      const requiresValue: FilterOperator[] = ['eq', 'ne', 'gt', 'lt', 'gte', 'lte', 'contains', 'startsWith', 'endsWith', 'in', 'notIn'];
+      if (requiresValue.includes(condition.operator) && condition.value === undefined) {
+        return { valid: false, error: `Operador ${condition.operator} requer um valor` };
       }
     }
   }

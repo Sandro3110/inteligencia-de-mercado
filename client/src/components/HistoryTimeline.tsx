@@ -6,7 +6,7 @@ interface HistoryEntry {
   field: string | null;
   oldValue: string | null;
   newValue: string | null;
-  changeType: "created" | "updated" | "enriched" | "validated";
+  changeType: 'created' | 'updated' | 'enriched' | 'validated';
   changedBy: string | null;
   changedAt: Date | string;
 }
@@ -18,76 +18,72 @@ interface HistoryTimelineProps {
 const changeTypeConfig = {
   created: {
     icon: Plus,
-    label: "Criado",
-    color: "text-green-600 dark:text-green-400",
-    bgColor: "bg-green-100 dark:bg-green-900/30",
+    label: 'Criado',
+    color: 'text-green-600 dark:text-green-400',
+    bgColor: 'bg-green-100 dark:bg-green-900/30',
   },
   updated: {
     icon: Edit,
-    label: "Atualizado",
-    color: "text-blue-600 dark:text-blue-400",
-    bgColor: "bg-blue-100 dark:bg-blue-900/30",
+    label: 'Atualizado',
+    color: 'text-blue-600 dark:text-blue-400',
+    bgColor: 'bg-blue-100 dark:bg-blue-900/30',
   },
   enriched: {
     icon: Sparkles,
-    label: "Enriquecido",
-    color: "text-purple-600 dark:text-purple-400",
-    bgColor: "bg-purple-100 dark:bg-purple-900/30",
+    label: 'Enriquecido',
+    color: 'text-purple-600 dark:text-purple-400',
+    bgColor: 'bg-purple-100 dark:bg-purple-900/30',
   },
   validated: {
     icon: CheckCircle,
-    label: "Validado",
-    color: "text-amber-600 dark:text-amber-400",
-    bgColor: "bg-amber-100 dark:bg-amber-900/30",
+    label: 'Validado',
+    color: 'text-amber-600 dark:text-amber-400',
+    bgColor: 'bg-amber-100 dark:bg-amber-900/30',
   },
 };
 
 const fieldLabels: Record<string, string> = {
-  nome: "Nome",
-  cnpj: "CNPJ",
-  email: "Email",
-  telefone: "Telefone",
-  site: "Site",
-  siteOficial: "Site Oficial",
-  cidade: "Cidade",
-  uf: "UF",
-  produto: "Produto",
-  produtoPrincipal: "Produto Principal",
-  categoria: "Categoria",
-  segmentacao: "Segmentação",
-  tamanhoMercado: "Tamanho do Mercado",
-  crescimentoAnual: "Crescimento Anual",
-  tendencias: "Tendências",
-  principaisPlayers: "Principais Players",
-  porte: "Porte",
-  faturamentoEstimado: "Faturamento Estimado",
-  tipo: "Tipo",
-  regiao: "Região",
-  setor: "Setor",
-  linkedin: "LinkedIn",
-  instagram: "Instagram",
-  cnae: "CNAE",
-  _created: "Registro Criado",
+  nome: 'Nome',
+  cnpj: 'CNPJ',
+  email: 'Email',
+  telefone: 'Telefone',
+  site: 'Site',
+  siteOficial: 'Site Oficial',
+  cidade: 'Cidade',
+  uf: 'UF',
+  produto: 'Produto',
+  produtoPrincipal: 'Produto Principal',
+  categoria: 'Categoria',
+  segmentacao: 'Segmentação',
+  tamanhoMercado: 'Tamanho do Mercado',
+  crescimentoAnual: 'Crescimento Anual',
+  tendencias: 'Tendências',
+  principaisPlayers: 'Principais Players',
+  porte: 'Porte',
+  faturamentoEstimado: 'Faturamento Estimado',
+  tipo: 'Tipo',
+  regiao: 'Região',
+  setor: 'Setor',
+  linkedin: 'LinkedIn',
+  instagram: 'Instagram',
+  cnae: 'CNAE',
+  _created: 'Registro Criado',
 };
 
 function formatDate(date: Date | string): string {
-  const d = typeof date === "string" ? new Date(date) : date;
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   }).format(d);
 }
 
 function formatValue(value: string | null): string {
-  if (value === null || value === "null") {
-    return "(vazio)";
-  }
-  if (value.length > 100) {
-    return value.substring(0, 100) + "...";
-  }
+  if (value === null || value === 'null') return '(vazio)';
+  if (value.length > 100) return value.substring(0, 100) + '...';
   return value;
 }
 
@@ -106,7 +102,7 @@ export default function HistoryTimeline({ history }: HistoryTimelineProps) {
       {history.map((entry, index) => {
         const config = changeTypeConfig[entry.changeType];
         const Icon = config.icon;
-        const fieldLabel = fieldLabels[entry.field || ""] || entry.field;
+        const fieldLabel = fieldLabels[entry.field || ''] || entry.field;
 
         return (
           <div key={entry.id} className="relative pl-8">
@@ -116,9 +112,7 @@ export default function HistoryTimeline({ history }: HistoryTimelineProps) {
             )}
 
             {/* Ícone */}
-            <div
-              className={`absolute left-0 top-1 w-6 h-6 rounded-full flex items-center justify-center ${config.bgColor}`}
-            >
+            <div className={`absolute left-0 top-1 w-6 h-6 rounded-full flex items-center justify-center ${config.bgColor}`}>
               <Icon className={`w-4 h-4 ${config.color}`} />
             </div>
 
@@ -129,7 +123,7 @@ export default function HistoryTimeline({ history }: HistoryTimelineProps) {
                   <span className={`font-medium ${config.color}`}>
                     {config.label}
                   </span>
-                  {entry.field && entry.field !== "_created" && (
+                  {entry.field && entry.field !== '_created' && (
                     <span className="text-sm text-muted-foreground ml-2">
                       • {fieldLabel}
                     </span>
@@ -140,24 +134,20 @@ export default function HistoryTimeline({ history }: HistoryTimelineProps) {
                 </div>
               </div>
 
-              {entry.field === "_created" ? (
+              {entry.field === '_created' ? (
                 <div className="text-sm text-muted-foreground">
                   Registro criado no sistema
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="text-xs text-muted-foreground mb-1">
-                      Anterior
-                    </div>
+                    <div className="text-xs text-muted-foreground mb-1">Anterior</div>
                     <div className="font-mono text-xs bg-muted/50 p-2 rounded">
                       {formatValue(entry.oldValue)}
                     </div>
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground mb-1">
-                      Novo
-                    </div>
+                    <div className="text-xs text-muted-foreground mb-1">Novo</div>
                     <div className="font-mono text-xs bg-muted/50 p-2 rounded">
                       {formatValue(entry.newValue)}
                     </div>
@@ -165,7 +155,7 @@ export default function HistoryTimeline({ history }: HistoryTimelineProps) {
                 </div>
               )}
 
-              {entry.changedBy && entry.changedBy !== "system" && (
+              {entry.changedBy && entry.changedBy !== 'system' && (
                 <div className="text-xs text-muted-foreground mt-2">
                   Por: {entry.changedBy}
                 </div>

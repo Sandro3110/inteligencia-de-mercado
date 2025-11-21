@@ -6,8 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Briefcase, CheckCircle2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Briefcase, Loader2 } from 'lucide-react';
 
 export function ProjectSelector() {
   const { selectedProjectId, selectedProject, projects, selectProject, isLoading } =
@@ -16,8 +15,8 @@ export function ProjectSelector() {
   if (isLoading) {
     return (
       <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
-        <Briefcase className="h-4 w-4" />
-        <span>Carregando...</span>
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <span>Carregando projetos...</span>
       </div>
     );
   }
@@ -42,29 +41,17 @@ export function ProjectSelector() {
           <SelectValue placeholder="Selecione um projeto" />
         </SelectTrigger>
         <SelectContent>
-          {projects.map((project) => {
-            const isSelected = project.id === selectedProjectId;
-            return (
-              <SelectItem 
-                key={project.id} 
-                value={project.id.toString()}
-                className={cn(
-                  isSelected && "bg-blue-50 font-semibold"
-                )}
-              >
-                <div className="flex items-center gap-2 w-full">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: project.cor || '#3b82f6' }}
-                  />
-                  <span className="flex-1">{project.nome}</span>
-                  {isSelected && (
-                    <CheckCircle2 className="w-4 h-4 text-blue-600 ml-2" />
-                  )}
-                </div>
-              </SelectItem>
-            );
-          })}
+          {projects.map((project) => (
+            <SelectItem key={project.id} value={project.id.toString()}>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: project.cor || '#3b82f6' }}
+                />
+                <span>{project.nome}</span>
+              </div>
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>

@@ -1,23 +1,18 @@
-import { useState, useEffect } from "react";
-import { trpc } from "@/lib/trpc";
+import { useState, useEffect } from 'react';
+import { trpc } from '@/lib/trpc';
 
-const STORAGE_KEY = "selected-project-id";
+const STORAGE_KEY = 'selected-project-id';
 
 export function useSelectedProject() {
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
-    null
-  );
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Buscar lista de projetos
-  const { data: projects = [], isLoading: isLoadingProjects } =
-    trpc.projects.list.useQuery();
+  const { data: projects = [], isLoading: isLoadingProjects } = trpc.projects.list.useQuery();
 
   // Inicializar projeto selecionado
   useEffect(() => {
-    if (isLoadingProjects) {
-      return;
-    }
+    if (isLoadingProjects) return;
 
     // Tentar carregar do localStorage
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -40,24 +35,10 @@ export function useSelectedProject() {
     setIsLoading(false);
   }, [projects, isLoadingProjects]);
 
-  const utils = trpc.useUtils();
-
   // Função para trocar de projeto
   const selectProject = (projectId: number) => {
     setSelectedProjectId(projectId);
     localStorage.setItem(STORAGE_KEY, projectId.toString());
-
-    // Invalidar cache de todas as queries relacionadas ao projeto
-    utils.mercados.list.invalidate();
-    utils.clientes.list.invalidate();
-    utils.clientes.byMercado.invalidate();
-    utils.concorrentes.list.invalidate();
-    utils.concorrentes.byMercado.invalidate();
-    utils.leads.list.invalidate();
-    utils.leads.byMercado.invalidate();
-    utils.produtos.byProject.invalidate();
-    utils.dashboard.stats.invalidate();
-    utils.pesquisas.list.invalidate();
   };
 
   const selectedProject = projects.find(p => p.id === selectedProjectId);

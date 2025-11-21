@@ -1,6 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { AnimatePresence, motion } from "framer-motion";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +24,7 @@ import { useIsMobile } from "@/hooks/useMobile";
 import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
+import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
@@ -54,7 +53,7 @@ export default function DashboardLayout({
   }, [sidebarWidth]);
 
   if (loading) {
-    return <DashboardLayoutSkeleton />;
+    return <DashboardLayoutSkeleton />
   }
 
   if (!user) {
@@ -124,8 +123,6 @@ function DashboardLayoutContent({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
-  const [peekLabel, setPeekLabel] = useState<string | null>(null);
-  const [peekTimeout, setPeekTimeout] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (isCollapsed) {
@@ -135,9 +132,7 @@ function DashboardLayoutContent({
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing) {
-        return;
-      }
+      if (!isResizing) return;
 
       const sidebarLeft = sidebarRef.current?.getBoundingClientRect().left ?? 0;
       const newWidth = e.clientX - sidebarLeft;
@@ -217,60 +212,18 @@ function DashboardLayoutContent({
               {menuItems.map(item => {
                 const isActive = location === item.path;
                 return (
-                  <SidebarMenuItem key={item.path} className="relative">
+                  <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton
                       isActive={isActive}
-                      onClick={() => {
-                        if (isCollapsed) {
-                          // Mostrar peek animation
-                          setPeekLabel(item.label);
-
-                          // Limpar timeout anterior se existir
-                          if (peekTimeout) {
-                            clearTimeout(peekTimeout);
-                          }
-
-                          // Navegar após 1.2 segundos
-                          const timeout = setTimeout(() => {
-                            setLocation(item.path);
-                            setPeekLabel(null);
-                          }, 1200);
-
-                          setPeekTimeout(timeout);
-                        } else {
-                          // Navegação imediata quando sidebar expandida
-                          setLocation(item.path);
-                        }
-                      }}
+                      onClick={() => setLocation(item.path)}
                       tooltip={item.label}
-                      className={`h-10 transition-all font-normal relative`}
+                      className={`h-10 transition-all font-normal`}
                     >
-                      {/* Dot colorido quando sidebar está recolhida e item está ativo */}
-                      {isCollapsed && isActive && (
-                        <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                      )}
                       <item.icon
                         className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
                       />
                       <span>{item.label}</span>
                     </SidebarMenuButton>
-
-                    {/* Peek animation - tooltip expandido */}
-                    <AnimatePresence>
-                      {isCollapsed && peekLabel === item.label && (
-                        <motion.div
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -10 }}
-                          transition={{ duration: 0.2 }}
-                          className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-50 pointer-events-none"
-                        >
-                          <div className="bg-popover text-popover-foreground px-3 py-2 rounded-md shadow-lg border whitespace-nowrap">
-                            {item.label}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
                   </SidebarMenuItem>
                 );
               })}
@@ -311,9 +264,7 @@ function DashboardLayoutContent({
         <div
           className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/20 transition-colors ${isCollapsed ? "hidden" : ""}`}
           onMouseDown={() => {
-            if (isCollapsed) {
-              return;
-            }
+            if (isCollapsed) return;
             setIsResizing(true);
           }}
           style={{ zIndex: 50 }}

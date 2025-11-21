@@ -1,0 +1,119 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications alt+T"
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - link "Inteligência de Mercado" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]:
+          - img [ref=e7]
+          - generic [ref=e9]:
+            - generic [ref=e10]: Inteligência
+            - generic [ref=e11]: de Mercado
+      - button [ref=e12] [cursor=pointer]:
+        - img
+    - generic [ref=e13]:
+      - generic [ref=e14]: ESTATÍSTICAS
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]: Mercados
+          - generic [ref=e18]: "667"
+        - generic [ref=e19]:
+          - generic [ref=e20]: Clientes
+          - generic [ref=e21]: "806"
+        - generic [ref=e22]:
+          - generic [ref=e23]: Concorrentes
+          - generic [ref=e24]: "4974"
+        - generic [ref=e25]:
+          - generic [ref=e26]: Leads
+          - generic [ref=e27]: "3607"
+    - navigation [ref=e28]:
+      - generic [ref=e29]:
+        - button "Início" [ref=e30] [cursor=pointer]:
+          - generic [ref=e31]:
+            - img [ref=e32]
+            - generic [ref=e35]: Início
+          - img [ref=e36]
+        - link "Visão Geral ⌘1" [ref=e39] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e40]:
+            - generic [ref=e41]:
+              - img [ref=e42]
+              - generic [ref=e45]: Visão Geral
+            - generic [ref=e46]: ⌘1
+      - generic [ref=e47]:
+        - button "Inteligência" [ref=e48] [cursor=pointer]:
+          - generic [ref=e49]:
+            - img [ref=e50]
+            - generic [ref=e52]: Inteligência
+          - img [ref=e53]
+        - generic [ref=e55]:
+          - link "Mercados ⌘2" [ref=e56] [cursor=pointer]:
+            - /url: /mercados
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - img [ref=e59]
+                - generic [ref=e63]: Mercados
+              - generic [ref=e64]: ⌘2
+          - link "Research Overview" [ref=e65] [cursor=pointer]:
+            - /url: /research-overview
+            - generic [ref=e67]:
+              - img [ref=e68]
+              - generic [ref=e71]: Research Overview
+          - link "Analytics ⌘3" [ref=e72] [cursor=pointer]:
+            - /url: /analytics
+            - generic [ref=e73]:
+              - generic [ref=e74]:
+                - img [ref=e75]
+                - generic [ref=e77]: Analytics
+              - generic [ref=e78]: ⌘3
+          - link "Relatórios" [ref=e79] [cursor=pointer]:
+            - /url: /relatorios
+            - generic [ref=e81]:
+              - img [ref=e82]
+              - generic [ref=e85]: Relatórios
+          - link "Exportação Inteligente ⌘E" [ref=e86] [cursor=pointer]:
+            - /url: /export
+            - generic [ref=e87]:
+              - generic [ref=e88]:
+                - img [ref=e89]
+                - generic [ref=e92]: Exportação Inteligente
+              - generic [ref=e93]: ⌘E
+          - link "Templates de Exportação" [ref=e94] [cursor=pointer]:
+            - /url: /export/templates
+            - generic [ref=e96]:
+              - img [ref=e97]
+              - generic [ref=e100]: Templates de Exportação
+      - button "Enriquecimento" [ref=e102] [cursor=pointer]:
+        - generic [ref=e103]:
+          - img [ref=e104]
+          - generic [ref=e106]: Enriquecimento
+        - img [ref=e107]
+      - button "Performance" [ref=e110] [cursor=pointer]:
+        - generic [ref=e111]:
+          - img [ref=e112]
+          - generic [ref=e115]: Performance
+        - img [ref=e116]
+      - button "Configurações" [ref=e119] [cursor=pointer]:
+        - generic [ref=e120]:
+          - img [ref=e121]
+          - generic [ref=e124]: Configurações
+        - img [ref=e125]
+      - button "Sistema" [ref=e128] [cursor=pointer]:
+        - generic [ref=e129]:
+          - img [ref=e130]
+          - generic [ref=e135]: Sistema
+        - img [ref=e136]
+  - generic [ref=e140]:
+    - img [ref=e144]
+    - heading "404" [level=1] [ref=e146]
+    - heading "Page Not Found" [level=2] [ref=e147]
+    - paragraph [ref=e148]:
+      - text: Sorry, the page you are looking for doesn't exist.
+      - text: It may have been moved or deleted.
+    - button "Go Home" [ref=e150] [cursor=pointer]:
+      - img
+      - text: Go Home
+```

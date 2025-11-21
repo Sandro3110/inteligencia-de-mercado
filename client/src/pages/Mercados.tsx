@@ -8,6 +8,7 @@ import { Link } from "wouter";
 import { Search, Building2, ArrowLeft, TrendingUp, Users, Download, Filter, X } from "lucide-react";
 import { toast } from "sonner";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { ProjectSelector } from "@/components/ProjectSelector";
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSidebarState } from "@/hooks/useSidebarState";
 export default function Mercados() {
@@ -88,6 +89,7 @@ export default function Mercados() {
               </h1>
             </div>
             </div>
+            <ProjectSelector />
           </div>
           <Breadcrumbs items={[{ label: "Mercados" }]} />
 

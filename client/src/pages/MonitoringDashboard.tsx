@@ -1,43 +1,27 @@
 import { useState, useEffect } from "react";
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ProjectSelector } from "@/components/ProjectSelector";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import {
-  Activity,
-  Zap,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  TrendingUp,
+import { 
+  Activity, 
+  Zap, 
+  CheckCircle2, 
+  XCircle, 
+  Clock, 
+  TrendingUp, 
   AlertTriangle,
   Loader2,
   PlayCircle,
   PauseCircle,
-  RefreshCw,
+  RefreshCw
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
 
 interface BatchMetrics {
   totalProcessed: number;
@@ -61,20 +45,22 @@ export default function MonitoringDashboard() {
   const [metricsHistory, setMetricsHistory] = useState<any[]>([]);
 
   // Buscar progresso do enriquecimento
-  const { data: progress, refetch: refetchProgress } =
-    trpc.enrichment.progress.useQuery(
-      { projectId: selectedProjectId! },
-      {
-        enabled: !!selectedProjectId && isPolling,
-        refetchInterval: isPolling ? 3000 : false, // Poll a cada 3 segundos
-      }
-    );
+  const { data: progress, refetch: refetchProgress } = trpc.enrichment.progress.useQuery(
+    { projectId: selectedProjectId! },
+    { 
+      enabled: !!selectedProjectId && isPolling,
+      refetchInterval: isPolling ? 3000 : false, // Poll a cada 3 segundos
+    }
+  );
 
   // Buscar status do job
-  const { data: jobStatus } = trpc.batchProcessor.status.useQuery(undefined, {
-    enabled: !!selectedProjectId && isPolling,
-    refetchInterval: isPolling ? 3000 : false,
-  });
+  const { data: jobStatus } = trpc.batchProcessor.status.useQuery(
+    undefined,
+    { 
+      enabled: !!selectedProjectId && isPolling,
+      refetchInterval: isPolling ? 3000 : false,
+    }
+  );
 
   // Mutations para controle
   const pauseMutation = trpc.batchProcessor.pause.useMutation();
@@ -105,8 +91,7 @@ export default function MonitoringDashboard() {
         errorCount: 0, // Você pode adicionar campo de erros no backend
         avgProcessingTime: 35, // Média em segundos
         currentBatchSize: 5,
-        estimatedTimeRemaining:
-          ((progress.total || 0) - (progress.processed || 0)) * 35,
+        estimatedTimeRemaining: ((progress.total || 0) - (progress.processed || 0)) * 35,
       };
       setMetrics(newMetrics);
 
@@ -122,10 +107,8 @@ export default function MonitoringDashboard() {
       ]);
 
       // Simular circuit breaker (você pode implementar lógica real)
-      const errorRate =
-        newMetrics.errorCount / (newMetrics.totalProcessed || 1);
-      if (errorRate > 0.1) {
-        // 10% de erro
+      const errorRate = newMetrics.errorCount / (newMetrics.totalProcessed || 1);
+      if (errorRate > 0.1) { // 10% de erro
         setCircuitBreaker(prev => ({
           ...prev,
           failureCount: prev.failureCount + 1,
@@ -137,9 +120,7 @@ export default function MonitoringDashboard() {
   }, [progress]);
 
   const handlePause = async () => {
-    if (!selectedProjectId) {
-      return;
-    }
+    if (!selectedProjectId) return;
     try {
       await pauseMutation.mutateAsync();
       toast.success("Enriquecimento pausado");
@@ -150,11 +131,9 @@ export default function MonitoringDashboard() {
   };
 
   const handleResume = async () => {
-    if (!selectedProjectId) {
-      return;
-    }
+    if (!selectedProjectId) return;
     try {
-      await resumeMutation.mutateAsync({
+      await resumeMutation.mutateAsync({ 
         pesquisaId: selectedProjectId,
         batchSize: 5,
       });
@@ -167,23 +146,17 @@ export default function MonitoringDashboard() {
 
   const getCircuitBreakerColor = () => {
     switch (circuitBreaker.state) {
-      case "closed":
-        return "text-green-600";
-      case "open":
-        return "text-red-600";
-      case "half-open":
-        return "text-yellow-600";
+      case "closed": return "text-green-600";
+      case "open": return "text-red-600";
+      case "half-open": return "text-yellow-600";
     }
   };
 
   const getCircuitBreakerIcon = () => {
     switch (circuitBreaker.state) {
-      case "closed":
-        return <CheckCircle2 className="w-5 h-5" />;
-      case "open":
-        return <XCircle className="w-5 h-5" />;
-      case "half-open":
-        return <AlertTriangle className="w-5 h-5" />;
+      case "closed": return <CheckCircle2 className="w-5 h-5" />;
+      case "open": return <XCircle className="w-5 h-5" />;
+      case "half-open": return <AlertTriangle className="w-5 h-5" />;
     }
   };
 
@@ -193,12 +166,11 @@ export default function MonitoringDashboard() {
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <DynamicBreadcrumbs />
+            <ProjectSelector />
           </div>
           <Card>
             <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">
-                Selecione um projeto para monitorar
-              </p>
+              <p className="text-muted-foreground">Selecione um projeto para monitorar</p>
             </CardContent>
           </Card>
         </div>
@@ -206,9 +178,8 @@ export default function MonitoringDashboard() {
     );
   }
 
-  const progressPercentage = progress
-    ? Math.round(((progress.processed || 0) / (progress.total || 1)) * 100)
-    : 0;
+  const progressPercentage = progress ? 
+    Math.round(((progress.processed || 0) / (progress.total || 1)) * 100) : 0;
 
   return (
     <div className="min-h-screen ml-60 bg-background p-6">
@@ -243,6 +214,7 @@ export default function MonitoringDashboard() {
                 </>
               )}
             </Button>
+            <ProjectSelector />
           </div>
         </div>
 
@@ -259,23 +231,17 @@ export default function MonitoringDashboard() {
                 {jobStatus?.status === "running" ? (
                   <>
                     <Loader2 className="w-5 h-5 text-green-600 animate-spin" />
-                    <span className="text-2xl font-bold text-green-600">
-                      Ativo
-                    </span>
+                    <span className="text-2xl font-bold text-green-600">Ativo</span>
                   </>
                 ) : jobStatus?.status === "paused" ? (
                   <>
                     <PauseCircle className="w-5 h-5 text-yellow-600" />
-                    <span className="text-2xl font-bold text-yellow-600">
-                      Pausado
-                    </span>
+                    <span className="text-2xl font-bold text-yellow-600">Pausado</span>
                   </>
                 ) : (
                   <>
                     <Clock className="w-5 h-5 text-slate-600" />
-                    <span className="text-2xl font-bold text-slate-600">
-                      Aguardando
-                    </span>
+                    <span className="text-2xl font-bold text-slate-600">Aguardando</span>
                   </>
                 )}
               </div>
@@ -291,9 +257,7 @@ export default function MonitoringDashboard() {
             <CardContent>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-foreground">
-                    {progressPercentage}%
-                  </span>
+                  <span className="text-2xl font-bold text-foreground">{progressPercentage}%</span>
                   <span className="text-sm text-muted-foreground">
                     {progress?.processed || 0}/{progress?.total || 0}
                   </span>
@@ -313,12 +277,9 @@ export default function MonitoringDashboard() {
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-green-600" />
                 <span className="text-2xl font-bold text-foreground">
-                  {metrics.totalProcessed > 0
-                    ? Math.round(
-                        (metrics.successCount / metrics.totalProcessed) * 100
-                      )
-                    : 0}
-                  %
+                  {metrics.totalProcessed > 0 
+                    ? Math.round((metrics.successCount / metrics.totalProcessed) * 100)
+                    : 0}%
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
@@ -334,13 +295,9 @@ export default function MonitoringDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div
-                className={`flex items-center gap-2 ${getCircuitBreakerColor()}`}
-              >
+              <div className={`flex items-center gap-2 ${getCircuitBreakerColor()}`}>
                 {getCircuitBreakerIcon()}
-                <span className="text-2xl font-bold capitalize">
-                  {circuitBreaker.state}
-                </span>
+                <span className="text-2xl font-bold capitalize">{circuitBreaker.state}</span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 {circuitBreaker.failureCount}/{circuitBreaker.threshold} falhas
@@ -365,18 +322,8 @@ export default function MonitoringDashboard() {
                   <YAxis />
                   <RechartsTooltip />
                   <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="processed"
-                    stroke="#3b82f6"
-                    name="Processados"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="errors"
-                    stroke="#ef4444"
-                    name="Erros"
-                  />
+                  <Line type="monotone" dataKey="processed" stroke="#3b82f6" name="Processados" />
+                  <Line type="monotone" dataKey="errors" stroke="#ef4444" name="Erros" />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
@@ -392,33 +339,23 @@ export default function MonitoringDashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    Tempo Médio
-                  </span>
+                  <span className="text-sm text-muted-foreground">Tempo Médio</span>
                 </div>
-                <span className="text-lg font-semibold">
-                  {metrics.avgProcessingTime}s
-                </span>
+                <span className="text-lg font-semibold">{metrics.avgProcessingTime}s</span>
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Zap className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    Batch Size
-                  </span>
+                  <span className="text-sm text-muted-foreground">Batch Size</span>
                 </div>
-                <span className="text-lg font-semibold">
-                  {metrics.currentBatchSize} paralelos
-                </span>
+                <span className="text-lg font-semibold">{metrics.currentBatchSize} paralelos</span>
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    Tempo Restante
-                  </span>
+                  <span className="text-sm text-muted-foreground">Tempo Restante</span>
                 </div>
                 <span className="text-lg font-semibold">
                   {Math.round(metrics.estimatedTimeRemaining / 60)}min
@@ -428,18 +365,12 @@ export default function MonitoringDashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <XCircle className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    Taxa de Erro
-                  </span>
+                  <span className="text-sm text-muted-foreground">Taxa de Erro</span>
                 </div>
                 <span className="text-lg font-semibold">
-                  {metrics.totalProcessed > 0
-                    ? (
-                        (metrics.errorCount / metrics.totalProcessed) *
-                        100
-                      ).toFixed(1)
-                    : 0}
-                  %
+                  {metrics.totalProcessed > 0 
+                    ? ((metrics.errorCount / metrics.totalProcessed) * 100).toFixed(1)
+                    : 0}%
                 </span>
               </div>
             </CardContent>
@@ -450,17 +381,13 @@ export default function MonitoringDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Controles de Enriquecimento</CardTitle>
-            <CardDescription>
-              Pausar, retomar ou reiniciar o processo
-            </CardDescription>
+            <CardDescription>Pausar, retomar ou reiniciar o processo</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
               <Button
                 onClick={handlePause}
-                disabled={
-                  pauseMutation.isPending || jobStatus?.status !== "running"
-                }
+                disabled={pauseMutation.isPending || jobStatus?.status !== "running"}
                 variant="outline"
               >
                 {pauseMutation.isPending ? (
@@ -478,9 +405,7 @@ export default function MonitoringDashboard() {
 
               <Button
                 onClick={handleResume}
-                disabled={
-                  resumeMutation.isPending || jobStatus?.status === "running"
-                }
+                disabled={resumeMutation.isPending || jobStatus?.status === "running"}
                 variant="default"
               >
                 {resumeMutation.isPending ? (
@@ -496,7 +421,10 @@ export default function MonitoringDashboard() {
                 )}
               </Button>
 
-              <Button onClick={() => refetchProgress()} variant="ghost">
+              <Button
+                onClick={() => refetchProgress()}
+                variant="ghost"
+              >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Atualizar
               </Button>
@@ -515,9 +443,8 @@ export default function MonitoringDashboard() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                O circuit breaker foi ativado devido a{" "}
-                {circuitBreaker.failureCount} falhas consecutivas. O sistema
-                está temporariamente pausado para evitar sobrecarga.
+                O circuit breaker foi ativado devido a {circuitBreaker.failureCount} falhas consecutivas.
+                O sistema está temporariamente pausado para evitar sobrecarga.
               </p>
               <Button variant="destructive" size="sm" className="mt-4">
                 Resetar Circuit Breaker

@@ -22,13 +22,7 @@ import {
 import { Download, X, Filter, Calendar, Sliders } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 
@@ -53,8 +47,8 @@ export function CompararMercadosModal({
   const [mostrarFiltros, setMostrarFiltros] = useState<boolean>(false);
 
   // Buscar dados de cada mercado
-  const mercadosData = mercadoIds.map(id => {
-    const mercado = mercados.find(m => m.id === id);
+  const mercadosData = mercadoIds.map((id) => {
+    const mercado = mercados.find((m) => m.id === id);
     const { data: clientesData } = trpc.clientes.byMercado.useQuery(
       { mercadoId: id },
       { enabled: isOpen && !!id }
@@ -79,26 +73,18 @@ export function CompararMercadosModal({
     const aplicarFiltros = (entidades: any[]) => {
       return entidades.filter((e: any) => {
         // Filtro de período
-        if (e.createdAt && new Date(e.createdAt) < dataLimite) {
-          return false;
-        }
+        if (e.createdAt && new Date(e.createdAt) < dataLimite) return false;
 
         // Filtro de qualidade mínima
-        if ((e.qualidadeScore || 0) < qualidadeMinima) {
-          return false;
-        }
+        if ((e.qualidadeScore || 0) < qualidadeMinima) return false;
 
         // Filtro de status
-        if (statusFiltro !== "todos" && e.validationStatus !== statusFiltro) {
-          return false;
-        }
+        if (statusFiltro !== "todos" && e.validationStatus !== statusFiltro) return false;
 
         // Filtro de dados completos
         if (apenasCompletos) {
-          const camposObrigatorios = ["nome", "cnpj"];
-          if (!camposObrigatorios.every(campo => e[campo])) {
-            return false;
-          }
+          const camposObrigatorios = ['nome', 'cnpj'];
+          if (!camposObrigatorios.every(campo => e[campo])) return false;
         }
 
         return true;
@@ -111,9 +97,7 @@ export function CompararMercadosModal({
 
     // Calcular qualidade média
     const calcularQualidadeMedia = (entidades: any[]) => {
-      if (entidades.length === 0) {
-        return 0;
-      }
+      if (entidades.length === 0) return 0;
       const total = entidades.reduce((sum, e) => {
         const score = e.qualidadeScore || 0;
         return sum + score;
@@ -125,10 +109,7 @@ export function CompararMercadosModal({
     const qualidadeMediaConcorrentes = calcularQualidadeMedia(concorrentes);
     const qualidadeMediaLeads = calcularQualidadeMedia(leads);
     const qualidadeMediaGeral = Math.round(
-      (qualidadeMediaClientes +
-        qualidadeMediaConcorrentes +
-        qualidadeMediaLeads) /
-        3
+      (qualidadeMediaClientes + qualidadeMediaConcorrentes + qualidadeMediaLeads) / 3
     );
 
     return {
@@ -187,9 +168,7 @@ export function CompararMercadosModal({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
-              <DialogTitle className="text-2xl">
-                Comparação de Mercados
-              </DialogTitle>
+              <DialogTitle className="text-2xl">Comparação de Mercados</DialogTitle>
               <DialogDescription>
                 Comparando {mercadoIds.length} mercados selecionados
               </DialogDescription>
@@ -202,14 +181,8 @@ export function CompararMercadosModal({
               >
                 <Filter className="w-4 h-4 mr-2" />
                 Filtros
-                {(periodoDias !== 30 ||
-                  qualidadeMinima > 0 ||
-                  statusFiltro !== "todos" ||
-                  apenasCompletos) && (
-                  <Badge
-                    variant="destructive"
-                    className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
-                  >
+                {(periodoDias !== 30 || qualidadeMinima > 0 || statusFiltro !== "todos" || apenasCompletos) && (
+                  <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
                     !
                   </Badge>
                 )}
@@ -234,7 +207,7 @@ export function CompararMercadosModal({
                 </Label>
                 <Select
                   value={periodoDias.toString()}
-                  onValueChange={v => setPeriodoDias(parseInt(v))}
+                  onValueChange={(v) => setPeriodoDias(parseInt(v))}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -256,7 +229,7 @@ export function CompararMercadosModal({
                 </Label>
                 <Slider
                   value={[qualidadeMinima]}
-                  onValueChange={v => setQualidadeMinima(v[0])}
+                  onValueChange={(v) => setQualidadeMinima(v[0])}
                   max={100}
                   step={5}
                   className="mt-2"
@@ -287,10 +260,7 @@ export function CompararMercadosModal({
                     checked={apenasCompletos}
                     onCheckedChange={setApenasCompletos}
                   />
-                  <Label
-                    className="text-sm cursor-pointer"
-                    onClick={() => setApenasCompletos(!apenasCompletos)}
-                  >
+                  <Label className="text-sm cursor-pointer" onClick={() => setApenasCompletos(!apenasCompletos)}>
                     Apenas completos
                   </Label>
                 </div>
@@ -339,9 +309,7 @@ export function CompararMercadosModal({
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Segmentação:</span>
-                    <span className="font-medium">
-                      {data.mercado?.segmentacao}
-                    </span>
+                    <span className="font-medium">{data.mercado?.segmentacao}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Clientes:</span>
@@ -349,22 +317,15 @@ export function CompararMercadosModal({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Concorrentes:</span>
-                    <span className="font-medium">
-                      {data.concorrentes.length}
-                    </span>
+                    <span className="font-medium">{data.concorrentes.length}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Leads:</span>
                     <span className="font-medium">{data.leads.length}</span>
                   </div>
                   <div className="flex justify-between pt-2 border-t">
-                    <span className="text-muted-foreground">
-                      Qualidade Média:
-                    </span>
-                    <span
-                      className="font-semibold"
-                      style={{ color: colors[idx] }}
-                    >
+                    <span className="text-muted-foreground">Qualidade Média:</span>
+                    <span className="font-semibold" style={{ color: colors[idx] }}>
                       {data.qualidadeMediaGeral}%
                     </span>
                   </div>
@@ -415,40 +376,25 @@ export function CompararMercadosModal({
                 </thead>
                 <tbody>
                   <tr className="border-b">
-                    <td className="py-2 px-3 text-muted-foreground">
-                      Total de Clientes
-                    </td>
+                    <td className="py-2 px-3 text-muted-foreground">Total de Clientes</td>
                     {mercadosData.map((data, idx) => (
-                      <td
-                        key={idx}
-                        className="text-center py-2 px-3 font-medium"
-                      >
+                      <td key={idx} className="text-center py-2 px-3 font-medium">
                         {data.clientes.length}
                       </td>
                     ))}
                   </tr>
                   <tr className="border-b">
-                    <td className="py-2 px-3 text-muted-foreground">
-                      Total de Concorrentes
-                    </td>
+                    <td className="py-2 px-3 text-muted-foreground">Total de Concorrentes</td>
                     {mercadosData.map((data, idx) => (
-                      <td
-                        key={idx}
-                        className="text-center py-2 px-3 font-medium"
-                      >
+                      <td key={idx} className="text-center py-2 px-3 font-medium">
                         {data.concorrentes.length}
                       </td>
                     ))}
                   </tr>
                   <tr className="border-b">
-                    <td className="py-2 px-3 text-muted-foreground">
-                      Total de Leads
-                    </td>
+                    <td className="py-2 px-3 text-muted-foreground">Total de Leads</td>
                     {mercadosData.map((data, idx) => (
-                      <td
-                        key={idx}
-                        className="text-center py-2 px-3 font-medium"
-                      >
+                      <td key={idx} className="text-center py-2 px-3 font-medium">
                         {data.leads.length}
                       </td>
                     ))}
@@ -458,14 +404,9 @@ export function CompararMercadosModal({
                       Leads por Cliente
                     </td>
                     {mercadosData.map((data, idx) => (
-                      <td
-                        key={idx}
-                        className="text-center py-2 px-3 font-medium"
-                      >
+                      <td key={idx} className="text-center py-2 px-3 font-medium">
                         {data.clientes.length > 0
-                          ? (data.leads.length / data.clientes.length).toFixed(
-                              1
-                            )
+                          ? (data.leads.length / data.clientes.length).toFixed(1)
                           : "0"}
                       </td>
                     ))}
@@ -475,22 +416,15 @@ export function CompararMercadosModal({
                       Concorrentes por Cliente
                     </td>
                     {mercadosData.map((data, idx) => (
-                      <td
-                        key={idx}
-                        className="text-center py-2 px-3 font-medium"
-                      >
+                      <td key={idx} className="text-center py-2 px-3 font-medium">
                         {data.clientes.length > 0
-                          ? (
-                              data.concorrentes.length / data.clientes.length
-                            ).toFixed(1)
+                          ? (data.concorrentes.length / data.clientes.length).toFixed(1)
                           : "0"}
                       </td>
                     ))}
                   </tr>
                   <tr className="border-b bg-muted/30">
-                    <td className="py-2 px-3 font-medium">
-                      Qualidade Média Clientes
-                    </td>
+                    <td className="py-2 px-3 font-medium">Qualidade Média Clientes</td>
                     {mercadosData.map((data, idx) => (
                       <td
                         key={idx}
@@ -502,9 +436,7 @@ export function CompararMercadosModal({
                     ))}
                   </tr>
                   <tr className="border-b bg-muted/30">
-                    <td className="py-2 px-3 font-medium">
-                      Qualidade Média Concorrentes
-                    </td>
+                    <td className="py-2 px-3 font-medium">Qualidade Média Concorrentes</td>
                     {mercadosData.map((data, idx) => (
                       <td
                         key={idx}
@@ -516,9 +448,7 @@ export function CompararMercadosModal({
                     ))}
                   </tr>
                   <tr className="border-b bg-muted/30">
-                    <td className="py-2 px-3 font-medium">
-                      Qualidade Média Leads
-                    </td>
+                    <td className="py-2 px-3 font-medium">Qualidade Média Leads</td>
                     {mercadosData.map((data, idx) => (
                       <td
                         key={idx}
@@ -530,9 +460,7 @@ export function CompararMercadosModal({
                     ))}
                   </tr>
                   <tr className="bg-muted/50">
-                    <td className="py-2 px-3 font-bold">
-                      Qualidade Média Geral
-                    </td>
+                    <td className="py-2 px-3 font-bold">Qualidade Média Geral</td>
                     {mercadosData.map((data, idx) => (
                       <td
                         key={idx}

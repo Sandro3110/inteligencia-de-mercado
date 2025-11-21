@@ -1,33 +1,15 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Plus, X, Search } from "lucide-react";
-import type {
-  AdvancedFilter,
-  FilterCondition,
-  FilterGroup,
-  LogicalOperator,
-  FilterOperator,
-} from "@shared/advancedFilters";
-import { FIELD_OPERATORS, OPERATOR_LABELS } from "@shared/advancedFilters";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Plus, X, Search } from 'lucide-react';
+import type { AdvancedFilter, FilterCondition, FilterGroup, LogicalOperator, FilterOperator } from '@shared/advancedFilters';
+import { FIELD_OPERATORS, OPERATOR_LABELS } from '@shared/advancedFilters';
 
 interface AdvancedFilterBuilderProps {
-  entityType: "mercados" | "clientes" | "concorrentes" | "leads";
+  entityType: 'mercados' | 'clientes' | 'concorrentes' | 'leads';
   onApply: (filter: AdvancedFilter) => void;
   onClear: () => void;
 }
@@ -35,51 +17,45 @@ interface AdvancedFilterBuilderProps {
 // Campos disponíveis por tipo de entidade
 const ENTITY_FIELDS: Record<string, Array<{ value: string; label: string }>> = {
   leads: [
-    { value: "nome", label: "Nome" },
-    { value: "tipo", label: "Tipo" },
-    { value: "porte", label: "Porte" },
-    { value: "regiao", label: "Região" },
-    { value: "setor", label: "Setor" },
-    { value: "qualidadeScore", label: "Score de Qualidade" },
-    { value: "stage", label: "Estágio" },
-    { value: "validationStatus", label: "Status de Validação" },
+    { value: 'nome', label: 'Nome' },
+    { value: 'tipo', label: 'Tipo' },
+    { value: 'porte', label: 'Porte' },
+    { value: 'regiao', label: 'Região' },
+    { value: 'setor', label: 'Setor' },
+    { value: 'qualidadeScore', label: 'Score de Qualidade' },
+    { value: 'stage', label: 'Estágio' },
+    { value: 'validationStatus', label: 'Status de Validação' },
   ],
   clientes: [
-    { value: "nome", label: "Nome" },
-    { value: "cnpj", label: "CNPJ" },
-    { value: "porte", label: "Porte" },
-    { value: "segmentacaoB2bB2c", label: "Segmentação" },
-    { value: "qualidadeScore", label: "Score de Qualidade" },
-    { value: "validationStatus", label: "Status de Validação" },
+    { value: 'nome', label: 'Nome' },
+    { value: 'cnpj', label: 'CNPJ' },
+    { value: 'porte', label: 'Porte' },
+    { value: 'segmentacaoB2bB2c', label: 'Segmentação' },
+    { value: 'qualidadeScore', label: 'Score de Qualidade' },
+    { value: 'validationStatus', label: 'Status de Validação' },
   ],
   concorrentes: [
-    { value: "nome", label: "Nome" },
-    { value: "cnpj", label: "CNPJ" },
-    { value: "porte", label: "Porte" },
-    { value: "produto", label: "Produto" },
-    { value: "validationStatus", label: "Status de Validação" },
+    { value: 'nome', label: 'Nome' },
+    { value: 'cnpj', label: 'CNPJ' },
+    { value: 'porte', label: 'Porte' },
+    { value: 'produto', label: 'Produto' },
+    { value: 'validationStatus', label: 'Status de Validação' },
   ],
   mercados: [
-    { value: "nome", label: "Nome" },
-    { value: "segmentacao", label: "Segmentação" },
-    { value: "categoria", label: "Categoria" },
-    { value: "quantidadeClientes", label: "Quantidade de Clientes" },
+    { value: 'nome', label: 'Nome' },
+    { value: 'segmentacao', label: 'Segmentação' },
+    { value: 'categoria', label: 'Categoria' },
+    { value: 'quantidadeClientes', label: 'Quantidade de Clientes' },
   ],
 };
 
-export function AdvancedFilterBuilder({
-  entityType,
-  onApply,
-  onClear,
-}: AdvancedFilterBuilderProps) {
+export function AdvancedFilterBuilder({ entityType, onApply, onClear }: AdvancedFilterBuilderProps) {
   const [filter, setFilter] = useState<AdvancedFilter>({
-    groups: [
-      {
-        conditions: [{ field: "", operator: "eq", value: "" }],
-        logicalOperator: "AND",
-      },
-    ],
-    globalOperator: "AND",
+    groups: [{
+      conditions: [{ field: '', operator: 'eq', value: '' }],
+      logicalOperator: 'AND',
+    }],
+    globalOperator: 'AND',
   });
 
   const fields = ENTITY_FIELDS[entityType] || [];
@@ -89,18 +65,13 @@ export function AdvancedFilterBuilder({
       ...filter,
       groups: [
         ...filter.groups,
-        {
-          conditions: [{ field: "", operator: "eq", value: "" }],
-          logicalOperator: "AND",
-        },
+        { conditions: [{ field: '', operator: 'eq', value: '' }], logicalOperator: 'AND' },
       ],
     });
   };
 
   const removeGroup = (groupIndex: number) => {
-    if (filter.groups.length === 1) {
-      return;
-    }
+    if (filter.groups.length === 1) return;
     setFilter({
       ...filter,
       groups: filter.groups.filter((_, i) => i !== groupIndex),
@@ -109,30 +80,18 @@ export function AdvancedFilterBuilder({
 
   const addCondition = (groupIndex: number) => {
     const newGroups = [...filter.groups];
-    newGroups[groupIndex].conditions.push({
-      field: "",
-      operator: "eq",
-      value: "",
-    });
+    newGroups[groupIndex].conditions.push({ field: '', operator: 'eq', value: '' });
     setFilter({ ...filter, groups: newGroups });
   };
 
   const removeCondition = (groupIndex: number, conditionIndex: number) => {
     const newGroups = [...filter.groups];
-    if (newGroups[groupIndex].conditions.length === 1) {
-      return;
-    }
-    newGroups[groupIndex].conditions = newGroups[groupIndex].conditions.filter(
-      (_, i) => i !== conditionIndex
-    );
+    if (newGroups[groupIndex].conditions.length === 1) return;
+    newGroups[groupIndex].conditions = newGroups[groupIndex].conditions.filter((_, i) => i !== conditionIndex);
     setFilter({ ...filter, groups: newGroups });
   };
 
-  const updateCondition = (
-    groupIndex: number,
-    conditionIndex: number,
-    updates: Partial<FilterCondition>
-  ) => {
+  const updateCondition = (groupIndex: number, conditionIndex: number, updates: Partial<FilterCondition>) => {
     const newGroups = [...filter.groups];
     newGroups[groupIndex].conditions[conditionIndex] = {
       ...newGroups[groupIndex].conditions[conditionIndex],
@@ -141,10 +100,7 @@ export function AdvancedFilterBuilder({
     setFilter({ ...filter, groups: newGroups });
   };
 
-  const updateGroupOperator = (
-    groupIndex: number,
-    operator: LogicalOperator
-  ) => {
+  const updateGroupOperator = (groupIndex: number, operator: LogicalOperator) => {
     const newGroups = [...filter.groups];
     newGroups[groupIndex].logicalOperator = operator;
     setFilter({ ...filter, groups: newGroups });
@@ -153,16 +109,11 @@ export function AdvancedFilterBuilder({
   const handleApply = () => {
     // Validar que todos os campos estão preenchidos
     const isValid = filter.groups.every(group =>
-      group.conditions.every(
-        c =>
-          c.field &&
-          c.operator &&
-          (c.operator === "isNull" || c.operator === "isNotNull" || c.value)
-      )
+      group.conditions.every(c => c.field && c.operator && (c.operator === 'isNull' || c.operator === 'isNotNull' || c.value))
     );
 
     if (!isValid) {
-      alert("Preencha todos os campos do filtro");
+      alert('Preencha todos os campos do filtro');
       return;
     }
 
@@ -171,13 +122,11 @@ export function AdvancedFilterBuilder({
 
   const handleClear = () => {
     setFilter({
-      groups: [
-        {
-          conditions: [{ field: "", operator: "eq", value: "" }],
-          logicalOperator: "AND",
-        },
-      ],
-      globalOperator: "AND",
+      groups: [{
+        conditions: [{ field: '', operator: 'eq', value: '' }],
+        logicalOperator: 'AND',
+      }],
+      globalOperator: 'AND',
     });
     onClear();
   };
@@ -193,14 +142,10 @@ export function AdvancedFilterBuilder({
       <CardContent className="space-y-4">
         {/* Global Operator */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
-            Combinar grupos com:
-          </span>
+          <span className="text-sm text-muted-foreground">Combinar grupos com:</span>
           <Select
             value={filter.globalOperator}
-            onValueChange={value =>
-              setFilter({ ...filter, globalOperator: value as LogicalOperator })
-            }
+            onValueChange={(value) => setFilter({ ...filter, globalOperator: value as LogicalOperator })}
           >
             <SelectTrigger className="w-24">
               <SelectValue />
@@ -235,12 +180,7 @@ export function AdvancedFilterBuilder({
                   {conditionIndex > 0 && (
                     <Select
                       value={group.logicalOperator}
-                      onValueChange={value =>
-                        updateGroupOperator(
-                          groupIndex,
-                          value as LogicalOperator
-                        )
-                      }
+                      onValueChange={(value) => updateGroupOperator(groupIndex, value as LogicalOperator)}
                     >
                       <SelectTrigger className="w-20">
                         <SelectValue />
@@ -254,67 +194,47 @@ export function AdvancedFilterBuilder({
 
                   <Select
                     value={condition.field}
-                    onValueChange={value =>
-                      updateCondition(groupIndex, conditionIndex, {
-                        field: value,
-                      })
-                    }
+                    onValueChange={(value) => updateCondition(groupIndex, conditionIndex, { field: value })}
                   >
                     <SelectTrigger className="w-[200px]">
                       <SelectValue placeholder="Selecione o campo" />
                     </SelectTrigger>
                     <SelectContent>
                       {fields.map(f => (
-                        <SelectItem key={f.value} value={f.value}>
-                          {f.label}
-                        </SelectItem>
+                        <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
 
                   <Select
                     value={condition.operator}
-                    onValueChange={value =>
-                      updateCondition(groupIndex, conditionIndex, {
-                        operator: value as FilterOperator,
-                      })
-                    }
+                    onValueChange={(value) => updateCondition(groupIndex, conditionIndex, { operator: value as FilterOperator })}
                     disabled={!condition.field}
                   >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Operador" />
                     </SelectTrigger>
                     <SelectContent>
-                      {condition.field &&
-                        FIELD_OPERATORS[condition.field]?.map(op => (
-                          <SelectItem key={op} value={op}>
-                            {OPERATOR_LABELS[op]}
-                          </SelectItem>
-                        ))}
+                      {condition.field && FIELD_OPERATORS[condition.field]?.map(op => (
+                        <SelectItem key={op} value={op}>{OPERATOR_LABELS[op]}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
 
-                  {condition.operator !== "isNull" &&
-                    condition.operator !== "isNotNull" && (
-                      <Input
-                        placeholder="Valor"
-                        value={condition.value || ""}
-                        onChange={e =>
-                          updateCondition(groupIndex, conditionIndex, {
-                            value: e.target.value,
-                          })
-                        }
-                        className="flex-1"
-                      />
-                    )}
+                  {condition.operator !== 'isNull' && condition.operator !== 'isNotNull' && (
+                    <Input
+                      placeholder="Valor"
+                      value={condition.value || ''}
+                      onChange={(e) => updateCondition(groupIndex, conditionIndex, { value: e.target.value })}
+                      className="flex-1"
+                    />
+                  )}
 
                   {group.conditions.length > 1 && (
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() =>
-                        removeCondition(groupIndex, conditionIndex)
-                      }
+                      onClick={() => removeCondition(groupIndex, conditionIndex)}
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -335,7 +255,11 @@ export function AdvancedFilterBuilder({
           ))}
         </div>
 
-        <Button variant="outline" onClick={addGroup} className="w-full">
+        <Button
+          variant="outline"
+          onClick={addGroup}
+          className="w-full"
+        >
           <Plus className="w-4 h-4 mr-2" />
           Adicionar Grupo
         </Button>

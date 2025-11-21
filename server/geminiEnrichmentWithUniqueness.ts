@@ -1,5 +1,8 @@
 import { invokeLLM } from "./_core/llm";
-import { filtrarEmpresasUnicas, getEmpresasExistentes } from "./empresasUnicas";
+import {
+  filtrarEmpresasUnicas,
+  getEmpresasExistentes,
+} from "./empresasUnicas";
 
 interface Concorrente {
   nome: string;
@@ -93,10 +96,7 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
         ],
       });
 
-      const content =
-        typeof response.choices[0]?.message?.content === "string"
-          ? response.choices[0].message.content
-          : "[]";
+      const content = typeof response.choices[0]?.message?.content === 'string' ? response.choices[0].message.content : '[]';
       const jsonMatch = content.match(/\[[\s\S]*\]/);
       const concorrentesGerados: Concorrente[] = jsonMatch
         ? JSON.parse(jsonMatch[0])
@@ -107,10 +107,12 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
       );
 
       // Calcular score de qualidade
-      const concorrentesComScore = concorrentesGerados.map(c => ({
+      const concorrentesComScore = concorrentesGerados.map((c) => ({
         ...c,
         qualidadeScore: calcularScoreConcorrente(c),
-        qualidadeClassificacao: classificarScore(calcularScoreConcorrente(c)),
+        qualidadeClassificacao: classificarScore(
+          calcularScoreConcorrente(c)
+        ),
       }));
 
       // Filtrar duplicatas
@@ -126,7 +128,9 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
       concorrentesUnicos.push(...concorrentesFiltrados);
 
       // Atualizar lista de empresas existentes para próxima iteração
-      empresasExistentes.push(...concorrentesFiltrados.map(c => c.nome));
+      empresasExistentes.push(
+        ...concorrentesFiltrados.map((c) => c.nome)
+      );
     } catch (error) {
       console.error(`[Unicidade] Erro na tentativa ${tentativas}:`, error);
     }
@@ -134,7 +138,9 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
 
   // Retornar apenas a quantidade solicitada
   const resultado = concorrentesUnicos.slice(0, quantidade);
-  console.log(`[Unicidade] Retornando ${resultado.length} concorrentes únicos`);
+  console.log(
+    `[Unicidade] Retornando ${resultado.length} concorrentes únicos`
+  );
 
   return resultado;
 }
@@ -212,17 +218,14 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
         ],
       });
 
-      const content =
-        typeof response.choices[0]?.message?.content === "string"
-          ? response.choices[0].message.content
-          : "[]";
+      const content = typeof response.choices[0]?.message?.content === 'string' ? response.choices[0].message.content : '[]';
       const jsonMatch = content.match(/\[[\s\S]*\]/);
       const leadsGerados: Lead[] = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
 
       console.log(`[Unicidade] Gemini gerou ${leadsGerados.length} leads`);
 
       // Calcular score de qualidade
-      const leadsComScore = leadsGerados.map(l => ({
+      const leadsComScore = leadsGerados.map((l) => ({
         ...l,
         qualidadeScore: calcularScoreLead(l),
         qualidadeClassificacao: classificarScore(calcularScoreLead(l)),
@@ -242,7 +245,7 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
       leadsUnicos.push(...leadsFiltrados);
 
       // Atualizar lista de empresas existentes para próxima iteração
-      empresasExistentes.push(...leadsFiltrados.map(l => l.nome));
+      empresasExistentes.push(...leadsFiltrados.map((l) => l.nome));
     } catch (error) {
       console.error(`[Unicidade] Erro na tentativa ${tentativas}:`, error);
     }
@@ -258,65 +261,33 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
 // Funções auxiliares de cálculo de score
 function calcularScoreConcorrente(c: Partial<Concorrente>): number {
   let score = 0;
-  if (c.nome) {
+  if (c.nome) score += 20;
+  if (c.cnpj && c.cnpj.match(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/))
     score += 20;
-  }
-  if (c.cnpj && c.cnpj.match(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/)) {
-    score += 20;
-  }
-  if (c.site && c.site.startsWith("http")) {
-    score += 20;
-  }
-  if (c.produto && c.produto.length > 50) {
-    score += 20;
-  }
-  if (c.porte) {
-    score += 10;
-  }
-  if (c.faturamentoEstimado) {
-    score += 10;
-  }
+  if (c.site && c.site.startsWith("http")) score += 20;
+  if (c.produto && c.produto.length > 50) score += 20;
+  if (c.porte) score += 10;
+  if (c.faturamentoEstimado) score += 10;
   return score;
 }
 
 function calcularScoreLead(l: Partial<Lead>): number {
   let score = 0;
-  if (l.nome) {
+  if (l.nome) score += 15;
+  if (l.cnpj && l.cnpj.match(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/))
     score += 15;
-  }
-  if (l.cnpj && l.cnpj.match(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/)) {
-    score += 15;
-  }
-  if (l.site && l.site.startsWith("http")) {
-    score += 15;
-  }
-  if (l.email && l.email.includes("@")) {
-    score += 15;
-  }
-  if (l.telefone && l.telefone.match(/\(\d{2}\)/)) {
-    score += 10;
-  }
-  if (l.tipo) {
-    score += 10;
-  }
-  if (l.porte) {
-    score += 10;
-  }
-  if (l.regiao) {
-    score += 5;
-  }
-  if (l.setor) {
-    score += 5;
-  }
+  if (l.site && l.site.startsWith("http")) score += 15;
+  if (l.email && l.email.includes("@")) score += 15;
+  if (l.telefone && l.telefone.match(/\(\d{2}\)/)) score += 10;
+  if (l.tipo) score += 10;
+  if (l.porte) score += 10;
+  if (l.regiao) score += 5;
+  if (l.setor) score += 5;
   return score;
 }
 
 function classificarScore(score: number): string {
-  if (score >= 90) {
-    return "Alta";
-  }
-  if (score >= 60) {
-    return "Média";
-  }
+  if (score >= 90) return "Alta";
+  if (score >= 60) return "Média";
   return "Baixa";
 }

@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { FileText } from 'lucide-react';
+import { FileText, Loader2 } from 'lucide-react';
 
 interface PesquisaSelectorProps {
   projectId?: number | null;
@@ -28,8 +28,8 @@ export function PesquisaSelector({ projectId }: PesquisaSelectorProps) {
   if (isLoading) {
     return (
       <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
-        <FileText className="h-4 w-4" />
-        <span>Carregando...</span>
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <span>Carregando pesquisas...</span>
       </div>
     );
   }

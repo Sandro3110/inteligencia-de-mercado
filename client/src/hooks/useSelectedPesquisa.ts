@@ -1,22 +1,19 @@
-import { useState, useEffect } from "react";
-import { trpc } from "@/lib/trpc";
+import { useState, useEffect } from 'react';
+import { trpc } from '@/lib/trpc';
 
-const STORAGE_KEY = "selected-pesquisa-id";
+const STORAGE_KEY = 'selected-pesquisa-id';
 
 export function useSelectedPesquisa(projectId?: number | null) {
-  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(
-    null
-  );
+  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Buscar lista de pesquisas do projeto
-  const { data: pesquisas = [], isLoading: isLoadingPesquisas } =
-    trpc.pesquisas.list.useQuery(
-      { projectId: projectId! },
-      { enabled: !!projectId }
-    );
+  const { data: pesquisas = [], isLoading: isLoadingPesquisas } = trpc.pesquisas.list.useQuery(
+    { projectId: projectId! },
+    { enabled: !!projectId }
+  );
 
-  // Inicializar pesquisa selecionada (resetar quando projeto mudar)
+  // Inicializar pesquisa selecionada
   useEffect(() => {
     if (!projectId) {
       setSelectedPesquisaId(null);
@@ -24,9 +21,7 @@ export function useSelectedPesquisa(projectId?: number | null) {
       return;
     }
 
-    if (isLoadingPesquisas) {
-      return;
-    }
+    if (isLoadingPesquisas) return;
 
     // Tentar carregar do localStorage (por projeto)
     const storageKey = `${STORAGE_KEY}-${projectId}`;
@@ -52,8 +47,6 @@ export function useSelectedPesquisa(projectId?: number | null) {
     setIsLoading(false);
   }, [pesquisas, isLoadingPesquisas, projectId]);
 
-  const utils = trpc.useUtils();
-
   // Função para trocar de pesquisa
   const selectPesquisa = (pesquisaId: number | null) => {
     setSelectedPesquisaId(pesquisaId);
@@ -61,16 +54,6 @@ export function useSelectedPesquisa(projectId?: number | null) {
       const storageKey = `${STORAGE_KEY}-${projectId}`;
       localStorage.setItem(storageKey, pesquisaId.toString());
     }
-
-    // Invalidar cache de todas as queries relacionadas à pesquisa
-    utils.mercados.list.invalidate();
-    utils.clientes.list.invalidate();
-    utils.clientes.byMercado.invalidate();
-    utils.concorrentes.list.invalidate();
-    utils.concorrentes.byMercado.invalidate();
-    utils.leads.list.invalidate();
-    utils.leads.byMercado.invalidate();
-    utils.dashboard.stats.invalidate();
   };
 
   const selectedPesquisa = pesquisas.find(p => p.id === selectedPesquisaId);

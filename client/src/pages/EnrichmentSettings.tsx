@@ -2,7 +2,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useState } from "react";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { useEnrichmentConfig } from "@/hooks/useEnrichmentConfig";
-
+import { ProjectSelector } from "@/components/ProjectSelector";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -100,6 +100,7 @@ export default function EnrichmentSettings() {
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <Breadcrumbs items={[{ label: "Configurações de Enriquecimento" }]} />
+            <ProjectSelector />
           </div>
           <Card>
             <CardContent className="py-12 text-center">
@@ -126,6 +127,7 @@ export default function EnrichmentSettings() {
               Configure API keys e critérios para o enriquecimento de dados
             </p>
           </div>
+          <ProjectSelector />
         </div>
 
         {isLoading ? (

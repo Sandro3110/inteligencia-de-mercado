@@ -1,7 +1,7 @@
 /**
  * Página de Gerenciamento de Projetos
  * Fase 57: Sistema de Hibernação de Projetos
- *
+ * 
  * Funcionalidades disponíveis:
  * - Listar todos os projetos (ativos e adormecidos)
  * - Criar novos projetos
@@ -13,30 +13,24 @@
  * - Visualizar estatísticas
  */
 
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
+import { useState } from 'react';
+import { trpc } from '@/lib/trpc';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogHeader, 
   DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
+  DialogFooter 
+} from '@/components/ui/dialog';
+import { 
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -45,27 +39,27 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
-  FolderPlus,
-  Edit,
-  Trash2,
-  Moon,
-  Sun,
-  Loader2,
+} from '@/components/ui/alert-dialog';
+import { 
+  FolderPlus, 
+  Edit, 
+  Trash2, 
+  Moon, 
+  Sun, 
+  Loader2, 
   CheckCircle2,
   AlertCircle,
   Folder,
   Filter,
   Copy,
-  History,
-} from "lucide-react";
-import { toast } from "sonner";
+  History
+} from 'lucide-react';
+import { toast } from 'sonner';
 
-type FilterStatus = "all" | "active" | "hibernated";
+type FilterStatus = 'all' | 'active' | 'hibernated';
 
 export default function ProjectManagement() {
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -73,93 +67,92 @@ export default function ProjectManagement() {
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [selectedProject, setSelectedProject] = useState<any>(null);
-
+  
   // Form states
-  const [projectName, setProjectName] = useState("");
-  const [projectDesc, setProjectDesc] = useState("");
-  const [projectColor, setProjectColor] = useState("#3b82f6");
-  const [duplicateName, setDuplicateName] = useState("");
+  const [projectName, setProjectName] = useState('');
+  const [projectDesc, setProjectDesc] = useState('');
+  const [projectColor, setProjectColor] = useState('#3b82f6');
+  const [duplicateName, setDuplicateName] = useState('');
   const [copyMarkets, setCopyMarkets] = useState(false);
 
   const { data: projects, isLoading, refetch } = trpc.projects.list.useQuery();
 
   const createMutation = trpc.projects.create.useMutation({
     onSuccess: () => {
-      toast.success("Projeto criado com sucesso!");
+      toast.success('Projeto criado com sucesso!');
       refetch();
       setShowCreateDialog(false);
       resetForm();
     },
-    onError: error => {
+    onError: (error) => {
       toast.error(`Erro ao criar projeto: ${error.message}`);
-    },
+    }
   });
 
   const updateMutation = trpc.projects.update.useMutation({
     onSuccess: () => {
-      toast.success("Projeto atualizado com sucesso!");
+      toast.success('Projeto atualizado com sucesso!');
       refetch();
       setShowEditDialog(false);
       resetForm();
     },
-    onError: error => {
+    onError: (error) => {
       toast.error(`Erro ao atualizar projeto: ${error.message}`);
-    },
+    }
   });
 
   const deleteMutation = trpc.projects.deleteEmpty.useMutation({
     onSuccess: () => {
-      toast.success("Projeto deletado com sucesso!");
+      toast.success('Projeto deletado com sucesso!');
       refetch();
       setShowDeleteDialog(false);
       setSelectedProject(null);
     },
-    onError: error => {
+    onError: (error) => {
       toast.error(`Erro ao deletar projeto: ${error.message}`);
-    },
+    }
   });
 
   const hibernateMutation = trpc.projects.hibernate.useMutation({
     onSuccess: () => {
-      toast.success("Projeto adormecido com sucesso!");
+      toast.success('Projeto adormecido com sucesso!');
       refetch();
       setShowHibernateDialog(false);
       setSelectedProject(null);
     },
-    onError: error => {
+    onError: (error) => {
       toast.error(`Erro ao adormecer projeto: ${error.message}`);
-    },
+    }
   });
 
   const reactivateMutation = trpc.projects.reactivate.useMutation({
     onSuccess: () => {
-      toast.success("Projeto reativado com sucesso!");
+      toast.success('Projeto reativado com sucesso!');
       refetch();
     },
-    onError: error => {
+    onError: (error) => {
       toast.error(`Erro ao reativar projeto: ${error.message}`);
-    },
+    }
   });
 
   const duplicateMutation = trpc.projects.duplicate.useMutation({
-    onSuccess: data => {
-      toast.success("Projeto duplicado com sucesso!");
+    onSuccess: (data) => {
+      toast.success('Projeto duplicado com sucesso!');
       refetch();
       setShowDuplicateDialog(false);
-      setDuplicateName("");
+      setDuplicateName('');
       setCopyMarkets(false);
       setSelectedProject(null);
     },
-    onError: error => {
+    onError: (error) => {
       toast.error(`Erro ao duplicar projeto: ${error.message}`);
-    },
+    }
   });
 
-  const { data: auditLog, isLoading: auditLoading } =
-    trpc.projects.getAuditLog.useQuery(
-      { projectId: selectedProject?.id || 0, limit: 50 },
-      { enabled: showHistoryDialog && !!selectedProject }
-    );
+  const { data: auditLog, isLoading: auditLoading } = trpc.projects.getAuditLog.useQuery(
+    { projectId: selectedProject?.id || 0, limit: 50 },
+    { enabled: showHistoryDialog && !!selectedProject }
+  );
 
   const { data: canDeleteData } = trpc.projects.canDelete.useQuery(
     selectedProject?.id || 0,
@@ -167,32 +160,30 @@ export default function ProjectManagement() {
   );
 
   const resetForm = () => {
-    setProjectName("");
-    setProjectDesc("");
-    setProjectColor("#3b82f6");
+    setProjectName('');
+    setProjectDesc('');
+    setProjectColor('#3b82f6');
     setSelectedProject(null);
   };
 
   const handleCreate = () => {
     if (!projectName.trim()) {
-      toast.error("Nome do projeto é obrigatório");
+      toast.error('Nome do projeto é obrigatório');
       return;
     }
 
     createMutation.mutate({
       nome: projectName,
       descricao: projectDesc || undefined,
-      cor: projectColor,
+      cor: projectColor
     });
   };
 
   const handleUpdate = () => {
-    if (!selectedProject) {
-      return;
-    }
-
+    if (!selectedProject) return;
+    
     if (!projectName.trim()) {
-      toast.error("Nome do projeto é obrigatório");
+      toast.error('Nome do projeto é obrigatório');
       return;
     }
 
@@ -200,15 +191,15 @@ export default function ProjectManagement() {
       id: selectedProject.id,
       nome: projectName,
       descricao: projectDesc || undefined,
-      cor: projectColor,
+      cor: projectColor
     });
   };
 
   const openEditDialog = (project: any) => {
     setSelectedProject(project);
     setProjectName(project.nome);
-    setProjectDesc(project.descricao || "");
-    setProjectColor(project.cor || "#3b82f6");
+    setProjectDesc(project.descricao || '');
+    setProjectColor(project.cor || '#3b82f6');
     setShowEditDialog(true);
   };
 
@@ -226,7 +217,7 @@ export default function ProjectManagement() {
 
   const handleDuplicate = () => {
     if (!selectedProject || !duplicateName.trim()) {
-      toast.error("Nome do projeto é obrigatório");
+      toast.error('Nome do projeto é obrigatório');
       return;
     }
 
@@ -247,18 +238,15 @@ export default function ProjectManagement() {
     setShowHibernateDialog(true);
   };
 
-  const filteredProjects =
-    projects?.filter(p => {
-      if (filterStatus === "all") {
-        return true;
-      }
-      return p.status === filterStatus;
-    }) || [];
+  const filteredProjects = projects?.filter(p => {
+    if (filterStatus === 'all') return true;
+    return p.status === filterStatus;
+  }) || [];
 
   const stats = {
     total: projects?.length || 0,
-    active: projects?.filter(p => p.status === "active").length || 0,
-    hibernated: projects?.filter(p => p.status === "hibernated").length || 0,
+    active: projects?.filter(p => p.status === 'active').length || 0,
+    hibernated: projects?.filter(p => p.status === 'hibernated').length || 0
   };
 
   if (isLoading) {
@@ -310,9 +298,7 @@ export default function ProjectManagement() {
           <CardContent>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-green-500" />
-              <span className="text-3xl font-bold text-green-600">
-                {stats.active}
-              </span>
+              <span className="text-3xl font-bold text-green-600">{stats.active}</span>
             </div>
           </CardContent>
         </Card>
@@ -326,9 +312,7 @@ export default function ProjectManagement() {
           <CardContent>
             <div className="flex items-center gap-2">
               <Moon className="w-5 h-5 text-blue-500" />
-              <span className="text-3xl font-bold text-blue-600">
-                {stats.hibernated}
-              </span>
+              <span className="text-3xl font-bold text-blue-600">{stats.hibernated}</span>
             </div>
           </CardContent>
         </Card>
@@ -345,34 +329,26 @@ export default function ProjectManagement() {
         <CardContent>
           <div className="flex gap-2">
             <Button
-              variant={filterStatus === "all" ? "default" : "outline"}
+              variant={filterStatus === 'all' ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setFilterStatus("all")}
+              onClick={() => setFilterStatus('all')}
             >
               Todos ({stats.total})
             </Button>
             <Button
-              variant={filterStatus === "active" ? "default" : "outline"}
+              variant={filterStatus === 'active' ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setFilterStatus("active")}
-              className={
-                filterStatus === "active"
-                  ? "bg-green-600 hover:bg-green-700"
-                  : ""
-              }
+              onClick={() => setFilterStatus('active')}
+              className={filterStatus === 'active' ? 'bg-green-600 hover:bg-green-700' : ''}
             >
               <CheckCircle2 className="w-4 h-4 mr-1" />
               Ativos ({stats.active})
             </Button>
             <Button
-              variant={filterStatus === "hibernated" ? "default" : "outline"}
+              variant={filterStatus === 'hibernated' ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setFilterStatus("hibernated")}
-              className={
-                filterStatus === "hibernated"
-                  ? "bg-blue-600 hover:bg-blue-700"
-                  : ""
-              }
+              onClick={() => setFilterStatus('hibernated')}
+              className={filterStatus === 'hibernated' ? 'bg-blue-600 hover:bg-blue-700' : ''}
             >
               <Moon className="w-4 h-4 mr-1" />
               Adormecidos ({stats.hibernated})
@@ -388,9 +364,10 @@ export default function ProjectManagement() {
             <CardContent className="flex flex-col items-center justify-center py-12">
               <AlertCircle className="w-12 h-12 text-gray-400 mb-4" />
               <p className="text-gray-600">
-                {filterStatus === "all"
-                  ? "Nenhum projeto encontrado. Crie seu primeiro projeto!"
-                  : `Nenhum projeto ${filterStatus === "active" ? "ativo" : "adormecido"} encontrado.`}
+                {filterStatus === 'all' 
+                  ? 'Nenhum projeto encontrado. Crie seu primeiro projeto!'
+                  : `Nenhum projeto ${filterStatus === 'active' ? 'ativo' : 'adormecido'} encontrado.`
+                }
               </p>
             </CardContent>
           </Card>
@@ -400,9 +377,9 @@ export default function ProjectManagement() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: project.cor || "#3b82f6" }}
+                    <div 
+                      className="w-3 h-3 rounded-full" 
+                      style={{ backgroundColor: project.cor || '#3b82f6' }}
                     />
                     <div>
                       <CardTitle className="text-lg">{project.nome}</CardTitle>
@@ -413,17 +390,14 @@ export default function ProjectManagement() {
                       )}
                     </div>
                   </div>
-                  <Badge
-                    variant={
-                      project.status === "active" ? "default" : "secondary"
-                    }
-                    className={
-                      project.status === "active"
-                        ? "bg-green-100 text-green-800 border-green-300"
-                        : "bg-blue-100 text-blue-800 border-blue-300"
+                  <Badge 
+                    variant={project.status === 'active' ? 'default' : 'secondary'}
+                    className={project.status === 'active' 
+                      ? 'bg-green-100 text-green-800 border-green-300' 
+                      : 'bg-blue-100 text-blue-800 border-blue-300'
                     }
                   >
-                    {project.status === "active" ? "✓ Ativo" : "💤 Adormecido"}
+                    {project.status === 'active' ? '✓ Ativo' : '💤 Adormecido'}
                   </Badge>
                 </div>
               </CardHeader>
@@ -438,7 +412,7 @@ export default function ProjectManagement() {
                     Editar
                   </Button>
 
-                  {project.status === "active" ? (
+                  {project.status === 'active' ? (
                     <Button
                       variant="outline"
                       size="sm"
@@ -457,9 +431,7 @@ export default function ProjectManagement() {
                       className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-300"
                     >
                       <Sun className="w-4 h-4 mr-1" />
-                      {reactivateMutation.isPending
-                        ? "Reativando..."
-                        : "Reativar"}
+                      {reactivateMutation.isPending ? 'Reativando...' : 'Reativar'}
                     </Button>
                   )}
 
@@ -514,7 +486,7 @@ export default function ProjectManagement() {
               <Input
                 id="name"
                 value={projectName}
-                onChange={e => setProjectName(e.target.value)}
+                onChange={(e) => setProjectName(e.target.value)}
                 placeholder="Ex: Embalagens"
               />
             </div>
@@ -523,7 +495,7 @@ export default function ProjectManagement() {
               <Textarea
                 id="desc"
                 value={projectDesc}
-                onChange={e => setProjectDesc(e.target.value)}
+                onChange={(e) => setProjectDesc(e.target.value)}
                 placeholder="Descreva o objetivo deste projeto..."
                 rows={3}
               />
@@ -535,7 +507,7 @@ export default function ProjectManagement() {
                   id="color"
                   type="color"
                   value={projectColor}
-                  onChange={e => setProjectColor(e.target.value)}
+                  onChange={(e) => setProjectColor(e.target.value)}
                   className="w-20 h-10"
                 />
                 <span className="text-sm text-gray-600">{projectColor}</span>
@@ -543,23 +515,23 @@ export default function ProjectManagement() {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowCreateDialog(false);
-                resetForm();
-              }}
-            >
+            <Button variant="outline" onClick={() => {
+              setShowCreateDialog(false);
+              resetForm();
+            }}>
               Cancelar
             </Button>
-            <Button onClick={handleCreate} disabled={createMutation.isPending}>
+            <Button 
+              onClick={handleCreate}
+              disabled={createMutation.isPending}
+            >
               {createMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Criando...
                 </>
               ) : (
-                "Criar Projeto"
+                'Criar Projeto'
               )}
             </Button>
           </DialogFooter>
@@ -581,7 +553,7 @@ export default function ProjectManagement() {
               <Input
                 id="edit-name"
                 value={projectName}
-                onChange={e => setProjectName(e.target.value)}
+                onChange={(e) => setProjectName(e.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -589,7 +561,7 @@ export default function ProjectManagement() {
               <Textarea
                 id="edit-desc"
                 value={projectDesc}
-                onChange={e => setProjectDesc(e.target.value)}
+                onChange={(e) => setProjectDesc(e.target.value)}
                 rows={3}
               />
             </div>
@@ -600,7 +572,7 @@ export default function ProjectManagement() {
                   id="edit-color"
                   type="color"
                   value={projectColor}
-                  onChange={e => setProjectColor(e.target.value)}
+                  onChange={(e) => setProjectColor(e.target.value)}
                   className="w-20 h-10"
                 />
                 <span className="text-sm text-gray-600">{projectColor}</span>
@@ -608,23 +580,23 @@ export default function ProjectManagement() {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowEditDialog(false);
-                resetForm();
-              }}
-            >
+            <Button variant="outline" onClick={() => {
+              setShowEditDialog(false);
+              resetForm();
+            }}>
               Cancelar
             </Button>
-            <Button onClick={handleUpdate} disabled={updateMutation.isPending}>
+            <Button 
+              onClick={handleUpdate}
+              disabled={updateMutation.isPending}
+            >
               {updateMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Salvando...
                 </>
               ) : (
-                "Salvar Alterações"
+                'Salvar Alterações'
               )}
             </Button>
           </DialogFooter>
@@ -632,17 +604,13 @@ export default function ProjectManagement() {
       </Dialog>
 
       {/* Hibernate Dialog */}
-      <AlertDialog
-        open={showHibernateDialog}
-        onOpenChange={setShowHibernateDialog}
-      >
+      <AlertDialog open={showHibernateDialog} onOpenChange={setShowHibernateDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Adormecer Projeto?</AlertDialogTitle>
             <AlertDialogDescription className="space-y-3">
               <p>
-                O projeto <strong>{selectedProject?.nome}</strong> ficará em
-                modo somente leitura.
+                O projeto <strong>{selectedProject?.nome}</strong> ficará em modo somente leitura.
               </p>
               <ul className="text-sm space-y-1 ml-4 list-disc">
                 <li>Você poderá visualizar todos os dados</li>
@@ -669,7 +637,7 @@ export default function ProjectManagement() {
                   Adormecendo...
                 </>
               ) : (
-                "Confirmar"
+                'Confirmar'
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -691,7 +659,7 @@ export default function ProjectManagement() {
               <Input
                 id="duplicate-name"
                 value={duplicateName}
-                onChange={e => setDuplicateName(e.target.value)}
+                onChange={(e) => setDuplicateName(e.target.value)}
                 placeholder="Ex: Cópia de Embalagens"
               />
             </div>
@@ -700,7 +668,7 @@ export default function ProjectManagement() {
                 type="checkbox"
                 id="copy-markets"
                 checked={copyMarkets}
-                onChange={e => setCopyMarkets(e.target.checked)}
+                onChange={(e) => setCopyMarkets(e.target.checked)}
                 className="w-4 h-4 rounded border-gray-300"
               />
               <Label htmlFor="copy-markets" className="cursor-pointer">
@@ -715,23 +683,19 @@ export default function ProjectManagement() {
                 {copyMarkets && <li>Mercados únicos (estrutura, sem dados)</li>}
               </ul>
               <p className="mt-2 text-xs">
-                <strong>Não será copiado:</strong> Pesquisas, clientes,
-                concorrentes, leads
+                <strong>Não será copiado:</strong> Pesquisas, clientes, concorrentes, leads
               </p>
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowDuplicateDialog(false);
-                setDuplicateName("");
-                setCopyMarkets(false);
-              }}
-            >
+            <Button variant="outline" onClick={() => {
+              setShowDuplicateDialog(false);
+              setDuplicateName('');
+              setCopyMarkets(false);
+            }}>
               Cancelar
             </Button>
-            <Button
+            <Button 
               onClick={handleDuplicate}
               disabled={duplicateMutation.isPending || !duplicateName.trim()}
               className="bg-purple-600 hover:bg-purple-700"
@@ -758,8 +722,7 @@ export default function ProjectManagement() {
           <DialogHeader>
             <DialogTitle>Histórico do Projeto</DialogTitle>
             <DialogDescription>
-              Todas as mudanças realizadas em{" "}
-              <strong>{selectedProject?.nome}</strong>
+              Todas as mudanças realizadas em <strong>{selectedProject?.nome}</strong>
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -770,55 +733,25 @@ export default function ProjectManagement() {
             ) : auditLog && auditLog.logs.length > 0 ? (
               <div className="space-y-4">
                 {auditLog.logs.map((log: any) => {
-                  const actionLabels: Record<
-                    string,
-                    { label: string; color: string; icon: string }
-                  > = {
-                    created: {
-                      label: "Criado",
-                      color: "bg-green-100 text-green-800 border-green-300",
-                      icon: "➕",
-                    },
-                    updated: {
-                      label: "Atualizado",
-                      color: "bg-blue-100 text-blue-800 border-blue-300",
-                      icon: "✏️",
-                    },
-                    hibernated: {
-                      label: "Adormecido",
-                      color: "bg-purple-100 text-purple-800 border-purple-300",
-                      icon: "💤",
-                    },
-                    reactivated: {
-                      label: "Reativado",
-                      color: "bg-yellow-100 text-yellow-800 border-yellow-300",
-                      icon: "☀️",
-                    },
-                    deleted: {
-                      label: "Deletado",
-                      color: "bg-red-100 text-red-800 border-red-300",
-                      icon: "🗑️",
-                    },
+                  const actionLabels: Record<string, { label: string; color: string; icon: string }> = {
+                    created: { label: 'Criado', color: 'bg-green-100 text-green-800 border-green-300', icon: '➕' },
+                    updated: { label: 'Atualizado', color: 'bg-blue-100 text-blue-800 border-blue-300', icon: '✏️' },
+                    hibernated: { label: 'Adormecido', color: 'bg-purple-100 text-purple-800 border-purple-300', icon: '💤' },
+                    reactivated: { label: 'Reativado', color: 'bg-yellow-100 text-yellow-800 border-yellow-300', icon: '☀️' },
+                    deleted: { label: 'Deletado', color: 'bg-red-100 text-red-800 border-red-300', icon: '🗑️' },
                   };
 
-                  const actionInfo = actionLabels[log.action] || {
-                    label: log.action,
-                    color: "bg-gray-100 text-gray-800",
-                    icon: "•",
-                  };
+                  const actionInfo = actionLabels[log.action] || { label: log.action, color: 'bg-gray-100 text-gray-800', icon: '•' };
 
                   return (
-                    <div
-                      key={log.id}
-                      className="border rounded-lg p-4 space-y-2"
-                    >
+                    <div key={log.id} className="border rounded-lg p-4 space-y-2">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
                           <Badge className={actionInfo.color}>
                             {actionInfo.icon} {actionInfo.label}
                           </Badge>
                           <span className="text-sm text-gray-600">
-                            {new Date(log.createdAt).toLocaleString("pt-BR")}
+                            {new Date(log.createdAt).toLocaleString('pt-BR')}
                           </span>
                         </div>
                         {log.userId && (
@@ -854,10 +787,7 @@ export default function ProjectManagement() {
             )}
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowHistoryDialog(false)}
-            >
+            <Button variant="outline" onClick={() => setShowHistoryDialog(false)}>
               Fechar
             </Button>
           </DialogFooter>
@@ -875,19 +805,16 @@ export default function ProjectManagement() {
                   <>
                     <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
                       <p className="text-sm text-yellow-800 font-semibold mb-2">
-                        ⚠️ Este projeto está vazio e pode ser deletado
-                        permanentemente.
+                        ⚠️ Este projeto está vazio e pode ser deletado permanentemente.
                       </p>
                       <p className="text-xs text-yellow-700">
-                        Pesquisas: {canDeleteData.stats?.pesquisas || 0} |
-                        Clientes: {canDeleteData.stats?.clientes || 0} |
+                        Pesquisas: {canDeleteData.stats?.pesquisas || 0} | 
+                        Clientes: {canDeleteData.stats?.clientes || 0} | 
                         Mercados: {canDeleteData.stats?.mercados || 0}
                       </p>
                     </div>
                     <p className="text-sm">
-                      Esta ação não pode ser desfeita. O projeto{" "}
-                      <strong>{selectedProject?.nome}</strong> será removido
-                      permanentemente.
+                      Esta ação não pode ser desfeita. O projeto <strong>{selectedProject?.nome}</strong> será removido permanentemente.
                     </p>
                   </>
                 ) : (
@@ -900,9 +827,9 @@ export default function ProjectManagement() {
                     </p>
                     {canDeleteData.stats && (
                       <p className="text-xs text-red-700 mt-2">
-                        Pesquisas: {canDeleteData.stats.pesquisas} | Clientes:{" "}
-                        {canDeleteData.stats.clientes} | Mercados:{" "}
-                        {canDeleteData.stats.mercados}
+                        Pesquisas: {canDeleteData.stats.pesquisas} | 
+                        Clientes: {canDeleteData.stats.clientes} | 
+                        Mercados: {canDeleteData.stats.mercados}
                       </p>
                     )}
                   </div>
@@ -930,7 +857,7 @@ export default function ProjectManagement() {
                     Deletando...
                   </>
                 ) : (
-                  "Deletar Permanentemente"
+                  'Deletar Permanentemente'
                 )}
               </AlertDialogAction>
             )}

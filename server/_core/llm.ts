@@ -19,12 +19,7 @@ export type FileContent = {
   type: "file_url";
   file_url: {
     url: string;
-    mime_type?:
-      | "audio/mpeg"
-      | "audio/wav"
-      | "application/pdf"
-      | "audio/mp4"
-      | "video/mp4";
+    mime_type?: "audio/mpeg" | "audio/wav" | "application/pdf" | "audio/mp4" | "video/mp4" ;
   };
 };
 
@@ -182,9 +177,7 @@ const normalizeToolChoice = (
   toolChoice: ToolChoice | undefined,
   tools: Tool[] | undefined
 ): "none" | "auto" | ToolChoiceExplicit | undefined => {
-  if (!toolChoice) {
-    return undefined;
-  }
+  if (!toolChoice) return undefined;
 
   if (toolChoice === "none" || toolChoice === "auto") {
     return toolChoice;
@@ -219,14 +212,13 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
-const resolveApiUrl = () => {
-  // Usar OpenAI diretamente
-  return "https://api.openai.com/v1/chat/completions";
-};
+const resolveApiUrl = () =>
+  ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
+    ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
+    : "https://forge.manus.im/v1/chat/completions";
 
 const assertApiKey = () => {
-  // Verificar se OPENAI_API_KEY está configurada
-  if (!process.env.OPENAI_API_KEY) {
+  if (!ENV.forgeApiKey) {
     throw new Error("OPENAI_API_KEY is not configured");
   }
 };
@@ -260,9 +252,7 @@ const normalizeResponseFormat = ({
   }
 
   const schema = outputSchema || output_schema;
-  if (!schema) {
-    return undefined;
-  }
+  if (!schema) return undefined;
 
   if (!schema.name || !schema.schema) {
     throw new Error("outputSchema requires both name and schema");
@@ -293,7 +283,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   } = params;
 
   const payload: Record<string, unknown> = {
-    model: params.model || "gpt-4o-mini", // Usar gpt-4o-mini por padrão
+    model: "gemini-2.5-flash",
     messages: messages.map(normalizeMessage),
   };
 
@@ -309,14 +299,9 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     payload.tool_choice = normalizedToolChoice;
   }
 
-  // Configurar max_tokens se fornecido
-  if (params.maxTokens || params.max_tokens) {
-    payload.max_tokens = params.maxTokens || params.max_tokens;
-  }
-
-  // Configurar temperature se fornecido
-  if (params.temperature !== undefined) {
-    payload.temperature = params.temperature;
+  payload.max_tokens = 32768
+  payload.thinking = {
+    "budget_tokens": 128
   }
 
   const normalizedResponseFormat = normalizeResponseFormat({
@@ -334,7 +319,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      authorization: `Bearer ${ENV.forgeApiKey}`,
     },
     body: JSON.stringify(payload),
   });

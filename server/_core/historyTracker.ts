@@ -2,16 +2,16 @@
  * Helper para rastrear mudanças em entidades
  */
 
-import { and, eq } from "drizzle-orm";
-import { getDb } from "../db";
+import { and, eq } from 'drizzle-orm';
+import { getDb } from '../db';
 import {
   mercadosHistory,
   clientesHistory,
   concorrentesHistory,
   leadsHistory,
-} from "../../drizzle/schema";
+} from '../../drizzle/schema';
 
-type ChangeType = "created" | "updated" | "enriched" | "validated";
+type ChangeType = 'created' | 'updated' | 'enriched' | 'validated';
 
 interface Change {
   field: string;
@@ -34,16 +34,14 @@ export function detectChanges(
     const newValue = newData[field];
 
     // Ignorar se ambos são null/undefined
-    if (oldValue === null && newValue === null) {
-      continue;
-    }
+    if (oldValue == null && newValue == null) continue;
 
     // Detectar mudança
     if (oldValue !== newValue) {
       changes.push({
         field,
-        oldValue: oldValue !== null ? String(oldValue) : null,
-        newValue: newValue !== null ? String(newValue) : null,
+        oldValue: oldValue != null ? String(oldValue) : null,
+        newValue: newValue != null ? String(newValue) : null,
       });
     }
   }
@@ -57,19 +55,15 @@ export function detectChanges(
 export async function trackMercadoChanges(
   mercadoId: number,
   changes: Change[],
-  changeType: ChangeType = "updated",
-  changedBy = "system"
+  changeType: ChangeType = 'updated',
+  changedBy: string = 'system'
 ) {
-  if (changes.length === 0) {
-    return;
-  }
+  if (changes.length === 0) return;
 
   const db = await getDb();
-  if (!db) {
-    return;
-  }
+  if (!db) return;
 
-  const records = changes.map(change => ({
+  const records = changes.map((change) => ({
     mercadoId,
     field: change.field,
     oldValue: change.oldValue,
@@ -79,9 +73,7 @@ export async function trackMercadoChanges(
   }));
 
   await db.insert(mercadosHistory).values(records);
-  console.log(
-    `[History] Registradas ${changes.length} mudanças para mercado ${mercadoId}`
-  );
+  console.log(`[History] Registradas ${changes.length} mudanças para mercado ${mercadoId}`);
 }
 
 /**
@@ -90,19 +82,15 @@ export async function trackMercadoChanges(
 export async function trackClienteChanges(
   clienteId: number,
   changes: Change[],
-  changeType: ChangeType = "updated",
-  changedBy = "system"
+  changeType: ChangeType = 'updated',
+  changedBy: string = 'system'
 ) {
-  if (changes.length === 0) {
-    return;
-  }
+  if (changes.length === 0) return;
 
   const db = await getDb();
-  if (!db) {
-    return;
-  }
+  if (!db) return;
 
-  const records = changes.map(change => ({
+  const records = changes.map((change) => ({
     clienteId,
     field: change.field,
     oldValue: change.oldValue,
@@ -112,9 +100,7 @@ export async function trackClienteChanges(
   }));
 
   await db.insert(clientesHistory).values(records);
-  console.log(
-    `[History] Registradas ${changes.length} mudanças para cliente ${clienteId}`
-  );
+  console.log(`[History] Registradas ${changes.length} mudanças para cliente ${clienteId}`);
 }
 
 /**
@@ -123,19 +109,15 @@ export async function trackClienteChanges(
 export async function trackConcorrenteChanges(
   concorrenteId: number,
   changes: Change[],
-  changeType: ChangeType = "updated",
-  changedBy = "system"
+  changeType: ChangeType = 'updated',
+  changedBy: string = 'system'
 ) {
-  if (changes.length === 0) {
-    return;
-  }
+  if (changes.length === 0) return;
 
   const db = await getDb();
-  if (!db) {
-    return;
-  }
+  if (!db) return;
 
-  const records = changes.map(change => ({
+  const records = changes.map((change) => ({
     concorrenteId,
     field: change.field,
     oldValue: change.oldValue,
@@ -145,9 +127,7 @@ export async function trackConcorrenteChanges(
   }));
 
   await db.insert(concorrentesHistory).values(records);
-  console.log(
-    `[History] Registradas ${changes.length} mudanças para concorrente ${concorrenteId}`
-  );
+  console.log(`[History] Registradas ${changes.length} mudanças para concorrente ${concorrenteId}`);
 }
 
 /**
@@ -156,19 +136,15 @@ export async function trackConcorrenteChanges(
 export async function trackLeadChanges(
   leadId: number,
   changes: Change[],
-  changeType: ChangeType = "updated",
-  changedBy = "system"
+  changeType: ChangeType = 'updated',
+  changedBy: string = 'system'
 ) {
-  if (changes.length === 0) {
-    return;
-  }
+  if (changes.length === 0) return;
 
   const db = await getDb();
-  if (!db) {
-    return;
-  }
+  if (!db) return;
 
-  const records = changes.map(change => ({
+  const records = changes.map((change) => ({
     leadId,
     field: change.field,
     oldValue: change.oldValue,
@@ -178,50 +154,40 @@ export async function trackLeadChanges(
   }));
 
   await db.insert(leadsHistory).values(records);
-  console.log(
-    `[History] Registradas ${changes.length} mudanças para lead ${leadId}`
-  );
+  console.log(`[History] Registradas ${changes.length} mudanças para lead ${leadId}`);
 }
 
 /**
  * Registra criação de entidade
  */
 export async function trackCreation(
-  entityType: "mercado" | "cliente" | "concorrente" | "lead",
+  entityType: 'mercado' | 'cliente' | 'concorrente' | 'lead',
   entityId: number,
   initialData: Record<string, any>,
-  changedBy = "system"
+  changedBy: string = 'system'
 ) {
   const db = await getDb();
-  if (!db) {
-    return;
-  }
+  if (!db) return;
 
   const change = {
-    field: "_created",
+    field: '_created',
     oldValue: null,
     newValue: JSON.stringify(initialData),
-    changeType: "created" as const,
+    changeType: 'created' as const,
     changedBy,
   };
 
   switch (entityType) {
-    case "mercado":
-      await db
-        .insert(mercadosHistory)
-        .values({ ...change, mercadoId: entityId });
+    case 'mercado':
+      await db.insert(mercadosHistory).values({ ...change, mercadoId: entityId });
       break;
-    case "cliente":
-      await db
-        .insert(clientesHistory)
-        .values({ ...change, clienteId: entityId });
+    case 'cliente':
+      await db.insert(clientesHistory).values({ ...change, clienteId: entityId });
       break;
-    case "concorrente":
-      await db
-        .insert(concorrentesHistory)
-        .values({ ...change, concorrenteId: entityId });
+    case 'concorrente':
+      await db.insert(concorrentesHistory).values({ ...change, concorrenteId: entityId });
       break;
-    case "lead":
+    case 'lead':
       await db.insert(leadsHistory).values({ ...change, leadId: entityId });
       break;
   }

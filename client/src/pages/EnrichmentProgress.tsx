@@ -2,35 +2,15 @@ import { useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { Progress } from "@/components/ui/progress";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  RefreshCw,
-  CheckCircle2,
-  Clock,
-  TrendingUp,
-  Pause,
-  Play,
-  History,
-  CalendarPlus,
-} from "lucide-react";
+import { RefreshCw, CheckCircle2, Clock, TrendingUp, Pause, Play, History, CalendarPlus } from "lucide-react";
 import EvolutionCharts from "@/components/EvolutionCharts";
 import HistoryFilters, { FilterState } from "@/components/HistoryFilters";
 import { exportToCSV, exportToPDF } from "@/lib/exportHistory";
 import { ScheduleEnrichment } from "@/components/ScheduleEnrichment";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 export default function EnrichmentProgress() {
   const { selectedProjectId } = useSelectedProject();
@@ -48,12 +28,8 @@ export default function EnrichmentProgress() {
   // Query com polling automático a cada 5 segundos
   // Usa projectId selecionado ou 1 como fallback
   const projectId = selectedProjectId || 1;
-
-  const {
-    data: progress,
-    isLoading,
-    refetch,
-  } = trpc.enrichment.progress.useQuery(
+  
+  const { data: progress, isLoading, refetch } = trpc.enrichment.progress.useQuery(
     { projectId },
     {
       refetchInterval: 5000, // Atualiza a cada 5 segundos
@@ -62,15 +38,14 @@ export default function EnrichmentProgress() {
   );
 
   // Query de status (para controles de pausa/retomada)
-  const { data: status, refetch: refetchStatus } =
-    trpc.enrichment.status.useQuery(
-      { projectId },
-      {
-        enabled: !!projectId,
-        refetchInterval: 5000,
-        refetchIntervalInBackground: true,
-      }
-    );
+  const { data: status, refetch: refetchStatus } = trpc.enrichment.status.useQuery(
+    { projectId },
+    {
+      enabled: !!projectId,
+      refetchInterval: 5000,
+      refetchIntervalInBackground: true,
+    }
+  );
 
   // Query de histórico
   const { data: history } = trpc.enrichment.history.useQuery(
@@ -115,31 +90,27 @@ export default function EnrichmentProgress() {
     // Filtro por data
     if (filters.dateFrom) {
       const dateFrom = new Date(filters.dateFrom);
-      filtered = filtered.filter(run => new Date(run.startedAt) >= dateFrom);
+      filtered = filtered.filter((run) => new Date(run.startedAt) >= dateFrom);
     }
     if (filters.dateTo) {
       const dateTo = new Date(filters.dateTo);
       dateTo.setHours(23, 59, 59, 999); // Incluir o dia inteiro
-      filtered = filtered.filter(run => new Date(run.startedAt) <= dateTo);
+      filtered = filtered.filter((run) => new Date(run.startedAt) <= dateTo);
     }
 
     // Filtro por status
     if (filters.status !== "all") {
-      filtered = filtered.filter(run => run.status === filters.status);
+      filtered = filtered.filter((run) => run.status === filters.status);
     }
 
     // Filtro por duração
     if (filters.durationMin) {
       const minSeconds = parseInt(filters.durationMin) * 60;
-      filtered = filtered.filter(
-        run => (run.durationSeconds || 0) >= minSeconds
-      );
+      filtered = filtered.filter((run) => (run.durationSeconds || 0) >= minSeconds);
     }
     if (filters.durationMax) {
       const maxSeconds = parseInt(filters.durationMax) * 60;
-      filtered = filtered.filter(
-        run => (run.durationSeconds || 0) <= maxSeconds
-      );
+      filtered = filtered.filter((run) => (run.durationSeconds || 0) <= maxSeconds);
     }
 
     setFilteredHistory(filtered);
@@ -165,12 +136,8 @@ export default function EnrichmentProgress() {
 
   const formatTimeSince = (date: Date) => {
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-    if (seconds < 10) {
-      return "agora mesmo";
-    }
-    if (seconds < 60) {
-      return `há ${seconds}s`;
-    }
+    if (seconds < 10) return "agora mesmo";
+    if (seconds < 60) return `há ${seconds}s`;
     const minutes = Math.floor(seconds / 60);
     return `há ${minutes}min`;
   };
@@ -242,7 +209,7 @@ export default function EnrichmentProgress() {
               Aguardando Início
             </Badge>
           )}
-
+          
           {/* Botões de Controle */}
           {status?.activeRun && (
             <div className="flex gap-2">
@@ -250,12 +217,7 @@ export default function EnrichmentProgress() {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() =>
-                    pauseMutation.mutate({
-                      projectId,
-                      runId: status.activeRun!.id,
-                    })
-                  }
+                  onClick={() => pauseMutation.mutate({ projectId, runId: status.activeRun!.id })}
                   disabled={pauseMutation.isPending}
                   className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
                 >
@@ -267,12 +229,7 @@ export default function EnrichmentProgress() {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() =>
-                    resumeMutation.mutate({
-                      projectId,
-                      runId: status.activeRun!.id,
-                    })
-                  }
+                  onClick={() => resumeMutation.mutate({ projectId, runId: status.activeRun!.id })}
                   disabled={resumeMutation.isPending}
                   className="border-green-500/30 text-green-400 hover:bg-green-500/10"
                 >
@@ -282,7 +239,7 @@ export default function EnrichmentProgress() {
               )}
             </div>
           )}
-
+          
           <span className="text-sm text-muted-foreground">
             Atualizado {formatTimeSince(lastUpdate)}
           </span>
@@ -317,17 +274,13 @@ export default function EnrichmentProgress() {
                 <div className="text-3xl font-bold text-blue-500">
                   {progress.processed}
                 </div>
-                <div className="text-sm text-muted-foreground mt-1">
-                  Processados
-                </div>
+                <div className="text-sm text-muted-foreground mt-1">Processados</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-yellow-500">
                   {progress.remaining}
                 </div>
-                <div className="text-sm text-muted-foreground mt-1">
-                  Restantes
-                </div>
+                <div className="text-sm text-muted-foreground mt-1">Restantes</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-green-500">
@@ -375,11 +328,9 @@ export default function EnrichmentProgress() {
                 Concorrentes encontrados
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Média:{" "}
-                {progress.processed > 0
-                  ? Math.round(progress.stats.concorrentes / progress.processed)
-                  : 0}{" "}
-                por cliente
+                Média: {progress.processed > 0 
+                  ? Math.round(progress.stats.concorrentes / progress.processed) 
+                  : 0} por cliente
               </p>
             </CardContent>
           </Card>
@@ -400,11 +351,9 @@ export default function EnrichmentProgress() {
                 Leads gerados
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Média:{" "}
-                {progress.processed > 0
-                  ? Math.round(progress.stats.leads / progress.processed)
-                  : 0}{" "}
-                por cliente
+                Média: {progress.processed > 0 
+                  ? Math.round(progress.stats.leads / progress.processed) 
+                  : 0} por cliente
               </p>
             </CardContent>
           </Card>
@@ -445,42 +394,31 @@ export default function EnrichmentProgress() {
                 <History className="w-5 h-5 text-purple-400" />
                 <CardTitle>Histórico de Execuções</CardTitle>
               </div>
-              <CardDescription>
-                Ultimas 5 execuções do enriquecimento
-              </CardDescription>
+              <CardDescription>Ultimas 5 execuções do enriquecimento</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {filteredHistory.map(run => {
-                  const duration = run.durationSeconds
-                    ? Math.floor(run.durationSeconds / 60)
-                    : 0;
-                  const statusColor = (
-                    {
-                      completed: "text-green-400",
-                      running: "text-blue-400",
-                      paused: "text-yellow-400",
-                      error: "text-red-400",
-                    } as Record<string, string>
-                  )[run.status];
-
+                {filteredHistory.map((run) => {
+                  const duration = run.durationSeconds ? Math.floor(run.durationSeconds / 60) : 0;
+                  const statusColor = ({
+                    completed: 'text-green-400',
+                    running: 'text-blue-400',
+                    paused: 'text-yellow-400',
+                    error: 'text-red-400',
+                  } as Record<string, string>)[run.status];
+                  
                   return (
-                    <div
-                      key={run.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-card border border-border/50"
-                    >
+                    <div key={run.id} className="flex items-center justify-between p-3 rounded-lg bg-card border border-border/50">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span
-                            className={`text-sm font-medium ${statusColor}`}
-                          >
-                            {run.status === "completed" && "✅ Concluído"}
-                            {run.status === "running" && "⏳ Em Execução"}
-                            {run.status === "paused" && "⏸️ Pausado"}
-                            {run.status === "error" && "❌ Erro"}
+                          <span className={`text-sm font-medium ${statusColor}`}>
+                            {run.status === 'completed' && '✅ Concluído'}
+                            {run.status === 'running' && '⏳ Em Execução'}
+                            {run.status === 'paused' && '⏸️ Pausado'}
+                            {run.status === 'error' && '❌ Erro'}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            {new Date(run.startedAt).toLocaleString("pt-BR")}
+                            {new Date(run.startedAt).toLocaleString('pt-BR')}
                           </span>
                         </div>
                         <div className="text-xs text-muted-foreground">
@@ -505,33 +443,23 @@ export default function EnrichmentProgress() {
             <div className="flex justify-between py-2 border-b border-border">
               <span className="text-muted-foreground">Status:</span>
               <span className="font-medium">
-                {isComplete
-                  ? "Concluído"
-                  : isInProgress
-                    ? "Em Progresso"
-                    : "Aguardando"}
+                {isComplete ? "Concluído" : isInProgress ? "Em Progresso" : "Aguardando"}
               </span>
             </div>
             <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-muted-foreground">
-                Atualização automática:
-              </span>
+              <span className="text-muted-foreground">Atualização automática:</span>
               <span className="font-medium">A cada 5 segundos</span>
             </div>
             <div className="flex justify-between py-2 border-b border-border">
               <span className="text-muted-foreground">Última atualização:</span>
-              <span className="font-medium">
-                {lastUpdate.toLocaleTimeString("pt-BR")}
-              </span>
+              <span className="font-medium">{lastUpdate.toLocaleTimeString('pt-BR')}</span>
             </div>
             {isInProgress && progress.remaining > 0 && (
               <div className="flex justify-between py-2">
                 <span className="text-muted-foreground">Tempo estimado:</span>
                 <span className="font-medium">
                   {Math.round((progress.remaining * 30) / 60)} minutos
-                  <span className="text-xs text-muted-foreground ml-1">
-                    (~30s por cliente)
-                  </span>
+                  <span className="text-xs text-muted-foreground ml-1">(~30s por cliente)</span>
                 </span>
               </div>
             )}
@@ -543,14 +471,9 @@ export default function EnrichmentProgress() {
       <Dialog open={showScheduleModal} onOpenChange={setShowScheduleModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-2xl text-foreground">
-              Agendamento de Enriquecimento
-            </DialogTitle>
+            <DialogTitle className="text-2xl text-foreground">Agendamento de Enriquecimento</DialogTitle>
           </DialogHeader>
-          <ScheduleEnrichment
-            projectId={projectId}
-            onClose={() => setShowScheduleModal(false)}
-          />
+          <ScheduleEnrichment projectId={projectId} onClose={() => setShowScheduleModal(false)} />
         </DialogContent>
       </Dialog>
     </div>
