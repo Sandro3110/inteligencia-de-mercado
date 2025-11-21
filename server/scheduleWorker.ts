@@ -54,7 +54,7 @@ async function checkAndExecuteSchedules() {
       return;
     }
 
-    const now = new Date();
+    const nowTimestamp = now();
     
     // Buscar agendamentos pendentes que já passaram da hora
     const pendingSchedules = await db
@@ -63,7 +63,7 @@ async function checkAndExecuteSchedules() {
       .where(
         and(
           eq(scheduledEnrichments.status, 'pending'),
-          lte(scheduledEnrichments.scheduledAt, now)
+          lte(scheduledEnrichments.scheduledAt, nowTimestamp)
         )
       )
       .limit(10);

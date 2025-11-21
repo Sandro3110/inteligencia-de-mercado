@@ -283,7 +283,7 @@ export function AlertConfig() {
       <div className="space-y-3">
         {alerts && alerts.length > 0 ? (
           alerts.map((alert) => {
-            const typeInfo = ALERT_TYPES[alert.type as AlertType];
+            const typeInfo = ALERT_TYPES[alert.alertType as AlertType];
             const condition = JSON.parse(alert.condition);
             return (
               <Card key={alert.id} className="bg-white border-slate-200 shadow-sm">
@@ -300,7 +300,7 @@ export function AlertConfig() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Switch
-                        checked={alert.enabled}
+                        checked={!!alert.enabled}
                         onCheckedChange={(checked) =>
                           updateMutation.mutate({ id: alert.id, enabled: checked })
                         }

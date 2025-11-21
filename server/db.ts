@@ -2489,7 +2489,7 @@ export async function getDashboardKPIs(projectId: number) {
 export async function createNotification(data: {
   userId?: string;
   projectId?: number;
-  type: 'lead_quality' | 'lead_closed' | 'new_competitor' | 'market_threshold' | 'data_incomplete';
+  type: 'lead_quality' | 'lead_closed' | 'new_competitor' | 'market_threshold' | 'data_incomplete' | 'enrichment' | 'validation' | 'export';
   title: string;
   message: string;
   entityType?: 'mercado' | 'cliente' | 'concorrente' | 'lead';

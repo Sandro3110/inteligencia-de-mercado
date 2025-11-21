@@ -11,7 +11,7 @@ import { eq } from 'drizzle-orm';
 import { clientes, mercadosUnicos, produtos, concorrentes, leads, clientesMercados } from '../drizzle/schema';
 import { generateAllDataOptimized } from './integrations/openaiOptimized';
 import crypto from 'crypto';
-import { now } from './dateUtils';
+import { now, toMySQLTimestamp } from './dateUtils';
 
 interface EnrichmentResult {
   clienteId: number;
@@ -166,7 +166,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
           preco: null,
           unidade: null,
           ativo: 1,
-          createdAt: new Date()
+          createdAt: toMySQLTimestamp(new Date())
         }).onDuplicateKeyUpdate({
           set: {
             descricao: truncate(produtoData.descricao || '', 1000),

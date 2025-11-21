@@ -1135,7 +1135,6 @@ export const appRouter = router({
           type: 'validation',
           title: input.title,
           message: input.message,
-          priority: 'normal',
         });
         
         return {
@@ -1215,9 +1214,10 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { createScheduledEnrichment } = await import('./db');
+        const { toMySQLTimestamp } = await import('./dateUtils');
         const id = await createScheduledEnrichment({
           projectId: input.projectId,
-          scheduledAt: input.scheduledAt,
+          scheduledAt: toMySQLTimestamp(input.scheduledAt),
           recurrence: input.recurrence,
           batchSize: input.batchSize,
           maxClients: input.maxClients,
@@ -1296,8 +1296,12 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { createAlertConfig } = await import('./db');
-        const { type, ...rest } = input;
-        return createAlertConfig({ ...rest, alertType: type });
+        const { type, enabled, ...rest } = input;
+        return createAlertConfig({ 
+          ...rest, 
+          alertType: type,
+          enabled: enabled ? 1 : 0
+        });
       }),
     
     update: publicProcedure
@@ -1310,8 +1314,10 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { updateAlertConfig } = await import('./db');
-        const { id, type, ...rest } = input;
-        const updateData = type ? { ...rest, alertType: type } : rest;
+        const { id, type, enabled, ...rest } = input;
+        const updateData: any = { ...rest };
+        if (type !== undefined) updateData.alertType = type;
+        if (enabled !== undefined) updateData.enabled = enabled ? 1 : 0;
         return updateAlertConfig(id, updateData);
       }),
     
@@ -1433,9 +1439,10 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { createScheduledEnrichment } = await import('./db');
+        const { toMySQLTimestamp } = await import('./dateUtils');
         const id = await createScheduledEnrichment({
           projectId: input.projectId,
-          scheduledAt: new Date(input.scheduledAt),
+          scheduledAt: toMySQLTimestamp(new Date(input.scheduledAt)),
           recurrence: input.recurrence,
           batchSize: input.batchSize,
           maxClients: input.maxClients,

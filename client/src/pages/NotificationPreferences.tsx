@@ -18,11 +18,11 @@ interface NotificationChannel {
 interface NotificationPreference {
   id: number;
   userId: string;
-  type: string;
+  type: 'lead_quality' | 'lead_closed' | 'new_competitor' | 'market_threshold' | 'data_incomplete' | 'enrichment' | 'validation' | 'export' | 'all';
   enabled: number;
-  channels: NotificationChannel;
-  createdAt: string;
-  updatedAt: string;
+  channels: NotificationChannel | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 
 const NOTIFICATION_TYPES = [

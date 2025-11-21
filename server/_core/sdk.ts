@@ -267,7 +267,8 @@ class SDKServer {
     }
 
     const sessionUserId = session.openId;
-    const signedInAt = new Date();
+    const { toMySQLTimestamp } = await import('../dateUtils');
+    const signedInAt = toMySQLTimestamp(new Date());
     let user = await db.getUser(sessionUserId);
 
     // If user not in DB, sync from OAuth server automatically
