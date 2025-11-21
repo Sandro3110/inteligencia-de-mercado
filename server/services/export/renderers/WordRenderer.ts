@@ -3,19 +3,19 @@
  * Item 15 do módulo de exportação inteligente
  */
 
-import { 
-  Document, 
-  Packer, 
-  Paragraph, 
-  TextRun, 
-  Table, 
-  TableRow, 
+import {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  Table,
+  TableRow,
   TableCell,
   HeadingLevel,
   AlignmentType,
   WidthType,
-  BorderStyle
-} from 'docx';
+  BorderStyle,
+} from "docx";
 
 export interface WordRenderOptions {
   includeHeader?: boolean;
@@ -39,7 +39,7 @@ export class WordRenderer {
     const {
       includeHeader = true,
       includeSummary = true,
-      pageNumbers = true
+      pageNumbers = true,
     } = options;
 
     const sections: any[] = [];
@@ -48,15 +48,15 @@ export class WordRenderer {
     if (includeHeader) {
       sections.push(
         new Paragraph({
-          text: 'Relatório de Exportação',
+          text: "Relatório de Exportação",
           heading: HeadingLevel.HEADING_1,
           alignment: AlignmentType.CENTER,
-          spacing: { after: 400 }
+          spacing: { after: 400 },
         }),
         new Paragraph({
-          text: `Gerado em: ${metadata.generatedAt.toLocaleString('pt-BR')}`,
+          text: `Gerado em: ${metadata.generatedAt.toLocaleString("pt-BR")}`,
           alignment: AlignmentType.CENTER,
-          spacing: { after: 200 }
+          spacing: { after: 200 },
         })
       );
     }
@@ -65,13 +65,13 @@ export class WordRenderer {
     if (includeSummary && metadata.context) {
       sections.push(
         new Paragraph({
-          text: 'Contexto da Exportação',
+          text: "Contexto da Exportação",
           heading: HeadingLevel.HEADING_2,
-          spacing: { before: 400, after: 200 }
+          spacing: { before: 400, after: 200 },
         }),
         new Paragraph({
           text: metadata.context,
-          spacing: { after: 400 }
+          spacing: { after: 400 },
         })
       );
     }
@@ -79,16 +79,16 @@ export class WordRenderer {
     // Estatísticas
     sections.push(
       new Paragraph({
-        text: 'Estatísticas',
+        text: "Estatísticas",
         heading: HeadingLevel.HEADING_2,
-        spacing: { before: 400, after: 200 }
+        spacing: { before: 400, after: 200 },
       }),
       new Paragraph({
         children: [
-          new TextRun({ text: 'Total de registros: ', bold: true }),
-          new TextRun({ text: metadata.recordCount.toString() })
+          new TextRun({ text: "Total de registros: ", bold: true }),
+          new TextRun({ text: metadata.recordCount.toString() }),
         ],
-        spacing: { after: 100 }
+        spacing: { after: 100 },
       })
     );
 
@@ -96,13 +96,13 @@ export class WordRenderer {
     if (metadata.analysis) {
       sections.push(
         new Paragraph({
-          text: 'Análise Contextualizada',
+          text: "Análise Contextualizada",
           heading: HeadingLevel.HEADING_2,
-          spacing: { before: 400, after: 200 }
+          spacing: { before: 400, after: 200 },
         }),
         new Paragraph({
           text: metadata.analysis,
-          spacing: { after: 400 }
+          spacing: { after: 400 },
         })
       );
     }
@@ -110,9 +110,9 @@ export class WordRenderer {
     // Tabela de dados
     sections.push(
       new Paragraph({
-        text: 'Dados Exportados',
+        text: "Dados Exportados",
         heading: HeadingLevel.HEADING_2,
-        spacing: { before: 400, after: 200 }
+        spacing: { before: 400, after: 200 },
       })
     );
 
@@ -124,29 +124,31 @@ export class WordRenderer {
         new Paragraph({
           children: [
             new TextRun({
-              text: 'Nenhum registro encontrado.',
-              italics: true
-            })
-          ]
+              text: "Nenhum registro encontrado.",
+              italics: true,
+            }),
+          ],
         })
       );
     }
 
     // Criar documento
     const doc = new Document({
-      sections: [{
-        properties: {
-          page: {
-            margin: {
-              top: 1440,    // 1 inch
-              right: 1440,
-              bottom: 1440,
-              left: 1440
-            }
-          }
+      sections: [
+        {
+          properties: {
+            page: {
+              margin: {
+                top: 1440, // 1 inch
+                right: 1440,
+                bottom: 1440,
+                left: 1440,
+              },
+            },
+          },
+          children: sections,
         },
-        children: sections
-      }]
+      ],
     });
 
     // Gerar buffer
@@ -168,53 +170,59 @@ export class WordRenderer {
     // Criar linha de cabeçalho
     const headerRow = new TableRow({
       tableHeader: true,
-      children: columns.map(col => 
-        new TableCell({
-          children: [
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: this.formatColumnName(col),
-                  bold: true
-                })
-              ],
-              alignment: AlignmentType.CENTER
-            })
-          ],
-          shading: {
-            fill: '4472C4'
-          },
-          width: {
-            size: 100 / columns.length,
-            type: WidthType.PERCENTAGE
-          }
-        })
-      )
-    });
-
-    // Criar linhas de dados
-    const dataRows = data.slice(0, 1000).map((record, index) => // Limitar a 1000 registros
-      new TableRow({
-        children: columns.map(col => 
+      children: columns.map(
+        col =>
           new TableCell({
             children: [
               new Paragraph({
-                text: this.formatCellValue(record[col])
-              })
+                children: [
+                  new TextRun({
+                    text: this.formatColumnName(col),
+                    bold: true,
+                  }),
+                ],
+                alignment: AlignmentType.CENTER,
+              }),
             ],
             shading: {
-              fill: index % 2 === 0 ? 'FFFFFF' : 'F2F2F2'
-            }
+              fill: "4472C4",
+            },
+            width: {
+              size: 100 / columns.length,
+              type: WidthType.PERCENTAGE,
+            },
           })
-        )
-      })
+      ),
+    });
+
+    // Criar linhas de dados
+    const dataRows = data.slice(0, 1000).map(
+      (
+        record,
+        index // Limitar a 1000 registros
+      ) =>
+        new TableRow({
+          children: columns.map(
+            col =>
+              new TableCell({
+                children: [
+                  new Paragraph({
+                    text: this.formatCellValue(record[col]),
+                  }),
+                ],
+                shading: {
+                  fill: index % 2 === 0 ? "FFFFFF" : "F2F2F2",
+                },
+              })
+          ),
+        })
     );
 
     return new Table({
       rows: [headerRow, ...dataRows],
       width: {
         size: 100,
-        type: WidthType.PERCENTAGE
+        type: WidthType.PERCENTAGE,
       },
       borders: {
         top: { style: BorderStyle.SINGLE, size: 1 },
@@ -222,8 +230,8 @@ export class WordRenderer {
         left: { style: BorderStyle.SINGLE, size: 1 },
         right: { style: BorderStyle.SINGLE, size: 1 },
         insideHorizontal: { style: BorderStyle.SINGLE, size: 1 },
-        insideVertical: { style: BorderStyle.SINGLE, size: 1 }
-      }
+        insideVertical: { style: BorderStyle.SINGLE, size: 1 },
+      },
     });
   }
 
@@ -232,7 +240,7 @@ export class WordRenderer {
    */
   private formatColumnName(name: string): string {
     return name
-      .replace(/([A-Z])/g, ' $1')
+      .replace(/([A-Z])/g, " $1")
       .replace(/^./, str => str.toUpperCase())
       .trim();
   }
@@ -241,9 +249,15 @@ export class WordRenderer {
    * Formata valor de célula
    */
   private formatCellValue(value: any): string {
-    if (value === null || value === undefined) return '';
-    if (typeof value === 'object') return JSON.stringify(value);
-    if (typeof value === 'boolean') return value ? 'Sim' : 'Não';
+    if (value === null || value === undefined) {
+      return "";
+    }
+    if (typeof value === "object") {
+      return JSON.stringify(value);
+    }
+    if (typeof value === "boolean") {
+      return value ? "Sim" : "Não";
+    }
     return String(value);
   }
 }

@@ -121,12 +121,14 @@ export const slideUpVariants: Variants = {
 
 // Configuração para respeitar prefers-reduced-motion
 export const getReducedMotionConfig = () => {
-  if (typeof window === "undefined") return false;
-  
+  if (typeof window === "undefined") {
+    return false;
+  }
+
   const prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   ).matches;
-  
+
   return prefersReducedMotion;
 };
 
@@ -143,6 +145,6 @@ export const withReducedMotion = (variants: Variants): Variants => {
       show: {},
     };
   }
-  
+
   return variants;
 };

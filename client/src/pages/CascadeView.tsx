@@ -1,8 +1,18 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { motion, AnimatePresence } from "framer-motion";
-import { pageVariants, pageTransition, listVariants, listItemVariants } from "@/lib/animations";
-import { calculateQualityScore, classifyQuality, isValidCNPJFormat, isValidEmailFormat } from "@shared/qualityScore";
+import {
+  pageVariants,
+  pageTransition,
+  listVariants,
+  listItemVariants,
+} from "@/lib/animations";
+import {
+  calculateQualityScore,
+  classifyQuality,
+  isValidCNPJFormat,
+  isValidEmailFormat,
+} from "@shared/qualityScore";
 import { trpc } from "@/lib/trpc";
 // ThemeToggle removido - sistema usa apenas tema light
 import { DetailPopup } from "@/components/DetailPopup";
@@ -11,10 +21,18 @@ import { TagManager } from "@/components/TagManager";
 import { EntityTagPicker } from "@/components/EntityTagPicker";
 import { TagFilter } from "@/components/TagFilter";
 import { MultiSelectFilter } from "@/components/MultiSelectFilter";
-import { SearchFieldSelector, SearchField } from "@/components/SearchFieldSelector";
+import {
+  SearchFieldSelector,
+  SearchField,
+} from "@/components/SearchFieldSelector";
 import { SaveFilterDialog } from "@/components/SaveFilterDialog";
 import { SavedFilters } from "@/components/SavedFilters";
-import { SkeletonMercado, SkeletonCliente, SkeletonConcorrente, SkeletonLead } from "@/components/SkeletonLoading";
+import {
+  SkeletonMercado,
+  SkeletonCliente,
+  SkeletonConcorrente,
+  SkeletonLead,
+} from "@/components/SkeletonLoading";
 import { MercadoAccordionCard } from "@/components/MercadoAccordionCard";
 import { CompararMercadosModal } from "@/components/CompararMercadosModal";
 import { Button } from "@/components/ui/button";
@@ -22,10 +40,20 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import {
   Building2,
@@ -52,7 +80,12 @@ import {
   List,
   GitCompare,
 } from "lucide-react";
-import { exportToCSV, exportToExcel, exportToPDF, ExportData } from "@/lib/exportUtils";
+import {
+  exportToCSV,
+  exportToExcel,
+  exportToPDF,
+  ExportData,
+} from "@/lib/exportUtils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,20 +109,30 @@ type ViewMode = "list" | "kanban";
 
 export default function CascadeView() {
   const { selectedProjectId } = useSelectedProject();
-  const { selectedPesquisaId, pesquisas, selectPesquisa } = useSelectedPesquisa(selectedProjectId);
+  const { selectedPesquisaId, pesquisas, selectPesquisa } =
+    useSelectedPesquisa(selectedProjectId);
   const { sidebarClass } = useSidebarState();
   const [currentPage, setCurrentPage] = useState<Page>("mercados");
-  const [selectedMercadoId, setSelectedMercadoId] = useState<number | null>(null);
+  const [selectedMercadoId, setSelectedMercadoId] = useState<number | null>(
+    null
+  );
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [searchQuery, setSearchQuery] = useState(""); // Inicia vazio, carrega do cache depois
-  const [searchFields, setSearchFields] = useState<SearchField[]>(["nome", "cnpj", "produto"]); // Campos padrão
+  const [searchFields, setSearchFields] = useState<SearchField[]>([
+    "nome",
+    "cnpj",
+    "produto",
+  ]); // Campos padrão
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
-  const [sortBy, setSortBy] = useState<"nome" | "qualidade" | "data" | "status">("nome");
+  const [sortBy, setSortBy] = useState<
+    "nome" | "qualidade" | "data" | "status"
+  >("nome");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [selectedMercadosForComparison, setSelectedMercadosForComparison] = useState<Set<number>>(new Set());
+  const [selectedMercadosForComparison, setSelectedMercadosForComparison] =
+    useState<Set<number>>(new Set());
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
-  
+
   // Estados para filtros avançados
   const [mercadoFilters, setMercadoFilters] = useState<{
     segmentacao: string[];
@@ -98,7 +141,7 @@ export default function CascadeView() {
     segmentacao: [],
     categoria: [],
   });
-  
+
   const [clienteFilters, setClienteFilters] = useState<{
     segmentacao: string[];
     cidade: string[];
@@ -108,13 +151,13 @@ export default function CascadeView() {
     cidade: [],
     uf: [],
   });
-  
+
   const [concorrenteFilters, setConcorrenteFilters] = useState<{
     porte: string[];
   }>({
     porte: [],
   });
-  
+
   const [leadFilters, setLeadFilters] = useState<{
     tipo: string[];
     porte: string[];
@@ -124,35 +167,37 @@ export default function CascadeView() {
   });
   const [detailPopupOpen, setDetailPopupOpen] = useState(false);
   const [detailPopupItem, setDetailPopupItem] = useState<any>(null);
-  const [detailPopupType, setDetailPopupType] = useState<"cliente" | "concorrente" | "lead">("cliente");
-  
+  const [detailPopupType, setDetailPopupType] = useState<
+    "cliente" | "concorrente" | "lead"
+  >("cliente");
+
   // Estados para validação em lote
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
   const [batchModalOpen, setBatchModalOpen] = useState(false);
   const [batchStatus, setBatchStatus] = useState<ValidationStatus>("rich");
   const [batchNotes, setBatchNotes] = useState("");
-  
+
   // Estado para salvar filtros
   const [saveFilterDialogOpen, setSaveFilterDialogOpen] = useState(false);
-  
+
   // Estados para scroll tracking
   const [showScrollTop, setShowScrollTop] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Estados para paginação
   const [currentPageNum, setCurrentPageNum] = useState(1);
   const pageSize = 20;
 
   const { data: mercados, isLoading } = trpc.mercados.list.useQuery(
-    { 
-      projectId: selectedProjectId!, 
+    {
+      projectId: selectedProjectId!,
       pesquisaId: selectedPesquisaId || undefined,
-      search: "" 
+      search: "",
     },
     { enabled: !!selectedProjectId }
   );
-  
+
   // Buscar estatísticas dinâmicas do banco
   const { data: dashboardStats } = trpc.dashboard.stats.useQuery(
     { projectId: selectedProjectId! },
@@ -170,7 +215,7 @@ export default function CascadeView() {
     { mercadoId: selectedMercadoId!, page: currentPageNum, pageSize },
     { enabled: !!selectedMercadoId }
   );
-  
+
   // Extrair dados da resposta paginada
   const clientes = clientesResponse?.data || [];
   const concorrentes = concorrentesResponse?.data || [];
@@ -181,10 +226,11 @@ export default function CascadeView() {
     { tagId: selectedTagIds[0] || 0, entityType: "cliente" },
     { enabled: selectedTagIds.length > 0 && currentPage === "clientes" }
   );
-  const { data: concorrentesComTags = [] } = trpc.tags.getEntitiesByTag.useQuery(
-    { tagId: selectedTagIds[0] || 0, entityType: "concorrente" },
-    { enabled: selectedTagIds.length > 0 && currentPage === "concorrentes" }
-  );
+  const { data: concorrentesComTags = [] } =
+    trpc.tags.getEntitiesByTag.useQuery(
+      { tagId: selectedTagIds[0] || 0, entityType: "concorrente" },
+      { enabled: selectedTagIds.length > 0 && currentPage === "concorrentes" }
+    );
   const { data: leadsComTags = [] } = trpc.tags.getEntitiesByTag.useQuery(
     { tagId: selectedTagIds[0] || 0, entityType: "lead" },
     { enabled: selectedTagIds.length > 0 && currentPage === "leads" }
@@ -193,23 +239,23 @@ export default function CascadeView() {
   // Atalhos de teclado
   useKeyboardShortcuts([
     {
-      key: 'k',
+      key: "k",
       ctrl: true,
       handler: () => {
         searchInputRef.current?.focus();
         searchInputRef.current?.select();
       },
-      description: 'Focar no campo de busca',
+      description: "Focar no campo de busca",
     },
     {
-      key: '/',
+      key: "/",
       handler: () => {
         searchInputRef.current?.focus();
       },
-      description: 'Focar no campo de busca',
+      description: "Focar no campo de busca",
     },
     {
-      key: 'Escape',
+      key: "Escape",
       handler: () => {
         if (detailPopupOpen) {
           setDetailPopupOpen(false);
@@ -217,13 +263,17 @@ export default function CascadeView() {
           setBatchModalOpen(false);
         }
       },
-      description: 'Fechar modals',
+      description: "Fechar modals",
     },
   ]);
-  
+
   // Metadata de paginação
   const clientesMeta = clientesResponse || { total: 0, page: 1, totalPages: 0 };
-  const concorrentesMeta = concorrentesResponse || { total: 0, page: 1, totalPages: 0 };
+  const concorrentesMeta = concorrentesResponse || {
+    total: 0,
+    page: 1,
+    totalPages: 0,
+  };
   const leadsMeta = leadsResponse || { total: 0, page: 1, totalPages: 0 };
 
   const utils = trpc.useUtils();
@@ -233,19 +283,20 @@ export default function CascadeView() {
       utils.mercados.list.invalidate();
     },
   });
-  const updateConcorrenteMutation = trpc.concorrentes.updateValidation.useMutation({
-    onSuccess: () => {
-      utils.concorrentes.byMercado.invalidate();
-      utils.mercados.list.invalidate();
-    },
-  });
+  const updateConcorrenteMutation =
+    trpc.concorrentes.updateValidation.useMutation({
+      onSuccess: () => {
+        utils.concorrentes.byMercado.invalidate();
+        utils.mercados.list.invalidate();
+      },
+    });
   const updateLeadMutation = trpc.leads.updateValidation.useMutation({
     onSuccess: () => {
       utils.leads.byMercado.invalidate();
       utils.mercados.list.invalidate();
     },
   });
-  
+
   const saveFilterMutation = trpc.savedFilters.create.useMutation({
     onSuccess: () => {
       utils.savedFilters.list.invalidate();
@@ -256,7 +307,7 @@ export default function CascadeView() {
     },
   });
 
-  const mercadoSelecionado = mercados?.find((m) => m.id === selectedMercadoId);
+  const mercadoSelecionado = mercados?.find(m => m.id === selectedMercadoId);
 
   // Carregar última pesquisa do cache ao montar o componente
   useEffect(() => {
@@ -279,15 +330,19 @@ export default function CascadeView() {
 
   // Monitorar scroll para mostrar botão voltar ao topo
   useEffect(() => {
-    const viewport = scrollAreaRef.current?.querySelector('[data-slot="scroll-area-viewport"]');
-    if (!viewport) return;
+    const viewport = scrollAreaRef.current?.querySelector(
+      '[data-slot="scroll-area-viewport"]'
+    );
+    if (!viewport) {
+      return;
+    }
 
     const handleScroll = () => {
       setShowScrollTop(viewport.scrollTop > 200);
     };
 
-    viewport.addEventListener('scroll', handleScroll);
-    return () => viewport.removeEventListener('scroll', handleScroll);
+    viewport.addEventListener("scroll", handleScroll);
+    return () => viewport.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Calcular totais gerais a partir das estatísticas do banco
@@ -298,59 +353,94 @@ export default function CascadeView() {
 
   // Filtrar por status
   const filterByStatus = (items: any[]) => {
-    if (statusFilter === "all") return items;
-    if (statusFilter === "pending") return items.filter((i) => i.validationStatus === "pending");
-    if (statusFilter === "rich") return items.filter((i) => i.validationStatus === "rich");
-    if (statusFilter === "discarded") return items.filter((i) => i.validationStatus === "discarded");
+    if (statusFilter === "all") {
+      return items;
+    }
+    if (statusFilter === "pending") {
+      return items.filter(i => i.validationStatus === "pending");
+    }
+    if (statusFilter === "rich") {
+      return items.filter(i => i.validationStatus === "rich");
+    }
+    if (statusFilter === "discarded") {
+      return items.filter(i => i.validationStatus === "discarded");
+    }
     return items;
   };
 
   // Busca global multi-campo
-  const matchesSearch = (item: any, type: "mercado" | "cliente" | "concorrente" | "lead") => {
-    if (!searchQuery || searchFields.length === 0) return true;
-    
+  const matchesSearch = (
+    item: any,
+    type: "mercado" | "cliente" | "concorrente" | "lead"
+  ) => {
+    if (!searchQuery || searchFields.length === 0) {
+      return true;
+    }
+
     const query = searchQuery.toLowerCase();
     const checkField = (value: string | null | undefined) => {
-      if (!value) return false;
+      if (!value) {
+        return false;
+      }
       return value.toLowerCase().includes(query);
     };
 
-    return searchFields.some((field) => {
+    return searchFields.some(field => {
       switch (field) {
         case "nome":
-          if (type === "mercado") return checkField(item.nome);
-          if (type === "cliente") return checkField(item.empresa);
-          if (type === "concorrente") return checkField(item.nome);
-          if (type === "lead") return checkField(item.nome);
+          if (type === "mercado") {
+            return checkField(item.nome);
+          }
+          if (type === "cliente") {
+            return checkField(item.empresa);
+          }
+          if (type === "concorrente") {
+            return checkField(item.nome);
+          }
+          if (type === "lead") {
+            return checkField(item.nome);
+          }
           return false;
-        
+
         case "cnpj":
           return checkField(item.cnpj);
-        
+
         case "produto":
-          if (type === "mercado") return checkField(item.categoria);
-          if (type === "cliente") return checkField(item.produtoPrincipal);
-          if (type === "concorrente") return checkField(item.produto);
+          if (type === "mercado") {
+            return checkField(item.categoria);
+          }
+          if (type === "cliente") {
+            return checkField(item.produtoPrincipal);
+          }
+          if (type === "concorrente") {
+            return checkField(item.produto);
+          }
           return false;
-        
+
         case "cidade":
-          if (type === "cliente") return checkField(item.cidade);
-          if (type === "lead") return checkField(item.regiao); // Região como aproximação
+          if (type === "cliente") {
+            return checkField(item.cidade);
+          }
+          if (type === "lead") {
+            return checkField(item.regiao);
+          } // Região como aproximação
           return false;
-        
+
         case "uf":
-          if (type === "cliente") return checkField(item.uf);
+          if (type === "cliente") {
+            return checkField(item.uf);
+          }
           return false;
-        
+
         case "email":
           return checkField(item.email);
-        
+
         case "telefone":
           return checkField(item.telefone);
-        
+
         case "observacoes":
           return checkField(item.observacoes) || checkField(item.notas);
-        
+
         default:
           return false;
       }
@@ -362,143 +452,191 @@ export default function CascadeView() {
     const sorted = [...entities];
     sorted.sort((a, b) => {
       let compareValue = 0;
-      
+
       switch (sortBy) {
         case "nome":
           const nameA = a.nome || a.empresa || "";
           const nameB = b.nome || b.empresa || "";
           compareValue = nameA.localeCompare(nameB);
           break;
-        
+
         case "qualidade":
           const scoreA = calculateQualityScore(a);
           const scoreB = calculateQualityScore(b);
           compareValue = scoreB - scoreA; // Maior qualidade primeiro
           break;
-        
+
         case "data":
           const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
           const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
           compareValue = dateB - dateA; // Mais recente primeiro
           break;
-        
+
         case "status":
-          const statusOrder = { rich: 0, needs_adjustment: 1, pending: 2, discarded: 3 };
-          const statusA = statusOrder[a.validationStatus as keyof typeof statusOrder] ?? 4;
-          const statusB = statusOrder[b.validationStatus as keyof typeof statusOrder] ?? 4;
+          const statusOrder = {
+            rich: 0,
+            needs_adjustment: 1,
+            pending: 2,
+            discarded: 3,
+          };
+          const statusA =
+            statusOrder[a.validationStatus as keyof typeof statusOrder] ?? 4;
+          const statusB =
+            statusOrder[b.validationStatus as keyof typeof statusOrder] ?? 4;
           compareValue = statusA - statusB;
           break;
       }
-      
+
       return sortOrder === "asc" ? compareValue : -compareValue;
     });
     return sorted;
   };
 
   const filteredMercados = useMemo(() => {
-    if (!mercados) return [];
+    if (!mercados) {
+      return [];
+    }
     let filtered = filterByStatus(mercados);
-    
+
     // Busca multi-campo
     if (searchQuery && searchFields.length > 0) {
-      filtered = filtered.filter((m) => matchesSearch(m, "mercado"));
+      filtered = filtered.filter(m => matchesSearch(m, "mercado"));
     }
-    
+
     // Filtrar por segmentação
     if (mercadoFilters.segmentacao.length > 0) {
-      filtered = filtered.filter((m) =>
+      filtered = filtered.filter(m =>
         mercadoFilters.segmentacao.includes(m.segmentacao || "")
       );
     }
-    
+
     // Aplicar ordenação
     return sortEntities(filtered);
-  }, [mercados, statusFilter, searchQuery, searchFields, mercadoFilters, sortBy, sortOrder]);
+  }, [
+    mercados,
+    statusFilter,
+    searchQuery,
+    searchFields,
+    mercadoFilters,
+    sortBy,
+    sortOrder,
+  ]);
 
   const filteredClientes = useMemo(() => {
-    if (!clientes) return [];
+    if (!clientes) {
+      return [];
+    }
     let filtered = filterByStatus(clientes);
-    
+
     // Busca multi-campo
     if (searchQuery && searchFields.length > 0) {
-      filtered = filtered.filter((c) => matchesSearch(c, "cliente"));
+      filtered = filtered.filter(c => matchesSearch(c, "cliente"));
     }
     // Filtrar por tags
     if (selectedTagIds.length > 0) {
       const idsComTags = new Set(clientesComTags);
-      filtered = filtered.filter((c) => idsComTags.has(c.id));
+      filtered = filtered.filter(c => idsComTags.has(c.id));
     }
     // Filtrar por segmentação
     if (clienteFilters.segmentacao.length > 0) {
-      filtered = filtered.filter((c) =>
+      filtered = filtered.filter(c =>
         clienteFilters.segmentacao.includes(c.segmentacaoB2bB2c || "")
       );
     }
     // Filtrar por UF
     if (clienteFilters.uf.length > 0) {
-      filtered = filtered.filter((c) =>
-        clienteFilters.uf.includes(c.uf || "")
-      );
+      filtered = filtered.filter(c => clienteFilters.uf.includes(c.uf || ""));
     }
     // Aplicar ordenação
     return sortEntities(filtered);
-  }, [clientes, statusFilter, searchQuery, selectedTagIds, clientesComTags, clienteFilters, sortBy, sortOrder]);
+  }, [
+    clientes,
+    statusFilter,
+    searchQuery,
+    selectedTagIds,
+    clientesComTags,
+    clienteFilters,
+    sortBy,
+    sortOrder,
+  ]);
 
   const filteredConcorrentes = useMemo(() => {
-    if (!concorrentes) return [];
+    if (!concorrentes) {
+      return [];
+    }
     let filtered = filterByStatus(concorrentes);
-    
+
     // Busca multi-campo
     if (searchQuery && searchFields.length > 0) {
-      filtered = filtered.filter((c) => matchesSearch(c, "concorrente"));
+      filtered = filtered.filter(c => matchesSearch(c, "concorrente"));
     }
     // Filtrar por tags
     if (selectedTagIds.length > 0) {
       const idsComTags = new Set(concorrentesComTags);
-      filtered = filtered.filter((c) => idsComTags.has(c.id));
+      filtered = filtered.filter(c => idsComTags.has(c.id));
     }
     // Filtrar por porte
     if (concorrenteFilters.porte.length > 0) {
-      filtered = filtered.filter((c) =>
+      filtered = filtered.filter(c =>
         concorrenteFilters.porte.includes(c.porte || "")
       );
     }
     // Aplicar ordenação
     return sortEntities(filtered);
-  }, [concorrentes, statusFilter, searchQuery, selectedTagIds, concorrentesComTags, concorrenteFilters, sortBy, sortOrder]);
+  }, [
+    concorrentes,
+    statusFilter,
+    searchQuery,
+    selectedTagIds,
+    concorrentesComTags,
+    concorrenteFilters,
+    sortBy,
+    sortOrder,
+  ]);
 
   const filteredLeads = useMemo(() => {
-    if (!leads) return [];
+    if (!leads) {
+      return [];
+    }
     let filtered = filterByStatus(leads);
-    
+
     // Busca multi-campo
     if (searchQuery && searchFields.length > 0) {
-      filtered = filtered.filter((l) => matchesSearch(l, "lead"));
+      filtered = filtered.filter(l => matchesSearch(l, "lead"));
     }
     // Filtrar por tags
     if (selectedTagIds.length > 0) {
       const idsComTags = new Set(leadsComTags);
-      filtered = filtered.filter((l) => idsComTags.has(l.id));
+      filtered = filtered.filter(l => idsComTags.has(l.id));
     }
     // Filtrar por tipo
     if (leadFilters.tipo.length > 0) {
-      filtered = filtered.filter((l) =>
-        leadFilters.tipo.includes(l.tipo || "")
-      );
+      filtered = filtered.filter(l => leadFilters.tipo.includes(l.tipo || ""));
     }
     // Filtrar por porte
     if (leadFilters.porte.length > 0) {
-      filtered = filtered.filter((l) =>
+      filtered = filtered.filter(l =>
         leadFilters.porte.includes(l.porte || "")
       );
     }
     // Aplicar ordenação
     return sortEntities(filtered);
-  }, [leads, statusFilter, searchQuery, selectedTagIds, leadsComTags, leadFilters, sortBy, sortOrder]);
+  }, [
+    leads,
+    statusFilter,
+    searchQuery,
+    selectedTagIds,
+    leadsComTags,
+    leadFilters,
+    sortBy,
+    sortOrder,
+  ]);
 
   // Contador de resultados de busca
   const searchResultsCount = useMemo(() => {
-    if (!searchQuery) return null;
+    if (!searchQuery) {
+      return null;
+    }
     return {
       clientes: filteredClientes.length,
       concorrentes: filteredConcorrentes.length,
@@ -508,9 +646,11 @@ export default function CascadeView() {
 
   // Funções de navegação
   const scrollToTop = () => {
-    const viewport = scrollAreaRef.current?.querySelector('[data-slot="scroll-area-viewport"]');
+    const viewport = scrollAreaRef.current?.querySelector(
+      '[data-slot="scroll-area-viewport"]'
+    );
     if (viewport) {
-      viewport.scrollTo({ top: 0, behavior: 'smooth' });
+      viewport.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -522,42 +662,72 @@ export default function CascadeView() {
   };
 
   const handleNextPage = () => {
-    if (currentPage === "mercados") setCurrentPage("clientes");
-    else if (currentPage === "clientes") setCurrentPage("concorrentes");
-    else if (currentPage === "concorrentes") setCurrentPage("leads");
+    if (currentPage === "mercados") {
+      setCurrentPage("clientes");
+    } else if (currentPage === "clientes") {
+      setCurrentPage("concorrentes");
+    } else if (currentPage === "concorrentes") {
+      setCurrentPage("leads");
+    }
     setSelectedItems(new Set());
     setTimeout(scrollToTop, 100);
   };
 
   const handlePrevPage = () => {
-    if (currentPage === "leads") setCurrentPage("concorrentes");
-    else if (currentPage === "concorrentes") setCurrentPage("clientes");
-    else if (currentPage === "clientes") setCurrentPage("mercados");
+    if (currentPage === "leads") {
+      setCurrentPage("concorrentes");
+    } else if (currentPage === "concorrentes") {
+      setCurrentPage("clientes");
+    } else if (currentPage === "clientes") {
+      setCurrentPage("mercados");
+    }
     setSelectedItems(new Set());
     setTimeout(scrollToTop, 100);
   };
 
   const getPageTitle = () => {
-    if (currentPage === "mercados") return "Selecione um Mercado";
-    if (currentPage === "clientes") return `Clientes - ${mercadoSelecionado?.nome || ""}`;
-    if (currentPage === "concorrentes") return `Concorrentes - ${mercadoSelecionado?.nome || ""}`;
-    if (currentPage === "leads") return `Leads - ${mercadoSelecionado?.nome || ""}`;
+    if (currentPage === "mercados") {
+      return "Selecione um Mercado";
+    }
+    if (currentPage === "clientes") {
+      return `Clientes - ${mercadoSelecionado?.nome || ""}`;
+    }
+    if (currentPage === "concorrentes") {
+      return `Concorrentes - ${mercadoSelecionado?.nome || ""}`;
+    }
+    if (currentPage === "leads") {
+      return `Leads - ${mercadoSelecionado?.nome || ""}`;
+    }
     return "";
   };
 
   const getPageNumber = () => {
-    if (currentPage === "mercados") return 1;
-    if (currentPage === "clientes") return 2;
-    if (currentPage === "concorrentes") return 3;
-    if (currentPage === "leads") return 4;
+    if (currentPage === "mercados") {
+      return 1;
+    }
+    if (currentPage === "clientes") {
+      return 2;
+    }
+    if (currentPage === "concorrentes") {
+      return 3;
+    }
+    if (currentPage === "leads") {
+      return 4;
+    }
     return 1;
   };
 
   // Ícones de status
   const getStatusIcon = (status: string | null) => {
-    if (status === "rich") return <CheckCircle2 className="w-4 h-4 text-green-500" />;
-    if (status === "needs_adjustment") return <AlertCircle className="w-4 h-4 text-yellow-500" />;
-    if (status === "discarded") return <XCircle className="w-4 h-4 text-red-500" />;
+    if (status === "rich") {
+      return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+    }
+    if (status === "needs_adjustment") {
+      return <AlertCircle className="w-4 h-4 text-yellow-500" />;
+    }
+    if (status === "discarded") {
+      return <XCircle className="w-4 h-4 text-red-500" />;
+    }
     return <Clock className="w-4 h-4 text-muted-foreground" />;
   };
 
@@ -596,14 +766,16 @@ export default function CascadeView() {
 
   // Validação em lote
   const handleBatchValidation = async () => {
-    if (selectedItems.size === 0) return;
+    if (selectedItems.size === 0) {
+      return;
+    }
 
     try {
       const ids = Array.from(selectedItems);
-      
+
       if (currentPage === "clientes") {
         await Promise.all(
-          ids.map((id) =>
+          ids.map(id =>
             updateClienteMutation.mutateAsync({
               id,
               status: batchStatus,
@@ -613,7 +785,7 @@ export default function CascadeView() {
         );
       } else if (currentPage === "concorrentes") {
         await Promise.all(
-          ids.map((id) =>
+          ids.map(id =>
             updateConcorrenteMutation.mutateAsync({
               id,
               status: batchStatus,
@@ -623,7 +795,7 @@ export default function CascadeView() {
         );
       } else if (currentPage === "leads") {
         await Promise.all(
-          ids.map((id) =>
+          ids.map(id =>
             updateLeadMutation.mutateAsync({
               id,
               status: batchStatus,
@@ -654,22 +826,58 @@ export default function CascadeView() {
       data = filteredMercados;
       totalData = mercados?.length || 0;
       entityType = "mercados";
-      headers = ["ID", "Nome", "Segmentação", "Categoria", "Tamanho", "Crescimento", "Qualidade (%)", "Status"];
+      headers = [
+        "ID",
+        "Nome",
+        "Segmentação",
+        "Categoria",
+        "Tamanho",
+        "Crescimento",
+        "Qualidade (%)",
+        "Status",
+      ];
     } else if (currentPage === "clientes") {
       data = filteredClientes;
       totalData = clientes?.length || 0;
       entityType = "clientes";
-      headers = ["ID", "Empresa", "CNPJ", "Produto", "Segmentação", "Cidade", "UF", "Qualidade (%)", "Status"];
+      headers = [
+        "ID",
+        "Empresa",
+        "CNPJ",
+        "Produto",
+        "Segmentação",
+        "Cidade",
+        "UF",
+        "Qualidade (%)",
+        "Status",
+      ];
     } else if (currentPage === "concorrentes") {
       data = filteredConcorrentes;
       totalData = concorrentes?.length || 0;
       entityType = "concorrentes";
-      headers = ["ID", "Nome", "CNPJ", "Produto", "Porte", "Qualidade (%)", "Status"];
+      headers = [
+        "ID",
+        "Nome",
+        "CNPJ",
+        "Produto",
+        "Porte",
+        "Qualidade (%)",
+        "Status",
+      ];
     } else if (currentPage === "leads") {
       data = filteredLeads;
       totalData = leads?.length || 0;
       entityType = "leads";
-      headers = ["ID", "Nome", "CNPJ", "Tipo", "Porte", "Região", "Qualidade (%)", "Status"];
+      headers = [
+        "ID",
+        "Nome",
+        "CNPJ",
+        "Tipo",
+        "Porte",
+        "Região",
+        "Qualidade (%)",
+        "Status",
+      ];
     } else {
       toast.error("Selecione uma página com dados para exportar");
       return null;
@@ -684,57 +892,59 @@ export default function CascadeView() {
 
     // Preparar linhas
     const rows = data.map((item): (string | number)[] => {
-        const qualityScore = calculateQualityScore(item);
-        
-        if (currentPage === "mercados") {
-          return [
-            item.id,
-            `"${item.nome || ""}"`,
-            item.segmentacao || "",
-            `"${item.categoria || ""}"`,
-            item.tamanhoMercado || "",
-            item.crescimentoAnual || "",
-            qualityScore,
-            item.validationStatus || "pending",
-          ];
-        } else if (currentPage === "clientes") {
-          return [
-            item.id,
-            `"${item.empresa || ""}"`,
-            item.cnpj || "",
-            `"${item.produtoPrincipal || ""}"`,
-            item.segmentacaoB2bB2c || "",
-            item.cidade || "",
-            item.uf || "",
-            qualityScore,
-            item.validationStatus || "pending",
-          ];
-        } else if (currentPage === "concorrentes") {
-          return [
-            item.id,
-            `"${item.nome || ""}"`,
-            item.cnpj || "",
-            `"${item.produto || ""}"`,
-            item.porte || "",
-            qualityScore,
-            item.validationStatus || "pending",
-          ];
-        } else {
-          return [
-            item.id,
-            `"${item.nome || ""}"`,
-            item.cnpj || "",
-            item.tipo || "",
-            item.porte || "",
-            item.regiao || "",
-            qualityScore,
-            item.validationStatus || "pending",
-          ];
-        }
-      });
+      const qualityScore = calculateQualityScore(item);
 
-    const hasFiltersActive = searchQuery || selectedTagIds.length > 0 || 
-      statusFilter !== "all" || 
+      if (currentPage === "mercados") {
+        return [
+          item.id,
+          `"${item.nome || ""}"`,
+          item.segmentacao || "",
+          `"${item.categoria || ""}"`,
+          item.tamanhoMercado || "",
+          item.crescimentoAnual || "",
+          qualityScore,
+          item.validationStatus || "pending",
+        ];
+      } else if (currentPage === "clientes") {
+        return [
+          item.id,
+          `"${item.empresa || ""}"`,
+          item.cnpj || "",
+          `"${item.produtoPrincipal || ""}"`,
+          item.segmentacaoB2bB2c || "",
+          item.cidade || "",
+          item.uf || "",
+          qualityScore,
+          item.validationStatus || "pending",
+        ];
+      } else if (currentPage === "concorrentes") {
+        return [
+          item.id,
+          `"${item.nome || ""}"`,
+          item.cnpj || "",
+          `"${item.produto || ""}"`,
+          item.porte || "",
+          qualityScore,
+          item.validationStatus || "pending",
+        ];
+      } else {
+        return [
+          item.id,
+          `"${item.nome || ""}"`,
+          item.cnpj || "",
+          item.tipo || "",
+          item.porte || "",
+          item.regiao || "",
+          qualityScore,
+          item.validationStatus || "pending",
+        ];
+      }
+    });
+
+    const hasFiltersActive =
+      searchQuery ||
+      selectedTagIds.length > 0 ||
+      statusFilter !== "all" ||
       Object.values(mercadoFilters).some(arr => arr.length > 0) ||
       Object.values(clienteFilters).some(arr => arr.length > 0) ||
       Object.values(concorrenteFilters).some(arr => arr.length > 0) ||
@@ -742,10 +952,18 @@ export default function CascadeView() {
 
     // Construir descrição dos filtros ativos
     const activeFilters: string[] = [];
-    if (searchQuery) activeFilters.push(`Busca: "${searchQuery}"`);
-    if (selectedTagIds.length > 0) activeFilters.push(`Tags: ${selectedTagIds.length} selecionadas`);
-    if (statusFilter !== "all") activeFilters.push(`Status: ${statusFilter}`);
-    if (sortBy !== "nome") activeFilters.push(`Ordenado por: ${sortBy}`);
+    if (searchQuery) {
+      activeFilters.push(`Busca: "${searchQuery}"`);
+    }
+    if (selectedTagIds.length > 0) {
+      activeFilters.push(`Tags: ${selectedTagIds.length} selecionadas`);
+    }
+    if (statusFilter !== "all") {
+      activeFilters.push(`Status: ${statusFilter}`);
+    }
+    if (sortBy !== "nome") {
+      activeFilters.push(`Ordenado por: ${sortBy}`);
+    }
 
     return {
       headers,
@@ -756,8 +974,9 @@ export default function CascadeView() {
         "Data de Geração": new Date().toLocaleString("pt-BR"),
         "Total de Registros": `${data.length} de ${totalData}`,
         "Filtros Aplicados": hasFiltersActive ? "Sim" : "Não",
-        "Detalhes dos Filtros": activeFilters.length > 0 ? activeFilters.join(", ") : "Nenhum",
-        "Ordenação": `${sortBy} (${sortOrder === "asc" ? "crescente" : "decrescente"})`,
+        "Detalhes dos Filtros":
+          activeFilters.length > 0 ? activeFilters.join(", ") : "Nenhum",
+        Ordenação: `${sortBy} (${sortOrder === "asc" ? "crescente" : "decrescente"})`,
       },
     };
   };
@@ -777,15 +996,42 @@ export default function CascadeView() {
     if (currentPage === "clientes") {
       data = filteredClientes.filter(c => selectedItems.has(c.id));
       entityType = "clientes_selecionados";
-      headers = ["ID", "Empresa", "CNPJ", "Produto", "Segmentação", "Cidade", "UF", "Qualidade (%)", "Status"];
+      headers = [
+        "ID",
+        "Empresa",
+        "CNPJ",
+        "Produto",
+        "Segmentação",
+        "Cidade",
+        "UF",
+        "Qualidade (%)",
+        "Status",
+      ];
     } else if (currentPage === "concorrentes") {
       data = filteredConcorrentes.filter(c => selectedItems.has(c.id));
       entityType = "concorrentes_selecionados";
-      headers = ["ID", "Nome", "CNPJ", "Produto", "Porte", "Qualidade (%)", "Status"];
+      headers = [
+        "ID",
+        "Nome",
+        "CNPJ",
+        "Produto",
+        "Porte",
+        "Qualidade (%)",
+        "Status",
+      ];
     } else if (currentPage === "leads") {
       data = filteredLeads.filter(l => selectedItems.has(l.id));
       entityType = "leads_selecionados";
-      headers = ["ID", "Nome", "CNPJ", "Tipo", "Porte", "Região", "Qualidade (%)", "Status"];
+      headers = [
+        "ID",
+        "Nome",
+        "CNPJ",
+        "Tipo",
+        "Porte",
+        "Região",
+        "Qualidade (%)",
+        "Status",
+      ];
     } else {
       toast.error("Seleção não disponível nesta página");
       return null;
@@ -793,7 +1039,7 @@ export default function CascadeView() {
 
     const rows = data.map((item): (string | number)[] => {
       const qualityScore = calculateQualityScore(item);
-      
+
       if (currentPage === "clientes") {
         return [
           item.id,
@@ -847,7 +1093,9 @@ export default function CascadeView() {
 
   const handleExportFiltered = (format: "csv" | "excel" | "pdf") => {
     const exportData = prepareExportData();
-    if (!exportData) return;
+    if (!exportData) {
+      return;
+    }
 
     try {
       if (format === "csv") {
@@ -857,7 +1105,9 @@ export default function CascadeView() {
       } else if (format === "pdf") {
         exportToPDF(exportData);
       }
-      toast.success(`Exportado com sucesso em formato ${format.toUpperCase()}!`);
+      toast.success(
+        `Exportado com sucesso em formato ${format.toUpperCase()}!`
+      );
     } catch (error) {
       console.error("Erro ao exportar:", error);
       toast.error("Erro ao exportar dados");
@@ -866,7 +1116,9 @@ export default function CascadeView() {
 
   const handleExportSelected = (format: "csv" | "excel" | "pdf") => {
     const exportData = prepareSelectedExportData();
-    if (!exportData) return;
+    if (!exportData) {
+      return;
+    }
 
     try {
       if (format === "csv") {
@@ -876,7 +1128,9 @@ export default function CascadeView() {
       } else if (format === "pdf") {
         exportToPDF(exportData);
       }
-      toast.success(`${selectedItems.size} itens exportados em formato ${format.toUpperCase()}!`);
+      toast.success(
+        `${selectedItems.size} itens exportados em formato ${format.toUpperCase()}!`
+      );
     } catch (error) {
       console.error("Erro ao exportar:", error);
       toast.error("Erro ao exportar dados");
@@ -884,7 +1138,9 @@ export default function CascadeView() {
   };
 
   return (
-    <div className={`h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100 overflow-x-hidden transition-all duration-300 ${sidebarClass}`}>
+    <div
+      className={`h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100 overflow-x-hidden transition-all duration-300 ${sidebarClass}`}
+    >
       {/* Header Simplificado */}
       <div className="flex items-center justify-between px-6 py-2 border-b border-border/40 gap-4">
         <div className="flex items-center gap-6 min-w-0">
@@ -893,7 +1149,11 @@ export default function CascadeView() {
         <div className="flex items-center gap-2 flex-shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9 whitespace-nowrap">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 whitespace-nowrap"
+              >
                 <Download className="w-4 h-4 mr-1.5" />
                 Exportar Filtrados
               </Button>
@@ -913,12 +1173,16 @@ export default function CascadeView() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          
+
           {/* Exportar Selecionados */}
           {selectedItems.size > 0 && currentPage !== "mercados" && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="default" size="sm" className="h-9 whitespace-nowrap">
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="h-9 whitespace-nowrap"
+                >
                   <Download className="w-4 h-4 mr-1.5" />
                   Exportar Selecionados ({selectedItems.size})
                 </Button>
@@ -939,7 +1203,7 @@ export default function CascadeView() {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-          
+
           <TagManager />
         </div>
       </div>
@@ -988,141 +1252,155 @@ export default function CascadeView() {
 
           {/* Filtros Avançados */}
           <div className="flex items-center gap-2">
-              {/* Filtros de Mercados */}
-              {currentPage === "mercados" && (
-                <>
-                  <MultiSelectFilter
-                    title="Segmentação"
-                    icon={<Briefcase className="w-3 h-3" />}
-                    options={[
-                      { value: "B2B", label: "B2B" },
-                      { value: "B2C", label: "B2C" },
-                      { value: "Ambos", label: "Ambos" },
-                    ]}
-                    selectedValues={mercadoFilters.segmentacao}
-                    onValuesChange={(values) =>
-                      setMercadoFilters({ ...mercadoFilters, segmentacao: values })
-                    }
-                  />
-                </>
-              )}
+            {/* Filtros de Mercados */}
+            {currentPage === "mercados" && (
+              <>
+                <MultiSelectFilter
+                  title="Segmentação"
+                  icon={<Briefcase className="w-3 h-3" />}
+                  options={[
+                    { value: "B2B", label: "B2B" },
+                    { value: "B2C", label: "B2C" },
+                    { value: "Ambos", label: "Ambos" },
+                  ]}
+                  selectedValues={mercadoFilters.segmentacao}
+                  onValuesChange={values =>
+                    setMercadoFilters({
+                      ...mercadoFilters,
+                      segmentacao: values,
+                    })
+                  }
+                />
+              </>
+            )}
 
-              {/* Filtros de Clientes */}
-              {currentPage === "clientes" && (
-                <>
-                  <MultiSelectFilter
-                    title="Segmentação"
-                    icon={<Briefcase className="w-3 h-3" />}
-                    options={[
-                      { value: "B2B", label: "B2B" },
-                      { value: "B2C", label: "B2C" },
-                      { value: "Ambos", label: "Ambos" },
-                    ]}
-                    selectedValues={clienteFilters.segmentacao}
-                    onValuesChange={(values) =>
-                      setClienteFilters({ ...clienteFilters, segmentacao: values })
-                    }
-                  />
-                  <MultiSelectFilter
-                    title="Estado (UF)"
-                    icon={<MapPin className="w-3 h-3" />}
-                    options={[
-                      { value: "SP", label: "São Paulo" },
-                      { value: "RJ", label: "Rio de Janeiro" },
-                      { value: "MG", label: "Minas Gerais" },
-                      { value: "RS", label: "Rio Grande do Sul" },
-                      { value: "PR", label: "Paraná" },
-                      { value: "SC", label: "Santa Catarina" },
-                      { value: "BA", label: "Bahia" },
-                      { value: "PE", label: "Pernambuco" },
-                      { value: "CE", label: "Ceará" },
-                      { value: "GO", label: "Goiás" },
-                    ]}
-                    selectedValues={clienteFilters.uf}
-                    onValuesChange={(values) =>
-                      setClienteFilters({ ...clienteFilters, uf: values })
-                    }
-                  />
-                </>
-              )}
+            {/* Filtros de Clientes */}
+            {currentPage === "clientes" && (
+              <>
+                <MultiSelectFilter
+                  title="Segmentação"
+                  icon={<Briefcase className="w-3 h-3" />}
+                  options={[
+                    { value: "B2B", label: "B2B" },
+                    { value: "B2C", label: "B2C" },
+                    { value: "Ambos", label: "Ambos" },
+                  ]}
+                  selectedValues={clienteFilters.segmentacao}
+                  onValuesChange={values =>
+                    setClienteFilters({
+                      ...clienteFilters,
+                      segmentacao: values,
+                    })
+                  }
+                />
+                <MultiSelectFilter
+                  title="Estado (UF)"
+                  icon={<MapPin className="w-3 h-3" />}
+                  options={[
+                    { value: "SP", label: "São Paulo" },
+                    { value: "RJ", label: "Rio de Janeiro" },
+                    { value: "MG", label: "Minas Gerais" },
+                    { value: "RS", label: "Rio Grande do Sul" },
+                    { value: "PR", label: "Paraná" },
+                    { value: "SC", label: "Santa Catarina" },
+                    { value: "BA", label: "Bahia" },
+                    { value: "PE", label: "Pernambuco" },
+                    { value: "CE", label: "Ceará" },
+                    { value: "GO", label: "Goiás" },
+                  ]}
+                  selectedValues={clienteFilters.uf}
+                  onValuesChange={values =>
+                    setClienteFilters({ ...clienteFilters, uf: values })
+                  }
+                />
+              </>
+            )}
 
-              {/* Filtros de Concorrentes */}
-              {currentPage === "concorrentes" && (
-                <>
-                  <MultiSelectFilter
-                    title="Porte"
-                    icon={<Package className="w-3 h-3" />}
-                    options={[
-                      { value: "Pequeno", label: "Pequeno" },
-                      { value: "Médio", label: "Médio" },
-                      { value: "Grande", label: "Grande" },
-                    ]}
-                    selectedValues={concorrenteFilters.porte}
-                    onValuesChange={(values) =>
-                      setConcorrenteFilters({ ...concorrenteFilters, porte: values })
-                    }
-                  />
-                </>
-              )}
+            {/* Filtros de Concorrentes */}
+            {currentPage === "concorrentes" && (
+              <>
+                <MultiSelectFilter
+                  title="Porte"
+                  icon={<Package className="w-3 h-3" />}
+                  options={[
+                    { value: "Pequeno", label: "Pequeno" },
+                    { value: "Médio", label: "Médio" },
+                    { value: "Grande", label: "Grande" },
+                  ]}
+                  selectedValues={concorrenteFilters.porte}
+                  onValuesChange={values =>
+                    setConcorrenteFilters({
+                      ...concorrenteFilters,
+                      porte: values,
+                    })
+                  }
+                />
+              </>
+            )}
 
-              {/* Filtros de Leads */}
-              {currentPage === "leads" && (
-                <>
-                  <MultiSelectFilter
-                    title="Tipo"
-                    icon={<Target className="w-3 h-3" />}
-                    options={[
-                      { value: "Cliente Potencial", label: "Cliente Potencial" },
-                      { value: "Parceiro", label: "Parceiro" },
-                      { value: "Fornecedor", label: "Fornecedor" },
-                    ]}
-                    selectedValues={leadFilters.tipo}
-                    onValuesChange={(values) =>
-                      setLeadFilters({ ...leadFilters, tipo: values })
-                    }
-                  />
-                  <MultiSelectFilter
-                    title="Porte"
-                    icon={<Package className="w-3 h-3" />}
-                    options={[
-                      { value: "Pequeno", label: "Pequeno" },
-                      { value: "Médio", label: "Médio" },
-                      { value: "Grande", label: "Grande" },
-                    ]}
-                    selectedValues={leadFilters.porte}
-                    onValuesChange={(values) =>
-                      setLeadFilters({ ...leadFilters, porte: values })
-                    }
-                  />
-                </>
-              )}
+            {/* Filtros de Leads */}
+            {currentPage === "leads" && (
+              <>
+                <MultiSelectFilter
+                  title="Tipo"
+                  icon={<Target className="w-3 h-3" />}
+                  options={[
+                    { value: "Cliente Potencial", label: "Cliente Potencial" },
+                    { value: "Parceiro", label: "Parceiro" },
+                    { value: "Fornecedor", label: "Fornecedor" },
+                  ]}
+                  selectedValues={leadFilters.tipo}
+                  onValuesChange={values =>
+                    setLeadFilters({ ...leadFilters, tipo: values })
+                  }
+                />
+                <MultiSelectFilter
+                  title="Porte"
+                  icon={<Package className="w-3 h-3" />}
+                  options={[
+                    { value: "Pequeno", label: "Pequeno" },
+                    { value: "Médio", label: "Médio" },
+                    { value: "Grande", label: "Grande" },
+                  ]}
+                  selectedValues={leadFilters.porte}
+                  onValuesChange={values =>
+                    setLeadFilters({ ...leadFilters, porte: values })
+                  }
+                />
+              </>
+            )}
           </div>
 
           {/* Filtro de Status */}
           <div className="flex items-center gap-2 ml-auto">
             {/* Botão Comparar Mercados (apenas na página de mercados) */}
-            {currentPage === "mercados" && selectedMercadosForComparison.size > 0 && (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() => {
-                  if (selectedMercadosForComparison.size < 2) {
-                    toast.error("Selecione pelo menos 2 mercados para comparar");
-                    return;
-                  }
-                  if (selectedMercadosForComparison.size > 3) {
-                    toast.error("Selecione no máximo 3 mercados para comparar");
-                    return;
-                  }
-                  setComparisonModalOpen(true);
-                }}
-                className="h-9"
-              >
-                <GitCompare className="w-4 h-4 mr-2" />
-                Comparar ({selectedMercadosForComparison.size})
-              </Button>
-            )}
-            
+            {currentPage === "mercados" &&
+              selectedMercadosForComparison.size > 0 && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => {
+                    if (selectedMercadosForComparison.size < 2) {
+                      toast.error(
+                        "Selecione pelo menos 2 mercados para comparar"
+                      );
+                      return;
+                    }
+                    if (selectedMercadosForComparison.size > 3) {
+                      toast.error(
+                        "Selecione no máximo 3 mercados para comparar"
+                      );
+                      return;
+                    }
+                    setComparisonModalOpen(true);
+                  }}
+                  className="h-9"
+                >
+                  <GitCompare className="w-4 h-4 mr-2" />
+                  Comparar ({selectedMercadosForComparison.size})
+                </Button>
+              )}
+
             {/* Seletor de Ordenação */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -1148,31 +1426,49 @@ export default function CascadeView() {
                   {sortBy === "status" && "✓ "}
                   Status
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
+                <DropdownMenuItem
+                  onClick={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
+                >
                   {sortOrder === "asc" ? "↑ Crescente" : "↓ Decrescente"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            
+
             {/* Filtros Salvos */}
             <SavedFilters
-              onApply={(filtersJson) => {
+              onApply={filtersJson => {
                 try {
                   const filters = JSON.parse(filtersJson);
                   setSearchQuery(filters.searchQuery || "");
-                  setSearchFields(filters.searchFields || ["nome", "cnpj", "produto"]);
+                  setSearchFields(
+                    filters.searchFields || ["nome", "cnpj", "produto"]
+                  );
                   setSelectedTagIds(filters.selectedTagIds || []);
                   setStatusFilter(filters.statusFilter || "all");
-                  setMercadoFilters(filters.mercadoFilters || { segmentacao: [], categoria: [] });
-                  setClienteFilters(filters.clienteFilters || { segmentacao: [], cidade: [], uf: [] });
-                  setConcorrenteFilters(filters.concorrenteFilters || { porte: [] });
-                  setLeadFilters(filters.leadFilters || { tipo: [], porte: [] });
+                  setMercadoFilters(
+                    filters.mercadoFilters || { segmentacao: [], categoria: [] }
+                  );
+                  setClienteFilters(
+                    filters.clienteFilters || {
+                      segmentacao: [],
+                      cidade: [],
+                      uf: [],
+                    }
+                  );
+                  setConcorrenteFilters(
+                    filters.concorrenteFilters || { porte: [] }
+                  );
+                  setLeadFilters(
+                    filters.leadFilters || { tipo: [], porte: [] }
+                  );
                 } catch (e) {
                   toast.error("Erro ao aplicar filtro");
                 }
               }}
             />
-            
+
             {/* Botão Salvar Filtros */}
             <Tooltip>
               <TooltipTrigger asChild>
@@ -1189,7 +1485,7 @@ export default function CascadeView() {
                 <p>Salvar Filtros</p>
               </TooltipContent>
             </Tooltip>
-            
+
             {/* Botão Limpar Filtros */}
             <Tooltip>
               <TooltipTrigger asChild>
@@ -1217,7 +1513,7 @@ export default function CascadeView() {
               </TooltipContent>
             </Tooltip>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -1234,7 +1530,7 @@ export default function CascadeView() {
                 <p>Todos</p>
               </TooltipContent>
             </Tooltip>
-            
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -1250,7 +1546,7 @@ export default function CascadeView() {
                 <p>Pendentes</p>
               </TooltipContent>
             </Tooltip>
-            
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -1266,7 +1562,7 @@ export default function CascadeView() {
                 <p>Validados</p>
               </TooltipContent>
             </Tooltip>
-            
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -1295,7 +1591,9 @@ export default function CascadeView() {
               <div>
                 <h2 className="text-xs font-semibold">{getPageTitle()}</h2>
                 <div className="flex items-center gap-3">
-                  <p className="text-sm text-muted-foreground">Página {getPageNumber()} de 4</p>
+                  <p className="text-sm text-muted-foreground">
+                    Página {getPageNumber()} de 4
+                  </p>
                   {currentPage === "mercados" && (
                     <Badge variant="outline" className="text-xs">
                       {mercados?.length || 0} mercados
@@ -1303,12 +1601,14 @@ export default function CascadeView() {
                   )}
                   {currentPage === "clientes" && (
                     <Badge variant="outline" className="text-xs">
-                      {filteredClientes.length} de {clientes?.length || 0} clientes
+                      {filteredClientes.length} de {clientes?.length || 0}{" "}
+                      clientes
                     </Badge>
                   )}
                   {currentPage === "concorrentes" && (
                     <Badge variant="outline" className="text-xs">
-                      {filteredConcorrentes.length} de {concorrentes?.length || 0} concorrentes
+                      {filteredConcorrentes.length} de{" "}
+                      {concorrentes?.length || 0} concorrentes
                     </Badge>
                   )}
                   {currentPage === "leads" && (
@@ -1339,19 +1639,25 @@ export default function CascadeView() {
                       </Button>
                     </div>
                   )}
-                  
+
                   {/* Checkbox de seleção (apenas no modo lista) */}
                   {viewMode === "list" && (
                     <>
                       <Checkbox
                         checked={
-                          (currentPage === "clientes" && selectedItems.size === filteredClientes.length) ||
-                          (currentPage === "concorrentes" && selectedItems.size === filteredConcorrentes.length) ||
-                          (currentPage === "leads" && selectedItems.size === filteredLeads.length)
+                          (currentPage === "clientes" &&
+                            selectedItems.size === filteredClientes.length) ||
+                          (currentPage === "concorrentes" &&
+                            selectedItems.size ===
+                              filteredConcorrentes.length) ||
+                          (currentPage === "leads" &&
+                            selectedItems.size === filteredLeads.length)
                         }
                         onCheckedChange={toggleSelectAll}
                       />
-                      <span className="text-sm text-muted-foreground">Selecionar todos ({selectedItems.size})</span>
+                      <span className="text-sm text-muted-foreground">
+                        Selecionar todos ({selectedItems.size})
+                      </span>
                     </>
                   )}
                 </div>
@@ -1362,8 +1668,14 @@ export default function CascadeView() {
           {/* Conteúdo */}
           <div className="flex-1 overflow-hidden p-6">
             <div className="h-full max-w-6xl mx-auto">
-              <div className="bg-white border-slate-200 shadow-sm h-full flex flex-col" ref={scrollAreaRef}>
-                <ScrollArea className="flex-1" style={{ height: 'calc(100vh - 280px)' }}>
+              <div
+                className="bg-white border-slate-200 shadow-sm h-full flex flex-col"
+                ref={scrollAreaRef}
+              >
+                <ScrollArea
+                  className="flex-1"
+                  style={{ height: "calc(100vh - 280px)" }}
+                >
                   <div className="p-4">
                     <AnimatePresence mode="wait">
                       {/* Lista de Mercados */}
@@ -1376,46 +1688,52 @@ export default function CascadeView() {
                           exit="exit"
                           transition={pageTransition}
                         >
-                        {isLoading ? (
-                          <div className="space-y-2">
-                            {Array.from({ length: 10 }).map((_, i) => (
-                              <SkeletonMercado key={i} />
-                            ))}
-                          </div>
-                        ) : (
-                          <motion.div 
-                            className="space-y-2"
-                            variants={listVariants}
-                            initial="hidden"
-                            animate="show"
-                          >
-                            {filteredMercados.map((mercado) => (
-                              <motion.div
-                                key={`mercado-item-${mercado.id}`}
-                                variants={listItemVariants}
-                              >
-                                <MercadoAccordionCard 
-                                  mercado={mercado} 
-                                  selectedProjectId={selectedProjectId}
-                                  isSelected={selectedMercadosForComparison.has(mercado.id)}
-                                  onToggleSelection={(id) => {
-                                    const newSet = new Set(selectedMercadosForComparison);
-                                    if (newSet.has(id)) {
-                                      newSet.delete(id);
-                                    } else {
-                                      if (newSet.size >= 3) {
-                                        toast.error("Você pode selecionar no máximo 3 mercados");
-                                        return;
+                          {isLoading ? (
+                            <div className="space-y-2">
+                              {Array.from({ length: 10 }).map((_, i) => (
+                                <SkeletonMercado key={i} />
+                              ))}
+                            </div>
+                          ) : (
+                            <motion.div
+                              className="space-y-2"
+                              variants={listVariants}
+                              initial="hidden"
+                              animate="show"
+                            >
+                              {filteredMercados.map(mercado => (
+                                <motion.div
+                                  key={`mercado-item-${mercado.id}`}
+                                  variants={listItemVariants}
+                                >
+                                  <MercadoAccordionCard
+                                    mercado={mercado}
+                                    selectedProjectId={selectedProjectId}
+                                    isSelected={selectedMercadosForComparison.has(
+                                      mercado.id
+                                    )}
+                                    onToggleSelection={id => {
+                                      const newSet = new Set(
+                                        selectedMercadosForComparison
+                                      );
+                                      if (newSet.has(id)) {
+                                        newSet.delete(id);
+                                      } else {
+                                        if (newSet.size >= 3) {
+                                          toast.error(
+                                            "Você pode selecionar no máximo 3 mercados"
+                                          );
+                                          return;
+                                        }
+                                        newSet.add(id);
                                       }
-                                      newSet.add(id);
-                                    }
-                                    setSelectedMercadosForComparison(newSet);
-                                  }}
-                                />
-                              </motion.div>
-                            ))}
-                          </motion.div>
-                        )}
+                                      setSelectedMercadosForComparison(newSet);
+                                    }}
+                                  />
+                                </motion.div>
+                              ))}
+                            </motion.div>
+                          )}
                         </motion.div>
                       )}
 
@@ -1429,69 +1747,82 @@ export default function CascadeView() {
                           exit="exit"
                           transition={pageTransition}
                         >
-                      <div className="space-y-2">
-                        {filteredClientes.map((cliente: any) => (
-                          <div
-                            key={cliente.id}
-                            className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
-                          >
-                            <Checkbox
-                              checked={selectedItems.has(cliente.id)}
-                              onCheckedChange={() => toggleItemSelection(cliente.id)}
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            <div
-                              className="flex-1"
-                              onClick={() => {
-                                setDetailPopupItem(cliente);
-                                setDetailPopupType("cliente");
-                                setDetailPopupOpen(true);
-                              }}
-                            >
-                              <div className="flex items-center gap-2">
-                                {getStatusIcon(cliente.validationStatus)}
-                                {cliente.cnpj && !isValidCNPJFormat(cliente.cnpj) && (
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>CNPJ inválido</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
-                                <h3 className="text-base font-medium group-hover:text-primary transition-colors">
-                                  {cliente.empresa}
-                                </h3>
-                                <Badge variant="outline" className="text-[11px] px-2 py-0.5">
-                                  {cliente.segmentacaoB2bB2c}
-                                </Badge>
-                                {(() => {
-                                  const score = calculateQualityScore(cliente);
-                                  const quality = classifyQuality(score);
-                                  return (
-                                    <Badge variant={quality.variant} className={`text-xs ${quality.color}`}>
-                                      {score}%
-                                    </Badge>
-                                  );
-                                })()}
-                                <span className="text-sm text-muted-foreground ml-auto">
-                                  {cliente.cidade}, {cliente.uf}
-                                </span>
-                              </div>
-                              <p className="text-sm text-muted-foreground mt-1 truncate">
-                                {cliente.produtoPrincipal}
-                              </p>
-                              <div className="mt-2" onClick={(e) => e.stopPropagation()}>
-                                <EntityTagPicker
-                                  entityType="cliente"
-                                  entityId={cliente.id}
+                          <div className="space-y-2">
+                            {filteredClientes.map((cliente: any) => (
+                              <div
+                                key={cliente.id}
+                                className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
+                              >
+                                <Checkbox
+                                  checked={selectedItems.has(cliente.id)}
+                                  onCheckedChange={() =>
+                                    toggleItemSelection(cliente.id)
+                                  }
+                                  onClick={e => e.stopPropagation()}
                                 />
+                                <div
+                                  className="flex-1"
+                                  onClick={() => {
+                                    setDetailPopupItem(cliente);
+                                    setDetailPopupType("cliente");
+                                    setDetailPopupOpen(true);
+                                  }}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {getStatusIcon(cliente.validationStatus)}
+                                    {cliente.cnpj &&
+                                      !isValidCNPJFormat(cliente.cnpj) && (
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            <p>CNPJ inválido</p>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      )}
+                                    <h3 className="text-base font-medium group-hover:text-primary transition-colors">
+                                      {cliente.empresa}
+                                    </h3>
+                                    <Badge
+                                      variant="outline"
+                                      className="text-[11px] px-2 py-0.5"
+                                    >
+                                      {cliente.segmentacaoB2bB2c}
+                                    </Badge>
+                                    {(() => {
+                                      const score =
+                                        calculateQualityScore(cliente);
+                                      const quality = classifyQuality(score);
+                                      return (
+                                        <Badge
+                                          variant={quality.variant}
+                                          className={`text-xs ${quality.color}`}
+                                        >
+                                          {score}%
+                                        </Badge>
+                                      );
+                                    })()}
+                                    <span className="text-sm text-muted-foreground ml-auto">
+                                      {cliente.cidade}, {cliente.uf}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground mt-1 truncate">
+                                    {cliente.produtoPrincipal}
+                                  </p>
+                                  <div
+                                    className="mt-2"
+                                    onClick={e => e.stopPropagation()}
+                                  >
+                                    <EntityTagPicker
+                                      entityType="cliente"
+                                      entityId={cliente.id}
+                                    />
+                                  </div>
+                                </div>
                               </div>
-                            </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
                         </motion.div>
                       )}
 
@@ -1505,54 +1836,70 @@ export default function CascadeView() {
                           exit="exit"
                           transition={pageTransition}
                         >
-                      <div className="space-y-2">
-                        {filteredConcorrentes.map((concorrente: any) => (
-                          <div
-                            key={concorrente.id}
-                            className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
-                          >
-                            <Checkbox
-                              checked={selectedItems.has(concorrente.id)}
-                              onCheckedChange={() => toggleItemSelection(concorrente.id)}
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            <div
-                              className="flex-1"
-                              onClick={() => {
-                                setDetailPopupItem(concorrente);
-                                setDetailPopupType("concorrente");
-                                setDetailPopupOpen(true);
-                              }}
-                            >
-                              <div className="flex items-center gap-2">
-                                {getStatusIcon(concorrente.validationStatus)}
-                                <h3 className="text-base font-medium group-hover:text-primary transition-colors">
-                                  {concorrente.nome}
-                                </h3>
-                                <Badge variant="outline" className="text-[11px] px-2 py-0.5">
-                                  {concorrente.porte}
-                                </Badge>
-                                {(() => {
-                                  const score = calculateQualityScore(concorrente);
-                                  const quality = classifyQuality(score);
-                                  return (
-                                    <Badge variant={quality.variant} className={`text-xs ${quality.color}`}>
-                                      {score}%
-                                    </Badge>
-                                  );
-                                })()}
-                              </div>
-                              <p className="text-sm text-muted-foreground mt-1 truncate">{concorrente.produto}</p>
-                              <div className="mt-2" onClick={(e) => e.stopPropagation()}>
-                                <EntityTagPicker
-                                  entityType="concorrente"
-                                  entityId={concorrente.id}
+                          <div className="space-y-2">
+                            {filteredConcorrentes.map((concorrente: any) => (
+                              <div
+                                key={concorrente.id}
+                                className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:bg-muted/50 cursor-pointer group transition-colors"
+                              >
+                                <Checkbox
+                                  checked={selectedItems.has(concorrente.id)}
+                                  onCheckedChange={() =>
+                                    toggleItemSelection(concorrente.id)
+                                  }
+                                  onClick={e => e.stopPropagation()}
                                 />
+                                <div
+                                  className="flex-1"
+                                  onClick={() => {
+                                    setDetailPopupItem(concorrente);
+                                    setDetailPopupType("concorrente");
+                                    setDetailPopupOpen(true);
+                                  }}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {getStatusIcon(
+                                      concorrente.validationStatus
+                                    )}
+                                    <h3 className="text-base font-medium group-hover:text-primary transition-colors">
+                                      {concorrente.nome}
+                                    </h3>
+                                    <Badge
+                                      variant="outline"
+                                      className="text-[11px] px-2 py-0.5"
+                                    >
+                                      {concorrente.porte}
+                                    </Badge>
+                                    {(() => {
+                                      const score =
+                                        calculateQualityScore(concorrente);
+                                      const quality = classifyQuality(score);
+                                      return (
+                                        <Badge
+                                          variant={quality.variant}
+                                          className={`text-xs ${quality.color}`}
+                                        >
+                                          {score}%
+                                        </Badge>
+                                      );
+                                    })()}
+                                  </div>
+                                  <p className="text-sm text-muted-foreground mt-1 truncate">
+                                    {concorrente.produto}
+                                  </p>
+                                  <div
+                                    className="mt-2"
+                                    onClick={e => e.stopPropagation()}
+                                  >
+                                    <EntityTagPicker
+                                      entityType="concorrente"
+                                      entityId={concorrente.id}
+                                    />
+                                  </div>
+                                </div>
                               </div>
-                            </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
                         </motion.div>
                       )}
 
@@ -1575,8 +1922,10 @@ export default function CascadeView() {
                                 >
                                   <Checkbox
                                     checked={selectedItems.has(lead.id)}
-                                    onCheckedChange={() => toggleItemSelection(lead.id)}
-                                    onClick={(e) => e.stopPropagation()}
+                                    onCheckedChange={() =>
+                                      toggleItemSelection(lead.id)
+                                    }
+                                    onClick={e => e.stopPropagation()}
                                   />
                                   <div
                                     className="flex-1"
@@ -1591,21 +1940,33 @@ export default function CascadeView() {
                                       <h3 className="text-base font-medium group-hover:text-primary transition-colors">
                                         {lead.nome}
                                       </h3>
-                                      <Badge variant="outline" className="text-[11px] px-2 py-0.5">
+                                      <Badge
+                                        variant="outline"
+                                        className="text-[11px] px-2 py-0.5"
+                                      >
                                         {lead.tipo}
                                       </Badge>
                                       {(() => {
-                                        const score = calculateQualityScore(lead);
+                                        const score =
+                                          calculateQualityScore(lead);
                                         const quality = classifyQuality(score);
                                         return (
-                                          <Badge variant={quality.variant} className={`text-xs ${quality.color}`}>
+                                          <Badge
+                                            variant={quality.variant}
+                                            className={`text-xs ${quality.color}`}
+                                          >
                                             {score}%
                                           </Badge>
                                         );
                                       })()}
                                     </div>
-                                    <p className="text-sm text-muted-foreground mt-1 truncate">{lead.regiao}</p>
-                                    <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                                    <p className="text-sm text-muted-foreground mt-1 truncate">
+                                      {lead.regiao}
+                                    </p>
+                                    <div
+                                      className="mt-2"
+                                      onClick={e => e.stopPropagation()}
+                                    >
                                       <EntityTagPicker
                                         entityType="lead"
                                         entityId={lead.id}
@@ -1655,7 +2016,10 @@ export default function CascadeView() {
 
             <Button
               onClick={handleNextPage}
-              disabled={currentPage === "leads" || (currentPage === "mercados" && !selectedMercadoId)}
+              disabled={
+                currentPage === "leads" ||
+                (currentPage === "mercados" && !selectedMercadoId)
+              }
             >
               Avançar
               <ChevronRight className="w-4 h-4 ml-2" />
@@ -1668,7 +2032,7 @@ export default function CascadeView() {
       <SaveFilterDialog
         open={saveFilterDialogOpen}
         onOpenChange={setSaveFilterDialogOpen}
-        onSave={(name) => {
+        onSave={name => {
           const filtersJson = JSON.stringify({
             searchQuery,
             searchFields,
@@ -1687,7 +2051,9 @@ export default function CascadeView() {
       <Dialog open={batchModalOpen} onOpenChange={setBatchModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Validar {selectedItems.size} itens selecionados</DialogTitle>
+            <DialogTitle>
+              Validar {selectedItems.size} itens selecionados
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -1703,7 +2069,9 @@ export default function CascadeView() {
                   Rico
                 </Button>
                 <Button
-                  variant={batchStatus === "needs_adjustment" ? "default" : "outline"}
+                  variant={
+                    batchStatus === "needs_adjustment" ? "default" : "outline"
+                  }
                   onClick={() => setBatchStatus("needs_adjustment")}
                   className="w-full"
                 >
@@ -1727,7 +2095,7 @@ export default function CascadeView() {
                 id="batch-notes"
                 placeholder="Adicione observações sobre a validação..."
                 value={batchNotes}
-                onChange={(e) => setBatchNotes(e.target.value)}
+                onChange={e => setBatchNotes(e.target.value)}
                 rows={4}
               />
             </div>
@@ -1773,4 +2141,3 @@ export default function CascadeView() {
     </div>
   );
 }
-

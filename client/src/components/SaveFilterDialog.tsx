@@ -18,7 +18,11 @@ interface SaveFilterDialogProps {
   onSave: (name: string) => void;
 }
 
-export function SaveFilterDialog({ open, onOpenChange, onSave }: SaveFilterDialogProps) {
+export function SaveFilterDialog({
+  open,
+  onOpenChange,
+  onSave,
+}: SaveFilterDialogProps) {
   const [name, setName] = useState("");
 
   const handleSave = () => {
@@ -35,7 +39,8 @@ export function SaveFilterDialog({ open, onOpenChange, onSave }: SaveFilterDialo
         <DialogHeader>
           <DialogTitle>Salvar Filtros Atuais</DialogTitle>
           <DialogDescription>
-            Dê um nome para esta combinação de filtros para reutilizá-la rapidamente no futuro.
+            Dê um nome para esta combinação de filtros para reutilizá-la
+            rapidamente no futuro.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -45,9 +50,11 @@ export function SaveFilterDialog({ open, onOpenChange, onSave }: SaveFilterDialo
               id="name"
               placeholder="Ex: B2B SP Validados"
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSave();
+              onChange={e => setName(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === "Enter") {
+                  handleSave();
+                }
               }}
             />
           </div>

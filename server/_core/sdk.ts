@@ -95,20 +95,33 @@ class SDKServer {
     platforms: unknown,
     fallback: string | null | undefined
   ): string | null {
-    if (fallback && fallback.length > 0) return fallback;
-    if (!Array.isArray(platforms) || platforms.length === 0) return null;
+    if (fallback && fallback.length > 0) {
+      return fallback;
+    }
+    if (!Array.isArray(platforms) || platforms.length === 0) {
+      return null;
+    }
     const set = new Set<string>(
       platforms.filter((p): p is string => typeof p === "string")
     );
-    if (set.has("REGISTERED_PLATFORM_EMAIL")) return "email";
-    if (set.has("REGISTERED_PLATFORM_GOOGLE")) return "google";
-    if (set.has("REGISTERED_PLATFORM_APPLE")) return "apple";
+    if (set.has("REGISTERED_PLATFORM_EMAIL")) {
+      return "email";
+    }
+    if (set.has("REGISTERED_PLATFORM_GOOGLE")) {
+      return "google";
+    }
+    if (set.has("REGISTERED_PLATFORM_APPLE")) {
+      return "apple";
+    }
     if (
       set.has("REGISTERED_PLATFORM_MICROSOFT") ||
       set.has("REGISTERED_PLATFORM_AZURE")
-    )
+    ) {
       return "microsoft";
-    if (set.has("REGISTERED_PLATFORM_GITHUB")) return "github";
+    }
+    if (set.has("REGISTERED_PLATFORM_GITHUB")) {
+      return "github";
+    }
     const first = Array.from(set)[0];
     return first ? first.toLowerCase() : null;
   }
@@ -267,7 +280,7 @@ class SDKServer {
     }
 
     const sessionUserId = session.openId;
-    const { toMySQLTimestamp } = await import('../dateUtils');
+    const { toMySQLTimestamp } = await import("../dateUtils");
     const signedInAt = toMySQLTimestamp(new Date());
     let user = await db.getUser(sessionUserId);
 

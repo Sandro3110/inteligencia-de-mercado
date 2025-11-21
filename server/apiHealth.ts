@@ -2,8 +2,8 @@ import { eq, desc, and, gte, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import { apiHealthLog } from "../drizzle/schema";
 
-export type APIName = 'openai' | 'serpapi' | 'receitaws';
-export type APIStatus = 'success' | 'error' | 'timeout';
+export type APIName = "openai" | "serpapi" | "receitaws";
+export type APIStatus = "success" | "error" | "timeout";
 
 export interface LogAPICallParams {
   apiName: APIName;
@@ -63,10 +63,15 @@ export async function logAPICall(params: LogAPICallParams): Promise<void> {
 /**
  * Obtém estatísticas de saúde de uma API específica
  */
-export async function getAPIHealthStats(apiName: APIName, days: number = 7): Promise<APIHealthStats> {
+export async function getAPIHealthStats(
+  apiName: APIName,
+  days = 7
+): Promise<APIHealthStats> {
   const db = await getDb();
   if (!db) {
-    console.warn("[APIHealth] Cannot get API health stats: database not available");
+    console.warn(
+      "[APIHealth] Cannot get API health stats: database not available"
+    );
     return {
       apiName,
       totalCalls: 0,
@@ -112,10 +117,7 @@ export async function getAPIHealthStats(apiName: APIName, days: number = 7): Pro
       .select()
       .from(apiHealthLog)
       .where(
-        and(
-          eq(apiHealthLog.apiName, apiName),
-          eq(apiHealthLog.status, 'error')
-        )
+        and(eq(apiHealthLog.apiName, apiName), eq(apiHealthLog.status, "error"))
       )
       .orderBy(desc(apiHealthLog.createdAt))
       .limit(1);
@@ -132,7 +134,8 @@ export async function getAPIHealthStats(apiName: APIName, days: number = 7): Pro
       successCount,
       errorCount,
       timeoutCount,
-      successRate: totalCalls > 0 ? Math.round((successCount / totalCalls) * 100) : 0,
+      successRate:
+        totalCalls > 0 ? Math.round((successCount / totalCalls) * 100) : 0,
       avgResponseTime,
       lastCallAt: lastCall[0]?.createdAt,
       lastError: lastError[0]?.errorMessage || undefined,
@@ -156,11 +159,13 @@ export async function getAPIHealthStats(apiName: APIName, days: number = 7): Pro
  */
 export async function getAPIHealthHistory(
   apiName?: APIName,
-  limit: number = 20
+  limit = 20
 ): Promise<APIHealthHistoryItem[]> {
   const db = await getDb();
   if (!db) {
-    console.warn("[APIHealth] Cannot get API health history: database not available");
+    console.warn(
+      "[APIHealth] Cannot get API health history: database not available"
+    );
     return [];
   }
 
@@ -177,7 +182,7 @@ export async function getAPIHealthHistory(
 
     const results = await query;
 
-    return results.map((row) => ({
+    return results.map(row => ({
       id: row.id,
       apiName: row.apiName,
       status: row.status,
@@ -204,7 +209,7 @@ export async function testAPIConnection(apiName: APIName): Promise<{
 
   try {
     switch (apiName) {
-      case 'openai':
+      case "openai":
         // Teste simples de ping para OpenAI
         const { invokeLLM } = await import("./_core/llm");
         await invokeLLM({
@@ -212,7 +217,7 @@ export async function testAPIConnection(apiName: APIName): Promise<{
         });
         break;
 
-      case 'serpapi':
+      case "serpapi":
         // Teste de API SERPAPI
         const serpApiKey = process.env.SERPAPI_KEY;
         if (!serpApiKey) {
@@ -226,7 +231,7 @@ export async function testAPIConnection(apiName: APIName): Promise<{
         }
         break;
 
-      case 'receitaws':
+      case "receitaws":
         // Teste de API ReceitaWS (CNPJ de teste)
         const receitaResponse = await fetch(
           "https://www.receitaws.com.br/v1/cnpj/00000000000191"
@@ -245,9 +250,9 @@ export async function testAPIConnection(apiName: APIName): Promise<{
     // Registrar sucesso
     await logAPICall({
       apiName,
-      status: 'success',
+      status: "success",
       responseTime,
-      endpoint: 'test',
+      endpoint: "test",
     });
 
     return {
@@ -261,10 +266,10 @@ export async function testAPIConnection(apiName: APIName): Promise<{
     // Registrar erro
     await logAPICall({
       apiName,
-      status: 'error',
+      status: "error",
       responseTime,
       errorMessage,
-      endpoint: 'test',
+      endpoint: "test",
     });
 
     return {

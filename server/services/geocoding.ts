@@ -1,11 +1,11 @@
 /**
  * Serviço de Geocodificação com Google Maps API
- * 
+ *
  * Usado como fallback para enriquecer registros sem coordenadas
  * que não foram obtidas via OpenAI durante o enriquecimento.
  */
 
-import { toMySQLTimestamp } from '../_core/dateUtils';
+import { toMySQLTimestamp } from "../_core/dateUtils";
 
 // Interface para resultado de geocodificação
 export interface GeocodeResult {
@@ -13,7 +13,7 @@ export interface GeocodeResult {
   longitude: number;
   formattedAddress: string;
   placeId?: string;
-  confidence: 'high' | 'medium' | 'low';
+  confidence: "high" | "medium" | "low";
 }
 
 // Interface para erro de geocodificação
@@ -34,7 +34,7 @@ function isValidBrazilCoordinates(lat: number, lng: number): boolean {
 
 /**
  * Geocodifica um endereço usando Google Maps Geocoding API
- * 
+ *
  * @param cidade - Nome da cidade
  * @param uf - Sigla do estado (ex: SP, RJ)
  * @param pais - País (padrão: Brasil)
@@ -44,7 +44,7 @@ function isValidBrazilCoordinates(lat: number, lng: number): boolean {
 export async function geocodeAddress(
   cidade: string,
   uf: string,
-  pais: string = 'Brasil',
+  pais = "Brasil",
   apiKey: string
 ): Promise<GeocodeResult | GeocodeError> {
   try {
@@ -52,14 +52,14 @@ export async function geocodeAddress(
     if (!cidade || !uf) {
       return {
         success: false,
-        error: 'Cidade e UF são obrigatórios',
+        error: "Cidade e UF são obrigatórios",
       };
     }
 
     if (!apiKey) {
       return {
         success: false,
-        error: 'API Key do Google Maps não configurada',
+        error: "API Key do Google Maps não configurada",
       };
     }
 
@@ -81,8 +81,11 @@ export async function geocodeAddress(
     const data = await response.json();
 
     // Verificar status da resposta
-    if (data.status !== 'OK') {
-      console.error(`[Geocoding] Erro na API: ${data.status}`, data.error_message);
+    if (data.status !== "OK") {
+      console.error(
+        `[Geocoding] Erro na API: ${data.status}`,
+        data.error_message
+      );
       return {
         success: false,
         error: `Erro na API do Google Maps: ${data.status}`,
@@ -94,7 +97,7 @@ export async function geocodeAddress(
     if (!data.results || data.results.length === 0) {
       return {
         success: false,
-        error: 'Nenhum resultado encontrado para o endereço',
+        error: "Nenhum resultado encontrado para o endereço",
       };
     }
 
@@ -106,23 +109,28 @@ export async function geocodeAddress(
 
     // Validar coordenadas
     if (!isValidBrazilCoordinates(latitude, longitude)) {
-      console.warn(`[Geocoding] Coordenadas fora do Brasil: ${latitude}, ${longitude}`);
+      console.warn(
+        `[Geocoding] Coordenadas fora do Brasil: ${latitude}, ${longitude}`
+      );
       return {
         success: false,
-        error: 'Coordenadas fora do território brasileiro',
+        error: "Coordenadas fora do território brasileiro",
       };
     }
 
     // Determinar nível de confiança baseado no tipo de resultado
-    let confidence: 'high' | 'medium' | 'low' = 'medium';
+    let confidence: "high" | "medium" | "low" = "medium";
     const locationType = result.geometry.location_type;
-    
-    if (locationType === 'ROOFTOP') {
-      confidence = 'high';
-    } else if (locationType === 'RANGE_INTERPOLATED' || locationType === 'GEOMETRIC_CENTER') {
-      confidence = 'medium';
+
+    if (locationType === "ROOFTOP") {
+      confidence = "high";
+    } else if (
+      locationType === "RANGE_INTERPOLATED" ||
+      locationType === "GEOMETRIC_CENTER"
+    ) {
+      confidence = "medium";
     } else {
-      confidence = 'low';
+      confidence = "low";
     }
 
     // Montar resultado
@@ -136,15 +144,16 @@ export async function geocodeAddress(
 
     // Salvar no cache
     geocodeCache.set(cacheKey, geocodeResult);
-    console.log(`[Geocoding] Sucesso: ${latitude}, ${longitude} (${confidence})`);
+    console.log(
+      `[Geocoding] Sucesso: ${latitude}, ${longitude} (${confidence})`
+    );
 
     return geocodeResult;
-
   } catch (error) {
-    console.error('[Geocoding] Erro ao geocodificar:', error);
+    console.error("[Geocoding] Erro ao geocodificar:", error);
     return {
       success: false,
-      error: 'Erro ao conectar com a API do Google Maps',
+      error: "Erro ao conectar com a API do Google Maps",
       details: error instanceof Error ? error.message : String(error),
     };
   }
@@ -152,24 +161,42 @@ export async function geocodeAddress(
 
 /**
  * Geocodifica múltiplos endereços em lote
- * 
+ *
  * @param addresses - Array de objetos com cidade, uf e id
  * @param apiKey - Chave da API do Google Maps
  * @param delayMs - Delay entre requisições (padrão: 200ms para evitar rate limiting)
  * @returns Array de resultados com id e coordenadas
  */
 export async function geocodeBatch(
-  addresses: Array<{ id: number; cidade: string; uf: string; tipo: 'cliente' | 'concorrente' | 'lead' }>,
+  addresses: Array<{
+    id: number;
+    cidade: string;
+    uf: string;
+    tipo: "cliente" | "concorrente" | "lead";
+  }>,
   apiKey: string,
-  delayMs: number = 200
-): Promise<Array<{ id: number; tipo: string; result: GeocodeResult | GeocodeError }>> {
-  const results: Array<{ id: number; tipo: string; result: GeocodeResult | GeocodeError }> = [];
+  delayMs = 200
+): Promise<
+  Array<{ id: number; tipo: string; result: GeocodeResult | GeocodeError }>
+> {
+  const results: Array<{
+    id: number;
+    tipo: string;
+    result: GeocodeResult | GeocodeError;
+  }> = [];
 
-  console.log(`[Geocoding] Iniciando geocodificação em lote de ${addresses.length} endereços`);
+  console.log(
+    `[Geocoding] Iniciando geocodificação em lote de ${addresses.length} endereços`
+  );
 
   for (const address of addresses) {
-    const result = await geocodeAddress(address.cidade, address.uf, 'Brasil', apiKey);
-    
+    const result = await geocodeAddress(
+      address.cidade,
+      address.uf,
+      "Brasil",
+      apiKey
+    );
+
     results.push({
       id: address.id,
       tipo: address.tipo,
@@ -182,27 +209,31 @@ export async function geocodeBatch(
     }
   }
 
-  const successCount = results.filter(r => 'latitude' in r.result).length;
-  console.log(`[Geocoding] Lote concluído: ${successCount}/${addresses.length} sucessos`);
+  const successCount = results.filter(r => "latitude" in r.result).length;
+  console.log(
+    `[Geocoding] Lote concluído: ${successCount}/${addresses.length} sucessos`
+  );
 
   return results;
 }
 
 /**
  * Testa a conexão com a API do Google Maps
- * 
+ *
  * @param apiKey - Chave da API do Google Maps
  * @returns true se a conexão foi bem-sucedida
  */
-export async function testGoogleMapsConnection(apiKey: string): Promise<{ success: boolean; message: string }> {
+export async function testGoogleMapsConnection(
+  apiKey: string
+): Promise<{ success: boolean; message: string }> {
   try {
     // Testar com um endereço conhecido
-    const result = await geocodeAddress('São Paulo', 'SP', 'Brasil', apiKey);
+    const result = await geocodeAddress("São Paulo", "SP", "Brasil", apiKey);
 
-    if ('latitude' in result) {
+    if ("latitude" in result) {
       return {
         success: true,
-        message: 'Conexão com Google Maps API estabelecida com sucesso',
+        message: "Conexão com Google Maps API estabelecida com sucesso",
       };
     } else {
       return {
@@ -213,7 +244,7 @@ export async function testGoogleMapsConnection(apiKey: string): Promise<{ succes
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Erro desconhecido',
+      message: error instanceof Error ? error.message : "Erro desconhecido",
     };
   }
 }
@@ -223,5 +254,5 @@ export async function testGoogleMapsConnection(apiKey: string): Promise<{ succes
  */
 export function clearGeocodeCache(): void {
   geocodeCache.clear();
-  console.log('[Geocoding] Cache limpo');
+  console.log("[Geocoding] Cache limpo");
 }

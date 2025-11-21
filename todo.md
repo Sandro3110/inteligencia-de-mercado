@@ -1651,3 +1651,41 @@ Leads: ✅ 60% com coordenadas (3/5)
 ### 84.4 Checkpoint Final
 
 - [x] Salvar checkpoint com todas as melhorias
+
+---
+
+## FASE 85: MELHORIAS AVANÇADAS DE QUALIDADE DE CÓDIGO 🚀
+
+### 85.1 - Migrar Conversões de Data
+
+- [x] Identificar todas as conversões manuais de Date→string no código
+- [x] Substituir por funções do dateUtils.ts (dateToMySQLString, formatDateForDisplay, etc)
+- [x] Testar conversões migradas
+- [x] Adicionar funções toDateBR, toDateTimeBR, toISODate, toISO ao dateUtils.ts
+- [x] Migrar analyticsAggregation.ts
+- [x] Migrar db.ts
+- [x] Migrar exportToExcel.ts
+- [x] Migrar routers.ts
+- [x] Migrar scheduleWorker.ts
+
+### 85.2 - Configurar ESLint
+
+- [x] Instalar ESLint e plugins TypeScript
+- [x] Criar arquivo eslint.config.mjs com regras
+- [x] Integrar ESLint no pre-commit hook
+- [x] Adicionar scripts lint e lint:fix ao package.json
+- [x] Configurar regras TypeScript (no-explicit-any, no-unused-vars, etc)
+- [x] Configurar regras React (react-hooks/rules-of-hooks, exhaustive-deps)
+- [x] Configurar regras gerais (prefer-const, no-var, eqeqeq, curly)
+
+### 85.3 - Expandir Testes Unitários
+
+- [x] Criar testes para dataValidation.ts (27 testes)
+- [x] Criar testes para databaseCritical.ts (24 testes)
+- [x] Criar testes para exportFunctions.ts (9 testes)
+- [x] Criar testes para enrichmentFlow.ts (2 testes)
+- [x] **TOTAL: 62 testes passando ✅**
+
+### 85.4 - Checkpoint Final
+
+- [x] Salvar checkpoint com todas as melhorias

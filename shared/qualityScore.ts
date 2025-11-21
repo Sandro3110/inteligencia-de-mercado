@@ -39,64 +39,66 @@ const FIELD_WEIGHTS = {
  * Calcula o score de qualidade de uma entidade (0-100)
  */
 export function calculateQualityScore(entity: QualityEntity): number {
-  if (!entity) return 0;
+  if (!entity) {
+    return 0;
+  }
 
   let score = 0;
 
   // CNPJ
-  if (entity.cnpj && entity.cnpj.trim() !== '') {
+  if (entity.cnpj && entity.cnpj.trim() !== "") {
     score += FIELD_WEIGHTS.cnpj;
   }
 
   // Email
-  if (entity.email && entity.email.trim() !== '') {
+  if (entity.email && entity.email.trim() !== "") {
     score += FIELD_WEIGHTS.email;
   }
 
   // Telefone
-  if (entity.telefone && entity.telefone.trim() !== '') {
+  if (entity.telefone && entity.telefone.trim() !== "") {
     score += FIELD_WEIGHTS.telefone;
   }
 
   // Site (pode ser 'site' ou 'siteOficial')
   const siteValue = entity.site || entity.siteOficial;
-  if (siteValue && siteValue.trim() !== '') {
+  if (siteValue && siteValue.trim() !== "") {
     score += FIELD_WEIGHTS.site;
   }
 
   // LinkedIn
-  if (entity.linkedin && entity.linkedin.trim() !== '') {
+  if (entity.linkedin && entity.linkedin.trim() !== "") {
     score += FIELD_WEIGHTS.linkedin;
   }
 
   // Instagram
-  if (entity.instagram && entity.instagram.trim() !== '') {
+  if (entity.instagram && entity.instagram.trim() !== "") {
     score += FIELD_WEIGHTS.instagram;
   }
 
   // Produto (pode ser 'produto' ou 'produtoPrincipal')
   const produtoValue = entity.produto || entity.produtoPrincipal;
-  if (produtoValue && produtoValue.trim() !== '') {
+  if (produtoValue && produtoValue.trim() !== "") {
     score += FIELD_WEIGHTS.produto;
   }
 
   // Cidade
-  if (entity.cidade && entity.cidade.trim() !== '') {
+  if (entity.cidade && entity.cidade.trim() !== "") {
     score += FIELD_WEIGHTS.cidade;
   }
 
   // UF
-  if (entity.uf && entity.uf.trim() !== '') {
+  if (entity.uf && entity.uf.trim() !== "") {
     score += FIELD_WEIGHTS.uf;
   }
 
   // CNAE
-  if (entity.cnae && entity.cnae.trim() !== '') {
+  if (entity.cnae && entity.cnae.trim() !== "") {
     score += FIELD_WEIGHTS.cnae;
   }
 
   // Porte
-  if (entity.porte && entity.porte.trim() !== '') {
+  if (entity.porte && entity.porte.trim() !== "") {
     score += FIELD_WEIGHTS.porte;
   }
 
@@ -109,33 +111,33 @@ export function calculateQualityScore(entity: QualityEntity): number {
 export function classifyQuality(score: number): {
   label: string;
   color: string;
-  variant: 'default' | 'secondary' | 'destructive' | 'outline';
+  variant: "default" | "secondary" | "destructive" | "outline";
 } {
   if (score >= 80) {
     return {
-      label: 'Excelente',
-      color: 'text-green-500',
-      variant: 'default',
+      label: "Excelente",
+      color: "text-green-500",
+      variant: "default",
     };
   }
   if (score >= 60) {
     return {
-      label: 'Bom',
-      color: 'text-blue-500',
-      variant: 'secondary',
+      label: "Bom",
+      color: "text-blue-500",
+      variant: "secondary",
     };
   }
   if (score >= 40) {
     return {
-      label: 'Regular',
-      color: 'text-yellow-500',
-      variant: 'outline',
+      label: "Regular",
+      color: "text-yellow-500",
+      variant: "outline",
     };
   }
   return {
-    label: 'Ruim',
-    color: 'text-red-500',
-    variant: 'destructive',
+    label: "Ruim",
+    color: "text-red-500",
+    variant: "destructive",
   };
 }
 
@@ -145,20 +147,36 @@ export function classifyQuality(score: number): {
 export function getMissingFields(entity: QualityEntity): string[] {
   const missing: string[] = [];
 
-  if (!entity.cnpj || entity.cnpj.trim() === '') missing.push('CNPJ');
-  if (!entity.email || entity.email.trim() === '') missing.push('Email');
-  if (!entity.telefone || entity.telefone.trim() === '') missing.push('Telefone');
-  
+  if (!entity.cnpj || entity.cnpj.trim() === "") {
+    missing.push("CNPJ");
+  }
+  if (!entity.email || entity.email.trim() === "") {
+    missing.push("Email");
+  }
+  if (!entity.telefone || entity.telefone.trim() === "") {
+    missing.push("Telefone");
+  }
+
   const siteValue = entity.site || entity.siteOficial;
-  if (!siteValue || siteValue.trim() === '') missing.push('Site');
-  
-  if (!entity.linkedin || entity.linkedin.trim() === '') missing.push('LinkedIn');
-  
+  if (!siteValue || siteValue.trim() === "") {
+    missing.push("Site");
+  }
+
+  if (!entity.linkedin || entity.linkedin.trim() === "") {
+    missing.push("LinkedIn");
+  }
+
   const produtoValue = entity.produto || entity.produtoPrincipal;
-  if (!produtoValue || produtoValue.trim() === '') missing.push('Produto');
-  
-  if (!entity.cidade || entity.cidade.trim() === '') missing.push('Cidade');
-  if (!entity.uf || entity.uf.trim() === '') missing.push('UF');
+  if (!produtoValue || produtoValue.trim() === "") {
+    missing.push("Produto");
+  }
+
+  if (!entity.cidade || entity.cidade.trim() === "") {
+    missing.push("Cidade");
+  }
+  if (!entity.uf || entity.uf.trim() === "") {
+    missing.push("UF");
+  }
 
   return missing;
 }
@@ -167,11 +185,13 @@ export function getMissingFields(entity: QualityEntity): string[] {
  * Valida formato de CNPJ (apenas formato, não valida dígitos verificadores)
  */
 export function isValidCNPJFormat(cnpj: string | null | undefined): boolean {
-  if (!cnpj) return false;
-  
+  if (!cnpj) {
+    return false;
+  }
+
   // Remove caracteres não numéricos
-  const cleaned = cnpj.replace(/\D/g, '');
-  
+  const cleaned = cnpj.replace(/\D/g, "");
+
   // CNPJ deve ter 14 dígitos
   return cleaned.length === 14;
 }
@@ -180,8 +200,10 @@ export function isValidCNPJFormat(cnpj: string | null | undefined): boolean {
  * Valida formato de email
  */
 export function isValidEmailFormat(email: string | null | undefined): boolean {
-  if (!email) return false;
-  
+  if (!email) {
+    return false;
+  }
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
@@ -190,11 +212,13 @@ export function isValidEmailFormat(email: string | null | undefined): boolean {
  * Valida formato de telefone brasileiro
  */
 export function isValidPhoneFormat(phone: string | null | undefined): boolean {
-  if (!phone) return false;
-  
+  if (!phone) {
+    return false;
+  }
+
   // Remove caracteres não numéricos
-  const cleaned = phone.replace(/\D/g, '');
-  
+  const cleaned = phone.replace(/\D/g, "");
+
   // Telefone brasileiro: 10 ou 11 dígitos (com DDD)
   return cleaned.length >= 10 && cleaned.length <= 11;
 }

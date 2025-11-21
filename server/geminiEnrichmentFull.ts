@@ -1,6 +1,6 @@
 /**
  * Enriquecimento Completo com Gemini LLM (SEM SerpAPI)
- * 
+ *
  * Gera concorrentes e leads diretamente via Gemini, com TODOS os campos preenchidos
  * Foco em QUALIDADE > QUANTIDADE
  */
@@ -11,7 +11,10 @@ import { invokeLLM } from "./_core/llm";
  * Gera lista de CONCORRENTES reais usando Gemini
  * Retorna empresas brasileiras reais do mercado especificado
  */
-export async function generateConcorrentesWithGemini(mercadoNome: string, quantidade: number = 5) {
+export async function generateConcorrentesWithGemini(
+  mercadoNome: string,
+  quantidade = 5
+) {
   const prompt = `Você é um analista de inteligência competitiva especializado no mercado brasileiro.
 
 MERCADO: ${mercadoNome}
@@ -37,8 +40,12 @@ Retorne um array JSON com ${quantidade} empresas.`;
   try {
     const response = await invokeLLM({
       messages: [
-        { role: "system", content: "Você é um assistente que retorna apenas JSON válido, sem texto adicional." },
-        { role: "user", content: prompt }
+        {
+          role: "system",
+          content:
+            "Você é um assistente que retorna apenas JSON válido, sem texto adicional.",
+        },
+        { role: "user", content: prompt },
       ],
       response_format: {
         type: "json_schema",
@@ -57,10 +64,26 @@ Retorne um array JSON com ${quantidade} empresas.`;
                     cnpj: { type: "string" },
                     site: { type: "string" },
                     produto: { type: "string" },
-                    porte: { type: "string", enum: ["Micro", "Pequena", "Média", "Grande", "Não disponível"] },
+                    porte: {
+                      type: "string",
+                      enum: [
+                        "Micro",
+                        "Pequena",
+                        "Média",
+                        "Grande",
+                        "Não disponível",
+                      ],
+                    },
                     faturamentoEstimado: { type: "string" },
                   },
-                  required: ["nome", "cnpj", "site", "produto", "porte", "faturamentoEstimado"],
+                  required: [
+                    "nome",
+                    "cnpj",
+                    "site",
+                    "produto",
+                    "porte",
+                    "faturamentoEstimado",
+                  ],
                   additionalProperties: false,
                 },
               },
@@ -82,14 +105,32 @@ Retorne um array JSON com ${quantidade} empresas.`;
     // Calcular score de qualidade para cada concorrente
     const concorrentesComScore = result.concorrentes.map((c: any) => {
       let qualidadeScore = 0;
-      
-      if (c.cnpj && !c.cnpj.includes("Não disponível")) qualidadeScore += 25;
-      if (c.site && !c.site.includes("Não disponível")) qualidadeScore += 20;
-      if (c.produto && !c.produto.includes("Não disponível")) qualidadeScore += 20;
-      if (c.porte && !c.porte.includes("Não disponível")) qualidadeScore += 15;
-      if (c.faturamentoEstimado && !c.faturamentoEstimado.includes("Não disponível")) qualidadeScore += 20;
 
-      const qualidadeClassificacao = qualidadeScore >= 71 ? "Alta" : qualidadeScore >= 41 ? "Média" : "Baixa";
+      if (c.cnpj && !c.cnpj.includes("Não disponível")) {
+        qualidadeScore += 25;
+      }
+      if (c.site && !c.site.includes("Não disponível")) {
+        qualidadeScore += 20;
+      }
+      if (c.produto && !c.produto.includes("Não disponível")) {
+        qualidadeScore += 20;
+      }
+      if (c.porte && !c.porte.includes("Não disponível")) {
+        qualidadeScore += 15;
+      }
+      if (
+        c.faturamentoEstimado &&
+        !c.faturamentoEstimado.includes("Não disponível")
+      ) {
+        qualidadeScore += 20;
+      }
+
+      const qualidadeClassificacao =
+        qualidadeScore >= 71
+          ? "Alta"
+          : qualidadeScore >= 41
+            ? "Média"
+            : "Baixa";
 
       return {
         ...c,
@@ -111,8 +152,8 @@ Retorne um array JSON com ${quantidade} empresas.`;
  */
 export async function generateLeadsWithGemini(
   mercadoNome: string,
-  tipo: 'fornecedor' | 'distribuidor' | 'parceiro' = 'fornecedor',
-  quantidade: number = 5
+  tipo: "fornecedor" | "distribuidor" | "parceiro" = "fornecedor",
+  quantidade = 5
 ) {
   const tipoDescricao = {
     fornecedor: "fornecedores de matéria-prima ou insumos",
@@ -150,8 +191,12 @@ Retorne um array JSON com ${quantidade} leads.`;
   try {
     const response = await invokeLLM({
       messages: [
-        { role: "system", content: "Você é um assistente que retorna apenas JSON válido, sem texto adicional." },
-        { role: "user", content: prompt }
+        {
+          role: "system",
+          content:
+            "Você é um assistente que retorna apenas JSON válido, sem texto adicional.",
+        },
+        { role: "user", content: prompt },
       ],
       response_format: {
         type: "json_schema",
@@ -172,11 +217,30 @@ Retorne um array JSON com ${quantidade} leads.`;
                     email: { type: "string" },
                     telefone: { type: "string" },
                     tipo: { type: "string" },
-                    porte: { type: "string", enum: ["Micro", "Pequena", "Média", "Grande", "Não disponível"] },
+                    porte: {
+                      type: "string",
+                      enum: [
+                        "Micro",
+                        "Pequena",
+                        "Média",
+                        "Grande",
+                        "Não disponível",
+                      ],
+                    },
                     regiao: { type: "string" },
                     setor: { type: "string" },
                   },
-                  required: ["nome", "cnpj", "site", "email", "telefone", "tipo", "porte", "regiao", "setor"],
+                  required: [
+                    "nome",
+                    "cnpj",
+                    "site",
+                    "email",
+                    "telefone",
+                    "tipo",
+                    "porte",
+                    "regiao",
+                    "setor",
+                  ],
                   additionalProperties: false,
                 },
               },
@@ -198,16 +262,35 @@ Retorne um array JSON com ${quantidade} leads.`;
     // Calcular score de qualidade para cada lead
     const leadsComScore = result.leads.map((l: any) => {
       let qualidadeScore = 0;
-      
-      if (l.cnpj && !l.cnpj.includes("Não disponível")) qualidadeScore += 20;
-      if (l.site && !l.site.includes("Não disponível")) qualidadeScore += 15;
-      if (l.email && !l.email.includes("Não disponível")) qualidadeScore += 20;
-      if (l.telefone && !l.telefone.includes("Não disponível")) qualidadeScore += 20;
-      if (l.tipo && !l.tipo.includes("Não disponível")) qualidadeScore += 10;
-      if (l.porte && !l.porte.includes("Não disponível")) qualidadeScore += 10;
-      if (l.setor && !l.setor.includes("Não disponível")) qualidadeScore += 5;
 
-      const qualidadeClassificacao = qualidadeScore >= 71 ? "Alta" : qualidadeScore >= 41 ? "Média" : "Baixa";
+      if (l.cnpj && !l.cnpj.includes("Não disponível")) {
+        qualidadeScore += 20;
+      }
+      if (l.site && !l.site.includes("Não disponível")) {
+        qualidadeScore += 15;
+      }
+      if (l.email && !l.email.includes("Não disponível")) {
+        qualidadeScore += 20;
+      }
+      if (l.telefone && !l.telefone.includes("Não disponível")) {
+        qualidadeScore += 20;
+      }
+      if (l.tipo && !l.tipo.includes("Não disponível")) {
+        qualidadeScore += 10;
+      }
+      if (l.porte && !l.porte.includes("Não disponível")) {
+        qualidadeScore += 10;
+      }
+      if (l.setor && !l.setor.includes("Não disponível")) {
+        qualidadeScore += 5;
+      }
+
+      const qualidadeClassificacao =
+        qualidadeScore >= 71
+          ? "Alta"
+          : qualidadeScore >= 41
+            ? "Média"
+            : "Baixa";
 
       return {
         ...l,
@@ -263,8 +346,12 @@ Retorne APENAS o JSON, sem explicações.`;
   try {
     const response = await invokeLLM({
       messages: [
-        { role: "system", content: "Você é um assistente que retorna apenas JSON válido, sem texto adicional." },
-        { role: "user", content: prompt }
+        {
+          role: "system",
+          content:
+            "Você é um assistente que retorna apenas JSON válido, sem texto adicional.",
+        },
+        { role: "user", content: prompt },
       ],
       response_format: {
         type: "json_schema",
@@ -275,14 +362,28 @@ Retorne APENAS o JSON, sem explicações.`;
             type: "object",
             properties: {
               produtoPrincipal: { type: "string" },
-              segmentacaoB2bB2c: { type: "string", enum: ["B2B", "B2C", "B2B2C", "Não disponível"] },
+              segmentacaoB2bB2c: {
+                type: "string",
+                enum: ["B2B", "B2C", "B2B2C", "Não disponível"],
+              },
               email: { type: "string" },
               telefone: { type: "string" },
               linkedin: { type: "string" },
               instagram: { type: "string" },
-              porte: { type: "string", enum: ["Micro", "Pequena", "Média", "Grande", "Não disponível"] },
+              porte: {
+                type: "string",
+                enum: ["Micro", "Pequena", "Média", "Grande", "Não disponível"],
+              },
             },
-            required: ["produtoPrincipal", "segmentacaoB2bB2c", "email", "telefone", "linkedin", "instagram", "porte"],
+            required: [
+              "produtoPrincipal",
+              "segmentacaoB2bB2c",
+              "email",
+              "telefone",
+              "linkedin",
+              "instagram",
+              "porte",
+            ],
             additionalProperties: false,
           },
         },
@@ -298,16 +399,42 @@ Retorne APENAS o JSON, sem explicações.`;
 
     // Calcular score de qualidade
     let qualidadeScore = 0;
-    if (cliente.cnpj) qualidadeScore += 20;
-    if (cliente.siteOficial) qualidadeScore += 15;
-    if (enrichedData.email && !enrichedData.email.includes("Não disponível")) qualidadeScore += 10;
-    if (enrichedData.telefone && !enrichedData.telefone.includes("Não disponível")) qualidadeScore += 10;
-    if (enrichedData.linkedin && !enrichedData.linkedin.includes("Não disponível")) qualidadeScore += 10;
-    if (enrichedData.produtoPrincipal && !enrichedData.produtoPrincipal.includes("Não disponível")) qualidadeScore += 15;
-    if (cliente.cidade) qualidadeScore += 10;
-    if (cliente.cnae) qualidadeScore += 10;
+    if (cliente.cnpj) {
+      qualidadeScore += 20;
+    }
+    if (cliente.siteOficial) {
+      qualidadeScore += 15;
+    }
+    if (enrichedData.email && !enrichedData.email.includes("Não disponível")) {
+      qualidadeScore += 10;
+    }
+    if (
+      enrichedData.telefone &&
+      !enrichedData.telefone.includes("Não disponível")
+    ) {
+      qualidadeScore += 10;
+    }
+    if (
+      enrichedData.linkedin &&
+      !enrichedData.linkedin.includes("Não disponível")
+    ) {
+      qualidadeScore += 10;
+    }
+    if (
+      enrichedData.produtoPrincipal &&
+      !enrichedData.produtoPrincipal.includes("Não disponível")
+    ) {
+      qualidadeScore += 15;
+    }
+    if (cliente.cidade) {
+      qualidadeScore += 10;
+    }
+    if (cliente.cnae) {
+      qualidadeScore += 10;
+    }
 
-    const qualidadeClassificacao = qualidadeScore >= 71 ? "Alta" : qualidadeScore >= 41 ? "Média" : "Baixa";
+    const qualidadeClassificacao =
+      qualidadeScore >= 71 ? "Alta" : qualidadeScore >= 41 ? "Média" : "Baixa";
 
     return {
       ...enrichedData,
@@ -323,7 +450,10 @@ Retorne APENAS o JSON, sem explicações.`;
 /**
  * Enriquece dados de um MERCADO usando Gemini
  */
-export async function enrichMercadoWithGemini(mercadoNome: string, produtosClientes: string[]) {
+export async function enrichMercadoWithGemini(
+  mercadoNome: string,
+  produtosClientes: string[]
+) {
   const prompt = `Você é um analista de mercado B2B especializado em inteligência competitiva.
 
 MERCADO: ${mercadoNome}
@@ -349,8 +479,12 @@ Retorne APENAS o JSON, sem explicações.`;
   try {
     const response = await invokeLLM({
       messages: [
-        { role: "system", content: "Você é um assistente que retorna apenas JSON válido, sem texto adicional." },
-        { role: "user", content: prompt }
+        {
+          role: "system",
+          content:
+            "Você é um assistente que retorna apenas JSON válido, sem texto adicional.",
+        },
+        { role: "user", content: prompt },
       ],
       response_format: {
         type: "json_schema",
@@ -367,7 +501,14 @@ Retorne APENAS o JSON, sem explicações.`;
               tendencias: { type: "string" },
               principaisPlayers: { type: "string" },
             },
-            required: ["segmentacao", "categoria", "tamanhoMercado", "crescimentoAnual", "tendencias", "principaisPlayers"],
+            required: [
+              "segmentacao",
+              "categoria",
+              "tamanhoMercado",
+              "crescimentoAnual",
+              "tendencias",
+              "principaisPlayers",
+            ],
             additionalProperties: false,
           },
         },

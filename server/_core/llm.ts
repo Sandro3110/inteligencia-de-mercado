@@ -19,7 +19,12 @@ export type FileContent = {
   type: "file_url";
   file_url: {
     url: string;
-    mime_type?: "audio/mpeg" | "audio/wav" | "application/pdf" | "audio/mp4" | "video/mp4" ;
+    mime_type?:
+      | "audio/mpeg"
+      | "audio/wav"
+      | "application/pdf"
+      | "audio/mp4"
+      | "video/mp4";
   };
 };
 
@@ -177,7 +182,9 @@ const normalizeToolChoice = (
   toolChoice: ToolChoice | undefined,
   tools: Tool[] | undefined
 ): "none" | "auto" | ToolChoiceExplicit | undefined => {
-  if (!toolChoice) return undefined;
+  if (!toolChoice) {
+    return undefined;
+  }
 
   if (toolChoice === "none" || toolChoice === "auto") {
     return toolChoice;
@@ -253,7 +260,9 @@ const normalizeResponseFormat = ({
   }
 
   const schema = outputSchema || output_schema;
-  if (!schema) return undefined;
+  if (!schema) {
+    return undefined;
+  }
 
   if (!schema.name || !schema.schema) {
     throw new Error("outputSchema requires both name and schema");
@@ -304,7 +313,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   if (params.maxTokens || params.max_tokens) {
     payload.max_tokens = params.maxTokens || params.max_tokens;
   }
-  
+
   // Configurar temperature se fornecido
   if (params.temperature !== undefined) {
     payload.temperature = params.temperature;

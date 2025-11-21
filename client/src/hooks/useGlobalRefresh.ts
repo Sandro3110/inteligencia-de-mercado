@@ -6,7 +6,7 @@ import { toast } from "sonner";
  * Hook para refresh global de dados
  * Fase 75: Opção 2 - Híbrida
  * Fase 76: + Ctrl+R + Auto-refresh inteligente
- * 
+ *
  * Permite forçar atualização de todas as queries tRPC ativas
  * Útil para botão "Atualizar Dados" no sidebar
  */
@@ -34,54 +34,69 @@ export function useGlobalRefresh(options?: {
    * Força refresh de todas as queries tRPC
    * Invalida cache e recarrega dados
    */
-  const refreshAll = useCallback(async (silent = false) => {
-    if (isRefreshing) return; // Previne cliques múltiplos
+  const refreshAll = useCallback(
+    async (silent = false) => {
+      if (isRefreshing) {
+        return;
+      } // Previne cliques múltiplos
 
-    setIsRefreshing(true);
-    
-    try {
-      // Invalida TODAS as queries do tRPC
-      await utils.invalidate();
-      
-      // Atualiza timestamp
-      setLastRefreshTime(new Date());
-      
-      // Feedback visual (apenas se não for silencioso)
-      if (!silent) {
-        toast.success("Dados atualizados com sucesso!", {
-          description: "Todas as informações foram recarregadas.",
-          duration: 3000,
-        });
+      setIsRefreshing(true);
+
+      try {
+        // Invalida TODAS as queries do tRPC
+        await utils.invalidate();
+
+        // Atualiza timestamp
+        setLastRefreshTime(new Date());
+
+        // Feedback visual (apenas se não for silencioso)
+        if (!silent) {
+          toast.success("Dados atualizados com sucesso!", {
+            description: "Todas as informações foram recarregadas.",
+            duration: 3000,
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar dados:", error);
+        if (!silent) {
+          toast.error("Erro ao atualizar dados", {
+            description: "Tente novamente em alguns instantes.",
+            duration: 4000,
+          });
+        }
+      } finally {
+        setIsRefreshing(false);
       }
-    } catch (error) {
-      console.error("Erro ao atualizar dados:", error);
-      if (!silent) {
-        toast.error("Erro ao atualizar dados", {
-          description: "Tente novamente em alguns instantes.",
-          duration: 4000,
-        });
-      }
-    } finally {
-      setIsRefreshing(false);
-    }
-  }, [utils]);
+    },
+    [utils]
+  );
 
   /**
    * Retorna tempo desde última atualização em formato legível
    */
   const getTimeSinceRefresh = (): string | null => {
-    if (!lastRefreshTime) return null;
+    if (!lastRefreshTime) {
+      return null;
+    }
 
     const now = new Date();
     const diffMs = now.getTime() - lastRefreshTime.getTime();
     const diffMinutes = Math.floor(diffMs / 60000);
 
-    if (diffMinutes === 0) return "agora mesmo";
-    if (diffMinutes === 1) return "há 1 minuto";
-    if (diffMinutes < 60) return `há ${diffMinutes} minutos`;
-    
+    if (diffMinutes === 0) {
+      return "agora mesmo";
+    }
+    if (diffMinutes === 1) {
+      return "há 1 minuto";
+    }
+    if (diffMinutes < 60) {
+      return `há ${diffMinutes} minutos`;
+    }
+
     const diffHours = Math.floor(diffMinutes / 60);
-    if (diffHours === 1) return "há 1 hora";
+    if (diffHours === 1) {
+      return "há 1 hora";
+    }
     return `há ${diffHours} horas`;
   };
 
@@ -109,7 +124,9 @@ export function useGlobalRefresh(options?: {
    * Verifica se dados estão desatualizados (>10min)
    */
   const isDataStale = (): boolean => {
-    if (!lastRefreshTime) return false;
+    if (!lastRefreshTime) {
+      return false;
+    }
     const now = new Date();
     const diffMs = now.getTime() - lastRefreshTime.getTime();
     const diffMinutes = Math.floor(diffMs / 60000);
@@ -118,7 +135,9 @@ export function useGlobalRefresh(options?: {
 
   // Auto-refresh inteligente (apenas quando aba está visível)
   useEffect(() => {
-    if (!autoRefreshEnabled) return;
+    if (!autoRefreshEnabled) {
+      return;
+    }
 
     const handleVisibilityChange = () => {
       // Se aba ficou visível e dados estão desatualizados, atualiza
@@ -146,7 +165,9 @@ export function useGlobalRefresh(options?: {
 
   // Atalho de teclado Ctrl+R
   useEffect(() => {
-    if (!enableKeyboardShortcut) return;
+    if (!enableKeyboardShortcut) {
+      return;
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ctrl+R ou Cmd+R (Mac)

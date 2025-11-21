@@ -85,14 +85,16 @@ export default function SearchHistory({ onSelectSearch }: SearchHistoryProps) {
 
 // Função auxiliar para adicionar busca ao histórico
 export function addToSearchHistory(query: string) {
-  if (!query.trim()) return;
+  if (!query.trim()) {
+    return;
+  }
 
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     let history: string[] = stored ? JSON.parse(stored) : [];
 
     // Remove duplicatas
-    history = history.filter((q) => q !== query);
+    history = history.filter(q => q !== query);
 
     // Adiciona no início
     history.unshift(query);

@@ -1,10 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Search, Building2, Users, Target, TrendingUp } from "lucide-react";
 import { useLocation } from "wouter";
@@ -23,33 +20,39 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { data: results = [], isLoading } = trpc.search.global.useQuery(
-    { 
-      query, 
+    {
+      query,
       projectId: selectedProjectId || undefined,
-      limit: 50 
+      limit: 50,
     },
     { enabled: query.length > 0 }
   );
 
   // Fuzzy search local para melhorar resultados
   const fuse = new Fuse(results, {
-    keys: ['title', 'subtitle'],
+    keys: ["title", "subtitle"],
     threshold: 0.3,
     includeScore: true,
   });
 
-  const filteredResults = query.length > 0 
-    ? (query.length > 2 ? fuse.search(query).map(r => r.item) : results)
-    : [];
+  const filteredResults =
+    query.length > 0
+      ? query.length > 2
+        ? fuse.search(query).map(r => r.item)
+        : results
+      : [];
 
   // Agrupar por tipo
-  const groupedResults = filteredResults.reduce((acc, result) => {
-    if (!acc[result.type]) {
-      acc[result.type] = [];
-    }
-    acc[result.type].push(result);
-    return acc;
-  }, {} as Record<string, typeof results>);
+  const groupedResults = filteredResults.reduce(
+    (acc, result) => {
+      if (!acc[result.type]) {
+        acc[result.type] = [];
+      }
+      acc[result.type].push(result);
+      return acc;
+    },
+    {} as Record<string, typeof results>
+  );
 
   // Reset selected index quando resultados mudam
   useEffect(() => {
@@ -65,12 +68,16 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 
   // Navegação por teclado
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex(prev => Math.min(prev + 1, filteredResults.length - 1));
+        setSelectedIndex(prev =>
+          Math.min(prev + 1, filteredResults.length - 1)
+        );
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setSelectedIndex(prev => Math.max(prev - 1, 0));
@@ -84,41 +91,51 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open, selectedIndex, filteredResults]);
 
-  const handleSelect = (result: typeof results[0]) => {
+  const handleSelect = (result: (typeof results)[0]) => {
     onOpenChange(false);
     setQuery("");
-    
+
     // Navegar para a entidade selecionada
     switch (result.type) {
-      case 'mercado':
+      case "mercado":
         setLocation(`/mercado/${result.id}`);
         break;
-      case 'cliente':
-      case 'concorrente':
-      case 'lead':
+      case "cliente":
+      case "concorrente":
+      case "lead":
         // Por enquanto volta para home, pode ser melhorado
-        setLocation('/');
+        setLocation("/");
         break;
     }
   };
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'mercado': return <Building2 className="h-4 w-4" />;
-      case 'cliente': return <Users className="h-4 w-4" />;
-      case 'concorrente': return <Target className="h-4 w-4" />;
-      case 'lead': return <TrendingUp className="h-4 w-4" />;
-      default: return <Search className="h-4 w-4" />;
+      case "mercado":
+        return <Building2 className="h-4 w-4" />;
+      case "cliente":
+        return <Users className="h-4 w-4" />;
+      case "concorrente":
+        return <Target className="h-4 w-4" />;
+      case "lead":
+        return <TrendingUp className="h-4 w-4" />;
+      default:
+        return <Search className="h-4 w-4" />;
     }
   };
 
   const getTypeLabel = (type: string) => {
     switch (type) {
-      case 'mercado': return 'Mercado';
-      case 'cliente': return 'Cliente';
-      case 'concorrente': return 'Concorrente';
-      case 'lead': return 'Lead';
-      default: return type;
+      case "mercado":
+        return "Mercado";
+      case "cliente":
+        return "Cliente";
+      case "concorrente":
+        return "Concorrente";
+      case "lead":
+        return "Lead";
+      default:
+        return type;
     }
   };
 
@@ -132,7 +149,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
             ref={inputRef}
             placeholder="Buscar mercados, clientes, concorrentes, leads..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={e => setQuery(e.target.value)}
             className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
           />
         </div>
@@ -149,7 +166,9 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
             <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
               <Search className="h-12 w-12 mb-2 opacity-50" />
               <p className="text-sm">Nenhum resultado encontrado</p>
-              <p className="text-xs mt-1">Tente buscar por nome, CNPJ ou email</p>
+              <p className="text-xs mt-1">
+                Tente buscar por nome, CNPJ ou email
+              </p>
             </div>
           )}
 
@@ -157,7 +176,9 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
             <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
               <Search className="h-12 w-12 mb-2 opacity-50" />
               <p className="text-sm">Digite para buscar...</p>
-              <p className="text-xs mt-1">Mercados, clientes, concorrentes e leads</p>
+              <p className="text-xs mt-1">
+                Mercados, clientes, concorrentes e leads
+              </p>
             </div>
           )}
 
@@ -169,15 +190,15 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
               {items.map((result, index) => {
                 const globalIndex = filteredResults.indexOf(result);
                 const isSelected = globalIndex === selectedIndex;
-                
+
                 return (
                   <button
                     key={`${result.type}-${result.id}`}
                     onClick={() => handleSelect(result)}
                     className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
-                      isSelected 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'hover:bg-accent/50'
+                      isSelected
+                        ? "bg-accent text-accent-foreground"
+                        : "hover:bg-accent/50"
                     }`}
                   >
                     <div className="flex-shrink-0 text-muted-foreground">
@@ -209,11 +230,15 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
                 Navegar
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Enter</kbd>
+                <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+                  Enter
+                </kbd>
                 Selecionar
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Esc</kbd>
+                <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+                  Esc
+                </kbd>
                 Fechar
               </span>
             </div>

@@ -1,6 +1,6 @@
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
 import { getDb } from "./db";
-import { toMySQLTimestamp } from './dateUtils';
+import { toMySQLTimestamp } from "./dateUtils";
 import {
   analyticsMercados,
   analyticsPesquisas,
@@ -25,16 +25,26 @@ export async function getAnalyticsByMercado(params: {
   dateTo?: Date;
 }) {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) {
+    return [];
+  }
 
   const { projectId, mercadoId, pesquisaId, dateFrom, dateTo } = params;
 
   const conditions = [eq(analyticsMercados.projectId, projectId)];
-  
-  if (mercadoId) conditions.push(eq(analyticsMercados.mercadoId, mercadoId));
-  if (pesquisaId) conditions.push(eq(analyticsMercados.pesquisaId, pesquisaId));
-  if (dateFrom) conditions.push(gte(analyticsMercados.periodo, toMySQLTimestamp(dateFrom)));
-  if (dateTo) conditions.push(lte(analyticsMercados.periodo, toMySQLTimestamp(dateTo)));
+
+  if (mercadoId) {
+    conditions.push(eq(analyticsMercados.mercadoId, mercadoId));
+  }
+  if (pesquisaId) {
+    conditions.push(eq(analyticsMercados.pesquisaId, pesquisaId));
+  }
+  if (dateFrom) {
+    conditions.push(gte(analyticsMercados.periodo, toMySQLTimestamp(dateFrom)));
+  }
+  if (dateTo) {
+    conditions.push(lte(analyticsMercados.periodo, toMySQLTimestamp(dateTo)));
+  }
 
   const metricas = await db
     .select()
@@ -53,12 +63,16 @@ export async function getAnalyticsByPesquisa(params: {
   pesquisaId?: number;
 }) {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) {
+    return [];
+  }
 
   const { projectId, pesquisaId } = params;
 
   const conditions = [eq(analyticsPesquisas.projectId, projectId)];
-  if (pesquisaId) conditions.push(eq(analyticsPesquisas.pesquisaId, pesquisaId));
+  if (pesquisaId) {
+    conditions.push(eq(analyticsPesquisas.pesquisaId, pesquisaId));
+  }
 
   const metricas = await db
     .select()
@@ -79,15 +93,23 @@ export async function getAnalyticsByDimensao(params: {
   pesquisaId?: number;
 }) {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) {
+    return [];
+  }
 
   const { projectId, dimensaoTipo, dimensaoValor, pesquisaId } = params;
 
   const conditions = [eq(analyticsDimensoes.projectId, projectId)];
-  
-  if (dimensaoTipo) conditions.push(eq(analyticsDimensoes.dimensaoTipo, dimensaoTipo));
-  if (dimensaoValor) conditions.push(eq(analyticsDimensoes.dimensaoValor, dimensaoValor));
-  if (pesquisaId) conditions.push(eq(analyticsDimensoes.pesquisaId, pesquisaId));
+
+  if (dimensaoTipo) {
+    conditions.push(eq(analyticsDimensoes.dimensaoTipo, dimensaoTipo));
+  }
+  if (dimensaoValor) {
+    conditions.push(eq(analyticsDimensoes.dimensaoValor, dimensaoValor));
+  }
+  if (pesquisaId) {
+    conditions.push(eq(analyticsDimensoes.pesquisaId, pesquisaId));
+  }
 
   const metricas = await db
     .select()
@@ -108,14 +130,20 @@ export async function getAnalyticsTimeline(params: {
   limit?: number;
 }) {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) {
+    return [];
+  }
 
   const { projectId, dateFrom, dateTo, limit = 30 } = params;
 
   const conditions = [eq(analyticsTimeline.projectId, projectId)];
-  
-  if (dateFrom) conditions.push(gte(analyticsTimeline.data, toMySQLTimestamp(dateFrom)));
-  if (dateTo) conditions.push(lte(analyticsTimeline.data, toMySQLTimestamp(dateTo)));
+
+  if (dateFrom) {
+    conditions.push(gte(analyticsTimeline.data, toMySQLTimestamp(dateFrom)));
+  }
+  if (dateTo) {
+    conditions.push(lte(analyticsTimeline.data, toMySQLTimestamp(dateTo)));
+  }
 
   const timeline = await db
     .select()
@@ -135,13 +163,17 @@ export async function getResearchOverviewMetrics(params: {
   pesquisaId?: number;
 }) {
   const db = await getDb();
-  if (!db) return null;
+  if (!db) {
+    return null;
+  }
 
   const { projectId, pesquisaId } = params;
 
   // Buscar métricas da pesquisa
   const pesquisaConditions = [eq(analyticsPesquisas.projectId, projectId)];
-  if (pesquisaId) pesquisaConditions.push(eq(analyticsPesquisas.pesquisaId, pesquisaId));
+  if (pesquisaId) {
+    pesquisaConditions.push(eq(analyticsPesquisas.pesquisaId, pesquisaId));
+  }
 
   const [pesquisaMetrics] = await db
     .select()
@@ -152,7 +184,9 @@ export async function getResearchOverviewMetrics(params: {
 
   // Buscar métricas por mercado
   const mercadoConditions = [eq(analyticsMercados.projectId, projectId)];
-  if (pesquisaId) mercadoConditions.push(eq(analyticsMercados.pesquisaId, pesquisaId));
+  if (pesquisaId) {
+    mercadoConditions.push(eq(analyticsMercados.pesquisaId, pesquisaId));
+  }
 
   const mercadosMetrics = await db
     .select()
@@ -161,21 +195,48 @@ export async function getResearchOverviewMetrics(params: {
 
   // Calcular totais agregados
   const totalMercados = mercadosMetrics.length;
-  const totalLeads = mercadosMetrics.reduce((sum, m) => sum + (m.totalLeadsGerados || 0), 0);
-  const totalValidados = mercadosMetrics.reduce((sum, m) => sum + (m.leadsValidados || 0), 0);
-  const totalAprovados = mercadosMetrics.reduce((sum, m) => sum + (m.leadsAprovados || 0), 0);
-  const totalDescartados = mercadosMetrics.reduce((sum, m) => sum + (m.leadsDescartados || 0), 0);
+  const totalLeads = mercadosMetrics.reduce(
+    (sum, m) => sum + (m.totalLeadsGerados || 0),
+    0
+  );
+  const totalValidados = mercadosMetrics.reduce(
+    (sum, m) => sum + (m.leadsValidados || 0),
+    0
+  );
+  const totalAprovados = mercadosMetrics.reduce(
+    (sum, m) => sum + (m.leadsAprovados || 0),
+    0
+  );
+  const totalDescartados = mercadosMetrics.reduce(
+    (sum, m) => sum + (m.leadsDescartados || 0),
+    0
+  );
 
-  const qualidadeMedia = totalLeads > 0
-    ? mercadosMetrics.reduce((sum, m) => sum + (m.qualidadeMediaLeads || 0) * (m.totalLeadsGerados || 0), 0) / totalLeads
-    : 0;
+  const qualidadeMedia =
+    totalLeads > 0
+      ? mercadosMetrics.reduce(
+          (sum, m) =>
+            sum + (m.qualidadeMediaLeads || 0) * (m.totalLeadsGerados || 0),
+          0
+        ) / totalLeads
+      : 0;
 
-  const taxaAprovacao = totalValidados > 0 ? (totalAprovados / totalValidados) * 100 : 0;
+  const taxaAprovacao =
+    totalValidados > 0 ? (totalAprovados / totalValidados) * 100 : 0;
 
   // Distribuição de qualidade
-  const leadsAlta = mercadosMetrics.reduce((sum, m) => sum + (m.leadsAltaQualidade || 0), 0);
-  const leadsMedia = mercadosMetrics.reduce((sum, m) => sum + (m.leadsMediaQualidade || 0), 0);
-  const leadsBaixa = mercadosMetrics.reduce((sum, m) => sum + (m.leadsBaixaQualidade || 0), 0);
+  const leadsAlta = mercadosMetrics.reduce(
+    (sum, m) => sum + (m.leadsAltaQualidade || 0),
+    0
+  );
+  const leadsMedia = mercadosMetrics.reduce(
+    (sum, m) => sum + (m.leadsMediaQualidade || 0),
+    0
+  );
+  const leadsBaixa = mercadosMetrics.reduce(
+    (sum, m) => sum + (m.leadsBaixaQualidade || 0),
+    0
+  );
 
   // Top 10 mercados por volume
   const topMercados = await db
@@ -187,7 +248,10 @@ export async function getResearchOverviewMetrics(params: {
       taxaAprovacao: analyticsMercados.taxaAprovacao,
     })
     .from(analyticsMercados)
-    .leftJoin(mercadosUnicos, eq(analyticsMercados.mercadoId, mercadosUnicos.id))
+    .leftJoin(
+      mercadosUnicos,
+      eq(analyticsMercados.mercadoId, mercadosUnicos.id)
+    )
     .where(and(...mercadoConditions))
     .orderBy(desc(analyticsMercados.totalLeadsGerados))
     .limit(10);
@@ -220,7 +284,9 @@ export async function getTimelineEvolution(params: {
   days?: number;
 }) {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) {
+    return [];
+  }
 
   const { projectId, days = 30 } = params;
 

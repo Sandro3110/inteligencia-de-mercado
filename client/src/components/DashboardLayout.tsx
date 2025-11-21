@@ -25,7 +25,7 @@ import { useIsMobile } from "@/hooks/useMobile";
 import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
+import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { Button } from "./ui/button";
 
 const menuItems = [
@@ -54,7 +54,7 @@ export default function DashboardLayout({
   }, [sidebarWidth]);
 
   if (loading) {
-    return <DashboardLayoutSkeleton />
+    return <DashboardLayoutSkeleton />;
   }
 
   if (!user) {
@@ -135,7 +135,9 @@ function DashboardLayoutContent({
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing) return;
+      if (!isResizing) {
+        return;
+      }
 
       const sidebarLeft = sidebarRef.current?.getBoundingClientRect().left ?? 0;
       const newWidth = e.clientX - sidebarLeft;
@@ -222,16 +224,18 @@ function DashboardLayoutContent({
                         if (isCollapsed) {
                           // Mostrar peek animation
                           setPeekLabel(item.label);
-                          
+
                           // Limpar timeout anterior se existir
-                          if (peekTimeout) clearTimeout(peekTimeout);
-                          
+                          if (peekTimeout) {
+                            clearTimeout(peekTimeout);
+                          }
+
                           // Navegar após 1.2 segundos
                           const timeout = setTimeout(() => {
                             setLocation(item.path);
                             setPeekLabel(null);
                           }, 1200);
-                          
+
                           setPeekTimeout(timeout);
                         } else {
                           // Navegação imediata quando sidebar expandida
@@ -250,7 +254,7 @@ function DashboardLayoutContent({
                       />
                       <span>{item.label}</span>
                     </SidebarMenuButton>
-                    
+
                     {/* Peek animation - tooltip expandido */}
                     <AnimatePresence>
                       {isCollapsed && peekLabel === item.label && (
@@ -307,7 +311,9 @@ function DashboardLayoutContent({
         <div
           className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/20 transition-colors ${isCollapsed ? "hidden" : ""}`}
           onMouseDown={() => {
-            if (isCollapsed) return;
+            if (isCollapsed) {
+              return;
+            }
             setIsResizing(true);
           }}
           style={{ zIndex: 50 }}

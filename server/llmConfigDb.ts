@@ -1,25 +1,29 @@
-import { eq } from 'drizzle-orm';
-import { getDb } from './db';
-import { now, toMySQLTimestamp } from './dateUtils';
-import { 
-  llmProviderConfigs, 
-  intelligentAlertsConfigs, 
+import { eq } from "drizzle-orm";
+import { getDb } from "./db";
+import { now, toMySQLTimestamp } from "./dateUtils";
+import {
+  llmProviderConfigs,
+  intelligentAlertsConfigs,
   intelligentAlertsHistory,
   type LLMProviderConfig,
   type InsertLLMProviderConfig,
   type IntelligentAlertsConfig,
   type InsertIntelligentAlertsConfig,
   type IntelligentAlertsHistory,
-  type InsertIntelligentAlertsHistory
-} from '../drizzle/schema';
+  type InsertIntelligentAlertsHistory,
+} from "../drizzle/schema";
 
 // ============================================
 // LLM Provider Config Helpers
 // ============================================
 
-export async function getLLMConfig(projectId: number): Promise<LLMProviderConfig | undefined> {
+export async function getLLMConfig(
+  projectId: number
+): Promise<LLMProviderConfig | undefined> {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) {
+    return undefined;
+  }
 
   const result = await db
     .select()
@@ -30,9 +34,13 @@ export async function getLLMConfig(projectId: number): Promise<LLMProviderConfig
   return result[0];
 }
 
-export async function upsertLLMConfig(data: InsertLLMProviderConfig): Promise<void> {
+export async function upsertLLMConfig(
+  data: InsertLLMProviderConfig
+): Promise<void> {
   const db = await getDb();
-  if (!db) throw new Error('Database not available');
+  if (!db) {
+    throw new Error("Database not available");
+  }
 
   const existing = await getLLMConfig(data.projectId);
 
@@ -47,27 +55,30 @@ export async function upsertLLMConfig(data: InsertLLMProviderConfig): Promise<vo
 }
 
 export async function testLLMConnection(
-  provider: 'openai' | 'gemini' | 'anthropic',
+  provider: "openai" | "gemini" | "anthropic",
   apiKey: string,
   model?: string
 ): Promise<{ success: boolean; message: string }> {
   try {
     // Teste simples de conexão
-    if (!apiKey || apiKey.trim() === '') {
-      return { success: false, message: 'API Key não pode estar vazia' };
+    if (!apiKey || apiKey.trim() === "") {
+      return { success: false, message: "API Key não pode estar vazia" };
     }
 
     // Aqui você pode adicionar testes reais de conexão se necessário
     // Por enquanto, apenas validação básica
-    if (provider === 'openai' && !apiKey.startsWith('sk-')) {
-      return { success: false, message: 'API Key OpenAI inválida (deve começar com sk-)' };
+    if (provider === "openai" && !apiKey.startsWith("sk-")) {
+      return {
+        success: false,
+        message: "API Key OpenAI inválida (deve começar com sk-)",
+      };
     }
 
-    return { success: true, message: 'Conexão testada com sucesso' };
+    return { success: true, message: "Conexão testada com sucesso" };
   } catch (error) {
-    return { 
-      success: false, 
-      message: error instanceof Error ? error.message : 'Erro desconhecido' 
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Erro desconhecido",
     };
   }
 }
@@ -76,9 +87,13 @@ export async function testLLMConnection(
 // Intelligent Alerts Config Helpers
 // ============================================
 
-export async function getAlertsConfig(projectId: number): Promise<IntelligentAlertsConfig | undefined> {
+export async function getAlertsConfig(
+  projectId: number
+): Promise<IntelligentAlertsConfig | undefined> {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) {
+    return undefined;
+  }
 
   const result = await db
     .select()
@@ -89,9 +104,13 @@ export async function getAlertsConfig(projectId: number): Promise<IntelligentAle
   return result[0];
 }
 
-export async function upsertAlertsConfig(data: InsertIntelligentAlertsConfig): Promise<void> {
+export async function upsertAlertsConfig(
+  data: InsertIntelligentAlertsConfig
+): Promise<void> {
   const db = await getDb();
-  if (!db) throw new Error('Database not available');
+  if (!db) {
+    throw new Error("Database not available");
+  }
 
   const existing = await getAlertsConfig(data.projectId);
 
@@ -109,9 +128,13 @@ export async function upsertAlertsConfig(data: InsertIntelligentAlertsConfig): P
 // Intelligent Alerts History Helpers
 // ============================================
 
-export async function createAlertHistory(data: InsertIntelligentAlertsHistory): Promise<number> {
+export async function createAlertHistory(
+  data: InsertIntelligentAlertsHistory
+): Promise<number> {
   const db = await getDb();
-  if (!db) throw new Error('Database not available');
+  if (!db) {
+    throw new Error("Database not available");
+  }
 
   const [result] = await db.insert(intelligentAlertsHistory).values(data);
   return Number(result.insertId);
@@ -119,10 +142,12 @@ export async function createAlertHistory(data: InsertIntelligentAlertsHistory): 
 
 export async function getAlertsHistory(
   projectId: number,
-  limit: number = 50
+  limit = 50
 ): Promise<IntelligentAlertsHistory[]> {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) {
+    return [];
+  }
 
   return db
     .select()
@@ -134,7 +159,9 @@ export async function getAlertsHistory(
 
 export async function markAlertAsRead(alertId: number): Promise<void> {
   const db = await getDb();
-  if (!db) throw new Error('Database not available');
+  if (!db) {
+    throw new Error("Database not available");
+  }
 
   await db
     .update(intelligentAlertsHistory)
@@ -144,7 +171,9 @@ export async function markAlertAsRead(alertId: number): Promise<void> {
 
 export async function dismissAlert(alertId: number): Promise<void> {
   const db = await getDb();
-  if (!db) throw new Error('Database not available');
+  if (!db) {
+    throw new Error("Database not available");
+  }
 
   await db
     .update(intelligentAlertsHistory)
@@ -152,7 +181,10 @@ export async function dismissAlert(alertId: number): Promise<void> {
     .where(eq(intelligentAlertsHistory.id, alertId));
 }
 
-export async function getAlertsStats(projectId: number, hours: number = 24): Promise<{
+export async function getAlertsStats(
+  projectId: number,
+  hours = 24
+): Promise<{
   total: number;
   unread: number;
   byType: Record<string, number>;
@@ -171,7 +203,9 @@ export async function getAlertsStats(projectId: number, hours: number = 24): Pro
     .from(intelligentAlertsHistory)
     .where(eq(intelligentAlertsHistory.projectId, projectId));
 
-  const recentAlerts = alerts.filter(a => a.createdAt && a.createdAt >= sinceStr);
+  const recentAlerts = alerts.filter(
+    a => a.createdAt && a.createdAt >= sinceStr
+  );
 
   const byType: Record<string, number> = {};
   const bySeverity: Record<string, number> = {};
@@ -180,7 +214,9 @@ export async function getAlertsStats(projectId: number, hours: number = 24): Pro
   for (const alert of recentAlerts) {
     byType[alert.alertType] = (byType[alert.alertType] || 0) + 1;
     bySeverity[alert.severity] = (bySeverity[alert.severity] || 0) + 1;
-    if (alert.isRead === 0) unread++;
+    if (alert.isRead === 0) {
+      unread++;
+    }
   }
 
   return {

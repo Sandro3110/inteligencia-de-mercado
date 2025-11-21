@@ -24,7 +24,7 @@ export class JSONRenderer {
     const {
       prettyPrint = true,
       nested = false,
-      includeMetadata = true
+      includeMetadata = true,
     } = options;
 
     let output: any;
@@ -36,9 +36,9 @@ export class JSONRenderer {
           filters: metadata.filters,
           recordCount: metadata.recordCount,
           generatedAt: metadata.generatedAt.toISOString(),
-          projectId: metadata.projectId
+          projectId: metadata.projectId,
         },
-        data: nested ? this.nestData(data) : data
+        data: nested ? this.nestData(data) : data,
       };
     } else {
       output = nested ? this.nestData(data) : data;
@@ -48,7 +48,7 @@ export class JSONRenderer {
       ? JSON.stringify(output, null, 2)
       : JSON.stringify(output);
 
-    return Buffer.from(jsonString, 'utf-8');
+    return Buffer.from(jsonString, "utf-8");
   }
 
   /**
@@ -61,14 +61,14 @@ export class JSONRenderer {
 
     for (const record of data) {
       const key = record.clienteId || record.mercadoId || record.id;
-      
+
       if (!grouped.has(key)) {
         grouped.set(key, {
           ...this.extractMainFields(record),
           produtos: [],
           mercados: [],
           concorrentes: [],
-          leads: []
+          leads: [],
         });
       }
 
@@ -79,7 +79,7 @@ export class JSONRenderer {
         entity.produtos.push({
           nome: record.produtoNome,
           descricao: record.produtoDescricao,
-          categoria: record.produtoCategoria
+          categoria: record.produtoCategoria,
         });
       }
 
@@ -87,7 +87,7 @@ export class JSONRenderer {
         entity.mercados.push({
           nome: record.mercadoNome,
           segmentacao: record.mercadoSegmentacao,
-          categoria: record.mercadoCategoria
+          categoria: record.mercadoCategoria,
         });
       }
     }
@@ -100,13 +100,15 @@ export class JSONRenderer {
    */
   private extractMainFields(record: any): any {
     const main: any = {};
-    
+
     for (const [key, value] of Object.entries(record)) {
       // Ignorar campos de relacionamento
-      if (!key.includes('produto') && 
-          !key.includes('mercado') && 
-          !key.includes('concorrente') &&
-          !key.includes('lead')) {
+      if (
+        !key.includes("produto") &&
+        !key.includes("mercado") &&
+        !key.includes("concorrente") &&
+        !key.includes("lead")
+      ) {
         main[key] = value;
       }
     }
@@ -118,18 +120,20 @@ export class JSONRenderer {
    * Gera schema JSON para documentação
    */
   generateSchema(data: any[]): any {
-    if (data.length === 0) return {};
+    if (data.length === 0) {
+      return {};
+    }
 
     const sample = data[0];
     const schema: any = {
-      type: 'object',
-      properties: {}
+      type: "object",
+      properties: {},
     };
 
     for (const [key, value] of Object.entries(sample)) {
       schema.properties[key] = {
         type: this.inferType(value),
-        example: value
+        example: value,
       };
     }
 
@@ -137,11 +141,21 @@ export class JSONRenderer {
   }
 
   private inferType(value: any): string {
-    if (value === null) return 'null';
-    if (typeof value === 'number') return 'number';
-    if (typeof value === 'boolean') return 'boolean';
-    if (Array.isArray(value)) return 'array';
-    if (typeof value === 'object') return 'object';
-    return 'string';
+    if (value === null) {
+      return "null";
+    }
+    if (typeof value === "number") {
+      return "number";
+    }
+    if (typeof value === "boolean") {
+      return "boolean";
+    }
+    if (Array.isArray(value)) {
+      return "array";
+    }
+    if (typeof value === "object") {
+      return "object";
+    }
+    return "string";
   }
 }

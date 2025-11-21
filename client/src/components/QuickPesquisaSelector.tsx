@@ -1,35 +1,46 @@
-import { useState, useEffect, useRef } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { Search, CheckCircle2, FolderOpen, Calendar } from 'lucide-react';
-import { useSelectedProject } from '@/hooks/useSelectedProject';
-import { useSelectedPesquisa } from '@/hooks/useSelectedPesquisa';
-import { cn } from '@/lib/utils';
+import { useState, useEffect, useRef } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { Search, CheckCircle2, FolderOpen, Calendar } from "lucide-react";
+import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { useSelectedPesquisa } from "@/hooks/useSelectedPesquisa";
+import { cn } from "@/lib/utils";
 
 interface QuickPesquisaSelectorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function QuickPesquisaSelector({ open, onOpenChange }: QuickPesquisaSelectorProps) {
+export function QuickPesquisaSelector({
+  open,
+  onOpenChange,
+}: QuickPesquisaSelectorProps) {
   const { selectedProject } = useSelectedProject();
-  const { pesquisas, selectedPesquisaId, selectPesquisa } = useSelectedPesquisa(selectedProject?.id);
-  const [searchQuery, setSearchQuery] = useState('');
+  const { pesquisas, selectedPesquisaId, selectPesquisa } = useSelectedPesquisa(
+    selectedProject?.id
+  );
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Filtrar pesquisas baseado na busca
-  const filteredPesquisas = pesquisas.filter(p =>
-    p.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.descricao?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredPesquisas = pesquisas.filter(
+    p =>
+      p.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.descricao?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Reset ao abrir
   useEffect(() => {
     if (open) {
-      setSearchQuery('');
+      setSearchQuery("");
       setSelectedIndex(0);
       setTimeout(() => inputRef.current?.focus(), 100);
     }
@@ -38,24 +49,26 @@ export function QuickPesquisaSelector({ open, onOpenChange }: QuickPesquisaSelec
   // Navegação por teclado
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!open) return;
+      if (!open) {
+        return;
+      }
 
-      if (e.key === 'ArrowDown') {
+      if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex(prev => 
+        setSelectedIndex(prev =>
           prev < filteredPesquisas.length - 1 ? prev + 1 : prev
         );
-      } else if (e.key === 'ArrowUp') {
+      } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setSelectedIndex(prev => prev > 0 ? prev - 1 : prev);
-      } else if (e.key === 'Enter' && filteredPesquisas[selectedIndex]) {
+        setSelectedIndex(prev => (prev > 0 ? prev - 1 : prev));
+      } else if (e.key === "Enter" && filteredPesquisas[selectedIndex]) {
         e.preventDefault();
         handleSelect(filteredPesquisas[selectedIndex].id);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open, selectedIndex, filteredPesquisas]);
 
   const handleSelect = (pesquisaId: number) => {
@@ -91,7 +104,8 @@ export function QuickPesquisaSelector({ open, onOpenChange }: QuickPesquisaSelec
             Seleção Rápida de Pesquisa
           </DialogTitle>
           <p className="text-sm text-muted-foreground">
-            Projeto: <span className="font-semibold">{selectedProject.nome}</span>
+            Projeto:{" "}
+            <span className="font-semibold">{selectedProject.nome}</span>
           </p>
         </DialogHeader>
 
@@ -102,7 +116,7 @@ export function QuickPesquisaSelector({ open, onOpenChange }: QuickPesquisaSelec
             ref={inputRef}
             placeholder="Digite para buscar pesquisas..."
             value={searchQuery}
-            onChange={(e) => {
+            onChange={e => {
               setSearchQuery(e.target.value);
               setSelectedIndex(0);
             }}
@@ -133,7 +147,8 @@ export function QuickPesquisaSelector({ open, onOpenChange }: QuickPesquisaSelec
                     className={cn(
                       "w-full text-left p-3 rounded-lg border transition-all",
                       "hover:border-blue-300 hover:bg-blue-50",
-                      isHighlighted && "border-blue-400 bg-blue-50 ring-2 ring-blue-200",
+                      isHighlighted &&
+                        "border-blue-400 bg-blue-50 ring-2 ring-blue-200",
                       isSelected && "bg-green-50 border-green-300"
                     )}
                   >
@@ -144,7 +159,10 @@ export function QuickPesquisaSelector({ open, onOpenChange }: QuickPesquisaSelec
                             {pesquisa.nome}
                           </h3>
                           {isSelected && (
-                            <Badge variant="default" className="bg-green-600 text-white">
+                            <Badge
+                              variant="default"
+                              className="bg-green-600 text-white"
+                            >
                               <CheckCircle2 className="w-3 h-3 mr-1" />
                               Ativa
                             </Badge>
@@ -158,7 +176,9 @@ export function QuickPesquisaSelector({ open, onOpenChange }: QuickPesquisaSelec
                         {pesquisa.createdAt && (
                           <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                             <Calendar className="w-3 h-3" />
-                            {new Date(pesquisa.createdAt).toLocaleDateString('pt-BR')}
+                            {new Date(pesquisa.createdAt).toLocaleDateString(
+                              "pt-BR"
+                            )}
                           </div>
                         )}
                       </div>
@@ -187,7 +207,8 @@ export function QuickPesquisaSelector({ open, onOpenChange }: QuickPesquisaSelec
             </span>
           </div>
           <span className="text-muted-foreground">
-            {filteredPesquisas.length} {filteredPesquisas.length === 1 ? 'pesquisa' : 'pesquisas'}
+            {filteredPesquisas.length}{" "}
+            {filteredPesquisas.length === 1 ? "pesquisa" : "pesquisas"}
           </span>
         </div>
       </DialogContent>

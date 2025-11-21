@@ -81,12 +81,16 @@ export function getCurrentMySQLTimestamp(): string {
  */
 export function formatDateForDisplay(
   date: Date | string | null | undefined,
-  locale: string = "pt-BR"
+  locale = "pt-BR"
 ): string | null {
-  if (!date) return null;
+  if (!date) {
+    return null;
+  }
 
   const dateObj = typeof date === "string" ? mysqlStringToDate(date) : date;
-  if (!dateObj) return null;
+  if (!dateObj) {
+    return null;
+  }
 
   return new Intl.DateTimeFormat(locale, {
     day: "2-digit",
@@ -117,7 +121,9 @@ export function getDaysDifference(
   const d1 = typeof date1 === "string" ? mysqlStringToDate(date1) : date1;
   const d2 = typeof date2 === "string" ? mysqlStringToDate(date2) : date2;
 
-  if (!d1 || !d2) return 0;
+  if (!d1 || !d2) {
+    return 0;
+  }
 
   const diffTime = Math.abs(d2.getTime() - d1.getTime());
   return Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -138,7 +144,9 @@ export function getDaysDifference(
  */
 export function addDays(date: Date | string, days: number): Date | null {
   const baseDate = typeof date === "string" ? mysqlStringToDate(date) : date;
-  if (!baseDate || isNaN(baseDate.getTime())) return null;
+  if (!baseDate || isNaN(baseDate.getTime())) {
+    return null;
+  }
 
   const result = new Date(baseDate);
   result.setDate(result.getDate() + days);

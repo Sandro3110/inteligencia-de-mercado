@@ -20,7 +20,7 @@ function isPortAvailable(port: number): Promise<boolean> {
   });
 }
 
-async function findAvailablePort(startPort: number = 3000): Promise<number> {
+async function findAvailablePort(startPort = 3000): Promise<number> {
   for (let port = startPort; port < startPort + 20; port++) {
     if (await isPortAvailable(port)) {
       return port;
@@ -37,14 +37,14 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
-  
+
   // SSE endpoint for enrichment progress
   app.get("/api/enrichment/progress/:jobId", setupSSE);
-  
+
   // SSE endpoint for real-time notifications
-  const { handleNotificationStream } = await import('../notificationStream');
+  const { handleNotificationStream } = await import("../notificationStream");
   app.get("/api/notifications/stream", handleNotificationStream);
-  
+
   // tRPC API
   app.use(
     "/api/trpc",
@@ -69,16 +69,18 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
-    
+
     // Inicializar WebSocket
     initializeWebSocket(server);
-    
+
     // Inicializar cron jobs
-    import("../cronJobs").then(({ initializeCronJobs }) => {
-      initializeCronJobs();
-    }).catch(err => {
-      console.error("[Server] Erro ao inicializar cron jobs:", err);
-    });
+    import("../cronJobs")
+      .then(({ initializeCronJobs }) => {
+        initializeCronJobs();
+      })
+      .catch(err => {
+        console.error("[Server] Erro ao inicializar cron jobs:", err);
+      });
   });
 }
 

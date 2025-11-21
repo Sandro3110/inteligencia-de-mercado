@@ -54,12 +54,12 @@ export default function MercadoDetalhes() {
   const mercadoId = params?.id ? parseInt(params.id) : 0;
   const [validationModal, setValidationModal] = useState<{
     open: boolean;
-    type: 'cliente' | 'concorrente' | 'lead';
+    type: "cliente" | "concorrente" | "lead";
     id: number;
     name: string;
     currentStatus?: string;
     currentNotes?: string;
-  }>({ open: false, type: 'cliente', id: 0, name: '' });
+  }>({ open: false, type: "cliente", id: 0, name: "" });
 
   // Estados de paginação
   const [clientesPage, setClientesPage] = useState(1);
@@ -75,36 +75,46 @@ export default function MercadoDetalhes() {
   const [porteFilter, setPorteFilter] = useState("all");
 
   const utils = trpc.useUtils();
-  
+
   // Buscar projeto selecionado do localStorage
-  const selectedProjectId = parseInt(localStorage.getItem("selectedProjectId") || "0");
+  const selectedProjectId = parseInt(
+    localStorage.getItem("selectedProjectId") || "0"
+  );
 
   // Funções de filtragem (definidas antes do uso)
   const filterClientes = (clientes: any[]) => {
-    return clientes.filter((cliente) => {
+    return clientes.filter(cliente => {
       // Busca global
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
-        const matchesSearch = 
+        const matchesSearch =
           cliente.nome?.toLowerCase().includes(search) ||
           cliente.cnpj?.toLowerCase().includes(search) ||
           cliente.produtoPrincipal?.toLowerCase().includes(search);
-        if (!matchesSearch) return false;
+        if (!matchesSearch) {
+          return false;
+        }
       }
 
       // Filtro de status
       if (statusFilter !== "all") {
-        if (cliente.validationStatus !== statusFilter) return false;
+        if (cliente.validationStatus !== statusFilter) {
+          return false;
+        }
       }
 
       // Filtro de UF
       if (ufFilter !== "all") {
-        if (cliente.uf !== ufFilter) return false;
+        if (cliente.uf !== ufFilter) {
+          return false;
+        }
       }
 
       // Filtro de porte
       if (porteFilter !== "all") {
-        if (cliente.porte !== porteFilter) return false;
+        if (cliente.porte !== porteFilter) {
+          return false;
+        }
       }
 
       return true;
@@ -112,30 +122,38 @@ export default function MercadoDetalhes() {
   };
 
   const filterConcorrentes = (concorrentes: any[]) => {
-    return concorrentes.filter((conc) => {
+    return concorrentes.filter(conc => {
       // Busca global
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
-        const matchesSearch = 
+        const matchesSearch =
           conc.nome?.toLowerCase().includes(search) ||
           conc.cnpj?.toLowerCase().includes(search) ||
           conc.produto?.toLowerCase().includes(search);
-        if (!matchesSearch) return false;
+        if (!matchesSearch) {
+          return false;
+        }
       }
 
       // Filtro de status
       if (statusFilter !== "all") {
-        if (conc.validationStatus !== statusFilter) return false;
+        if (conc.validationStatus !== statusFilter) {
+          return false;
+        }
       }
 
       // Filtro de qualidade
       if (qualidadeFilter !== "all") {
-        if (conc.qualidadeClassificacao !== qualidadeFilter) return false;
+        if (conc.qualidadeClassificacao !== qualidadeFilter) {
+          return false;
+        }
       }
 
       // Filtro de porte
       if (porteFilter !== "all") {
-        if (conc.porte !== porteFilter) return false;
+        if (conc.porte !== porteFilter) {
+          return false;
+        }
       }
 
       return true;
@@ -143,47 +161,67 @@ export default function MercadoDetalhes() {
   };
 
   const filterLeads = (leads: any[]) => {
-    return leads.filter((lead) => {
+    return leads.filter(lead => {
       // Busca global
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
-        const matchesSearch = 
+        const matchesSearch =
           lead.nome?.toLowerCase().includes(search) ||
           lead.cnpj?.toLowerCase().includes(search) ||
           lead.tipo?.toLowerCase().includes(search);
-        if (!matchesSearch) return false;
+        if (!matchesSearch) {
+          return false;
+        }
       }
 
       // Filtro de status
       if (statusFilter !== "all") {
-        if (lead.validationStatus !== statusFilter) return false;
+        if (lead.validationStatus !== statusFilter) {
+          return false;
+        }
       }
 
       // Filtro de qualidade
       if (qualidadeFilter !== "all") {
-        if (lead.qualidadeClassificacao !== qualidadeFilter) return false;
+        if (lead.qualidadeClassificacao !== qualidadeFilter) {
+          return false;
+        }
       }
 
       // Filtro de porte
       if (porteFilter !== "all") {
-        if (lead.porte !== porteFilter) return false;
+        if (lead.porte !== porteFilter) {
+          return false;
+        }
       }
 
       return true;
     });
   };
-  
+
   // Buscar todos os mercados do projeto para o seletor
   const { data: mercados } = trpc.mercados.list.useQuery(
     { projectId: selectedProjectId, search: "" },
     { enabled: !!selectedProjectId }
   );
 
-  const { data: mercado, isLoading: loadingMercado } = trpc.mercados.byId.useQuery(mercadoId);
-  const { data: clientesResponse, isLoading: loadingClientes } = trpc.clientes.byMercado.useQuery({ mercadoId, page: clientesPage, pageSize });
-  const { data: concorrentesResponse, isLoading: loadingConcorrentes } = trpc.concorrentes.byMercado.useQuery({ mercadoId, page: concorrentesPage, pageSize });
-  const { data: leadsResponse, isLoading: loadingLeads } = trpc.leads.byMercado.useQuery({ mercadoId, page: leadsPage, pageSize });
-  
+  const { data: mercado, isLoading: loadingMercado } =
+    trpc.mercados.byId.useQuery(mercadoId);
+  const { data: clientesResponse, isLoading: loadingClientes } =
+    trpc.clientes.byMercado.useQuery({
+      mercadoId,
+      page: clientesPage,
+      pageSize,
+    });
+  const { data: concorrentesResponse, isLoading: loadingConcorrentes } =
+    trpc.concorrentes.byMercado.useQuery({
+      mercadoId,
+      page: concorrentesPage,
+      pageSize,
+    });
+  const { data: leadsResponse, isLoading: loadingLeads } =
+    trpc.leads.byMercado.useQuery({ mercadoId, page: leadsPage, pageSize });
+
   // Extrair arrays dos objetos paginados e aplicar filtros
   const clientesRaw = clientesResponse?.data || [];
   const concorrentesRaw = concorrentesResponse?.data || [];
@@ -197,55 +235,63 @@ export default function MercadoDetalhes() {
     onSuccess: () => {
       utils.clientes.byMercado.invalidate({ mercadoId });
       utils.dashboard.stats.invalidate();
-      toast.success('Cliente validado com sucesso!');
+      toast.success("Cliente validado com sucesso!");
     },
     onError: () => {
-      toast.error('Erro ao validar cliente');
+      toast.error("Erro ao validar cliente");
     },
   });
 
-  const updateConcorrenteMutation = trpc.concorrentes.updateValidation.useMutation({
-    onSuccess: () => {
-      utils.concorrentes.byMercado.invalidate({ mercadoId });
-      utils.dashboard.stats.invalidate();
-      toast.success('Concorrente validado com sucesso!');
-    },
-    onError: () => {
-      toast.error('Erro ao validar concorrente');
-    },
-  });
+  const updateConcorrenteMutation =
+    trpc.concorrentes.updateValidation.useMutation({
+      onSuccess: () => {
+        utils.concorrentes.byMercado.invalidate({ mercadoId });
+        utils.dashboard.stats.invalidate();
+        toast.success("Concorrente validado com sucesso!");
+      },
+      onError: () => {
+        toast.error("Erro ao validar concorrente");
+      },
+    });
 
   const updateLeadMutation = trpc.leads.updateValidation.useMutation({
     onSuccess: () => {
       utils.leads.byMercado.invalidate({ mercadoId });
       utils.dashboard.stats.invalidate();
-      toast.success('Lead validado com sucesso!');
+      toast.success("Lead validado com sucesso!");
     },
     onError: () => {
-      toast.error('Erro ao validar lead');
+      toast.error("Erro ao validar lead");
     },
   });
 
   const handleValidation = (status: string, notes: string) => {
     const { type, id } = validationModal;
-    
-    if (type === 'cliente') {
+
+    if (type === "cliente") {
       updateClienteMutation.mutate({ id, status, notes });
-    } else if (type === 'concorrente') {
+    } else if (type === "concorrente") {
       updateConcorrenteMutation.mutate({ id, status, notes });
-    } else if (type === 'lead') {
+    } else if (type === "lead") {
       updateLeadMutation.mutate({ id, status, notes });
     }
   };
 
   const openValidationModal = (
-    type: 'cliente' | 'concorrente' | 'lead',
+    type: "cliente" | "concorrente" | "lead",
     id: number,
     name: string,
     currentStatus?: string,
     currentNotes?: string
   ) => {
-    setValidationModal({ open: true, type, id, name, currentStatus, currentNotes });
+    setValidationModal({
+      open: true,
+      type,
+      id,
+      name,
+      currentStatus,
+      currentNotes,
+    });
   };
 
   if (loadingMercado) {
@@ -260,7 +306,9 @@ export default function MercadoDetalhes() {
     return (
       <div className="min-h-screen ml-60 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-lg font-medium text-foreground mb-2">Mercado não encontrado</p>
+          <p className="text-lg font-medium text-foreground mb-2">
+            Mercado não encontrado
+          </p>
           <Link href="/mercados">
             <Button>Voltar para Mercados</Button>
           </Link>
@@ -271,7 +319,7 @@ export default function MercadoDetalhes() {
 
   // Função para scroll to top ao mudar de página
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Funções de paginação
@@ -362,13 +410,13 @@ export default function MercadoDetalhes() {
                 {/* Seletor de Mercados */}
                 <Select
                   value={mercadoId.toString()}
-                  onValueChange={(value) => setLocation(`/mercado/${value}`)}
+                  onValueChange={value => setLocation(`/mercado/${value}`)}
                 >
                   <SelectTrigger className="w-full max-w-2xl">
                     <SelectValue placeholder="Selecione um mercado" />
                   </SelectTrigger>
                   <SelectContent>
-                    {mercados?.map((m) => (
+                    {mercados?.map(m => (
                       <SelectItem key={m.id} value={m.id.toString()}>
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{m.nome}</span>
@@ -385,11 +433,10 @@ export default function MercadoDetalhes() {
               </div>
             </div>
           </div>
-          <Breadcrumbs items={[
-            { label: "Mercados" },
-            { label: mercado.nome }
-          ]} />
-          
+          <Breadcrumbs
+            items={[{ label: "Mercados" }, { label: mercado.nome }]}
+          />
+
           {/* Segmentação e Categoria */}
           <div className="flex items-center gap-2 mb-4">
             {mercado.segmentacao && (
@@ -399,7 +446,9 @@ export default function MercadoDetalhes() {
               </span>
             )}
             {mercado.categoria && (
-              <span className="text-sm text-muted-foreground">{mercado.categoria}</span>
+              <span className="text-sm text-muted-foreground">
+                {mercado.categoria}
+              </span>
             )}
           </div>
 
@@ -411,7 +460,9 @@ export default function MercadoDetalhes() {
                   <Users className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{clientesResponse?.total || 0}</p>
+                  <p className="text-2xl font-bold">
+                    {clientesResponse?.total || 0}
+                  </p>
                   <p className="text-sm text-muted-foreground">Clientes</p>
                 </div>
               </CardContent>
@@ -423,7 +474,9 @@ export default function MercadoDetalhes() {
                   <Target className="h-5 w-5 text-orange-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{concorrentesResponse?.total || 0}</p>
+                  <p className="text-2xl font-bold">
+                    {concorrentesResponse?.total || 0}
+                  </p>
                   <p className="text-sm text-muted-foreground">Concorrentes</p>
                 </div>
               </CardContent>
@@ -435,7 +488,9 @@ export default function MercadoDetalhes() {
                   <TrendingUp className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{leadsResponse?.total || 0}</p>
+                  <p className="text-2xl font-bold">
+                    {leadsResponse?.total || 0}
+                  </p>
                   <p className="text-sm text-muted-foreground">Leads</p>
                 </div>
               </CardContent>
@@ -456,7 +511,7 @@ export default function MercadoDetalhes() {
                   type="text"
                   placeholder="Buscar por nome, CNPJ ou produto..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -475,7 +530,9 @@ export default function MercadoDetalhes() {
             <div className="flex items-center gap-3 flex-wrap">
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-muted-foreground">Filtros:</span>
+                <span className="text-sm font-medium text-muted-foreground">
+                  Filtros:
+                </span>
               </div>
 
               {/* Filtro de Status */}
@@ -492,7 +549,10 @@ export default function MercadoDetalhes() {
               </Select>
 
               {/* Filtro de Qualidade */}
-              <Select value={qualidadeFilter} onValueChange={setQualidadeFilter}>
+              <Select
+                value={qualidadeFilter}
+                onValueChange={setQualidadeFilter}
+              >
                 <SelectTrigger className="w-40 h-9">
                   <SelectValue placeholder="Qualidade" />
                 </SelectTrigger>
@@ -541,7 +601,8 @@ export default function MercadoDetalhes() {
               {/* Contador de Resultados */}
               <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
                 <Badge variant="secondary" className="font-normal">
-                  {clientes.length + concorrentes.length + leads.length} resultados
+                  {clientes.length + concorrentes.length + leads.length}{" "}
+                  resultados
                 </Badge>
               </div>
             </div>
@@ -571,7 +632,9 @@ export default function MercadoDetalhes() {
           <TabsContent value="clientes" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Clientes ({Array.isArray(clientes) ? clientes.length : 0})</CardTitle>
+                <CardTitle>
+                  Clientes ({Array.isArray(clientes) ? clientes.length : 0})
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {loadingClientes ? (
@@ -593,72 +656,83 @@ export default function MercadoDetalhes() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {Array.isArray(clientes) && clientes.map((cliente: any) => (
-                          <TableRow key={cliente.id}>
-                            <TableCell className="font-medium">
-                              <div>
-                                <p>{cliente.nome}</p>
-                                {cliente.siteOficial && (
-                                  <a
-                                    href={cliente.siteOficial}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
-                                  >
-                                    <ExternalLink className="h-3 w-3" />
-                                    Site
-                                  </a>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm">{cliente.produtoPrincipal || "-"}</span>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline">{cliente.segmentacaoB2bB2c || "-"}</Badge>
-                            </TableCell>
-                            <TableCell>
-                              {cliente.cidade && cliente.uf && (
-                                <div className="flex items-center gap-1 text-sm">
-                                  <MapPin className="h-3 w-3" />
-                                  {cliente.cidade}, {cliente.uf}
+                        {Array.isArray(clientes) &&
+                          clientes.map((cliente: any) => (
+                            <TableRow key={cliente.id}>
+                              <TableCell className="font-medium">
+                                <div>
+                                  <p>{cliente.nome}</p>
+                                  {cliente.siteOficial && (
+                                    <a
+                                      href={cliente.siteOficial}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
+                                    >
+                                      <ExternalLink className="h-3 w-3" />
+                                      Site
+                                    </a>
+                                  )}
                                 </div>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <div className="space-y-1">
-                                {cliente.email && (
-                                  <div className="flex items-center gap-1 text-xs">
-                                    <Mail className="h-3 w-3" />
-                                    {cliente.email}
+                              </TableCell>
+                              <TableCell>
+                                <span className="text-sm">
+                                  {cliente.produtoPrincipal || "-"}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline">
+                                  {cliente.segmentacaoB2bB2c || "-"}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                {cliente.cidade && cliente.uf && (
+                                  <div className="flex items-center gap-1 text-sm">
+                                    <MapPin className="h-3 w-3" />
+                                    {cliente.cidade}, {cliente.uf}
                                   </div>
                                 )}
-                                {cliente.telefone && (
-                                  <div className="flex items-center gap-1 text-xs">
-                                    <Phone className="h-3 w-3" />
-                                    {cliente.telefone}
-                                  </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="space-y-1">
+                                  {cliente.email && (
+                                    <div className="flex items-center gap-1 text-xs">
+                                      <Mail className="h-3 w-3" />
+                                      {cliente.email}
+                                    </div>
+                                  )}
+                                  {cliente.telefone && (
+                                    <div className="flex items-center gap-1 text-xs">
+                                      <Phone className="h-3 w-3" />
+                                      {cliente.telefone}
+                                    </div>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                {getStatusBadge(
+                                  cliente.validationStatus || "pending"
                                 )}
-                              </div>
-                            </TableCell>
-                            <TableCell>{getStatusBadge(cliente.validationStatus || "pending")}</TableCell>
-                            <TableCell>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => openValidationModal(
-                                  'cliente',
-                                  cliente.id,
-                                  cliente.nome,
-                                  cliente.validationStatus || undefined,
-                                  cliente.validationNotes || undefined
-                                )}
-                              >
-                                Validar
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() =>
+                                    openValidationModal(
+                                      "cliente",
+                                      cliente.id,
+                                      cliente.nome,
+                                      cliente.validationStatus || undefined,
+                                      cliente.validationNotes || undefined
+                                    )
+                                  }
+                                >
+                                  Validar
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
                       </TableBody>
                     </Table>
                   </div>
@@ -667,7 +741,9 @@ export default function MercadoDetalhes() {
                 {!loadingClientes && clientesResponse && (
                   <Pagination
                     currentPage={clientesPage}
-                    totalPages={Math.ceil((clientesResponse.total || 0) / pageSize)}
+                    totalPages={Math.ceil(
+                      (clientesResponse.total || 0) / pageSize
+                    )}
                     totalItems={clientesResponse.total || 0}
                     pageSize={pageSize}
                     onPageChange={handleClientesPageChange}
@@ -682,7 +758,10 @@ export default function MercadoDetalhes() {
           <TabsContent value="concorrentes" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Concorrentes ({Array.isArray(concorrentes) ? concorrentes.length : 0})</CardTitle>
+                <CardTitle>
+                  Concorrentes (
+                  {Array.isArray(concorrentes) ? concorrentes.length : 0})
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {loadingConcorrentes ? (
@@ -704,59 +783,76 @@ export default function MercadoDetalhes() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {Array.isArray(concorrentes) && concorrentes.map((conc: any) => (
-                          <TableRow key={conc.id}>
-                            <TableCell className="font-medium">
-                              <div>
-                                <p>{conc.nome}</p>
-                                {conc.site && (
-                                  <a
-                                    href={conc.site}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
-                                  >
-                                    <ExternalLink className="h-3 w-3" />
-                                    Site
-                                  </a>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm">{conc.produto || "-"}</span>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline">{conc.porte || "-"}</Badge>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm">{conc.faturamentoEstimado || "-"}</span>
-                            </TableCell>
-                            <TableCell>
-                              {conc.qualidadeScore && (
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium">{conc.qualidadeScore}/10</span>
-                                  <Badge variant="secondary">{conc.qualidadeClassificacao}</Badge>
+                        {Array.isArray(concorrentes) &&
+                          concorrentes.map((conc: any) => (
+                            <TableRow key={conc.id}>
+                              <TableCell className="font-medium">
+                                <div>
+                                  <p>{conc.nome}</p>
+                                  {conc.site && (
+                                    <a
+                                      href={conc.site}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
+                                    >
+                                      <ExternalLink className="h-3 w-3" />
+                                      Site
+                                    </a>
+                                  )}
                                 </div>
-                              )}
-                            </TableCell>
-                            <TableCell>{getStatusBadge(conc.validationStatus || "pending")}</TableCell>
-                            <TableCell>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => openValidationModal(
-                                  'concorrente',
-                                  conc.id,
-                                  conc.nome,
-                                  conc.validationStatus || undefined,
-                                  conc.validationNotes || undefined
+                              </TableCell>
+                              <TableCell>
+                                <span className="text-sm">
+                                  {conc.produto || "-"}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline">
+                                  {conc.porte || "-"}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <span className="text-sm">
+                                  {conc.faturamentoEstimado || "-"}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                {conc.qualidadeScore && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">
+                                      {conc.qualidadeScore}/10
+                                    </span>
+                                    <Badge variant="secondary">
+                                      {conc.qualidadeClassificacao}
+                                    </Badge>
+                                  </div>
                                 )}
-                              >
-                                Validar
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                              </TableCell>
+                              <TableCell>
+                                {getStatusBadge(
+                                  conc.validationStatus || "pending"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() =>
+                                    openValidationModal(
+                                      "concorrente",
+                                      conc.id,
+                                      conc.nome,
+                                      conc.validationStatus || undefined,
+                                      conc.validationNotes || undefined
+                                    )
+                                  }
+                                >
+                                  Validar
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
                       </TableBody>
                     </Table>
                   </div>
@@ -765,7 +861,9 @@ export default function MercadoDetalhes() {
                 {!loadingConcorrentes && concorrentesResponse && (
                   <Pagination
                     currentPage={concorrentesPage}
-                    totalPages={Math.ceil((concorrentesResponse.total || 0) / pageSize)}
+                    totalPages={Math.ceil(
+                      (concorrentesResponse.total || 0) / pageSize
+                    )}
                     totalItems={concorrentesResponse.total || 0}
                     pageSize={pageSize}
                     onPageChange={handleConcorrentesPageChange}
@@ -780,7 +878,9 @@ export default function MercadoDetalhes() {
           <TabsContent value="leads" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Leads ({Array.isArray(leads) ? leads.length : 0})</CardTitle>
+                <CardTitle>
+                  Leads ({Array.isArray(leads) ? leads.length : 0})
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {loadingLeads ? (
@@ -803,75 +903,92 @@ export default function MercadoDetalhes() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {Array.isArray(leads) && leads.map((lead: any) => (
-                          <TableRow key={lead.id}>
-                            <TableCell className="font-medium">
-                              <div>
-                                <p>{lead.nome}</p>
-                                {lead.site && (
-                                  <a
-                                    href={lead.site}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
-                                  >
-                                    <ExternalLink className="h-3 w-3" />
-                                    Site
-                                  </a>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline">{lead.tipo || "-"}</Badge>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm">{lead.porte || "-"}</span>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm">{lead.regiao || "-"}</span>
-                            </TableCell>
-                            <TableCell>
-                              <div className="space-y-1">
-                                {lead.email && (
-                                  <div className="flex items-center gap-1 text-xs">
-                                    <Mail className="h-3 w-3" />
-                                    {lead.email}
-                                  </div>
-                                )}
-                                {lead.telefone && (
-                                  <div className="flex items-center gap-1 text-xs">
-                                    <Phone className="h-3 w-3" />
-                                    {lead.telefone}
-                                  </div>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              {lead.qualidadeScore && (
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium">{lead.qualidadeScore}/10</span>
-                                  <Badge variant="secondary">{lead.qualidadeClassificacao}</Badge>
+                        {Array.isArray(leads) &&
+                          leads.map((lead: any) => (
+                            <TableRow key={lead.id}>
+                              <TableCell className="font-medium">
+                                <div>
+                                  <p>{lead.nome}</p>
+                                  {lead.site && (
+                                    <a
+                                      href={lead.site}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
+                                    >
+                                      <ExternalLink className="h-3 w-3" />
+                                      Site
+                                    </a>
+                                  )}
                                 </div>
-                              )}
-                            </TableCell>
-                            <TableCell>{getStatusBadge(lead.validationStatus || "pending")}</TableCell>
-                            <TableCell>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => openValidationModal(
-                                  'lead',
-                                  lead.id,
-                                  lead.nome,
-                                  lead.validationStatus || undefined,
-                                  lead.validationNotes || undefined
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline">
+                                  {lead.tipo || "-"}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <span className="text-sm">
+                                  {lead.porte || "-"}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                <span className="text-sm">
+                                  {lead.regiao || "-"}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                <div className="space-y-1">
+                                  {lead.email && (
+                                    <div className="flex items-center gap-1 text-xs">
+                                      <Mail className="h-3 w-3" />
+                                      {lead.email}
+                                    </div>
+                                  )}
+                                  {lead.telefone && (
+                                    <div className="flex items-center gap-1 text-xs">
+                                      <Phone className="h-3 w-3" />
+                                      {lead.telefone}
+                                    </div>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                {lead.qualidadeScore && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">
+                                      {lead.qualidadeScore}/10
+                                    </span>
+                                    <Badge variant="secondary">
+                                      {lead.qualidadeClassificacao}
+                                    </Badge>
+                                  </div>
                                 )}
-                              >
-                                Validar
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                              </TableCell>
+                              <TableCell>
+                                {getStatusBadge(
+                                  lead.validationStatus || "pending"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() =>
+                                    openValidationModal(
+                                      "lead",
+                                      lead.id,
+                                      lead.nome,
+                                      lead.validationStatus || undefined,
+                                      lead.validationNotes || undefined
+                                    )
+                                  }
+                                >
+                                  Validar
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
                       </TableBody>
                     </Table>
                   </div>
@@ -880,7 +997,9 @@ export default function MercadoDetalhes() {
                 {!loadingLeads && leadsResponse && (
                   <Pagination
                     currentPage={leadsPage}
-                    totalPages={Math.ceil((leadsResponse.total || 0) / pageSize)}
+                    totalPages={Math.ceil(
+                      (leadsResponse.total || 0) / pageSize
+                    )}
                     totalItems={leadsResponse.total || 0}
                     pageSize={pageSize}
                     onPageChange={handleLeadsPageChange}
@@ -896,7 +1015,7 @@ export default function MercadoDetalhes() {
       {/* Validation Modal */}
       <ValidationModal
         open={validationModal.open}
-        onOpenChange={(open) => setValidationModal({ ...validationModal, open })}
+        onOpenChange={open => setValidationModal({ ...validationModal, open })}
         onSubmit={handleValidation}
         itemName={validationModal.name}
         currentStatus={validationModal.currentStatus}
@@ -905,4 +1024,3 @@ export default function MercadoDetalhes() {
     </div>
   );
 }
-

@@ -3,9 +3,9 @@
  * Integração com SerpAPI para buscar dados reais da web
  */
 
-import { ENV } from './env';
+import { ENV } from "./env";
 
-const SERPAPI_BASE_URL = 'https://serpapi.com/search';
+const SERPAPI_BASE_URL = "https://serpapi.com/search";
 
 export interface SerpApiResult {
   position: number;
@@ -34,9 +34,9 @@ export async function searchGoogle(
   } = {}
 ): Promise<SerpApiResult[]> {
   const apiKey = process.env.SERPAPI_KEY;
-  
+
   if (!apiKey) {
-    console.error('[SerpAPI] SERPAPI_KEY não configurada');
+    console.error("[SerpAPI] SERPAPI_KEY não configurada");
     return [];
   }
 
@@ -44,19 +44,19 @@ export async function searchGoogle(
     const params = new URLSearchParams({
       q: query,
       api_key: apiKey,
-      engine: 'google',
+      engine: "google",
       num: String(options.num || 10),
-      location: options.location || 'Brazil',
-      hl: options.hl || 'pt-br',
-      gl: 'br',
+      location: options.location || "Brazil",
+      hl: options.hl || "pt-br",
+      gl: "br",
     });
 
     const url = `${SERPAPI_BASE_URL}?${params.toString()}`;
-    
+
     console.log(`[SerpAPI] Buscando: "${query}"`);
-    
+
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       throw new Error(`SerpAPI retornou status ${response.status}`);
     }
@@ -67,19 +67,23 @@ export async function searchGoogle(
       throw new Error(`SerpAPI erro: ${data.error}`);
     }
 
-    const results: SerpApiResult[] = (data.organic_results || []).map((result: any, index: number) => ({
-      position: result.position || index + 1,
-      title: result.title || '',
-      link: result.link || '',
-      snippet: result.snippet || '',
-      source: result.source || '',
-    }));
+    const results: SerpApiResult[] = (data.organic_results || []).map(
+      (result: any, index: number) => ({
+        position: result.position || index + 1,
+        title: result.title || "",
+        link: result.link || "",
+        snippet: result.snippet || "",
+        source: result.source || "",
+      })
+    );
 
-    console.log(`[SerpAPI] Encontrados ${results.length} resultados para "${query}"`);
-    
+    console.log(
+      `[SerpAPI] Encontrados ${results.length} resultados para "${query}"`
+    );
+
     return results;
   } catch (error) {
-    console.error('[SerpAPI] Erro na busca:', error);
+    console.error("[SerpAPI] Erro na busca:", error);
     return [];
   }
 }
@@ -90,9 +94,9 @@ export async function searchGoogle(
 export async function searchCompetitors(
   mercado: string,
   referencia?: string,
-  limit: number = 10
+  limit = 10
 ): Promise<CompanySearchResult[]> {
-  const query = referencia 
+  const query = referencia
     ? `concorrentes ${referencia} ${mercado} Brasil`
     : `principais empresas ${mercado} Brasil`;
 
@@ -102,7 +106,7 @@ export async function searchCompetitors(
     nome: extractCompanyName(r.title),
     site: r.link,
     descricao: r.snippet,
-    fonte: 'serpapi',
+    fonte: "serpapi",
   }));
 }
 
@@ -111,8 +115,8 @@ export async function searchCompetitors(
  */
 export async function searchLeads(
   mercado: string,
-  tipo: 'fornecedores' | 'distribuidores' | 'parceiros' = 'fornecedores',
-  limit: number = 20
+  tipo: "fornecedores" | "distribuidores" | "parceiros" = "fornecedores",
+  limit = 20
 ): Promise<CompanySearchResult[]> {
   const query = `${tipo} ${mercado} Brasil empresas`;
 
@@ -122,16 +126,14 @@ export async function searchLeads(
     nome: extractCompanyName(r.title),
     site: r.link,
     descricao: r.snippet,
-    fonte: 'serpapi',
+    fonte: "serpapi",
   }));
 }
 
 /**
  * Busca informações sobre uma empresa específica
  */
-export async function searchCompanyInfo(
-  nomeEmpresa: string
-): Promise<{
+export async function searchCompanyInfo(nomeEmpresa: string): Promise<{
   site?: string;
   descricao?: string;
   setor?: string;
@@ -141,7 +143,9 @@ export async function searchCompanyInfo(
 
   const results = await searchGoogle(query, { num: 3 });
 
-  if (results.length === 0) return null;
+  if (results.length === 0) {
+    return null;
+  }
 
   const firstResult = results[0];
 
@@ -159,9 +163,9 @@ export async function searchCompanyInfo(
 function extractCompanyName(title: string): string {
   // Remover sufixos comuns
   let name = title
-    .replace(/\s*-\s*.*$/, '') // Remove tudo após " - "
-    .replace(/\s*\|.*$/, '')   // Remove tudo após " | "
-    .replace(/\s*–.*$/, '')    // Remove tudo após " – "
+    .replace(/\s*-\s*.*$/, "") // Remove tudo após " - "
+    .replace(/\s*\|.*$/, "") // Remove tudo após " | "
+    .replace(/\s*–.*$/, "") // Remove tudo após " – "
     .trim();
 
   // Limitar tamanho
@@ -177,13 +181,23 @@ function extractCompanyName(title: string): string {
  */
 function extractSector(snippet: string): string | undefined {
   const setores = [
-    'automotivo', 'tecnologia', 'alimentos', 'farmacêutico', 
-    'construção', 'energia', 'financeiro', 'varejo', 'logística',
-    'saúde', 'educação', 'agronegócio', 'telecomunicações'
+    "automotivo",
+    "tecnologia",
+    "alimentos",
+    "farmacêutico",
+    "construção",
+    "energia",
+    "financeiro",
+    "varejo",
+    "logística",
+    "saúde",
+    "educação",
+    "agronegócio",
+    "telecomunicações",
   ];
 
   const snippetLower = snippet.toLowerCase();
-  
+
   for (const setor of setores) {
     if (snippetLower.includes(setor)) {
       return setor.charAt(0).toUpperCase() + setor.slice(1);
@@ -198,9 +212,18 @@ function extractSector(snippet: string): string | undefined {
  */
 function extractLocation(snippet: string): string | undefined {
   const cidades = [
-    'São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Curitiba',
-    'Porto Alegre', 'Brasília', 'Salvador', 'Fortaleza', 'Recife',
-    'Campinas', 'Manaus', 'Goiânia'
+    "São Paulo",
+    "Rio de Janeiro",
+    "Belo Horizonte",
+    "Curitiba",
+    "Porto Alegre",
+    "Brasília",
+    "Salvador",
+    "Fortaleza",
+    "Recife",
+    "Campinas",
+    "Manaus",
+    "Goiânia",
   ];
 
   for (const cidade of cidades) {
@@ -210,10 +233,10 @@ function extractLocation(snippet: string): string | undefined {
   }
 
   // Buscar estados
-  const estados = ['SP', 'RJ', 'MG', 'PR', 'RS', 'SC', 'BA', 'PE', 'CE'];
-  
+  const estados = ["SP", "RJ", "MG", "PR", "RS", "SC", "BA", "PE", "CE"];
+
   for (const estado of estados) {
-    const regex = new RegExp(`\\b${estado}\\b`, 'i');
+    const regex = new RegExp(`\\b${estado}\\b`, "i");
     if (regex.test(snippet)) {
       return estado;
     }
@@ -227,11 +250,11 @@ function extractLocation(snippet: string): string | undefined {
  */
 export async function testSerpApiConnection(): Promise<boolean> {
   try {
-    const results = await searchGoogle('test', { num: 1 });
-    console.log('[SerpAPI] Conexão OK');
+    const results = await searchGoogle("test", { num: 1 });
+    console.log("[SerpAPI] Conexão OK");
     return results.length > 0;
   } catch (error) {
-    console.error('[SerpAPI] Falha na conexão:', error);
+    console.error("[SerpAPI] Falha na conexão:", error);
     return false;
   }
 }

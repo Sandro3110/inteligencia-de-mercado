@@ -32,16 +32,21 @@ export function FilaTrabalho({
   onValidateAll,
   onDiscardAll,
 }: FilaTrabalhoProps) {
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   // Agrupar por mercado
-  const itemsByMercado = items.reduce((acc, item) => {
-    if (!acc[item.mercadoNome]) {
-      acc[item.mercadoNome] = [];
-    }
-    acc[item.mercadoNome].push(item);
-    return acc;
-  }, {} as Record<string, SelectedItem[]>);
+  const itemsByMercado = items.reduce(
+    (acc, item) => {
+      if (!acc[item.mercadoNome]) {
+        acc[item.mercadoNome] = [];
+      }
+      acc[item.mercadoNome].push(item);
+      return acc;
+    },
+    {} as Record<string, SelectedItem[]>
+  );
 
   const getTypeLabel = (type: string) => {
     switch (type) {
@@ -111,43 +116,47 @@ export function FilaTrabalho({
               <>
                 <ScrollArea className="flex-1">
                   <div className="p-4 space-y-4">
-                    {Object.entries(itemsByMercado).map(([mercadoNome, mercadoItems]) => (
-                      <div key={mercadoNome}>
-                        <h4 className="text-sm font-semibold text-foreground mb-2">
-                          {mercadoNome}
-                        </h4>
-                        <div className="space-y-2">
-                          {mercadoItems.map((item) => (
-                            <div
-                              key={`${item.type}-${item.id}`}
-                              className="p-3 rounded-lg border border-border/50 bg-card hover:bg-accent/50 transition-colors"
-                            >
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-foreground truncate">
-                                    {item.nome}
-                                  </p>
-                                  <Badge
-                                    variant="outline"
-                                    className={`text-xs mt-1 ${getTypeBadgeColor(item.type)}`}
+                    {Object.entries(itemsByMercado).map(
+                      ([mercadoNome, mercadoItems]) => (
+                        <div key={mercadoNome}>
+                          <h4 className="text-sm font-semibold text-foreground mb-2">
+                            {mercadoNome}
+                          </h4>
+                          <div className="space-y-2">
+                            {mercadoItems.map(item => (
+                              <div
+                                key={`${item.type}-${item.id}`}
+                                className="p-3 rounded-lg border border-border/50 bg-card hover:bg-accent/50 transition-colors"
+                              >
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-foreground truncate">
+                                      {item.nome}
+                                    </p>
+                                    <Badge
+                                      variant="outline"
+                                      className={`text-xs mt-1 ${getTypeBadgeColor(item.type)}`}
+                                    >
+                                      {getTypeLabel(item.type)}
+                                    </Badge>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="shrink-0 h-8 w-8"
+                                    onClick={() =>
+                                      onRemoveItem(item.id, item.type)
+                                    }
                                   >
-                                    {getTypeLabel(item.type)}
-                                  </Badge>
+                                    <X className="h-4 w-4" />
+                                  </Button>
                                 </div>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="shrink-0 h-8 w-8"
-                                  onClick={() => onRemoveItem(item.id, item.type)}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 </ScrollArea>
 
@@ -186,4 +195,3 @@ export function FilaTrabalho({
     </>
   );
 }
-

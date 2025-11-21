@@ -1,6 +1,6 @@
 import { eq, and, sql, gte, lte, desc } from "drizzle-orm";
 import { getDb } from "./db";
-import { toMySQLTimestamp, toMySQLTimestampOrNull, now } from './dateUtils';
+import { toMySQLTimestamp, toMySQLTimestampOrNull, now } from "./dateUtils";
 import {
   analyticsMercados,
   analyticsPesquisas,
@@ -33,13 +33,18 @@ export async function aggregateMercadoMetrics(
   periodo?: Date
 ): Promise<void> {
   const db = await getDb();
-  if (!db) return;
+  if (!db) {
+    return;
+  }
 
   const periodoRef = toMySQLTimestamp(periodo || new Date());
-  
+
   // Buscar todos os mercados do projeto/pesquisa
   const whereClause = pesquisaId
-    ? and(eq(mercadosUnicos.projectId, projectId), eq(mercadosUnicos.pesquisaId, pesquisaId))
+    ? and(
+        eq(mercadosUnicos.projectId, projectId),
+        eq(mercadosUnicos.pesquisaId, pesquisaId)
+      )
     : eq(mercadosUnicos.projectId, projectId);
 
   const mercados = await db.select().from(mercadosUnicos).where(whereClause);
@@ -59,18 +64,33 @@ export async function aggregateMercadoMetrics(
 
     // Calcular métricas
     const totalLeadsGerados = leadsDoMercado.length;
-    const leadsAltaQualidade = leadsDoMercado.filter(l => (l.qualidadeScore || 0) >= 80).length;
-    const leadsMediaQualidade = leadsDoMercado.filter(l => (l.qualidadeScore || 0) >= 50 && (l.qualidadeScore || 0) < 80).length;
-    const leadsBaixaQualidade = leadsDoMercado.filter(l => (l.qualidadeScore || 0) < 50).length;
-    
-    const qualidadeMedia = totalLeadsGerados > 0
-      ? leadsDoMercado.reduce((sum, l) => sum + (l.qualidadeScore || 0), 0) / totalLeadsGerados
-      : 0;
+    const leadsAltaQualidade = leadsDoMercado.filter(
+      l => (l.qualidadeScore || 0) >= 80
+    ).length;
+    const leadsMediaQualidade = leadsDoMercado.filter(
+      l => (l.qualidadeScore || 0) >= 50 && (l.qualidadeScore || 0) < 80
+    ).length;
+    const leadsBaixaQualidade = leadsDoMercado.filter(
+      l => (l.qualidadeScore || 0) < 50
+    ).length;
 
-    const leadsValidados = leadsDoMercado.filter(l => l.validationStatus && l.validationStatus !== 'pending').length;
-    const leadsAprovados = leadsDoMercado.filter(l => l.validationStatus === 'rich').length;
-    const leadsDescartados = leadsDoMercado.filter(l => l.validationStatus === 'discarded').length;
-    const taxaAprovacao = leadsValidados > 0 ? (leadsAprovados / leadsValidados) * 100 : 0;
+    const qualidadeMedia =
+      totalLeadsGerados > 0
+        ? leadsDoMercado.reduce((sum, l) => sum + (l.qualidadeScore || 0), 0) /
+          totalLeadsGerados
+        : 0;
+
+    const leadsValidados = leadsDoMercado.filter(
+      l => l.validationStatus && l.validationStatus !== "pending"
+    ).length;
+    const leadsAprovados = leadsDoMercado.filter(
+      l => l.validationStatus === "rich"
+    ).length;
+    const leadsDescartados = leadsDoMercado.filter(
+      l => l.validationStatus === "discarded"
+    ).length;
+    const taxaAprovacao =
+      leadsValidados > 0 ? (leadsAprovados / leadsValidados) * 100 : 0;
 
     // Buscar clientes e concorrentes do mercado
     const clientesDoMercado = await db
@@ -125,64 +145,100 @@ export async function aggregatePesquisaMetrics(
   pesquisaId: number
 ): Promise<void> {
   const db = await getDb();
-  if (!db) return;
+  if (!db) {
+    return;
+  }
 
   // Buscar pesquisa
   const [pesquisa] = await db
     .select()
     .from(pesquisas)
-    .where(and(eq(pesquisas.id, pesquisaId), eq(pesquisas.projectId, projectId)))
+    .where(
+      and(eq(pesquisas.id, pesquisaId), eq(pesquisas.projectId, projectId))
+    )
     .limit(1);
 
-  if (!pesquisa) return;
+  if (!pesquisa) {
+    return;
+  }
 
   // Buscar mercados mapeados
   const mercadosMapeados = await db
     .select()
     .from(mercadosUnicos)
-    .where(and(eq(mercadosUnicos.projectId, projectId), eq(mercadosUnicos.pesquisaId, pesquisaId)));
+    .where(
+      and(
+        eq(mercadosUnicos.projectId, projectId),
+        eq(mercadosUnicos.pesquisaId, pesquisaId)
+      )
+    );
 
   // Buscar clientes base
   const clientesBase = await db
     .select()
     .from(clientes)
-    .where(and(eq(clientes.projectId, projectId), eq(clientes.pesquisaId, pesquisaId)));
+    .where(
+      and(
+        eq(clientes.projectId, projectId),
+        eq(clientes.pesquisaId, pesquisaId)
+      )
+    );
 
   // Buscar leads gerados
   const leadsGerados = await db
     .select()
     .from(leads)
-    .where(and(eq(leads.projectId, projectId), eq(leads.pesquisaId, pesquisaId)));
+    .where(
+      and(eq(leads.projectId, projectId), eq(leads.pesquisaId, pesquisaId))
+    );
 
   // Calcular métricas
   const totalLeadsGerados = leadsGerados.length;
   const totalClientesBase = clientesBase.length;
-  const taxaConversao = totalClientesBase > 0 ? (totalLeadsGerados / totalClientesBase) * 100 : 0;
+  const taxaConversao =
+    totalClientesBase > 0 ? (totalLeadsGerados / totalClientesBase) * 100 : 0;
 
-  const qualidadeMedia = totalLeadsGerados > 0
-    ? leadsGerados.reduce((sum, l) => sum + (l.qualidadeScore || 0), 0) / totalLeadsGerados
-    : 0;
+  const qualidadeMedia =
+    totalLeadsGerados > 0
+      ? leadsGerados.reduce((sum, l) => sum + (l.qualidadeScore || 0), 0) /
+        totalLeadsGerados
+      : 0;
 
-  const leadsAlta = leadsGerados.filter(l => (l.qualidadeScore || 0) >= 80).length;
-  const leadsMedia = leadsGerados.filter(l => (l.qualidadeScore || 0) >= 50 && (l.qualidadeScore || 0) < 80).length;
-  const leadsBaixa = leadsGerados.filter(l => (l.qualidadeScore || 0) < 50).length;
+  const leadsAlta = leadsGerados.filter(
+    l => (l.qualidadeScore || 0) >= 80
+  ).length;
+  const leadsMedia = leadsGerados.filter(
+    l => (l.qualidadeScore || 0) >= 50 && (l.qualidadeScore || 0) < 80
+  ).length;
+  const leadsBaixa = leadsGerados.filter(
+    l => (l.qualidadeScore || 0) < 50
+  ).length;
 
   const distribuicaoQualidade = JSON.stringify({
     alta: leadsAlta,
     media: leadsMedia,
-    baixa: leadsBaixa
+    baixa: leadsBaixa,
   });
 
   // Calcular duração
   const dataInicioRaw = pesquisa.dataImportacao || pesquisa.createdAt;
-  const dataConclusaoRaw = pesquisa.status === 'concluido' ? pesquisa.updatedAt : new Date();
-  
-  const dataInicioDate = typeof dataInicioRaw === 'string' ? new Date(dataInicioRaw) : dataInicioRaw;
-  const dataConclusaoDate = typeof dataConclusaoRaw === 'string' ? new Date(dataConclusaoRaw) : dataConclusaoRaw;
-  
-  const duracaoDias = dataInicioDate && dataConclusaoDate
-    ? Math.ceil((dataConclusaoDate.getTime() - dataInicioDate.getTime()) / (1000 * 60 * 60 * 24))
-    : 0;
+  const dataConclusaoRaw =
+    pesquisa.status === "concluido" ? pesquisa.updatedAt : new Date();
+
+  const dataInicioDate =
+    typeof dataInicioRaw === "string" ? new Date(dataInicioRaw) : dataInicioRaw;
+  const dataConclusaoDate =
+    typeof dataConclusaoRaw === "string"
+      ? new Date(dataConclusaoRaw)
+      : dataConclusaoRaw;
+
+  const duracaoDias =
+    dataInicioDate && dataConclusaoDate
+      ? Math.ceil(
+          (dataConclusaoDate.getTime() - dataInicioDate.getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      : 0;
 
   // Inserir/atualizar métricas
   const metricas: InsertAnalyticsPesquisa = {
@@ -194,8 +250,16 @@ export async function aggregatePesquisaMetrics(
     taxaConversaoClienteLead: Math.round(taxaConversao * 100),
     qualidadeMediaGeral: Math.round(qualidadeMedia * 100),
     distribuicaoQualidade,
-    dataInicio: dataInicioRaw ? (typeof dataInicioRaw === 'string' ? dataInicioRaw : toMySQLTimestamp(dataInicioRaw)) : undefined,
-    dataConclusao: dataConclusaoRaw ? (typeof dataConclusaoRaw === 'string' ? dataConclusaoRaw : toMySQLTimestamp(dataConclusaoRaw)) : undefined,
+    dataInicio: dataInicioRaw
+      ? typeof dataInicioRaw === "string"
+        ? dataInicioRaw
+        : toMySQLTimestamp(dataInicioRaw)
+      : undefined,
+    dataConclusao: dataConclusaoRaw
+      ? typeof dataConclusaoRaw === "string"
+        ? dataConclusaoRaw
+        : toMySQLTimestamp(dataConclusaoRaw)
+      : undefined,
     duracaoDias,
   };
 
@@ -210,12 +274,17 @@ export async function aggregateDimensaoMetrics(
   pesquisaId?: number
 ): Promise<void> {
   const db = await getDb();
-  if (!db) return;
+  if (!db) {
+    return;
+  }
 
-  const dimensoes: Array<{ tipo: 'uf' | 'porte' | 'segmentacao' | 'categoria', campo: string }> = [
-    { tipo: 'uf', campo: 'uf' },
-    { tipo: 'porte', campo: 'porte' },
-    { tipo: 'segmentacao', campo: 'tipo' },
+  const dimensoes: Array<{
+    tipo: "uf" | "porte" | "segmentacao" | "categoria";
+    campo: string;
+  }> = [
+    { tipo: "uf", campo: "uf" },
+    { tipo: "porte", campo: "porte" },
+    { tipo: "segmentacao", campo: "tipo" },
   ];
 
   for (const { tipo, campo } of dimensoes) {
@@ -235,7 +304,9 @@ export async function aggregateDimensaoMetrics(
       .groupBy(sql`${leads[campo as keyof typeof leads]}`);
 
     for (const grupo of leadsAgrupados) {
-      if (!grupo.valor) continue;
+      if (!grupo.valor) {
+        continue;
+      }
 
       const metricas: InsertAnalyticsDimensao = {
         projectId,
@@ -259,17 +330,19 @@ export async function aggregateTimelineMetrics(
   data?: Date
 ): Promise<void> {
   const db = await getDb();
-  if (!db) return;
+  if (!db) {
+    return;
+  }
 
   const dataRef = toMySQLTimestamp(data || new Date());
   const inicioDia = new Date(dataRef);
   inicioDia.setHours(0, 0, 0, 0);
   const fimDia = new Date(dataRef);
   fimDia.setHours(23, 59, 59, 999);
-  
+
   // Converter para strings ISO para comparação com timestamp do banco
-  const inicioDiaStr = inicioDia.toISOString().slice(0, 19).replace('T', ' ');
-  const fimDiaStr = fimDia.toISOString().slice(0, 19).replace('T', ' ');
+  const inicioDiaStr = toMySQLTimestamp(inicioDia);
+  const fimDiaStr = toMySQLTimestamp(fimDia);
 
   // Leads gerados no dia
   const leadsGeradosDia = await db
@@ -312,10 +385,7 @@ export async function aggregateTimelineMetrics(
     .select({ count: sql<number>`COUNT(*)` })
     .from(leads)
     .where(
-      and(
-        eq(leads.projectId, projectId),
-        lte(leads.createdAt, fimDiaStr)
-      )
+      and(eq(leads.projectId, projectId), lte(leads.createdAt, fimDiaStr))
     );
 
   const metricas: InsertAnalyticsTimeline = {
@@ -333,9 +403,14 @@ export async function aggregateTimelineMetrics(
 /**
  * Executa todas as agregações para um projeto
  */
-export async function runFullAggregation(projectId: number, pesquisaId?: number): Promise<void> {
-  console.log(`[Analytics] Iniciando agregação para projeto ${projectId}${pesquisaId ? `, pesquisa ${pesquisaId}` : ''}`);
-  
+export async function runFullAggregation(
+  projectId: number,
+  pesquisaId?: number
+): Promise<void> {
+  console.log(
+    `[Analytics] Iniciando agregação para projeto ${projectId}${pesquisaId ? `, pesquisa ${pesquisaId}` : ""}`
+  );
+
   try {
     await aggregateMercadoMetrics(projectId, pesquisaId);
     console.log(`[Analytics] ✓ Métricas por mercado agregadas`);

@@ -5,7 +5,7 @@
 import { eq, and, isNull, or, inArray, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import { clientes, concorrentes, leads } from "../drizzle/schema";
-import { toMySQLTimestamp } from './_core/dateUtils';
+import { toMySQLTimestamp } from "./_core/dateUtils";
 
 // Interface para registro sem coordenadas
 export interface RecordSemCoordenadas {
@@ -13,7 +13,7 @@ export interface RecordSemCoordenadas {
   nome: string;
   cidade: string;
   uf: string;
-  tipo: 'cliente' | 'concorrente' | 'lead';
+  tipo: "cliente" | "concorrente" | "lead";
   mercadoNome?: string;
 }
 
@@ -22,16 +22,18 @@ export interface RecordSemCoordenadas {
  */
 export async function getRecordsSemCoordenadas(
   projetoId: number,
-  tipo?: 'cliente' | 'concorrente' | 'lead'
+  tipo?: "cliente" | "concorrente" | "lead"
 ): Promise<RecordSemCoordenadas[]> {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) {
+    return [];
+  }
 
   const records: RecordSemCoordenadas[] = [];
 
   try {
     // Buscar clientes sem coordenadas
-    if (!tipo || tipo === 'cliente') {
+    if (!tipo || tipo === "cliente") {
       const clientesSemCoord = await db
         .select({
           id: clientes.id,
@@ -43,25 +45,22 @@ export async function getRecordsSemCoordenadas(
         .where(
           and(
             eq(clientes.projectId, projetoId),
-            or(
-              isNull(clientes.latitude),
-              isNull(clientes.longitude)
-            )
+            or(isNull(clientes.latitude), isNull(clientes.longitude))
           )
         );
 
       records.push(
         ...clientesSemCoord.map(c => ({
           ...c,
-          tipo: 'cliente' as const,
-          cidade: c.cidade || '',
-          uf: c.uf || '',
+          tipo: "cliente" as const,
+          cidade: c.cidade || "",
+          uf: c.uf || "",
         }))
       );
     }
 
     // Buscar concorrentes sem coordenadas
-    if (!tipo || tipo === 'concorrente') {
+    if (!tipo || tipo === "concorrente") {
       const concorrentesSemCoord = await db
         .select({
           id: concorrentes.id,
@@ -73,25 +72,22 @@ export async function getRecordsSemCoordenadas(
         .where(
           and(
             eq(concorrentes.projectId, projetoId),
-            or(
-              isNull(concorrentes.latitude),
-              isNull(concorrentes.longitude)
-            )
+            or(isNull(concorrentes.latitude), isNull(concorrentes.longitude))
           )
         );
 
       records.push(
         ...concorrentesSemCoord.map(c => ({
           ...c,
-          tipo: 'concorrente' as const,
-          cidade: c.cidade || '',
-          uf: c.uf || '',
+          tipo: "concorrente" as const,
+          cidade: c.cidade || "",
+          uf: c.uf || "",
         }))
       );
     }
 
     // Buscar leads sem coordenadas
-    if (!tipo || tipo === 'lead') {
+    if (!tipo || tipo === "lead") {
       const leadsSemCoord = await db
         .select({
           id: leads.id,
@@ -103,28 +99,24 @@ export async function getRecordsSemCoordenadas(
         .where(
           and(
             eq(leads.projectId, projetoId),
-            or(
-              isNull(leads.latitude),
-              isNull(leads.longitude)
-            )
+            or(isNull(leads.latitude), isNull(leads.longitude))
           )
         );
 
       records.push(
         ...leadsSemCoord.map(l => ({
           ...l,
-          tipo: 'lead' as const,
-          cidade: l.cidade || '',
-          uf: l.uf || '',
+          tipo: "lead" as const,
+          cidade: l.cidade || "",
+          uf: l.uf || "",
         }))
       );
     }
 
     console.log(`[DB] Encontrados ${records.length} registros sem coordenadas`);
     return records;
-
   } catch (error) {
-    console.error('[DB] Erro ao buscar registros sem coordenadas:', error);
+    console.error("[DB] Erro ao buscar registros sem coordenadas:", error);
     return [];
   }
 }
@@ -138,7 +130,9 @@ export async function updateClienteCoordinates(
   longitude: number
 ): Promise<boolean> {
   const db = await getDb();
-  if (!db) return false;
+  if (!db) {
+    return false;
+  }
 
   try {
     await db
@@ -153,7 +147,10 @@ export async function updateClienteCoordinates(
     console.log(`[DB] Coordenadas atualizadas para cliente ${id}`);
     return true;
   } catch (error) {
-    console.error(`[DB] Erro ao atualizar coordenadas do cliente ${id}:`, error);
+    console.error(
+      `[DB] Erro ao atualizar coordenadas do cliente ${id}:`,
+      error
+    );
     return false;
   }
 }
@@ -167,7 +164,9 @@ export async function updateConcorrenteCoordinates(
   longitude: number
 ): Promise<boolean> {
   const db = await getDb();
-  if (!db) return false;
+  if (!db) {
+    return false;
+  }
 
   try {
     await db
@@ -182,7 +181,10 @@ export async function updateConcorrenteCoordinates(
     console.log(`[DB] Coordenadas atualizadas para concorrente ${id}`);
     return true;
   } catch (error) {
-    console.error(`[DB] Erro ao atualizar coordenadas do concorrente ${id}:`, error);
+    console.error(
+      `[DB] Erro ao atualizar coordenadas do concorrente ${id}:`,
+      error
+    );
     return false;
   }
 }
@@ -196,7 +198,9 @@ export async function updateLeadCoordinates(
   longitude: number
 ): Promise<boolean> {
   const db = await getDb();
-  if (!db) return false;
+  if (!db) {
+    return false;
+  }
 
   try {
     await db
@@ -223,8 +227,18 @@ export async function getGeocodeStats(projetoId: number) {
   const db = await getDb();
   if (!db) {
     return {
-      clientes: { total: 0, comCoordenadas: 0, semCoordenadas: 0, percentual: 0 },
-      concorrentes: { total: 0, comCoordenadas: 0, semCoordenadas: 0, percentual: 0 },
+      clientes: {
+        total: 0,
+        comCoordenadas: 0,
+        semCoordenadas: 0,
+        percentual: 0,
+      },
+      concorrentes: {
+        total: 0,
+        comCoordenadas: 0,
+        semCoordenadas: 0,
+        percentual: 0,
+      },
       leads: { total: 0, comCoordenadas: 0, semCoordenadas: 0, percentual: 0 },
       total: { total: 0, comCoordenadas: 0, semCoordenadas: 0, percentual: 0 },
     };
@@ -271,7 +285,8 @@ export async function getGeocodeStats(projetoId: number) {
 
     const concorrentesTotalNum = Number(concorrentesTotal[0]?.count || 0);
     const concorrentesComCoordNum = Number(concorrentesComCoord[0]?.count || 0);
-    const concorrentesSemCoordNum = concorrentesTotalNum - concorrentesComCoordNum;
+    const concorrentesSemCoordNum =
+      concorrentesTotalNum - concorrentesComCoordNum;
 
     // Estatísticas de leads
     const leadsTotal = await db
@@ -296,7 +311,8 @@ export async function getGeocodeStats(projetoId: number) {
 
     // Totais gerais
     const totalGeral = clientesTotalNum + concorrentesTotalNum + leadsTotalNum;
-    const totalComCoord = clientesComCoordNum + concorrentesComCoordNum + leadsComCoordNum;
+    const totalComCoord =
+      clientesComCoordNum + concorrentesComCoordNum + leadsComCoordNum;
     const totalSemCoord = totalGeral - totalComCoord;
 
     return {
@@ -304,33 +320,52 @@ export async function getGeocodeStats(projetoId: number) {
         total: clientesTotalNum,
         comCoordenadas: clientesComCoordNum,
         semCoordenadas: clientesSemCoordNum,
-        percentual: clientesTotalNum > 0 ? Math.round((clientesComCoordNum / clientesTotalNum) * 100) : 0,
+        percentual:
+          clientesTotalNum > 0
+            ? Math.round((clientesComCoordNum / clientesTotalNum) * 100)
+            : 0,
       },
       concorrentes: {
         total: concorrentesTotalNum,
         comCoordenadas: concorrentesComCoordNum,
         semCoordenadas: concorrentesSemCoordNum,
-        percentual: concorrentesTotalNum > 0 ? Math.round((concorrentesComCoordNum / concorrentesTotalNum) * 100) : 0,
+        percentual:
+          concorrentesTotalNum > 0
+            ? Math.round((concorrentesComCoordNum / concorrentesTotalNum) * 100)
+            : 0,
       },
       leads: {
         total: leadsTotalNum,
         comCoordenadas: leadsComCoordNum,
         semCoordenadas: leadsSemCoordNum,
-        percentual: leadsTotalNum > 0 ? Math.round((leadsComCoordNum / leadsTotalNum) * 100) : 0,
+        percentual:
+          leadsTotalNum > 0
+            ? Math.round((leadsComCoordNum / leadsTotalNum) * 100)
+            : 0,
       },
       total: {
         total: totalGeral,
         comCoordenadas: totalComCoord,
         semCoordenadas: totalSemCoord,
-        percentual: totalGeral > 0 ? Math.round((totalComCoord / totalGeral) * 100) : 0,
+        percentual:
+          totalGeral > 0 ? Math.round((totalComCoord / totalGeral) * 100) : 0,
       },
     };
-
   } catch (error) {
-    console.error('[DB] Erro ao buscar estatísticas de geocodificação:', error);
+    console.error("[DB] Erro ao buscar estatísticas de geocodificação:", error);
     return {
-      clientes: { total: 0, comCoordenadas: 0, semCoordenadas: 0, percentual: 0 },
-      concorrentes: { total: 0, comCoordenadas: 0, semCoordenadas: 0, percentual: 0 },
+      clientes: {
+        total: 0,
+        comCoordenadas: 0,
+        semCoordenadas: 0,
+        percentual: 0,
+      },
+      concorrentes: {
+        total: 0,
+        comCoordenadas: 0,
+        semCoordenadas: 0,
+        percentual: 0,
+      },
       leads: { total: 0, comCoordenadas: 0, semCoordenadas: 0, percentual: 0 },
       total: { total: 0, comCoordenadas: 0, semCoordenadas: 0, percentual: 0 },
     };
