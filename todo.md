@@ -1119,3 +1119,48 @@ Leads: ✅ 60% com coordenadas (3/5)
 - 4 erros TypeScript eliminados
 - Indicadores visuais de loading implementados
 - Todas as páginas principais testadas e funcionando
+
+
+---
+
+## FASE 60: 3 MELHORIAS AVANÇADAS DO SISTEMA 🚀 ✅
+
+### 60.1 Sistema de Salvamento Automático (Drafts) no Wizard
+- [x] Criar tabela research_drafts no banco de dados
+- [x] Implementar funções de gerenciamento de drafts no db.ts
+- [x] Criar endpoints tRPC: drafts.save, drafts.get, drafts.delete, drafts.list
+- [x] Integrar auto-save no ResearchWizard (debounce 2s)
+- [x] Carregar draft salvo automaticamente ao abrir wizard
+- [x] Deletar draft após criação bem-sucedida da pesquisa
+- [x] Adicionar feedback visual (toast) ao carregar draft
+
+### 60.2 Preview/Resumo ao Final de Cada Step do Wizard
+- [x] Criar componente StepPreview.tsx reutilizável
+- [x] Implementar preview para Step 1 (Projeto Selecionado)
+- [x] Implementar preview para Step 2 (Informações da Pesquisa)
+- [x] Implementar preview para Step 3 (Parâmetros Configurados)
+- [x] Implementar preview para Step 4 (Método de Entrada)
+- [x] Implementar preview para Step 5 (Dados Inseridos)
+- [x] Implementar preview para Step 6 (Dados Validados)
+- [x] Integrar StepPreview no ResearchWizard
+- [x] Adicionar ícones e badges visuais nos previews
+
+### 60.3 Dashboard de Tendências de Qualidade
+- [x] Criar página QualityTrendsDashboard.tsx
+- [x] Implementar gráficos de tendências com Recharts (Linha, Área, Barras)
+- [x] Adicionar filtros: Projeto, Período (7/15/30/60/90 dias), Tipo de Gráfico
+- [x] Criar cards de estatísticas (Atual, Média, Máximo, Mínimo, Variação)
+- [x] Adicionar indicadores de tendência (↑ Subindo, ↓ Caindo, → Estável)
+- [x] Reutilizar query existente analytics.qualityTrends
+- [x] Adicionar rota /quality-trends no App.tsx
+- [x] Adicionar link no AppSidebar (seção Análise)
+- [x] Implementar estado vazio com mensagem instrutiva
+
+### 60.4 Validação e Testes
+- [x] Validar wizard com auto-save funcionando
+- [x] Validar preview em todos os steps do wizard
+- [x] Validar dashboard de tendências com filtros
+- [x] Testar interface visualmente via browser
+- [x] Verificar integração com backend (tRPC)
+
+**Status**: ✅ Todas as 3 melhorias implementadas e validadas com sucesso!

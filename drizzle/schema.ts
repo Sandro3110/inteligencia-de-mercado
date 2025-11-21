@@ -847,3 +847,21 @@ export type InsertExportHistory = typeof exportHistory.$inferInsert;
 
 export type SavedFilterExport = typeof savedFiltersExport.$inferSelect;
 export type InsertSavedFilterExport = typeof savedFiltersExport.$inferInsert;
+
+// ========================================
+// RESEARCH DRAFTS (Auto-save do Wizard)
+// Fase 60.1
+// ========================================
+
+export const researchDrafts = mysqlTable("research_drafts", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  projectId: int("projectId"),
+  draftData: json("draftData").notNull(),
+  currentStep: int("currentStep").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type ResearchDraft = typeof researchDrafts.$inferSelect;
+export type InsertResearchDraft = typeof researchDrafts.$inferInsert;

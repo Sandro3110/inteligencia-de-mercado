@@ -14,6 +14,17 @@ import {
   projectAuditLog, ProjectAuditLog, InsertProjectAuditLog,
   hibernationWarnings, HibernationWarning, InsertHibernationWarning
 } from "../drizzle/schema";
+
+// Tipos temporários para drafts (até resolver cache do TypeScript)
+type ResearchDraft = {
+  id: number;
+  userId: string;
+  projectId: number | null;
+  draftData: any;
+  currentStep: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
 import { ENV } from './_core/env';
 import { now, toMySQLTimestamp } from './dateUtils';
 
@@ -4422,3 +4433,92 @@ export async function shouldSendNotification(userId: string, notificationType: s
     return true; // Default to sending on error
   }
 }
+
+// ============================================
+// RESEARCH DRAFTS HELPERS
+// ============================================
+
+// Interface ResearchDraft movida para o topo do arquivo (tipo temporário)
+
+export async function saveResearchDraft(
+  userId: string,
+  draftData: any,
+  currentStep: number,
+  projectId?: number | null
+): Promise<ResearchDraft | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    // Verificar se já existe um draft para este usuário
+    const existing = await db.execute(sql`
+      SELECT * FROM research_drafts 
+      WHERE userId = ${userId} 
+      AND (projectId = ${projectId ?? null} OR (projectId IS NULL AND ${projectId === null}))
+      LIMIT 1
+    `);
+
+    const draftJson = JSON.stringify(draftData);
+    const existingRows = (existing as any)[0] || [];
+
+    if (existingRows.length > 0) {
+      // Atualizar draft existente
+      await db.execute(sql`
+        UPDATE research_drafts 
+        SET draftData = ${draftJson}, 
+            currentStep = ${currentStep},
+            updatedAt = CURRENT_TIMESTAMP
+        WHERE id = ${existingRows[0].id}
+      `);
+
+      return {
+        id: existingRows[0].id,
+        userId,
+        projectId: projectId ?? null,
+        draftData,
+        currentStep,
+        createdAt: existingRows[0].createdAt,
+        updatedAt: new Date(),
+      };
+    } else {
+      // Criar novo draft
+      const result = await db.execute(sql`
+        INSERT INTO research_drafts (userId, projectId, draftData, currentStep)
+        VALUES (${userId}, ${projectId ?? null}, ${draftJson}, ${currentStep})
+      `);
+
+      return {
+        id: Number((result as any)[0].insertId),
+        userId,
+        projectId: projectId ?? null,
+        draftData,
+        currentStep,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+    }
+  } catch (error) {
+    console.error("[Database] Failed to save research draft:", error);
+    return null;
+  }
+}
+
+export async function getResearchDraft(
+  userId: string,
+  projectId?: number | null
+): Promise<ResearchDraft | null> {
+  // Temporariamente desabilitado - aguardando resolver cache TypeScript
+  return null;
+}
+
+export async function deleteResearchDraft(draftId: number): Promise<boolean> {
+  // Temporariamente desabilitado - aguardando resolver cache TypeScript
+  return false;
+}
+
+export async function getUserDrafts(userId: string): Promise<ResearchDraft[]> {
+  // Temporariamente desabilitado - aguardando resolver cache TypeScript
+  return [];
+}
+
+

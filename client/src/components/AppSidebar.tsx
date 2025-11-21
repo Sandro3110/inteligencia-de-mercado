@@ -94,6 +94,7 @@ const navSections: NavSection[] = [
       { title: "Dashboard Avançado", href: "/dashboard-avancado", icon: BarChart3 },
       { title: "Analytics Dashboard", href: "/analytics-dashboard", icon: BarChart3 },
       { title: "Tendências", href: "/tendencias", icon: TrendingUp },
+      { title: "Tendências de Qualidade", href: "/quality-trends", icon: TrendingUp, badge: "Novo" },
       { title: "ROI e Performance", href: "/roi", icon: DollarSign, shortcut: "Ctrl+R" },
       { title: "Funil de Conversão", href: "/funil", icon: Filter },
       { title: "Relatórios", href: "/relatorios", icon: FileText },

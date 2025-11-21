@@ -3,7 +3,7 @@
  * Fase 39.3 - Wizard de Criação de Pesquisa
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -22,6 +22,7 @@ import {
   Step6ValidateData,
   Step7Summary
 } from '@/components/research-wizard';
+import { StepPreview } from '@/components/research-wizard/StepPreview';
 
 import type { ResearchWizardData } from '@/types/research-wizard';
 
@@ -88,9 +89,56 @@ export default function ResearchWizard() {
       clientes: [],
     },
   });
+  const [draftId, setDraftId] = useState<number | null>(null);
+  const [draftLoaded, setDraftLoaded] = useState(false);
+
+  // Carregar draft salvo ao iniciar
+  const { data: savedDraft } = trpc.drafts.get.useQuery(
+    { projectId: null },
+    { enabled: !draftLoaded }
+  );
+
+  useEffect(() => {
+    if (savedDraft && !draftLoaded) {
+      setWizardData(savedDraft.draftData);
+      setCurrentStep(savedDraft.currentStep);
+      setDraftId(savedDraft.id);
+      setDraftLoaded(true);
+      toast.success('Rascunho anterior carregado!');
+    }
+  }, [savedDraft, draftLoaded]);
+
+  // Salvar draft automaticamente
+  const saveDraftMutation = trpc.drafts.save.useMutation();
+
+  useEffect(() => {
+    if (draftLoaded) {
+      const timer = setTimeout(() => {
+        saveDraftMutation.mutate({
+          draftData: wizardData,
+          currentStep,
+          projectId: wizardData.projectId,
+        }, {
+          onSuccess: (draft) => {
+            if (draft) {
+              setDraftId(draft.id);
+            }
+          },
+        });
+      }, 2000); // Auto-save após 2 segundos de inatividade
+
+      return () => clearTimeout(timer);
+    }
+  }, [wizardData, currentStep, draftLoaded]);
+
+  const deleteDraftMutation = trpc.drafts.delete.useMutation();
 
   const createPesquisaMutation = trpc.pesquisas.create.useMutation({
     onSuccess: (pesquisa) => {
+      // Deletar draft após criar pesquisa com sucesso
+      if (draftId) {
+        deleteDraftMutation.mutate({ draftId });
+      }
       toast.success(`Pesquisa "${pesquisa.nome}" criada com sucesso! Iniciando enriquecimento...`);
       setLocation('/enrichment-progress');
     },
@@ -237,6 +285,7 @@ export default function ResearchWizard() {
         {/* Step Content */}
         <Card className="p-8 mb-8">
           {renderStep()}
+          <StepPreview step={currentStep} data={wizardData} />
         </Card>
 
         {/* Navigation Buttons */}

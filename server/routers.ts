@@ -2166,5 +2166,48 @@ export const appRouter = router({
         );
       }),
   }),
+
+  // Research Drafts
+  drafts: router({
+    save: protectedProcedure
+      .input(z.object({
+        draftData: z.any(),
+        currentStep: z.number(),
+        projectId: z.number().optional().nullable(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { saveResearchDraft } = await import('./db');
+        return saveResearchDraft(
+          ctx.user.id,
+          input.draftData,
+          input.currentStep,
+          input.projectId
+        );
+      }),
+
+    get: protectedProcedure
+      .input(z.object({
+        projectId: z.number().optional().nullable(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getResearchDraft } = await import('./db');
+        return getResearchDraft(ctx.user.id, input.projectId);
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({
+        draftId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const { deleteResearchDraft } = await import('./db');
+        return deleteResearchDraft(input.draftId);
+      }),
+
+    list: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getUserDrafts } = await import('./db');
+        return getUserDrafts(ctx.user.id);
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

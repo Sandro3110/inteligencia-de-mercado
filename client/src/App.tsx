@@ -52,6 +52,7 @@ const TestNotifications = lazy(() => import("./pages/TestNotifications"));
 const NotificationHistory = lazy(() => import("./pages/NotificationHistory"));
 const ExportHistory = lazy(() => import("./pages/ExportHistory"));
 const Geocodificacao = lazy(() => import("./pages/Geocodificacao"));
+const QualityTrendsDashboard = lazy(() => import("./pages/QualityTrendsDashboard"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -100,6 +101,7 @@ function Router() {
       <Route path="/notificacoes/teste" component={TestNotifications} />
       <Route path="/export/historico" component={ExportHistory} />
       <Route path="/geocodificacao" component={Geocodificacao} />
+      <Route path="/quality-trends" component={QualityTrendsDashboard} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
