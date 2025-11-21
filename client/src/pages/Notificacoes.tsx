@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +19,10 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import DashboardLayout from "@/components/DashboardLayout";
+import {
+  NotificationFilters,
+  NotificationFiltersState,
+} from "@/components/NotificationFilters";
 
 const notificationIcons: Record<string, React.ReactNode> = {
   lead_quality: <Target className="h-5 w-5 text-purple-500" />,
@@ -26,6 +30,9 @@ const notificationIcons: Record<string, React.ReactNode> = {
   new_competitor: <AlertTriangle className="h-5 w-5 text-yellow-500" />,
   market_threshold: <AlertCircle className="h-5 w-5 text-orange-500" />,
   data_incomplete: <XCircle className="h-5 w-5 text-red-500" />,
+  enrichment: <Target className="h-5 w-5 text-blue-500" />,
+  validation: <CheckCircle2 className="h-5 w-5 text-green-500" />,
+  export: <AlertCircle className="h-5 w-5 text-purple-500" />,
 };
 
 const notificationLabels: Record<string, string> = {
@@ -34,14 +41,37 @@ const notificationLabels: Record<string, string> = {
   new_competitor: "Novo Concorrente",
   market_threshold: "Limite de Mercado",
   data_incomplete: "Dados Incompletos",
+  enrichment: "Enriquecimento",
+  validation: "Validação",
+  export: "Exportação",
 };
 
+const FILTERS_STORAGE_KEY = "notification-filters";
+
 export default function Notificacoes() {
-  const [showOnlyUnread, setShowOnlyUnread] = useState(false);
   const utils = trpc.useUtils();
+
+  // Load filters from localStorage
+  const [filters, setFilters] = useState<NotificationFiltersState>(() => {
+    const stored = localStorage.getItem(FILTERS_STORAGE_KEY);
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        return { status: "all", type: "all", period: "all" };
+      }
+    }
+    return { status: "all", type: "all", period: "all" };
+  });
+
+  // Save filters to localStorage
+  useEffect(() => {
+    localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(filters));
+  }, [filters]);
 
   const { data: notifications = [], isLoading } = trpc.notifications.list.useQuery();
   const { data: unreadCount = 0 } = trpc.notifications.unreadCount.useQuery();
+  const { data: projects = [] } = trpc.projects.list.useQuery();
 
   const markAsReadMutation = trpc.notifications.markAsRead.useMutation({
     onSuccess: () => {
@@ -66,9 +96,55 @@ export default function Notificacoes() {
     },
   });
 
-  const filteredNotifications = showOnlyUnread
-    ? notifications.filter((n: any) => !n.isRead)
-    : notifications;
+  // Apply filters
+  const filteredNotifications = useMemo(() => {
+    let result = [...notifications];
+
+    // Filter by status
+    if (filters.status === "read") {
+      result = result.filter((n: any) => n.isRead);
+    } else if (filters.status === "unread") {
+      result = result.filter((n: any) => !n.isRead);
+    }
+
+    // Filter by type
+    if (filters.type && filters.type !== "all") {
+      result = result.filter((n: any) => n.type === filters.type);
+    }
+
+    // Filter by period
+    if (filters.period && filters.period !== "all") {
+      const now = new Date();
+      const periodDays: Record<string, number> = {
+        today: 1,
+        "7days": 7,
+        "30days": 30,
+        "90days": 90,
+      };
+      const days = periodDays[filters.period];
+      if (days) {
+        const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        result = result.filter((n: any) => new Date(n.createdAt) >= cutoffDate);
+      }
+    }
+
+    // Filter by project
+    if (filters.projectId) {
+      result = result.filter((n: any) => n.projectId === filters.projectId);
+    }
+
+    // Filter by search text
+    if (filters.searchText && filters.searchText.trim()) {
+      const searchLower = filters.searchText.toLowerCase();
+      result = result.filter(
+        (n: any) =>
+          n.title?.toLowerCase().includes(searchLower) ||
+          n.message?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return result;
+  }, [notifications, filters]);
 
   const handleMarkAsRead = (id: number) => {
     markAsReadMutation.mutate(id);
@@ -97,24 +173,6 @@ export default function Notificacoes() {
               {unreadCount} não lidas
             </Badge>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowOnlyUnread(!showOnlyUnread)}
-            >
-              {showOnlyUnread ? (
-                <>
-                  <Bell className="h-4 w-4 mr-2" />
-                  Mostrar Todas
-                </>
-              ) : (
-                <>
-                  <BellOff className="h-4 w-4 mr-2" />
-                  Apenas Não Lidas
-                </>
-              )}
-            </Button>
-
             {unreadCount > 0 && (
               <Button
                 variant="default"
@@ -129,6 +187,20 @@ export default function Notificacoes() {
           </div>
         </div>
 
+        {/* Filters */}
+        <NotificationFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          projects={projects}
+        />
+
+        {/* Results Count */}
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <span>
+            Mostrando {filteredNotifications.length} de {notifications.length} notificações
+          </span>
+        </div>
+
         {isLoading ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">Carregando notificações...</p>
@@ -137,15 +209,11 @@ export default function Notificacoes() {
           <Card>
             <CardContent className="py-12 text-center">
               <Bell className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">
-                {showOnlyUnread
-                  ? "Nenhuma notificação não lida"
-                  : "Nenhuma notificação"}
-              </h3>
+              <h3 className="text-lg font-semibold mb-2">Nenhuma notificação encontrada</h3>
               <p className="text-muted-foreground">
-                {showOnlyUnread
-                  ? "Você está em dia com todas as notificações!"
-                  : "Você ainda não recebeu notificações"}
+                {notifications.length === 0
+                  ? "Você ainda não recebeu notificações"
+                  : "Tente ajustar os filtros para ver mais resultados"}
               </p>
             </CardContent>
           </Card>
@@ -171,9 +239,7 @@ export default function Notificacoes() {
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <CardTitle className="text-base">
-                            {notification.title}
-                          </CardTitle>
+                          <CardTitle className="text-base">{notification.title}</CardTitle>
                           {!notification.isRead && (
                             <Badge variant="default" className="text-xs">
                               Nova

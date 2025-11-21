@@ -482,7 +482,7 @@ export const notifications = mysqlTable("notifications", {
 	id: int().autoincrement().notNull(),
 	userId: varchar({ length: 64 }).references(() => users.id, { onDelete: "cascade" } ),
 	projectId: int().references(() => projects.id, { onDelete: "cascade" } ),
-	type: mysqlEnum(['lead_quality','lead_closed','new_competitor','market_threshold','data_incomplete']).notNull(),
+	type: mysqlEnum(['lead_quality','lead_closed','new_competitor','market_threshold','data_incomplete','enrichment','validation','export']).notNull(),
 	title: varchar({ length: 255 }).notNull(),
 	message: text().notNull(),
 	entityType: mysqlEnum(['mercado','cliente','concorrente','lead']),
@@ -490,6 +490,19 @@ export const notifications = mysqlTable("notifications", {
 	isRead: int().default(0).notNull(),
 	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
 });
+
+export const notificationPreferences = mysqlTable("notification_preferences", {
+	id: int().autoincrement().notNull(),
+	userId: varchar({ length: 64 }).references(() => users.id, { onDelete: "cascade" } ).notNull(),
+	type: mysqlEnum(['lead_quality','lead_closed','new_competitor','market_threshold','data_incomplete','enrichment','validation','export','all']).notNull(),
+	enabled: int().default(1).notNull(),
+	channels: json().$type<{ email?: boolean; push?: boolean; inApp?: boolean }>().default({ inApp: true }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow(),
+},
+(table) => [
+	index("idx_user_type").on(table.userId, table.type),
+]);
 
 export const operationalAlerts = mysqlTable("operational_alerts", {
 	id: int().autoincrement().notNull(),
@@ -656,3 +669,6 @@ export const users = mysqlTable("users", {
 	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
 	lastSignedIn: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
 });
+
+export type NotificationPreference = typeof notificationPreferences.$inferSelect;
+export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;

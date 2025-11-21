@@ -619,3 +619,47 @@
 
 **Resultado**: Sistema restaurado com sucesso! Aplicação totalmente funcional.
 
+
+---
+
+## FASE 71: MELHORIAS AVANÇADAS NO SISTEMA DE NOTIFICAÇÕES 🔔
+
+### 71.1 Contador Dinâmico de Notificações Não Lidas
+- [x] Criar query `notifications.countUnread` no backend
+- [x] Adicionar função `getUnreadNotificationsCount()` no db.ts
+- [x] Criar hook `useUnreadNotificationsCount` no frontend
+- [x] Adicionar badge com contador no item "Notificações" do menu
+- [x] Implementar atualização automática (polling a cada 30s)
+- [x] Adicionar animação de pulso quando houver notificações novas
+- [ ] Testar contador com diferentes quantidades
+
+### 71.2 Filtros Avançados na Página de Notificações
+- [x] Criar componente `NotificationFilters`
+- [x] Adicionar filtro por tipo (enrichment, validation, export, etc)
+- [x] Adicionar filtro por período (hoje, 7 dias, 30 dias, todos)
+- [x] Adicionar filtro por projeto relacionado
+- [x] Adicionar filtro por status (lida/não lida)
+- [x] Implementar busca por texto no título/mensagem
+- [x] Adicionar botão "Limpar Filtros"
+- [x] Persistir filtros no localStorage
+- [x] Atualizar query backend para aceitar filtros (filtros aplicados no frontend)
+
+### 71.3 Sistema de Preferências de Notificações
+- [x] Criar tabela `notification_preferences` no banco
+- [x] Adicionar campos: userId, type, enabled, channels (email, push, in-app)
+- [x] Criar funções CRUD no backend (get, update, reset)
+- [x] Criar endpoints tRPC (preferences.get, update, reset)
+- [ ] Criar página `/configuracoes/notificacoes`
+- [ ] Adicionar toggles por tipo de notificação
+- [ ] Adicionar seletor de canais (email, push, in-app)
+- [ ] Adicionar botão "Restaurar Padrões"
+- [ ] Integrar preferências no sistema de envio de notificações
+- [ ] Adicionar link no menu (Configurações > Notificações)
+
+### 71.4 Testes e Validação
+- [ ] Testar contador com 0, 1, 10+ notificações
+- [ ] Testar filtros individualmente e combinados
+- [ ] Testar preferências (habilitar/desabilitar tipos)
+- [ ] Validar performance com grandes volumes
+- [ ] Testar em diferentes navegadores
+

@@ -1086,6 +1086,39 @@ export const appRouter = router({
         const { deleteNotification } = await import('./db');
         return deleteNotification(input);
       }),
+    
+    // Notification Preferences
+    getPreferences: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user) return [];
+      const { getUserNotificationPreferences } = await import('./db');
+      return getUserNotificationPreferences(ctx.user.id);
+    }),
+    
+    updatePreference: publicProcedure
+      .input(z.object({
+        type: z.string(),
+        enabled: z.boolean(),
+        channels: z.object({
+          email: z.boolean().optional(),
+          push: z.boolean().optional(),
+          inApp: z.boolean().optional(),
+        }).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user) return null;
+        const { upsertNotificationPreference } = await import('./db');
+        return upsertNotificationPreference({
+          userId: ctx.user.id,
+          ...input,
+        });
+      }),
+    
+    resetPreferences: publicProcedure
+      .mutation(async ({ ctx }) => {
+        if (!ctx.user) return false;
+        const { resetNotificationPreferences } = await import('./db');
+        return resetNotificationPreferences(ctx.user.id);
+      }),
   }),
 
   enrichment: router({

@@ -1,0 +1,13 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `notification_preferences` (\n  `id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,\n  `userId` varchar(64) NOT NULL,\n  `type` enum('lead_quality','lead_closed','new_competitor','market_threshold','data_incomplete','enrichment','validation','export','all') NOT NULL,\n  `enabled` int DEFAULT 1 NOT NULL,\n  `channels` json DEFAULT ('{\"inApp\":true}'),\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE,\n  INDEX `idx_user_type` (`userId`, `type`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute CREATE TABLE IF NOT EXISTS `notification_preferences` (\n  `id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,\n  `userId` varchar(64) NOT NULL,\n  `type` enum('lead_quality','lead_closed','new_competitor','market_threshold','data_incomplete','enrichment','validation','export','all') NOT NULL,\n  `enabled` int DEFAULT 1 NOT NULL,\n  `channels` json DEFAULT ('{\"inApp\":true}'),\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE,\n  INDEX `idx_user_type` (`userId`, `type`)\n);",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 6 column 44 near \"'{\"inApp\":true}'),",
+    "  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE,",
+    "  INDEX `idx_user_type` (`userId`, `type`)",
+    ")\""
+  ]
+}

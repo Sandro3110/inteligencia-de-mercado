@@ -30,6 +30,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { useUnreadNotificationsCount } from "@/hooks/useUnreadNotificationsCount";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
@@ -137,6 +138,7 @@ const STORAGE_KEY = 'sidebar-collapsed';
 
 export function AppSidebar() {
   const [location, setLocation] = useLocation();
+  const { count: unreadCount } = useUnreadNotificationsCount();
   const [collapsed, setCollapsed] = useState(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored === 'true';
@@ -313,13 +315,22 @@ export function AppSidebar() {
                             <TooltipTrigger asChild>
                               <a
                                 className={cn(
-                                  "flex items-center justify-center p-2 rounded-md transition-colors",
+                                  "flex items-center justify-center p-2 rounded-md transition-colors relative",
                                   active
                                     ? "bg-blue-100 text-blue-700"
                                     : "text-slate-600 hover:bg-slate-100"
                                 )}
                               >
                                 <ItemIcon className="w-5 h-5" />
+                                {/* Badge de notificações não lidas (collapsed) */}
+                                {item.href === "/notificacoes" && unreadCount > 0 && (
+                                  <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex items-center justify-center rounded-full h-4 w-4 bg-red-500 text-white text-[10px] font-bold">
+                                      {unreadCount > 9 ? '9' : unreadCount}
+                                    </span>
+                                  </span>
+                                )}
                               </a>
                             </TooltipTrigger>
                             <TooltipContent side="right">
@@ -346,11 +357,19 @@ export function AppSidebar() {
                               <ItemIcon className="w-4 h-4" />
                               <span className="text-sm">{item.title}</span>
                             </div>
-                            {item.badge && (
+                            {/* Badge de notificações não lidas */}
+                            {item.href === "/notificacoes" && unreadCount > 0 ? (
+                              <span className="relative flex h-5 w-5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span className="relative inline-flex items-center justify-center rounded-full h-5 w-5 bg-red-500 text-white text-xs font-bold">
+                                  {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                              </span>
+                            ) : item.badge ? (
                               <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold">
                                 {item.badge}
                               </span>
-                            )}
+                            ) : null}
                             {item.shortcut && !item.badge && (
                               <span className="text-xs text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
                                 {item.shortcut}

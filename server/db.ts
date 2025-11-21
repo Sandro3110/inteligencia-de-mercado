@@ -4259,3 +4259,147 @@ export async function executeScheduledHibernations(
     return { hibernated, errors: errors + 1 };
   }
 }
+
+// ============================================
+// NOTIFICATION PREFERENCES
+// ============================================
+
+/**
+ * Get user notification preferences
+ */
+export async function getUserNotificationPreferences(userId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const { notificationPreferences } = await import('../drizzle/schema');
+    return await db.select()
+      .from(notificationPreferences)
+      .where(eq(notificationPreferences.userId, userId));
+  } catch (error) {
+    console.error('[DB] Error getting notification preferences:', error);
+    return [];
+  }
+}
+
+/**
+ * Update or create notification preference
+ */
+export async function upsertNotificationPreference(data: {
+  userId: string;
+  type: string;
+  enabled: boolean;
+  channels?: { email?: boolean; push?: boolean; inApp?: boolean };
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { notificationPreferences } = await import('../drizzle/schema');
+    
+    // Check if preference exists
+    const existing = await db.select()
+      .from(notificationPreferences)
+      .where(and(
+        eq(notificationPreferences.userId, data.userId),
+        eq(notificationPreferences.type, data.type as any)
+      ))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing
+      await db.update(notificationPreferences)
+        .set({
+          enabled: data.enabled ? 1 : 0,
+          channels: data.channels || { inApp: true },
+        })
+        .where(eq(notificationPreferences.id, existing[0].id));
+      
+      return { ...existing[0], enabled: data.enabled ? 1 : 0, channels: data.channels };
+    } else {
+      // Create new
+      const result = await db.insert(notificationPreferences).values({
+        userId: data.userId,
+        type: data.type as any,
+        enabled: data.enabled ? 1 : 0,
+        channels: data.channels || { inApp: true },
+      });
+
+      return {
+        id: Number(result.insertId),
+        userId: data.userId,
+        type: data.type,
+        enabled: data.enabled ? 1 : 0,
+        channels: data.channels || { inApp: true },
+      };
+    }
+  } catch (error) {
+    console.error('[DB] Error upserting notification preference:', error);
+    return null;
+  }
+}
+
+/**
+ * Reset notification preferences to defaults
+ */
+export async function resetNotificationPreferences(userId: string) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    const { notificationPreferences } = await import('../drizzle/schema');
+    
+    // Delete all user preferences
+    await db.delete(notificationPreferences)
+      .where(eq(notificationPreferences.userId, userId));
+
+    return true;
+  } catch (error) {
+    console.error('[DB] Error resetting notification preferences:', error);
+    return false;
+  }
+}
+
+/**
+ * Check if user should receive notification based on preferences
+ */
+export async function shouldSendNotification(userId: string, notificationType: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return true; // Default to sending if DB unavailable
+
+  try {
+    const { notificationPreferences } = await import('../drizzle/schema');
+    
+    // Check specific type preference
+    const typePreference = await db.select()
+      .from(notificationPreferences)
+      .where(and(
+        eq(notificationPreferences.userId, userId),
+        eq(notificationPreferences.type, notificationType as any)
+      ))
+      .limit(1);
+
+    if (typePreference.length > 0) {
+      return typePreference[0].enabled === 1;
+    }
+
+    // Check "all" preference
+    const allPreference = await db.select()
+      .from(notificationPreferences)
+      .where(and(
+        eq(notificationPreferences.userId, userId),
+        eq(notificationPreferences.type, 'all' as any)
+      ))
+      .limit(1);
+
+    if (allPreference.length > 0) {
+      return allPreference[0].enabled === 1;
+    }
+
+    // Default to enabled if no preference set
+    return true;
+  } catch (error) {
+    console.error('[DB] Error checking notification preference:', error);
+    return true; // Default to sending on error
+  }
+}
