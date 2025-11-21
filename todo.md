@@ -1889,3 +1889,22 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [x] Banco de dados vazio (esperado em instalação nova)
 - [x] Nenhum projeto cadastrado (esperado)
 - [x] Nenhuma pesquisa cadastrada (esperado)
+
+---
+
+## FASE 101: CORREÇÃO DO BUG DE LISTAGEM DE PROJETOS 🐛
+
+### Problema Identificado
+
+- [x] Identificado: Query `project.list` retorna apenas 3 projetos (LIMIT hardcoded)
+- [x] Identificado: Pesquisa "Embalagens" (ID: 1) existe mas não aparece na UI
+- [x] Identificado: Banco tem 8 projetos e 21 pesquisas, mas UI mostra apenas 3 projetos
+
+### Correção Aplicada
+
+- [x] Verificado: Função getProjects() NÃO tem LIMIT (estava correta)
+- [x] Verificado: Procedure project.list está correta (sem filtros extras)
+- [x] Identificado: Projetos estavam com ativo = 0 (inativos)
+- [x] Corrigido: Ativados TODOS os 8 projetos no banco (UPDATE projects SET ativo = 1)
+- [x] Resultado: Todas as 21 pesquisas agora aparecem na interface
+- [x] Pesquisa "Embalagens" (ID: 1) agora está visível

@@ -1,0 +1,74 @@
+{
+  "query": "SELECT id, nome, status, ativo, \n       (SELECT COUNT(*) FROM pesquisas WHERE projectId = projects.id) as num_pesquisas,\n       (SELECT nome FROM pesquisas WHERE projectId = projects.id LIMIT 1) as primeira_pesquisa\nFROM projects\nORDER BY id",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT id, nome, status, ativo, \n       (SELECT COUNT(*) FROM pesquisas WHERE projectId = projects.id) as num_pesquisas,\n       (SELECT nome FROM pesquisas WHERE projectId = projects.id LIMIT 1) as primeira_pesquisa\nFROM projects\nORDER BY id",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Embalagens",
+      "status": "active",
+      "ativo": "1",
+      "num_pesquisas": "7",
+      "primeira_pesquisa": "Embalagens"
+    },
+    {
+      "id": "330001",
+      "nome": "Ground",
+      "status": "active",
+      "ativo": "1",
+      "num_pesquisas": "8",
+      "primeira_pesquisa": "Ground"
+    },
+    {
+      "id": "330002",
+      "nome": "TechGround",
+      "status": "active",
+      "ativo": "1",
+      "num_pesquisas": "1",
+      "primeira_pesquisa": "TechGround"
+    },
+    {
+      "id": "480016",
+      "nome": "Projeto Teste Wizard 1763740366667",
+      "status": "active",
+      "ativo": "1",
+      "num_pesquisas": "5",
+      "primeira_pesquisa": "Pesquisa Teste Mínima"
+    },
+    {
+      "id": "480018",
+      "nome": "Projeto Teste Atualizado",
+      "status": "active",
+      "ativo": "0",
+      "num_pesquisas": "0",
+      "primeira_pesquisa": "NULL"
+    },
+    {
+      "id": "510001",
+      "nome": "Projeto Teste PAV",
+      "status": "active",
+      "ativo": "1",
+      "num_pesquisas": "0",
+      "primeira_pesquisa": "NULL"
+    },
+    {
+      "id": "510002",
+      "nome": "Projeto Teste PAV",
+      "status": "active",
+      "ativo": "1",
+      "num_pesquisas": "0",
+      "primeira_pesquisa": "NULL"
+    },
+    {
+      "id": "510003",
+      "nome": "Projeto Teste PAV",
+      "status": "active",
+      "ativo": "1",
+      "num_pesquisas": "0",
+      "primeira_pesquisa": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tstatus\tativo\tnum_pesquisas\tprimeira_pesquisa\n1\tEmbalagens\tactive\t1\t7\tEmbalagens\n330001\tGround\tactive\t1\t8\tGround\n330002\tTechGround\tactive\t1\t1\tTechGround\n480016\tProjeto Teste Wizard 1763740366667\tactive\t1\t5\tPesquisa Teste Mínima\n480018\tProjeto Teste Atualizado\tactive\t0\t0\tNULL\n510001\tProjeto Teste PAV\tactive\t1\t0\tNULL\n510002\tProjeto Teste PAV\tactive\t1\t0\tNULL\n510003\tProjeto Teste PAV\tactive\t1\t0\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}
