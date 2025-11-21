@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `export_history` (\n  `id` varchar(64) PRIMARY KEY,\n  `userId` varchar(64) NOT NULL,\n  `projectId` int,\n  `pesquisaId` int,\n  `context` text,\n  `filters` json,\n  `format` enum('csv','excel','pdf') NOT NULL,\n  `outputType` enum('list','report') NOT NULL,\n  `recordCount` int DEFAULT 0 NOT NULL,\n  `fileUrl` text,\n  `fileSize` int DEFAULT 0,\n  `generationTime` int DEFAULT 0,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  INDEX `idx_export_user` (`userId`),\n  INDEX `idx_export_project` (`projectId`),\n  INDEX `idx_export_created` (`createdAt`),\n  FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE,\n  FOREIGN KEY (`projectId`) REFERENCES `projects`(`id`) ON DELETE CASCADE,\n  FOREIGN KEY (`pesquisaId`) REFERENCES `pesquisas`(`id`) ON DELETE CASCADE\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute CREATE TABLE IF NOT EXISTS `export_history` (\n  `id` varchar(64) PRIMARY KEY,\n  `userId` varchar(64) NOT NULL,\n  `projectId` int,\n  `pesquisaId` int,\n  `context` text,\n  `filters` json,\n  `format` enum('csv','excel','pdf') NOT NULL,\n  `outputType` enum('list','report') NOT NULL,\n  `recordCount` int DEFAULT 0 NOT NULL,\n  `fileUrl` text,\n  `fileSize` int DEFAULT 0,\n  `generationTime` int DEFAULT 0,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  INDEX `idx_export_user` (`userId`),\n  INDEX `idx_export_project` (`projectId`),\n  INDEX `idx_export_created` (`createdAt`),\n  FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE,\n  FOREIGN KEY (`projectId`) REFERENCES `projects`(`id`) ON DELETE CASCADE,\n  FOREIGN KEY (`pesquisaId`) REFERENCES `pesquisas`(`id`) ON DELETE CASCADE\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 315
+}

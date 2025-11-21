@@ -24,6 +24,8 @@ interface ClienteEnriquecidoData {
   telefone?: string;
   linkedin?: string;
   instagram?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface MercadoData {
@@ -44,6 +46,10 @@ interface ConcorrenteData {
   descricao: string;
   porte?: 'Pequeno' | 'Médio' | 'Grande';
   regiao?: string;
+  cidade?: string;
+  uf?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface LeadData {
@@ -52,6 +58,10 @@ interface LeadData {
   potencial: 'Alto' | 'Médio' | 'Baixo';
   justificativa: string;
   porte?: 'Pequeno' | 'Médio' | 'Grande';
+  cidade?: string;
+  uf?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface EnrichmentData {
@@ -109,6 +119,7 @@ Gere um relatório completo de inteligência de mercado:
    - Se não informado, pesquise: site oficial, produto principal, cidade, UF, região
    - Estime: porte (Pequeno/Médio/Grande)
    - Se possível, encontre: email, telefone, LinkedIn, Instagram
+   - **IMPORTANTE:** Adicione latitude e longitude aproximadas do centro da cidade onde a empresa está localizada
    - NÃO invente dados - se não encontrar, deixe em branco
 
 1️⃣ **2 MERCADOS PRINCIPAIS** onde esta empresa atua ou pode atuar
@@ -140,6 +151,8 @@ Para cada mercado, forneça:
    - Nome oficial da empresa
    - Descrição breve (diferencial, foco)
    - Porte estimado (Pequeno/Médio/Grande)
+   - Cidade e UF (se conhecido)
+   - Latitude e longitude aproximadas do centro da cidade
    - Região de atuação (se relevante)
 
 💼 **5 LEADS QUALIFICADOS:**
@@ -156,6 +169,8 @@ Para cada mercado, forneça:
    - Potencial (Alto/Médio/Baixo) baseado em critérios objetivos
    - Justificativa ESPECÍFICA (por que comprariam? qual dor resolve?)
    - Porte estimado (Pequeno/Médio/Grande)
+   - Cidade e UF (se conhecido)
+   - Latitude e longitude aproximadas do centro da cidade
 
 **FORMATO JSON ESPERADO:**
 {
@@ -169,7 +184,9 @@ Para cada mercado, forneça:
     "email": "contato@empresa.com.br",
     "telefone": "(11) 1234-5678",
     "linkedin": "https://linkedin.com/company/empresa",
-    "instagram": "@empresa"
+    "instagram": "@empresa",
+    "latitude": -23.5505,
+    "longitude": -46.6333
   },
   "mercados": [
     {
@@ -191,12 +208,20 @@ Para cada mercado, forneça:
           "nome": "Bemis Latin America",
           "descricao": "Líder em embalagens flexíveis, foco em alta barreira",
           "porte": "Grande",
+          "cidade": "São Paulo",
+          "uf": "SP",
+          "latitude": -23.5505,
+          "longitude": -46.6333,
           "regiao": "Nacional"
         },
         {
           "nome": "Embalagens XYZ Ltda",
           "descricao": "Especializada em pequenos lotes customizados",
           "porte": "Pequeno",
+          "cidade": "São Paulo",
+          "uf": "SP",
+          "latitude": -23.5505,
+          "longitude": -46.6333,
           "regiao": "São Paulo"
         }
       ],
@@ -206,14 +231,22 @@ Para cada mercado, forneça:
           "segmento": "Indústria Alimentícia",
           "potencial": "Alto",
           "justificativa": "Maior compradora de embalagens do país, busca fornecedores regionais para reduzir custos logísticos. Tem programa de qualificação de fornecedores locais.",
-          "porte": "Grande"
+          "porte": "Grande",
+          "cidade": "São Paulo",
+          "uf": "SP",
+          "latitude": -23.5505,
+          "longitude": -46.6333
         },
         {
           "nome": "Padaria e Confeitaria ABC",
           "segmento": "Panificação Artesanal",
           "potencial": "Médio",
           "justificativa": "Rede com 15 lojas expandindo para produtos embalados. Precisa de embalagens personalizadas em pequenos volumes.",
-          "porte": "Pequeno"
+          "porte": "Pequeno",
+          "cidade": "São Paulo",
+          "uf": "SP",
+          "latitude": -23.5505,
+          "longitude": -46.6333
         }
       ]
     }

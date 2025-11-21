@@ -107,6 +107,41 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
       cidade: cliente.cidade || undefined
     });
     
+    // 2.5 Atualizar cliente com dados enriquecidos (incluindo coordenadas)
+    if (allData.clienteEnriquecido) {
+      const enriched = allData.clienteEnriquecido;
+      const updateData: any = {};
+      
+      if (enriched.siteOficial) updateData.siteOficial = truncate(enriched.siteOficial, 500);
+      if (enriched.produtoPrincipal) updateData.produtoPrincipal = enriched.produtoPrincipal;
+      if (enriched.cidade) updateData.cidade = truncate(enriched.cidade, 100);
+      if (enriched.uf) updateData.uf = truncate(enriched.uf, 2);
+      if (enriched.regiao) updateData.regiao = truncate(enriched.regiao, 100);
+      if (enriched.porte) updateData.porte = truncate(enriched.porte, 50);
+      if (enriched.email) updateData.email = truncate(enriched.email, 320);
+      if (enriched.telefone) updateData.telefone = truncate(enriched.telefone, 50);
+      if (enriched.linkedin) updateData.linkedin = truncate(enriched.linkedin, 500);
+      if (enriched.instagram) updateData.instagram = truncate(enriched.instagram, 500);
+      
+      // Adicionar coordenadas geográficas
+      if (enriched.latitude !== undefined && enriched.latitude !== null) {
+        updateData.latitude = enriched.latitude.toString();
+      }
+      if (enriched.longitude !== undefined && enriched.longitude !== null) {
+        updateData.longitude = enriched.longitude.toString();
+      }
+      if (enriched.latitude || enriched.longitude) {
+        updateData.geocodedAt = now();
+      }
+      
+      if (Object.keys(updateData).length > 0) {
+        await db.update(clientes)
+          .set(updateData)
+          .where(eq(clientes.id, clienteId));
+        console.log(`[Enrich] Updated cliente with enriched data (including coordinates)`);
+      }
+    }
+    
     // 3. Processar cada mercado
     for (const mercadoItem of allData.mercados) {
       const mercadoData = mercadoItem.mercado;
@@ -203,7 +238,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
           .limit(1);
         
         if (!existing) {
-          await db.insert(concorrentes).values({
+          const concorrenteInsert: any = {
             projectId,
             pesquisaId: cliente.pesquisaId || null,
             mercadoId,
@@ -212,15 +247,28 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
             porte: truncate(concorrenteData.porte || '', 50),
             cnpj: null,
             site: null,
-            cidade: null,
-            uf: null,
+            cidade: truncate(concorrenteData.cidade || '', 100) || null,
+            uf: truncate(concorrenteData.uf || '', 2) || null,
             faturamentoEstimado: null,
             qualidadeScore: qualityScore,
             qualidadeClassificacao: getQualityClassification(qualityScore),
             validationStatus: 'pending',
             concorrenteHash,
             createdAt: now()
-          });
+          };
+          
+          // Adicionar coordenadas se disponíveis
+          if (concorrenteData.latitude !== undefined && concorrenteData.latitude !== null) {
+            concorrenteInsert.latitude = concorrenteData.latitude.toString();
+          }
+          if (concorrenteData.longitude !== undefined && concorrenteData.longitude !== null) {
+            concorrenteInsert.longitude = concorrenteData.longitude.toString();
+          }
+          if (concorrenteData.latitude || concorrenteData.longitude) {
+            concorrenteInsert.geocodedAt = now();
+          }
+          
+          await db.insert(concorrentes).values(concorrenteInsert);
           result.concorrentesCreated++;
         }
       }
@@ -251,7 +299,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
           .limit(1);
         
         if (!existing) {
-          await db.insert(leads).values({
+          const leadInsert: any = {
             projectId,
             pesquisaId: cliente.pesquisaId || null,
             mercadoId,
@@ -259,13 +307,28 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
             setor: truncate(leadData.segmento || '', 100),
             tipo: truncate(leadData.potencial || '', 20),
             porte: truncate(leadData.porte || '', 50),
+            cidade: truncate(leadData.cidade || '', 100) || null,
+            uf: truncate(leadData.uf || '', 2) || null,
             qualidadeScore: qualityScore,
             qualidadeClassificacao: getQualityClassification(qualityScore),
             validationStatus: 'pending',
             stage: 'novo',
             leadHash,
             createdAt: now()
-          });
+          };
+          
+          // Adicionar coordenadas se disponíveis
+          if (leadData.latitude !== undefined && leadData.latitude !== null) {
+            leadInsert.latitude = leadData.latitude.toString();
+          }
+          if (leadData.longitude !== undefined && leadData.longitude !== null) {
+            leadInsert.longitude = leadData.longitude.toString();
+          }
+          if (leadData.latitude || leadData.longitude) {
+            leadInsert.geocodedAt = now();
+          }
+          
+          await db.insert(leads).values(leadInsert);
           result.leadsCreated++;
         }
       }

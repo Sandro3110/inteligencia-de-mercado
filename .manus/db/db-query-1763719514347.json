@@ -1,0 +1,50 @@
+{
+  "query": "\nSELECT id, nome, cnpj, cidade, uf, createdAt\nFROM clientes \nWHERE cidade IS NOT NULL AND uf IS NOT NULL\nLIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT id, nome, cnpj, cidade, uf, createdAt\nFROM clientes \nWHERE cidade IS NOT NULL AND uf IS NOT NULL\nLIMIT 5;\n",
+  "rows": [
+    {
+      "id": "301634",
+      "nome": "AGRO-COMERCIAL AFUBRA LTDA",
+      "cnpj": "74072513000144",
+      "cidade": "Santa Cruz do Sul",
+      "uf": "RS",
+      "createdAt": "2025-11-19 03:44:19"
+    },
+    {
+      "id": "331696",
+      "nome": "COPAPA CIA PADUANA DE PAPEIS",
+      "cnpj": "31590862000145",
+      "cidade": "Santo Antônio de Pádua",
+      "uf": "RJ",
+      "createdAt": "2025-11-19 09:04:17"
+    },
+    {
+      "id": "331763",
+      "nome": "EUCATEX IND E COM LTDA",
+      "cnpj": "14675270000450",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "createdAt": "2025-11-19 10:09:23"
+    },
+    {
+      "id": "331809",
+      "nome": "FRIBAZ FRIGORIFICO BAZOTTI LTDA",
+      "cnpj": "1879013000145",
+      "cidade": "Aquidauana",
+      "uf": "MS",
+      "createdAt": "2025-11-19 10:49:49"
+    },
+    {
+      "id": "331818",
+      "nome": "GERALTECH INJECAO PLASTICA LTDA",
+      "cnpj": "16814336000128",
+      "cidade": "Jundiaí",
+      "uf": "SP",
+      "createdAt": "2025-11-19 10:58:24"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcnpj\tcidade\tuf\tcreatedAt\n301634\tAGRO-COMERCIAL AFUBRA LTDA\t74072513000144\tSanta Cruz do Sul\tRS\t2025-11-19 03:44:19\n331696\tCOPAPA CIA PADUANA DE PAPEIS\t31590862000145\tSanto Antônio de Pádua\tRJ\t2025-11-19 09:04:17\n331763\tEUCATEX IND E COM LTDA\t14675270000450\tSão Paulo\tSP\t2025-11-19 10:09:23\n331809\tFRIBAZ FRIGORIFICO BAZOTTI LTDA\t1879013000145\tAquidauana\tMS\t2025-11-19 10:49:49\n331818\tGERALTECH INJECAO PLASTICA LTDA\t16814336000128\tJundiaí\tSP\t2025-11-19 10:58:24\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

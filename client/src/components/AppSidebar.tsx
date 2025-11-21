@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   Plus,
   Download,
+  History,
   Folder,
   PlayCircle,
   Eye,
@@ -128,6 +129,7 @@ const navSections: NavSection[] = [
     items: [
       { title: "Notificações", href: "/notificacoes", icon: Bell, badge: "Novo" },
       { title: "Histórico de Notificações", href: "/notificacoes/historico", icon: FileText },
+      { title: "Histórico de Exportações", href: "/export/historico", icon: Download },
       { title: "Preferências de Notificações", href: "/configuracoes/notificacoes", icon: Settings },
       { title: "Monitoramento", href: "/monitoring", icon: Activity },
       { title: "Atividade de Projetos", href: "/projetos/atividade", icon: FolderOpen, badge: "Novo" },

@@ -8,7 +8,7 @@ import { excelRenderer } from "../renderers/ExcelRenderer";
 import { pdfListRenderer } from "../renderers/PDFListRenderer";
 import { pdfReportRenderer } from "../renderers/PDFReportRenderer";
 import { getDb } from "../db";
-// import { exportHistory, savedFiltersExport } from "../../drizzle/schema"; // TODO: Implementar no schema
+import { exportHistory, savedFiltersExport } from "../../drizzle/schema";
 import crypto from "crypto";
 
 /**
@@ -145,22 +145,22 @@ export const exportRouter = router({
 
         const generationTime = Math.floor((Date.now() - startTime) / 1000);
 
-        // TODO: Salvar no histórico quando tabela exportHistory for criada
-        // const db = await getDb();
-        // if (db) {
-        //   await db.insert(exportHistory).values({
-        //     id: crypto.randomBytes(16).toString('hex'),
-        //     userId: ctx.user.id,
-        //     context: input.title || '',
-        //     filters: input.data.length > 0 ? { count: input.data.length } : {},
-        //     format: input.format,
-        //     outputType: input.outputType,
-        //     recordCount: input.data.length,
-        //     fileUrl: result.url,
-        //     fileSize: result.size,
-        //     generationTime
-        //   });
-        // }
+        // Salvar no histórico
+        const db = await getDb();
+        if (db) {
+          await db.insert(exportHistory).values({
+            id: crypto.randomBytes(16).toString('hex'),
+            userId: ctx.user.id,
+            context: input.title || '',
+            filters: input.data.length > 0 ? { count: input.data.length } : {},
+            format: input.format === 'json' ? 'csv' : input.format,
+            outputType: input.outputType === 'simple' ? 'list' : 'report',
+            recordCount: input.data.length,
+            fileUrl: result.url,
+            fileSize: result.size,
+            generationTime
+          });
+        }
 
         return {
           ...result,
@@ -185,8 +185,23 @@ export const exportRouter = router({
       if (!db) return { history: [], total: 0 };
 
       try {
-        // TODO: Implementar tabela exportHistory no schema
-        return { history: [], total: 0 };
+        const { exportHistory } = await import('../../drizzle/schema');
+        
+        const history = await db.select()
+          .from(exportHistory)
+          .where(eq(exportHistory.userId, ctx.user.id))
+          .orderBy(desc(exportHistory.createdAt))
+          .limit(input.limit)
+          .offset(input.offset);
+        
+        const [countResult] = await db.select({ count: sql<number>`count(*)` })
+          .from(exportHistory)
+          .where(eq(exportHistory.userId, ctx.user.id));
+        
+        return { 
+          history, 
+          total: countResult?.count || 0 
+        };
       } catch (error) {
         console.error('[ExportRouter] Erro ao listar histórico:', error);
         return { history: [], total: 0 };
@@ -222,12 +237,11 @@ export const exportRouter = router({
       historyId: z.string()
     }))
     .mutation(async ({ input, ctx }) => {
-      // TODO: Implementar quando tabela exportHistory for criada
-      // const db = await getDb();
-      // if (!db) throw new Error('Database not available');
-      // 
-      // await db.delete(exportHistory)
-      //   .where(eq(exportHistory.id, input.historyId));
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+      
+      await db.delete(exportHistory)
+        .where(eq(exportHistory.id, input.historyId));
       
       return { success: true };
     }),
@@ -255,4 +269,4 @@ export const exportRouter = router({
 });
 
 // Imports necessários para o histórico
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";

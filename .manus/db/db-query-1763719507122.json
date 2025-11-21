@@ -1,0 +1,31 @@
+{
+  "query": "\nSELECT \n  'clientes' as tabela,\n  COUNT(*) as total,\n  COUNT(cidade) as com_cidade,\n  COUNT(uf) as com_uf,\n  COUNT(CASE WHEN cidade IS NOT NULL AND uf IS NOT NULL THEN 1 END) as com_ambos\nFROM clientes\nUNION ALL\nSELECT \n  'concorrentes' as tabela,\n  COUNT(*) as total,\n  COUNT(cidade) as com_cidade,\n  COUNT(uf) as com_uf,\n  COUNT(CASE WHEN cidade IS NOT NULL AND uf IS NOT NULL THEN 1 END) as com_ambos\nFROM concorrentes\nUNION ALL\nSELECT \n  'leads' as tabela,\n  COUNT(*) as total,\n  COUNT(cidade) as com_cidade,\n  COUNT(uf) as com_uf,\n  COUNT(CASE WHEN cidade IS NOT NULL AND uf IS NOT NULL THEN 1 END) as com_ambos\nFROM leads;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nSELECT \n  'clientes' as tabela,\n  COUNT(*) as total,\n  COUNT(cidade) as com_cidade,\n  COUNT(uf) as com_uf,\n  COUNT(CASE WHEN cidade IS NOT NULL AND uf IS NOT NULL THEN 1 END) as com_ambos\nFROM clientes\nUNION ALL\nSELECT \n  'concorrentes' as tabela,\n  COUNT(*) as total,\n  COUNT(cidade) as com_cidade,\n  COUNT(uf) as com_uf,\n  COUNT(CASE WHEN cidade IS NOT NULL AND uf IS NOT NULL THEN 1 END) as com_ambos\nFROM concorrentes\nUNION ALL\nSELECT \n  'leads' as tabela,\n  COUNT(*) as total,\n  COUNT(cidade) as com_cidade,\n  COUNT(uf) as com_uf,\n  COUNT(CASE WHEN cidade IS NOT NULL AND uf IS NOT NULL THEN 1 END) as com_ambos\nFROM leads;\n",
+  "rows": [
+    {
+      "tabela": "clientes",
+      "total": "810",
+      "com_cidade": "11",
+      "com_uf": "11",
+      "com_ambos": "11"
+    },
+    {
+      "tabela": "concorrentes",
+      "total": "4978",
+      "com_cidade": "0",
+      "com_uf": "0",
+      "com_ambos": "0"
+    },
+    {
+      "tabela": "leads",
+      "total": "3609",
+      "com_cidade": "0",
+      "com_uf": "0",
+      "com_ambos": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\ttotal\tcom_cidade\tcom_uf\tcom_ambos\nclientes\t810\t11\t11\t11\nconcorrentes\t4978\t0\t0\t0\nleads\t3609\t0\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 726
+}

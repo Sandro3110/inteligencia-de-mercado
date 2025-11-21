@@ -156,6 +156,9 @@ export const clientes = mysqlTable("clientes", {
 	faturamentoDeclarado: text(),
 	numeroEstabelecimentos: text(),
 	pesquisaId: int(),
+	latitude: decimal({ precision: 10, scale: 8 }),
+	longitude: decimal({ precision: 11, scale: 8 }),
+	geocodedAt: timestamp({ mode: 'string' }),
 },
 (table) => [
 	index("idx_clientes_projectId").on(table.projectId),
@@ -206,6 +209,9 @@ export const concorrentes = mysqlTable("concorrentes", {
 	faturamentoDeclarado: text(),
 	numeroEstabelecimentos: text(),
 	pesquisaId: int(),
+	latitude: decimal({ precision: 10, scale: 8 }),
+	longitude: decimal({ precision: 11, scale: 8 }),
+	geocodedAt: timestamp({ mode: 'string' }),
 },
 (table) => [
 	index("idx_concorrentes_projectId").on(table.projectId),
@@ -411,6 +417,9 @@ export const leads = mysqlTable("leads", {
 	numeroEstabelecimentos: text(),
 	pesquisaId: int(),
 	stage: varchar({ length: 50 }).default('novo'),
+	latitude: decimal({ precision: 10, scale: 8 }),
+	longitude: decimal({ precision: 11, scale: 8 }),
+	geocodedAt: timestamp({ mode: 'string' }),
 },
 (table) => [
 	index("idx_leads_projectId").on(table.projectId),
@@ -476,6 +485,43 @@ export const mercadosUnicos = mysqlTable("mercados_unicos", {
 	index("idx_mercados_projectId").on(table.projectId),
 	index("unique_mercado_hash").on(table.mercadoHash),
 	index("idx_mercado_hash").on(table.mercadoHash),
+]);
+
+export const exportHistory = mysqlTable("export_history", {
+	id: varchar({ length: 64 }).primaryKey(),
+	userId: varchar({ length: 64 }).references(() => users.id, { onDelete: "cascade" }).notNull(),
+	projectId: int().references(() => projects.id, { onDelete: "cascade" }),
+	pesquisaId: int().references(() => pesquisas.id, { onDelete: "cascade" }),
+	context: text(),
+	filters: json(),
+	format: mysqlEnum(['csv','excel','pdf']).notNull(),
+	outputType: mysqlEnum(['list','report']).notNull(),
+	recordCount: int().default(0).notNull(),
+	fileUrl: text(),
+	fileSize: int().default(0),
+	generationTime: int().default(0),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
+},
+(table) => [
+	index("idx_export_user").on(table.userId),
+	index("idx_export_project").on(table.projectId),
+	index("idx_export_created").on(table.createdAt),
+]);
+
+export const savedFiltersExport = mysqlTable("saved_filters_export", {
+	id: int().autoincrement().notNull(),
+	userId: varchar({ length: 64 }).references(() => users.id, { onDelete: "cascade" }).notNull(),
+	projectId: int().references(() => projects.id, { onDelete: "cascade" }),
+	name: varchar({ length: 255 }).notNull(),
+	description: text(),
+	entityType: mysqlEnum(['mercados','clientes','concorrentes','leads','produtos']).notNull(),
+	filters: json().notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow(),
+},
+(table) => [
+	index("idx_saved_filter_user").on(table.userId),
+	index("idx_saved_filter_project").on(table.projectId),
 ]);
 
 export const notifications = mysqlTable("notifications", {
@@ -794,3 +840,9 @@ export type InsertAlertHistory = typeof alertHistory.$inferInsert;
 
 export type IntelligentAlertsHistory = typeof intelligentAlertsHistory.$inferSelect;
 export type InsertIntelligentAlertsHistory = typeof intelligentAlertsHistory.$inferInsert;
+
+export type ExportHistory = typeof exportHistory.$inferSelect;
+export type InsertExportHistory = typeof exportHistory.$inferInsert;
+
+export type SavedFilterExport = typeof savedFiltersExport.$inferSelect;
+export type InsertSavedFilterExport = typeof savedFiltersExport.$inferInsert;

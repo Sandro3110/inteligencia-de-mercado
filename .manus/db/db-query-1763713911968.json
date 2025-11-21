@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `saved_filters_export` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `userId` varchar(64) NOT NULL,\n  `projectId` int,\n  `name` varchar(255) NOT NULL,\n  `description` text,\n  `entityType` enum('mercados','clientes','concorrentes','leads','produtos') NOT NULL,\n  `filters` json NOT NULL,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `idx_saved_filter_user` (`userId`),\n  INDEX `idx_saved_filter_project` (`projectId`),\n  FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE,\n  FOREIGN KEY (`projectId`) REFERENCES `projects`(`id`) ON DELETE CASCADE\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute CREATE TABLE IF NOT EXISTS `saved_filters_export` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `userId` varchar(64) NOT NULL,\n  `projectId` int,\n  `name` varchar(255) NOT NULL,\n  `description` text,\n  `entityType` enum('mercados','clientes','concorrentes','leads','produtos') NOT NULL,\n  `filters` json NOT NULL,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `idx_saved_filter_user` (`userId`),\n  INDEX `idx_saved_filter_project` (`projectId`),\n  FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE,\n  FOREIGN KEY (`projectId`) REFERENCES `projects`(`id`) ON DELETE CASCADE\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 261
+}
