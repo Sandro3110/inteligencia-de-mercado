@@ -1,4 +1,4 @@
-import { eq, sql, and, or, like, count, desc, gte, inArray } from "drizzle-orm";
+import { eq, sql, and, or, like, count, desc, gte, inArray, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users, 
@@ -12,19 +12,9 @@ import {
   activityLog, ActivityLog, InsertActivityLog,
   enrichmentConfigs, EnrichmentConfig, InsertEnrichmentConfig,
   projectAuditLog, ProjectAuditLog, InsertProjectAuditLog,
-  hibernationWarnings, HibernationWarning, InsertHibernationWarning
+  hibernationWarnings, HibernationWarning, InsertHibernationWarning,
+  notificationPreferences
 } from "../drizzle/schema";
-
-// Tipos temporários para drafts (até resolver cache do TypeScript)
-type ResearchDraft = {
-  id: number;
-  userId: string;
-  projectId: number | null;
-  draftData: any;
-  currentStep: number;
-  createdAt: Date;
-  updatedAt: Date;
-};
 import { ENV } from './_core/env';
 import { now, toMySQLTimestamp } from './dateUtils';
 
@@ -4438,8 +4428,18 @@ export async function shouldSendNotification(userId: string, notificationType: s
 // RESEARCH DRAFTS HELPERS
 // ============================================
 
-// Interface ResearchDraft movida para o topo do arquivo (tipo temporário)
+// Tipo temporário para drafts (evitando problema de cache do TypeScript)
+type ResearchDraft = {
+  id: number;
+  userId: string;
+  projectId: number | null;
+  draftData: any;
+  currentStep: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
+// Funções de gerenciamento de drafts de pesquisa (usando raw SQL temporariamente)
 export async function saveResearchDraft(
   userId: string,
   draftData: any,
@@ -4447,18 +4447,32 @@ export async function saveResearchDraft(
   projectId?: number | null
 ): Promise<ResearchDraft | null> {
   const db = await getDb();
-  if (!db) return null;
+  if (!db) {
+    console.warn("[Database] Cannot save research draft: database not available");
+    return null;
+  }
 
   try {
-    // Verificar se já existe um draft para este usuário
-    const existing = await db.execute(sql`
-      SELECT * FROM research_drafts 
-      WHERE userId = ${userId} 
-      AND (projectId = ${projectId ?? null} OR (projectId IS NULL AND ${projectId === null}))
-      LIMIT 1
-    `);
-
     const draftJson = JSON.stringify(draftData);
+    
+    // Verificar se já existe um draft para este usuário
+    let existing;
+    if (projectId === null || projectId === undefined) {
+      existing = await db.execute(sql`
+        SELECT * FROM research_drafts 
+        WHERE userId = ${userId} 
+        AND projectId IS NULL
+        LIMIT 1
+      `);
+    } else {
+      existing = await db.execute(sql`
+        SELECT * FROM research_drafts 
+        WHERE userId = ${userId} 
+        AND projectId = ${projectId}
+        LIMIT 1
+      `);
+    }
+
     const existingRows = (existing as any)[0] || [];
 
     if (existingRows.length > 0) {
@@ -4507,18 +4521,93 @@ export async function getResearchDraft(
   userId: string,
   projectId?: number | null
 ): Promise<ResearchDraft | null> {
-  // Temporariamente desabilitado - aguardando resolver cache TypeScript
-  return null;
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get research draft: database not available");
+    return null;
+  }
+
+  try {
+    let result;
+    if (projectId === null || projectId === undefined) {
+      result = await db.execute(sql`
+        SELECT * FROM research_drafts 
+        WHERE userId = ${userId} 
+        AND projectId IS NULL
+        LIMIT 1
+      `);
+    } else {
+      result = await db.execute(sql`
+        SELECT * FROM research_drafts 
+        WHERE userId = ${userId} 
+        AND projectId = ${projectId}
+        LIMIT 1
+      `);
+    }
+
+    const rows = (result as any)[0] || [];
+    if (rows.length === 0) return null;
+
+    const draft = rows[0];
+    return {
+      id: draft.id,
+      userId: draft.userId,
+      projectId: draft.projectId,
+      draftData: typeof draft.draftData === 'string' ? JSON.parse(draft.draftData) : draft.draftData,
+      currentStep: draft.currentStep,
+      createdAt: draft.createdAt,
+      updatedAt: draft.updatedAt,
+    };
+  } catch (error) {
+    console.error("[Database] Failed to get research draft:", error);
+    return null;
+  }
 }
 
 export async function deleteResearchDraft(draftId: number): Promise<boolean> {
-  // Temporariamente desabilitado - aguardando resolver cache TypeScript
-  return false;
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot delete research draft: database not available");
+    return false;
+  }
+
+  try {
+    await db.execute(sql`DELETE FROM research_drafts WHERE id = ${draftId}`);
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete research draft:", error);
+    return false;
+  }
 }
 
 export async function getUserDrafts(userId: string): Promise<ResearchDraft[]> {
-  // Temporariamente desabilitado - aguardando resolver cache TypeScript
-  return [];
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user drafts: database not available");
+    return [];
+  }
+
+  try {
+    const results = await db.execute(sql`
+      SELECT * FROM research_drafts 
+      WHERE userId = ${userId} 
+      ORDER BY updatedAt DESC
+    `);
+
+    const rows = (results as any)[0] || [];
+    return rows.map((draft: any) => ({
+      id: draft.id,
+      userId: draft.userId,
+      projectId: draft.projectId,
+      draftData: typeof draft.draftData === 'string' ? JSON.parse(draft.draftData) : draft.draftData,
+      currentStep: draft.currentStep,
+      createdAt: draft.createdAt,
+      updatedAt: draft.updatedAt,
+    }));
+  } catch (error) {
+    console.error("[Database] Failed to get user drafts:", error);
+    return [];
+  }
 }
 
 

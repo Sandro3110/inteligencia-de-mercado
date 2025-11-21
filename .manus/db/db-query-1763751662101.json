@@ -1,0 +1,19 @@
+{
+  "query": "SELECT * FROM research_drafts WHERE userId = 'test-user-drafts-123' LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT * FROM research_drafts WHERE userId = 'test-user-drafts-123' LIMIT 5",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "test-user-drafts-123",
+      "projectId": "NULL",
+      "draftData": "{\"selectedMarkets\": [\"Embalagens\", \"Alimentos\"], \"step1Complete\": true, \"step2Complete\": true, \"step3Data\": {\"more\": \"data\"}}",
+      "currentStep": "3",
+      "createdAt": "2025-11-21 18:59:31",
+      "updatedAt": "2025-11-21 19:00:08"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tprojectId\tdraftData\tcurrentStep\tcreatedAt\tupdatedAt\n1\ttest-user-drafts-123\tNULL\t{\"selectedMarkets\": [\"Embalagens\", \"Alimentos\"], \"step1Complete\": true, \"step2Complete\": true, \"step3Data\": {\"more\": \"data\"}}\t3\t2025-11-21 18:59:31\t2025-11-21 19:00:08\n",
+  "stderr": "",
+  "execution_time_ms": 104
+}

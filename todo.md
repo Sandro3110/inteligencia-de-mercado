@@ -1164,3 +1164,38 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [x] Verificar integração com backend (tRPC)
 
 **Status**: ✅ Todas as 3 melhorias implementadas e validadas com sucesso!
+
+
+---
+
+## FASE 60.5: REATIVAÇÃO E MELHORIAS DO SISTEMA DE AUTO-SAVE 🔄
+
+### 60.5.1 Correção do Sistema de Drafts
+- [x] Investigar problema de cache do TypeScript com researchDrafts
+- [x] Implementar funções de draft usando raw SQL temporariamente
+- [x] Corrigir lógica de comparação de projectId NULL
+- [x] Corrigir parse de draftData (objeto vs string JSON)
+- [x] Criar testes vitest para todas as funções de draft
+- [x] Validar auto-save funcionando no wizard
+
+### 60.5.2 Comparação de Tendências entre Projetos
+- [ ] Adicionar seleção múltipla de projetos no QualityTrendsDashboard
+- [ ] Implementar gráfico comparativo de tendências entre projetos
+- [ ] Adicionar legenda com cores diferentes por projeto
+- [ ] Criar tabela de comparação de métricas entre projetos
+- [ ] Adicionar filtros específicos para comparação
+
+### 60.5.3 Sistema de Alertas Automáticos de Qualidade
+- [ ] Criar tabela quality_alerts no banco de dados
+- [ ] Implementar função detectQualityAlerts() no backend
+- [ ] Criar cron job para verificar alertas diariamente
+- [ ] Adicionar thresholds configuráveis (queda >10%, >20%, >30%)
+- [ ] Criar notificações automáticas para o owner
+- [ ] Adicionar página de gerenciamento de alertas
+- [ ] Implementar histórico de alertas
+
+### 60.5.4 Testes e Validação
+- [ ] Testar comparação de tendências com múltiplos projetos
+- [ ] Testar sistema de alertas com diferentes thresholds
+- [ ] Validar notificações automáticas
+- [ ] Verificar performance das queries
