@@ -1030,3 +1030,56 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [ ] Passo 5: Análise Geográfica
 - [ ] Passo 6: Testes e Validação Final
 
+
+
+---
+
+## 🗺️ FASE 74 - PASSO 3: GEOCODIFICAÇÃO COM GOOGLE MAPS (FALLBACK) - EM ANDAMENTO
+
+### 3.1 Backend - Serviço de Geocodificação
+- [x] Criar arquivo server/services/geocoding.ts
+- [x] Implementar função geocodeAddress(cidade, uf, pais = 'Brasil')
+- [x] Implementar tratamento de erros e rate limiting
+- [x] Implementar cache de resultados (evitar chamadas duplicadas)
+- [x] Adicionar validação de coordenadas (range Brasil: lat -33 a 5, lng -73 a -34)
+- [x] Adicionar retry automático em caso de falha temporária
+
+### 3.2 Backend - Endpoints tRPC
+- [x] Criar router geo.geocodeAddress (geocodificação individual)
+- [x] Criar router geo.geocodeBatch (geocodificação em lote)
+- [x] Criar router geo.getRecordsSemCoordenadas (buscar registros sem coordenadas)
+- [x] Criar router geo.autoGeocode (geocodificação automática de todos os registros)
+- [x] Criar router geo.getStats (estatísticas de cobertura geográfica)
+
+### 3.3 Frontend - Página de Geocodificação
+- [x] Criar página /geocodificacao com dashboard de status
+- [x] Adicionar contador de registros com/sem coordenadas por tipo
+- [x] Adicionar botão "Geocodificar Todos" com barra de progresso
+- [x] Adicionar filtros por tipo (clientes/concorrentes/leads)
+- [x] Adicionar lista de registros sem coordenadas com botão individual
+- [x] Adicionar link no menu lateral (seção Sistema)
+- [x] Implementar feedback visual durante processamento
+
+### 3.4 Sistema Automático
+- [x] Adicionar campo googleMapsApiKey no enrichment_configs
+- [ ] Adicionar campo autoGeocode (boolean) no enrichment_configs
+- [ ] Integrar geocodificação automática no enrichmentOptimized.ts
+- [ ] Executar geocodificação após criar cliente/concorrente/lead sem coordenadas
+- [ ] Adicionar logs de geocodificação no sistema
+- [ ] Implementar fila de processamento para evitar rate limiting
+
+### 3.5 Configuração e UI
+- [x] Adicionar input de API key na página /enrichment-settings
+- [ ] Adicionar toggle "Geocodificação Automática" nas configurações
+- [ ] Adicionar botão "Testar Conexão" do Google Maps API
+- [ ] Documentar como obter API key do Google Maps
+- [ ] Adicionar tooltip explicativo sobre custos da API
+
+### 3.6 Testes
+- [x] Criar teste unitário do serviço de geocodificação
+- [x] Testar geocodificação de 5-10 endereços reais
+- [x] Validar precisão das coordenadas retornadas
+- [x] Testar rate limiting e tratamento de erros
+- [x] Testar geocodificação em lote (50+ registros)
+- [x] Validar cache de resultados
+

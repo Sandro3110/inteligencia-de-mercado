@@ -20,6 +20,7 @@ export default function EnrichmentSettings() {
   const [openaiApiKey, setOpenaiApiKey] = useState("");
   const [serpapiKey, setSerpapiKey] = useState("");
   const [receitawsKey, setReceitawsKey] = useState("");
+  const [googleMapsApiKey, setGoogleMapsApiKey] = useState("");
   const [produtosPorMercado, setProdutosPorMercado] = useState(3);
   const [concorrentesPorMercado, setConcorrentesPorMercado] = useState(5);
   const [leadsPorMercado, setLeadsPorMercado] = useState(5);
@@ -36,6 +37,7 @@ export default function EnrichmentSettings() {
       setOpenaiApiKey(config.openaiApiKey || "");
       setSerpapiKey(config.serpapiKey || "");
       setReceitawsKey(config.receitawsKey || "");
+      setGoogleMapsApiKey(config.googleMapsApiKey || "");
       setProdutosPorMercado(config.produtosPorMercado || 3);
       setConcorrentesPorMercado(config.concorrentesPorMercado || 5);
       setLeadsPorMercado(config.leadsPorMercado || 5);
@@ -73,6 +75,7 @@ export default function EnrichmentSettings() {
       openaiApiKey,
       serpapiKey: serpapiKey || undefined,
       receitawsKey: receitawsKey || undefined,
+      googleMapsApiKey: googleMapsApiKey || undefined,
       produtosPorMercado,
       concorrentesPorMercado,
       leadsPorMercado,
@@ -193,6 +196,21 @@ export default function EnrichmentSettings() {
                   />
                   <p className="text-xs text-muted-foreground">
                     Opcional. Usada para validar e enriquecer dados de CNPJ.
+                  </p>
+                </div>
+
+                {/* Google Maps API Key */}
+                <div className="space-y-2">
+                  <Label htmlFor="googlemaps-key">Google Maps API Key (Opcional)</Label>
+                  <Input
+                    id="googlemaps-key"
+                    type="password"
+                    placeholder="AIza..."
+                    value={googleMapsApiKey}
+                    onChange={(e) => setGoogleMapsApiKey(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Opcional. Usada para geocodificar endereços (adicionar coordenadas lat/lng) quando a IA não conseguir.
                   </p>
                 </div>
 

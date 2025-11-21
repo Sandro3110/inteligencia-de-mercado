@@ -260,6 +260,7 @@ export const enrichmentConfigs = mysqlTable("enrichment_configs", {
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow(),
 	geminiApiKey: text(),
 	anthropicApiKey: text(),
+	googleMapsApiKey: text(),
 },
 (table) => [
 	index("projectId").on(table.projectId),
