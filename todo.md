@@ -1083,3 +1083,46 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [x] Testar geocodificação em lote (50+ registros)
 - [x] Validar cache de resultados
 
+
+
+---
+
+## FASE 75: SELETORES DESTACADOS NO SIDEBAR COM REFRESH MANUAL 🎯 ✅
+
+### 75.1 Seção "Contexto de Trabalho" no Sidebar
+- [x] Criar seção destacada no topo do sidebar
+- [x] Adicionar título "CONTEXTO DE TRABALHO" com ícone
+- [x] Aplicar gradiente de fundo (blue-50 to indigo-50)
+- [x] Adicionar borda superior destacada (border-blue-200)
+- [x] Integrar ProjectSelector e PesquisaSelector
+
+### 75.2 Hook de Refresh Global
+- [x] Criar hook useGlobalRefresh
+- [x] Implementar função refreshAll() que invalida todas as queries
+- [x] Adicionar estado de loading (isRefreshing)
+- [x] Implementar tracking de timestamp da última atualização
+- [x] Adicionar função getTimeSinceRefresh() para exibir tempo relativo
+- [x] Integrar com toast de feedback (sucesso/erro)
+
+### 75.3 Botão de Atualização Manual
+- [x] Adicionar botão "Atualizar Dados" na seção de contexto
+- [x] Integrar com hook useGlobalRefresh
+- [x] Adicionar animação de spin no ícone durante loading
+- [x] Desabilitar botão durante atualização
+- [x] Exibir timestamp "Atualizado há X minutos" abaixo do botão
+
+### 75.4 Melhorias Visuais e UX
+- [x] Adicionar badge "Ativa" ao seletor de Pesquisa
+- [x] Redesenhar cards de estatísticas em grid 2 colunas
+- [x] Adicionar ícones coloridos (roxo para Mercados, verde para Leads)
+- [x] Aplicar sombras sutis e fundo branco nos cards
+- [x] Melhorar hierarquia visual com labels e valores destacados
+
+### 75.5 Validação e Testes
+- [x] Testar botão de atualização em diferentes páginas
+- [x] Validar animação de loading
+- [x] Verificar feedback visual (toast)
+- [x] Confirmar que todas as queries são invalidadas
+- [x] Testar timestamp relativo
+
+**Resultado**: Implementação completa da Opção 2 (Híbrida) - Seletores sempre visíveis + botão de refresh manual para controle total do usuário!

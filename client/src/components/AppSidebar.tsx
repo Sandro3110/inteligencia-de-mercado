@@ -32,6 +32,10 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { useSelectedPesquisa } from "@/hooks/useSelectedPesquisa";
+import { useGlobalRefresh } from "@/hooks/useGlobalRefresh";
+import { ProjectSelector } from "@/components/ProjectSelector";
+import { PesquisaSelector } from "@/components/PesquisaSelector";
 import { useUnreadNotificationsCount } from "@/hooks/useUnreadNotificationsCount";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
@@ -159,6 +163,7 @@ export function AppSidebar() {
   );
 
   const { selectedProjectId } = useSelectedProject();
+  const { refreshAll, isRefreshing, timeSinceRefresh } = useGlobalRefresh();
   const { data: stats } = trpc.dashboard.stats.useQuery(
     { projectId: selectedProjectId ?? undefined },
     { enabled: !!selectedProjectId }
@@ -246,17 +251,78 @@ export function AppSidebar() {
         </Tooltip>
       </div>
 
-      {/* Project Selector */}
-      {!collapsed && selectedProjectId && stats && (
-        <div className="p-3 border-b border-slate-200 bg-slate-50">
-          <div className="text-xs font-semibold text-slate-600 mb-1">Projeto Ativo</div>
-          <div className="text-sm font-medium text-slate-900">
-            Projeto #{selectedProjectId}
-          </div>
-          <div className="flex gap-2 mt-2 text-xs text-slate-600">
-            <span>{stats.totals.mercados} mercados</span>
-            <span>•</span>
-            <span>{stats.totals.leads} leads</span>
+      {/* Seção de Seleção de Contexto - Fase 75 */}
+      {!collapsed && (
+        <div className="p-4 border-b-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <div className="space-y-3">
+            {/* Título da Seção */}
+            <div className="flex items-center gap-2">
+              <Folder className="w-4 h-4 text-blue-600" />
+              <h3 className="text-xs font-bold text-blue-900 uppercase tracking-wide">
+                Contexto de Trabalho
+              </h3>
+            </div>
+
+            {/* Seletor de Projeto */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-700">
+                📁 Projeto
+              </label>
+              <ProjectSelector />
+            </div>
+
+            {/* Seletor de Pesquisa */}
+            {selectedProjectId && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-700">
+                    🔍 Pesquisa
+                  </label>
+                  <span className="text-[9px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">
+                    Ativa
+                  </span>
+                </div>
+                <PesquisaSelector />
+              </div>
+            )}
+
+            {/* Botão de Atualização */}
+            <Button
+              onClick={refreshAll}
+              disabled={isRefreshing}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              size="sm"
+            >
+              <Activity className={cn("w-4 h-4 mr-2", isRefreshing && "animate-spin")} />
+              {isRefreshing ? "Atualizando..." : "Atualizar Dados"}
+            </Button>
+
+            {/* Timestamp da última atualização */}
+            {timeSinceRefresh && (
+              <div className="text-[10px] text-center text-slate-500">
+                ⏱️ Atualizado {timeSinceRefresh}
+              </div>
+            )}
+
+            {/* Estatísticas Rápidas */}
+            {selectedProjectId && stats && (
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-blue-200">
+                <div className="flex items-center gap-1.5 px-2 py-1.5 bg-white rounded-md shadow-sm">
+                  <Package className="w-3.5 h-3.5 text-purple-600" />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-500 font-medium">Mercados</span>
+                    <span className="text-xs font-bold text-slate-900">{stats.totals.mercados}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 px-2 py-1.5 bg-white rounded-md shadow-sm">
+                  <TrendingUp className="w-3.5 h-3.5 text-green-600" />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-500 font-medium">Leads</span>
+                    <span className="text-xs font-bold text-slate-900">{stats.totals.leads}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
