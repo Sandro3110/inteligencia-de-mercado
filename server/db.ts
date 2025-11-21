@@ -1276,7 +1276,7 @@ export async function updateProject(
 
     // Log de auditoria com comparação
     if (oldProject) {
-      const changes: Record<string, { before: any; after: any }> = {};
+      const changes: Record<string, { before: unknown; after: unknown }> = {};
 
       if (data.nome !== undefined && data.nome !== oldProject.nome) {
         changes.nome = { before: oldProject.nome, after: data.nome };
@@ -1331,7 +1331,17 @@ export async function deleteProject(id: number): Promise<boolean> {
  */
 export async function canDeleteProject(
   projectId: number
-): Promise<{ canDelete: boolean; reason?: string; stats?: any }> {
+): Promise<{
+  canDelete: boolean;
+  reason?: string;
+  stats?: {
+    pesquisas: number;
+    mercados: number;
+    clientes: number;
+    concorrentes: number;
+    leads: number;
+  };
+}> {
   const db = await getDb();
   if (!db) {
     return { canDelete: false, reason: "Database not available" };
@@ -1585,8 +1595,8 @@ export async function logProjectChange(
   projectId: number,
   userId: string | null,
   action: "created" | "updated" | "hibernated" | "reactivated" | "deleted",
-  changes?: Record<string, { before: any; after: any }>,
-  metadata?: Record<string, any>
+  changes?: Record<string, { before: unknown; after: unknown }>,
+  metadata?: Record<string, unknown>
 ): Promise<void> {
   const db = await getDb();
   if (!db) {
@@ -1730,7 +1740,7 @@ export async function duplicateProject(
     }
 
     return { success: true, newProjectId };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[Database] Failed to duplicate project:", error);
     return { success: false, error: error.message };
   }
@@ -2034,7 +2044,7 @@ export async function updateMercado(
     return null;
   }
 
-  const updateData: any = {};
+  const updateData: Record<string, unknown> = {};
   if (data.nome !== undefined) {
     updateData.nome = data.nome;
   }
@@ -2293,7 +2303,7 @@ export async function updateCliente(
     return null;
   }
 
-  const updateData: any = {};
+  const updateData: Record<string, unknown> = {};
   Object.keys(data).forEach(key => {
     if (data[key as keyof typeof data] !== undefined) {
       updateData[key] = data[key as keyof typeof data];
@@ -2464,7 +2474,7 @@ export async function updateConcorrente(
     return null;
   }
 
-  const updateData: any = {};
+  const updateData: Record<string, unknown> = {};
   Object.keys(data).forEach(key => {
     if (data[key as keyof typeof data] !== undefined) {
       updateData[key] = data[key as keyof typeof data];
@@ -2641,7 +2651,7 @@ export async function updateLead(
     return null;
   }
 
-  const updateData: any = {};
+  const updateData: Record<string, unknown> = {};
   Object.keys(data).forEach(key => {
     if (data[key as keyof typeof data] !== undefined) {
       updateData[key] = data[key as keyof typeof data];
@@ -2732,7 +2742,7 @@ export async function updateTemplate(
     return null;
   }
 
-  const updateData: any = {};
+  const updateData: Record<string, unknown> = {};
   Object.keys(data).forEach(key => {
     if (data[key as keyof typeof data] !== undefined) {
       updateData[key] = data[key as keyof typeof data];
@@ -2771,7 +2781,7 @@ export async function deleteTemplate(id: number) {
 
 export async function searchLeadsAdvanced(
   projectId: number,
-  filter: any,
+  filter: { status?: string; tags?: string[] },
   page = 1,
   pageSize = 20
 ) {
@@ -3279,7 +3289,7 @@ export async function updateEnrichmentRun(
   const { enrichmentRuns } = await import("../drizzle/schema");
 
   // Convert Date to MySQL timestamp string
-  const updateData: any = { ...data };
+  const updateData: Record<string, unknown> = { ...data };
   if (data.completedAt) {
     updateData.completedAt = toMySQLTimestamp(data.completedAt);
   }
@@ -3623,7 +3633,7 @@ export async function getFunnelData(projectId: number) {
 
   // Mapear para objeto
   const stageCounts: Record<string, number> = {};
-  stageCountsResult.forEach((row: any) => {
+  stageCountsResult.forEach((row: { stage: string; count: number }) => {
     stageCounts[row.stage] = row.count;
   });
 
@@ -4279,7 +4289,7 @@ export async function saveEnrichmentConfig(data: {
 
   try {
     // Criptografar API keys antes de salvar
-    const encryptedData: any = { ...data };
+    const encryptedData: Record<string, unknown> = { ...data };
 
     if (data.openaiApiKey) {
       encryptedData.openaiApiKey = encryptApiKey(data.openaiApiKey);
@@ -4505,8 +4515,8 @@ export async function getQualityTrends(projectId: number, days = 30) {
       // Agrupar por data e calcular qualidade média
       const dataPoints: Record<string, { total: number; count: number }> = {};
 
-      const processarEntidades = (entidades: any[]) => {
-        entidades.forEach((e: any) => {
+      const processarEntidades = (entidades: unknown[]) => {
+        entidades.forEach((e: Record<string, unknown>) => {
           const entity = e.clientes || e.concorrentes || e.leads || e;
           if (!entity.createdAt) {
             return;

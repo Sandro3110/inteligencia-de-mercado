@@ -33,10 +33,10 @@ export type EnrichmentProgress = {
   data?: {
     projectId?: number;
     projectName?: string;
-    clientes?: any[];
-    mercados?: any[];
-    concorrentes?: any[];
-    leads?: any[];
+    clientes?: Array<Record<string, unknown>>;
+    mercados?: Array<Record<string, unknown>>;
+    concorrentes?: Array<Record<string, unknown>>;
+    leads?: Array<Record<string, unknown>>;
     stats?: {
       mercadosCount?: number;
       clientesCount?: number;
@@ -561,7 +561,7 @@ async function enrichClientes(
 
   for (const cliente of clientes) {
     // Tentar buscar dados do cache primeiro
-    let dadosEnriquecidos: any = null;
+    let dadosEnriquecidos: Record<string, unknown> | null = null;
     if (cliente.cnpj) {
       const cnpjLimpo = cliente.cnpj.replace(/\D/g, "");
       if (cnpjLimpo.length === 14) {
@@ -746,7 +746,7 @@ async function enrichClientes(
     }
 
     // Usar dados enriquecidos se disponíveis
-    const clienteData: any = {
+    const clienteData: Record<string, unknown> = {
       ...cliente,
       nome: dadosEnriquecidos?.nome || cliente.nome,
       porte: dadosEnriquecidos?.porte,
@@ -823,7 +823,7 @@ async function findCompetitorsForMarkets(
   const { createConcorrente } = await import("./db");
   const { filterDuplicates } = await import("./_core/deduplication");
   const { filterRealCompanies } = await import("./_core/companyFilters");
-  const concorrentes: any[] = [];
+  const concorrentes: Array<Record<string, unknown>> = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {
@@ -968,7 +968,7 @@ async function findLeadsForMarkets(
   const { createLead } = await import("./db");
   const { filterDuplicates } = await import("./_core/deduplication");
   const { filterRealCompanies } = await import("./_core/companyFilters");
-  const leads: any[] = [];
+  const leads: Array<Record<string, unknown>> = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {

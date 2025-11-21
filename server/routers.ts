@@ -1569,7 +1569,7 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const { updateAlertConfig } = await import("./db");
         const { id, type, enabled, ...rest } = input;
-        const updateData: any = { ...rest };
+        const updateData: Record<string, unknown> = { ...rest };
         if (type !== undefined) {
           updateData.alertType = type;
         }
@@ -2238,7 +2238,12 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        const results: any = { openai: false, serpapi: false };
+        const results: {
+          openai: boolean;
+          openaiMessage?: string;
+          serpapi: boolean;
+          serpapiMessage?: string;
+        } = { openai: false, serpapi: false };
 
         // Testar OpenAI
         try {
@@ -2251,9 +2256,11 @@ export const appRouter = router({
           results.openaiMessage = response.ok
             ? "Chave válida"
             : "Chave inválida";
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           results.openai = false;
-          results.openaiMessage = error.message;
+          results.openaiMessage = errorMessage;
         }
 
         // Testar SerpAPI (se fornecida)
@@ -2267,9 +2274,11 @@ export const appRouter = router({
             results.serpapiMessage = results.serpapi
               ? "Chave válida"
               : "Chave inválida";
-          } catch (error: any) {
+          } catch (error: unknown) {
+            const errorMessage =
+              error instanceof Error ? error.message : String(error);
             results.serpapi = false;
-            results.serpapiMessage = error.message;
+            results.serpapiMessage = errorMessage;
           }
         }
 
