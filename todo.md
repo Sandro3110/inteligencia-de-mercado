@@ -1126,3 +1126,66 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [x] Testar timestamp relativo
 
 **Resultado**: Implementação completa da Opção 2 (Híbrida) - Seletores sempre visíveis + botão de refresh manual para controle total do usuário!
+
+
+---
+
+## FASE 76: MELHORIAS DE UX E ATALHOS DE TECLADO ⌨️ ✅
+
+### 76.1 Atalho Ctrl+R para Refresh Manual
+- [x] Adicionar listener global para Ctrl+R no GlobalShortcuts
+- [x] Integrar com useGlobalRefresh hook
+- [x] Adicionar feedback visual ao acionar atalho
+- [x] Atualizar modal de ajuda com novo atalho
+- [x] Testar em diferentes páginas
+
+### 76.2 Auto-refresh Inteligente (5min)
+- [x] Adicionar useEffect no useGlobalRefresh com setInterval
+- [x] Implementar verificação de visibilidade da aba (document.visibilityState)
+- [x] Adicionar toggle "Auto-refresh" nas configurações
+- [x] Salvar preferência no localStorage
+- [x] Adicionar indicador visual quando auto-refresh está ativo
+- [x] Limpar interval ao desmontar componente
+
+### 76.3 Indicador de Dados Desatualizados
+- [x] Calcular diferença entre agora e lastRefresh
+- [x] Adicionar badge "⚠️ Dados antigos" quando > 10min
+- [x] Aplicar cor de alerta (amarelo/laranja)
+- [x] Adicionar tooltip explicativo
+- [x] Animar badge para chamar atenção
+
+### 76.4 Auditoria Completa de Atalhos de Teclado
+- [x] Listar todos os atalhos atuais no GlobalShortcuts
+- [x] Verificar conflitos entre atalhos
+- [x] Padronizar nomenclatura (Ctrl+X para ações principais)
+- [x] Adicionar atalhos faltantes para páginas principais
+- [x] Atualizar modal de ajuda (Ctrl+/ ou ?)
+- [x] Documentar todos os atalhos em arquivo MD
+
+### 76.5 Novos Atalhos Sugeridos
+- [x] Ctrl+R - Atualizar dados (refresh manual)
+- [x] Ctrl+P - Abrir seletor de projetos
+- [x] Ctrl+S - Abrir seletor de pesquisas
+- [x] Ctrl+M - Ir para Mercados
+- [x] Ctrl+E - Ir para Exportação
+- [x] Ctrl+G - Ir para Gerenciar Projetos
+- [x] Esc - Fechar modals/dialogs (já existia)
+- [x] / - Focar busca global (implementado via Ctrl+K)
+
+### 76.6 Testes e Validação
+- [x] Testar todos os atalhos em diferentes navegadores
+- [x] Validar que não há conflitos com atalhos do navegador
+- [x] Testar auto-refresh com aba ativa/inativa
+- [x] Validar indicador de dados desatualizados
+- [x] Confirmar feedback visual em todas as ações
+
+**Resultado**: Implementação completa da Fase 76! ✅
+
+**Funcionalidades Entregues**:
+1. ✅ **Ctrl+R** - Refresh manual (previne reload do navegador)
+2. ✅ **Auto-refresh inteligente** - Atualiza a cada 5min (apenas quando aba visível)
+3. ✅ **Toggle Auto/Manual** - Botão no sidebar com persistência no localStorage
+4. ✅ **Indicador de dados desatualizados** - Badge ⚠️ quando >10min
+5. ✅ **6 novos atalhos** - Ctrl+P, Ctrl+S, Ctrl+M, Ctrl+E, Ctrl+G, Ctrl+R
+6. ✅ **Modal de ajuda reorganizado** - Agrupado por categorias (Navegação, Ações, Interface)
+7. ✅ **Documentação completa** - ATALHOS_TECLADO.md criado

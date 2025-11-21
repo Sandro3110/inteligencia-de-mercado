@@ -163,7 +163,14 @@ export function AppSidebar() {
   );
 
   const { selectedProjectId } = useSelectedProject();
-  const { refreshAll, isRefreshing, timeSinceRefresh } = useGlobalRefresh();
+  const { 
+    refreshAll, 
+    isRefreshing, 
+    timeSinceRefresh, 
+    autoRefreshEnabled, 
+    toggleAutoRefresh,
+    isDataStale,
+  } = useGlobalRefresh({ enableAutoRefresh: false });
   const { data: stats } = trpc.dashboard.stats.useQuery(
     { projectId: selectedProjectId ?? undefined },
     { enabled: !!selectedProjectId }
@@ -297,10 +304,59 @@ export function AppSidebar() {
               {isRefreshing ? "Atualizando..." : "Atualizar Dados"}
             </Button>
 
-            {/* Timestamp da última atualização */}
-            {timeSinceRefresh && (
-              <div className="text-[10px] text-center text-slate-500">
-                ⏱️ Atualizado {timeSinceRefresh}
+            {/* Timestamp da última atualização + Indicador de dados desatualizados */}
+            <div className="flex items-center justify-between gap-2">
+              {timeSinceRefresh && (
+                <div className={cn(
+                  "text-[10px] text-slate-500 flex items-center gap-1",
+                  isDataStale && "text-orange-600 font-semibold"
+                )}>
+                  {isDataStale && <span className="animate-pulse">⚠️</span>}
+                  ⏱️ Atualizado {timeSinceRefresh}
+                </div>
+              )}
+              
+              {/* Toggle Auto-refresh */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={toggleAutoRefresh}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-6 px-2 text-[10px]",
+                      autoRefreshEnabled 
+                        ? "bg-green-100 text-green-700 hover:bg-green-200" 
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    )}
+                  >
+                    {autoRefreshEnabled ? (
+                      <>
+                        <Activity className="w-3 h-3 mr-1 animate-pulse" />
+                        Auto
+                      </>
+                    ) : (
+                      <>
+                        <Activity className="w-3 h-3 mr-1" />
+                        Manual
+                      </>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  {autoRefreshEnabled 
+                    ? "Auto-refresh ativo (5min)" 
+                    : "Clique para ativar auto-refresh"}
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            
+            {/* Badge de dados desatualizados (destaque maior) */}
+            {isDataStale && (
+              <div className="flex items-center gap-1.5 px-2 py-1.5 bg-orange-50 border border-orange-200 rounded-md">
+                <span className="text-orange-600 text-xs font-semibold animate-pulse">
+                  ⚠️ Dados podem estar desatualizados
+                </span>
               </div>
             )}
 
