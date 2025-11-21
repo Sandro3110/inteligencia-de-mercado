@@ -1266,3 +1266,42 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [ ] Testar breadcrumbs em todas as páginas principais
 - [ ] Validar atalho Ctrl+Shift+P e navegação por teclado
 - [ ] Confirmar que não há erros TypeScript
+
+
+---
+
+## FASE 79: CORREÇÕES CRÍTICAS DO SIDEBAR - HIERARQUIA, SCROLL E HOVER 🎯
+
+### 79.1 Restaurar Hierarquia Projeto → Pesquisa
+- [x] Adicionar ProjectSelector de volta no sidebar
+- [x] Posicionar ProjectSelector acima do PesquisaSelector
+- [x] Garantir hierarquia clara: Projeto → Pesquisa
+- [x] PesquisaSelector deve filtrar por projeto selecionado
+
+### 79.2 Eliminar Scroll Horizontal
+- [x] Identificar causa do scroll horizontal no sidebar
+- [x] Ajustar larguras de elementos internos
+- [x] Garantir overflow-x: hidden no sidebar
+- [x] Testar em diferentes resoluções
+
+### 79.3 Sidebar com Hover e Botão de Fixar
+- [x] Implementar modo hover (sidebar aparece ao passar mouse)
+- [x] Adicionar botão de "fixar" (pin) no topo do sidebar
+- [x] Sidebar recolhida por padrão (apenas ícones)
+- [x] Ao passar mouse, sidebar expande automaticamente
+- [x] Ao clicar em "fixar", sidebar fica expandida permanentemente
+- [x] Salvar preferência de fixação no localStorage
+- [x] Adicionar animações suaves de transição
+
+### 79.4 Melhorias de UX
+- [x] Botão de voltar/expandir sempre visível
+- [x] Tooltips nos ícones quando sidebar está recolhida
+- [x] Indicador visual de sidebar fixada vs hover
+- [x] Melhorar contraste e visibilidade dos elementos
+
+### 79.5 Testes e Validação
+- [x] Testar hierarquia Projeto → Pesquisa
+- [x] Validar que não há scroll horizontal
+- [x] Testar modo hover em diferentes resoluções
+- [x] Validar persistência de preferência de fixação
+- [x] Testar transições e animações

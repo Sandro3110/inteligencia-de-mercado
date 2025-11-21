@@ -147,6 +147,7 @@ const navSections: NavSection[] = [
 ];
 
 const STORAGE_KEY = 'sidebar-collapsed';
+const PINNED_KEY = 'sidebar-pinned';
 
 export function AppSidebar() {
   const [location, setLocation] = useLocation();
@@ -155,6 +156,14 @@ export function AppSidebar() {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored === 'true';
   });
+  const [pinned, setPinned] = useState(() => {
+    const stored = localStorage.getItem(PINNED_KEY);
+    return stored === 'true';
+  });
+  const [hovering, setHovering] = useState(false);
+
+  // Sidebar está expandida se estiver fixada OU em hover
+  const isExpanded = pinned || hovering;
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
     navSections.reduce((acc, section) => {
       acc[section.title] = section.defaultOpen ?? false;
@@ -193,8 +202,16 @@ export function AppSidebar() {
     });
   };
 
+  const togglePinned = () => {
+    setPinned(prev => {
+      const newValue = !prev;
+      localStorage.setItem(PINNED_KEY, String(newValue));
+      return newValue;
+    });
+  };
+
   const toggleSection = (title: string) => {
-    if (!collapsed) {
+    if (isExpanded) {
       setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
     }
   };
@@ -218,14 +235,16 @@ export function AppSidebar() {
 
   return (
     <aside 
+      onMouseEnter={() => !pinned && setHovering(true)}
+      onMouseLeave={() => !pinned && setHovering(false)}
       className={cn(
-        "fixed left-0 top-0 h-screen bg-white border-r border-slate-200 overflow-y-auto z-50 transition-all duration-300",
-        collapsed ? "w-16" : "w-64"
+        "fixed left-0 top-0 h-screen bg-white border-r border-slate-200 overflow-y-auto overflow-x-hidden z-50 transition-all duration-300",
+        isExpanded ? "w-64" : "w-16"
       )}
     >
-      {/* Logo + Toggle */}
-      <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-        {!collapsed && (
+      {/* Logo + Toggle + Pin */}
+      <div className="p-4 border-b border-slate-200 flex items-center justify-between gap-2">
+        {isExpanded && (
           <Link href="/">
             <span className="flex items-center gap-2 cursor-pointer">
               <BarChart3 className="w-6 h-6 text-blue-600" />
@@ -236,36 +255,46 @@ export function AppSidebar() {
             </span>
           </Link>
         )}
-        {collapsed && (
+        {!isExpanded && (
           <Link href="/">
             <BarChart3 className="w-6 h-6 text-blue-600 cursor-pointer mx-auto" />
           </Link>
         )}
-        {/* Botão de Toggle - SEMPRE VISÍVEL */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleSidebar}
-              className={cn(
-                "h-8 w-8 shrink-0",
-                collapsed && "mx-auto bg-blue-50 hover:bg-blue-100 border border-blue-200"
-              )}
-            >
-              {collapsed ? <ChevronRight className="w-4 h-4 text-blue-600" /> : <ChevronLeft className="w-4 h-4" />}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right">
-            {collapsed ? 'Expandir menu' : 'Recolher menu'}
-          </TooltipContent>
-        </Tooltip>
+        {/* Botão de Fixar - SEMPRE VISÍVEL quando expandido */}
+        {isExpanded && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={togglePinned}
+                className={cn(
+                  "h-8 w-8 shrink-0",
+                  pinned ? "bg-blue-100 text-blue-700 hover:bg-blue-200" : "hover:bg-slate-100"
+                )}
+              >
+                {pinned ? (
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              {pinned ? 'Desafixar menu' : 'Fixar menu'}
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
 
       {/* Seção de Seleção de Projeto e Pesquisa */}
-      {!collapsed && (
-        <div className="p-4 border-b-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
-          <div className="space-y-3">
+      {isExpanded && (
+        <div className="p-4 border-b-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 max-w-full overflow-hidden">
+          <div className="space-y-3 max-w-full overflow-hidden">
             {/* Seletor de Projeto */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
@@ -398,11 +427,11 @@ export function AppSidebar() {
                 onClick={() => toggleSection(section.title)}
                 className={cn(
                   "w-full flex items-center justify-between px-3 py-2 rounded-md transition-colors",
-                  collapsed ? "justify-center" : "",
+                  !isExpanded ? "justify-center" : "",
                   section.priority === 'core' ? "hover:bg-blue-50" : "hover:bg-slate-100"
                 )}
               >
-                {collapsed ? (
+                {!isExpanded ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="flex items-center">
@@ -442,7 +471,7 @@ export function AppSidebar() {
 
                     return (
                       <Link key={item.href} href={item.href}>
-                        {collapsed ? (
+                        {!isExpanded ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <a

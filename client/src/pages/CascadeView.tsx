@@ -886,15 +886,15 @@ export default function CascadeView() {
   return (
     <div className={`h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100 overflow-x-hidden transition-all duration-300 ${sidebarClass}`}>
       {/* Header Simplificado */}
-      <div className="flex items-center justify-between px-6 py-2 border-b border-border/40 flex-wrap gap-2">
-        <div className="flex items-center gap-6">
+      <div className="flex items-center justify-between px-6 py-2 border-b border-border/40 gap-4">
+        <div className="flex items-center gap-6 min-w-0">
           <DynamicBreadcrumbs />
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-10">
-                <Download className="w-4 h-4 mr-2" />
+              <Button variant="outline" size="sm" className="h-9 whitespace-nowrap">
+                <Download className="w-4 h-4 mr-1.5" />
                 Exportar Filtrados
               </Button>
             </DropdownMenuTrigger>
@@ -918,8 +918,8 @@ export default function CascadeView() {
           {selectedItems.size > 0 && currentPage !== "mercados" && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="default" className="h-10">
-                  <Download className="w-4 h-4 mr-2" />
+                <Button variant="default" size="sm" className="h-9 whitespace-nowrap">
+                  <Download className="w-4 h-4 mr-1.5" />
                   Exportar Selecionados ({selectedItems.size})
                 </Button>
               </DropdownMenuTrigger>
