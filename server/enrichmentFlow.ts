@@ -373,9 +373,12 @@ async function identifyMarkets(
   for (const produto of produtosUnicos) {
     if (!produto) continue;
 
+    const startTime = Date.now();
     try {
       // Usar LLM para identificar mercado (com retry automático)
       const { withLLMRetry } = await import('./_core/retryHelper');
+      const { logAPICall } = await import('./apiHealth');
+      
       const response = await withLLMRetry(
         () => invokeLLM({
       messages: [
@@ -411,6 +414,16 @@ async function identifyMarkets(
       );
 
       const content = response.choices[0]?.message?.content;
+      
+      // Log de sucesso da API
+      await logAPICall({
+        apiName: 'openai',
+        endpoint: '/chat/completions',
+        status: 'success',
+        responseTime: Date.now() - startTime,
+        requestData: JSON.stringify({ produto, action: 'identificar_mercado' })
+      });
+      
       if (!content || typeof content !== 'string') {
         console.warn(`[Enriquecimento] LLM retornou conteúdo inválido para produto: ${produto}`);
         continue;
@@ -434,6 +447,23 @@ async function identifyMarkets(
       }
     } catch (error) {
       console.error(`[Enriquecimento] Erro ao identificar mercado para produto "${produto}":`, error);
+      
+      // Log de erro da API
+      try {
+        const { logAPICall } = await import('./apiHealth');
+        const errorTime = Date.now() - startTime;
+        await logAPICall({
+          apiName: 'openai',
+          endpoint: '/chat/completions',
+          status: 'error',
+          responseTime: errorTime,
+          errorMessage: error instanceof Error ? error.message : 'Erro desconhecido',
+          requestData: JSON.stringify({ produto, action: 'identificar_mercado' })
+        });
+      } catch (logError) {
+        console.error('[APIHealth] Erro ao registrar log:', logError);
+      }
+      
       // Notificar owner sobre falha de API
       try {
         const { notifyOwner } = await import('./_core/notification');
@@ -478,8 +508,10 @@ async function enrichClientes(
         
         // Se não tem cache, consultar ReceitaWS
         if (!dadosEnriquecidos) {
+          const apiStartTime = Date.now();
           try {
             const { withAPIRetry } = await import('./_core/retryHelper');
+            const { logAPICall } = await import('./apiHealth');
             const receitaData = await withAPIRetry(
               () => consultarCNPJ(cnpjLimpo),
               'ReceitaWS',
@@ -503,9 +535,34 @@ async function enrichClientes(
             
               // Salvar no cache
               await setCachedEnrichment(cnpjLimpo, dadosEnriquecidos, 'receitaws');
+              
+              // Log de sucesso da API
+              await logAPICall({
+                apiName: 'receitaws',
+                endpoint: '/cnpj',
+                status: 'success',
+                responseTime: Date.now() - apiStartTime,
+                requestData: JSON.stringify({ cnpj: cnpjLimpo, cliente: cliente.nome })
+              });
             }
           } catch (error) {
             console.error(`[Enriquecimento] Erro ao consultar ReceitaWS para CNPJ "${cnpjLimpo}":`, error);
+            
+            // Log de erro da API
+            try {
+              const { logAPICall } = await import('./apiHealth');
+              await logAPICall({
+                apiName: 'receitaws',
+                endpoint: '/cnpj',
+                status: 'error',
+                responseTime: Date.now() - apiStartTime,
+                errorMessage: error instanceof Error ? error.message : 'Erro desconhecido',
+                requestData: JSON.stringify({ cnpj: cnpjLimpo, cliente: cliente.nome })
+              });
+            } catch (logError) {
+              console.error('[APIHealth] Erro ao registrar log:', logError);
+            }
+            
             // Notificar owner sobre falha de API
             try {
               const { notifyOwner } = await import('./_core/notification');
@@ -524,8 +581,10 @@ async function enrichClientes(
     let mercadoId: number | null = null;
 
     if (cliente.produto) {
+      const llmStartTime = Date.now();
       try {
         const { withLLMRetry } = await import('./_core/retryHelper');
+        const { logAPICall } = await import('./apiHealth');
         const response = await withLLMRetry(
           () => invokeLLM({
         messages: [
@@ -540,6 +599,16 @@ async function enrichClientes(
         );
 
         const content = response.choices[0]?.message?.content;
+        
+        // Log de sucesso da API
+        await logAPICall({
+          apiName: 'openai',
+          endpoint: '/chat/completions',
+          status: 'success',
+          responseTime: Date.now() - llmStartTime,
+          requestData: JSON.stringify({ produto: cliente.produto, cliente: cliente.nome, action: 'identificar_mercado_cliente' })
+        });
+        
         if (content && typeof content === 'string') {
           // Buscar mercado correspondente
           for (const [mercadoNome, id] of Array.from(mercadosMap.entries())) {
@@ -551,6 +620,22 @@ async function enrichClientes(
         }
       } catch (error) {
         console.error(`[Enriquecimento] Erro ao identificar mercado do cliente "${cliente.nome}":`, error);
+        
+        // Log de erro da API
+        try {
+          const { logAPICall } = await import('./apiHealth');
+          await logAPICall({
+            apiName: 'openai',
+            endpoint: '/chat/completions',
+            status: 'error',
+            responseTime: Date.now() - llmStartTime,
+            errorMessage: error instanceof Error ? error.message : 'Erro desconhecido',
+            requestData: JSON.stringify({ produto: cliente.produto, cliente: cliente.nome, action: 'identificar_mercado_cliente' })
+          });
+        } catch (logError) {
+          console.error('[APIHealth] Erro ao registrar log:', logError);
+        }
+        
         // Notificar owner sobre falha de API
         try {
           const { notifyOwner } = await import('./_core/notification');

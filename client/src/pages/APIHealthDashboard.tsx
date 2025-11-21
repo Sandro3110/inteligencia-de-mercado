@@ -234,6 +234,38 @@ export default function APIHealthDashboard() {
         )}
       </div>
 
+      {/* Gráfico de Tendências */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Tendências de Desempenho</CardTitle>
+          <CardDescription>Taxa de sucesso por API nos últimos {days} dias</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!stats || stats.length === 0 ? (
+            <div className="text-center py-8 text-slate-500">
+              Nenhum dado disponível ainda
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={stats.map(stat => ({
+                name: API_NAMES[stat.apiName as APIName]?.label || stat.apiName,
+                'Taxa de Sucesso': stat.successRate,
+                'Tempo Médio (ms)': stat.avgResponseTime,
+              }))}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis yAxisId="left" label={{ value: 'Taxa de Sucesso (%)', angle: -90, position: 'insideLeft' }} />
+                <YAxis yAxisId="right" orientation="right" label={{ value: 'Tempo (ms)', angle: 90, position: 'insideRight' }} />
+                <Tooltip />
+                <Legend />
+                <Line yAxisId="left" type="monotone" dataKey="Taxa de Sucesso" stroke="#10b981" strokeWidth={2} />
+                <Line yAxisId="right" type="monotone" dataKey="Tempo Médio (ms)" stroke="#3b82f6" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Histórico de Chamadas */}
       <Card>
         <CardHeader>
