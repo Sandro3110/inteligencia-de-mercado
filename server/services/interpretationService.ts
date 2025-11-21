@@ -1,7 +1,7 @@
 import { invokeLLM } from "../_core/llm";
 import crypto from "crypto";
 import { getDb } from "../db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 /**
  * Entidades extraídas do contexto em linguagem natural
@@ -270,46 +270,44 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
           break;
       }
 
-      let query = `SELECT COUNT(*) as count FROM ${tableName} WHERE 1=1`;
-      const params: any[] = [];
+      // Constrói query usando template string SQL do Drizzle
+      let conditions = sql`1=1`;
 
       // Adiciona filtro de projeto se fornecido
       if (projectId) {
-        query += ` AND projectId = ?`;
-        params.push(projectId);
+        conditions = sql`${conditions} AND projectId = ${projectId}`;
       }
 
       // Adiciona filtros geográficos
       if (entities.geography?.states && entities.geography.states.length > 0) {
-        query += ` AND uf IN (${entities.geography.states.map(() => '?').join(',')})`;
-        params.push(...entities.geography.states);
+        const statesList = entities.geography.states.map(s => sql`${s}`).reduce((acc, curr) => sql`${acc}, ${curr}`);
+        conditions = sql`${conditions} AND uf IN (${statesList})`;
       }
 
       // Adiciona filtros de qualidade
       if (entities.quality?.minScore) {
-        query += ` AND quality_score >= ?`;
-        params.push(entities.quality.minScore);
+        conditions = sql`${conditions} AND qualidadeScore >= ${entities.quality.minScore}`;
       }
 
       if (entities.quality?.status && entities.quality.status.length > 0) {
-        query += ` AND status IN (${entities.quality.status.map(() => '?').join(',')})`;
-        params.push(...entities.quality.status);
+        const statusList = entities.quality.status.map(s => sql`${s}`).reduce((acc, curr) => sql`${acc}, ${curr}`);
+        conditions = sql`${conditions} AND status IN (${statusList})`;
       }
 
       // Adiciona filtros de porte
       if (entities.size?.porte && entities.size.porte.length > 0) {
-        query += ` AND porte IN (${entities.size.porte.map(() => '?').join(',')})`;
-        params.push(...entities.size.porte);
+        const porteList = entities.size.porte.map(p => sql`${p}`).reduce((acc, curr) => sql`${acc}, ${curr}`);
+        conditions = sql`${conditions} AND porte IN (${porteList})`;
       }
 
       // Adiciona filtros de segmentação
       if (entities.segmentation?.type && entities.segmentation.type.length > 0) {
-        query += ` AND segmentacao IN (${entities.segmentation.type.map(() => '?').join(',')})`;
-        params.push(...entities.segmentation.type);
+        const typeList = entities.segmentation.type.map(t => sql`${t}`).reduce((acc, curr) => sql`${acc}, ${curr}`);
+        conditions = sql`${conditions} AND segmentacao IN (${typeList})`;
       }
 
       // Executa query
-      const result: any = await db.execute(query);
+      const result: any = await db.execute(sql`SELECT COUNT(*) as count FROM ${sql.identifier(tableName)} WHERE ${conditions}`);
       return result[0]?.count || 0;
     } catch (error) {
       console.error('[InterpretationService] Erro ao estimar registros:', error);

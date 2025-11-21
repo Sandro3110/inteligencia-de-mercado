@@ -1199,3 +1199,81 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [ ] Testar sistema de alertas com diferentes thresholds
 - [ ] Validar notificações automáticas
 - [ ] Verificar performance das queries
+
+
+---
+
+## FASE 64: TESTES COMPLETOS DE FUNCIONALIDADES E CORREÇÃO DE BUGS 🧪
+
+### 64.1 Testes de Autenticação e Usuários
+- [ ] Testar login com Manus OAuth
+- [ ] Verificar redirecionamento após login
+- [ ] Testar logout
+- [ ] Verificar persistência de sessão
+- [ ] Testar controle de acesso admin vs user
+- [ ] Verificar criação automática de usuário no primeiro login
+
+### 64.2 Testes de Gestão de Projetos
+- [ ] Testar criação de novo projeto
+- [ ] Testar edição de projeto
+- [ ] Testar hibernação de projeto
+- [ ] Testar reativação de projeto
+- [ ] Testar duplicação de projeto
+- [ ] Testar deleção de projeto vazio
+- [ ] Verificar histórico de auditoria
+- [ ] Testar dashboard de atividade
+
+### 64.3 Testes de Gestão de Pesquisas
+- [ ] Testar criação de pesquisa via wizard (todos os steps)
+- [ ] Testar seleção de projeto no Step 1
+- [ ] Testar configuração de parâmetros no Step 2
+- [ ] Testar escolha de método no Step 3
+- [ ] Testar inserção de dados no Step 4
+- [ ] Testar edição de pesquisa existente
+- [ ] Testar exclusão de pesquisa
+- [ ] Verificar validação de campos obrigatórios
+
+### 64.4 Testes de Enriquecimento de Dados
+- [ ] Testar busca de CNPJ via ReceitaWS
+- [ ] Testar enriquecimento de clientes
+- [ ] Testar enriquecimento de concorrentes
+- [ ] Testar enriquecimento de leads
+- [ ] Verificar tratamento de erros de API
+- [ ] Testar limites de rate limiting
+
+### 64.5 Testes de Análise e Visualização
+- [ ] Testar CascadeView com filtro de pesquisa
+- [ ] Testar expansão de mercados (accordion)
+- [ ] Testar abas (Clientes/Concorrentes/Leads)
+- [ ] Testar busca dentro das abas
+- [ ] Testar ordenação de itens
+- [ ] Testar filtros de qualidade
+- [ ] Verificar gráficos e estatísticas
+- [ ] Testar comparação de mercados
+
+### 64.6 Testes de Ações em Lote
+- [ ] Testar seleção múltipla de itens
+- [ ] Testar validação em lote
+- [ ] Testar marcação como "Rico" em lote
+- [ ] Testar exportação de dados filtrados
+- [ ] Verificar feedback visual (toasts)
+
+### 64.7 Testes de Integrações IA
+- [ ] Testar geração de insights com IA
+- [ ] Testar análise de qualidade automática
+- [ ] Verificar tratamento de erros de API
+- [ ] Testar diferentes prompts
+
+### 64.8 Testes de Interface e UX
+- [ ] Testar navegação entre páginas
+- [ ] Verificar responsividade mobile
+- [ ] Testar feedback visual (loading, erros, sucesso)
+- [ ] Verificar tema escuro
+- [ ] Testar acessibilidade básica
+- [ ] Verificar performance com grandes volumes
+
+### 64.9 Bugs Encontrados
+- [x] BUG #1: Erro SQL no InterpretationService (syntax error com placeholders ?)
+
+### 64.10 Correções Realizadas
+- [x] Corrigido erro SQL no InterpretationService - migrado de placeholders ? para template strings sql do Drizzle
