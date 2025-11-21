@@ -4,14 +4,19 @@ export default defineConfig({
   root: path.resolve(import.meta.dirname),
   test: {
     environment: "node",
-    include: ["server/**/*.test.ts", "server/**/*.spec.ts", "server/__tests__/**/*.test.ts"],
+    include: [
+      "server/**/*.test.ts",
+      "server/**/*.spec.ts",
+      "server/__tests__/**/*.test.ts",
+      "shared/**/*.test.ts",
+    ],
     globals: true,
     testTimeout: 30000,
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
     alias: {
-      '@shared': path.resolve(import.meta.dirname, 'shared'),
-    }
-  }
+      "@shared": path.resolve(import.meta.dirname, "shared"),
+    },
+  },
 });
