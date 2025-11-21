@@ -68,16 +68,7 @@ export async function checkAndSendAlerts(
         content: `O circuit breaker foi ativado no projeto ${projectId} após ${metrics.circuitBreakerFailures} falhas consecutivas. O enriquecimento foi pausado automaticamente para evitar sobrecarga.`,
       });
       
-      // Enviar via SSE
-      const { broadcastNotificationSSE } = await import('./notificationSSEEndpoint');
-      broadcastNotificationSSE({
-        type: 'circuit_breaker',
-        title: '⚠️ Circuit Breaker Ativado',
-        message: `Circuit breaker ativado no projeto ${projectId} após ${metrics.circuitBreakerFailures} falhas consecutivas.`,
-        data: { projectId, failures: metrics.circuitBreakerFailures },
-      });
-
-      // Enviar via WebSocket (legado)
+      // Enviar via WebSocket
       const wsManager = getWebSocketManager();
       if (wsManager) {
         wsManager.broadcast({
@@ -109,16 +100,7 @@ export async function checkAndSendAlerts(
         content: `A taxa de erro no projeto ${projectId} atingiu ${errorRate.toFixed(1)}% (${metrics.errorCount} erros em ${metrics.processedClients} processados). Verifique os logs para identificar o problema.`,
       });
       
-      // Enviar via SSE
-      const { broadcastNotificationSSE } = await import('./notificationSSEEndpoint');
-      broadcastNotificationSSE({
-        type: 'quality_alert',
-        title: '⚠️ Taxa de Erro Elevada',
-        message: `Taxa de erro no projeto ${projectId}: ${errorRate.toFixed(1)}% (${metrics.errorCount} erros).`,
-        data: { projectId, errorRate, errorCount: metrics.errorCount },
-      });
-
-      // Enviar via WebSocket (legado)
+      // Enviar via WebSocket
       const wsManager = getWebSocketManager();
       if (wsManager) {
         wsManager.broadcast({

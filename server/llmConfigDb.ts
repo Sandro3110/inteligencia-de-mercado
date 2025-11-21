@@ -38,7 +38,7 @@ export async function upsertLLMConfig(data: InsertLLMProviderConfig): Promise<vo
   if (existing) {
     await db
       .update(llmProviderConfigs)
-      .set({ ...data, updatedAt: new Date().toISOString() })
+      .set({ ...data, updatedAt: new Date() })
       .where(eq(llmProviderConfigs.projectId, data.projectId));
   } else {
     await db.insert(llmProviderConfigs).values(data);
@@ -97,7 +97,7 @@ export async function upsertAlertsConfig(data: InsertIntelligentAlertsConfig): P
   if (existing) {
     await db
       .update(intelligentAlertsConfigs)
-      .set({ ...data, updatedAt: new Date().toISOString() })
+      .set({ ...data, updatedAt: new Date() })
       .where(eq(intelligentAlertsConfigs.projectId, data.projectId));
   } else {
     await db.insert(intelligentAlertsConfigs).values(data);
@@ -137,7 +137,7 @@ export async function markAlertAsRead(alertId: number): Promise<void> {
 
   await db
     .update(intelligentAlertsHistory)
-    .set({ isRead: 1, readAt: new Date().toISOString() })
+    .set({ isRead: 1, readAt: new Date() })
     .where(eq(intelligentAlertsHistory.id, alertId));
 }
 
@@ -147,7 +147,7 @@ export async function dismissAlert(alertId: number): Promise<void> {
 
   await db
     .update(intelligentAlertsHistory)
-    .set({ isDismissed: 1, dismissedAt: new Date().toISOString() })
+    .set({ isDismissed: 1, dismissedAt: new Date() })
     .where(eq(intelligentAlertsHistory.id, alertId));
 }
 
@@ -163,14 +163,13 @@ export async function getAlertsStats(projectId: number, hours: number = 24): Pro
   }
 
   const since = new Date(Date.now() - hours * 60 * 60 * 1000);
-  const sinceStr = since.toISOString();
 
   const alerts = await db
     .select()
     .from(intelligentAlertsHistory)
     .where(eq(intelligentAlertsHistory.projectId, projectId));
 
-  const recentAlerts = alerts.filter(a => a.createdAt && a.createdAt >= sinceStr);
+  const recentAlerts = alerts.filter(a => a.createdAt && a.createdAt >= since);
 
   const byType: Record<string, number> = {};
   const bySeverity: Record<string, number> = {};

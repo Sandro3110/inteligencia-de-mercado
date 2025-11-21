@@ -39,7 +39,6 @@ interface NavItem {
   icon: any;
   shortcut?: string;
   badge?: string;
-  dynamicBadge?: boolean;
 }
 
 interface NavSection {
@@ -106,7 +105,6 @@ const navSections: NavSection[] = [
     priority: 'medium',
     defaultOpen: false,
     items: [
-      { title: "Notificações", href: "/configuracoes/notificacoes", icon: Bell },
       { title: "Templates Exportação", href: "/export/templates", icon: FileText },
       { title: "Parâmetros Enriquecimento", href: "/enrichment-settings", icon: Settings },
       { title: "Alertas Inteligentes", href: "/intelligent-alerts", icon: Sparkles },
@@ -125,11 +123,11 @@ const navSections: NavSection[] = [
     priority: 'low',
     defaultOpen: false,
     items: [
-      { title: "Notificações", href: "/notificacoes", icon: Bell, dynamicBadge: true },
+      { title: "Notificações", href: "/notificacoes", icon: Bell, badge: "Novo" },
       { title: "Monitoramento", href: "/monitoring", icon: Activity },
       { title: "Atividade de Projetos", href: "/projetos/atividade", icon: FolderOpen, badge: "Novo" },
       { title: "Registro de Atividades", href: "/atividade", icon: Clock },
-      { title: "Histórico de Alertas", href: "/alertas/historico", icon: AlertCircle },
+      { title: "Histórico de Alertas", href: "/alertas/historico", icon: Bell },
       { title: "Dashboard Geral", href: "/dashboard", icon: BarChart3, shortcut: "Ctrl+D" },
     ],
   },
@@ -155,9 +153,6 @@ export function AppSidebar() {
     { projectId: selectedProjectId ?? undefined },
     { enabled: !!selectedProjectId }
   );
-
-  // Contador de notificações não lidas
-  const { data: unreadCount = 0 } = trpc.notifications.unreadCount.useQuery();
 
   // Listener para evento de toggle sidebar
   useEffect(() => {
@@ -351,12 +346,7 @@ export function AppSidebar() {
                               <ItemIcon className="w-4 h-4" />
                               <span className="text-sm">{item.title}</span>
                             </div>
-                            {item.dynamicBadge && unreadCount > 0 && (
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-red-500 text-white font-semibold animate-pulse">
-                                {unreadCount}
-                              </span>
-                            )}
-                            {item.badge && !item.dynamicBadge && (
+                            {item.badge && (
                               <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold">
                                 {item.badge}
                               </span>

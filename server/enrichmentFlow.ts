@@ -76,14 +76,6 @@ export async function executeEnrichmentFlow(
       jobManager.createJob(jobId, totalSteps);
     }
 
-    // Enviar notificação de início via SSE
-    const { broadcastNotificationSSE } = await import('./notificationSSEEndpoint');
-    broadcastNotificationSSE({
-      type: 'enrichment_started',
-      title: '🚀 Enriquecimento Iniciado',
-      message: `Processando ${input.clientes.length} clientes...`,
-    });
-
     // Passo 1: Criar ou reusar projeto
     let project: { id: number; nome: string } | null = null;
     
@@ -272,28 +264,12 @@ export async function executeEnrichmentFlow(
         content: `O enriquecimento foi concluído com sucesso!\n\n• ${clientesEnriquecidos.length} clientes processados\n• ${mercadosMap.size} mercados identificados\n• ${concorrentes.length} concorrentes encontrados\n• ${leadsEncontrados.length} leads gerados\n• Tempo total: ${Math.floor(durationSeconds / 60)} minutos`,
       });
       
-      // Enviar notificação em tempo real via SSE
-      broadcastNotificationSSE({
-        type: 'enrichment_complete',
-        title: '✅ Enriquecimento Concluído',
-        message: `Projeto "${project.nome}" processado! ${clientesEnriquecidos.length} clientes, ${mercadosMap.size} mercados, ${concorrentes.length} concorrentes, ${leadsEncontrados.length} leads.`,
-        data: {
-          projectId: project.id,
-          projectName: project.nome,
-          stats: {
-            clientesCount: clientesEnriquecidos.length,
-            mercadosCount: mercadosMap.size,
-            concorrentesCount: concorrentes.length,
-            leadsCount: leadsEncontrados.length,
-            avgQualityScore,
-          },
-        },
-      });
-
-      // Enviar notificação em tempo real via WebSocket (legado)
+      // Enviar notificação em tempo real via WebSocket
       const { getWebSocketManager } = await import('./websocket');
       const wsManager = getWebSocketManager();
       if (wsManager) {
+        // TODO: Obter userId do contexto quando disponível
+        // Por enquanto, broadcast para todos os usuários conectados
         wsManager.broadcast({
           id: `enrichment-${project.id}-${Date.now()}`,
           type: 'enrichment_complete',
@@ -367,18 +343,6 @@ export async function executeEnrichmentFlow(
         errorMessage,
       });
       console.error(`[Enrichment] Run ${runId} falhou: ${errorMessage}`);
-
-      // Enviar notificação de erro via SSE
-      const { broadcastNotificationSSE } = await import('./notificationSSEEndpoint');
-      broadcastNotificationSSE({
-        type: 'enrichment_error',
-        title: '❌ Erro no Enriquecimento',
-        message: `Falha ao processar dados: ${errorMessage}`,
-        data: {
-          runId,
-          errorMessage,
-        },
-      });
     }
 
     return {
@@ -851,33 +815,6 @@ async function findLeadsForMarkets(
                 totalProcessed: leads.length,
                 newLeadScore: qualidadeScore,
               });
-              
-              // Criar notificação de lead de alta qualidade
-              try {
-                const { createNotification } = await import('./db-notifications');
-                const { ENV } = await import('./_core/env');
-                
-                await createNotification({
-                  userId: ENV.ownerId,
-                  projectId,
-                  type: 'lead_high_quality',
-                  title: `🎯 Lead de Alta Qualidade Identificado!`,
-                  message: `Novo lead com score excelente: ${lead.nome} (${qualidadeScore} pontos) no mercado ${mercadoNome}`,
-                  metadata: {
-                    leadId: novoLead.id,
-                    leadNome: lead.nome,
-                    score: qualidadeScore,
-                    mercadoNome,
-                    mercadoId,
-                    cnpj: lead.cnpj,
-                    site: lead.site,
-                  },
-                  entityType: 'lead',
-                  entityId: novoLead.id,
-                });
-              } catch (error) {
-                console.error('[Notifications] Erro ao criar notificação de lead:', error);
-              }
             }
           }
         } catch (error) {

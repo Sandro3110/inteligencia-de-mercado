@@ -8,39 +8,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useWebSocket } from '@/hooks/useWebSocket';
-import { useNotificationsSSE } from '@/hooks/useNotificationsSSE';
-import { trpc } from '@/lib/trpc';
-import { toast } from 'sonner';
 import { NotificationPanel } from './NotificationPanel';
 import { cn } from '@/lib/utils';
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const { unreadCount, isConnected } = useWebSocket();
-  const utils = trpc.useUtils();
-
-  // Conectar ao SSE para notificações em tempo real
-  const { isConnected: sseConnected } = useNotificationsSSE({
-    onNotification: (notification) => {
-      // Invalidar cache de notificações
-      utils.notifications.list.invalidate();
-      utils.notifications.unreadCount.invalidate();
-
-      // Mostrar toast para notificações importantes
-      if (notification.type !== 'welcome' && notification.title) {
-        toast.info(notification.title, {
-          description: notification.message,
-          duration: 5000,
-        });
-      }
-    },
-    onConnect: () => {
-      console.log('[NotificationBell] SSE conectado');
-    },
-    onDisconnect: () => {
-      console.log('[NotificationBell] SSE desconectado');
-    },
-  });
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
