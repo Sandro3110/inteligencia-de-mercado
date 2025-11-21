@@ -1189,3 +1189,35 @@ Leads: ✅ 60% com coordenadas (3/5)
 5. ✅ **6 novos atalhos** - Ctrl+P, Ctrl+S, Ctrl+M, Ctrl+E, Ctrl+G, Ctrl+R
 6. ✅ **Modal de ajuda reorganizado** - Agrupado por categorias (Navegação, Ações, Interface)
 7. ✅ **Documentação completa** - ATALHOS_TECLADO.md criado
+
+
+---
+
+## FASE 77: CORREÇÕES DE SIDEBAR E SELETORES DUPLICADOS
+
+### 77.1 Correções no Sidebar
+- [x] Adicionar botão visível de expansão quando sidebar está recolhido (sempre visível)
+- [x] Remover texto "CONTEXTO DE TRABALHO" da seção
+- [x] Manter apenas seletor de Pesquisa (remover ProjectSelector do sidebar)
+- [x] Garantir que botão de toggle seja sempre visível e clicável
+- [x] Melhorar contraste do botão quando sidebar está recolhido
+
+### 77.2 Varredura de Páginas com Seletores Duplicados
+- [x] Identificar todas as páginas com ProjectSelector no conteúdo
+- [x] Identificar todas as páginas com PesquisaSelector no conteúdo
+- [x] Listar páginas que têm seletores duplicados (aparecem 2x na tela)
+- [x] Documentar quais componentes precisam ser removidos por página
+
+### 77.3 Remoção de Seletores Duplicados
+- [x] Remover ProjectSelector de todas as páginas (já está no sidebar)
+- [x] Remover PesquisaSelector de todas as páginas (já está no sidebar)
+- [x] Manter apenas breadcrumbs para contexto visual
+- [x] Validar que hooks useSelectedProject e useSelectedPesquisa ainda funcionam
+- [x] Garantir que seleção no sidebar afeta todas as páginas
+
+### 77.4 Testes e Validação
+- [x] Testar expansão/recolhimento do sidebar com botão visível
+- [x] Validar que seleção de pesquisa no sidebar funciona em todas as páginas
+- [x] Confirmar que não há seletores duplicados visíveis em nenhuma página
+- [x] Testar navegação entre páginas mantendo contexto
+- [x] Validar que Ctrl+B ainda funciona para toggle do sidebar

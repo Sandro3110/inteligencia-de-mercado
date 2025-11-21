@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
-import { ProjectSelector } from "@/components/ProjectSelector";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -166,7 +165,6 @@ export default function MonitoringDashboard() {
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <DynamicBreadcrumbs />
-            <ProjectSelector />
           </div>
           <Card>
             <CardContent className="py-12 text-center">
@@ -214,7 +212,6 @@ export default function MonitoringDashboard() {
                 </>
               )}
             </Button>
-            <ProjectSelector />
           </div>
         </div>
 

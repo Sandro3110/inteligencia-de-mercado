@@ -65,8 +65,7 @@ import { Link } from "wouter";
 import SearchHistory, { addToSearchHistory } from "@/components/SearchHistory";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { useSelectedPesquisa } from "@/hooks/useSelectedPesquisa";
-import { ProjectSelector } from "@/components/ProjectSelector";
-import { PesquisaSelector } from "@/components/PesquisaSelector";
+
 import { AppSidebar } from "@/components/AppSidebar";
 import { useSidebarState } from "@/hooks/useSidebarState";
 
@@ -889,11 +888,7 @@ export default function CascadeView() {
       {/* Header Simplificado */}
       <div className="flex items-center justify-between px-6 py-2 border-b border-border/40 flex-wrap gap-2">
         <div className="flex items-center gap-6">
-          <ProjectSelector />
-          <PesquisaSelector projectId={selectedProjectId} />
-          <div className="mt-2">
-            <DynamicBreadcrumbs />
-          </div>
+          <DynamicBreadcrumbs />
         </div>
         <div className="flex items-center gap-4">
           <DropdownMenu>

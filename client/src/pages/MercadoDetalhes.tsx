@@ -39,7 +39,7 @@ import {
   Filter,
   X,
 } from "lucide-react";
-import { ProjectSelector } from "@/components/ProjectSelector";
+
 import {
   Select,
   SelectContent,
@@ -384,7 +384,6 @@ export default function MercadoDetalhes() {
                 </Select>
               </div>
             </div>
-            <ProjectSelector />
           </div>
           <Breadcrumbs items={[
             { label: "Mercados" },

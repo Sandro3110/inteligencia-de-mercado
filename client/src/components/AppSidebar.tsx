@@ -241,15 +241,19 @@ export function AppSidebar() {
             <BarChart3 className="w-6 h-6 text-blue-600 cursor-pointer mx-auto" />
           </Link>
         )}
+        {/* Botão de Toggle - SEMPRE VISÍVEL */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleSidebar}
-              className={cn("h-8 w-8", collapsed && "mx-auto")}
+              className={cn(
+                "h-8 w-8 shrink-0",
+                collapsed && "mx-auto bg-blue-50 hover:bg-blue-100 border border-blue-200"
+              )}
             >
-              {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+              {collapsed ? <ChevronRight className="w-4 h-4 text-blue-600" /> : <ChevronLeft className="w-4 h-4" />}
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">
@@ -258,28 +262,12 @@ export function AppSidebar() {
         </Tooltip>
       </div>
 
-      {/* Seção de Seleção de Contexto - Fase 75 */}
+      {/* Seção de Seleção de Pesquisa - Simplificada */}
       {!collapsed && (
         <div className="p-4 border-b-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
           <div className="space-y-3">
-            {/* Título da Seção */}
-            <div className="flex items-center gap-2">
-              <Folder className="w-4 h-4 text-blue-600" />
-              <h3 className="text-xs font-bold text-blue-900 uppercase tracking-wide">
-                Contexto de Trabalho
-              </h3>
-            </div>
-
-            {/* Seletor de Projeto */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">
-                📁 Projeto
-              </label>
-              <ProjectSelector />
-            </div>
-
             {/* Seletor de Pesquisa */}
-            {selectedProjectId && (
+            {selectedProjectId ? (
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-semibold text-slate-700">
@@ -290,6 +278,10 @@ export function AppSidebar() {
                   </span>
                 </div>
                 <PesquisaSelector />
+              </div>
+            ) : (
+              <div className="text-xs text-slate-500 text-center py-2">
+                Selecione um projeto primeiro
               </div>
             )}
 

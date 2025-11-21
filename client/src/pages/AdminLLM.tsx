@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
-import { ProjectSelector } from "@/components/ProjectSelector";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -206,7 +206,6 @@ export default function AdminLLM() {
         <div className="max-w-5xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <DynamicBreadcrumbs />
-            <ProjectSelector />
           </div>
           <Card>
             <CardContent className="py-12 text-center">
@@ -233,7 +232,6 @@ export default function AdminLLM() {
               Configure múltiplos provedores de IA e escolha o ativo
             </p>
           </div>
-          <ProjectSelector />
         </div>
 
         {isLoading ? (
