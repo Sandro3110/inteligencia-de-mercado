@@ -1119,6 +1119,33 @@ export const appRouter = router({
         const { resetNotificationPreferences } = await import('./db');
         return resetNotificationPreferences(ctx.user.id);
       }),
+    
+    // Endpoint de teste para disparar notificação
+    sendTestNotification: publicProcedure
+      .input(z.object({
+        title: z.string().optional().default('🧪 Notificação de Teste'),
+        message: z.string().optional().default('Sistema de notificações em tempo real funcionando perfeitamente!'),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user) throw new Error('Usuário não autenticado');
+        
+        const { createNotification } = await import('./db');
+        
+        // Criar notificação no banco
+        const notification = await createNotification({
+          userId: ctx.user.id,
+          type: 'all',
+          title: input.title,
+          message: input.message,
+          priority: 'normal',
+        });
+        
+        return {
+          success: true,
+          notification,
+          message: 'Notificação de teste enviada com sucesso!'
+        };
+      }),
   }),
 
   enrichment: router({

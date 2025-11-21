@@ -93,9 +93,9 @@ export async function startEnrichmentJob(jobId: number): Promise<void> {
   await db.update(enrichmentJobs)
     .set({ 
       status: 'running',
-      startedAt: job.startedAt || new Date(),
+      startedAt: job.startedAt || now(),
       pausedAt: null,
-      updatedAt: new Date(),
+      updatedAt: now(),
     })
     .where(eq(enrichmentJobs.id, jobId));
 
@@ -109,8 +109,8 @@ export async function startEnrichmentJob(jobId: number): Promise<void> {
       .set({ 
         status: 'failed',
         errorMessage: error.message,
-        completedAt: new Date(),
-        updatedAt: new Date(),
+        completedAt: now(),
+        updatedAt: now(),
       })
       .where(eq(enrichmentJobs.id, jobId));
     
@@ -151,8 +151,8 @@ export async function cancelEnrichmentJob(jobId: number): Promise<void> {
     .set({ 
       status: 'failed',
       errorMessage: 'Cancelado pelo usuário',
-      completedAt: new Date(),
-      updatedAt: new Date(),
+      completedAt: now(),
+      updatedAt: now(),
     })
     .where(eq(enrichmentJobs.id, jobId));
 }
@@ -249,8 +249,8 @@ async function processJob(jobId: number): Promise<void> {
       await db.update(enrichmentJobs)
         .set({ 
           status: 'paused',
-          pausedAt: new Date(),
-          updatedAt: new Date(),
+          pausedAt: now(),
+          updatedAt: now(),
         })
         .where(eq(enrichmentJobs.id, jobId));
       
@@ -305,7 +305,7 @@ async function processJob(jobId: number): Promise<void> {
         currentBatch,
         lastClienteId: batch[batch.length - 1].id,
         estimatedTimeRemaining,
-        updatedAt: new Date(),
+        updatedAt: now(),
       })
       .where(eq(enrichmentJobs.id, jobId));
 
@@ -328,9 +328,9 @@ async function processJob(jobId: number): Promise<void> {
   await db.update(enrichmentJobs)
     .set({ 
       status: 'completed',
-      completedAt: new Date(),
+      completedAt: now(),
       estimatedTimeRemaining: 0,
-      updatedAt: new Date(),
+      updatedAt: now(),
     })
     .where(eq(enrichmentJobs.id, jobId));
 

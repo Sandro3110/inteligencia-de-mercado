@@ -8,6 +8,7 @@
 import { getEnrichmentProgress, getAlertConfigs, updateAlertConfig, createAlertHistory } from './db';
 import { updateEnrichmentRun } from './db';
 import { notifyOwner } from './_core/notification';
+import { now } from './dateUtils';
 
 type NotificationMilestone = {
   percentage: number;
@@ -81,7 +82,7 @@ export async function checkAlerts(
         
         // Atualizar lastTriggeredAt
         await updateAlertConfig(alert.id, {
-          lastTriggeredAt: new Date(),
+          lastTriggeredAt: now(),
         });
         
         // Registrar no histórico

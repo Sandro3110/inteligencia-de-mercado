@@ -672,3 +672,125 @@ export const users = mysqlTable("users", {
 
 export type NotificationPreference = typeof notificationPreferences.$inferSelect;
 export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;
+
+// ===== TIPOS EXPORTADOS =====
+
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = typeof projects.$inferInsert;
+
+export type Pesquisa = typeof pesquisas.$inferSelect;
+export type InsertPesquisa = typeof pesquisas.$inferInsert;
+
+export type Cliente = typeof clientes.$inferSelect;
+export type InsertCliente = typeof clientes.$inferInsert;
+
+export type Concorrente = typeof concorrentes.$inferSelect;
+export type InsertConcorrente = typeof concorrentes.$inferInsert;
+
+export type Lead = typeof leads.$inferSelect;
+export type InsertLead = typeof leads.$inferInsert;
+
+export type Produto = typeof produtos.$inferSelect;
+export type InsertProduto = typeof produtos.$inferInsert;
+
+export type MercadoUnico = typeof mercadosUnicos.$inferSelect;
+export type InsertMercadoUnico = typeof mercadosUnicos.$inferInsert;
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
+
+export type ProjectTemplate = typeof projectTemplates.$inferSelect;
+export type InsertProjectTemplate = typeof projectTemplates.$inferInsert;
+
+export type EnrichmentCache = typeof enrichmentCache.$inferSelect;
+export type InsertEnrichmentCache = typeof enrichmentCache.$inferInsert;
+
+export type EnrichmentConfig = typeof enrichmentConfigs.$inferSelect;
+export type InsertEnrichmentConfig = typeof enrichmentConfigs.$inferInsert;
+
+export type EnrichmentJob = typeof enrichmentJobs.$inferSelect;
+export type InsertEnrichmentJob = typeof enrichmentJobs.$inferInsert;
+
+export type EnrichmentQueue = typeof enrichmentQueue.$inferSelect;
+export type InsertEnrichmentQueue = typeof enrichmentQueue.$inferInsert;
+
+export type EnrichmentRun = typeof enrichmentRuns.$inferSelect;
+export type InsertEnrichmentRun = typeof enrichmentRuns.$inferInsert;
+
+export type AnalyticsMercado = typeof analyticsMercados.$inferSelect;
+export type InsertAnalyticsMercado = typeof analyticsMercados.$inferInsert;
+
+export type AnalyticsPesquisa = typeof analyticsPesquisas.$inferSelect;
+export type InsertAnalyticsPesquisa = typeof analyticsPesquisas.$inferInsert;
+
+export type AnalyticsDimensao = typeof analyticsDimensoes.$inferSelect;
+export type InsertAnalyticsDimensao = typeof analyticsDimensoes.$inferInsert;
+
+export type AnalyticsTimeline = typeof analyticsTimeline.$inferSelect;
+export type InsertAnalyticsTimeline = typeof analyticsTimeline.$inferInsert;
+
+export type ProjectAuditLog = typeof projectAuditLog.$inferSelect;
+export type InsertProjectAuditLog = typeof projectAuditLog.$inferInsert;
+
+export type HibernationWarning = typeof hibernationWarnings.$inferSelect;
+export type InsertHibernationWarning = typeof hibernationWarnings.$inferInsert;
+
+export type AlertConfig = typeof alertConfigs.$inferSelect;
+export type InsertAlertConfig = typeof alertConfigs.$inferInsert;
+
+export type Tag = typeof tags.$inferSelect;
+export type InsertTag = typeof tags.$inferInsert;
+
+export type EntityTag = typeof entityTags.$inferSelect;
+export type InsertEntityTag = typeof entityTags.$inferInsert;
+
+export type SavedFilter = typeof savedFilters.$inferSelect;
+export type InsertSavedFilter = typeof savedFilters.$inferInsert;
+
+export type ScheduledEnrichment = typeof scheduledEnrichments.$inferSelect;
+export type InsertScheduledEnrichment = typeof scheduledEnrichments.$inferInsert;
+
+export type LLMProviderConfig = typeof llmProviderConfigs.$inferSelect;
+export type InsertLLMProviderConfig = typeof llmProviderConfigs.$inferInsert;
+
+export type IntelligentAlertsConfig = typeof intelligentAlertsConfigs.$inferSelect;
+export type InsertIntelligentAlertsConfig = typeof intelligentAlertsConfigs.$inferInsert;
+
+export type OperationalAlert = typeof operationalAlerts.$inferSelect;
+export type InsertOperationalAlert = typeof operationalAlerts.$inferInsert;
+
+export type Recommendation = typeof recommendations.$inferSelect;
+export type InsertRecommendation = typeof recommendations.$inferInsert;
+
+export type SalesforceSyncLog = typeof salesforceSyncLog.$inferSelect;
+export type InsertSalesforceSyncLog = typeof salesforceSyncLog.$inferInsert;
+
+export type LeadConversion = typeof leadConversions.$inferSelect;
+export type InsertLeadConversion = typeof leadConversions.$inferInsert;
+
+export type ActivityLog = typeof activityLog.$inferSelect;
+export type InsertActivityLog = typeof activityLog.$inferInsert;
+
+export type ClienteMercado = typeof clientesMercados.$inferSelect;
+export type InsertClienteMercado = typeof clientesMercados.$inferInsert;
+
+export type ClienteHistory = typeof clientesHistory.$inferSelect;
+export type InsertClienteHistory = typeof clientesHistory.$inferInsert;
+
+export type ConcorrenteHistory = typeof concorrentesHistory.$inferSelect;
+export type InsertConcorrenteHistory = typeof concorrentesHistory.$inferInsert;
+
+export type LeadHistory = typeof leadsHistory.$inferSelect;
+export type InsertLeadHistory = typeof leadsHistory.$inferInsert;
+
+export type MercadoHistory = typeof mercadosHistory.$inferSelect;
+export type InsertMercadoHistory = typeof mercadosHistory.$inferInsert;
+
+export type AlertHistory = typeof alertHistory.$inferSelect;
+export type InsertAlertHistory = typeof alertHistory.$inferInsert;
+
+export type IntelligentAlertsHistory = typeof intelligentAlertsHistory.$inferSelect;
+export type InsertIntelligentAlertsHistory = typeof intelligentAlertsHistory.$inferInsert;

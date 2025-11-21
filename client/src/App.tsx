@@ -48,6 +48,7 @@ const ProjectManagement = lazy(() => import("./pages/ProjectManagement"));
 const ProjectActivityDashboard = lazy(() => import("./pages/ProjectActivityDashboard"));
 const Notificacoes = lazy(() => import("./pages/Notificacoes"));
 const NotificationPreferences = lazy(() => import("./pages/NotificationPreferences"));
+const TestNotifications = lazy(() => import("./pages/TestNotifications"));
 const NotificationHistory = lazy(() => import("./pages/NotificationHistory"));
 
 // Loading fallback component
@@ -94,6 +95,7 @@ function Router() {
       <Route path="/notificacoes" component={Notificacoes} />
       <Route path="/configuracoes/notificacoes" component={NotificationPreferences} />
       <Route path="/notificacoes/historico" component={NotificationHistory} />
+      <Route path="/notificacoes/teste" component={TestNotifications} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -11,10 +11,12 @@ import {
   concorrentes,
   mercadosUnicos,
   pesquisas,
-  type InsertAnalyticsMercado,
-  type InsertAnalyticsPesquisa,
-  type InsertAnalyticsDimensao,
-  type InsertAnalyticsTimeline,
+} from "../drizzle/schema";
+import type {
+  InsertAnalyticsMercado,
+  InsertAnalyticsPesquisa,
+  InsertAnalyticsDimensao,
+  InsertAnalyticsTimeline,
 } from "../drizzle/schema";
 
 /**
@@ -33,7 +35,7 @@ export async function aggregateMercadoMetrics(
   const db = await getDb();
   if (!db) return;
 
-  const periodoRef = periodo || new Date();
+  const periodoRef = toMySQLTimestamp(periodo || new Date());
   
   // Buscar todos os mercados do projeto/pesquisa
   const whereClause = pesquisaId
@@ -172,10 +174,14 @@ export async function aggregatePesquisaMetrics(
   });
 
   // Calcular duração
-  const dataInicio = pesquisa.dataImportacao || pesquisa.createdAt;
-  const dataConclusao = pesquisa.status === 'concluido' ? pesquisa.updatedAt : new Date();
-  const duracaoDias = dataInicio && dataConclusao
-    ? Math.ceil((dataConclusao.getTime() - dataInicio.getTime()) / (1000 * 60 * 60 * 24))
+  const dataInicioRaw = pesquisa.dataImportacao || pesquisa.createdAt;
+  const dataConclusaoRaw = pesquisa.status === 'concluido' ? pesquisa.updatedAt : new Date();
+  
+  const dataInicioDate = typeof dataInicioRaw === 'string' ? new Date(dataInicioRaw) : dataInicioRaw;
+  const dataConclusaoDate = typeof dataConclusaoRaw === 'string' ? new Date(dataConclusaoRaw) : dataConclusaoRaw;
+  
+  const duracaoDias = dataInicioDate && dataConclusaoDate
+    ? Math.ceil((dataConclusaoDate.getTime() - dataInicioDate.getTime()) / (1000 * 60 * 60 * 24))
     : 0;
 
   // Inserir/atualizar métricas
@@ -188,8 +194,8 @@ export async function aggregatePesquisaMetrics(
     taxaConversaoClienteLead: Math.round(taxaConversao * 100),
     qualidadeMediaGeral: Math.round(qualidadeMedia * 100),
     distribuicaoQualidade,
-    dataInicio: dataInicio || undefined,
-    dataConclusao: dataConclusao || undefined,
+    dataInicio: dataInicioRaw ? (typeof dataInicioRaw === 'string' ? dataInicioRaw : toMySQLTimestamp(dataInicioRaw)) : undefined,
+    dataConclusao: dataConclusaoRaw ? (typeof dataConclusaoRaw === 'string' ? dataConclusaoRaw : toMySQLTimestamp(dataConclusaoRaw)) : undefined,
     duracaoDias,
   };
 
@@ -255,7 +261,7 @@ export async function aggregateTimelineMetrics(
   const db = await getDb();
   if (!db) return;
 
-  const dataRef = data || new Date();
+  const dataRef = toMySQLTimestamp(data || new Date());
   const inicioDia = new Date(dataRef);
   inicioDia.setHours(0, 0, 0, 0);
   const fimDia = new Date(dataRef);
@@ -308,7 +314,7 @@ export async function aggregateTimelineMetrics(
     .where(
       and(
         eq(leads.projectId, projectId),
-        lte(leads.createdAt, fimDia)
+        lte(leads.createdAt, fimDiaStr)
       )
     );
 

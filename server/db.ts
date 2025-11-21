@@ -15,6 +15,7 @@ import {
   hibernationWarnings, HibernationWarning, InsertHibernationWarning
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { now, toMySQLTimestamp } from './dateUtils';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -78,7 +79,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     }
 
     if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
+      updateSet.lastSignedIn = now();
     }
 
     await db.insert(users).values(values).onDuplicateKeyUpdate({
@@ -290,7 +291,7 @@ export async function getClientesByMercado(mercadoId: number, validationStatus?:
       cnpj: clientes.cnpj,
       siteOficial: clientes.siteOficial,
       produtoPrincipal: clientes.produtoPrincipal,
-      segmentacaoB2bB2c: clientes.segmentacaoB2bB2c,
+      segmentacaoB2BB2C: clientes.segmentacaoB2BB2C,
       email: clientes.email,
       telefone: clientes.telefone,
       cidade: clientes.cidade,
@@ -338,7 +339,7 @@ export async function getClientesByMercadoPaginated(
       cnpj: clientes.cnpj,
       siteOficial: clientes.siteOficial,
       produtoPrincipal: clientes.produtoPrincipal,
-      segmentacaoB2bB2c: clientes.segmentacaoB2bB2c,
+      segmentacaoB2BB2C: clientes.segmentacaoB2BB2C,
       email: clientes.email,
       telefone: clientes.telefone,
       cidade: clientes.cidade,
@@ -371,7 +372,7 @@ export async function updateClienteValidation(
       validationStatus: status as any,
       validationNotes: notes,
       validatedBy: userId,
-      validatedAt: new Date(),
+      validatedAt: now(),
     })
     .where(eq(clientes.id, id));
 
@@ -470,7 +471,7 @@ export async function updateConcorrenteValidation(
       validationStatus: status as any,
       validationNotes: notes,
       validatedBy: userId,
-      validatedAt: new Date(),
+      validatedAt: now(),
     })
     .where(eq(concorrentes.id, id));
 
@@ -569,7 +570,7 @@ export async function updateLeadValidation(
       validationStatus: status as any,
       validationNotes: notes,
       validatedBy: userId,
-      validatedAt: new Date(),
+      validatedAt: now(),
     })
     .where(eq(leads.id, id));
 
@@ -899,12 +900,12 @@ export async function getDistribuicaoSegmentacao() {
   
   const result = await db
     .select({
-      segmentacao: clientes.segmentacaoB2bB2c,
+      segmentacao: clientes.segmentacaoB2BB2C,
       count: sql<number>`count(*)`.as("count"),
     })
     .from(clientes)
-    .where(sql`${clientes.segmentacaoB2bB2c} IS NOT NULL`)
-    .groupBy(clientes.segmentacaoB2bB2c);
+    .where(sql`${clientes.segmentacaoB2BB2C} IS NOT NULL`)
+    .groupBy(clientes.segmentacaoB2BB2C);
   
   return result;
 }
@@ -986,7 +987,7 @@ export async function updateLeadStage(
     .update(leads)
     .set({
       stage,
-      stageUpdatedAt: new Date(),
+      stageUpdatedAt: now(),
     })
     .where(eq(leads.id, leadId));
 }
@@ -1080,7 +1081,7 @@ export async function updateProject(id: number, data: Partial<InsertProject>, us
     
     await db
       .update(projects)
-      .set({ ...data, updatedAt: new Date() })
+      .set({ ...data, updatedAt: now() })
       .where(eq(projects.id, id));
     
     // Log de auditoria com comparação
@@ -1117,7 +1118,7 @@ export async function deleteProject(id: number): Promise<boolean> {
     // Soft delete - apenas marca como inativo
     await db
       .update(projects)
-      .set({ ativo: 0, updatedAt: new Date() })
+      .set({ ativo: 0, updatedAt: now() })
       .where(eq(projects.id, id));
     return true;
   } catch (error) {
@@ -1240,7 +1241,7 @@ export async function hibernateProject(projectId: number, userId?: string | null
     // Atualizar status para hibernated
     await db
       .update(projects)
-      .set({ status: 'hibernated', updatedAt: new Date() })
+      .set({ status: 'hibernated', updatedAt: now() })
       .where(eq(projects.id, projectId));
     
     // Log de auditoria
@@ -1278,7 +1279,7 @@ export async function reactivateProject(projectId: number, userId?: string | nul
     // Atualizar status para active
     await db
       .update(projects)
-      .set({ status: 'active', updatedAt: new Date() })
+      .set({ status: 'active', updatedAt: now() })
       .where(eq(projects.id, projectId));
     
     // Log de auditoria
@@ -1312,7 +1313,7 @@ export async function updateProjectActivity(projectId: number): Promise<void> {
   if (!db) return;
 
   await db.update(projects)
-    .set({ lastActivityAt: new Date() })
+    .set({ lastActivityAt: now() })
     .where(eq(projects.id, projectId));
 }
 
@@ -1324,8 +1325,9 @@ export async function getInactiveProjects(inactiveDays: number): Promise<Project
   const db = await getDb();
   if (!db) return [];
 
-  const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - inactiveDays);
+  const cutoffDateObj = new Date();
+  cutoffDateObj.setDate(cutoffDateObj.getDate() - inactiveDays);
+  const cutoffDate = toMySQLTimestamp(cutoffDateObj);
 
   const result = await db
     .select()
@@ -1449,7 +1451,7 @@ export async function duplicateProject(
       cor: originalProject.cor,
       ativo: 1,
       status: 'active',
-      lastActivityAt: new Date(),
+      lastActivityAt: now(),
     });
 
     const newProjectId = Number(result.insertId);
@@ -1591,7 +1593,7 @@ export async function updatePesquisaStatus(
   try {
     await db
       .update(pesquisas)
-      .set({ status, updatedAt: new Date() })
+      .set({ status, updatedAt: now() })
       .where(eq(pesquisas.id, pesquisaId));
     console.log(`[Pesquisa] Status atualizado: ${pesquisaId} -> ${status}`);
   } catch (error) {
@@ -1771,7 +1773,7 @@ export async function createCliente(data: {
   cnpj?: string | null;
   siteOficial?: string | null;
   produtoPrincipal?: string | null;
-  segmentacaoB2bB2c?: 'B2B' | 'B2C' | 'B2B2C' | null;
+  segmentacaoB2BB2C?: 'B2B' | 'B2C' | 'B2B2C' | null;
   email?: string | null;
   telefone?: string | null;
   linkedin?: string | null;
@@ -1826,7 +1828,7 @@ export async function createCliente(data: {
           cnpj: data.cnpj || existing[0].cnpj,
           siteOficial: data.siteOficial || existing[0].siteOficial,
           produtoPrincipal: data.produtoPrincipal || existing[0].produtoPrincipal,
-          segmentacaoB2bB2c: data.segmentacaoB2bB2c || existing[0].segmentacaoB2bB2c,
+          segmentacaoB2BB2C: data.segmentacaoB2BB2C || existing[0].segmentacaoB2BB2C,
           email: data.email || existing[0].email,
           telefone: data.telefone || existing[0].telefone,
           linkedin: data.linkedin || existing[0].linkedin,
@@ -1855,7 +1857,7 @@ export async function createCliente(data: {
     cnpj: data.cnpj || null,
     siteOficial: data.siteOficial || null,
     produtoPrincipal: data.produtoPrincipal || null,
-    segmentacaoB2bB2c: data.segmentacaoB2bB2c || null,
+    segmentacaoB2BB2C: data.segmentacaoB2BB2C || null,
     email: data.email || null,
     telefone: data.telefone || null,
     linkedin: data.linkedin || null,
@@ -1912,7 +1914,7 @@ export async function updateCliente(id: number, data: Partial<{
   cnpj: string;
   siteOficial: string;
   produtoPrincipal: string;
-  segmentacaoB2bB2c: string;
+  segmentacaoB2BB2C: string;
   email: string;
   telefone: string;
   linkedin: string;
@@ -2870,7 +2872,7 @@ export async function updateAlertConfig(id: number, updates: Partial<InsertAlert
   
   await db
     .update(alertConfigs)
-    .set({ ...updates, updatedAt: new Date() })
+    .set({ ...updates, updatedAt: now() })
     .where(eq(alertConfigs.id, id));
 }
 
@@ -3376,8 +3378,8 @@ export async function createProduto(data: {
       preco: data.preco,
       unidade: data.unidade,
       ativo: data.ativo ?? 1,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: now(),
+      updatedAt: now(),
     });
 
     return produto;
@@ -3469,7 +3471,7 @@ export async function updateProduto(id: number, data: {
     await db.update(produtos)
       .set({
         ...data,
-        updatedAt: new Date(),
+        updatedAt: now(),
       })
       .where(eq(produtos.id, id));
 
@@ -3499,7 +3501,6 @@ export async function deleteProduto(id: number) {
 // ============================================================================
 
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
-import { toMySQLTimestamp, toMySQLTimestampOrNull, now } from './dateUtils';
 
 // Chave de criptografia (deve estar em variável de ambiente em produção)
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'default-32-char-key-change-me!!'; // 32 caracteres
@@ -3626,7 +3627,7 @@ export async function saveEnrichmentConfig(data: {
       await db.update(enrichmentConfigs)
         .set({
           ...encryptedData,
-          updatedAt: new Date(),
+          updatedAt: now(),
         })
         .where(eq(enrichmentConfigs.projectId, data.projectId));
     } else {
@@ -3685,7 +3686,7 @@ export async function batchUpdateClientesValidation(
         validationStatus: status as any,
         validationNotes: notes,
         validatedBy: userId,
-        validatedAt: new Date(),
+        validatedAt: now(),
       })
       .where(inArray(clientes.id, ids));
 
@@ -3715,7 +3716,7 @@ export async function batchUpdateConcorrentesValidation(
         validationStatus: status as any,
         validationNotes: notes,
         validatedBy: userId,
-        validatedAt: new Date(),
+        validatedAt: now(),
       })
       .where(inArray(concorrentes.id, ids));
 
@@ -3745,7 +3746,7 @@ export async function batchUpdateLeadsValidation(
         validationStatus: status as any,
         validationNotes: notes,
         validatedBy: userId,
-        validatedAt: new Date(),
+        validatedAt: now(),
       })
       .where(inArray(leads.id, ids));
 
@@ -3768,7 +3769,7 @@ export async function getQualityTrends(projectId: number, days: number = 30) {
   if (!db) return [];
 
   try {
-    const dataLimite = new Date();
+    const dataLimite = now();
     dataLimite.setDate(dataLimite.getDate() - days);
 
     // Buscar todos os mercados do projeto
@@ -3907,21 +3908,25 @@ export async function getProjectsActivity(): Promise<{
   const hibernatedProjects = allProjects.filter(p => p.status === 'hibernated').length;
 
   // Projetos inativos por período
-  const now = new Date();
-  const cutoff30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-  const cutoff60 = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
-  const cutoff90 = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+  const nowDate = new Date();
+  const cutoff30 = new Date(nowDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const cutoff60 = new Date(nowDate.getTime() - 60 * 24 * 60 * 60 * 1000);
+  const cutoff90 = new Date(nowDate.getTime() - 90 * 24 * 60 * 60 * 1000);
+  
+  const cutoff30Str = toMySQLTimestamp(cutoff30);
+  const cutoff60Str = toMySQLTimestamp(cutoff60);
+  const cutoff90Str = toMySQLTimestamp(cutoff90);
 
   const inactiveProjects30 = allProjects.filter(p => 
-    p.status === 'active' && p.lastActivityAt && p.lastActivityAt < cutoff30
+    p.status === 'active' && p.lastActivityAt && p.lastActivityAt < cutoff30Str
   ).length;
 
   const inactiveProjects60 = allProjects.filter(p => 
-    p.status === 'active' && p.lastActivityAt && p.lastActivityAt < cutoff60
+    p.status === 'active' && p.lastActivityAt && p.lastActivityAt < cutoff60Str
   ).length;
 
   const inactiveProjects90 = allProjects.filter(p => 
-    p.status === 'active' && p.lastActivityAt && p.lastActivityAt < cutoff90
+    p.status === 'active' && p.lastActivityAt && p.lastActivityAt < cutoff90Str
   ).length;
 
   // Buscar projetos com suas atividades recentes
@@ -3930,7 +3935,8 @@ export async function getProjectsActivity(): Promise<{
       // Calcular dias desde última atividade
       let daysSinceActivity: number | null = null;
       if (project.lastActivityAt) {
-        const diffMs = now.getTime() - project.lastActivityAt.getTime();
+        const lastActivityDate = typeof project.lastActivityAt === 'string' ? new Date(project.lastActivityAt) : project.lastActivityAt;
+        const diffMs = nowDate.getTime() - lastActivityDate.getTime();
         daysSinceActivity = Math.floor(diffMs / (1000 * 60 * 60 * 24));
       }
 
@@ -4022,7 +4028,7 @@ export async function checkProjectsForHibernation(
   const db = await getDb();
   if (!db) return [];
 
-  const now = new Date();
+  const now = now();
   const warningThreshold = inactiveDays - 7; // Avisar 7 dias antes
   const cutoffDate = new Date(now.getTime() - warningThreshold * 24 * 60 * 60 * 1000);
 
@@ -4108,7 +4114,7 @@ export async function sendHibernationWarning(
     // Registrar aviso no banco
     const result = await db.insert(hibernationWarnings).values({
       projectId,
-      warningDate: new Date(),
+      warningDate: now(),
       scheduledHibernationDate,
       daysInactive: daysSinceActivity,
       notificationSent: 0, // Será marcado como 1 após envio
@@ -4210,7 +4216,7 @@ export async function executeScheduledHibernations(
   const db = await getDb();
   if (!db) return { hibernated: 0, errors: 0 };
 
-  const now = new Date();
+  const now = now();
   let hibernated = 0;
   let errors = 0;
 

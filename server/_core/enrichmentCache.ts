@@ -74,13 +74,13 @@ export async function setCachedEnrichment(
         cnpj,
         dadosJson,
         fonte,
-        dataAtualizacao: new Date(),
+        dataAtualizacao: now(),
       })
       .onDuplicateKeyUpdate({
         set: {
           dadosJson,
           fonte,
-          dataAtualizacao: new Date(),
+          dataAtualizacao: now(),
         },
       });
 

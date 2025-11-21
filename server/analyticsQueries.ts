@@ -1,5 +1,6 @@
-import { eq, and, sql, gte, lte, desc } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
 import { getDb } from "./db";
+import { toMySQLTimestamp } from './dateUtils';
 import {
   analyticsMercados,
   analyticsPesquisas,
@@ -32,8 +33,8 @@ export async function getAnalyticsByMercado(params: {
   
   if (mercadoId) conditions.push(eq(analyticsMercados.mercadoId, mercadoId));
   if (pesquisaId) conditions.push(eq(analyticsMercados.pesquisaId, pesquisaId));
-  if (dateFrom) conditions.push(gte(analyticsMercados.periodo, dateFrom));
-  if (dateTo) conditions.push(lte(analyticsMercados.periodo, dateTo));
+  if (dateFrom) conditions.push(gte(analyticsMercados.periodo, toMySQLTimestamp(dateFrom)));
+  if (dateTo) conditions.push(lte(analyticsMercados.periodo, toMySQLTimestamp(dateTo)));
 
   const metricas = await db
     .select()
@@ -113,8 +114,8 @@ export async function getAnalyticsTimeline(params: {
 
   const conditions = [eq(analyticsTimeline.projectId, projectId)];
   
-  if (dateFrom) conditions.push(gte(analyticsTimeline.data, dateFrom));
-  if (dateTo) conditions.push(lte(analyticsTimeline.data, dateTo));
+  if (dateFrom) conditions.push(gte(analyticsTimeline.data, toMySQLTimestamp(dateFrom)));
+  if (dateTo) conditions.push(lte(analyticsTimeline.data, toMySQLTimestamp(dateTo)));
 
   const timeline = await db
     .select()
@@ -225,6 +226,7 @@ export async function getTimelineEvolution(params: {
 
   const dateFrom = new Date();
   dateFrom.setDate(dateFrom.getDate() - days);
+  const dateFromStr = toMySQLTimestamp(dateFrom);
 
   const timeline = await db
     .select({
@@ -238,7 +240,7 @@ export async function getTimelineEvolution(params: {
     .where(
       and(
         eq(analyticsTimeline.projectId, projectId),
-        gte(analyticsTimeline.data, dateFrom)
+        gte(analyticsTimeline.data, dateFromStr)
       )
     )
     .orderBy(analyticsTimeline.data);

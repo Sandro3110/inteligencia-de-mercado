@@ -11,6 +11,7 @@ import { eq } from 'drizzle-orm';
 import { clientes, mercadosUnicos, produtos, concorrentes, leads, clientesMercados } from '../drizzle/schema';
 import { generateAllDataOptimized } from './integrations/openaiOptimized';
 import crypto from 'crypto';
+import { now } from './dateUtils';
 
 interface EnrichmentResult {
   clienteId: number;
@@ -138,7 +139,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
             segmentacao: truncate(mercadoData.segmentacao || '', 50),
             tamanhoMercado: truncate(mercadoData.tamanhoEstimado || '', 500),
             mercadoHash,
-            createdAt: new Date()
+            createdAt: now()
           });
         
         mercadoId = Number(newMercado.insertId);
@@ -218,7 +219,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
             qualidadeClassificacao: getQualityClassification(qualityScore),
             validationStatus: 'pending',
             concorrenteHash,
-            createdAt: new Date()
+            createdAt: now()
           });
           result.concorrentesCreated++;
         }
@@ -263,7 +264,7 @@ export async function enrichClienteOptimized(clienteId: number, projectId: numbe
             validationStatus: 'pending',
             stage: 'novo',
             leadHash,
-            createdAt: new Date()
+            createdAt: now()
           });
           result.leadsCreated++;
         }
