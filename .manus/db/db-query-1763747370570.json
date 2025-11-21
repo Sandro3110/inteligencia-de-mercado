@@ -1,0 +1,17 @@
+{
+  "query": "SELECT p.id, p.nome, p.projectId, p.totalClientes,\n       (SELECT COUNT(*) FROM clientes c WHERE c.pesquisaId = p.id) as clientes_reais\nFROM pesquisas p\nWHERE p.nome = 'Ground'\nLIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT p.id, p.nome, p.projectId, p.totalClientes,\n       (SELECT COUNT(*) FROM clientes c WHERE c.pesquisaId = p.id) as clientes_reais\nFROM pesquisas p\nWHERE p.nome = 'Ground'\nLIMIT 5",
+  "rows": [
+    {
+      "id": "60001",
+      "nome": "Ground",
+      "projectId": "330001",
+      "totalClientes": "1",
+      "clientes_reais": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tprojectId\ttotalClientes\tclientes_reais\n60001\tGround\t330001\t1\t1\n",
+  "stderr": "",
+  "execution_time_ms": 95
+}

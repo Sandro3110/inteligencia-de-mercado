@@ -40,10 +40,24 @@ export function useSelectedProject() {
     setIsLoading(false);
   }, [projects, isLoadingProjects]);
 
+  const utils = trpc.useUtils();
+
   // Função para trocar de projeto
   const selectProject = (projectId: number) => {
     setSelectedProjectId(projectId);
     localStorage.setItem(STORAGE_KEY, projectId.toString());
+
+    // Invalidar cache de todas as queries relacionadas ao projeto
+    utils.mercados.list.invalidate();
+    utils.clientes.list.invalidate();
+    utils.clientes.byMercado.invalidate();
+    utils.concorrentes.list.invalidate();
+    utils.concorrentes.byMercado.invalidate();
+    utils.leads.list.invalidate();
+    utils.leads.byMercado.invalidate();
+    utils.produtos.byProject.invalidate();
+    utils.dashboard.stats.invalidate();
+    utils.pesquisas.list.invalidate();
   };
 
   const selectedProject = projects.find(p => p.id === selectedProjectId);

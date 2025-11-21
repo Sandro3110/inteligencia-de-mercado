@@ -16,7 +16,7 @@ export function useSelectedPesquisa(projectId?: number | null) {
       { enabled: !!projectId }
     );
 
-  // Inicializar pesquisa selecionada
+  // Inicializar pesquisa selecionada (resetar quando projeto mudar)
   useEffect(() => {
     if (!projectId) {
       setSelectedPesquisaId(null);
@@ -52,6 +52,8 @@ export function useSelectedPesquisa(projectId?: number | null) {
     setIsLoading(false);
   }, [pesquisas, isLoadingPesquisas, projectId]);
 
+  const utils = trpc.useUtils();
+
   // Função para trocar de pesquisa
   const selectPesquisa = (pesquisaId: number | null) => {
     setSelectedPesquisaId(pesquisaId);
@@ -59,6 +61,16 @@ export function useSelectedPesquisa(projectId?: number | null) {
       const storageKey = `${STORAGE_KEY}-${projectId}`;
       localStorage.setItem(storageKey, pesquisaId.toString());
     }
+
+    // Invalidar cache de todas as queries relacionadas à pesquisa
+    utils.mercados.list.invalidate();
+    utils.clientes.list.invalidate();
+    utils.clientes.byMercado.invalidate();
+    utils.concorrentes.list.invalidate();
+    utils.concorrentes.byMercado.invalidate();
+    utils.leads.list.invalidate();
+    utils.leads.byMercado.invalidate();
+    utils.dashboard.stats.invalidate();
   };
 
   const selectedPesquisa = pesquisas.find(p => p.id === selectedPesquisaId);

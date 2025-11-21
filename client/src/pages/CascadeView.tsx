@@ -328,6 +328,20 @@ export default function CascadeView() {
     }
   }, [searchQuery, selectedProjectId]);
 
+  // Invalidar cache quando pesquisa selecionada mudar
+  useEffect(() => {
+    if (selectedPesquisaId !== null) {
+      utils.mercados.list.invalidate();
+      utils.clientes.list.invalidate();
+      utils.clientes.byMercado.invalidate();
+      utils.concorrentes.list.invalidate();
+      utils.concorrentes.byMercado.invalidate();
+      utils.leads.list.invalidate();
+      utils.leads.byMercado.invalidate();
+      utils.dashboard.stats.invalidate();
+    }
+  }, [selectedPesquisaId, utils]);
+
   // Monitorar scroll para mostrar botão voltar ao topo
   useEffect(() => {
     const viewport = scrollAreaRef.current?.querySelector(

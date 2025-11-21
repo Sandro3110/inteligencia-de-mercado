@@ -456,7 +456,7 @@ export function AppSidebar() {
                     Ativa
                   </span>
                 </div>
-                <PesquisaSelector />
+                <PesquisaSelector projectId={selectedProjectId} />
               </div>
             ) : (
               <div className="text-xs text-slate-500 text-center py-2">
