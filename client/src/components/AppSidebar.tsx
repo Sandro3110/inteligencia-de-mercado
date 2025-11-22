@@ -403,14 +403,7 @@ export function AppSidebar() {
         })}
       </nav>
 
-      {/* Footer */}
-      {!collapsed && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 bg-slate-50">
-          <div className="text-xs text-slate-500 text-center">
-            Gestor PAV v2.0
-          </div>
-        </div>
-      )}
+
     </aside>
   );
 }

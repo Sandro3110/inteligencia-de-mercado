@@ -2098,3 +2098,37 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 - [ ] Validar integração com sistema de email
 - [ ] Criar testes unitários para novas funções
 
+
+---
+
+## FASE 71: CORREÇÕES CRÍTICAS E EXPORTAÇÃO VISUAL DO HEATMAP 🗺️
+
+### 71.1 Remover Label Problemático do Menu
+- [x] Remover label "Gestor PAV v2.0" que está quebrando o menu lateral
+- [ ] Verificar que menu lateral funciona corretamente após remoção
+- [ ] Testar navegação em dispositivos móveis
+
+### 71.2 Implementar Exportação Visual do Heatmap Territorial
+- [x] Adicionar botão "Exportar Relatório" no header da página TerritorialHeatmap
+- [x] Implementar exportação como PNG usando html2canvas
+- [x] Implementar exportação como PDF usando jsPDF
+- [x] Adicionar dropdown de formatos (PNG | PDF)
+- [x] Capturar mapa + estatísticas + ranking em uma única imagem
+- [x] Adicionar metadados no arquivo (data, filtros aplicados, projeto)
+- [x] Adicionar toast de confirmação com nome do arquivo
+- [x] Otimizar qualidade da imagem exportada
+
+### 71.3 Completar Testes Faltantes da Última Implementação
+- [x] Criar testes para análise territorial (territorial.test.ts)
+- [x] Testar getTerritorialDensity com diferentes filtros
+- [x] Testar getDensityStatsByRegion
+- [x] Testar exportação de relatórios territoriais
+- [x] Validar performance com grandes volumes de dados
+- [x] Criar testes de integração completa
+
+### 71.4 Validação e UX
+- [ ] Testar exportação em diferentes resoluções
+- [ ] Validar qualidade das imagens exportadas
+- [ ] Testar em diferentes navegadores (Chrome, Firefox, Safari)
+- [ ] Adicionar loading state durante exportação
+- [ ] Adicionar tratamento de erros com mensagens claras

@@ -1,16 +1,66 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, TrendingUp, Users, Target, Filter, Layers } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { MapPin, TrendingUp, Users, Target, Filter, Layers, Download } from "lucide-react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { toast } from "sonner";
 
 export default function TerritorialHeatmap() {
   const { selectedProjectId } = useSelectedProject();
   const [entityType, setEntityType] = useState<"clientes" | "leads" | "concorrentes" | undefined>();
   const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | undefined>();
+  const [isExporting, setIsExporting] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
+
+  // Função de exportação
+  const handleExport = async (format: "png" | "pdf") => {
+    if (!exportRef.current) return;
+
+    setIsExporting(true);
+    toast.info(`Gerando ${format.toUpperCase()}...`);
+
+    try {
+      const canvas = await html2canvas(exportRef.current, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        logging: false,
+        useCORS: true,
+      });
+
+      const timestamp = new Date().toISOString().split("T")[0];
+      const entityLabel = entityType ? entityType : "todas";
+      const fileName = `heatmap-territorial-${entityLabel}-${timestamp}`;
+
+      if (format === "png") {
+        const link = document.createElement("a");
+        link.download = `${fileName}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        toast.success(`Imagem exportada: ${fileName}.png`);
+      } else {
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({
+          orientation: canvas.width > canvas.height ? "landscape" : "portrait",
+          unit: "px",
+          format: [canvas.width, canvas.height],
+        });
+        pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+        pdf.save(`${fileName}.pdf`);
+        toast.success(`PDF exportado: ${fileName}.pdf`);
+      }
+    } catch (error) {
+      console.error("Erro ao exportar:", error);
+      toast.error("Erro ao exportar. Tente novamente.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Buscar pesquisas do projeto
   const { data: pesquisas } = trpc.pesquisas.list.useQuery(undefined, {
@@ -132,7 +182,26 @@ export default function TerritorialHeatmap() {
             Visualize a densidade de clientes, leads e concorrentes por região
           </p>
         </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button disabled={isExporting || !densityData || densityData.length === 0}>
+              <Download className="w-4 h-4 mr-2" />
+              {isExporting ? "Exportando..." : "Exportar Relatório"}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleExport("png")}>
+              Exportar como PNG
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleExport("pdf")}>
+              Exportar como PDF
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
+
+      {/* Conteúdo exportável */}
+      <div ref={exportRef} className="space-y-6">
 
       {/* Filtros */}
       <Card>
@@ -365,6 +434,8 @@ export default function TerritorialHeatmap() {
           </div>
         </CardContent>
       </Card>
+      </div>
+      {/* Fim do conteúdo exportável */}
     </div>
   );
 }
