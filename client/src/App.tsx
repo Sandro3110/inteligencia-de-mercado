@@ -39,6 +39,7 @@ const MonitoringDashboard = lazy(() => import("./pages/MonitoringDashboard"));
 
 const TendenciasDashboard = lazy(() => import("./pages/TendenciasDashboard"));
 const ProjectManagement = lazy(() => import("./pages/ProjectManagement"));
+const SurveysList = lazy(() => import("./pages/SurveysList"));
 const Notificacoes = lazy(() => import("./pages/Notificacoes"));
 const NotificationConfig = lazy(() => import("./pages/NotificationConfig"));
 // ExportHistory fundido em ExportWizard
@@ -97,6 +98,7 @@ function Router() {
       
       {/* Gestão de Projetos - Fusão de 3 páginas */}
       <Route path="/projetos" component={ProjectManagement} />
+      <Route path="/pesquisas" component={SurveysList} />
       <Route path="/projetos/atividade">{() => { window.location.href = '/projetos'; return null; }}</Route>
       <Route path="/atividade">{() => { window.location.href = '/projetos'; return null; }}</Route>
       <Route path="/notificacoes" component={Notificacoes} />

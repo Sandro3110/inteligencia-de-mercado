@@ -3129,3 +3129,65 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 ✅ **Filtros implementados**
 ✅ **SSE funcionando**
 ✅ **Código limpo**
+
+
+---
+
+## FASE 66: IMPLEMENTAÇÃO DAS MELHORIAS SOLICITADAS 🚀
+
+### 66.1 Página de Listagem de Pesquisas
+- [x] Criar página SurveysList.tsx (/pesquisas)
+- [x] Implementar listagem de todas as pesquisas do sistema
+- [x] Adicionar filtros (por projeto, status, data)
+- [x] Adicionar ordenação (nome, data, status)
+- [x] Mostrar informações resumidas de cada pesquisa
+- [x] Adicionar ações rápidas (visualizar, editar, duplicar, deletar)
+- [x] Adicionar rota no App.tsx
+- [x] Adicionar item no menu lateral
+
+### 66.2 Botão "Ver Pesquisas" nos Cards de Projeto
+- [x] Adicionar botão "Ver Pesquisas" em ProjectManagement.tsx
+- [x] Implementar navegação para /pesquisas?projectId={id}
+- [x] Filtrar pesquisas automaticamente pelo projeto selecionado
+- [ ] Adicionar contador de pesquisas no card do projeto
+- [ ] Adicionar tooltip com informações rápidas
+
+### 66.3 Melhorias no Wizard de Pesquisa - Step 3
+- [x] Adicionar opção "Importar de Arquivo" no Step 3
+- [x] Criar componente de upload de arquivo (CSV/Excel)
+- [x] Implementar parser de CSV/Excel no frontend
+- [x] Validar formato e colunas do arquivo
+- [x] Pré-visualizar dados antes de importar
+- [x] Adicionar mapeamento de colunas
+- [x] Implementar importação em lote
+- [x] Adicionar feedback de progresso
+
+### 66.4 Melhorias no Wizard de Pesquisa - Step 4
+- [x] Adicionar opção "Importar de Arquivo" no Step 4
+- [x] Reutilizar componente de upload criado no Step 3
+- [x] Adaptar parser para formato do Step 4 (já suporta tipo 'cliente')
+- [x] Validar dados específicos do Step 4
+- [x] Implementar pré-visualização de dados
+- [x] Adicionar validação de dados obrigatórios
+- [x] Implementar importação em lote
+
+### 66.5 Testes e Validação
+- [x] Testar listagem de pesquisas com diferentes filtros
+- [x] Testar navegação do card de projeto para pesquisas
+- [x] Testar importação de CSV no Step 3
+- [x] Testar importação de Excel no Step 3
+- [x] Testar importação de CSV no Step 4
+- [x] Testar importação de Excel no Step 4
+- [x] Validar mapeamento de colunas
+- [x] Validar tratamento de erros de importação
+- [x] Testar fluxo completo end-to-end
+
+**Resultado dos Testes:**
+- ✅ 10 testes passaram com sucesso
+- ✅ Listagem de pesquisas funcionando
+- ✅ Filtro por projeto funcionando
+- ✅ Deleção (soft delete) funcionando
+- ✅ Validação de CSV funcionando
+- ✅ Mapeamento de colunas funcionando
+- ✅ Detecção de duplicatas funcionando
+- ✅ Integração projeto-pesquisas funcionando

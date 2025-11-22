@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -43,7 +44,8 @@ import {
   Folder,
   Filter,
   Copy,
-  History
+  History,
+  FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
@@ -56,6 +58,7 @@ interface ProjectsTabProps {
 }
 
 export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
+  const [, navigate] = useLocation();
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -353,6 +356,14 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
                     >
                       <Copy className="h-3 w-3 mr-1" />
                       Duplicar
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => navigate(`/pesquisas?projectId=${project.id}`)}
+                    >
+                      <FileText className="h-3 w-3 mr-1" />
+                      Ver Pesquisas
                     </Button>
                     <Button
                       size="sm"

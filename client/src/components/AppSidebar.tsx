@@ -73,6 +73,7 @@ const navSections: NavSection[] = [
     items: [
       { title: "Visão Geral", href: "/", icon: Home, shortcut: "Ctrl+H" },
       { title: "Nova Pesquisa", href: "/research/new", icon: Plus, badge: "Criar" },
+      { title: "Pesquisas", href: "/pesquisas", icon: FileStack },
       { title: "Enriquecer Dados", href: "/enrichment", icon: Sparkles, shortcut: "Ctrl+E" },
       { title: "Acompanhar Progresso", href: "/enrichment-progress", icon: Activity },
       { title: "Ver Resultados", href: "/resultados-enriquecimento", icon: CheckCircle },

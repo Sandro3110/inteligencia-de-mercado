@@ -1549,6 +1549,24 @@ export async function getPesquisasByProject(projectId: number) {
   }
 }
 
+export async function deletePesquisa(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  try {
+    // Soft delete: marca como inativo
+    await db
+      .update(pesquisas)
+      .set({ ativo: 0 })
+      .where(eq(pesquisas.id, id));
+    
+    return { success: true };
+  } catch (error) {
+    console.error('[Database] Failed to delete pesquisa:', error);
+    throw error;
+  }
+}
+
 export async function createPesquisa(data: {
   projectId: number;
   nome: string;

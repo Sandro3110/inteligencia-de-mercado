@@ -3,7 +3,7 @@
  * Fase 42.2 - Upload funcional CSV/Excel
  */
 
-import { useState, useRef, DragEvent } from 'react';
+import { useState, useRef, DragEvent, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Upload, FileSpreadsheet, Loader2, AlertCircle, CheckCircle2, X } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import type { ResearchWizardData } from '@/types/research-wizard';
+import { ColumnMapper } from '@/components/ColumnMapper';
 
 interface FileUploadZoneProps {
   data: ResearchWizardData;
@@ -30,6 +31,8 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
   const [file, setFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<ParsedRow[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [showMapping, setShowMapping] = useState(false);
+  const [rawData, setRawData] = useState<{ headers: string[]; rows: any[][] }>({ headers: [], rows: [] });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mutation para fazer upload e parse (endpoint não implementado)
@@ -80,14 +83,11 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
 
     setFile(selectedFile);
 
-    // Ler arquivo e enviar para backend
+    // Ler arquivo e fazer parse
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
-      
-      // Simular parse (em produção, enviaria para backend)
-      // Por enquanto, vou criar dados mock para demonstração
-      simulateFileParse(selectedFile.name);
+      parseCSV(content);
     };
 
     if (fileExtension === '.csv') {
@@ -97,31 +97,55 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
     }
   };
 
-  // Simulação de parse (substituir por chamada real ao backend)
-  const simulateFileParse = (filename: string) => {
-    // Mock data para demonstração
-    const mockRows: ParsedRow[] = [
-      {
-        data: { nome: 'Empresa Exemplo 1', cidade: 'São Paulo', uf: 'SP' },
-        valid: true,
-        rowNumber: 1
-      },
-      {
-        data: { nome: '', cidade: 'Rio de Janeiro', uf: 'RJ' },
-        valid: false,
-        errors: ['Nome é obrigatório'],
-        rowNumber: 2
-      },
-      {
-        data: { nome: 'Empresa Exemplo 3', cidade: 'Curitiba', uf: 'PR' },
-        valid: true,
-        rowNumber: 3
-      }
-    ];
+  // Parse real de CSV
+  const parseCSV = useCallback((text: string) => {
+    const lines = text.split('\n').filter(line => line.trim());
+    if (lines.length === 0) {
+      alert('Arquivo CSV vazio');
+      return;
+    }
 
-    setParsedData(mockRows);
+    // Detectar delimitador (vírgula, ponto-e-vírgula ou tab)
+    const firstLine = lines[0];
+    const delimiter = firstLine.includes(';') ? ';' : firstLine.includes('\t') ? '\t' : ',';
+
+    const headers = lines[0].split(delimiter).map(h => h.trim().replace(/^"|"$/g, ''));
+    const rows = lines.slice(1).map(line => {
+      return line.split(delimiter).map(cell => cell.trim().replace(/^"|"$/g, ''));
+    });
+
+    setRawData({ headers, rows });
+    setShowMapping(true);
+  }, []);
+
+  const handleMappingComplete = useCallback((mapping: Record<string, string>) => {
+    // Converter dados brutos em formato estruturado usando o mapeamento
+    const mappedRows: ParsedRow[] = rawData.rows.map((row, index) => {
+      const data: any = {};
+      
+      Object.entries(mapping).forEach(([targetField, sourceColumn]) => {
+        const colIndex = rawData.headers.indexOf(sourceColumn);
+        if (colIndex !== -1) {
+          data[targetField] = row[colIndex];
+        }
+      });
+
+      // Validação simples
+      const valid = !!data.nome;
+      const errors = !data.nome ? ['Nome é obrigatório'] : [];
+
+      return {
+        data,
+        valid,
+        errors,
+        rowNumber: index + 1
+      };
+    });
+
+    setParsedData(mappedRows);
+    setShowMapping(false);
     setShowPreview(true);
-  };
+  }, [rawData]);
 
   const handleImportValid = () => {
     const validRows = parsedData.filter(r => r.valid);
@@ -162,10 +186,36 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
   const validCount = parsedData.filter(r => r.valid).length;
   const invalidCount = parsedData.filter(r => !r.valid).length;
 
+  // Definir campos alvo baseado no tipo
+  const targetFields = tipo === 'mercado' ? [
+    { key: 'nome', label: 'Nome', required: true, description: 'Nome do mercado' },
+    { key: 'segmentacao', label: 'Segmentação', required: false, description: 'B2B, B2C, B2B2C ou B2G' },
+  ] : [
+    { key: 'nome', label: 'Nome', required: true, description: 'Nome da empresa' },
+    { key: 'razaoSocial', label: 'Razão Social', required: false },
+    { key: 'cnpj', label: 'CNPJ', required: false },
+    { key: 'site', label: 'Site', required: false },
+    { key: 'email', label: 'Email', required: false },
+    { key: 'telefone', label: 'Telefone', required: false },
+    { key: 'cidade', label: 'Cidade', required: false },
+    { key: 'uf', label: 'UF', required: false },
+    { key: 'porte', label: 'Porte', required: false },
+  ];
+
   return (
     <div className="space-y-6">
+      {/* Mapeamento de Colunas */}
+      {showMapping && (
+        <ColumnMapper
+          sourceColumns={rawData.headers}
+          targetFields={targetFields}
+          onMappingComplete={handleMappingComplete}
+          previewData={rawData.rows}
+        />
+      )}
+
       {/* Zona de Upload */}
-      {!showPreview && (
+      {!showPreview && !showMapping && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

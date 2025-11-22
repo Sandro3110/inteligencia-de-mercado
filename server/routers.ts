@@ -1074,6 +1074,13 @@ export const appRouter = router({
 
         return pesquisa;
       }),
+
+    delete: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        const { deletePesquisa } = await import('./db');
+        return deletePesquisa(input);
+      }),
   }),
 
   templates: router({
