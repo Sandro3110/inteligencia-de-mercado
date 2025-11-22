@@ -415,6 +415,17 @@ export const appRouter = router({
         .where(eq(produtos.clienteId, input.id));
         return produtosList;
       }),
+    
+    updateCoordinates: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        latitude: z.number().min(-90).max(90),
+        longitude: z.number().min(-180).max(180),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateClienteCoordinates } = await import('./db');
+        return updateClienteCoordinates(input.id, input.latitude, input.longitude);
+      }),
   }),
 
   concorrentes: router({
@@ -513,6 +524,17 @@ export const appRouter = router({
           .from(concorrentesHistory)
           .where(eq(concorrentesHistory.concorrenteId, input.id))
           .orderBy(desc(concorrentesHistory.changedAt));
+      }),
+    
+    updateCoordinates: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        latitude: z.number().min(-90).max(90),
+        longitude: z.number().min(-180).max(180),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateConcorrenteCoordinates } = await import('./db');
+        return updateConcorrenteCoordinates(input.id, input.latitude, input.longitude);
       }),
   }),
 
@@ -720,6 +742,17 @@ export const appRouter = router({
       .query(async ({ input }) => {
         const { searchLeadsAdvanced } = await import('./db');
         return searchLeadsAdvanced(input.projectId, input.filter, input.page, input.pageSize);
+      }),
+    
+    updateCoordinates: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        latitude: z.number().min(-90).max(90),
+        longitude: z.number().min(-180).max(180),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateLeadCoordinates } = await import('./db');
+        return updateLeadCoordinates(input.id, input.latitude, input.longitude);
       }),
   }),
 

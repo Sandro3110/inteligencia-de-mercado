@@ -4719,3 +4719,79 @@ export async function getAllSystemSettings(): Promise<Array<{
     return [];
   }
 }
+
+// ============================================================
+// GEOCOCKPIT - Atualização de Coordenadas
+// ============================================================
+
+export async function updateClienteCoordinates(
+  id: number,
+  latitude: number,
+  longitude: number
+): Promise<boolean> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update cliente coordinates: database not available");
+    return false;
+  }
+
+  try {
+    await db.execute(sql`
+      UPDATE clientes 
+      SET latitude = ${latitude}, longitude = ${longitude}
+      WHERE id = ${id}
+    `);
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to update cliente coordinates:", error);
+    return false;
+  }
+}
+
+export async function updateConcorrenteCoordinates(
+  id: number,
+  latitude: number,
+  longitude: number
+): Promise<boolean> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update concorrente coordinates: database not available");
+    return false;
+  }
+
+  try {
+    await db.execute(sql`
+      UPDATE concorrentes 
+      SET latitude = ${latitude}, longitude = ${longitude}
+      WHERE id = ${id}
+    `);
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to update concorrente coordinates:", error);
+    return false;
+  }
+}
+
+export async function updateLeadCoordinates(
+  id: number,
+  latitude: number,
+  longitude: number
+): Promise<boolean> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update lead coordinates: database not available");
+    return false;
+  }
+
+  try {
+    await db.execute(sql`
+      UPDATE leads 
+      SET latitude = ${latitude}, longitude = ${longitude}
+      WHERE id = ${id}
+    `);
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to update lead coordinates:", error);
+    return false;
+  }
+}
