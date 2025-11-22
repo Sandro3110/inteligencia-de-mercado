@@ -55,6 +55,7 @@ const Geocodificacao = lazy(() => import("./pages/Geocodificacao"));
 const GeoAdmin = lazy(() => import("./pages/GeoAdmin"));
 const GeoCockpit = lazy(() => import("./pages/GeoCockpit"));
 const GeoCockpitTest = lazy(() => import("./pages/GeoCockpitTest"));
+const GeoCockpitAdvanced = lazy(() => import("./pages/GeoCockpitAdvanced"));
 const QualityTrendsDashboard = lazy(() => import("./pages/QualityTrendsDashboard"));
 const NotificationDashboard = lazy(() => import("./pages/NotificationDashboard"));
 const PushSettings = lazy(() => import("./pages/PushSettings"));
@@ -110,6 +111,7 @@ function Router() {
       <Route path="/geo-admin" component={GeoAdmin} />
       <Route path="/geo-cockpit" component={GeoCockpit} />
       <Route path="/geo-cockpit-test" component={GeoCockpitTest} />
+      <Route path="/geo-cockpit-advanced" component={GeoCockpitAdvanced} />
       <Route path="/quality-trends" component={QualityTrendsDashboard} />
       <Route path="/notificacoes/dashboard" component={NotificationDashboard} />
       <Route path="/notificacoes/push" component={PushSettings} />

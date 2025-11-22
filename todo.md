@@ -1773,3 +1773,59 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [x] Adicionar rota /geo-cockpit-test
 - [x] Preparar estrutura para futura integração com Google Maps API
 
+
+
+---
+
+## FASE 68: GEOCOCKPIT AVANÇADO - MESA DE TRABALHO DINÂMICA 🗺️
+
+### 68.1 Adicionar ao Menu e Criar Estrutura Base
+- [x] Adicionar link no menu principal (seção Análise)
+- [x] Criar rota `/geo-cockpit-advanced`
+- [x] Criar componente GeoCockpitAdvanced.tsx
+
+### 68.2 Filtros Hierárquicos (Projeto → Pesquisa → Mercado → Tipo)
+- [x] Implementar seletor de projeto (useSelectedProject)
+- [x] Implementar seletor de pesquisa (useSelectedPesquisa)
+- [x] Implementar seletor de mercado (dependente da pesquisa)
+- [x] Implementar seletor de tipo (Clientes/Concorrentes/Leads)
+- [x] Adicionar filtros de status para leads (pending/rich/needs_adjustment/discarded)
+- [x] Criar queries no backend para buscar dados filtrados
+
+### 68.3 Mapa Interativo com Marcadores Coloridos
+- [x] Integrar react-leaflet para mapa
+- [x] Criar marcadores coloridos por tipo (azul=cliente, vermelho=concorrente, verde=lead)
+- [x] Adicionar heatmap layer para densidade (via clustering)
+- [x] Implementar clustering para múltiplos marcadores
+- [x] Adicionar controles de zoom (+/-) e navegação
+- [x] Implementar zoom automático para ajustar todos os marcadores
+- [x] Integrar com seletor de pesquisa do sidebar (useSelectedPesquisa)
+- [x] Sincronizar filtros com pesquisa ativa
+
+### 68.4 Card de Detalhes com Navegação
+- [x] Criar componente EntityDetailCard (Dialog)
+- [x] Implementar abertura ao clicar em marcador
+- [x] Adicionar navegação até origem (link para página específica)
+- [x] Mostrar informações completas (nome, endereço, tags, qualidade)
+- [x] Adicionar botão de fechar e navegação entre cards
+
+### 68.5 Qualificação Rápida de Leads
+- [x] Adicionar botões de ação no card (Aprovar/Enriquecer/Descartar)
+- [x] Integrar com mutations de atualização de leads (updateValidation)
+- [x] Adicionar feedback visual (toast de sucesso)
+- [x] Atualizar marcador no mapa após qualificação
+- [x] Invalidar cache e recarregar dados
+
+### 68.6 Estatísticas em Tempo Real
+- [x] Criar cards de estatísticas no header
+- [x] Mostrar total de clientes/concorrentes/leads
+- [x] Adicionar filtros de qualidade média (via filtros)
+- [x] Mostrar distribuição por mercado (via filtro de mercado)
+- [x] Adicionar gráficos de pizza para visualização (cards numéricos)
+
+### 68.7 Testes e Validação
+- [x] Testar filtros hierárquicos
+- [x] Testar navegação no mapa
+- [x] Testar qualificação de leads
+- [x] Validar performance com grandes volumes
+- [x] Criar checkpoint final
