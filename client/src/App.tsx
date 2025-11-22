@@ -25,16 +25,11 @@ const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
 const EnrichmentProgress = lazy(() => import("./pages/EnrichmentProgress"));
 const AlertsPage = lazy(() => import("./pages/AlertsPage"));
 
-const ReportsPage = lazy(() => import("./pages/ReportsPage"));
-const ReportSchedules = lazy(() => import("./pages/ReportSchedules"));
-const ROIDashboard = lazy(() => import("./pages/ROIDashboard"));
-const FunnelView = lazy(() => import("./pages/FunnelView"));
-const SchedulePage = lazy(() => import("./pages/SchedulePage"));
-const AtividadePage = lazy(() => import("./pages/AtividadePage"));
+const ReportsAutomation = lazy(() => import("./pages/ReportsAutomation"));
+const PerformanceCenter = lazy(() => import("./pages/PerformanceCenter"));
 const EnrichmentSettings = lazy(() => import("./pages/EnrichmentSettings"));
 
 const ResultadosEnriquecimento = lazy(() => import("./pages/ResultadosEnriquecimento"));
-const ResearchOverview = lazy(() => import("./pages/ResearchOverview"));
 
 const ExportWizard = lazy(() => import("./pages/ExportWizard"));
 // TemplateAdmin fundido em ExportWizard
@@ -44,7 +39,6 @@ const MonitoringDashboard = lazy(() => import("./pages/MonitoringDashboard"));
 
 const TendenciasDashboard = lazy(() => import("./pages/TendenciasDashboard"));
 const ProjectManagement = lazy(() => import("./pages/ProjectManagement"));
-const ProjectActivityDashboard = lazy(() => import("./pages/ProjectActivityDashboard"));
 const Notificacoes = lazy(() => import("./pages/Notificacoes"));
 const NotificationConfig = lazy(() => import("./pages/NotificationConfig"));
 // ExportHistory fundido em ExportWizard
@@ -78,16 +72,20 @@ function Router() {
       <Route path="/enrichment-progress" component={EnrichmentProgress} />
       <Route path="/alertas" component={AlertsPage} />
       {/* /alertas/historico fundido em /alertas */}
-      <Route path="/relatorios" component={ReportsPage} />
-      <Route path="/agendamentos-relatorios" component={ReportSchedules} />
-      <Route path="/roi" component={ROIDashboard} />
-      <Route path="/funil" component={FunnelView} />
-      <Route path="/agendamento" component={SchedulePage} />
-      <Route path="/atividade" component={AtividadePage} />
+      
+      {/* Relatórios e Automação - Fusão de 3 páginas */}
+      <Route path="/relatorios" component={ReportsAutomation} />
+      <Route path="/agendamentos-relatorios">{() => { window.location.href = '/relatorios'; return null; }}</Route>
+      <Route path="/agendamento">{() => { window.location.href = '/relatorios'; return null; }}</Route>
+      
+      {/* Performance e Conversão - Fusão de 3 páginas */}
+      <Route path="/performance" component={PerformanceCenter} />
+      <Route path="/roi">{() => { window.location.href = '/performance'; return null; }}</Route>
+      <Route path="/funil">{() => { window.location.href = '/performance'; return null; }}</Route>
+      <Route path="/research-overview">{() => { window.location.href = '/performance'; return null; }}</Route>
+      
       <Route path="/enrichment-settings" component={EnrichmentSettings} />
-
       <Route path="/resultados-enriquecimento" component={ResultadosEnriquecimento} />
-      <Route path="/research-overview" component={ResearchOverview} />
 
       <Route path="/export" component={ExportWizard} />
       {/* /export/templates fundido em /export/wizard */}
@@ -96,8 +94,11 @@ function Router() {
       <Route path="/monitoring" component={MonitoringDashboard} />
       {/* /intelligent-alerts fundido em /alertas */}
       <Route path="/tendencias" component={TendenciasDashboard} />
+      
+      {/* Gestão de Projetos - Fusão de 3 páginas */}
       <Route path="/projetos" component={ProjectManagement} />
-      <Route path="/projetos/atividade" component={ProjectActivityDashboard} />
+      <Route path="/projetos/atividade">{() => { window.location.href = '/projetos'; return null; }}</Route>
+      <Route path="/atividade">{() => { window.location.href = '/projetos'; return null; }}</Route>
       <Route path="/notificacoes" component={Notificacoes} />
       <Route path="/notificacoes/config" component={NotificationConfig} />
       {/* /export/historico fundido em /export/wizard */}

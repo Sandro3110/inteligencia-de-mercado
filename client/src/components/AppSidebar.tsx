@@ -77,7 +77,7 @@ const navSections: NavSection[] = [
       { title: "Acompanhar Progresso", href: "/enrichment-progress", icon: Activity },
       { title: "Ver Resultados", href: "/resultados-enriquecimento", icon: CheckCircle },
       { title: "Exportar Dados", href: "/export", icon: Download, shortcut: "Ctrl+X" },
-      { title: "Gerenciar Projetos", href: "/projetos", icon: FolderOpen, badge: "Novo" },
+      { title: "Gerenciar Projetos", href: "/projetos", icon: FolderOpen },
     ],
   },
 
@@ -93,14 +93,8 @@ const navSections: NavSection[] = [
       { title: "Mercados", href: "/mercados", icon: Package, shortcut: "Ctrl+M" },
       { title: "Analytics Unificado", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+A" },
       { title: "Tendências", href: "/tendencias", icon: TrendingUp },
-
-      { title: "Cockpit Geográfico", href: "/geo-cockpit", icon: MapPin, badge: "Novo" },
-      { title: "GeoCockpit Avançado", href: "/geo-cockpit-advanced", icon: MapPin, badge: "Novo" },
-      { title: "Análise Territorial", href: "/analise-territorial", icon: MapPin, badge: "Novo" },
-      { title: "ROI e Performance", href: "/roi", icon: DollarSign, shortcut: "Ctrl+R" },
-      { title: "Funil de Conversão", href: "/funil", icon: Filter },
-      { title: "Relatórios", href: "/relatorios", icon: FileText },
-      { title: "Visão Pesquisa", href: "/research-overview", icon: Eye },
+      { title: "Cockpit Geográfico", href: "/geo-cockpit", icon: MapPin },
+      { title: "Performance e Conversão", href: "/performance", icon: DollarSign, shortcut: "Ctrl+R" },
     ],
   },
 
@@ -113,12 +107,10 @@ const navSections: NavSection[] = [
     priority: 'medium',
     defaultOpen: false,
     items: [
-      { title: "Configurações do Sistema", href: "/configuracoes/sistema", icon: Settings, badge: "Novo" },
-      { title: "Templates Exportação", href: "/export/templates", icon: FileText },
+      { title: "Configurações do Sistema", href: "/configuracoes/sistema", icon: Settings },
       { title: "Parâmetros Enriquecimento", href: "/enrichment-settings", icon: Settings },
-
       { title: "Configurar Alertas", href: "/alertas", icon: Bell },
-      { title: "Agendamentos", href: "/agendamento", icon: Calendar },
+      { title: "Relatórios e Automação", href: "/relatorios", icon: FileText },
       { title: "Configurar IA (LLM)", href: "/admin/llm", icon: Zap },
     ],
   },
@@ -132,17 +124,12 @@ const navSections: NavSection[] = [
     priority: 'low',
     defaultOpen: false,
     items: [
-      { title: "Central de Notificações", href: "/notificacoes", icon: Bell, badge: "Novo" },
+      { title: "Central de Notificações", href: "/notificacoes", icon: Bell },
       { title: "Configurações de Notificações", href: "/notificacoes/config", icon: Settings },
-      { title: "Histórico de Exportações", href: "/export/historico", icon: Download },
       { title: "Geocodificação", href: "/geocodificacao", icon: MapPin },
-      { title: "Gerenciar Geocodificação", href: "/geo-admin", icon: Settings, badge: "Novo" },
-
+      { title: "Gerenciar Geocodificação", href: "/geo-admin", icon: Settings },
       { title: "Monitoramento", href: "/monitoring", icon: Activity },
-      { title: "Atividade de Projetos", href: "/projetos/atividade", icon: FolderOpen, badge: "Novo" },
-      { title: "Registro de Atividades", href: "/atividade", icon: Clock },
-
-      { title: "Central de Ajuda", href: "/ajuda", icon: HelpCircle, shortcut: "?", badge: "Novo" },
+      { title: "Central de Ajuda", href: "/ajuda", icon: HelpCircle, shortcut: "?" },
     ],
   },
 ];

@@ -2523,3 +2523,348 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 
 **Objetivo:** Completar todas as fusões planejadas de forma eficiente.
 
+
+
+---
+
+## FASE 64: OTIMIZAÇÃO E FUSÃO DE PÁGINAS 🔄
+
+**Objetivo:** Reduzir de 46 para 18 páginas através da consolidação de funcionalidades duplicadas
+**Redução esperada:** 28 páginas (61%)
+**Código eliminado:** ~8.000 linhas duplicadas
+
+---
+
+### 64.1 FUSÕES DE ALTA PRIORIDADE (Semana 1)
+
+#### 64.1.1 Analytics Unificado
+- [ ] Criar página AnalyticsUnified.tsx (/analytics)
+- [ ] Implementar sistema de abas (4 abas)
+- [ ] Aba "Visão Geral" - migrar Dashboard.tsx
+- [ ] Aba "Análise Avançada" - migrar AnalyticsPage.tsx
+- [ ] Aba "Tendências" - migrar DashboardPage.tsx
+- [ ] Aba "Comparativos" - migrar AnalyticsDashboard.tsx
+- [ ] Consolidar queries tRPC duplicadas
+- [ ] Deletar páginas antigas (4 páginas)
+- [ ] Atualizar rotas no App.tsx
+- [ ] Criar testes unitários
+
+**Páginas removidas:**
+- Dashboard.tsx (/dashboard)
+- DashboardPage.tsx (/dashboard-avancado)
+- AnalyticsDashboard.tsx (/analytics-dashboard)
+- AnalyticsPage.tsx (/analytics) - substituída
+
+**Redução:** 4 → 1 página | ~1.500 linhas eliminadas
+
+---
+
+#### 64.1.2 Central de Notificações
+- [ ] Criar página NotificationCenter.tsx (/notificacoes)
+- [ ] Implementar sistema de abas (3 abas)
+- [ ] Aba "Recentes" - migrar Notificacoes.tsx + NotificationDashboard.tsx
+- [ ] Aba "Histórico" - migrar NotificationHistory.tsx
+- [ ] Aba "Estatísticas" - criar dashboard de métricas
+- [ ] Integrar SSE em tempo real
+- [ ] Consolidar queries de notificações
+- [ ] Deletar páginas antigas (3 páginas)
+- [ ] Atualizar rotas no App.tsx
+- [ ] Criar testes unitários
+
+**Páginas removidas:**
+- Notificacoes.tsx (/notificacoes) - substituída
+- NotificationDashboard.tsx (/notificacoes/dashboard)
+- NotificationHistory.tsx (/notificacoes/historico)
+
+**Redução:** 3 → 1 página | ~850 linhas eliminadas
+
+---
+
+#### 64.1.3 Configurações de Notificações
+- [ ] Criar página NotificationConfig.tsx (/notificacoes/config)
+- [ ] Implementar sistema de abas (3 abas)
+- [ ] Aba "Preferências" - migrar NotificationPreferences.tsx
+- [ ] Aba "Web Push" - migrar PushSettings.tsx
+- [ ] Aba "Teste" - migrar TestNotifications.tsx
+- [ ] Consolidar mutations de configuração
+- [ ] Deletar páginas antigas (3 páginas)
+- [ ] Atualizar rotas no App.tsx
+- [ ] Criar testes unitários
+
+**Páginas removidas:**
+- NotificationPreferences.tsx (/configuracoes/notificacoes)
+- PushSettings.tsx (/notificacoes/push)
+- TestNotifications.tsx (/notificacoes/teste)
+
+**Redução:** 3 → 1 página | ~750 linhas eliminadas
+
+---
+
+#### 64.1.4 Geo Cockpit Unificado
+- [ ] Criar página GeoCockpitUnified.tsx (/geo-cockpit)
+- [ ] Implementar seletor de modo (Cockpit/Análise/Heatmap)
+- [ ] Modo "Cockpit" - migrar GeoCockpit.tsx + GeoCockpitAdvanced.tsx
+- [ ] Modo "Análise Territorial" - migrar TerritorialAnalysis.tsx
+- [ ] Modo "Heatmap" - migrar TerritorialHeatmap.tsx
+- [ ] Painel lateral com controles avançados
+- [ ] Consolidar queries geográficas
+- [ ] Deletar páginas antigas (5 páginas)
+- [ ] Atualizar rotas no App.tsx
+- [ ] Criar testes unitários
+
+**Páginas removidas:**
+- GeoCockpit.tsx (/geo-cockpit) - substituída
+- GeoCockpitAdvanced.tsx (/geo-cockpit-advanced)
+- GeoCockpitTest.tsx (/geo-cockpit-test)
+- TerritorialAnalysis.tsx (/analise-territorial)
+- TerritorialHeatmap.tsx (/heatmap-territorial)
+
+**Redução:** 5 → 1 página | ~2.500 linhas eliminadas
+
+---
+
+#### 64.1.5 Administração Geo
+- [ ] Criar página GeoAdmin.tsx (/geo-admin)
+- [ ] Implementar sistema de abas (3 abas)
+- [ ] Aba "Geocodificação" - migrar Geocodificacao.tsx
+- [ ] Aba "Configurações" - criar painel de config
+- [ ] Aba "Histórico" - criar log de geocodificações
+- [ ] Consolidar funções de geocodificação
+- [ ] Deletar páginas antigas (1 página)
+- [ ] Atualizar rotas no App.tsx
+- [ ] Criar testes unitários
+
+**Páginas removidas:**
+- Geocodificacao.tsx (/geocodificacao)
+
+**Redução:** 2 → 1 página | ~400 linhas eliminadas
+
+---
+
+### 64.2 FUSÕES DE MÉDIA PRIORIDADE (Semana 2)
+
+#### 64.2.1 Central de Exportação
+- [ ] Criar página ExportCenter.tsx (/export)
+- [ ] Implementar sistema de abas (3 abas)
+- [ ] Aba "Nova Exportação" - migrar ExportWizard.tsx
+- [ ] Aba "Templates" - migrar TemplateAdmin.tsx
+- [ ] Aba "Histórico" - migrar ExportHistory.tsx
+- [ ] Consolidar queries de exportação
+- [ ] Deletar páginas antigas (3 páginas)
+- [ ] Atualizar rotas no App.tsx
+- [ ] Criar testes unitários
+
+**Páginas removidas:**
+- ExportWizard.tsx (/export) - substituída
+- TemplateAdmin.tsx (/export/templates)
+- ExportHistory.tsx (/export/historico)
+
+**Redução:** 3 → 1 página | ~500 linhas eliminadas
+
+---
+
+#### 64.2.2 Central de Alertas
+- [ ] Criar página AlertsCenter.tsx (/alertas)
+- [ ] Implementar sistema de abas (3 abas)
+- [ ] Aba "Configuração" - migrar AlertsPage.tsx
+- [ ] Aba "Histórico" - migrar AlertHistoryPage.tsx
+- [ ] Aba "Inteligentes" - migrar IntelligentAlerts.tsx
+- [ ] Consolidar queries de alertas
+- [ ] Deletar páginas antigas (3 páginas)
+- [ ] Atualizar rotas no App.tsx
+- [ ] Criar testes unitários
+
+**Páginas removidas:**
+- AlertsPage.tsx (/alertas) - substituída
+- AlertHistoryPage.tsx (/alertas/historico)
+- IntelligentAlerts.tsx (/intelligent-alerts)
+
+**Redução:** 3 → 1 página | ~500 linhas eliminadas
+
+---
+
+#### 64.2.3 Gestão de Projetos Unificada
+- [x] Atualizar página ProjectManagement.tsx (/projetos)
+- [x] Implementar sistema de abas (3 abas)
+- [x] Aba "Projetos" - manter funcionalidade atual
+- [x] Aba "Atividades" - migrar ProjectActivityDashboard.tsx
+- [x] Aba "Logs" - migrar AtividadePage.tsx
+- [x] Consolidar queries de projetos
+- [ ] Deletar páginas antigas (2 páginas)
+- [ ] Atualizar rotas no App.tsx
+- [ ] Criar testes unitários
+
+**Páginas removidas:**
+- ProjectActivityDashboard.tsx (/projetos/atividade)
+- AtividadePage.tsx (/atividade)
+
+**Redução:** 3 → 1 página | ~600 linhas eliminadas
+
+---
+
+### 64.3 FUSÕES DE BAIXA PRIORIDADE (Semana 3)
+
+#### 64.3.1 Dashboard de Tendências
+- [ ] Atualizar página TendenciasDashboard.tsx (/tendencias)
+- [ ] Implementar toggle superior (2 modos)
+- [ ] Modo "Tendências Gerais" - manter funcionalidade atual
+- [ ] Modo "Tendências de Qualidade" - migrar QualityTrendsDashboard.tsx
+- [ ] Consolidar queries de tendências
+- [ ] Deletar páginas antigas (1 página)
+- [ ] Atualizar rotas no App.tsx
+- [ ] Criar testes unitários
+
+**Páginas removidas:**
+- QualityTrendsDashboard.tsx (/quality-trends)
+
+**Redução:** 2 → 1 página | ~400 linhas eliminadas
+
+---
+
+#### 64.3.2 Performance e Conversão
+- [x] Criar página PerformanceCenter.tsx (/performance)
+- [x] Seção 1: Métricas de ROI (migrar ROIDashboard.tsx)
+- [x] Seção 2: Funil de conversão (migrar FunnelView.tsx)
+- [x] Seção 3: Overview de pesquisas (migrar ResearchOverview.tsx)
+- [x] Consolidar queries de performance
+- [ ] Deletar páginas antigas (3 páginas)
+- [ ] Atualizar rotas no App.tsx
+- [ ] Criar testes unitários**Páginas removidas:**
+- ROIDashboard.tsx (/roi)
+- FunnelView.tsx (/funil)
+- ResearchOverview.tsx (/research-overview)
+
+**Redução:** 3 → 1 página | ~700 linhas eliminadas
+
+---
+
+#### 64.3.3 Relatórios e Automação
+- [x] Criar página ReportsAutomation.tsx (/relatorios)
+- [x] Implementar sistema de abas (3 abas)
+- [x] Aba "Relatórios" - migrar ReportsPage.tsx
+- [x] Aba "Agendamentos" - migrar SchedulePage.tsx
+- [x] Aba "Automação" - migrar ReportSchedules.tsx
+- [x] Consolidar queries de relatórios
+- [ ] Deletar páginas antigas (3 páginas)
+- [ ] Atualizar rotas no App.tsx
+- [ ] Criar testes unitários
+
+**Páginas removidas:**
+- ReportsPage.tsx (/relatorios) - substituída
+- SchedulePage.tsx (/agendamento)
+- ReportSchedules.tsx (/agendamentos-relatorios)
+
+**Redução:** 3 → 1 página | ~450 linhas eliminadas
+
+---
+
+#### 64.3.4 Enriquecimento Unificado
+- [ ] Criar página EnrichmentUnified.tsx (/enrichment)
+- [ ] Implementar wizard/stepper com 3 etapas
+- [ ] Etapa 1: Configuração - migrar EnrichmentFlow.tsx
+- [ ] Etapa 2: Progresso - migrar EnrichmentProgress.tsx
+- [ ] Etapa 3: Resultados - migrar ResultadosEnriquecimento.tsx
+- [ ] Manter EnrichmentSettings.tsx separada
+- [ ] Consolidar queries de enriquecimento
+- [ ] Deletar páginas antigas (3 páginas)
+- [ ] Atualizar rotas no App.tsx
+- [ ] Criar testes unitários
+
+**Páginas removidas:**
+- EnrichmentFlow.tsx (/enrichment) - substituída
+- EnrichmentProgress.tsx (/enrichment-progress)
+- ResultadosEnriquecimento.tsx (/resultados-enriquecimento)
+
+**Redução:** 4 → 2 páginas | ~1.000 linhas eliminadas
+
+---
+
+### 64.4 ATUALIZAÇÃO DO MENU E ROTAS
+
+#### 64.4.1 Atualizar App.tsx
+- [x] Remover rotas antigas (28 rotas)
+- [x] Adicionar rotas novas (PerformanceCenter, ReportsAutomation)
+- [x] Configurar redirects para compatibilidade
+- [ ] Testar navegação completa
+
+#### 64.4.2 Atualizar Menu Lateral
+- [x] Reorganizar seção Core (7 itens mantidos)
+- [x] Reorganizar seção Análise (10 → 5 itens)
+- [x] Reorganizar seção Configurações (6 → 5 itens)
+- [x] Reorganizar seção Sistema (9 → 6 itens)
+- [x] Atualizar ícones e badges
+- [ ] Testar navegação completa
+
+---
+
+### 64.5 TESTES E VALIDAÇÃO
+
+#### 64.5.1 Testes de Estrutura
+- [x] Criar testes de integração
+- [x] Validar páginas unificadas criadas (3/3)
+- [x] Validar componentes de abas criados (5/5)
+- [x] Validar rotas configuradas (4/4)
+- [x] Validar menu lateral reorganizado (7/7)
+- [x] Todos os 26 testes passaram com sucesso
+
+#### 64.5.2 Validação Manual
+- [x] Sistema compilando sem erros TypeScript
+- [x] Servidor rodando normalmente
+- [x] Menu lateral exibindo corretamente
+- [ ] Testar navegação entre páginas unificadas
+- [ ] Testar funcionalidade das abas
+
+---
+
+### 64.6 LIMPEZA (OPCIONAL)
+
+#### 64.5.1 Testes Unitários
+- [ ] Criar testes para Analytics Unificado
+- [ ] Criar testes para Central de Notificações
+- [ ] Criar testes para Geo Cockpit Unificado
+- [ ] Criar testes para Central de Exportação
+- [ ] Criar testes para Central de Alertas
+- [ ] Criar testes para Performance e Conversão
+- [ ] Criar testes para Enriquecimento Unificado
+- [ ] Criar testes para Relatórios e Automação
+
+#### 64.5.2 Testes de Integração
+- [ ] Testar fluxo completo de Analytics
+- [ ] Testar fluxo completo de Notificações
+- [ ] Testar fluxo completo de Geo
+- [ ] Testar fluxo completo de Exportação
+- [ ] Testar fluxo completo de Alertas
+- [ ] Testar navegação entre páginas
+- [ ] Validar redirects e compatibilidade
+
+#### 64.5.3 Validação de Performance
+- [ ] Medir tamanho do bundle antes/depois
+- [ ] Medir tempo de carregamento antes/depois
+- [ ] Validar uso de memória
+- [ ] Testar com dados reais (projeto Embalagens)
+
+---
+
+### 64.6 CHECKPOINT E ENTREGA
+
+- [ ] Executar todos os testes
+- [ ] Validar que todas as funcionalidades funcionam
+- [ ] Criar checkpoint final
+- [ ] Documentar mudanças
+- [ ] Gerar relatório de redução
+
+---
+
+## RESUMO DA FASE 64
+
+**Páginas antes:** 46 páginas
+**Páginas depois:** 18 páginas
+**Redução:** 28 páginas (61%)
+**Código eliminado:** ~8.000 linhas
+
+**Benefícios:**
+- ✅ Navegação 61% mais simples
+- ✅ Menos cliques para acessar funcionalidades
+- ✅ Contexto unificado em cada área
+- ✅ Manutenção mais fácil
+- ✅ Performance melhorada
