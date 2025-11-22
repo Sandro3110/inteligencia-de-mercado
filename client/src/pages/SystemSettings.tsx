@@ -150,16 +150,6 @@ export default function SystemSettings() {
           </Button>
         </CardContent>
       </Card>
-
-      {/* Placeholder para futuras configurações */}
-      <Card className="border-dashed">
-        <CardHeader>
-          <CardTitle className="text-muted-foreground">Outras Integrações</CardTitle>
-          <CardDescription>
-            Mais configurações serão adicionadas aqui no futuro
-          </CardDescription>
-        </CardHeader>
-      </Card>
     </div>
   );
 }
