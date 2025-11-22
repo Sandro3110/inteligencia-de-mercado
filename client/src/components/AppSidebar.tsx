@@ -112,6 +112,7 @@ const navSections: NavSection[] = [
     priority: 'medium',
     defaultOpen: false,
     items: [
+      { title: "Configurações do Sistema", href: "/configuracoes/sistema", icon: Settings, badge: "Novo" },
       { title: "Templates Exportação", href: "/export/templates", icon: FileText },
       { title: "Parâmetros Enriquecimento", href: "/enrichment-settings", icon: Settings },
       { title: "Alertas Inteligentes", href: "/intelligent-alerts", icon: Sparkles },

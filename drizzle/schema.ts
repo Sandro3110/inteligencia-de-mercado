@@ -266,6 +266,18 @@ export const enrichmentConfigs = mysqlTable("enrichment_configs", {
 	index("projectId").on(table.projectId),
 ]);
 
+export const systemSettings = mysqlTable("system_settings", {
+	id: int().autoincrement().notNull(),
+	settingKey: varchar({ length: 100 }).notNull(),
+	settingValue: text(),
+	description: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP'),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow(),
+},
+(table) => [
+	index("idx_setting_key").on(table.settingKey),
+]);
+
 export const enrichmentJobs = mysqlTable("enrichment_jobs", {
 	id: int().autoincrement().notNull(),
 	projectId: int().notNull(),

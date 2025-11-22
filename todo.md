@@ -1711,3 +1711,45 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [ ] Documentar estrutura de dados geográficos
 - [ ] Criar guia de uso do cockpit geográfico
 - [ ] Documentar limitações e rate limits
+
+
+---
+
+## FASE 67: MELHORIAS AVANÇADAS DO GEOCOCKPIT 🗺️
+
+### 67.1 Configuração de Google Maps API Key
+- [x] Adicionar campo googleMapsApiKey na tabela system_settings
+- [x] Criar função setGoogleMapsApiKey() no backend
+- [x] Criar função getGoogleMapsApiKey() no backend
+- [x] Criar endpoint tRPC settings.setGoogleMapsApiKey
+- [x] Criar endpoint tRPC settings.getGoogleMapsApiKey
+- [x] Adicionar campo de configuração na página de configurações do sistema
+- [x] Validar formato da API Key antes de salvar
+- [ ] Atualizar GeoCockpit para usar API Key configurada
+
+### 67.2 Filtros Avançados no GeoCockpit
+- [x] Adicionar campo de busca por texto (nome, cidade)
+- [x] Adicionar filtro por mercado (checkboxes multi-select)
+- [x] Adicionar filtro por qualidade (slider 0-100)
+- [x] Implementar lógica de filtros combinados
+- [x] Adicionar contador de resultados filtrados
+- [x] Adicionar botão "Limpar Filtros"
+- [x] Badge indicando número de filtros ativos
+- [ ] Persistir filtros no localStorage
+
+### 67.3 Clustering de Marcadores
+- [x] Instalar biblioteca de clustering (react-leaflet-cluster)
+- [x] Implementar clustering no mapa
+- [x] Configurar níveis de zoom para agrupamento (maxClusterRadius: 50)
+- [x] Adicionar contador de marcadores em cada cluster (automático)
+- [x] Adicionar animação de expansão ao clicar no cluster (spiderfyOnMaxZoom)
+- [x] Otimizar performance para milhares de marcadores (chunkedLoading)
+- [x] Adicionar toggle para ativar/desativar clustering
+- [x] Mostrar cobertura ao passar mouse sobre cluster
+
+### 67.4 Testes e Validação
+- [x] Criar testes para configuração de API Key (5 testes)
+- [x] Criar testes para filtros avançados (4 testes)
+- [x] Testar clustering com diferentes volumes de dados (3 testes)
+- [x] Criar testes de integração completa (2 testes)
+- [x] Total: 14 testes criados e passando 100%

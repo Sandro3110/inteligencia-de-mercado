@@ -4,20 +4,27 @@
  * Página principal para visualização geográfica de clientes, concorrentes e leads
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MapPin, Users, Building2, Target, AlertCircle, Loader2, Map as MapIcon } from 'lucide-react';
+import { MapPin, Users, Building2, Target, AlertCircle, Loader2, Map as MapIcon, Search, Filter, X, Calendar, Sliders } from 'lucide-react';
 import MapContainer from '@/components/maps/MapContainer';
 import HeatmapLayer from '@/components/maps/HeatmapLayer';
 import CustomMarker from '@/components/maps/CustomMarker';
 import DashboardLayout from '@/components/DashboardLayout';
+import MarkerClusterGroup from 'react-leaflet-cluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 export default function GeoCockpit() {
   // Estado dos filtros
@@ -25,6 +32,13 @@ export default function GeoCockpit() {
   const [selectedPesquisa, setSelectedPesquisa] = useState<number | undefined>();
   const [selectedTipo, setSelectedTipo] = useState<'cliente' | 'concorrente' | 'lead' | undefined>();
   const [viewMode, setViewMode] = useState<'heatmap' | 'markers'>('heatmap');
+  
+  // Novos filtros avançados
+  const [searchText, setSearchText] = useState('');
+  const [selectedMercados, setSelectedMercados] = useState<number[]>([]);
+  const [minQuality, setMinQuality] = useState<number>(0);
+  const [showFilters, setShowFilters] = useState(false);
+  const [enableClustering, setEnableClustering] = useState(true);
 
   // Queries
   const { data: stats, isLoading: statsLoading } = trpc.geo.getStats.useQuery({ projetoId: selectedProject });
@@ -38,25 +52,68 @@ export default function GeoCockpit() {
     pesquisaId: selectedPesquisa,
   });
 
-  // Transformar locations para formato do heatmap
-  const heatmapPoints = useMemo(() => {
+  // Query de mercados para o filtro
+  const { data: mercados } = trpc.mercados.list.useQuery({ 
+    projectId: selectedProject,
+    pesquisaId: selectedPesquisa 
+  });
+
+  // Aplicar filtros locais
+  const filteredLocations = useMemo(() => {
     if (!locations) return [];
-    return locations.map(loc => ({
+    
+    return locations.filter(loc => {
+      // Filtro de busca por texto
+      if (searchText) {
+        const search = searchText.toLowerCase();
+        const matchesName = loc.nome?.toLowerCase().includes(search);
+        const matchesCidade = loc.cidade?.toLowerCase().includes(search);
+        if (!matchesName && !matchesCidade) return false;
+      }
+      
+      // Filtro de mercados
+      if (selectedMercados.length > 0 && loc.mercadoId) {
+        if (!selectedMercados.includes(loc.mercadoId)) return false;
+      }
+      
+      // Filtro de qualidade mínima
+      if (minQuality > 0 && loc.qualidadeScore) {
+        if (loc.qualidadeScore < minQuality) return false;
+      }
+      
+      return true;
+    });
+  }, [locations, searchText, selectedMercados, minQuality]);
+
+  // Transformar locations filtradas para formato do heatmap
+  const heatmapPoints = useMemo(() => {
+    if (!filteredLocations) return [];
+    return filteredLocations.map(loc => ({
       lat: loc.latitude,
       lng: loc.longitude,
       intensity: (loc.qualidadeScore || 50) / 100, // Normalizar 0-1
     }));
-  }, [locations]);
+  }, [filteredLocations]);
 
-  // Calcular centro do mapa baseado nos dados
+  // Calcular centro do mapa baseado nos dados filtrados
   const mapCenter = useMemo((): [number, number] => {
-    if (!locations || locations.length === 0) {
+    if (!filteredLocations || filteredLocations.length === 0) {
       return [-14.235, -51.925]; // Centro do Brasil
     }
-    const avgLat = locations.reduce((sum, loc) => sum + loc.latitude, 0) / locations.length;
-    const avgLng = locations.reduce((sum, loc) => sum + loc.longitude, 0) / locations.length;
+    const avgLat = filteredLocations.reduce((sum, loc) => sum + loc.latitude, 0) / filteredLocations.length;
+    const avgLng = filteredLocations.reduce((sum, loc) => sum + loc.longitude, 0) / filteredLocations.length;
     return [avgLat, avgLng];
-  }, [locations]);
+  }, [filteredLocations]);
+  
+  // Função para limpar todos os filtros
+  const clearFilters = () => {
+    setSearchText('');
+    setSelectedMercados([]);
+    setMinQuality(0);
+  };
+  
+  // Verificar se há filtros ativos
+  const hasActiveFilters = searchText || selectedMercados.length > 0 || minQuality > 0;
 
   // Verificar se há dados geocodificados
   const hasGeocodedData = stats && stats.total.comCoordenadas > 0;
@@ -166,6 +223,116 @@ export default function GeoCockpit() {
                 <CardDescription>Configure a visualização do mapa</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Botão de Filtros Avançados */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="w-full"
+                >
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filtros Avançados
+                  {hasActiveFilters && (
+                    <Badge variant="destructive" className="ml-2">
+                      {[searchText, selectedMercados.length > 0, minQuality > 0].filter(Boolean).length}
+                    </Badge>
+                  )}
+                </Button>
+
+                {/* Painel de Filtros Avançados */}
+                {showFilters && (
+                  <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                    {/* Busca por Texto */}
+                    <div className="space-y-2">
+                      <Label htmlFor="search" className="flex items-center gap-2">
+                        <Search className="h-4 w-4" />
+                        Buscar
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="search"
+                          placeholder="Nome, cidade..."
+                          value={searchText}
+                          onChange={(e) => setSearchText(e.target.value)}
+                        />
+                        {searchText && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-1 top-1 h-7 w-7 p-0"
+                            onClick={() => setSearchText('')}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Filtro de Mercados */}
+                    <div className="space-y-2">
+                      <Label>Mercados</Label>
+                      <div className="max-h-40 overflow-y-auto space-y-2">
+                        {mercados && mercados.length > 0 ? (
+                          mercados.map((mercado: any) => (
+                            <div key={mercado.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`mercado-${mercado.id}`}
+                                checked={selectedMercados.includes(mercado.id)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedMercados([...selectedMercados, mercado.id]);
+                                  } else {
+                                    setSelectedMercados(selectedMercados.filter(id => id !== mercado.id));
+                                  }
+                                }}
+                              />
+                              <label
+                                htmlFor={`mercado-${mercado.id}`}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              >
+                                {mercado.nome}
+                              </label>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Nenhum mercado disponível</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Filtro de Qualidade Mínima */}
+                    <div className="space-y-2">
+                      <Label className="flex items-center justify-between">
+                        <span className="flex items-center gap-2">
+                          <Sliders className="h-4 w-4" />
+                          Qualidade Mínima
+                        </span>
+                        <span className="text-primary font-bold">{minQuality}</span>
+                      </Label>
+                      <Slider
+                        value={[minQuality]}
+                        onValueChange={(value) => setMinQuality(value[0])}
+                        max={100}
+                        step={5}
+                        className="w-full"
+                      />
+                    </div>
+
+                    {/* Botão Limpar Filtros */}
+                    {hasActiveFilters && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={clearFilters}
+                        className="w-full"
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Limpar Filtros
+                      </Button>
+                    )}
+                  </div>
+                )}
+
                 {/* Filtro de Tipo */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Tipo de Registro</label>
@@ -196,11 +363,33 @@ export default function GeoCockpit() {
                   </Tabs>
                 </div>
 
+                {/* Toggle de Clustering (apenas para modo marcadores) */}
+                {viewMode === 'markers' && (
+                  <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
+                    <Checkbox
+                      id="clustering"
+                      checked={enableClustering}
+                      onCheckedChange={(checked) => setEnableClustering(checked as boolean)}
+                    />
+                    <label
+                      htmlFor="clustering"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Agrupar marcadores próximos
+                    </label>
+                  </div>
+                )}
+
                 {/* Estatísticas do Filtro Atual */}
-                {locations && (
+                {filteredLocations && (
                   <div className="pt-4 border-t">
                     <div className="text-sm font-medium mb-2">Registros Visíveis</div>
-                    <div className="text-2xl font-bold text-primary">{locations.length}</div>
+                    <div className="text-2xl font-bold text-primary">{filteredLocations.length}</div>
+                    {hasActiveFilters && locations && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        de {locations.length} total
+                      </p>
+                    )}
                   </div>
                 )}
               </CardContent>
@@ -254,31 +443,64 @@ export default function GeoCockpit() {
               </CardHeader>
               <CardContent className="h-[calc(100%-80px)]">
                 {hasGeocodedData ? (
-                  <MapContainer center={mapCenter} zoom={locations && locations.length > 0 ? 5 : 4}>
+                  <MapContainer center={mapCenter} zoom={filteredLocations && filteredLocations.length > 0 ? 5 : 4}>
                     {viewMode === 'heatmap' && heatmapPoints.length > 0 && (
                       <HeatmapLayer points={heatmapPoints} options={{ radius: 30, blur: 20 }} />
                     )}
                     
-                    {viewMode === 'markers' && locations && locations.map((loc: any) => (
-                      <CustomMarker
-                        key={`${loc.tipo}-${loc.id}`}
-                        position={[loc.latitude, loc.longitude]}
-                        type={loc.tipo}
-                        title={loc.nome}
-                      >
-                        <div className="text-xs space-y-1">
-                          <p><strong>Cidade:</strong> {loc.cidade}/{loc.uf}</p>
-                          {loc.qualidadeScore && (
-                            <p><strong>Qualidade:</strong> {loc.qualidadeScore}</p>
-                          )}
-                          {loc.validationStatus && (
-                            <Badge variant="outline" className="text-xs">
-                              {loc.validationStatus}
-                            </Badge>
-                          )}
-                        </div>
-                      </CustomMarker>
-                    ))}
+                    {viewMode === 'markers' && filteredLocations && (
+                      enableClustering ? (
+                        <MarkerClusterGroup
+                          chunkedLoading
+                          maxClusterRadius={50}
+                          spiderfyOnMaxZoom
+                          showCoverageOnHover
+                          zoomToBoundsOnClick
+                        >
+                          {filteredLocations.map((loc: any) => (
+                            <CustomMarker
+                              key={`${loc.tipo}-${loc.id}`}
+                              position={[loc.latitude, loc.longitude]}
+                              type={loc.tipo}
+                              title={loc.nome}
+                            >
+                              <div className="text-xs space-y-1">
+                                <p><strong>Cidade:</strong> {loc.cidade}/{loc.uf}</p>
+                                {loc.qualidadeScore && (
+                                  <p><strong>Qualidade:</strong> {loc.qualidadeScore}</p>
+                                )}
+                                {loc.validationStatus && (
+                                  <Badge variant="outline" className="text-xs">
+                                    {loc.validationStatus}
+                                  </Badge>
+                                )}
+                              </div>
+                            </CustomMarker>
+                          ))}
+                        </MarkerClusterGroup>
+                      ) : (
+                        filteredLocations.map((loc: any) => (
+                          <CustomMarker
+                            key={`${loc.tipo}-${loc.id}`}
+                            position={[loc.latitude, loc.longitude]}
+                            type={loc.tipo}
+                            title={loc.nome}
+                          >
+                            <div className="text-xs space-y-1">
+                              <p><strong>Cidade:</strong> {loc.cidade}/{loc.uf}</p>
+                              {loc.qualidadeScore && (
+                                <p><strong>Qualidade:</strong> {loc.qualidadeScore}</p>
+                              )}
+                              {loc.validationStatus && (
+                                <Badge variant="outline" className="text-xs">
+                                  {loc.validationStatus}
+                                </Badge>
+                              )}
+                            </div>
+                          </CustomMarker>
+                        ))
+                      )
+                    )}
                   </MapContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center text-muted-foreground">

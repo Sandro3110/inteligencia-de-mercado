@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE system_settings ADD UNIQUE KEY unique_setting_key (settingKey);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute ALTER TABLE system_settings ADD UNIQUE KEY unique_setting_key (settingKey);",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1062 (23000) at line 1: Duplicate entry '?' for key 'system_settings.unique_setting_key'"
+  ]
+}

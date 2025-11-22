@@ -4640,3 +4640,82 @@ export async function getUserDrafts(userId: string): Promise<ResearchDraft[]> {
 }
 
 
+
+// ============================================
+// SYSTEM SETTINGS HELPERS
+// ============================================
+
+export async function getSystemSetting(key: string): Promise<string | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get system setting: database not available");
+    return null;
+  }
+
+  try {
+    const results = await db.execute(sql`
+      SELECT settingValue FROM system_settings 
+      WHERE settingKey = ${key}
+      LIMIT 1
+    `);
+    
+    const rows = (results as any)[0] || [];
+    return rows.length > 0 ? rows[0].settingValue : null;
+  } catch (error) {
+    console.error("[Database] Failed to get system setting:", error);
+    return null;
+  }
+}
+
+export async function setSystemSetting(
+  key: string, 
+  value: string, 
+  description?: string
+): Promise<boolean> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot set system setting: database not available");
+    return false;
+  }
+
+  try {
+    await db.execute(sql`
+      INSERT INTO system_settings (settingKey, settingValue, description)
+      VALUES (${key}, ${value}, ${description || null})
+      ON DUPLICATE KEY UPDATE 
+        settingValue = ${value},
+        description = ${description || null},
+        updatedAt = CURRENT_TIMESTAMP
+    `);
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to set system setting:", error);
+    return false;
+  }
+}
+
+export async function getAllSystemSettings(): Promise<Array<{
+  key: string;
+  value: string | null;
+  description: string | null;
+}>> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get all system settings: database not available");
+    return [];
+  }
+
+  try {
+    const results = await db.execute(sql`
+      SELECT settingKey as \`key\`, settingValue as value, description 
+      FROM system_settings
+      ORDER BY settingKey
+    `);
+    
+    const rows = (results as any)[0] || [];
+    return rows;
+  } catch (error) {
+    console.error("[Database] Failed to get all system settings:", error);
+    return [];
+  }
+}

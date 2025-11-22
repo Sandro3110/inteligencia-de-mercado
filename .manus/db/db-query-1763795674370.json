@@ -1,0 +1,9 @@
+{
+  "query": "\nDELETE t1 FROM system_settings t1\nINNER JOIN system_settings t2 \nWHERE t1.id > t2.id AND t1.settingKey = t2.settingKey;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute \nDELETE t1 FROM system_settings t1\nINNER JOIN system_settings t2 \nWHERE t1.id > t2.id AND t1.settingKey = t2.settingKey;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 60
+}

@@ -11,6 +11,31 @@ export const appRouter = router({
   export: exportRouter,
   geo: geocodingRouter,
 
+  settings: router({
+    getGoogleMapsApiKey: protectedProcedure.query(async () => {
+      const { getSystemSetting } = await import('./db');
+      const apiKey = await getSystemSetting('google_maps_api_key');
+      return { apiKey };
+    }),
+
+    setGoogleMapsApiKey: protectedProcedure
+      .input(z.object({ apiKey: z.string().min(1, 'API Key é obrigatória') }))
+      .mutation(async ({ input }) => {
+        const { setSystemSetting } = await import('./db');
+        const success = await setSystemSetting(
+          'google_maps_api_key',
+          input.apiKey,
+          'Google Maps API Key para geocodificação'
+        );
+        return { success };
+      }),
+
+    getAllSettings: protectedProcedure.query(async () => {
+      const { getAllSystemSettings } = await import('./db');
+      return getAllSystemSettings();
+    }),
+  }),
+
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
