@@ -1829,3 +1829,23 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [x] Testar qualificação de leads
 - [x] Validar performance com grandes volumes
 - [x] Criar checkpoint final
+
+
+---
+
+## FASE ATUAL: INTEGRAÇÃO COMPLETA DE GEOCODIFICAÇÃO NO SISTEMA DE ENRIQUECIMENTO 🗺️
+
+### Objetivo
+Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodificados automaticamente durante o fluxo de enriquecimento
+
+### Tarefas
+- [x] Criar helper de geocodificação (geocodeHelper.ts)
+- [x] Integrar geocodificação automática em enrichClientes
+- [x] Adicionar imports de geocodificação em findCompetitorsForMarkets
+- [x] Adicionar imports de geocodificação em findLeadsForMarkets
+- [x] Atualizar schema Gemini de concorrentes para incluir cidade/UF
+- [x] Atualizar schema Gemini de leads para incluir cidade/UF
+- [x] Integrar geocodificação após enriquecimento Gemini de concorrentes
+- [x] Integrar geocodificação após enriquecimento Gemini de leads
+- [x] Atualizar todo.md com status
+- [ ] Criar checkpoint final

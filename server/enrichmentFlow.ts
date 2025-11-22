@@ -442,6 +442,7 @@ async function enrichClientes(
   const { invokeLLM } = await import('./_core/llm');
   const { getCachedEnrichment, setCachedEnrichment } = await import('./_core/enrichmentCache');
   const { consultarCNPJ, extractPorte, extractEndereco, extractCNAE } = await import('./_core/receitaws');
+  const { geocodeCliente } = await import('./geocodeHelper');
 
   const enriched = [];
 
@@ -544,6 +545,11 @@ async function enrichClientes(
       validationStatus: 'pending',
     });
     
+    // Geocodificar automaticamente se tiver cidade e UF
+    if (novoCliente && dadosEnriquecidos?.cidade && dadosEnriquecidos?.uf) {
+      await geocodeCliente(novoCliente.id, dadosEnriquecidos.cidade, dadosEnriquecidos.uf);
+    }
+    
     // Salvar no cache se não estava em cache
     if (!dadosEnriquecidos && cliente.cnpj) {
       const cnpjLimpo = cliente.cnpj.replace(/\D/g, '');
@@ -578,6 +584,7 @@ async function findCompetitorsForMarkets(
   const { createConcorrente } = await import('./db');
   const { filterDuplicates } = await import('./_core/deduplication');
   const { filterRealCompanies } = await import('./_core/companyFilters');
+  const { geocodeConcorrente } = await import('./geocodeHelper');
   const concorrentes: any[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
@@ -671,6 +678,19 @@ async function findCompetitorsForMarkets(
           });
 
           if (novoConcorrente) {
+            // Enriquecer com Gemini para obter cidade/UF
+            const { enrichConcorrenteWithGemini } = await import('./geminiEnrichment');
+            const geminiData = await enrichConcorrenteWithGemini({
+              nome: comp.nome,
+              site: enrichedData.site || undefined,
+              mercadoNome,
+            });
+            
+            // Geocodificar se tiver cidade e UF do Gemini
+            if (geminiData?.cidade && geminiData?.uf) {
+              await geocodeConcorrente(novoConcorrente.id, geminiData.cidade, geminiData.uf);
+            }
+            
             concorrentes.push(novoConcorrente);
           }
         } catch (error) {
@@ -699,6 +719,7 @@ async function findLeadsForMarkets(
   const { createLead } = await import('./db');
   const { filterDuplicates } = await import('./_core/deduplication');
   const { filterRealCompanies } = await import('./_core/companyFilters');
+  const { geocodeLead } = await import('./geocodeHelper');
   const leads: any[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
@@ -799,6 +820,19 @@ async function findLeadsForMarkets(
           });
 
           if (novoLead) {
+            // Enriquecer com Gemini para obter cidade/UF
+            const { enrichLeadWithGemini } = await import('./geminiEnrichment');
+            const geminiData = await enrichLeadWithGemini({
+              nome: lead.nome,
+              site: enrichedData.site || undefined,
+              mercadoNome,
+            });
+            
+            // Geocodificar se tiver cidade e UF do Gemini
+            if (geminiData?.cidade && geminiData?.uf) {
+              await geocodeLead(novoLead.id, geminiData.cidade, geminiData.uf);
+            }
+            
             leads.push(novoLead);
             
             // Registrar atividade

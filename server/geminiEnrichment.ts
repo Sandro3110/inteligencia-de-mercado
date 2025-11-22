@@ -177,6 +177,8 @@ export async function enrichConcorrenteWithGemini(concorrente: {
   nome: string;
   site?: string;
   mercadoNome: string;
+  cidade?: string;
+  uf?: string;
 }) {
   const prompt = `Você é um analista de inteligência competitiva especializado em empresas brasileiras.
 
@@ -189,6 +191,8 @@ Analise esta empresa concorrente e retorne um JSON com os seguintes campos:
 1. produto: Produtos/serviços principais oferecidos (máximo 300 caracteres)
 2. porte: "Micro", "Pequena", "Média" ou "Grande"
 3. faturamentoEstimado: Faturamento anual estimado (ex: "R$ 10-50 milhões/ano", "Acima de R$ 100 milhões/ano")
+4. cidade: Cidade onde a empresa está localizada (apenas o nome da cidade)
+5. uf: Sigla do estado (2 letras, ex: "SP", "RJ")
 
 IMPORTANTE:
 - Seja conservador nas estimativas
@@ -215,8 +219,10 @@ Retorne APENAS o JSON, sem explicações.`;
               produto: { type: "string" },
               porte: { type: "string", enum: ["Micro", "Pequena", "Média", "Grande", "Informação não disponível"] },
               faturamentoEstimado: { type: "string" },
+              cidade: { type: "string" },
+              uf: { type: "string" },
             },
-            required: ["produto", "porte", "faturamentoEstimado"],
+            required: ["produto", "porte", "faturamentoEstimado", "cidade", "uf"],
             additionalProperties: false,
           },
         },
@@ -257,6 +263,8 @@ export async function enrichLeadWithGemini(lead: {
   nome: string;
   site?: string;
   mercadoNome: string;
+  cidade?: string;
+  uf?: string;
 }) {
   const prompt = `Você é um analista de prospecção B2B especializado em qualificação de leads.
 
@@ -270,6 +278,8 @@ Analise este lead e retorne um JSON com os seguintes campos:
 2. porte: "Micro", "Pequena", "Média" ou "Grande"
 3. regiao: Região principal de atuação (ex: "Sudeste", "Nacional", "Sul")
 4. setor: Setor de atuação principal (ex: "Indústria Química", "Varejo", "Logística")
+5. cidade: Cidade onde a empresa está localizada (apenas o nome da cidade)
+6. uf: Sigla do estado (2 letras, ex: "SP", "RJ")
 
 IMPORTANTE:
 - Baseie-se no nome e site da empresa
@@ -297,8 +307,10 @@ Retorne APENAS o JSON, sem explicações.`;
               porte: { type: "string", enum: ["Micro", "Pequena", "Média", "Grande", "Informação não disponível"] },
               regiao: { type: "string" },
               setor: { type: "string" },
+              cidade: { type: "string" },
+              uf: { type: "string" },
             },
-            required: ["tipo", "porte", "regiao", "setor"],
+            required: ["tipo", "porte", "regiao", "setor", "cidade", "uf"],
             additionalProperties: false,
           },
         },
