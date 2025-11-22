@@ -1,179 +1,198 @@
 /**
- * Testes da Fase 65: Correções Críticas
- * - Migração SQL (colunas qtdConcorrentesPorMercado, qtdLeadsPorMercado, qtdProdutosPorCliente)
- * - Página de enriquecimento com progresso
- * - Seletor de pesquisa no header
+ * Testes para Fase 65: Agendamentos, Filtros de Drafts e Heatmap
  */
 
-import { describe, it, expect, beforeAll } from 'vitest';
-import { getDb } from '../db';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { drizzle } from 'drizzle-orm/mysql2';
+import { eq } from 'drizzle-orm';
+import {
+  createReportSchedule,
+  getReportSchedules,
+  getReportScheduleById,
+  updateReportSchedule,
+  deleteReportSchedule,
+  saveResearchDraft,
+  getFilteredDrafts,
+  deleteResearchDraft,
+  getTerritorialDensity,
+  getDensityStatsByRegion,
+} from '../db';
 
-describe('Fase 65: Correções Críticas', () => {
-  let db: Awaited<ReturnType<typeof getDb>>;
+const db = drizzle(process.env.DATABASE_URL!);
 
-  beforeAll(async () => {
-    db = await getDb();
-  });
+describe('Fase 65: Novas Funcionalidades', () => {
+  const testProjectId = 1;
+  const testUserId = 'test-user-fase65';
 
-  describe('65.1 - Migração SQL: Colunas Adicionadas', () => {
-    it('deve ter coluna qtdConcorrentesPorMercado na tabela pesquisas', async () => {
-      if (!db) throw new Error('Database not available');
+  describe('65.1: Agendamento de Relatórios', () => {
+    let scheduleId: number;
 
-      const result: any = await db.execute(`
-        SELECT COLUMN_NAME, DATA_TYPE, COLUMN_DEFAULT
-        FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_SCHEMA = DATABASE()
-        AND TABLE_NAME = 'pesquisas'
-        AND COLUMN_NAME = 'qtdConcorrentesPorMercado'
-      `);
+    it('deve criar um agendamento de relatório', async () => {
+      const nextRunAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      const nextRunTimestamp = nextRunAt.toISOString().slice(0, 19).replace('T', ' ');
 
-      expect(result).toHaveLength(1);
-      expect(result[0].COLUMN_NAME).toBe('qtdConcorrentesPorMercado');
-      expect(result[0].DATA_TYPE).toBe('int');
-      expect(result[0].COLUMN_DEFAULT).toBe('10');
-    });
+      const result = await createReportSchedule({
+        projectId: testProjectId,
+        name: 'Relatório Semanal de Teste',
+        frequency: 'weekly',
+        recipients: ['test@example.com', 'test2@example.com'],
+        config: {
+          format: 'pdf',
+          includeCharts: true,
+        },
+        nextRunAt: nextRunTimestamp,
+      });
 
-    it('deve ter coluna qtdLeadsPorMercado na tabela pesquisas', async () => {
-      if (!db) throw new Error('Database not available');
-
-      const result: any = await db.execute(`
-        SELECT COLUMN_NAME, DATA_TYPE, COLUMN_DEFAULT
-        FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_SCHEMA = DATABASE()
-        AND TABLE_NAME = 'pesquisas'
-        AND COLUMN_NAME = 'qtdLeadsPorMercado'
-      `);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].COLUMN_NAME).toBe('qtdLeadsPorMercado');
-      expect(result[0].DATA_TYPE).toBe('int');
-      expect(result[0].COLUMN_DEFAULT).toBe('20');
-    });
-
-    it('deve ter coluna qtdProdutosPorCliente na tabela pesquisas', async () => {
-      if (!db) throw new Error('Database not available');
-
-      const result: any = await db.execute(`
-        SELECT COLUMN_NAME, DATA_TYPE, COLUMN_DEFAULT
-        FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_SCHEMA = DATABASE()
-        AND TABLE_NAME = 'pesquisas'
-        AND COLUMN_NAME = 'qtdProdutosPorCliente'
-      `);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].COLUMN_NAME).toBe('qtdProdutosPorCliente');
-      expect(result[0].DATA_TYPE).toBe('int');
-      expect(result[0].COLUMN_DEFAULT).toBe('3');
-    });
-
-    it('deve conseguir buscar pesquisas sem erro de coluna', async () => {
-      if (!db) throw new Error('Database not available');
-
-      // Esta query deve funcionar sem erro "Unknown column"
-      const result: any = await db.execute(`
-        SELECT id, projectId, nome, qtdConcorrentesPorMercado, qtdLeadsPorMercado, qtdProdutosPorCliente
-        FROM pesquisas
-        WHERE ativo = 1
-        LIMIT 1
-      `);
-
-      // Se chegou aqui, não houve erro de coluna
       expect(result).toBeDefined();
+      expect(result?.id).toBeTypeOf('number');
+      expect(result?.name).toBe('Relatório Semanal de Teste');
+      expect(result?.frequency).toBe('weekly');
+
+      scheduleId = result!.id;
+    });
+
+    it('deve listar agendamentos do projeto', async () => {
+      const result = await getReportSchedules(testProjectId);
+
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeGreaterThan(0);
+    });
+
+    it('deve buscar agendamento por ID', async () => {
+      const result = await getReportScheduleById(scheduleId);
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe(scheduleId);
+      expect(result?.name).toBe('Relatório Semanal de Teste');
+    });
+
+    it('deve atualizar um agendamento', async () => {
+      const success = await updateReportSchedule(scheduleId, {
+        name: 'Relatório Semanal Atualizado',
+        enabled: false,
+      });
+
+      expect(success).toBe(true);
+
+      const updated = await getReportScheduleById(scheduleId);
+      expect(updated?.name).toBe('Relatório Semanal Atualizado');
+      expect(updated?.enabled).toBe(false);
+    });
+
+    it('deve deletar um agendamento', async () => {
+      const success = await deleteReportSchedule(scheduleId);
+      expect(success).toBe(true);
+
+      const deleted = await getReportScheduleById(scheduleId);
+      expect(deleted).toBeNull();
     });
   });
 
-  describe('65.2 - Página de Enriquecimento', () => {
-    it('deve ter rota /enrichment-progress configurada no App.tsx', async () => {
-      const fs = await import('fs/promises');
-      const appContent = await fs.readFile('/home/ubuntu/gestor-pav/client/src/App.tsx', 'utf-8');
+  describe('65.2: Filtros Avançados de Drafts', () => {
+    let draftId: number;
+
+    it('deve salvar um draft com progressStatus', async () => {
+      const result = await saveResearchDraft(
+        testUserId,
+        {
+          projectName: 'Projeto Teste',
+          method: 'manual',
+          step1Data: { test: true },
+        },
+        2,
+        testProjectId,
+        'in_progress'
+      );
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBeTypeOf('number');
+      expect(result?.currentStep).toBe(2);
       
-      expect(appContent).toContain('/enrichment-progress');
-      expect(appContent).toContain('EnrichmentProgress');
+      draftId = result!.id;
     });
 
-    it('deve ter componente EnrichmentProgress.tsx criado', async () => {
-      const fs = await import('fs/promises');
-      
-      try {
-        const content = await fs.readFile('/home/ubuntu/gestor-pav/client/src/pages/EnrichmentProgress.tsx', 'utf-8');
-        expect(content).toContain('export default function EnrichmentProgress');
-        expect(content).toContain('refetchInterval: 5000'); // Polling a cada 5s
-      } catch (error) {
-        throw new Error('Arquivo EnrichmentProgress.tsx não encontrado');
-      }
+    it('deve filtrar drafts por projeto', async () => {
+      const result = await getFilteredDrafts(testUserId, {
+        projectId: testProjectId,
+      });
+
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeGreaterThan(0);
     });
 
-    it('deve ter redirecionamento do wizard para /enrichment-progress', async () => {
-      const fs = await import('fs/promises');
-      const wizardContent = await fs.readFile('/home/ubuntu/gestor-pav/client/src/pages/ResearchWizard.tsx', 'utf-8');
-      
-      expect(wizardContent).toContain("setLocation('/enrichment-progress')");
+    it('deve filtrar drafts por status de progresso', async () => {
+      const result = await getFilteredDrafts(testUserId, {
+        progressStatus: 'in_progress',
+      });
+
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('deve filtrar drafts por período (últimos 7 dias)', async () => {
+      const result = await getFilteredDrafts(testUserId, {
+        daysAgo: 7,
+      });
+
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('deve buscar drafts por texto no conteúdo', async () => {
+      const result = await getFilteredDrafts(testUserId, {
+        searchText: 'Projeto Teste',
+      });
+
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('deve limpar o draft de teste', async () => {
+      const success = await deleteResearchDraft(draftId);
+      expect(success).toBe(true);
     });
   });
 
-  describe('65.3 - Seletor de Pesquisa no Header', () => {
-    it('deve ter componente PesquisaSelector no CascadeView', async () => {
-      const fs = await import('fs/promises');
-      const cascadeContent = await fs.readFile('/home/ubuntu/gestor-pav/client/src/pages/CascadeView.tsx', 'utf-8');
-      
-      expect(cascadeContent).toContain('PesquisaSelector');
-      expect(cascadeContent).toContain('useSelectedPesquisa');
-    });
+  describe('65.3: Heatmap de Concentração Territorial', () => {
+    it('deve buscar dados de densidade territorial', async () => {
+      const result = await getTerritorialDensity(testProjectId);
 
-    it('deve passar pesquisaId para query de mercados', async () => {
-      const fs = await import('fs/promises');
-      const cascadeContent = await fs.readFile('/home/ubuntu/gestor-pav/client/src/pages/CascadeView.tsx', 'utf-8');
+      expect(Array.isArray(result)).toBe(true);
       
-      expect(cascadeContent).toContain('pesquisaId: selectedPesquisaId');
-    });
-
-    it('deve ter hook useSelectedPesquisa implementado', async () => {
-      const fs = await import('fs/promises');
-      
-      try {
-        const content = await fs.readFile('/home/ubuntu/gestor-pav/client/src/hooks/useSelectedPesquisa.ts', 'utf-8');
-        expect(content).toContain('export function useSelectedPesquisa');
-        expect(content).toContain('localStorage');
-      } catch (error) {
-        throw new Error('Hook useSelectedPesquisa não encontrado');
+      if (result.length > 0) {
+        const item = result[0];
+        expect(item).toHaveProperty('latitude');
+        expect(item).toHaveProperty('longitude');
+        expect(item).toHaveProperty('cidade');
+        expect(item).toHaveProperty('uf');
       }
     });
-  });
 
-  describe('65.4 - Validação Integrada', () => {
-    it('deve conseguir buscar mercados filtrados por pesquisaId', async () => {
-      if (!db) throw new Error('Database not available');
+    it('deve filtrar densidade por tipo de entidade', async () => {
+      const result = await getTerritorialDensity(testProjectId, undefined, 'clientes');
 
-      // Buscar uma pesquisa ativa
-      const pesquisas: any = await db.execute(`
-        SELECT id, projectId FROM pesquisas WHERE ativo = 1 LIMIT 1
-      `);
-
-      if (pesquisas.length === 0) {
-        console.log('⚠️ Nenhuma pesquisa ativa encontrada para teste');
-        return;
-      }
-
-      const pesquisaId = pesquisas[0].id;
-      const projectId = pesquisas[0].projectId;
-
-      // Buscar mercados filtrados por pesquisaId
-      const mercados: any = await db.execute(`
-        SELECT COUNT(*) as total
-        FROM mercados
-        WHERE projectId = ${projectId}
-        AND pesquisaId = ${pesquisaId}
-      `);
-
-      expect(mercados).toBeDefined();
-      expect(mercados[0].total).toBeGreaterThanOrEqual(0);
+      expect(Array.isArray(result)).toBe(true);
     });
 
-    it('deve ter servidor funcionando sem erros críticos', async () => {
-      // Verifica se consegue conectar ao banco
-      expect(db).toBeDefined();
-      expect(db).not.toBeNull();
+    it('deve buscar estatísticas de densidade por região', async () => {
+      const result = await getDensityStatsByRegion(testProjectId);
+
+      expect(Array.isArray(result)).toBe(true);
+      
+      if (result.length > 0) {
+        const stat = result[0];
+        expect(stat).toHaveProperty('uf');
+        expect(stat).toHaveProperty('total');
+        expect(stat).toHaveProperty('qualidadeMedia');
+        expect(stat).toHaveProperty('altaQualidade');
+      }
+    });
+
+    it('deve retornar estatísticas ordenadas por total decrescente', async () => {
+      const result = await getDensityStatsByRegion(testProjectId);
+
+      if (result.length > 1) {
+        for (let i = 0; i < result.length - 1; i++) {
+          expect(Number(result[i].total)).toBeGreaterThanOrEqual(Number(result[i + 1].total));
+        }
+      }
     });
   });
 });

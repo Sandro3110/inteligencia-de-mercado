@@ -35,7 +35,12 @@ import {
   Loader2,
   AlertCircle,
   PlayCircle,
+  Filter,
+  X,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -52,11 +57,26 @@ export default function DraftRecoveryModal({
   onContinueDraft,
 }: DraftRecoveryModalProps) {
   const [draftToDelete, setDraftToDelete] = useState<number | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Filtros
+  const [projectIdFilter, setProjectIdFilter] = useState<number | undefined>();
+  const [progressStatusFilter, setProgressStatusFilter] = useState<'started' | 'in_progress' | 'almost_done' | undefined>();
+  const [daysAgoFilter, setDaysAgoFilter] = useState<number | undefined>();
+  const [searchText, setSearchText] = useState("");
 
-  // Query para listar drafts
-  const { data: drafts, isLoading, refetch } = trpc.drafts.list.useQuery(undefined, {
-    enabled: open,
-  });
+  // Query para listar drafts (com ou sem filtros)
+  const { data: drafts, isLoading, refetch } = trpc.drafts.getFiltered.useQuery(
+    {
+      projectId: projectIdFilter,
+      progressStatus: progressStatusFilter,
+      daysAgo: daysAgoFilter,
+      searchText: searchText || undefined,
+    },
+    {
+      enabled: open,
+    }
+  );
 
   // Mutation para deletar draft
   const deleteDraft = trpc.drafts.delete.useMutation({
@@ -111,14 +131,115 @@ export default function DraftRecoveryModal({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-3xl max-h-[80vh]">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              Recuperar Rascunhos
-            </DialogTitle>
-            <DialogDescription>
-              Retome pesquisas que você começou mas não finalizou
-            </DialogDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Recuperar Rascunhos
+                </DialogTitle>
+                <DialogDescription>
+                  Retome pesquisas que você começou mas não finalizou
+                </DialogDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+                className="gap-2"
+              >
+                <Filter className="w-4 h-4" />
+                {showFilters ? "Ocultar" : "Filtros"}
+              </Button>
+            </div>
           </DialogHeader>
+
+          {/* Painel de Filtros */}
+          {showFilters && (
+            <div className="border rounded-lg p-4 space-y-4 bg-slate-50">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium text-sm">Filtros Avançados</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setProjectIdFilter(undefined);
+                    setProgressStatusFilter(undefined);
+                    setDaysAgoFilter(undefined);
+                    setSearchText("");
+                  }}
+                  className="gap-2 text-xs"
+                >
+                  <X className="w-3 h-3" />
+                  Limpar
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="projectFilter" className="text-xs">Projeto</Label>
+                  <Input
+                    id="projectFilter"
+                    type="number"
+                    placeholder="ID do projeto"
+                    value={projectIdFilter ?? ""}
+                    onChange={(e) => setProjectIdFilter(e.target.value ? Number(e.target.value) : undefined)}
+                    className="h-8 text-sm"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="statusFilter" className="text-xs">Status de Progresso</Label>
+                  <Select
+                    value={progressStatusFilter ?? "all"}
+                    onValueChange={(v) => setProgressStatusFilter(v === "all" ? undefined : v as any)}
+                  >
+                    <SelectTrigger className="h-8 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="started">Iniciado</SelectItem>
+                      <SelectItem value="in_progress">Em Progresso</SelectItem>
+                      <SelectItem value="almost_done">Quase Pronto</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="daysFilter" className="text-xs">Período</Label>
+                  <Select
+                    value={daysAgoFilter?.toString() ?? "all"}
+                    onValueChange={(v) => setDaysAgoFilter(v === "all" ? undefined : Number(v))}
+                  >
+                    <SelectTrigger className="h-8 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="7">Últimos 7 dias</SelectItem>
+                      <SelectItem value="30">Últimos 30 dias</SelectItem>
+                      <SelectItem value="90">Últimos 90 dias</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="searchFilter" className="text-xs">Buscar</Label>
+                  <Input
+                    id="searchFilter"
+                    placeholder="Buscar no conteúdo..."
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    className="h-8 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="text-xs text-slate-600">
+                {drafts && `${drafts.length} rascunho(s) encontrado(s)`}
+              </div>
+            </div>
+          )}
 
           {isLoading ? (
             <div className="flex items-center justify-center py-12">

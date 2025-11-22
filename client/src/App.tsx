@@ -28,6 +28,7 @@ const EnrichmentProgress = lazy(() => import("./pages/EnrichmentProgress"));
 const AlertsPage = lazy(() => import("./pages/AlertsPage"));
 const AlertHistoryPage = lazy(() => import("./pages/AlertHistoryPage"));
 const ReportsPage = lazy(() => import("./pages/ReportsPage"));
+const ReportSchedules = lazy(() => import("./pages/ReportSchedules"));
 const ROIDashboard = lazy(() => import("./pages/ROIDashboard"));
 const FunnelView = lazy(() => import("./pages/FunnelView"));
 const SchedulePage = lazy(() => import("./pages/SchedulePage"));
@@ -57,6 +58,7 @@ const GeoCockpit = lazy(() => import("./pages/GeoCockpit"));
 const GeoCockpitTest = lazy(() => import("./pages/GeoCockpitTest"));
 const GeoCockpitAdvanced = lazy(() => import("./pages/GeoCockpitAdvanced"));
 const TerritorialAnalysis = lazy(() => import("./pages/TerritorialAnalysis"));
+const TerritorialHeatmap = lazy(() => import("./pages/TerritorialHeatmap"));
 const QualityTrendsDashboard = lazy(() => import("./pages/QualityTrendsDashboard"));
 const NotificationDashboard = lazy(() => import("./pages/NotificationDashboard"));
 const PushSettings = lazy(() => import("./pages/PushSettings"));
@@ -85,6 +87,7 @@ function Router() {
       <Route path="/alertas" component={AlertsPage} />
       <Route path="/alertas/historico" component={AlertHistoryPage} />
       <Route path="/relatorios" component={ReportsPage} />
+      <Route path="/agendamentos-relatorios" component={ReportSchedules} />
       <Route path="/roi" component={ROIDashboard} />
       <Route path="/funil" component={FunnelView} />
       <Route path="/agendamento" component={SchedulePage} />
@@ -114,6 +117,7 @@ function Router() {
       <Route path="/geo-cockpit-test" component={GeoCockpitTest} />
       <Route path="/geo-cockpit-advanced" component={GeoCockpitAdvanced} />
       <Route path="/analise-territorial" component={TerritorialAnalysis} />
+      <Route path="/heatmap-territorial" component={TerritorialHeatmap} />
       <Route path="/quality-trends" component={QualityTrendsDashboard} />
       <Route path="/notificacoes/dashboard" component={NotificationDashboard} />
       <Route path="/notificacoes/push" component={PushSettings} />

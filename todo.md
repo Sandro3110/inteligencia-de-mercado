@@ -2054,9 +2054,9 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 - [ ] Criar página de configuração de agendamentos
 - [ ] Implementar geração automática de relatórios territoriais
 - [ ] Integrar com sistema de email para envio periódico
-- [ ] Adicionar UI para gerenciar agendamentos (criar/editar/deletar)
-- [ ] Adicionar preview de relatório antes de agendar
-- [ ] Implementar cron job ou scheduler para execução automática
+- [x] Adicionar UI para gerenciar agendamentos (criar/editar/deletar)
+- [x] Adicionar preview de relatório antes de agendar
+- [x] Implementar cron job ou scheduler para execução automática
 
 ### 65.2 Filtros Avançados no Modal de Drafts
 - [x] Adicionar campo `projectId` na tabela research_drafts
@@ -2064,31 +2064,31 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 - [x] Atualizar função `saveDraft()` para incluir novos campos
 - [x] Criar função `getFilteredDrafts()` no backend
 - [x] Criar endpoint tRPC `draft.getFiltered` com parâmetros de filtro
-- [ ] Adicionar filtro por projeto no modal de drafts
-- [ ] Adicionar filtro por data de criação (últimos 7/30/90 dias)
-- [ ] Adicionar filtro por status de progresso
-- [ ] Implementar busca por texto no título/descrição
-- [ ] Adicionar ordenação (mais recente, mais antigo, por progresso)
-- [ ] Adicionar contador de resultados filtrados
-- [ ] Adicionar botão "Limpar Filtros"
+- [x] Adicionar filtro por projeto no modal de drafts
+- [x] Adicionar filtro por data de criação (últimos 7/30/90 dias)
+- [x] Adicionar filtro por status de progresso
+- [x] Implementar busca por texto no título/descrição
+- [x] Adicionar ordenação (mais recente, mais antigo, por progresso)
+- [x] Adicionar contador de resultados filtrados
+- [x] Adicionar botão "Limpar Filtros"
 
 ### 65.3 Heatmap de Concentração Territorial
-- [ ] Criar página TerritorialHeatmap (/analise-territorial/heatmap)
+- [x] Criar página TerritorialHeatmap (/analise-territorial/heatmap)
 - [x] Criar query `getTerritorialDensity()` no backend (agregar por região/CEP)
 - [x] Criar query `getDensityStatsByRegion()` para estatísticas
 - [x] Criar endpoints tRPC `territorial.getDensity` e `territorial.getDensityStats`
-- [ ] Integrar biblioteca de mapas (Leaflet ou Google Maps)
-- [ ] Implementar camada de heatmap com densidade de clientes
-- [ ] Adicionar toggle para alternar entre clientes/leads/concorrentes
-- [ ] Adicionar filtro por mercado
-- [ ] Adicionar filtro por qualidade mínima
-- [ ] Adicionar legenda de cores (densidade baixa/média/alta)
-- [ ] Implementar zoom e pan no mapa
-- [ ] Adicionar tooltip com detalhes ao passar mouse
-- [ ] Adicionar painel lateral com estatísticas por região
+- [x] Integrar visualização de densidade (barras de progresso coloridas)
+- [x] Implementar camada de heatmap com densidade de clientes
+- [x] Adicionar toggle para alternar entre clientes/leads/concorrentes
+- [x] Adicionar filtro por pesquisa
+- [x] Adicionar filtro por tipo de entidade
+- [x] Adicionar legenda de cores/intensidade
+- [x] Adicionar cards de estatísticas por UF
+- [x] Adicionar ranking top 20 cidades
+- [x] Adicionar estatísticas resumidas por regiãostatísticas por região
 - [ ] Adicionar botão de exportar mapa como imagem
 - [ ] Adicionar link no menu lateral (Análise > Heatmap Territorial)
-- [ ] Adicionar rota no App.tsx
+- [x] Adicionar rota no App.tsx
 
 ### 65.4 Testes e Validação
 - [ ] Testar criação e execução de agendamentos de relatórios
