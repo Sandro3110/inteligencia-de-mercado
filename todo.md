@@ -1848,4 +1848,134 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 - [x] Integrar geocodificação após enriquecimento Gemini de concorrentes
 - [x] Integrar geocodificação após enriquecimento Gemini de leads
 - [x] Atualizar todo.md com status
+- [x] Criar checkpoint final
+
+
+---
+
+## FASE 69: SISTEMA DE DRAFTS + GEOCODIFICAÇÃO EM MASSA + ANÁLISE TERRITORIAL 🗺️📝
+
+### 69.1 Sistema de Drafts - Backend
+- [x] Criar tabela research_drafts no schema
+- [x] Adicionar campos: id, userId, projectId, draftData (JSON), step, createdAt, updatedAt
+- [x] Criar função saveDraft() no db.ts
+- [x] Criar função getDraft() no db.ts
+- [x] Criar função listDrafts() no db.ts
+- [x] Criar função deleteDraft() no db.ts
+- [x] Criar router tRPC draft.save
+- [x] Criar router tRPC draft.get
+- [x] Criar router tRPC draft.list
+- [x] Criar router tRPC draft.delete
+
+### 69.2 Sistema de Drafts - Frontend
+- [x] Criar hook useDraftAutoSave com debounce de 2s
+- [x] Integrar auto-save no ResearchWizard
+- [x] Adicionar indicador visual "Salvando..." / "Salvo"
+- [ ] Criar modal de recuperação de draft na página inicial
+- [ ] Adicionar botão "Retomar Rascunho" quando houver draft
+- [ ] Implementar listagem de drafts com data e progresso
+- [ ] Adicionar botão "Descartar Rascunho"
+- [x] Testar salvamento automático entre steps
+
+### 69.3 Script de Geocodificação em Massa
+- [x] Criar arquivo geocode-bulk.mjs na raiz do projeto
+- [x] Implementar função geocodeClientes()
+- [x] Implementar função geocodeConcorrentes()
+- [x] Implementar função geocodeLeads()
+- [x] Adicionar barra de progresso com cli-progress
+- [x] Adicionar logs detalhados de sucesso/erro
+- [x] Implementar modo "all" para processar todos os tipos
+- [x] Implementar modo "clientes", "concorrentes", "leads"
+- [x] Adicionar rate limiting para respeitar API limits
+- [x] Adicionar retry com backoff exponencial
+- [ ] Testar com pequeno lote primeiro
+- [ ] Executar geocodificação completa da base
+
+### 69.4 Melhorias do GeoCockpit - Filtros e Visualização
+- [ ] Adicionar filtro por pesquisa no GeoCockpit
+- [ ] Adicionar filtro por mercado
+- [ ] Adicionar filtro por período (data)
+- [ ] Adicionar filtro por qualidade (slider)
+- [ ] Adicionar filtro por status de validação
+- [ ] Implementar modo de visualização: heatmap vs marcadores
+- [ ] Adicionar toggle para alternar entre modos
+- [ ] Criar componente HeatmapLayer.tsx
+- [ ] Integrar heatmap com leaflet.heat
+- [ ] Adicionar controle de intensidade do heatmap
+
+### 69.5 GeoCockpit - Interatividade
+- [ ] Implementar click em marcador para abrir detalhes
+- [ ] Criar drawer lateral com informações completas
+- [ ] Adicionar botão "Ver Detalhes Completos" (link para página)
+- [ ] Implementar hover para preview rápido
+- [ ] Adicionar busca por endereço/cidade
+- [ ] Implementar botão "Centralizar no Brasil"
+- [ ] Adicionar seleção de múltiplos pontos (shift+click)
+- [ ] Implementar ações em lote para selecionados
+
+### 69.6 Análise Territorial - Backend
+- [x] Criar função getRegionAnalysis() no db.ts
+- [x] Implementar agregação por UF (estados)
+- [x] Implementar agregação por cidade
+- [x] Calcular densidade por região (pontos/km²)
+- [x] Calcular qualidade média por região
+- [x] Identificar top 10 regiões com maior concentração
+- [x] Criar função getTerritorialInsights()
+- [x] Implementar detecção de clusters geográficos
+- [x] Criar router tRPC geo.getRegionAnalysis
+- [x] Criar router tRPC geo.getTerritorialInsights
+
+### 69.7 Análise Territorial - Frontend
+- [x] Criar página TerritorialAnalysis.tsx (/analise-territorial)
+- [x] Adicionar cards de estatísticas por região
+- [x] Criar tabela de ranking de estados
+- [x] Criar tabela de ranking de cidades
+- [x] Implementar gráfico de barras: Top 10 cidades
+- [x] Implementar gráfico de pizza: Distribuição por UF
+- [ ] Implementar mapa coroplético (estados coloridos por densidade)
+- [x] Adicionar filtros por projeto/pesquisa/mercado
+- [x] Criar seção "Regiões com Maior Potencial"
+- [ ] Adicionar exportação de relatório em PDF
+
+### 69.8 Relatórios de Concentração Geográfica
+- [ ] Criar componente ConcentrationReport.tsx
+- [ ] Calcular índice de concentração de Herfindahl
+- [ ] Identificar regiões com alta concentração de clientes
+- [ ] Identificar regiões com alta concentração de concorrentes
+- [ ] Identificar gaps geográficos (regiões sem cobertura)
+- [ ] Criar mapa de oportunidades (leads vs concorrentes)
+- [ ] Adicionar recomendações automáticas de expansão
+- [ ] Implementar comparação temporal (evolução)
+
+### 69.9 Exportação e Compartilhamento
+- [ ] Adicionar botão "Exportar Mapa como Imagem" (PNG)
+- [ ] Implementar captura de screenshot do mapa
+- [ ] Adicionar botão "Exportar Dados Visíveis" (CSV)
+- [ ] Implementar exportação de relatório territorial (PDF)
+- [ ] Adicionar metadados nos arquivos exportados
+- [ ] Implementar salvamento de configurações de visualização
+
+### 69.10 Integração e Navegação
+- [x] Adicionar link "Análise Territorial" no menu (seção Análise)
+- [x] Adicionar rota /analise-territorial no App.tsx
+- [ ] Adicionar mini-mapa nas páginas de detalhes
+- [ ] Adicionar botão "Ver no Mapa" nos cards de clientes/concorrentes
+- [x] Integrar com sistema de filtros global
+- [ ] Adicionar breadcrumbs de navegação
+
+### 69.11 Performance e Otimização
+- [ ] Implementar virtualização para grandes volumes
+- [ ] Adicionar loading states e skeletons
+- [ ] Implementar debounce em filtros (500ms)
+- [ ] Otimizar queries com índices geográficos
+- [ ] Implementar cache de dados geográficos
+- [ ] Adicionar paginação de marcadores (lazy loading)
+
+### 69.12 Testes e Validação
+- [ ] Criar testes para sistema de drafts (5 testes)
+- [ ] Criar testes para geocodificação em massa (4 testes)
+- [ ] Criar testes para análise territorial (6 testes)
+- [ ] Testar performance com 1000+ pontos no mapa
+- [ ] Validar precisão dos cálculos de densidade
+- [ ] Testar exportações de relatórios
 - [ ] Criar checkpoint final

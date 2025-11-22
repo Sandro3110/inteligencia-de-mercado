@@ -8,7 +8,7 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, Loader2, Save, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
 
@@ -250,10 +250,29 @@ export default function ResearchWizard() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Nova Pesquisa de Mercado</h1>
-          <p className="text-muted-foreground">
-            Siga os 7 passos para criar uma pesquisa completa com enriquecimento automático
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Nova Pesquisa de Mercado</h1>
+              <p className="text-muted-foreground">
+                Siga os 7 passos para criar uma pesquisa completa com enriquecimento automático
+              </p>
+            </div>
+            {draftLoaded && (
+              <div className="flex items-center gap-2 text-sm">
+                {saveDraftMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                    <span className="text-muted-foreground">Salvando...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <span className="text-muted-foreground">Salvo automaticamente</span>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Progress Bar */}

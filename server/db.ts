@@ -4795,3 +4795,273 @@ export async function updateLeadCoordinates(
     return false;
   }
 }
+
+
+
+// ========================================
+// ANÁLISE TERRITORIAL
+// Fase 69.6 - Análise geográfica e insights territoriais
+// ========================================
+
+export async function getRegionAnalysis(projectId: number, pesquisaId?: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get region analysis: database not available");
+    return { byUF: [], byCidade: [] };
+  }
+
+  try {
+    // Análise por UF (estado)
+    const byUFQuery = pesquisaId
+      ? sql`
+        SELECT 
+          uf,
+          COUNT(DISTINCT CASE WHEN source_table = 'clientes' THEN id END) as totalClientes,
+          COUNT(DISTINCT CASE WHEN source_table = 'concorrentes' THEN id END) as totalConcorrentes,
+          COUNT(DISTINCT CASE WHEN source_table = 'leads' THEN id END) as totalLeads,
+          AVG(CASE WHEN qualityScore IS NOT NULL THEN qualityScore ELSE 0 END) as qualidadeMedia,
+          COUNT(*) as total
+        FROM (
+          SELECT id, uf, qualityScore, 'clientes' as source_table
+          FROM clientes 
+          WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT id, uf, qualityScore, 'concorrentes' as source_table
+          FROM concorrentes 
+          WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT id, uf, qualityScore, 'leads' as source_table
+          FROM leads 
+          WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+        ) as combined
+        WHERE uf IS NOT NULL
+        GROUP BY uf
+        ORDER BY total DESC
+      `
+      : sql`
+        SELECT 
+          uf,
+          COUNT(DISTINCT CASE WHEN source_table = 'clientes' THEN id END) as totalClientes,
+          COUNT(DISTINCT CASE WHEN source_table = 'concorrentes' THEN id END) as totalConcorrentes,
+          COUNT(DISTINCT CASE WHEN source_table = 'leads' THEN id END) as totalLeads,
+          AVG(CASE WHEN qualityScore IS NOT NULL THEN qualityScore ELSE 0 END) as qualidadeMedia,
+          COUNT(*) as total
+        FROM (
+          SELECT id, uf, qualityScore, 'clientes' as source_table
+          FROM clientes 
+          WHERE projectId = ${projectId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT id, uf, qualityScore, 'concorrentes' as source_table
+          FROM concorrentes 
+          WHERE projectId = ${projectId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT id, uf, qualityScore, 'leads' as source_table
+          FROM leads 
+          WHERE projectId = ${projectId} AND latitude IS NOT NULL
+        ) as combined
+        WHERE uf IS NOT NULL
+        GROUP BY uf
+        ORDER BY total DESC
+      `;
+
+    const byUFResult = await db.execute(byUFQuery);
+    const byUF = (byUFResult as any)[0] || [];
+
+    // Análise por Cidade (top 20)
+    const byCidadeQuery = pesquisaId
+      ? sql`
+        SELECT 
+          cidade,
+          uf,
+          COUNT(DISTINCT CASE WHEN source_table = 'clientes' THEN id END) as totalClientes,
+          COUNT(DISTINCT CASE WHEN source_table = 'concorrentes' THEN id END) as totalConcorrentes,
+          COUNT(DISTINCT CASE WHEN source_table = 'leads' THEN id END) as totalLeads,
+          AVG(CASE WHEN qualityScore IS NOT NULL THEN qualityScore ELSE 0 END) as qualidadeMedia,
+          COUNT(*) as total
+        FROM (
+          SELECT id, cidade, uf, qualityScore, 'clientes' as source_table
+          FROM clientes 
+          WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT id, cidade, uf, qualityScore, 'concorrentes' as source_table
+          FROM concorrentes 
+          WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT id, cidade, uf, qualityScore, 'leads' as source_table
+          FROM leads 
+          WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+        ) as combined
+        WHERE cidade IS NOT NULL
+        GROUP BY cidade, uf
+        ORDER BY total DESC
+        LIMIT 20
+      `
+      : sql`
+        SELECT 
+          cidade,
+          uf,
+          COUNT(DISTINCT CASE WHEN source_table = 'clientes' THEN id END) as totalClientes,
+          COUNT(DISTINCT CASE WHEN source_table = 'concorrentes' THEN id END) as totalConcorrentes,
+          COUNT(DISTINCT CASE WHEN source_table = 'leads' THEN id END) as totalLeads,
+          AVG(CASE WHEN qualityScore IS NOT NULL THEN qualityScore ELSE 0 END) as qualidadeMedia,
+          COUNT(*) as total
+        FROM (
+          SELECT id, cidade, uf, qualityScore, 'clientes' as source_table
+          FROM clientes 
+          WHERE projectId = ${projectId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT id, cidade, uf, qualityScore, 'concorrentes' as source_table
+          FROM concorrentes 
+          WHERE projectId = ${projectId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT id, cidade, uf, qualityScore, 'leads' as source_table
+          FROM leads 
+          WHERE projectId = ${projectId} AND latitude IS NOT NULL
+        ) as combined
+        WHERE cidade IS NOT NULL
+        GROUP BY cidade, uf
+        ORDER BY total DESC
+        LIMIT 20
+      `;
+
+    const byCidadeResult = await db.execute(byCidadeQuery);
+    const byCidade = (byCidadeResult as any)[0] || [];
+
+    return { byUF, byCidade };
+  } catch (error) {
+    console.error("[Database] Failed to get region analysis:", error);
+    return { byUF: [], byCidade: [] };
+  }
+}
+
+export async function getTerritorialInsights(projectId: number, pesquisaId?: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get territorial insights: database not available");
+    return null;
+  }
+
+  try {
+    // Estatísticas gerais
+    const statsQuery = pesquisaId
+      ? sql`
+        SELECT 
+          COUNT(DISTINCT uf) as totalEstados,
+          COUNT(DISTINCT cidade) as totalCidades,
+          COUNT(*) as totalRegistros,
+          COUNT(DISTINCT CASE WHEN source_table = 'clientes' THEN id END) as totalClientes,
+          COUNT(DISTINCT CASE WHEN source_table = 'concorrentes' THEN id END) as totalConcorrentes,
+          COUNT(DISTINCT CASE WHEN source_table = 'leads' THEN id END) as totalLeads,
+          AVG(CASE WHEN qualityScore IS NOT NULL THEN qualityScore ELSE 0 END) as qualidadeMediaGeral
+        FROM (
+          SELECT id, uf, cidade, qualityScore, 'clientes' as source_table
+          FROM clientes 
+          WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT id, uf, cidade, qualityScore, 'concorrentes' as source_table
+          FROM concorrentes 
+          WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT id, uf, cidade, qualityScore, 'leads' as source_table
+          FROM leads 
+          WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+        ) as combined
+      `
+      : sql`
+        SELECT 
+          COUNT(DISTINCT uf) as totalEstados,
+          COUNT(DISTINCT cidade) as totalCidades,
+          COUNT(*) as totalRegistros,
+          COUNT(DISTINCT CASE WHEN source_table = 'clientes' THEN id END) as totalClientes,
+          COUNT(DISTINCT CASE WHEN source_table = 'concorrentes' THEN id END) as totalConcorrentes,
+          COUNT(DISTINCT CASE WHEN source_table = 'leads' THEN id END) as totalLeads,
+          AVG(CASE WHEN qualityScore IS NOT NULL THEN qualityScore ELSE 0 END) as qualidadeMediaGeral
+        FROM (
+          SELECT id, uf, cidade, qualityScore, 'clientes' as source_table
+          FROM clientes 
+          WHERE projectId = ${projectId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT id, uf, cidade, qualityScore, 'concorrentes' as source_table
+          FROM concorrentes 
+          WHERE projectId = ${projectId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT id, uf, cidade, qualityScore, 'leads' as source_table
+          FROM leads 
+          WHERE projectId = ${projectId} AND latitude IS NOT NULL
+        ) as combined
+      `;
+
+    const statsResult = await db.execute(statsQuery);
+    const stats = (statsResult as any)[0]?.[0] || {};
+
+    // Região com maior concentração
+    const topRegionQuery = pesquisaId
+      ? sql`
+        SELECT uf, COUNT(*) as total
+        FROM (
+          SELECT uf FROM clientes WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT uf FROM concorrentes WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT uf FROM leads WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+        ) as combined
+        WHERE uf IS NOT NULL
+        GROUP BY uf
+        ORDER BY total DESC
+        LIMIT 1
+      `
+      : sql`
+        SELECT uf, COUNT(*) as total
+        FROM (
+          SELECT uf FROM clientes WHERE projectId = ${projectId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT uf FROM concorrentes WHERE projectId = ${projectId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT uf FROM leads WHERE projectId = ${projectId} AND latitude IS NOT NULL
+        ) as combined
+        WHERE uf IS NOT NULL
+        GROUP BY uf
+        ORDER BY total DESC
+        LIMIT 1
+      `;
+
+    const topRegionResult = await db.execute(topRegionQuery);
+    const topRegion = (topRegionResult as any)[0]?.[0] || null;
+
+    // Cidade com maior potencial (mais leads de alta qualidade)
+    const topCityQuery = pesquisaId
+      ? sql`
+        SELECT cidade, uf, COUNT(*) as totalLeads, AVG(qualityScore) as qualidadeMedia
+        FROM leads
+        WHERE projectId = ${projectId} 
+          AND pesquisaId = ${pesquisaId}
+          AND latitude IS NOT NULL 
+          AND qualityScore >= 70
+        GROUP BY cidade, uf
+        ORDER BY totalLeads DESC, qualidadeMedia DESC
+        LIMIT 1
+      `
+      : sql`
+        SELECT cidade, uf, COUNT(*) as totalLeads, AVG(qualityScore) as qualidadeMedia
+        FROM leads
+        WHERE projectId = ${projectId} 
+          AND latitude IS NOT NULL 
+          AND qualityScore >= 70
+        GROUP BY cidade, uf
+        ORDER BY totalLeads DESC, qualidadeMedia DESC
+        LIMIT 1
+      `;
+
+    const topCityResult = await db.execute(topCityQuery);
+    const topCity = (topCityResult as any)[0]?.[0] || null;
+
+    return {
+      ...stats,
+      topRegion,
+      topCity,
+    };
+  } catch (error) {
+    console.error("[Database] Failed to get territorial insights:", error);
+    return null;
+  }
+}

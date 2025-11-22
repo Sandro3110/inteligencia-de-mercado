@@ -97,6 +97,7 @@ const navSections: NavSection[] = [
       { title: "Tendências de Qualidade", href: "/quality-trends", icon: TrendingUp, badge: "Novo" },
       { title: "Cockpit Geográfico", href: "/geo-cockpit", icon: MapPin, badge: "Novo" },
       { title: "GeoCockpit Avançado", href: "/geo-cockpit-advanced", icon: MapPin, badge: "Novo" },
+      { title: "Análise Territorial", href: "/analise-territorial", icon: MapPin, badge: "Novo" },
       { title: "ROI e Performance", href: "/roi", icon: DollarSign, shortcut: "Ctrl+R" },
       { title: "Funil de Conversão", href: "/funil", icon: Filter },
       { title: "Relatórios", href: "/relatorios", icon: FileText },

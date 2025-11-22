@@ -253,4 +253,36 @@ export const geocodingRouter = router({
       const { getRegionStats } = await import("../db-geocoding");
       return getRegionStats(input.projectId, input.pesquisaId);
     }),
+
+  /**
+   * Análise territorial completa (por UF e cidade)
+   * Fase 69.6
+   */
+  getRegionAnalysis: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+        pesquisaId: z.number().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const { getRegionAnalysis } = await import("../db");
+      return getRegionAnalysis(input.projectId, input.pesquisaId);
+    }),
+
+  /**
+   * Insights territoriais (estatísticas gerais + regiões de destaque)
+   * Fase 69.6
+   */
+  getTerritorialInsights: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+        pesquisaId: z.number().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const { getTerritorialInsights } = await import("../db");
+      return getTerritorialInsights(input.projectId, input.pesquisaId);
+    }),
 });
