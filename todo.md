@@ -2200,3 +2200,30 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 - [ ] Testar acessibilidade com ferramentas automatizadas
 - [ ] Realizar testes de usabilidade com usuários
 
+
+
+---
+
+## FASE ATUAL: IMPLEMENTAR PASSO 1 E AJUSTES NAS PÁGINAS 🚀
+
+### Passo 1: Estrutura de Dados e Autenticação
+- [x] Revisar e validar schema do banco de dados
+- [x] Verificar helpers de banco de dados (db.ts)
+- [x] Validar rotas tRPC existentes
+- [x] Confirmar autenticação e controle de acesso
+
+### Ajustes nas Páginas
+- [x] Revisar design system e paleta de cores
+- [x] Validar layout global e navegação
+- [x] Adicionar classes utilitárias modernas (badges, cards, inputs)
+- [x] Melhorar espaçamentos e hierarquia visual
+- [x] Otimizar cores para acessibilidade e contraste
+- [ ] Verificar responsividade das páginas
+- [ ] Testar fluxos principais de usuário
+- [ ] Corrigir bugs visuais ou de UX
+- [ ] Otimizar performance de carregamento
+
+### Validação Final
+- [x] Executar testes automatizados (20 testes passaram)
+- [x] Verificar status do servidor dev
+- [ ] Criar checkpoint após conclusão
