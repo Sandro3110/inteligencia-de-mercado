@@ -240,6 +240,11 @@ export const appRouter = router({
   }),
 
   mercados: router({
+    getFilterOptions: publicProcedure.query(async () => {
+      const { getFilterOptions } = await import('./db');
+      return getFilterOptions();
+    }),
+    
     list: publicProcedure
       .input(z.object({
         projectId: z.number().optional(),

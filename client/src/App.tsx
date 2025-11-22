@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { CompactModeProvider } from "./contexts/CompactModeContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
 import { DashboardCustomizationProvider } from "./contexts/DashboardCustomizationContext";
+import { FilterProvider } from "./contexts/FilterContext";
 import { GlobalShortcuts } from "./components/GlobalShortcuts";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { AppSidebar } from "./components/AppSidebar";
@@ -143,6 +144,7 @@ function App() {
         <CompactModeProvider>
           <OnboardingProvider>
             <DashboardCustomizationProvider>
+              <FilterProvider>
               <TooltipProvider>
                 <Toaster />
                 <GlobalShortcuts />
@@ -152,6 +154,7 @@ function App() {
                   <Router />
                 </Suspense>
               </TooltipProvider>
+              </FilterProvider>
             </DashboardCustomizationProvider>
           </OnboardingProvider>
         </CompactModeProvider>

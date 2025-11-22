@@ -65,6 +65,18 @@ export default function UnifiedCockpit() {
   // Estado da aba ativa (sincronizado com URL)
   const [activeView, setActiveView] = useState<ViewType>("lista");
   
+  // Estado para controlar quais abas já foram visitadas (lazy loading)
+  const [visitedTabs, setVisitedTabs] = useState<Set<ViewType>>(() => new Set<ViewType>(["lista"]));
+  
+  // Função para marcar aba como visitada
+  const markTabAsVisited = (tab: ViewType) => {
+    setVisitedTabs(prev => {
+      const newSet = new Set<ViewType>(prev);
+      newSet.add(tab);
+      return newSet;
+    });
+  };
+  
   // Estado de filtros unificados
   const [filters, setFilters] = useState<UnifiedFilters>({
     searchQuery: "",
@@ -133,6 +145,7 @@ export default function UnifiedCockpit() {
   // Atualizar URL quando aba mudar
   const handleViewChange = (view: ViewType) => {
     setActiveView(view);
+    markTabAsVisited(view); // Marca aba como visitada para lazy loading
     const params = new URLSearchParams(window.location.search);
     params.set("view", view);
     setLocation(`/?${params.toString()}`, { replace: true });
@@ -331,15 +344,35 @@ export default function UnifiedCockpit() {
             
             <div className="flex-1 overflow-hidden">
               <TabsContent value="lista" className="h-full m-0 p-0">
-                <ListViewTab filters={filters} onFiltersChange={setFilters} />
+                {visitedTabs.has("lista") && (
+                  <ListViewTab filters={filters} onFiltersChange={setFilters} />
+                )}
               </TabsContent>
               
               <TabsContent value="mapa" className="h-full m-0 p-0">
-                <MapViewTab filters={filters} onFiltersChange={setFilters} />
+                {visitedTabs.has("mapa") ? (
+                  <MapViewTab filters={filters} onFiltersChange={setFilters} />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <Map className="h-12 w-12 mx-auto mb-4 text-muted-foreground animate-pulse" />
+                      <p className="text-muted-foreground">Carregando mapa...</p>
+                    </div>
+                  </div>
+                )}
               </TabsContent>
               
               <TabsContent value="kanban" className="h-full m-0 p-0">
-                <KanbanViewTab filters={filters} onFiltersChange={setFilters} />
+                {visitedTabs.has("kanban") ? (
+                  <KanbanViewTab filters={filters} onFiltersChange={setFilters} />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <LayoutGrid className="h-12 w-12 mx-auto mb-4 text-muted-foreground animate-pulse" />
+                      <p className="text-muted-foreground">Carregando kanban...</p>
+                    </div>
+                  </div>
+                )}
               </TabsContent>
             </div>
           </Tabs>

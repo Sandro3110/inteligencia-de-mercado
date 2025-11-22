@@ -5472,3 +5472,89 @@ export async function getDensityStatsByRegion(
     return [];
   }
 }
+
+// ============================================
+// FILTER OPTIONS HELPERS
+// ============================================
+
+export async function getFilterOptions() {
+  const db = await getDb();
+  if (!db) {
+    return {
+      estados: [],
+      cidades: [],
+      tags: [],
+    };
+  }
+
+  try {
+    // Buscar estados únicos de todas as entidades
+    const estadosQuery = sql`
+      SELECT DISTINCT uf as estado
+      FROM (
+        SELECT uf FROM clientes WHERE uf IS NOT NULL
+        UNION
+        SELECT uf FROM concorrentes WHERE uf IS NOT NULL
+        UNION
+        SELECT uf FROM leads WHERE uf IS NOT NULL
+      ) as combined
+      WHERE estado IS NOT NULL
+      ORDER BY estado
+    `;
+
+    // Buscar cidades únicas de todas as entidades
+    const cidadesQuery = sql`
+      SELECT DISTINCT cidade
+      FROM (
+        SELECT cidade FROM clientes WHERE cidade IS NOT NULL
+        UNION
+        SELECT cidade FROM concorrentes WHERE cidade IS NOT NULL
+        UNION
+        SELECT cidade FROM leads WHERE cidade IS NOT NULL
+      ) as combined
+      WHERE cidade IS NOT NULL
+      ORDER BY cidade
+    `;
+
+    // Buscar tags únicas
+    const tagsQuery = sql`
+      SELECT DISTINCT tag
+      FROM (
+        SELECT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(tags, ',', numbers.n), ',', -1)) as tag
+        FROM (
+          SELECT tags FROM clientes WHERE tags IS NOT NULL AND tags != ''
+          UNION ALL
+          SELECT tags FROM concorrentes WHERE tags IS NOT NULL AND tags != ''
+          UNION ALL
+          SELECT tags FROM leads WHERE tags IS NOT NULL AND tags != ''
+        ) as entities
+        JOIN (
+          SELECT 1 n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
+          UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+        ) numbers
+        ON CHAR_LENGTH(entities.tags) - CHAR_LENGTH(REPLACE(entities.tags, ',', '')) >= numbers.n - 1
+      ) as all_tags
+      WHERE tag IS NOT NULL AND tag != ''
+      ORDER BY tag
+    `;
+
+    const [estadosResult, cidadesResult, tagsResult] = await Promise.all([
+      db.execute(estadosQuery),
+      db.execute(cidadesQuery),
+      db.execute(tagsQuery),
+    ]);
+
+    return {
+      estados: ((estadosResult as any)[0] || []).map((row: any) => row.estado).filter(Boolean),
+      cidades: ((cidadesResult as any)[0] || []).map((row: any) => row.cidade).filter(Boolean),
+      tags: ((tagsResult as any)[0] || []).map((row: any) => row.tag).filter(Boolean),
+    };
+  } catch (error) {
+    console.error("[Database] Failed to get filter options:", error);
+    return {
+      estados: [],
+      cidades: [],
+      tags: [],
+    };
+  }
+}

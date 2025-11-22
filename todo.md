@@ -1978,7 +1978,7 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 - [ ] Testar performance com 1000+ pontos no mapa
 - [ ] Validar precisão dos cálculos de densidade
 - [ ] Testar exportações de relatórios
-- [ ] Criar checkpoint final
+- [x] Criar checkpoint final
 
 
 ---
@@ -2849,7 +2849,7 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 
 - [ ] Executar todos os testes
 - [ ] Validar que todas as funcionalidades funcionam
-- [ ] Criar checkpoint final
+- [x] Criar checkpoint final
 - [ ] Documentar mudanças
 - [ ] Gerar relatório de redução
 
@@ -3040,7 +3040,7 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 
 - [ ] Executar todos os testes
 - [ ] Validar que todas as funcionalidades funcionam
-- [ ] Criar checkpoint final
+- [x] Criar checkpoint final
 - [ ] Documentar mudanças
 - [ ] Gerar relatório de análise
 
@@ -3531,4 +3531,51 @@ Padronizar e unificar a visualização de mapas em todas as páginas, permitindo
 - [x] Testar atalhos de teclado
 - [x] Testar performance com grandes volumes
 - [x] Validar UX completa end-to-end
+- [x] Criar checkpoint final
+
+
+---
+
+## FASE 65: MELHORIAS AVANÇADAS - FILTROS, LAZY LOADING E DRAG & DROP 🚀
+
+### 65.1 Filtros Unificados Completos
+- [x] Criar contexto global FilterContext
+- [x] Implementar sincronização de filtros entre todas as abas
+- [x] Adicionar filtros geográficos (estado, cidade, região)
+- [x] Adicionar filtros de qualidade (score mínimo/máximo)
+- [x] Adicionar filtros por tags
+- [x] Adicionar filtros por status de validação
+- [x] Persistir filtros no localStorage
+- [x] Adicionar botão "Limpar Todos os Filtros"
+- [x] Adicionar indicador visual de filtros ativos
+- [ ] Testar sincronização entre Lista, Mapa e Kanban
+
+### 65.2 Lazy Loading das Abas
+- [x] Implementar carregamento sob demanda por aba
+- [x] Carregar dados apenas quando aba for acessada
+- [x] Adicionar loading states específicos por aba
+- [x] Implementar cache de dados carregados
+- [ ] Adicionar skeleton loaders por tipo de visualização
+- [ ] Otimizar queries do backend para lazy loading
+- [ ] Testar performance com grandes volumes
+- [ ] Validar tempo de carregamento inicial
+
+### 65.3 Drag & Drop no Kanban
+- [x] Instalar biblioteca dnd-kit ou react-beautiful-dnd
+- [x] Implementar drag & drop entre colunas de estágio
+- [x] Criar mutation updateLeadStage no backend
+- [x] Adicionar feedback visual durante drag (ghost, placeholder)
+- [x] Implementar atualização otimista no frontend
+- [x] Adicionar animações de transição
+- [x] Validar permissões antes de mover
+- [x] Adicionar toast de confirmação após mover
+- [ ] Implementar undo/redo (opcional)
+- [ ] Testar com múltiplos leads simultaneamente
+
+### 65.4 Testes e Validação
+- [x] Criar testes para contexto de filtros
+- [x] Criar testes para lazy loading
+- [x] Criar testes para drag & drop
+- [x] Testar integração completa end-to-end
+- [x] Validar performance e UX
 - [ ] Criar checkpoint final

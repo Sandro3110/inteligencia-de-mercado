@@ -17,6 +17,7 @@ import { SavedFilters } from "@/components/SavedFilters";
 import { SkeletonMercado, SkeletonCliente, SkeletonConcorrente, SkeletonLead } from "@/components/SkeletonLoading";
 import { MercadoAccordionCard } from "@/components/MercadoAccordionCard";
 import { CompararMercadosModal } from "@/components/CompararMercadosModal";
+import { UnifiedFilterPanel } from "@/components/UnifiedFilterPanel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -965,6 +966,8 @@ export default function CascadeView() {
       {/* Barra de Filtros Horizontal */}
       <div className="border-b border-border/40 px-6 py-3 bg-white/80 backdrop-blur-sm">
         <div className="flex items-center gap-4 flex-wrap">
+          {/* Painel de Filtros Unificados */}
+          <UnifiedFilterPanel />
           {/* Busca Global *        <div className="flex items-center gap-2">
           <Link href="/enrichment">
             <Button variant="default" className="h-10 gap-2">
