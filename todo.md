@@ -2452,3 +2452,74 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 
 **Resultado:** Redução de 3 para 1 página. Central de Alertas agora unificada com 3 abas: Configuração, Histórico e Alertas Inteligentes.
 
+
+
+---
+
+## 🎯 FASE 2 - SEMANA 1: FUSÃO 3 - GEO COCKPIT UNIFICADO
+
+### Fusão 3: Geo Cockpit Unificado (5→2) 🗺️
+- [x] Analisar páginas existentes: GeoCockpit, GeoCockpitAdvanced, TerritorialAnalysis, TerritorialHeatmap
+- [x] Criar nova estrutura com seletor de modo em GeoCockpit.tsx
+- [x] Migrar modo "Cockpit" (GeoCockpit.tsx atual)
+- [x] Migrar modo "Análise Territorial" (TerritorialAnalysis.tsx)
+- [x] Migrar modo "Heatmap" (TerritorialHeatmap.tsx)
+- [x] Adicionar painel lateral com controles avançados
+- [x] Integrar todas as funcionalidades geo (mapa, filtros, análise)
+- [x] Remover arquivos: GeoCockpitAdvanced.tsx, GeoCockpitTest.tsx, TerritorialAnalysis.tsx, TerritorialHeatmap.tsx
+- [ ] Criar página "Administração Geo" (/geo-admin) com abas (GeoAdmin + Geocodificacao) - PENDENTE
+- [x] Atualizar rotas no App.tsx
+- [ ] Atualizar menu no AppSidebar.tsx - PENDENTE
+- [ ] Testar navegação e funcionalidades - PENDENTE
+
+**Objetivo:** Redução de 5 para 2 páginas. Interface geo unificada e profissional.
+
+
+
+---
+
+## 🎯 FASE 2 - SEMANA 2: FUSÃO 6 - CENTRAL DE EXPORTAÇÃO
+
+### Fusão 6: Central de Exportação (3→1) 📤
+- [x] Analisar páginas existentes: ExportWizard, TemplateAdmin, ExportHistory
+- [x] Criar nova estrutura com sistema de abas em ExportWizard.tsx
+- [x] Aba "Nova Exportação" (wizard de exportação)
+- [x] Aba "Templates" (gerenciar templates)
+- [x] Aba "Histórico" (exportações anteriores)
+- [x] Remover arquivos: TemplateAdmin.tsx, ExportHistory.tsx
+- [x] Atualizar rotas no App.tsx
+- [ ] Atualizar menu no AppSidebar.tsx - PENDENTE
+- [ ] Testar workflow de exportação - PENDENTE
+
+**Objetivo:** Redução de 3 para 1 página. Workflow de exportação mais fluido.
+
+
+
+---
+
+## 🎯 FASE 3 - FUSÕES RESTANTES (BATCH)
+
+### Fusão 8: Gestão de Projetos (3→1) 📁
+- [ ] Analisar: ProjectManagement, ProjectActivityDashboard, ProjectSettings
+- [ ] Criar estrutura com abas em ProjectManagement.tsx
+- [ ] Remover arquivos antigos
+- [ ] Atualizar rotas
+
+### Fusão 9: Enriquecimento Unificado (4→2) 🔍
+- [ ] Analisar: EnrichmentWizard, EnrichmentConfig, ResultadosEnriquecimento, EnrichmentHistory
+- [ ] Criar EnrichmentWizard unificado com abas
+- [ ] Criar EnrichmentConfig com settings
+- [ ] Remover arquivos antigos
+
+### Fusão 10: Performance e Conversão (3→1) 📊
+- [ ] Analisar: PerformanceAnalysis, ConversionTracking, ROIAnalysis
+- [ ] Criar Performance unificado com abas
+- [ ] Remover arquivos antigos
+
+### Fusão 7: Relatórios e Automação (3→1) 📋
+- [ ] Analisar: ReportBuilder, AutomationRules, ScheduledReports
+- [ ] Criar Reports unificado com abas
+- [ ] Remover arquivos antigos
+
+**Objetivo:** Completar todas as fusões planejadas de forma eficiente.
+

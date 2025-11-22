@@ -37,7 +37,7 @@ const ResultadosEnriquecimento = lazy(() => import("./pages/ResultadosEnriquecim
 const ResearchOverview = lazy(() => import("./pages/ResearchOverview"));
 
 const ExportWizard = lazy(() => import("./pages/ExportWizard"));
-const TemplateAdmin = lazy(() => import("./pages/TemplateAdmin"));
+// TemplateAdmin fundido em ExportWizard
 const ResearchWizard = lazy(() => import("./pages/ResearchWizard"));
 const AdminLLM = lazy(() => import("./pages/AdminLLM"));
 const MonitoringDashboard = lazy(() => import("./pages/MonitoringDashboard"));
@@ -47,14 +47,11 @@ const ProjectManagement = lazy(() => import("./pages/ProjectManagement"));
 const ProjectActivityDashboard = lazy(() => import("./pages/ProjectActivityDashboard"));
 const Notificacoes = lazy(() => import("./pages/Notificacoes"));
 const NotificationConfig = lazy(() => import("./pages/NotificationConfig"));
-const ExportHistory = lazy(() => import("./pages/ExportHistory"));
+// ExportHistory fundido em ExportWizard
 const Geocodificacao = lazy(() => import("./pages/Geocodificacao"));
 const GeoAdmin = lazy(() => import("./pages/GeoAdmin"));
 const GeoCockpit = lazy(() => import("./pages/GeoCockpit"));
-const GeoCockpitTest = lazy(() => import("./pages/GeoCockpitTest"));
-const GeoCockpitAdvanced = lazy(() => import("./pages/GeoCockpitAdvanced"));
-const TerritorialAnalysis = lazy(() => import("./pages/TerritorialAnalysis"));
-const TerritorialHeatmap = lazy(() => import("./pages/TerritorialHeatmap"));
+// GeoCockpitTest, GeoCockpitAdvanced, TerritorialAnalysis, TerritorialHeatmap fundidos em GeoCockpit
 
 
 const SystemSettings = lazy(() => import("./pages/SystemSettings"));
@@ -93,7 +90,7 @@ function Router() {
       <Route path="/research-overview" component={ResearchOverview} />
 
       <Route path="/export" component={ExportWizard} />
-      <Route path="/export/templates" component={TemplateAdmin} />
+      {/* /export/templates fundido em /export/wizard */}
       <Route path="/research/new" component={ResearchWizard} />
       <Route path="/admin/llm" component={AdminLLM} />
       <Route path="/monitoring" component={MonitoringDashboard} />
@@ -103,14 +100,11 @@ function Router() {
       <Route path="/projetos/atividade" component={ProjectActivityDashboard} />
       <Route path="/notificacoes" component={Notificacoes} />
       <Route path="/notificacoes/config" component={NotificationConfig} />
-      <Route path="/export/historico" component={ExportHistory} />
+      {/* /export/historico fundido em /export/wizard */}
       <Route path="/geocodificacao" component={Geocodificacao} />
       <Route path="/geo-admin" component={GeoAdmin} />
       <Route path="/geo-cockpit" component={GeoCockpit} />
-      <Route path="/geo-cockpit-test" component={GeoCockpitTest} />
-      <Route path="/geo-cockpit-advanced" component={GeoCockpitAdvanced} />
-      <Route path="/analise-territorial" component={TerritorialAnalysis} />
-      <Route path="/heatmap-territorial" component={TerritorialHeatmap} />
+      {/* Rotas removidas - funcionalidades fundidas em /geo-cockpit */}
       {/* /quality-trends fundido em /tendencias */}
 
       <Route path="/configuracoes/sistema" component={SystemSettings} />
