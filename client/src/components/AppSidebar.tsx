@@ -93,7 +93,7 @@ const navSections: NavSection[] = [
       { title: "Mercados", href: "/mercados", icon: Package, shortcut: "Ctrl+M" },
       { title: "Analytics Unificado", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+A" },
       { title: "Tendências", href: "/tendencias", icon: TrendingUp },
-      { title: "Tendências de Qualidade", href: "/quality-trends", icon: TrendingUp, badge: "Novo" },
+
       { title: "Cockpit Geográfico", href: "/geo-cockpit", icon: MapPin, badge: "Novo" },
       { title: "GeoCockpit Avançado", href: "/geo-cockpit-advanced", icon: MapPin, badge: "Novo" },
       { title: "Análise Territorial", href: "/analise-territorial", icon: MapPin, badge: "Novo" },
@@ -116,7 +116,7 @@ const navSections: NavSection[] = [
       { title: "Configurações do Sistema", href: "/configuracoes/sistema", icon: Settings, badge: "Novo" },
       { title: "Templates Exportação", href: "/export/templates", icon: FileText },
       { title: "Parâmetros Enriquecimento", href: "/enrichment-settings", icon: Settings },
-      { title: "Alertas Inteligentes", href: "/intelligent-alerts", icon: Sparkles },
+
       { title: "Configurar Alertas", href: "/alertas", icon: Bell },
       { title: "Agendamentos", href: "/agendamento", icon: Calendar },
       { title: "Configurar IA (LLM)", href: "/admin/llm", icon: Zap },
@@ -141,7 +141,7 @@ const navSections: NavSection[] = [
       { title: "Monitoramento", href: "/monitoring", icon: Activity },
       { title: "Atividade de Projetos", href: "/projetos/atividade", icon: FolderOpen, badge: "Novo" },
       { title: "Registro de Atividades", href: "/atividade", icon: Clock },
-      { title: "Histórico de Alertas", href: "/alertas/historico", icon: Bell },
+
       { title: "Central de Ajuda", href: "/ajuda", icon: HelpCircle, shortcut: "?", badge: "Novo" },
     ],
   },

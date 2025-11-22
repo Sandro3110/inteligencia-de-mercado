@@ -2412,3 +2412,43 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 - [x] Atualizar rotas no App.tsx
 - [x] Atualizar menu no AppSidebar.tsx
 - [ ] Testar sistema completo
+
+
+---
+
+## 🎯 FASE 2 - SEMANA 1: FUSÃO 4 - DASHBOARD DE TENDÊNCIAS ✅
+
+### Fusão 4: Dashboard de Tendências (2→1) 📊
+- [x] Criar nova estrutura com sistema de abas em TendenciasDashboard.tsx
+- [x] Migrar conteúdo de TendenciasDashboard.tsx para aba "Tendências Gerais"
+- [x] Migrar conteúdo de QualityTrendsDashboard.tsx para aba "Tendências de Qualidade"
+- [x] Adicionar toggle entre as duas visões com Tabs do shadcn/ui
+- [x] Manter todos os gráficos (linha, área, barras) na aba de qualidade
+- [x] Manter insights e alertas na aba de tendências gerais
+- [x] Remover arquivo: QualityTrendsDashboard.tsx
+- [x] Atualizar rotas no App.tsx
+- [x] Atualizar menu no AppSidebar.tsx
+- [x] Testar navegação e funcionalidades
+
+**Resultado:** Redução de 2 para 1 página. Dashboard de Tendências agora unificado com toggle entre visões gerais e de qualidade.
+
+
+
+---
+
+## 🎯 FASE 2 - SEMANA 1: FUSÃO 5 - CENTRAL DE ALERTAS ✅
+
+### Fusão 5: Central de Alertas (3→1) 🔔
+- [x] Criar nova estrutura com sistema de abas em AlertsPage.tsx
+- [x] Migrar AlertConfig (configuração básica) para aba "Configuração"
+- [x] Migrar AlertHistoryPage.tsx para aba "Histórico"
+- [x] Migrar IntelligentAlerts.tsx para aba "Alertas Inteligentes"
+- [x] Manter todas as funcionalidades (criar/editar/deletar alertas, histórico, alertas IA)
+- [x] Adicionar sistema de abas com 3 seções
+- [x] Remover arquivos: AlertHistoryPage.tsx, IntelligentAlerts.tsx
+- [x] Atualizar rotas no App.tsx
+- [x] Atualizar menu no AppSidebar.tsx
+- [x] Corrigir erro TypeScript (intelligentStats.total)
+
+**Resultado:** Redução de 3 para 1 página. Central de Alertas agora unificada com 3 abas: Configuração, Histórico e Alertas Inteligentes.
+

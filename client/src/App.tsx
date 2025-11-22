@@ -24,7 +24,7 @@ const EnrichmentFlow = lazy(() => import("./pages/EnrichmentFlow"));
 const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
 const EnrichmentProgress = lazy(() => import("./pages/EnrichmentProgress"));
 const AlertsPage = lazy(() => import("./pages/AlertsPage"));
-const AlertHistoryPage = lazy(() => import("./pages/AlertHistoryPage"));
+
 const ReportsPage = lazy(() => import("./pages/ReportsPage"));
 const ReportSchedules = lazy(() => import("./pages/ReportSchedules"));
 const ROIDashboard = lazy(() => import("./pages/ROIDashboard"));
@@ -41,7 +41,7 @@ const TemplateAdmin = lazy(() => import("./pages/TemplateAdmin"));
 const ResearchWizard = lazy(() => import("./pages/ResearchWizard"));
 const AdminLLM = lazy(() => import("./pages/AdminLLM"));
 const MonitoringDashboard = lazy(() => import("./pages/MonitoringDashboard"));
-const IntelligentAlerts = lazy(() => import("./pages/IntelligentAlerts"));
+
 const TendenciasDashboard = lazy(() => import("./pages/TendenciasDashboard"));
 const ProjectManagement = lazy(() => import("./pages/ProjectManagement"));
 const ProjectActivityDashboard = lazy(() => import("./pages/ProjectActivityDashboard"));
@@ -55,7 +55,7 @@ const GeoCockpitTest = lazy(() => import("./pages/GeoCockpitTest"));
 const GeoCockpitAdvanced = lazy(() => import("./pages/GeoCockpitAdvanced"));
 const TerritorialAnalysis = lazy(() => import("./pages/TerritorialAnalysis"));
 const TerritorialHeatmap = lazy(() => import("./pages/TerritorialHeatmap"));
-const QualityTrendsDashboard = lazy(() => import("./pages/QualityTrendsDashboard"));
+
 
 const SystemSettings = lazy(() => import("./pages/SystemSettings"));
 const Ajuda = lazy(() => import("./pages/Ajuda"));
@@ -80,7 +80,7 @@ function Router() {
       {/* /analytics-dashboard fundido em /analytics */}
       <Route path="/enrichment-progress" component={EnrichmentProgress} />
       <Route path="/alertas" component={AlertsPage} />
-      <Route path="/alertas/historico" component={AlertHistoryPage} />
+      {/* /alertas/historico fundido em /alertas */}
       <Route path="/relatorios" component={ReportsPage} />
       <Route path="/agendamentos-relatorios" component={ReportSchedules} />
       <Route path="/roi" component={ROIDashboard} />
@@ -97,7 +97,7 @@ function Router() {
       <Route path="/research/new" component={ResearchWizard} />
       <Route path="/admin/llm" component={AdminLLM} />
       <Route path="/monitoring" component={MonitoringDashboard} />
-      <Route path="/intelligent-alerts" component={IntelligentAlerts} />
+      {/* /intelligent-alerts fundido em /alertas */}
       <Route path="/tendencias" component={TendenciasDashboard} />
       <Route path="/projetos" component={ProjectManagement} />
       <Route path="/projetos/atividade" component={ProjectActivityDashboard} />
@@ -111,7 +111,7 @@ function Router() {
       <Route path="/geo-cockpit-advanced" component={GeoCockpitAdvanced} />
       <Route path="/analise-territorial" component={TerritorialAnalysis} />
       <Route path="/heatmap-territorial" component={TerritorialHeatmap} />
-      <Route path="/quality-trends" component={QualityTrendsDashboard} />
+      {/* /quality-trends fundido em /tendencias */}
 
       <Route path="/configuracoes/sistema" component={SystemSettings} />
       <Route path="/ajuda" component={Ajuda} />
