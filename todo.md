@@ -3578,4 +3578,4 @@ Padronizar e unificar a visualização de mapas em todas as páginas, permitindo
 - [x] Criar testes para drag & drop
 - [x] Testar integração completa end-to-end
 - [x] Validar performance e UX
-- [ ] Criar checkpoint final
+- [x] Criar checkpoint final
