@@ -7,6 +7,7 @@ import { exportRouter } from "./routers/exportRouter";
 import { geocodingRouter } from "./routers/geocodingRouter";
 import { territorialRouter } from "./routers/territorialRouter";
 import { reportsRouter } from "./routers/reportsRouter";
+import { unifiedMapRouter } from "./routers/unifiedMapRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -14,6 +15,7 @@ export const appRouter = router({
   geo: geocodingRouter,
   territorial: territorialRouter,
   reports: reportsRouter,
+  unifiedMap: unifiedMapRouter,
 
   settings: router({
     getGoogleMapsApiKey: protectedProcedure.query(async () => {

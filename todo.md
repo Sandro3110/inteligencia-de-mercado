@@ -3346,3 +3346,86 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 - Criar testes vitest adicionais para cobertura completa
 - Salvar checkpoint final
 - Gerar documentação de usuário
+
+
+---
+
+## NOVOS ITENS SOLICITADOS
+
+### 1. Implementar Funcionalidade de Pesquisa
+- [ ] Adicionar campo de busca global no header
+- [ ] Implementar busca em tempo real
+- [ ] Adicionar filtros de busca avançada
+- [ ] Criar página de resultados de busca
+- [ ] Indexar dados para busca rápida
+
+### 2. Melhorar Sistema de Notificações
+- [ ] Criar componente de notificações no header
+- [ ] Implementar badge de contador de notificações não lidas
+- [ ] Criar página de histórico de notificações
+- [ ] Adicionar tipos de notificação (info, sucesso, aviso, erro)
+- [ ] Implementar sistema de preferências de notificação
+
+### 3. Adicionar Exportação de Relatórios Personalizados
+- [ ] Criar interface de seleção de dados para exportação
+- [ ] Implementar exportação em múltiplos formatos (PDF, Excel, CSV)
+- [ ] Adicionar templates de relatórios predefinidos
+- [ ] Permitir customização de layout de relatórios
+- [ ] Implementar agendamento de relatórios automáticos
+
+
+---
+
+## FASE NOVA: SISTEMA UNIFICADO DE VISUALIZAÇÃO EM MAPAS 🗺️
+
+### Objetivo
+Padronizar e unificar a visualização de mapas em todas as páginas, permitindo que o usuário visualize mercados, clientes, produtos, concorrentes e leads em um único mapa interativo com controles avançados de camadas, clustering e filtros.
+
+### Backend - Queries tRPC
+- [x] Criar query `geo.getAllEntities` para buscar todas as entidades (mercados, clientes, produtos, concorrentes, leads) com coordenadas
+- [x] Criar query `geo.getEntityDetails` para buscar detalhes de uma entidade específica ao clicar
+- [x] Adicionar filtros: tipo de entidade, mercados, qualidade mínima, região, período
+- [x] Otimizar queries com índices nas colunas latitude/longitude
+- [x] Adicionar suporte a paginação/limite para grandes volumes
+
+### Frontend - Componentes Base
+- [x] Criar `UnifiedMapView.tsx` - Componente principal do mapa unificado
+- [x] Criar `MapControls.tsx` - Painel de controles (seletor de entidades, modo de visualização, zoom)
+- [x] Criar `EntityMarker.tsx` - Marcador unificado com cores e ícones por tipo
+- [x] Criar `EntityPopupCard.tsx` - Card popup padronizado ao clicar em marcador
+- [x] Criar `MapLegend.tsx` - Legenda com contadores por tipo de entidade
+- [x] Criar `MapFilters.tsx` - Painel lateral de filtros avançados
+
+### Frontend - Funcionalidades
+- [x] Implementar seletor de entidades (checkboxes: Mercados, Clientes, Produtos, Concorrentes, Leads)
+- [x] Implementar modo de visualização (Pontos Individuais, Heatmap, Híbrido)
+- [x] Implementar controle de agrupamento (zoom, raio de cluster, auto-ajustar)
+- [x] Implementar cores e ícones padronizados por tipo de entidade
+- [x] Implementar clustering inteligente (por estado/região/cidade conforme zoom)
+- [x] Implementar cards popup com informações específicas por tipo
+- [x] Adicionar ações nos cards (Ver Detalhes, Editar, Navegar)
+- [x] Implementar filtros avançados (busca, qualidade, mercados, regiões, período)
+- [x] Adicionar legenda com contadores em tempo real
+
+### Integração com Páginas Existentes
+- [x] Atualizar `GeoCockpit.tsx` para usar `UnifiedMapView`
+- [ ] Adicionar mini-mapa no Dashboard usando `UnifiedMapView`
+- [ ] Atualizar Análise Territorial para usar o novo sistema
+- [ ] Adicionar mapa focado em Detalhes de Mercado
+
+### Produtos no Mapa
+- [x] Definir lógica de posicionamento de produtos (baseado em mercados/clientes onde são vendidos)
+- [x] Criar agregação de produtos por localização
+- [x] Implementar popup de produto com lista de mercados/clientes
+
+### Testes e Validação
+- [x] Criar testes vitest para queries tRPC
+- [x] Testar carregamento de grandes volumes (1000+ pontos)
+- [ ] Testar clustering em diferentes níveis de zoom
+- [ ] Testar filtros e interações
+- [ ] Validar performance e responsividade
+
+### Documentação
+- [ ] Documentar estrutura de dados das entidades
+- [ ] Documentar API dos componentes
+- [ ] Criar guia de uso do sistema de mapas
