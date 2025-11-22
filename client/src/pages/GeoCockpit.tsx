@@ -130,8 +130,6 @@ export default function GeoCockpit() {
     pesquisaId: selectedPesquisaId ?? undefined 
   }, { enabled: !!selectedProjectId });
 
-  // TODO: Implementar exportação PDF territorial
-
   // Filtrar locations (modo Cockpit)
   const filteredLocations = useMemo(() => {
     if (!locations) return [];

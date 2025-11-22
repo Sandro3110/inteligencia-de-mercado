@@ -40,6 +40,9 @@ import {
   X,
 } from "lucide-react";
 import { ProjectSelector } from "@/components/ProjectSelector";
+import { PesquisaSelector } from "@/components/PesquisaSelector";
+import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { useSelectedPesquisa } from "@/hooks/useSelectedPesquisa";
 import {
   Select,
   SelectContent,
@@ -76,8 +79,9 @@ export default function MercadoDetalhes() {
 
   const utils = trpc.useUtils();
   
-  // Buscar projeto selecionado do localStorage
-  const selectedProjectId = parseInt(localStorage.getItem("selectedProjectId") || "0");
+  // Usar hooks para projeto e pesquisa selecionados
+  const { selectedProjectId } = useSelectedProject();
+  const { selectedPesquisaId } = useSelectedPesquisa(selectedProjectId);
 
   // Funções de filtragem (definidas antes do uso)
   const filterClientes = (clientes: any[]) => {
@@ -175,7 +179,11 @@ export default function MercadoDetalhes() {
   
   // Buscar todos os mercados do projeto para o seletor
   const { data: mercados } = trpc.mercados.list.useQuery(
-    { projectId: selectedProjectId, search: "" },
+    { 
+      projectId: selectedProjectId ?? undefined, 
+      pesquisaId: selectedPesquisaId ?? undefined,
+      search: "" 
+    },
     { enabled: !!selectedProjectId }
   );
 
@@ -384,7 +392,10 @@ export default function MercadoDetalhes() {
                 </Select>
               </div>
             </div>
-            <ProjectSelector />
+            <div className="flex items-center gap-2">
+              <ProjectSelector />
+              <PesquisaSelector />
+            </div>
           </div>
           <Breadcrumbs items={[
             { label: "Mercados" },

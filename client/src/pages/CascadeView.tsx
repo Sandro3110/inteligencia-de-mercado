@@ -1783,9 +1783,13 @@ export default function CascadeView() {
         open={draftModalOpen}
         onOpenChange={setDraftModalOpen}
         onContinueDraft={(draft) => {
-          // TODO: Implementar lógica de carregamento do draft
-          console.log('Carregar draft:', draft);
-          toast.info('Funcionalidade de carregar draft será implementada');
+          // Redirecionar para o wizard com o draft
+          const draftParams = new URLSearchParams({
+            draftId: String(draft.id),
+            step: String(draft.currentStep || 1),
+          });
+          window.location.href = `/research/new?${draftParams.toString()}`;
+          toast.success('Redirecionando para continuar a pesquisa...');
         }}
       />
 
