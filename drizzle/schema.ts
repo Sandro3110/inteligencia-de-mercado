@@ -871,6 +871,7 @@ export const researchDrafts = mysqlTable("research_drafts", {
   projectId: int("projectId"),
   draftData: json("draftData").notNull(),
   currentStep: int("currentStep").default(1).notNull(),
+  progressStatus: mysqlEnum("progressStatus", ["started", "in_progress", "almost_done"]).default("started"),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
 });
@@ -899,3 +900,31 @@ export const pushSubscriptions = mysqlTable("push_subscriptions", {
 
 export type PushSubscription = typeof pushSubscriptions.$inferSelect;
 export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
+
+// ========================================
+// REPORT SCHEDULES (Agendamento de Relatórios)
+// Fase 65.1
+// ========================================
+
+export const reportSchedules = mysqlTable("report_schedules", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  projectId: int("projectId").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  frequency: mysqlEnum("frequency", ["weekly", "monthly"]).notNull(),
+  recipients: text("recipients").notNull(), // JSON array de emails
+  config: json("config").notNull(), // Configurações do relatório (filtros, formato, etc)
+  nextRunAt: timestamp("nextRunAt", { mode: 'string' }).notNull(),
+  lastRunAt: timestamp("lastRunAt", { mode: 'string' }),
+  enabled: tinyint("enabled").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+},
+(table) => [
+  index("idx_userId").on(table.userId),
+  index("idx_projectId").on(table.projectId),
+  index("idx_nextRunAt").on(table.nextRunAt),
+]);
+
+export type ReportSchedule = typeof reportSchedules.$inferSelect;
+export type InsertReportSchedule = typeof reportSchedules.$inferInsert;

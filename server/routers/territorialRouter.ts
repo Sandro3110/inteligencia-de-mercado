@@ -6,6 +6,32 @@ import {
 } from "../pdfGenerator";
 
 export const territorialRouter = router({
+  // Heatmap de Concentração Territorial - Fase 65.3
+  getDensity: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+        pesquisaId: z.number().optional(),
+        entityType: z.enum(['clientes', 'leads', 'concorrentes']).optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const { getTerritorialDensity } = await import('../db');
+      return getTerritorialDensity(input.projectId, input.pesquisaId, input.entityType);
+    }),
+
+  getDensityStats: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+        pesquisaId: z.number().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const { getDensityStatsByRegion } = await import('../db');
+      return getDensityStatsByRegion(input.projectId, input.pesquisaId);
+    }),
+
   generateReport: protectedProcedure
     .input(
       z.object({

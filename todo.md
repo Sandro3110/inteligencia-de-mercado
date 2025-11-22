@@ -2036,3 +2036,65 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 - [x] Criar link para GeoCockpit com filtro pré-aplicado
 - [x] Otimizar performance (lazy loading do mapa)
 - [ ] Testar mini-mapas em todas as páginas de detalhes
+
+
+---
+
+## FASE 65: NOVAS FUNCIONALIDADES AVANÇADAS 🚀
+
+### 65.1 Agendamento Automático de Relatórios
+- [x] Criar tabela `report_schedules` no banco
+- [x] Adicionar campos: id, userId, projectId, frequency (weekly/monthly), recipients, config, nextRunAt, createdAt
+- [x] Criar função `createReportSchedule()` no backend
+- [x] Criar função `getReportSchedules()` no backend
+- [x] Criar função `deleteReportSchedule()` no backend
+- [x] Criar endpoint tRPC `reports.createSchedule`
+- [x] Criar endpoint tRPC `reports.getSchedules`
+- [x] Criar endpoint tRPC `reports.deleteSchedule`
+- [ ] Criar página de configuração de agendamentos
+- [ ] Implementar geração automática de relatórios territoriais
+- [ ] Integrar com sistema de email para envio periódico
+- [ ] Adicionar UI para gerenciar agendamentos (criar/editar/deletar)
+- [ ] Adicionar preview de relatório antes de agendar
+- [ ] Implementar cron job ou scheduler para execução automática
+
+### 65.2 Filtros Avançados no Modal de Drafts
+- [x] Adicionar campo `projectId` na tabela research_drafts
+- [x] Adicionar campo `progressStatus` na tabela research_drafts (enum: started, in_progress, almost_done)
+- [x] Atualizar função `saveDraft()` para incluir novos campos
+- [x] Criar função `getFilteredDrafts()` no backend
+- [x] Criar endpoint tRPC `draft.getFiltered` com parâmetros de filtro
+- [ ] Adicionar filtro por projeto no modal de drafts
+- [ ] Adicionar filtro por data de criação (últimos 7/30/90 dias)
+- [ ] Adicionar filtro por status de progresso
+- [ ] Implementar busca por texto no título/descrição
+- [ ] Adicionar ordenação (mais recente, mais antigo, por progresso)
+- [ ] Adicionar contador de resultados filtrados
+- [ ] Adicionar botão "Limpar Filtros"
+
+### 65.3 Heatmap de Concentração Territorial
+- [ ] Criar página TerritorialHeatmap (/analise-territorial/heatmap)
+- [x] Criar query `getTerritorialDensity()` no backend (agregar por região/CEP)
+- [x] Criar query `getDensityStatsByRegion()` para estatísticas
+- [x] Criar endpoints tRPC `territorial.getDensity` e `territorial.getDensityStats`
+- [ ] Integrar biblioteca de mapas (Leaflet ou Google Maps)
+- [ ] Implementar camada de heatmap com densidade de clientes
+- [ ] Adicionar toggle para alternar entre clientes/leads/concorrentes
+- [ ] Adicionar filtro por mercado
+- [ ] Adicionar filtro por qualidade mínima
+- [ ] Adicionar legenda de cores (densidade baixa/média/alta)
+- [ ] Implementar zoom e pan no mapa
+- [ ] Adicionar tooltip com detalhes ao passar mouse
+- [ ] Adicionar painel lateral com estatísticas por região
+- [ ] Adicionar botão de exportar mapa como imagem
+- [ ] Adicionar link no menu lateral (Análise > Heatmap Territorial)
+- [ ] Adicionar rota no App.tsx
+
+### 65.4 Testes e Validação
+- [ ] Testar criação e execução de agendamentos de relatórios
+- [ ] Testar filtros avançados no modal de drafts
+- [ ] Testar heatmap com diferentes filtros e toggles
+- [ ] Validar performance das queries de densidade territorial
+- [ ] Validar integração com sistema de email
+- [ ] Criar testes unitários para novas funções
+

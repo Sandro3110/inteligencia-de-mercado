@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `report_schedules` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `userId` varchar(64) NOT NULL,\n  `projectId` int NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `frequency` enum('weekly', 'monthly') NOT NULL,\n  `recipients` text NOT NULL,\n  `config` json NOT NULL,\n  `nextRunAt` timestamp NOT NULL,\n  `lastRunAt` timestamp NULL,\n  `enabled` tinyint NOT NULL DEFAULT 1,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `idx_userId` (`userId`),\n  INDEX `idx_projectId` (`projectId`),\n  INDEX `idx_nextRunAt` (`nextRunAt`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute CREATE TABLE IF NOT EXISTS `report_schedules` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `userId` varchar(64) NOT NULL,\n  `projectId` int NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `frequency` enum('weekly', 'monthly') NOT NULL,\n  `recipients` text NOT NULL,\n  `config` json NOT NULL,\n  `nextRunAt` timestamp NOT NULL,\n  `lastRunAt` timestamp NULL,\n  `enabled` tinyint NOT NULL DEFAULT 1,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `idx_userId` (`userId`),\n  INDEX `idx_projectId` (`projectId`),\n  INDEX `idx_nextRunAt` (`nextRunAt`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 220
+}

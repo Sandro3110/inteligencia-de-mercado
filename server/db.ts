@@ -1,4 +1,4 @@
-import { eq, sql, and, or, like, count, desc, gte, inArray, isNull } from "drizzle-orm";
+import { eq, sql, and, or, like, count, desc, gte, lte, inArray, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users, 
@@ -13,7 +13,8 @@ import {
   enrichmentConfigs, EnrichmentConfig, InsertEnrichmentConfig,
   projectAuditLog, ProjectAuditLog, InsertProjectAuditLog,
   hibernationWarnings, HibernationWarning, InsertHibernationWarning,
-  notificationPreferences
+  notificationPreferences,
+  reportSchedules, ReportSchedule, InsertReportSchedule
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { now, toMySQLTimestamp } from './dateUtils';
@@ -4473,7 +4474,8 @@ export async function saveResearchDraft(
   userId: string,
   draftData: any,
   currentStep: number,
-  projectId?: number | null
+  projectId?: number | null,
+  progressStatus?: 'started' | 'in_progress' | 'almost_done'
 ): Promise<ResearchDraft | null> {
   const db = await getDb();
   if (!db) {
@@ -4506,13 +4508,24 @@ export async function saveResearchDraft(
 
     if (existingRows.length > 0) {
       // Atualizar draft existente
-      await db.execute(sql`
-        UPDATE research_drafts 
-        SET draftData = ${draftJson}, 
-            currentStep = ${currentStep},
-            updatedAt = CURRENT_TIMESTAMP
-        WHERE id = ${existingRows[0].id}
-      `);
+      const updateQuery = progressStatus
+        ? sql`
+          UPDATE research_drafts 
+          SET draftData = ${draftJson}, 
+              currentStep = ${currentStep},
+              progressStatus = ${progressStatus},
+              updatedAt = CURRENT_TIMESTAMP
+          WHERE id = ${existingRows[0].id}
+        `
+        : sql`
+          UPDATE research_drafts 
+          SET draftData = ${draftJson}, 
+              currentStep = ${currentStep},
+              updatedAt = CURRENT_TIMESTAMP
+          WHERE id = ${existingRows[0].id}
+        `;
+      
+      await db.execute(updateQuery);
 
       return {
         id: existingRows[0].id,
@@ -4525,10 +4538,17 @@ export async function saveResearchDraft(
       };
     } else {
       // Criar novo draft
-      const result = await db.execute(sql`
-        INSERT INTO research_drafts (userId, projectId, draftData, currentStep)
-        VALUES (${userId}, ${projectId ?? null}, ${draftJson}, ${currentStep})
-      `);
+      const insertQuery = progressStatus
+        ? sql`
+          INSERT INTO research_drafts (userId, projectId, draftData, currentStep, progressStatus)
+          VALUES (${userId}, ${projectId ?? null}, ${draftJson}, ${currentStep}, ${progressStatus})
+        `
+        : sql`
+          INSERT INTO research_drafts (userId, projectId, draftData, currentStep)
+          VALUES (${userId}, ${projectId ?? null}, ${draftJson}, ${currentStep})
+        `;
+      
+      const result = await db.execute(insertQuery);
 
       return {
         id: Number((result as any)[0].insertId),
@@ -4630,11 +4650,85 @@ export async function getUserDrafts(userId: string): Promise<ResearchDraft[]> {
       projectId: draft.projectId,
       draftData: typeof draft.draftData === 'string' ? JSON.parse(draft.draftData) : draft.draftData,
       currentStep: draft.currentStep,
+      progressStatus: draft.progressStatus,
       createdAt: draft.createdAt,
       updatedAt: draft.updatedAt,
     }));
   } catch (error) {
     console.error("[Database] Failed to get user drafts:", error);
+    return [];
+  }
+}
+
+/**
+ * Buscar rascunhos com filtros avançados
+ * Fase 65.2
+ */
+export async function getFilteredDrafts(
+  userId: string,
+  filters?: {
+    projectId?: number;
+    progressStatus?: 'started' | 'in_progress' | 'almost_done';
+    daysAgo?: number; // Últimos X dias
+    searchText?: string; // Busca no draftData
+  }
+): Promise<ResearchDraft[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get filtered drafts: database not available");
+    return [];
+  }
+
+  try {
+    let query = sql`SELECT * FROM research_drafts WHERE userId = ${userId}`;
+
+    // Filtro por projeto
+    if (filters?.projectId) {
+      query = sql`${query} AND projectId = ${filters.projectId}`;
+    }
+
+    // Filtro por status de progresso
+    if (filters?.progressStatus) {
+      query = sql`${query} AND progressStatus = ${filters.progressStatus}`;
+    }
+
+    // Filtro por data (últimos X dias)
+    if (filters?.daysAgo) {
+      const dateLimit = new Date();
+      dateLimit.setDate(dateLimit.getDate() - filters.daysAgo);
+      const dateLimitStr = toMySQLTimestamp(dateLimit);
+      query = sql`${query} AND createdAt >= ${dateLimitStr}`;
+    }
+
+    // Ordenar por data de atualização
+    query = sql`${query} ORDER BY updatedAt DESC`;
+
+    const results = await db.execute(query);
+    const rows = (results as any)[0] || [];
+
+    let drafts = rows.map((draft: any) => ({
+      id: draft.id,
+      userId: draft.userId,
+      projectId: draft.projectId,
+      draftData: typeof draft.draftData === 'string' ? JSON.parse(draft.draftData) : draft.draftData,
+      currentStep: draft.currentStep,
+      progressStatus: draft.progressStatus,
+      createdAt: draft.createdAt,
+      updatedAt: draft.updatedAt,
+    }));
+
+    // Filtro por texto (busca no draftData)
+    if (filters?.searchText) {
+      const searchLower = filters.searchText.toLowerCase();
+      drafts = drafts.filter((draft: any) => {
+        const dataStr = JSON.stringify(draft.draftData).toLowerCase();
+        return dataStr.includes(searchLower);
+      });
+    }
+
+    return drafts;
+  } catch (error) {
+    console.error("[Database] Failed to get filtered drafts:", error);
     return [];
   }
 }
@@ -5063,5 +5157,300 @@ export async function getTerritorialInsights(projectId: number, pesquisaId?: num
   } catch (error) {
     console.error("[Database] Failed to get territorial insights:", error);
     return null;
+  }
+}
+
+
+// ============================================
+// REPORT SCHEDULES HELPERS
+// Fase 65.1 - Agendamento de Relatórios
+// ============================================
+
+/**
+ * Criar novo agendamento de relatório
+ */
+export async function createReportSchedule(data: InsertReportSchedule): Promise<ReportSchedule> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const result = await db.insert(reportSchedules).values(data);
+    const insertId = result[0].insertId;
+    
+    const created = await db.select()
+      .from(reportSchedules)
+      .where(eq(reportSchedules.id, insertId))
+      .limit(1);
+    
+    return created[0];
+  } catch (error) {
+    console.error("[Database] Failed to create report schedule:", error);
+    throw error;
+  }
+}
+
+/**
+ * Buscar agendamentos de um usuário
+ */
+export async function getReportSchedules(userId: string, projectId?: number): Promise<ReportSchedule[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const conditions = [eq(reportSchedules.userId, userId)];
+    
+    if (projectId) {
+      conditions.push(eq(reportSchedules.projectId, projectId));
+    }
+
+    const results = await db.select()
+      .from(reportSchedules)
+      .where(and(...conditions))
+      .orderBy(desc(reportSchedules.createdAt));
+    
+    return results;
+  } catch (error) {
+    console.error("[Database] Failed to get report schedules:", error);
+    return [];
+  }
+}
+
+/**
+ * Buscar agendamento por ID
+ */
+export async function getReportScheduleById(id: number): Promise<ReportSchedule | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.select()
+      .from(reportSchedules)
+      .where(eq(reportSchedules.id, id))
+      .limit(1);
+    
+    return result[0] || null;
+  } catch (error) {
+    console.error("[Database] Failed to get report schedule:", error);
+    return null;
+  }
+}
+
+/**
+ * Atualizar agendamento
+ */
+export async function updateReportSchedule(
+  id: number, 
+  data: Partial<InsertReportSchedule>
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    await db.update(reportSchedules)
+      .set(data)
+      .where(eq(reportSchedules.id, id));
+  } catch (error) {
+    console.error("[Database] Failed to update report schedule:", error);
+    throw error;
+  }
+}
+
+/**
+ * Deletar agendamento
+ */
+export async function deleteReportSchedule(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    await db.delete(reportSchedules)
+      .where(eq(reportSchedules.id, id));
+  } catch (error) {
+    console.error("[Database] Failed to delete report schedule:", error);
+    throw error;
+  }
+}
+
+/**
+ * Buscar agendamentos que precisam ser executados
+ */
+export async function getSchedulesToRun(): Promise<ReportSchedule[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const currentTime = now();
+    const results = await db.select()
+      .from(reportSchedules)
+      .where(
+        and(
+          eq(reportSchedules.enabled, 1),
+          sql`${reportSchedules.nextRunAt} <= ${currentTime}`
+        )
+      );
+    
+    return results;
+  } catch (error) {
+    console.error("[Database] Failed to get schedules to run:", error);
+    return [];
+  }
+}
+
+/**
+ * Atualizar timestamp de última execução e calcular próxima execução
+ */
+export async function updateScheduleAfterRun(id: number, frequency: 'weekly' | 'monthly'): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const currentTime = now();
+    const currentDate = new Date();
+    const nextRunDate = new Date(currentDate);
+    
+    if (frequency === 'weekly') {
+      nextRunDate.setDate(nextRunDate.getDate() + 7);
+    } else if (frequency === 'monthly') {
+      nextRunDate.setMonth(nextRunDate.getMonth() + 1);
+    }
+
+    await db.update(reportSchedules)
+      .set({
+        lastRunAt: currentTime,
+        nextRunAt: toMySQLTimestamp(nextRunDate)
+      })
+      .where(eq(reportSchedules.id, id));
+  } catch (error) {
+    console.error("[Database] Failed to update schedule after run:", error);
+    throw error;
+  }
+}
+
+
+// ============================================
+// HEATMAP DE CONCENTRAÇÃO TERRITORIAL
+// Fase 65.3
+// ============================================
+
+/**
+ * Buscar densidade territorial por coordenadas
+ * Agrupa entidades por região para visualização em heatmap
+ */
+export async function getTerritorialDensity(
+  projectId: number,
+  pesquisaId?: number,
+  entityType?: 'clientes' | 'leads' | 'concorrentes'
+) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    // Definir quais tabelas consultar
+    const tables = entityType
+      ? [entityType]
+      : ['clientes', 'leads', 'concorrentes'];
+
+    const densityData: any[] = [];
+
+    for (const table of tables) {
+      const query = pesquisaId
+        ? sql`
+          SELECT 
+            latitude,
+            longitude,
+            cidade,
+            uf,
+            qualidadeScore,
+            '${sql.raw(table)}' as entityType
+          FROM ${sql.raw(table)}
+          WHERE projectId = ${projectId}
+            AND pesquisaId = ${pesquisaId}
+            AND latitude IS NOT NULL
+            AND longitude IS NOT NULL
+        `
+        : sql`
+          SELECT 
+            latitude,
+            longitude,
+            cidade,
+            uf,
+            qualidadeScore,
+            '${sql.raw(table)}' as entityType
+          FROM ${sql.raw(table)}
+          WHERE projectId = ${projectId}
+            AND latitude IS NOT NULL
+            AND longitude IS NOT NULL
+        `;
+
+      const result = await db.execute(query);
+      const rows = (result as any)[0] || [];
+      densityData.push(...rows);
+    }
+
+    return densityData;
+  } catch (error) {
+    console.error("[Database] Failed to get territorial density:", error);
+    return [];
+  }
+}
+
+/**
+ * Buscar estatísticas de densidade por região (UF)
+ */
+export async function getDensityStatsByRegion(
+  projectId: number,
+  pesquisaId?: number
+) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const query = pesquisaId
+      ? sql`
+        SELECT 
+          uf,
+          COUNT(*) as total,
+          AVG(qualidadeScore) as qualidadeMedia,
+          SUM(CASE WHEN qualidadeScore >= 80 THEN 1 ELSE 0 END) as altaQualidade
+        FROM (
+          SELECT uf, qualidadeScore FROM clientes 
+          WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT uf, qualidadeScore FROM leads 
+          WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT uf, qualidadeScore FROM concorrentes 
+          WHERE projectId = ${projectId} AND pesquisaId = ${pesquisaId} AND latitude IS NOT NULL
+        ) as combined
+        WHERE uf IS NOT NULL
+        GROUP BY uf
+        ORDER BY total DESC
+      `
+      : sql`
+        SELECT 
+          uf,
+          COUNT(*) as total,
+          AVG(qualidadeScore) as qualidadeMedia,
+          SUM(CASE WHEN qualidadeScore >= 80 THEN 1 ELSE 0 END) as altaQualidade
+        FROM (
+          SELECT uf, qualidadeScore FROM clientes 
+          WHERE projectId = ${projectId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT uf, qualidadeScore FROM leads 
+          WHERE projectId = ${projectId} AND latitude IS NOT NULL
+          UNION ALL
+          SELECT uf, qualidadeScore FROM concorrentes 
+          WHERE projectId = ${projectId} AND latitude IS NOT NULL
+        ) as combined
+        WHERE uf IS NOT NULL
+        GROUP BY uf
+        ORDER BY total DESC
+      `;
+
+    const result = await db.execute(query);
+    return (result as any)[0] || [];
+  } catch (error) {
+    console.error("[Database] Failed to get density stats by region:", error);
+    return [];
   }
 }

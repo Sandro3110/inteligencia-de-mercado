@@ -6,12 +6,14 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { exportRouter } from "./routers/exportRouter";
 import { geocodingRouter } from "./routers/geocodingRouter";
 import { territorialRouter } from "./routers/territorialRouter";
+import { reportsRouter } from "./routers/reportsRouter";
 
 export const appRouter = router({
   system: systemRouter,
   export: exportRouter,
   geo: geocodingRouter,
   territorial: territorialRouter,
+  reports: reportsRouter,
 
   settings: router({
     getGoogleMapsApiKey: protectedProcedure.query(async () => {
@@ -1540,7 +1542,7 @@ export const appRouter = router({
   }),
 
   // Relatórios Executivos
-  reports: router({
+  executiveReports: router({
     generate: publicProcedure
       .input(z.object({ 
         projectId: z.number(),
@@ -2240,6 +2242,7 @@ export const appRouter = router({
         draftData: z.any(),
         currentStep: z.number(),
         projectId: z.number().optional().nullable(),
+        progressStatus: z.enum(['started', 'in_progress', 'almost_done']).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const { saveResearchDraft } = await import('./db');
@@ -2247,7 +2250,8 @@ export const appRouter = router({
           ctx.user.id,
           input.draftData,
           input.currentStep,
-          input.projectId
+          input.projectId,
+          input.progressStatus
         );
       }),
 
@@ -2273,6 +2277,18 @@ export const appRouter = router({
       .query(async ({ ctx }) => {
         const { getUserDrafts } = await import('./db');
         return getUserDrafts(ctx.user.id);
+      }),
+
+    getFiltered: protectedProcedure
+      .input(z.object({
+        projectId: z.number().optional(),
+        progressStatus: z.enum(['started', 'in_progress', 'almost_done']).optional(),
+        daysAgo: z.number().optional(), // 7, 30, 90
+        searchText: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getFilteredDrafts } = await import('./db');
+        return getFilteredDrafts(ctx.user.id, input);
       }),
   }),
 

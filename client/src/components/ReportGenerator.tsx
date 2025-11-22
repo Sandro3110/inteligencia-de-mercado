@@ -23,7 +23,7 @@ export function ReportGenerator() {
     { enabled: !!selectedProjectId }
   );
 
-  const { data: reportData, refetch, isLoading } = trpc.reports.generate.useQuery(
+  const { data: reportData, refetch, isLoading } = trpc.executiveReports.generate.useQuery(
     { 
       projectId: selectedProjectId!,
       pesquisaId: selectedPesquisaId ?? undefined,
