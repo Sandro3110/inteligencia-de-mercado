@@ -14,6 +14,7 @@ import { useRealtimeNotifications } from "./hooks/useRealtimeNotifications";
 
 // Lazy load de páginas principais (carregamento imediato)
 import CascadeView from "./pages/CascadeView";
+import UnifiedCockpit from "./pages/UnifiedCockpit";
 import NotFound from "./pages/NotFound";
 
 // Lazy load de páginas secundárias (carregamento sob demanda)
@@ -63,9 +64,15 @@ function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"/"} component={CascadeView} />
-      {/* Rotas antigas redirecionadas para /analytics */}
-      <Route path="/mercados" component={Mercados} />
+      {/* Cockpit Unificado - Página Principal */}
+      <Route path={"/"} component={UnifiedCockpit} />
+      
+      {/* Redirects das rotas antigas para o cockpit unificado */}
+      <Route path="/cascade">{() => { window.location.href = '/?view=lista'; return null; }}</Route>
+      <Route path="/geo-cockpit">{() => { window.location.href = '/?view=mapa'; return null; }}</Route>
+      <Route path="/mercados">{() => { window.location.href = '/?view=lista'; return null; }}</Route>
+      
+      {/* Páginas secundárias mantidas */}
       <Route path="/mercado/:id" component={MercadoDetalhes} />
       <Route path="/enrichment" component={EnrichmentFlow} />
       <Route path="/analytics" component={AnalyticsPage} />
@@ -106,7 +113,7 @@ function Router() {
       {/* /export/historico fundido em /export/wizard */}
       <Route path="/geocodificacao" component={Geocodificacao} />
       <Route path="/geo-admin" component={GeoAdmin} />
-      <Route path="/geo-cockpit" component={GeoCockpit} />
+      {/* /geo-cockpit redirecionado para /?view=mapa */}
       {/* Rotas removidas - funcionalidades fundidas em /geo-cockpit */}
       {/* /quality-trends fundido em /tendencias */}
 

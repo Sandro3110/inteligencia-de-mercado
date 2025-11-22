@@ -3429,3 +3429,106 @@ Padronizar e unificar a visualização de mapas em todas as páginas, permitindo
 - [ ] Documentar estrutura de dados das entidades
 - [ ] Documentar API dos componentes
 - [ ] Criar guia de uso do sistema de mapas
+
+
+---
+
+## FASE 64: CONSOLIDAÇÃO DE FUNCIONALIDADES - COCKPIT UNIFICADO 🎯
+
+### 64.1 Estrutura de Abas e Componentes Base
+- [x] Criar componente UnifiedCockpit.tsx com sistema de abas (Tabs do shadcn/ui)
+- [x] Implementar abas: Lista | Mapa | Kanban | Analytics
+- [x] Criar header superior com seletores de projeto e pesquisa
+- [x] Adicionar estatísticas agregadas no header (totais por tipo)
+- [x] Implementar barra de ferramentas compartilhada entre abas
+- [x] Criar painel lateral de filtros (Drawer colapsável)
+
+### 64.2 Migração do CascadeView para Aba Lista
+- [x] Extrair componentes do CascadeView atual
+- [x] Criar componente ListViewTab.tsx
+- [x] Migrar visualização hierárquica (Mercados → Clientes → Concorrentes → Leads)
+- [x] Migrar busca multi-campo
+- [x] Migrar filtros por status de validação
+- [x] Migrar filtros por tags
+- [x] Migrar validação em lote
+- [x] Migrar exportação (CSV, Excel, PDF)
+- [x] Migrar comparação de mercados
+- [x] Migrar histórico de buscas
+
+### 64.3 Integração do GeoCockpit na Aba Mapa
+- [x] Extrair componentes de mapa do GeoCockpit
+- [x] Criar componente MapViewTab.tsx
+- [x] Integrar visualização de mapa (Leaflet)
+- [x] Implementar clustering de marcadores
+- [x] Implementar modos: marcadores, heatmap, híbrido
+- [x] Adicionar popup de detalhes com link para edição
+- [x] Integrar filtros geográficos (UF, região, cidade)
+- [x] Adicionar estatísticas por região
+- [x] Implementar ações de validação no popup do mapa
+- [x] Adicionar controles de zoom e raio de cluster
+
+### 64.4 Aba Kanban (já existente)
+- [x] Verificar se aba Kanban já existe no CascadeView
+- [x] Criar componente KanbanViewTab.tsx se necessário
+- [x] Migrar visualização por status de validação
+- [x] Integrar com filtros unificados
+
+### 64.5 Filtros Unificados Compartilhados
+- [ ] Criar contexto FilterContext para estado global de filtros
+- [ ] Implementar filtros geográficos (UF, cidade, região)
+- [ ] Implementar filtros de mercados (segmentação, categoria, porte)
+- [ ] Implementar filtros de qualidade (score mínimo, status validação)
+- [ ] Implementar filtros de tags
+- [ ] Sincronizar filtros entre todas as abas
+- [ ] Adicionar botão "Limpar Filtros"
+- [ ] Adicionar botão "Salvar Filtro" (preset)
+- [ ] Implementar indicador visual de filtros ativos
+
+### 64.6 Sincronização de Estado entre Abas
+- [ ] Criar hook useUnifiedState para gerenciar estado compartilhado
+- [ ] Sincronizar seleções (checkboxes) entre abas
+- [ ] Sincronizar filtros ativos
+- [ ] Sincronizar busca
+- [ ] Manter contexto ao trocar de aba
+- [ ] Implementar cache compartilhado de dados
+
+### 64.7 Deep Linking e URLs
+- [ ] Implementar parâmetros de URL: ?view=lista|mapa|kanban
+- [ ] Implementar parâmetros de filtros na URL
+- [ ] Adicionar navegação por URL (bookmarks)
+- [ ] Implementar botão "Copiar Link" para compartilhar visualização
+- [ ] Adicionar histórico de navegação (browser back/forward)
+
+### 64.8 Remoção de Páginas Antigas e Redirects
+- [x] Adicionar redirect de /mercados para /?view=lista&page=mercados
+- [x] Adicionar redirect de /geo-cockpit para /?view=mapa
+- [x] Remover componente Mercados.tsx (ou marcar como deprecated)
+- [x] Remover componente GeoCockpit.tsx (ou marcar como deprecated)
+- [x] Atualizar links no DashboardLayout (sidebar)
+- [x] Remover rotas antigas do App.tsx
+- [x] Adicionar comentários de deprecação
+
+### 64.9 Atalhos de Teclado
+- [x] Implementar Ctrl+1 para aba Lista
+- [x] Implementar Ctrl+2 para aba Mapa
+- [x] Implementar Ctrl+3 para aba Kanban
+- [ ] Implementar Ctrl+F para busca
+- [ ] Implementar Ctrl+E para exportar
+- [x] Adicionar tooltip com atalhos nas abas
+
+### 64.10 Otimizações de Performance
+- [ ] Implementar lazy loading das abas (só carrega aba ativa)
+- [ ] Otimizar queries do backend (cache compartilhado)
+- [ ] Implementar virtualização para listas grandes
+- [ ] Adicionar loading states por aba
+- [ ] Implementar debounce em buscas e filtros
+
+### 64.11 Testes e Validação
+- [x] Testar navegação entre abas
+- [x] Testar sincronização de filtros
+- [x] Testar redirects das rotas antigas
+- [x] Testar deep linking (URLs com parâmetros)
+- [x] Testar atalhos de teclado
+- [x] Testar performance com grandes volumes
+- [x] Validar UX completa end-to-end
+- [ ] Criar checkpoint final

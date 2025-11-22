@@ -71,7 +71,7 @@ const navSections: NavSection[] = [
     priority: 'core',
     defaultOpen: true,
     items: [
-      { title: "Visão Geral", href: "/", icon: Home, shortcut: "Ctrl+H" },
+      { title: "Cockpit Unificado", href: "/", icon: Home, shortcut: "Ctrl+H" },
       { title: "Nova Pesquisa", href: "/research/new", icon: Plus, badge: "Criar" },
       { title: "Pesquisas", href: "/pesquisas", icon: FileStack },
       { title: "Enriquecer Dados", href: "/enrichment", icon: Sparkles, shortcut: "Ctrl+E" },
@@ -91,10 +91,8 @@ const navSections: NavSection[] = [
     priority: 'high',
     defaultOpen: false,
     items: [
-      { title: "Mercados", href: "/mercados", icon: Package, shortcut: "Ctrl+M" },
       { title: "Analytics Unificado", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+A" },
       { title: "Tendências", href: "/tendencias", icon: TrendingUp },
-      { title: "Cockpit Geográfico", href: "/geo-cockpit", icon: MapPin },
       { title: "Performance e Conversão", href: "/performance", icon: DollarSign, shortcut: "Ctrl+R" },
     ],
   },
