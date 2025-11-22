@@ -51,6 +51,7 @@ import {
   FileDown,
   List,
   GitCompare,
+  History,
 } from "lucide-react";
 import { exportToCSV, exportToExcel, exportToPDF, ExportData } from "@/lib/exportUtils";
 import {
@@ -69,6 +70,7 @@ import { ProjectSelector } from "@/components/ProjectSelector";
 import { PesquisaSelector } from "@/components/PesquisaSelector";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useSidebarState } from "@/hooks/useSidebarState";
+import DraftRecoveryModal from "@/components/DraftRecoveryModal";
 
 type StatusFilter = "all" | "pending" | "rich" | "discarded";
 type Page = "mercados" | "clientes" | "concorrentes" | "leads";
@@ -90,6 +92,7 @@ export default function CascadeView() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [selectedMercadosForComparison, setSelectedMercadosForComparison] = useState<Set<number>>(new Set());
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
+  const [draftModalOpen, setDraftModalOpen] = useState(false);
   
   // Estados para filtros avançados
   const [mercadoFilters, setMercadoFilters] = useState<{
@@ -946,6 +949,16 @@ export default function CascadeView() {
           )}
           
           <TagManager />
+          
+          {/* Botão de Recuperar Rascunhos */}
+          <Button 
+            variant="outline" 
+            className="h-10 gap-2"
+            onClick={() => setDraftModalOpen(true)}
+          >
+            <History className="w-4 h-4" />
+            Recuperar Rascunhos
+          </Button>
         </div>
       </div>
 
@@ -1763,6 +1776,17 @@ export default function CascadeView() {
         onClose={() => setComparisonModalOpen(false)}
         mercadoIds={Array.from(selectedMercadosForComparison)}
         mercados={filteredMercados}
+      />
+
+      {/* Modal de Recuperação de Drafts */}
+      <DraftRecoveryModal
+        open={draftModalOpen}
+        onOpenChange={setDraftModalOpen}
+        onContinueDraft={(draft) => {
+          // TODO: Implementar lógica de carregamento do draft
+          console.log('Carregar draft:', draft);
+          toast.info('Funcionalidade de carregar draft será implementada');
+        }}
       />
 
       {/* Botão Voltar ao Topo */}

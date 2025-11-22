@@ -54,6 +54,127 @@ export default function TerritorialAnalysis() {
   );
 
   const isLoading = loadingInsights || loadingAnalysis;
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  // Mutation para gerar PDF
+  const generatePDF = trpc.territorial.generateReport.useMutation({
+    onSuccess: (data) => {
+      // Converter base64 para blob e fazer download
+      const byteCharacters = atob(data.pdf);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      setIsGeneratingPDF(false);
+      toast.success('Relatório PDF gerado com sucesso!', {
+        description: `Arquivo: ${data.filename}`,
+      });
+    },
+    onError: (error) => {
+      setIsGeneratingPDF(false);
+      toast.error('Erro ao gerar relatório', {
+        description: error.message,
+      });
+    },
+  });
+
+  const handleExportPDF = () => {
+    if (!insights || !analysis || !selectedProjectId) {
+      toast.error('Dados insuficientes para gerar relatório');
+      return;
+    }
+
+    setIsGeneratingPDF(true);
+
+    // Preparar dados do relatório
+    const stateRanking = (analysis.byUF || []).map((item: any) => ({
+      state: item.uf,
+      clients: Number(item.totalClientes) || 0,
+      competitors: Number(item.totalConcorrentes) || 0,
+      leads: Number(item.totalLeads) || 0,
+      score: Number(item.qualidadeMedia) || 0,
+    }));
+
+    const cityRanking = (analysis.byCidade || []).map((item: any) => ({
+      city: item.cidade,
+      state: item.uf,
+      clients: Number(item.totalClientes) || 0,
+      competitors: Number(item.totalConcorrentes) || 0,
+      leads: Number(item.totalLeads) || 0,
+      score: Number(item.qualidadeMedia) || 0,
+    }));
+
+    // Gerar insights automáticos
+    const autoInsights: string[] = [];
+    if (insights.topRegion) {
+      autoInsights.push(
+        `A região de ${insights.topRegion.cidade}/${insights.topRegion.uf} lidera com ${insights.topRegion.total} registros.`
+      );
+    }
+    if (insights.totalEstados) {
+      const cobertura = ((insights.totalEstados / 27) * 100).toFixed(0);
+      autoInsights.push(
+        `Cobertura territorial de ${cobertura}% do Brasil (${insights.totalEstados} de 27 estados).`
+      );
+    }
+    if (insights.qualidadeMediaGeral) {
+      const qualidade = Number(insights.qualidadeMediaGeral);
+      const nivel = qualidade >= 70 ? 'alta' : qualidade >= 50 ? 'média' : 'baixa';
+      autoInsights.push(
+        `Qualidade média dos dados: ${qualidade.toFixed(0)}/100 (${nivel}).`
+      );
+    }
+
+    // Gerar recomendações automáticas
+    const recommendations: string[] = [];
+    if (stateRanking.length > 0) {
+      const top3States = stateRanking.slice(0, 3).map((s: any) => s.state).join(', ');
+      recommendations.push(
+        `Priorizar esforços comerciais nos estados: ${top3States}.`
+      );
+    }
+    if (cityRanking.length > 0) {
+      const top3Cities = cityRanking.slice(0, 3).map((c: any) => `${c.city}/${c.state}`).join(', ');
+      recommendations.push(
+        `Focar ações de marketing nas cidades: ${top3Cities}.`
+      );
+    }
+    if (insights.totalEstados && insights.totalEstados < 10) {
+      recommendations.push(
+        'Expandir cobertura territorial para outras regiões do Brasil.'
+      );
+    }
+    if (insights.qualidadeMediaGeral && Number(insights.qualidadeMediaGeral) < 60) {
+      recommendations.push(
+        'Investir em enriquecimento de dados para melhorar a qualidade das informações.'
+      );
+    }
+
+    generatePDF.mutate({
+      projectId: selectedProjectId.toString(),
+      projectName: 'Projeto Atual', // TODO: buscar nome real do projeto
+      totalStates: insights.totalEstados || 0,
+      totalCities: insights.totalCidades || 0,
+      totalClients: insights.totalClientes || 0,
+      totalCompetitors: insights.totalConcorrentes || 0,
+      totalLeads: insights.totalLeads || 0,
+      stateRanking,
+      cityRanking,
+      insights: autoInsights,
+      recommendations,
+    });
+  };
 
   // Preparar dados para gráficos
   const ufChartData = useMemo(() => {
@@ -125,9 +246,18 @@ export default function TerritorialAnalysis() {
             Concentração geográfica e regiões com maior potencial de mercado
           </p>
         </div>
-        <Button variant="outline" className="gap-2">
-          <Download className="w-4 h-4" />
-          Exportar Relatório
+        <Button 
+          variant="outline" 
+          className="gap-2"
+          onClick={handleExportPDF}
+          disabled={isGeneratingPDF || !insights || !analysis}
+        >
+          {isGeneratingPDF ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Download className="w-4 h-4" />
+          )}
+          {isGeneratingPDF ? 'Gerando...' : 'Exportar Relatório PDF'}
         </Button>
       </div>
 

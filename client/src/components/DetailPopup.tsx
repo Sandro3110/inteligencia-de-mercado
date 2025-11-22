@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X, Building2, Mail, Phone, Globe, MapPin, Hash, FileText, Linkedin, Instagram, TrendingUp, Users, Package, Briefcase, Calendar, AlertCircle, CheckCircle2, XCircle, Clock, Edit, Trash2, History, ShoppingBag, ExternalLink } from "lucide-react";
+import MiniMap from "@/components/MiniMap";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -441,6 +442,19 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                       </div>
                     )}
                   </div>
+                  
+                  {/* Mini Mapa */}
+                  {(item.latitude || item.longitude) && (
+                    <div className="mt-4">
+                      <MiniMap
+                        latitude={item.latitude}
+                        longitude={item.longitude}
+                        title={item.nome || item.empresa}
+                        height={250}
+                        linkToFullMap={true}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <Separator />

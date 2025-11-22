@@ -5,11 +5,13 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { exportRouter } from "./routers/exportRouter";
 import { geocodingRouter } from "./routers/geocodingRouter";
+import { territorialRouter } from "./routers/territorialRouter";
 
 export const appRouter = router({
   system: systemRouter,
   export: exportRouter,
   geo: geocodingRouter,
+  territorial: territorialRouter,
 
   settings: router({
     getGoogleMapsApiKey: protectedProcedure.query(async () => {

@@ -1979,3 +1979,60 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 - [ ] Validar precisão dos cálculos de densidade
 - [ ] Testar exportações de relatórios
 - [ ] Criar checkpoint final
+
+
+---
+
+## FASE 70: NOVOS PASSOS SOLICITADOS 🎯
+
+### 70.1 Passo 1
+- [ ] Implementar funcionalidade do Passo 1
+- [ ] Testar Passo 1
+
+### 70.2 Passo 2
+- [ ] Implementar funcionalidade do Passo 2
+- [ ] Testar Passo 2
+
+### 70.3 Passo 3
+- [ ] Implementar funcionalidade do Passo 3
+- [ ] Testar Passo 3
+
+
+---
+
+## FASE 70: MELHORIAS FINAIS - RELATÓRIOS, DRAFTS E MINI-MAPAS 🎯
+
+### 70.1 Exportação de Relatórios Territoriais em PDF 📄
+- [x] Criar função generateTerritorialReportPDF() no backend
+- [x] Integrar jsPDF + jsPDF-autotable para geração de PDF
+- [x] Adicionar gráficos ao PDF (converter canvas para imagem)
+- [x] Incluir tabelas de ranking de estados e cidades
+- [x] Adicionar insights e recomendações no relatório
+- [x] Criar botão "Exportar Relatório PDF" na página TerritorialAnalysis
+- [x] Implementar loading state durante geração
+- [x] Adicionar toast de sucesso após download
+- [ ] Testar geração de PDF com dados reais
+
+### 70.2 Modal de Recuperação de Drafts 💾
+- [x] Criar componente DraftRecoveryModal.tsx
+- [x] Implementar listagem de drafts salvos (getUserDrafts)
+- [x] Adicionar preview de cada draft (projeto, data, progresso)
+- [x] Implementar botão "Continuar" para carregar draft
+- [x] Implementar botão "Excluir" para deletar draft
+- [ ] Adicionar filtros por projeto e data
+- [x] Criar botão "Recuperar Rascunhos" na página inicial (CascadeView)
+- [ ] Implementar auto-abertura do modal se houver drafts pendentes
+- [x] Adicionar confirmação antes de excluir draft
+- [ ] Testar fluxo completo de recuperação
+
+### 70.3 Mini-mapas nas Páginas de Detalhes 🗺️
+- [x] Criar componente MiniMap.tsx (versão compacta do mapa)
+- [x] Implementar visualização de marcador único (lat/lng)
+- [x] Adicionar zoom automático no marcador
+- [x] Integrar MiniMap no DetailPopup.tsx
+- [ ] Adicionar MiniMap nos cards de MercadoAccordionCard
+- [x] Implementar fallback quando não há coordenadas
+- [x] Adicionar tooltip "Clique para ver no mapa completo"
+- [x] Criar link para GeoCockpit com filtro pré-aplicado
+- [x] Otimizar performance (lazy loading do mapa)
+- [ ] Testar mini-mapas em todas as páginas de detalhes
