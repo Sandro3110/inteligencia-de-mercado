@@ -24,9 +24,10 @@ const clients = new Map<string, SSEClient>();
  * Handler para endpoint SSE de notificações
  */
 export function handleNotificationStream(req: Request, res: Response) {
-  // Verificar autenticação
-  const user = (req as any).user;
+  // Autenticação já foi verificada pelo middleware requireAuth
+  const user = req.user;
   if (!user) {
+    // Fallback - não deveria acontecer se middleware estiver configurado
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }

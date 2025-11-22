@@ -173,13 +173,40 @@ export default function ResearchWizard() {
   };
 
   const handleNext = () => {
-    if (!canProceed()) {
-      toast.error('Preencha todos os campos obrigatórios antes de continuar');
+    console.log('[Wizard] handleNext chamado - Step atual:', currentStep);
+    console.log('[Wizard] Dados atuais:', wizardData);
+    
+    const canProceedResult = canProceed();
+    console.log('[Wizard] canProceed():', canProceedResult);
+    
+    if (!canProceedResult) {
+      // Mensagens específicas por step
+      let errorMessage = 'Preencha todos os campos obrigatórios antes de continuar';
+      
+      switch (currentStep) {
+        case 1:
+          errorMessage = 'Selecione um projeto antes de continuar';
+          break;
+        case 2:
+          errorMessage = 'Digite um nome para a pesquisa (mínimo 3 caracteres)';
+          break;
+        case 5:
+          errorMessage = 'Adicione pelo menos um mercado ou cliente antes de continuar';
+          break;
+        case 6:
+          errorMessage = 'Valide os dados antes de continuar';
+          break;
+      }
+      
+      console.log('[Wizard] Navegação bloqueada:', errorMessage);
+      toast.error(errorMessage);
       return;
     }
 
     if (currentStep < 7) {
+      console.log('[Wizard] Avançando para step:', currentStep + 1);
       setCurrentStep(currentStep + 1);
+      toast.success(`Avançado para: ${STEPS[currentStep].title}`);
     }
   };
 
@@ -311,6 +338,8 @@ export default function ResearchWizard() {
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
+                className={!canProceed() ? 'opacity-50 cursor-not-allowed' : ''}
+                title={!canProceed() ? 'Preencha os campos obrigatórios' : 'Avançar para o próximo passo'}
               >
                 Próximo
                 <ChevronRight className="w-4 h-4 ml-2" />

@@ -9,6 +9,10 @@ export default defineConfig({
     testTimeout: 30000,
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+    alias: {
+      '@shared': path.resolve(import.meta.dirname, 'shared'),
+      '@': path.resolve(import.meta.dirname, 'client/src')
+    }
   }
 });

@@ -1340,3 +1340,137 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [ ] Atualizar todo.md com status final
 
 - [x] Implementar botões de exportação nas abas de Clientes, Concorrentes e Leads dentro dos mercados expandidos
+
+
+### 61.5 Testes de Integração Completa
+- [x] Criar testes automatizados de backend (7 testes - 100% passando)
+- [x] Testar seleção de projeto no sidebar visualmente
+- [x] Testar seleção de pesquisa no sidebar visualmente
+- [x] Validar filtro de pesquisas por projeto
+- [x] Validar atualização de dados ao trocar projeto/pesquisa
+- [x] Confirmar que dashboard responde corretamente às mudanças
+
+
+---
+
+## FASE 64: TESTES DE TIPOS DE PESQUISA DISPONÍVEIS 🧪
+
+### 64.1 Análise dos Tipos de Pesquisa
+- [x] Analisar código do ResearchWizard para identificar tipos disponíveis
+- [x] Verificar métodos de entrada de dados implementados
+- [x] Documentar fluxo de cada tipo
+
+### 64.2 Teste de Criação via Wizard Manual
+- [x] Testar entrada manual de dados no Step 5
+- [x] Validar campos obrigatórios (nome do mercado)
+- [x] Testar com diferentes quantidades de mercados (2 mercados adicionados)
+- [ ] Verificar salvamento no banco de dados (requer completar wizard)
+
+### 64.3 Teste de Criação via Upload de Planilha
+- [x] Visualizar interface de upload (drag-and-drop + botão)
+- [x] Verificar instruções de formato (colunas: nome, segmentacao)
+- [ ] Testar upload de arquivo Excel real
+- [ ] Validar parsing de dados da planilha
+- [ ] Testar tratamento de erros (arquivo inválido)
+
+### 64.4 Teste de Criação via Pré-pesquisa com IA
+- [x] Visualizar interface de pré-pesquisa com IA
+- [x] Verificar campo de texto para linguagem natural
+- [x] Verificar botões "Buscar Mercados" e "Buscar Clientes"
+- [ ] Testar geração automática com IA (executar busca real)
+- [ ] Validar qualidade dos dados gerados
+
+### 64.5 Validação dos Dados Criados
+- [ ] Completar wizard até Step 7 e criar pesquisa
+- [ ] Executar queries SQL para verificar dados
+- [ ] Validar relacionamentos entre tabelas
+- [ ] Verificar integridade referencial
+- [ ] Confirmar quality scores calculados
+
+### 64.6 Relatório Final
+- [x] Documentar resultados de cada teste
+- [x] Identificar bugs ou problemas encontrados (navegação via interface)
+- [x] Sugerir melhorias e próximos passos
+
+
+---
+
+## FASE 65: CORREÇÃO DO BUG DE NAVEGAÇÃO NO WIZARD 🔧
+
+### 65.1 Investigação do Problema
+- [x] Analisar código do ResearchWizard.tsx
+- [x] Verificar event handlers dos botões "Próximo" e "Voltar"
+- [x] Identificar condições de validação que bloqueiam navegação
+- [x] Verificar estado do wizard (currentStep, formData)
+
+### 65.2 Análise dos Componentes
+- [x] Revisar AllSteps.tsx e navegação entre steps
+- [x] Verificar validações em cada step
+- [x] Analisar função handleNext() e handlePrevious()
+- [x] Identificar race conditions ou problemas de estado
+
+### 65.3 Implementação da Correção
+- [x] Adicionar logs de debug detalhados em handleNext()
+- [x] Implementar mensagens de erro específicas por step
+- [x] Adicionar feedback visual em tempo real (Step 2)
+- [x] Adicionar contador de caracteres com validação visual
+- [x] Adicionar indicadores de sucesso (Step 5 e Step 6)
+- [x] Melhorar tooltip do botão "Próximo"
+- [x] Adicionar toast de sucesso ao avançar de step
+
+### 65.4 Testes de Validação
+- [x] Testar navegação Step 1 → Step 2 (OK - 14% → 29%)
+- [x] Testar navegação Step 2 → Step 3 (OK - 29% → 43%)
+- [ ] Testar navegação Step 3 → Step 4
+- [ ] Testar navegação Step 4 → Step 5
+- [ ] Testar navegação reversa (botão Voltar)
+- [x] Testar validações de campos obrigatórios (funcionando)
+
+### 65.5 Validação Final
+- [ ] Completar wizard do início ao fim
+- [ ] Verificar que dados são mantidos entre steps
+- [ ] Confirmar que pesquisa é criada com sucesso
+- [x] Documentar correção aplicada
+
+### 65.6 Conclusão da Investigação
+- [x] **Bug NÃO reproduzido**: Navegação funcionando corretamente
+- [x] **Causa provável**: Validações de campos obrigatórios (comportamento esperado)
+- [x] **Melhorias implementadas**: Feedback visual aprimorado para evitar confusão
+- [x] **Recomendação**: Investigar erros 401 no console (autenticação)
+
+
+---
+
+## FASE 66: CORREÇÃO DOS ERROS 401 (UNAUTHORIZED) 🔐
+
+### 66.1 Identificação dos Endpoints com Erro
+- [x] Abrir navegador e acessar aplicação
+- [x] Verificar console do navegador (Network tab)
+- [x] Listar todos os endpoints retornando 401
+- [x] Identificar padrões (tRPC, REST, etc)
+- [x] Capturar headers das requisições
+
+### 66.2 Análise de Autenticação
+- [x] Verificar middleware de autenticação (server/_core/context.ts)
+- [x] Analisar sistema de sessões/cookies
+- [x] Verificar configuração OAuth
+- [x] Identificar endpoints que requerem autenticação
+- [x] Verificar se token/cookie está sendo enviado
+
+### 66.3 Implementação da Correção
+- [x] Criar middleware de autenticação compartilhado (authMiddleware.ts)
+- [x] Aplicar middleware requireAuth aos endpoints SSE
+- [x] Atualizar notificationStream para usar req.user tipado
+- [x] Atualizar server/_core/index.ts com middleware
+- [x] Testar correção no navegador
+
+### 66.4 Validação da Correção
+- [x] Testar navegação sem erros 401
+- [x] Verificar que dados carregam corretamente
+- [x] Testar SSE conectando com sucesso (log do servidor)
+- [x] Confirmar que console está limpo (sem erros)
+
+### 66.5 Documentação
+- [x] Documentar causa raiz do problema (analise-401.md)
+- [x] Documentar solução aplicada (analise-401.md)
+- [ ] Criar checkpoint final

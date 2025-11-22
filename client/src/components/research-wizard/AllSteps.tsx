@@ -452,6 +452,9 @@ export function Step2NameResearch({ data, updateData }: {
   data: ResearchWizardData;
   updateData: (d: Partial<ResearchWizardData>) => void;
 }) {
+  const isNameValid = data.researchName.trim().length >= 3;
+  const charCount = data.researchName.length;
+  
   return (
     <div className="space-y-6">
       <div>
@@ -463,12 +466,24 @@ export function Step2NameResearch({ data, updateData }: {
 
       <div className="space-y-4">
         <div>
-          <Label>Nome *</Label>
+          <div className="flex items-center justify-between mb-2">
+            <Label>Nome *</Label>
+            <span className={`text-xs ${
+              charCount === 0 ? 'text-muted-foreground' :
+              isNameValid ? 'text-green-600' : 'text-red-600'
+            }`}>
+              {charCount === 0 ? 'Mínimo 3 caracteres' :
+               isNameValid ? `✓ ${charCount} caracteres` : `${charCount}/3 caracteres`}
+            </span>
+          </div>
           <Input
             placeholder="Ex: Pesquisa de Embalagens Plásticas Q4 2025"
             value={data.researchName}
             onChange={(e) => updateData({ researchName: e.target.value })}
-            className="mt-2"
+            className={`mt-2 ${
+              charCount > 0 && !isNameValid ? 'border-red-300 focus:border-red-500' :
+              isNameValid ? 'border-green-300 focus:border-green-500' : ''
+            }`}
           />
         </div>
 
@@ -703,8 +718,27 @@ export function Step5InsertData({ data, updateData }: {
           </div>
 
           {data.mercados.length === 0 && (
-            <div className="text-center p-8 text-muted-foreground">
-              Nenhum mercado adicionado ainda
+            <div className="p-6 border-2 border-dashed border-yellow-300 rounded-lg bg-yellow-50">
+              <div className="text-center space-y-2">
+                <AlertCircle className="w-8 h-8 text-yellow-600 mx-auto" />
+                <p className="text-sm font-semibold text-yellow-800">
+                  Nenhum mercado adicionado ainda
+                </p>
+                <p className="text-xs text-yellow-700">
+                  Adicione pelo menos um mercado para continuar
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {data.mercados.length > 0 && (
+            <div className="p-4 border-2 border-green-300 rounded-lg bg-green-50">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <p className="text-sm font-semibold text-green-800">
+                  {data.mercados.length} mercado{data.mercados.length > 1 ? 's' : ''} adicionado{data.mercados.length > 1 ? 's' : ''} - Pronto para continuar!
+                </p>
+              </div>
             </div>
           )}
         </div>
@@ -731,6 +765,7 @@ export function Step6ValidateData({ data, updateData }: {
 }) {
   const validMercados = data.mercados.filter(m => m.nome?.trim().length >= 3);
   const invalidMercados = data.mercados.filter(m => !m.nome || m.nome.trim().length < 3);
+  const isDataValidated = data.validatedData.mercados.length > 0 || data.validatedData.clientes.length > 0;
 
   return (
     <div className="space-y-6">
@@ -742,19 +777,21 @@ export function Step6ValidateData({ data, updateData }: {
       </div>
 
       <div className="space-y-4">
-        <Card className="p-4 bg-green-50 border-green-200">
-          <div className="flex items-center gap-2 mb-2">
-            <CheckCircle2 className="w-5 h-5 text-green-600" />
-            <h3 className="font-semibold text-green-800">Dados Válidos ({validMercados.length})</h3>
-          </div>
-          <div className="space-y-2">
-            {validMercados.map((m, i) => (
-              <div key={i} className="text-sm text-green-700">
-                ✓ {m.nome}
-              </div>
-            ))}
-          </div>
-        </Card>
+        {validMercados.length > 0 && (
+          <Card className="p-4 bg-green-50 border-green-200">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle2 className="w-5 h-5 text-green-600" />
+              <h3 className="font-semibold text-green-800">Dados Válidos ({validMercados.length})</h3>
+            </div>
+            <div className="space-y-2">
+              {validMercados.map((m, i) => (
+                <div key={i} className="text-sm text-green-700">
+                  ✓ {m.nome}
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
 
         {invalidMercados.length > 0 && (
           <Card className="p-4 bg-red-50 border-red-200">
@@ -771,6 +808,20 @@ export function Step6ValidateData({ data, updateData }: {
             </div>
           </Card>
         )}
+        
+        {validMercados.length === 0 && (
+          <Card className="p-6 bg-yellow-50 border-yellow-200">
+            <div className="text-center space-y-2">
+              <AlertCircle className="w-8 h-8 text-yellow-600 mx-auto" />
+              <p className="text-sm font-semibold text-yellow-800">
+                Nenhum dado válido para validar
+              </p>
+              <p className="text-xs text-yellow-700">
+                Volte ao passo anterior e adicione dados
+              </p>
+            </div>
+          </Card>
+        )}
 
         <Button
           onClick={() => {
@@ -780,11 +831,24 @@ export function Step6ValidateData({ data, updateData }: {
                 clientes: []
               }
             });
+            toast.success(`${validMercados.length} mercado(s) validado(s) com sucesso!`);
           }}
+          disabled={validMercados.length === 0}
           className="w-full"
         >
-          Aprovar Dados Válidos
+          {isDataValidated ? '✓ Dados Já Validados - Clicar para Revalidar' : 'Aprovar Dados Válidos'}
         </Button>
+        
+        {isDataValidated && (
+          <div className="p-4 border-2 border-green-300 rounded-lg bg-green-50">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-green-600" />
+              <p className="text-sm font-semibold text-green-800">
+                Dados validados - Pronto para continuar!
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

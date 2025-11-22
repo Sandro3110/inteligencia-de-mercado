@@ -9,6 +9,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { setupSSE } from "./sseEndpoint";
 import { initializeWebSocket } from "../websocket";
+import { requireAuth } from "./authMiddleware";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -38,12 +39,12 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   
-  // SSE endpoint for enrichment progress
-  app.get("/api/enrichment/progress/:jobId", setupSSE);
+  // SSE endpoint for enrichment progress (requer autenticação)
+  app.get("/api/enrichment/progress/:jobId", requireAuth, setupSSE);
   
-  // SSE endpoint for real-time notifications
+  // SSE endpoint for real-time notifications (requer autenticação)
   const { handleNotificationStream } = await import('../notificationStream');
-  app.get("/api/notifications/stream", handleNotificationStream);
+  app.get("/api/notifications/stream", requireAuth, handleNotificationStream);
   
   // tRPC API
   app.use(
