@@ -132,14 +132,12 @@ const navSections: NavSection[] = [
     priority: 'low',
     defaultOpen: false,
     items: [
-      { title: "Notificações", href: "/notificacoes", icon: Bell, badge: "Novo" },
-      { title: "Dashboard de Notificações (SSE)", href: "/notificacoes/dashboard", icon: Bell, badge: "Novo" },
-      { title: "Configurar Web Push", href: "/notificacoes/push", icon: Bell, badge: "Novo" },
-      { title: "Histórico de Notificações", href: "/notificacoes/historico", icon: FileText },
+      { title: "Central de Notificações", href: "/notificacoes", icon: Bell, badge: "Novo" },
+      { title: "Configurações de Notificações", href: "/notificacoes/config", icon: Settings },
       { title: "Histórico de Exportações", href: "/export/historico", icon: Download },
       { title: "Geocodificação", href: "/geocodificacao", icon: MapPin },
       { title: "Gerenciar Geocodificação", href: "/geo-admin", icon: Settings, badge: "Novo" },
-      { title: "Preferências de Notificações", href: "/configuracoes/notificacoes", icon: Settings },
+
       { title: "Monitoramento", href: "/monitoring", icon: Activity },
       { title: "Atividade de Projetos", href: "/projetos/atividade", icon: FolderOpen, badge: "Novo" },
       { title: "Registro de Atividades", href: "/atividade", icon: Clock },

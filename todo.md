@@ -2393,3 +2393,22 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 - [ ] Validar que todas as funcionalidades foram migradas
 - [ ] Testar navegação completa
 - [ ] Documentar mudanças
+
+
+---
+
+## 🎯 FASE 2 - SEMANA 1: FUSÃO 2 - CENTRAL DE NOTIFICAÇÕES (EM ANDAMENTO)
+
+### Fusão 2: Central de Notificações (6→2) 🔔
+- [x] Criar nova estrutura com sistema de abas em Notificacoes.tsx
+- [x] Migrar conteúdo de NotificationDashboard.tsx para aba "Recentes" (SSE em tempo real)
+- [x] Migrar conteúdo de NotificationHistory.tsx para aba "Histórico"
+- [x] Adicionar aba "Estatísticas" com filtros avançados
+- [x] Criar página separada NotificationConfig.tsx
+- [x] Migrar NotificationPreferences para aba "Preferências"
+- [x] Migrar PushSettings para aba "Web Push"
+- [x] Migrar TestNotifications para aba "Teste"
+- [x] Remover arquivos antigos (6 arquivos)
+- [x] Atualizar rotas no App.tsx
+- [x] Atualizar menu no AppSidebar.tsx
+- [ ] Testar sistema completo

@@ -46,9 +46,7 @@ const TendenciasDashboard = lazy(() => import("./pages/TendenciasDashboard"));
 const ProjectManagement = lazy(() => import("./pages/ProjectManagement"));
 const ProjectActivityDashboard = lazy(() => import("./pages/ProjectActivityDashboard"));
 const Notificacoes = lazy(() => import("./pages/Notificacoes"));
-const NotificationPreferences = lazy(() => import("./pages/NotificationPreferences"));
-const TestNotifications = lazy(() => import("./pages/TestNotifications"));
-const NotificationHistory = lazy(() => import("./pages/NotificationHistory"));
+const NotificationConfig = lazy(() => import("./pages/NotificationConfig"));
 const ExportHistory = lazy(() => import("./pages/ExportHistory"));
 const Geocodificacao = lazy(() => import("./pages/Geocodificacao"));
 const GeoAdmin = lazy(() => import("./pages/GeoAdmin"));
@@ -58,8 +56,7 @@ const GeoCockpitAdvanced = lazy(() => import("./pages/GeoCockpitAdvanced"));
 const TerritorialAnalysis = lazy(() => import("./pages/TerritorialAnalysis"));
 const TerritorialHeatmap = lazy(() => import("./pages/TerritorialHeatmap"));
 const QualityTrendsDashboard = lazy(() => import("./pages/QualityTrendsDashboard"));
-const NotificationDashboard = lazy(() => import("./pages/NotificationDashboard"));
-const PushSettings = lazy(() => import("./pages/PushSettings"));
+
 const SystemSettings = lazy(() => import("./pages/SystemSettings"));
 const Ajuda = lazy(() => import("./pages/Ajuda"));
 
@@ -105,9 +102,7 @@ function Router() {
       <Route path="/projetos" component={ProjectManagement} />
       <Route path="/projetos/atividade" component={ProjectActivityDashboard} />
       <Route path="/notificacoes" component={Notificacoes} />
-      <Route path="/configuracoes/notificacoes" component={NotificationPreferences} />
-      <Route path="/notificacoes/historico" component={NotificationHistory} />
-      <Route path="/notificacoes/teste" component={TestNotifications} />
+      <Route path="/notificacoes/config" component={NotificationConfig} />
       <Route path="/export/historico" component={ExportHistory} />
       <Route path="/geocodificacao" component={Geocodificacao} />
       <Route path="/geo-admin" component={GeoAdmin} />
@@ -117,8 +112,7 @@ function Router() {
       <Route path="/analise-territorial" component={TerritorialAnalysis} />
       <Route path="/heatmap-territorial" component={TerritorialHeatmap} />
       <Route path="/quality-trends" component={QualityTrendsDashboard} />
-      <Route path="/notificacoes/dashboard" component={NotificationDashboard} />
-      <Route path="/notificacoes/push" component={PushSettings} />
+
       <Route path="/configuracoes/sistema" component={SystemSettings} />
       <Route path="/ajuda" component={Ajuda} />
       <Route path={"/404"} component={NotFound} />
