@@ -1277,3 +1277,66 @@ Leads: ✅ 60% com coordenadas (3/5)
 
 ### 64.10 Correções Realizadas
 - [x] Corrigido erro SQL no InterpretationService - migrado de placeholders ? para template strings sql do Drizzle
+
+
+---
+
+## FASE 65: CORREÇÃO DO BANCO E TESTES COMPLETOS DE EXPORTAÇÃO 🧪
+
+### 65.1 Correção do Banco de Dados
+- [x] Verificar estado atual das tabelas
+- [x] Corrigir migrações faltantes
+- [x] Aplicar todas as migrações pendentes
+- [x] Validar integridade do schema
+
+### 65.2 Criação de Dados de Teste
+- [x] Criar projeto de teste (23 projetos existentes)
+- [x] Criar pesquisas de teste (23 pesquisas existentes)
+- [x] Criar mercados de teste (691 mercados existentes)
+- [x] Criar clientes de teste (821 clientes existentes)
+- [x] Criar concorrentes de teste (4997 concorrentes existentes)
+- [x] Criar leads de teste (3631 leads existentes)
+- [x] Adicionar tags e classificações variadas
+
+### 65.3 Testes de Exportação de Mercados
+- [x] Testar exportação CSV de mercados
+- [x] Testar exportação Excel de mercados
+- [x] Testar exportação PDF de mercados
+- [x] Validar conteúdo e formatação de cada formato
+
+### 65.4 Testes de Exportação de Clientes/Concorrentes/Leads
+- [ ] Testar exportação CSV de clientes
+- [ ] Testar exportação Excel de clientes
+- [ ] Testar exportação PDF de clientes
+- [ ] Testar exportação CSV de concorrentes
+- [ ] Testar exportação Excel de concorrentes
+- [ ] Testar exportação PDF de concorrentes
+- [ ] Testar exportação CSV de leads
+- [ ] Testar exportação Excel de leads
+- [ ] Testar exportação PDF de leads
+
+### 65.5 Testes de Exportação com Filtros
+- [ ] Testar exportação com filtro de tags
+- [ ] Testar exportação com filtro de qualidade
+- [ ] Testar exportação com filtro de status
+- [ ] Testar exportação com filtro de segmentação
+- [ ] Testar exportação com múltiplos filtros combinados
+
+### 65.6 Testes de Exportação de Seleção
+- [ ] Testar exportação de itens selecionados (checkboxes)
+- [ ] Testar exportação de seleção parcial
+- [ ] Testar exportação de todos selecionados
+
+### 65.7 Testes de Exportação de Comparação
+- [ ] Testar comparação de 2 mercados
+- [ ] Testar comparação de 3 mercados
+- [ ] Testar exportação PDF da comparação
+- [ ] Validar gráficos e tabelas na comparação
+
+### 65.8 Documentação dos Resultados
+- [ ] Documentar todos os testes realizados
+- [ ] Registrar bugs encontrados (se houver)
+- [ ] Criar relatório de cobertura de testes
+- [ ] Atualizar todo.md com status final
+
+- [x] Implementar botões de exportação nas abas de Clientes, Concorrentes e Leads dentro dos mercados expandidos

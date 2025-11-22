@@ -385,42 +385,42 @@ export function MercadoAccordionCard({
                 </span>
 
                 {selectedItems.size > 0 && (
-                  <>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleBatchValidate("rich")}
-                      disabled={batchValidateClientes.isPending || batchValidateConcorrentes.isPending || batchValidateLeads.isPending}
-                      className="h-7 px-2 text-xs"
-                    >
-                      {(batchValidateClientes.isPending || batchValidateConcorrentes.isPending || batchValidateLeads.isPending) ? (
-                        <span className="animate-spin mr-1">⏳</span>
-                      ) : (
-                        <CheckCircle2 className="w-3 h-3 mr-1" />
-                      )}
-                      Validar ({selectedItems.size})
-                    </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                          <Download className="w-3 h-3 mr-1" />
-                          Exportar
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleExportTab("csv")}>
-                          CSV
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleExportTab("excel")}>
-                          Excel
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleExportTab("pdf")}>
-                          PDF
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleBatchValidate("rich")}
+                    disabled={batchValidateClientes.isPending || batchValidateConcorrentes.isPending || batchValidateLeads.isPending}
+                    className="h-7 px-2 text-xs"
+                  >
+                    {(batchValidateClientes.isPending || batchValidateConcorrentes.isPending || batchValidateLeads.isPending) ? (
+                      <span className="animate-spin mr-1">⏳</span>
+                    ) : (
+                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                    )}
+                    Validar ({selectedItems.size})
+                  </Button>
                 )}
+                
+                {/* Botão Exportar - sempre visível */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+                      <Download className="w-3 h-3 mr-1" />
+                      {selectedItems.size > 0 ? `Exportar (${selectedItems.size})` : "Exportar Aba"}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleExportTab("csv")}>
+                      CSV
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExportTab("excel")}>
+                      Excel
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExportTab("pdf")}>
+                      PDF
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
 
