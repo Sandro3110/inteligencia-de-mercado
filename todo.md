@@ -2226,4 +2226,170 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 ### Validação Final
 - [x] Executar testes automatizados (20 testes passaram)
 - [x] Verificar status do servidor dev
-- [ ] Criar checkpoint após conclusão
+- [x] Criar checkpoint após conclusão (versão 8cca0dd3)
+
+
+---
+
+## FASE 72: AJUSTES DE NAVEGAÇÃO, MENUS E UX 🎯
+
+### 72.1 Componente Breadcrumbs Melhorado
+- [x] Melhorar componente Breadcrumbs existente
+- [x] Adicionar suporte a links (href) com wouter
+- [x] Adicionar suporte a ícones personalizados
+- [x] Adicionar ícone Home automático no primeiro item
+- [x] Melhorar estilos e acessibilidade
+- [ ] Adicionar breadcrumbs nas páginas principais
+
+### 72.2 Ajustes de Menu Lateral
+- [ ] Revisar organização das seções
+- [ ] Remover itens duplicados ou redundantes
+- [ ] Melhorar responsividade mobile
+- [ ] Adicionar overlay para fechar menu em mobile
+- [ ] Melhorar indicadores visuais de página ativa
+
+### 72.3 Ajustes de Rotas
+- [ ] Revisar rotas duplicadas no App.tsx
+- [ ] Padronizar nomenclatura de rotas
+- [ ] Adicionar redirecionamentos para rotas antigas
+- [ ] Documentar estrutura de rotas
+
+### 72.4 Melhorias de UX
+- [ ] Adicionar estados de loading consistentes
+- [ ] Implementar estados vazios informativos
+- [ ] Adicionar mensagens de erro amigáveis
+- [ ] Implementar confirmações de ações destrutivas
+- [ ] Adicionar feedback visual para todas as ações
+
+
+---
+
+## FASE 73: FUSÃO E OTIMIZAÇÃO DE PÁGINAS 🔄
+
+### 73.1 Preparação e Análise
+- [x] Criar documento ANALISE_FUSAO_PAGINAS.md
+- [x] Identificar 15 páginas para remoção
+- [x] Identificar 8 páginas para modificação
+- [ ] Criar checkpoint de backup antes de iniciar
+
+### 73.2 Fusão Grupo 1: Dashboards (4→1)
+- [ ] Modificar AnalyticsPage.tsx para incluir 3 abas
+- [ ] Migrar conteúdo de Dashboard.tsx para aba "Visão Geral"
+- [ ] Migrar conteúdo de AnalyticsDashboard.tsx para aba "Analytics Avançado"
+- [ ] Migrar conteúdo de DashboardPage.tsx para aba "Métricas Detalhadas"
+- [x] Remover arquivos: Dashboard.tsx, DashboardPage.tsx, AnalyticsDashboard.tsx
+- [ ] Testar navegação e funcionalidades
+
+### 73.3 Fusão Grupo 2: Geo/Mapas (5→2)
+- [ ] Modificar GeoCockpit.tsx para incluir toggle "Modo Avançado"
+- [ ] Migrar funcionalidades de GeoCockpitAdvanced.tsx
+- [ ] Adicionar aba "Heatmap" no GeoCockpit
+- [ ] Migrar conteúdo de TerritorialHeatmap.tsx
+- [ ] Remover arquivos: GeoCockpitTest.tsx, GeoCockpitAdvanced.tsx, TerritorialHeatmap.tsx
+- [ ] Manter TerritorialAnalysis.tsx separado
+- [ ] Testar mapas e visualizações
+
+### 73.4 Fusão Grupo 3: Notificações (4→1)
+- [ ] Modificar Notificacoes.tsx para incluir 4 abas
+- [ ] Migrar conteúdo de NotificationDashboard.tsx para aba "Dashboard SSE"
+- [ ] Migrar conteúdo de NotificationHistory.tsx para aba "Histórico"
+- [ ] Migrar conteúdo de NotificationPreferences.tsx para aba "Configurações"
+- [ ] Remover arquivos: NotificationDashboard.tsx, NotificationHistory.tsx, NotificationPreferences.tsx
+- [ ] Testar sistema de notificações completo
+
+### 73.5 Fusão Grupo 4: Alertas (3→1)
+- [ ] Modificar AlertsPage.tsx para incluir 3 abas
+- [ ] Migrar conteúdo de AlertHistoryPage.tsx para aba "Histórico"
+- [ ] Migrar conteúdo de IntelligentAlerts.tsx para aba "Alertas Inteligentes"
+- [ ] Remover arquivos: AlertHistoryPage.tsx, IntelligentAlerts.tsx
+- [ ] Testar sistema de alertas completo
+
+### 73.6 Fusão Grupo 5: Enriquecimento (4→2)
+- [ ] Modificar EnrichmentFlow.tsx para incluir 2 abas
+- [ ] Migrar conteúdo de EnrichmentProgress.tsx para aba "Progresso"
+- [ ] Migrar conteúdo de ResultadosEnriquecimento.tsx para aba "Resultados"
+- [ ] Manter EnrichmentSettings.tsx separado
+- [ ] Remover arquivos: EnrichmentProgress.tsx, ResultadosEnriquecimento.tsx
+- [ ] Testar fluxo de enriquecimento completo
+
+### 73.7 Fusão Grupo 6: Geocodificação (2→1)
+- [ ] Modificar Geocodificacao.tsx para incluir aba "Administração"
+- [ ] Migrar conteúdo de GeoAdmin.tsx
+- [ ] Remover arquivo: GeoAdmin.tsx
+- [ ] Testar funcionalidades de geocodificação
+
+### 73.8 Atualização de Rotas e Menu
+- [ ] Atualizar App.tsx - remover 15 rotas antigas
+- [ ] Adicionar redirecionamentos para rotas antigas (compatibilidade)
+- [ ] Atualizar AppSidebar.tsx com nova estrutura
+- [ ] Reorganizar seções do menu
+- [ ] Atualizar breadcrumbs onde necessário
+- [ ] Testar navegação completa
+
+### 73.9 Validação e Testes
+- [ ] Testar todas as páginas fundidas
+- [ ] Verificar que todas as funcionalidades foram migradas
+- [ ] Testar breadcrumbs em todas as páginas
+- [ ] Validar links do menu lateral
+- [ ] Testar responsividade mobile
+- [ ] Executar testes automatizados
+- [ ] Verificar performance de carregamento
+
+### 73.10 Finalização
+- [ ] Criar checkpoint após fusão completa
+- [ ] Documentar mudanças no CHANGELOG
+- [ ] Atualizar documentação de usuário
+- [ ] Marcar Fase 73 como concluída
+
+**Meta:** Reduzir de 48 para 33 páginas (-31%)
+**Benefícios:** Navegação simplificada, melhor manutenibilidade, UX aprimorada
+
+
+---
+
+## 🎯 FASE 2 - SEMANA 1: FUSÕES DE ALTA PRIORIDADE
+
+### Fusão 1: Analytics Unificado (4→1) 📊
+- [x] Criar nova estrutura com sistema de abas em AnalyticsPage.tsx
+- [x] Migrar conteúdo de Dashboard.tsx para aba "Visão Geral"
+- [x] Migrar conteúdo de DashboardPage.tsx para aba "Métricas Detalhadas"
+- [x] Migrar conteúdo de AnalyticsDashboard.tsx para aba "Comparativos"
+- [x] Adicionar aba "Analytics" (conteúdo original AnalyticsPage)
+- [x] Criar componentes: OverviewTab, InteractiveTab, MetricsTab, ComparativeTab
+- [x] Remover arquivos: Dashboard.tsx, DashboardPage.tsx, AnalyticsDashboard.tsx
+- [x] Atualizar rotas no App.tsx
+- [x] Atualizar menu no AppSidebar.tsx
+- [x] Testar todas as funcionalidades
+
+### Fusão 2: Central de Notificações (6→2) 🔔
+- [ ] Modificar Notificacoes.tsx com 3 abas
+- [ ] Aba "Recentes" (lista + dashboard SSE do NotificationDashboard)
+- [ ] Aba "Histórico" (NotificationHistory)
+- [ ] Aba "Estatísticas" (métricas)
+- [ ] Criar página separada NotificationConfig.tsx
+- [ ] Migrar NotificationPreferences para aba "Preferências"
+- [ ] Migrar PushSettings para aba "Web Push"
+- [ ] Migrar TestNotifications para aba "Teste"
+- [ ] Remover arquivos antigos
+- [ ] Atualizar rotas e menu
+- [ ] Testar sistema completo
+
+### Fusão 3: Geo Cockpit Unificado (7→2) 🗺️
+- [ ] Modificar GeoCockpit.tsx com seletor de modo
+- [ ] Modo "Cockpit" (visualização padrão)
+- [ ] Modo "Análise Territorial" (TerritorialAnalysis)
+- [ ] Modo "Heatmap" (TerritorialHeatmap)
+- [ ] Integrar funcionalidades do GeoCockpitAdvanced
+- [ ] Criar página GeoAdmin.tsx unificada
+- [ ] Aba "Geocodificação" (Geocodificacao)
+- [ ] Aba "Configurações" (configurações geo)
+- [ ] Aba "Histórico" (log de geocodificações)
+- [ ] Remover: GeoCockpitTest, GeoCockpitAdvanced, TerritorialHeatmap, Geocodificacao
+- [ ] Atualizar rotas e menu
+- [ ] Testar mapas e visualizações
+
+### Checkpoint Semana 1
+- [ ] Criar checkpoint após conclusão das 3 fusões
+- [ ] Validar que todas as funcionalidades foram migradas
+- [ ] Testar navegação completa
+- [ ] Documentar mudanças

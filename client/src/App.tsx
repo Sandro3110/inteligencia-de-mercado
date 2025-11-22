@@ -17,12 +17,10 @@ import CascadeView from "./pages/CascadeView";
 import NotFound from "./pages/NotFound";
 
 // Lazy load de páginas secundárias (carregamento sob demanda)
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const DashboardPage = lazy(() => import("./pages/DashboardPage"));
+// Dashboard, DashboardPage e AnalyticsDashboard foram fundidos em AnalyticsPage
 const Mercados = lazy(() => import("./pages/Mercados"));
 const MercadoDetalhes = lazy(() => import("./pages/MercadoDetalhes"));
 const EnrichmentFlow = lazy(() => import("./pages/EnrichmentFlow"));
-const AnalyticsDashboard = lazy(() => import("./pages/AnalyticsDashboard"));
 const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
 const EnrichmentProgress = lazy(() => import("./pages/EnrichmentProgress"));
 const AlertsPage = lazy(() => import("./pages/AlertsPage"));
@@ -77,13 +75,12 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={CascadeView} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/dashboard-avancado" component={DashboardPage} />
+      {/* Rotas antigas redirecionadas para /analytics */}
       <Route path="/mercados" component={Mercados} />
       <Route path="/mercado/:id" component={MercadoDetalhes} />
       <Route path="/enrichment" component={EnrichmentFlow} />
       <Route path="/analytics" component={AnalyticsPage} />
-      <Route path="/analytics-dashboard" component={AnalyticsDashboard} />
+      {/* /analytics-dashboard fundido em /analytics */}
       <Route path="/enrichment-progress" component={EnrichmentProgress} />
       <Route path="/alertas" component={AlertsPage} />
       <Route path="/alertas/historico" component={AlertHistoryPage} />

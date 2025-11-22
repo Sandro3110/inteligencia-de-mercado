@@ -91,9 +91,7 @@ const navSections: NavSection[] = [
     defaultOpen: false,
     items: [
       { title: "Mercados", href: "/mercados", icon: Package, shortcut: "Ctrl+M" },
-      { title: "Analytics Avançado", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+A" },
-      { title: "Dashboard Avançado", href: "/dashboard-avancado", icon: BarChart3 },
-      { title: "Analytics Dashboard", href: "/analytics-dashboard", icon: BarChart3 },
+      { title: "Analytics Unificado", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+A" },
       { title: "Tendências", href: "/tendencias", icon: TrendingUp },
       { title: "Tendências de Qualidade", href: "/quality-trends", icon: TrendingUp, badge: "Novo" },
       { title: "Cockpit Geográfico", href: "/geo-cockpit", icon: MapPin, badge: "Novo" },
@@ -146,7 +144,6 @@ const navSections: NavSection[] = [
       { title: "Atividade de Projetos", href: "/projetos/atividade", icon: FolderOpen, badge: "Novo" },
       { title: "Registro de Atividades", href: "/atividade", icon: Clock },
       { title: "Histórico de Alertas", href: "/alertas/historico", icon: Bell },
-      { title: "Dashboard Geral", href: "/dashboard", icon: BarChart3, shortcut: "Ctrl+D" },
       { title: "Central de Ajuda", href: "/ajuda", icon: HelpCircle, shortcut: "?", badge: "Novo" },
     ],
   },
