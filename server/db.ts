@@ -2538,6 +2538,35 @@ export async function getUnreadNotificationsCount(userId: string) {
   return Number(result[0]?.count || 0);
 }
 
+export async function getNotificationStats(userId: string) {
+  const db = await getDb();
+  if (!db) return { total: 0, unread: 0, last24h: 0 };
+
+  const [totalResult] = await db.select({ count: count() })
+    .from(notifications)
+    .where(eq(notifications.userId, userId));
+
+  const [unreadResult] = await db.select({ count: count() })
+    .from(notifications)
+    .where(and(eq(notifications.userId, userId), eq(notifications.isRead, 0)));
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const [last24hResult] = await db.select({ count: count() })
+    .from(notifications)
+    .where(and(
+      eq(notifications.userId, userId),
+      sql`${notifications.createdAt} >= ${yesterday}`
+    ));
+
+  return {
+    total: Number(totalResult?.count || 0),
+    unread: Number(unreadResult?.count || 0),
+    last24h: Number(last24hResult?.count || 0),
+  };
+}
+
 export async function markNotificationAsRead(id: number) {
   const db = await getDb();
   if (!db) return false;

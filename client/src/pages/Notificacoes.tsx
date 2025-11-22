@@ -147,7 +147,7 @@ export default function Notificacoes() {
   }, [notifications, filters]);
 
   const handleMarkAsRead = (id: number) => {
-    markAsReadMutation.mutate(id);
+    markAsReadMutation.mutate({ id });
   };
 
   const handleDelete = (id: number) => {

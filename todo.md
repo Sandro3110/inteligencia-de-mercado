@@ -1532,3 +1532,49 @@ Leads: ✅ 60% com coordenadas (3/5)
 
 **Cobertura Total**: 15 testes automatizados para validação de segurança e funcionalidade SSE
 
+
+
+---
+
+## FASE 66: MELHORIAS AVANÇADAS DE NOTIFICAÇÕES 🔔
+
+### 66.1 Dashboard de Monitoramento SSE
+- [x] Backend: Criar endpoint SSE /api/notifications/stream
+- [x] Backend: Implementar stream de notificações em tempo real
+- [x] Frontend: Criar página NotificationDashboard (/notificacoes/dashboard)
+- [x] Frontend: Conectar ao SSE e exibir notificações em tempo real
+- [x] Frontend: Cards de estatísticas (total, não lidas, últimas 24h)
+- [x] Frontend: Lista de notificações com auto-refresh
+- [x] Adicionar rota no App.tsx
+- [x] Adicionar item no menu lateral
+
+### 66.2 Sistema de Web Push API
+- [x] Backend: Gerar VAPID keys
+- [x] Backend: Criar endpoint de subscrição push (/api/push/subscribe)
+- [x] Backend: Criar endpoint de envio de push (/api/push/send)
+- [x] Backend: Armazenar subscrições no banco
+- [x] Frontend: Criar página PushSettings (/notificacoes/push)
+- [x] Frontend: Solicitar permissão de notificações
+- [x] Frontend: Registrar Service Worker
+- [x] Frontend: Enviar subscrição ao backend
+- [x] Frontend: UI para testar envio de push
+- [x] Service Worker: Receber e exibir notificações push
+- [x] Adicionar rota no App.tsx
+- [x] Adicionar item no menu lateral
+
+### 66.3 Testes E2E com Playwright
+- [x] Instalar Playwright e dependências
+- [x] Configurar playwright.config.ts
+- [x] Criar teste E2E de criação de pesquisa
+- [x] Criar teste E2E de notificações
+- [x] Criar teste E2E de dashboard
+- [x] Criar teste E2E de push notifications
+- [x] Adicionar scripts no package.json
+- [x] Documentar como executar testes
+
+### 66.4 Integração no Menu Lateral
+- [x] Adicionar seção "🔔 Notificações" no menu
+- [x] Adicionar item "Dashboard de Notificações"
+- [x] Adicionar item "Configurar Push"
+- [x] Adicionar item "Testes E2E" (dev only)
+- [x] Testar navegação entre páginas

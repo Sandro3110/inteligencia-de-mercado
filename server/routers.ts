@@ -1068,11 +1068,17 @@ export const appRouter = router({
       return getUnreadNotificationsCount(ctx.user.id);
     }),
     
+    getStats: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user) return { total: 0, unread: 0, last24h: 0 };
+      const { getNotificationStats } = await import('./db');
+      return getNotificationStats(ctx.user.id);
+    }),
+    
     markAsRead: publicProcedure
-      .input(z.number())
+      .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         const { markNotificationAsRead } = await import('./db');
-        return markNotificationAsRead(input);
+        return markNotificationAsRead(input.id);
       }),
     
     markAllAsRead: publicProcedure
@@ -2207,6 +2213,46 @@ export const appRouter = router({
       .query(async ({ ctx }) => {
         const { getUserDrafts } = await import('./db');
         return getUserDrafts(ctx.user.id);
+      }),
+  }),
+
+  // Web Push API
+  push: router({
+    getPublicKey: publicProcedure.query(async () => {
+      const { getVapidPublicKey } = await import('./webPush');
+      return getVapidPublicKey();
+    }),
+
+    subscribe: protectedProcedure
+      .input(z.object({
+        endpoint: z.string(),
+        keys: z.object({
+          p256dh: z.string(),
+          auth: z.string(),
+        }),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { savePushSubscription } = await import('./webPush');
+        const userAgent = ctx.req.get('user-agent');
+        return savePushSubscription(ctx.user.id, input, userAgent);
+      }),
+
+    unsubscribe: protectedProcedure
+      .input(z.object({ endpoint: z.string() }))
+      .mutation(async ({ input }) => {
+        const { removePushSubscription } = await import('./webPush');
+        return removePushSubscription(input.endpoint);
+      }),
+
+    sendTest: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { sendPushToUser } = await import('./webPush');
+        return sendPushToUser(ctx.user.id, {
+          title: 'Notificação de Teste',
+          body: 'Esta é uma notificação de teste do Gestor PAV!',
+          icon: '/logo.png',
+          data: { url: '/notificacoes' },
+        });
       }),
   }),
 });

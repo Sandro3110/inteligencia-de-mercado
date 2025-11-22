@@ -865,3 +865,25 @@ export const researchDrafts = mysqlTable("research_drafts", {
 
 export type ResearchDraft = typeof researchDrafts.$inferSelect;
 export type InsertResearchDraft = typeof researchDrafts.$inferInsert;
+
+// ========================================
+// PUSH SUBSCRIPTIONS (Web Push API)
+// Fase 66.2
+// ========================================
+
+export const pushSubscriptions = mysqlTable("push_subscriptions", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  endpoint: text("endpoint").notNull(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  lastUsedAt: timestamp("lastUsedAt").defaultNow().onUpdateNow(),
+},
+(table) => [
+  index("idx_userId").on(table.userId),
+]);
+
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
