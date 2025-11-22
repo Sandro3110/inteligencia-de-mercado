@@ -27,6 +27,7 @@ import {
   Sparkles,
   FolderOpen,
   MapPin,
+  HelpCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -146,6 +147,7 @@ const navSections: NavSection[] = [
       { title: "Registro de Atividades", href: "/atividade", icon: Clock },
       { title: "Histórico de Alertas", href: "/alertas/historico", icon: Bell },
       { title: "Dashboard Geral", href: "/dashboard", icon: BarChart3, shortcut: "Ctrl+D" },
+      { title: "Central de Ajuda", href: "/ajuda", icon: HelpCircle, shortcut: "?", badge: "Novo" },
     ],
   },
 ];

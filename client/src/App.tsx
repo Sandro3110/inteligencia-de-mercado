@@ -63,6 +63,7 @@ const QualityTrendsDashboard = lazy(() => import("./pages/QualityTrendsDashboard
 const NotificationDashboard = lazy(() => import("./pages/NotificationDashboard"));
 const PushSettings = lazy(() => import("./pages/PushSettings"));
 const SystemSettings = lazy(() => import("./pages/SystemSettings"));
+const Ajuda = lazy(() => import("./pages/Ajuda"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -122,6 +123,7 @@ function Router() {
       <Route path="/notificacoes/dashboard" component={NotificationDashboard} />
       <Route path="/notificacoes/push" component={PushSettings} />
       <Route path="/configuracoes/sistema" component={SystemSettings} />
+      <Route path="/ajuda" component={Ajuda} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

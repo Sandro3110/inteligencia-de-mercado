@@ -2132,3 +2132,71 @@ Garantir que todos os registros (clientes, concorrentes, leads) sejam geocodific
 - [ ] Testar em diferentes navegadores (Chrome, Firefox, Safari)
 - [ ] Adicionar loading state durante exportação
 - [ ] Adicionar tratamento de erros com mensagens claras
+
+
+---
+
+## FASE ATUAL: AJUSTES COMPLETOS DE PÁGINAS, MENUS, ROTAS E SISTEMA DE AJUDA 🎯
+
+### Ajustes de Navegação e Rotas
+- [ ] Revisar e ajustar todas as rotas no App.tsx
+- [ ] Garantir consistência entre rotas e itens do menu
+- [ ] Adicionar breadcrumbs em todas as páginas principais
+- [ ] Implementar navegação contextual (voltar, próximo)
+- [ ] Validar links entre páginas relacionadas
+
+### Ajustes de Menus
+- [ ] Revisar estrutura completa do menu lateral
+- [ ] Garantir ícones consistentes e intuitivos
+- [ ] Adicionar badges de status onde necessário
+- [ ] Implementar menu responsivo para mobile
+- [ ] Adicionar indicadores visuais de página ativa
+
+### Sistema de Atalhos de Teclado
+- [x] Criar hook useKeyboardShortcuts global - já existe e funcional
+- [x] Implementar atalhos de navegação (G+H home, G+P projetos, etc) - 8 atalhos Gmail-style adicionados
+- [x] Implementar atalhos de ação (Ctrl+N novo, Ctrl+S salvar, etc) - Ctrl+K, Ctrl+N, Ctrl+B implementados
+- [ ] Implementar atalhos contextuais por página
+- [x] Criar modal de ajuda de atalhos (Shift+? ou Ctrl+/) - modal organizado por categorias
+- [ ] Adicionar indicadores visuais de atalhos nos botões
+- [x] Documentar todos os atalhos disponíveis - documentados na página de ajuda
+
+### Sistema de Tour e Ajuda
+- [x] Instalar e configurar biblioteca de tour (react-joyride) - já instalado e configurado
+- [x] Criar tour de primeira utilização (onboarding) - OnboardingTour existente
+- [x] Criar tour para criação de projeto - definido em useTour hook
+- [x] Criar tour para criação de pesquisa - definido em useTour hook
+- [x] Criar tour para análise de dados - definido em useTour hook (analytics)
+- [x] Criar tour para dashboard - coberto no onboarding
+- [ ] Implementar sistema de tooltips informativos
+- [x] Criar página de documentação/ajuda (/ajuda) - página completa com 4 abas
+- [x] Adicionar botão de ajuda no header principal - adicionado no menu Sistema
+- [ ] Implementar sistema de "Dicas do Dia"
+- [x] Criar FAQ interativo - 10 perguntas com busca
+- [x] Adicionar vídeos tutoriais (links ou embeds) - 6 tutoriais na aba Tutoriais
+
+### Melhorias de UX nas Páginas
+- [ ] Adicionar estados de loading consistentes
+- [ ] Implementar estados vazios informativos
+- [ ] Adicionar mensagens de erro amigáveis
+- [ ] Implementar confirmações de ações destrutivas
+- [ ] Adicionar feedback visual para todas as ações
+- [ ] Implementar debouncing em campos de busca
+- [ ] Adicionar skeleton loaders onde apropriado
+
+### Acessibilidade
+- [ ] Validar navegação por teclado em todas as páginas
+- [ ] Adicionar labels ARIA apropriados
+- [ ] Garantir contraste adequado de cores
+- [ ] Implementar focus trap em modais
+- [ ] Adicionar textos alternativos em imagens
+- [ ] Testar com leitor de tela
+
+### Testes e Validação
+- [ ] Testar navegação completa entre todas as páginas
+- [ ] Testar todos os atalhos de teclado
+- [ ] Testar tours em diferentes cenários
+- [ ] Validar responsividade em diferentes resoluções
+- [ ] Testar acessibilidade com ferramentas automatizadas
+- [ ] Realizar testes de usabilidade com usuários
+
