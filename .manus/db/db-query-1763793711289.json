@@ -1,0 +1,15 @@
+{
+  "query": "SELECT \n  projectId,\n  CASE WHEN googleMapsApiKey IS NOT NULL THEN 'Configurado' ELSE 'Não configurado' END as status_api_key,\n  CASE WHEN googleMapsApiKey IS NOT NULL THEN LEFT(googleMapsApiKey, 10) ELSE NULL END as preview_key\nFROM enrichment_configs;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  projectId,\n  CASE WHEN googleMapsApiKey IS NOT NULL THEN 'Configurado' ELSE 'Não configurado' END as status_api_key,\n  CASE WHEN googleMapsApiKey IS NOT NULL THEN LEFT(googleMapsApiKey, 10) ELSE NULL END as preview_key\nFROM enrichment_configs;",
+  "rows": [
+    {
+      "projectId": "999999",
+      "status_api_key": "Não configurado",
+      "preview_key": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "projectId\tstatus_api_key\tpreview_key\n999999\tNão configurado\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}

@@ -1,0 +1,55 @@
+{
+  "query": "SELECT \n  id,\n  nome,\n  cidade,\n  uf,\n  latitude,\n  longitude,\n  geocodedAt\nFROM clientes\nWHERE cidade IS NOT NULL\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute SELECT \n  id,\n  nome,\n  cidade,\n  uf,\n  latitude,\n  longitude,\n  geocodedAt\nFROM clientes\nWHERE cidade IS NOT NULL\nLIMIT 5;",
+  "rows": [
+    {
+      "id": "301634",
+      "nome": "AGRO-COMERCIAL AFUBRA LTDA",
+      "cidade": "Santa Cruz do Sul",
+      "uf": "RS",
+      "latitude": "NULL",
+      "longitude": "NULL",
+      "geocodedAt": "NULL"
+    },
+    {
+      "id": "331696",
+      "nome": "COPAPA CIA PADUANA DE PAPEIS",
+      "cidade": "Santo Antônio de Pádua",
+      "uf": "RJ",
+      "latitude": "NULL",
+      "longitude": "NULL",
+      "geocodedAt": "NULL"
+    },
+    {
+      "id": "331763",
+      "nome": "EUCATEX IND E COM LTDA",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "latitude": "NULL",
+      "longitude": "NULL",
+      "geocodedAt": "NULL"
+    },
+    {
+      "id": "331809",
+      "nome": "FRIBAZ FRIGORIFICO BAZOTTI LTDA",
+      "cidade": "Aquidauana",
+      "uf": "MS",
+      "latitude": "NULL",
+      "longitude": "NULL",
+      "geocodedAt": "NULL"
+    },
+    {
+      "id": "331818",
+      "nome": "GERALTECH INJECAO PLASTICA LTDA",
+      "cidade": "Jundiaí",
+      "uf": "SP",
+      "latitude": "NULL",
+      "longitude": "NULL",
+      "geocodedAt": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcidade\tuf\tlatitude\tlongitude\tgeocodedAt\n301634\tAGRO-COMERCIAL AFUBRA LTDA\tSanta Cruz do Sul\tRS\tNULL\tNULL\tNULL\n331696\tCOPAPA CIA PADUANA DE PAPEIS\tSanto Antônio de Pádua\tRJ\tNULL\tNULL\tNULL\n331763\tEUCATEX IND E COM LTDA\tSão Paulo\tSP\tNULL\tNULL\tNULL\n331809\tFRIBAZ FRIGORIFICO BAZOTTI LTDA\tAquidauana\tMS\tNULL\tNULL\tNULL\n331818\tGERALTECH INJECAO PLASTICA LTDA\tJundiaí\tSP\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

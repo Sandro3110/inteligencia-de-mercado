@@ -336,3 +336,243 @@ export async function getGeocodeStats(projetoId: number) {
     };
   }
 }
+
+/**
+ * Interface para dados geolocalizados
+ */
+export interface GeolocatedRecord {
+  id: number;
+  nome: string;
+  latitude: number;
+  longitude: number;
+  cidade: string;
+  uf: string;
+  tipo: 'cliente' | 'concorrente' | 'lead';
+  qualidadeScore?: number;
+  validationStatus?: string;
+  mercadoId?: number;
+  pesquisaId?: number;
+}
+
+/**
+ * Busca registros com coordenadas (para exibir no mapa)
+ */
+export async function getGeolocatedRecords(filters: {
+  projectId: number;
+  pesquisaId?: number;
+  mercadoId?: number;
+  tipo?: 'cliente' | 'concorrente' | 'lead';
+  validationStatus?: string;
+}): Promise<GeolocatedRecord[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const records: GeolocatedRecord[] = [];
+
+  try {
+    // Buscar clientes com coordenadas
+    if (!filters.tipo || filters.tipo === 'cliente') {
+      const conditions = [
+        eq(clientes.projectId, filters.projectId),
+        sql`${clientes.latitude} IS NOT NULL`,
+        sql`${clientes.longitude} IS NOT NULL`,
+      ];
+
+      if (filters.pesquisaId) {
+        conditions.push(eq(clientes.pesquisaId, filters.pesquisaId));
+      }
+
+      if (filters.validationStatus) {
+        conditions.push(eq(clientes.validationStatus, filters.validationStatus as any));
+      }
+
+      const clientesComCoord = await db
+        .select({
+          id: clientes.id,
+          nome: clientes.nome,
+          latitude: clientes.latitude,
+          longitude: clientes.longitude,
+          cidade: clientes.cidade,
+          uf: clientes.uf,
+          qualidadeScore: clientes.qualidadeScore,
+          validationStatus: clientes.validationStatus,
+          pesquisaId: clientes.pesquisaId,
+        })
+        .from(clientes)
+        .where(and(...conditions));
+
+      records.push(
+        ...clientesComCoord.map(c => ({
+          id: c.id,
+          nome: c.nome,
+          latitude: parseFloat(c.latitude || '0'),
+          longitude: parseFloat(c.longitude || '0'),
+          cidade: c.cidade || '',
+          uf: c.uf || '',
+          tipo: 'cliente' as const,
+          qualidadeScore: c.qualidadeScore || undefined,
+          validationStatus: c.validationStatus || undefined,
+          pesquisaId: c.pesquisaId || undefined,
+        }))
+      );
+    }
+
+    // Buscar concorrentes com coordenadas
+    if (!filters.tipo || filters.tipo === 'concorrente') {
+      const conditions = [
+        eq(concorrentes.projectId, filters.projectId),
+        sql`${concorrentes.latitude} IS NOT NULL`,
+        sql`${concorrentes.longitude} IS NOT NULL`,
+      ];
+
+      if (filters.pesquisaId) {
+        conditions.push(eq(concorrentes.pesquisaId, filters.pesquisaId));
+      }
+
+      if (filters.mercadoId) {
+        conditions.push(eq(concorrentes.mercadoId, filters.mercadoId));
+      }
+
+      if (filters.validationStatus) {
+        conditions.push(eq(concorrentes.validationStatus, filters.validationStatus as any));
+      }
+
+      const concorrentesComCoord = await db
+        .select({
+          id: concorrentes.id,
+          nome: concorrentes.nome,
+          latitude: concorrentes.latitude,
+          longitude: concorrentes.longitude,
+          cidade: concorrentes.cidade,
+          uf: concorrentes.uf,
+          qualidadeScore: concorrentes.qualidadeScore,
+          validationStatus: concorrentes.validationStatus,
+          mercadoId: concorrentes.mercadoId,
+          pesquisaId: concorrentes.pesquisaId,
+        })
+        .from(concorrentes)
+        .where(and(...conditions));
+
+      records.push(
+        ...concorrentesComCoord.map(c => ({
+          id: c.id,
+          nome: c.nome,
+          latitude: parseFloat(c.latitude || '0'),
+          longitude: parseFloat(c.longitude || '0'),
+          cidade: c.cidade || '',
+          uf: c.uf || '',
+          tipo: 'concorrente' as const,
+          qualidadeScore: c.qualidadeScore || undefined,
+          validationStatus: c.validationStatus || undefined,
+          mercadoId: c.mercadoId || undefined,
+          pesquisaId: c.pesquisaId || undefined,
+        }))
+      );
+    }
+
+    // Buscar leads com coordenadas
+    if (!filters.tipo || filters.tipo === 'lead') {
+      const conditions = [
+        eq(leads.projectId, filters.projectId),
+        sql`${leads.latitude} IS NOT NULL`,
+        sql`${leads.longitude} IS NOT NULL`,
+      ];
+
+      if (filters.pesquisaId) {
+        conditions.push(eq(leads.pesquisaId, filters.pesquisaId));
+      }
+
+      if (filters.mercadoId) {
+        conditions.push(eq(leads.mercadoId, filters.mercadoId));
+      }
+
+      if (filters.validationStatus) {
+        conditions.push(eq(leads.validationStatus, filters.validationStatus as any));
+      }
+
+      const leadsComCoord = await db
+        .select({
+          id: leads.id,
+          nome: leads.nome,
+          latitude: leads.latitude,
+          longitude: leads.longitude,
+          cidade: leads.cidade,
+          uf: leads.uf,
+          qualidadeScore: leads.qualidadeScore,
+          validationStatus: leads.validationStatus,
+          mercadoId: leads.mercadoId,
+          pesquisaId: leads.pesquisaId,
+        })
+        .from(leads)
+        .where(and(...conditions));
+
+      records.push(
+        ...leadsComCoord.map(l => ({
+          id: l.id,
+          nome: l.nome,
+          latitude: parseFloat(l.latitude || '0'),
+          longitude: parseFloat(l.longitude || '0'),
+          cidade: l.cidade || '',
+          uf: l.uf || '',
+          tipo: 'lead' as const,
+          qualidadeScore: l.qualidadeScore || undefined,
+          validationStatus: l.validationStatus || undefined,
+          mercadoId: l.mercadoId || undefined,
+          pesquisaId: l.pesquisaId || undefined,
+        }))
+      );
+    }
+
+    console.log(`[DB] Encontrados ${records.length} registros geolocalizados`);
+    return records;
+
+  } catch (error) {
+    console.error('[DB] Erro ao buscar registros geolocalizados:', error);
+    return [];
+  }
+}
+
+/**
+ * Estatísticas geográficas por região (UF)
+ */
+export async function getRegionStats(projectId: number, pesquisaId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const conditions = [
+      eq(clientes.projectId, projectId),
+      sql`${clientes.uf} IS NOT NULL`,
+    ];
+
+    if (pesquisaId) {
+      conditions.push(eq(clientes.pesquisaId, pesquisaId));
+    }
+
+    // Estatísticas por UF
+    const stats = await db
+      .select({
+        uf: clientes.uf,
+        total: sql<number>`count(*)`,
+        comCoordenadas: sql<number>`sum(case when ${clientes.latitude} is not null and ${clientes.longitude} is not null then 1 else 0 end)`,
+        qualidadeMedia: sql<number>`avg(${clientes.qualidadeScore})`,
+      })
+      .from(clientes)
+      .where(and(...conditions))
+      .groupBy(clientes.uf);
+
+    return stats.map(s => ({
+      uf: s.uf || '',
+      total: Number(s.total),
+      comCoordenadas: Number(s.comCoordenadas),
+      qualidadeMedia: Math.round(Number(s.qualidadeMedia) || 0),
+      percentualGeolocalizado: Number(s.total) > 0 
+        ? Math.round((Number(s.comCoordenadas) / Number(s.total)) * 100) 
+        : 0,
+    }));
+
+  } catch (error) {
+    console.error('[DB] Erro ao buscar estatísticas por região:', error);
+    return [];
+  }
+}

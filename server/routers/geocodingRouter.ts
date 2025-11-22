@@ -220,4 +220,37 @@ export const geocodingRouter = router({
       const result = await testGoogleMapsConnection(apiKey);
       return result;
     }),
+
+  /**
+   * Busca registros com coordenadas (para exibir no mapa)
+   */
+  getLocations: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+        pesquisaId: z.number().optional(),
+        mercadoId: z.number().optional(),
+        tipo: z.enum(["cliente", "concorrente", "lead"]).optional(),
+        validationStatus: z.string().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const { getGeolocatedRecords } = await import("../db-geocoding");
+      return getGeolocatedRecords(input);
+    }),
+
+  /**
+   * Estatísticas geográficas por região
+   */
+  getRegionStats: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+        pesquisaId: z.number().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const { getRegionStats } = await import("../db-geocoding");
+      return getRegionStats(input.projectId, input.pesquisaId);
+    }),
 });

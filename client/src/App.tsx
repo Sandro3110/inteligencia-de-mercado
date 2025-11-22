@@ -52,6 +52,8 @@ const TestNotifications = lazy(() => import("./pages/TestNotifications"));
 const NotificationHistory = lazy(() => import("./pages/NotificationHistory"));
 const ExportHistory = lazy(() => import("./pages/ExportHistory"));
 const Geocodificacao = lazy(() => import("./pages/Geocodificacao"));
+const GeoAdmin = lazy(() => import("./pages/GeoAdmin"));
+const GeoCockpit = lazy(() => import("./pages/GeoCockpit"));
 const QualityTrendsDashboard = lazy(() => import("./pages/QualityTrendsDashboard"));
 const NotificationDashboard = lazy(() => import("./pages/NotificationDashboard"));
 const PushSettings = lazy(() => import("./pages/PushSettings"));
@@ -103,6 +105,8 @@ function Router() {
       <Route path="/notificacoes/teste" component={TestNotifications} />
       <Route path="/export/historico" component={ExportHistory} />
       <Route path="/geocodificacao" component={Geocodificacao} />
+      <Route path="/geo-admin" component={GeoAdmin} />
+      <Route path="/geo-cockpit" component={GeoCockpit} />
       <Route path="/quality-trends" component={QualityTrendsDashboard} />
       <Route path="/notificacoes/dashboard" component={NotificationDashboard} />
       <Route path="/notificacoes/push" component={PushSettings} />

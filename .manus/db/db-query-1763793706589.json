@@ -1,0 +1,31 @@
+{
+  "query": "-- Verificar clientes com coordenadas\nSELECT \n  'clientes' as tabela,\n  COUNT(*) as total,\n  COUNT(latitude) as com_latitude,\n  COUNT(longitude) as com_longitude,\n  COUNT(CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN 1 END) as com_ambos\nFROM clientes\nUNION ALL\n-- Verificar concorrentes com coordenadas\nSELECT \n  'concorrentes' as tabela,\n  COUNT(*) as total,\n  COUNT(latitude) as com_latitude,\n  COUNT(longitude) as com_longitude,\n  COUNT(CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN 1 END) as com_ambos\nFROM concorrentes\nUNION ALL\n-- Verificar leads com coordenadas\nSELECT \n  'leads' as tabela,\n  COUNT(*) as total,\n  COUNT(latitude) as com_latitude,\n  COUNT(longitude) as com_longitude,\n  COUNT(CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN 1 END) as com_ambos\nFROM leads;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4LxBqKfHv1LE9mk.f65588d6698e --database XpSHcSiEisTmX38X46V9tQ --execute -- Verificar clientes com coordenadas\nSELECT \n  'clientes' as tabela,\n  COUNT(*) as total,\n  COUNT(latitude) as com_latitude,\n  COUNT(longitude) as com_longitude,\n  COUNT(CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN 1 END) as com_ambos\nFROM clientes\nUNION ALL\n-- Verificar concorrentes com coordenadas\nSELECT \n  'concorrentes' as tabela,\n  COUNT(*) as total,\n  COUNT(latitude) as com_latitude,\n  COUNT(longitude) as com_longitude,\n  COUNT(CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN 1 END) as com_ambos\nFROM concorrentes\nUNION ALL\n-- Verificar leads com coordenadas\nSELECT \n  'leads' as tabela,\n  COUNT(*) as total,\n  COUNT(latitude) as com_latitude,\n  COUNT(longitude) as com_longitude,\n  COUNT(CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN 1 END) as com_ambos\nFROM leads;",
+  "rows": [
+    {
+      "tabela": "clientes",
+      "total": "821",
+      "com_latitude": "0",
+      "com_longitude": "0",
+      "com_ambos": "0"
+    },
+    {
+      "tabela": "concorrentes",
+      "total": "4997",
+      "com_latitude": "16",
+      "com_longitude": "16",
+      "com_ambos": "16"
+    },
+    {
+      "tabela": "leads",
+      "total": "3631",
+      "com_latitude": "15",
+      "com_longitude": "15",
+      "com_ambos": "15"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\ttotal\tcom_latitude\tcom_longitude\tcom_ambos\nclientes\t821\t0\t0\t0\nconcorrentes\t4997\t16\t16\t16\nleads\t3631\t15\t15\t15\n",
+  "stderr": "",
+  "execution_time_ms": 926
+}

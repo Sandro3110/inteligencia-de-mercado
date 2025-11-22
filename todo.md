@@ -1578,3 +1578,136 @@ Leads: ✅ 60% com coordenadas (3/5)
 - [x] Adicionar item "Configurar Push"
 - [x] Adicionar item "Testes E2E" (dev only)
 - [x] Testar navegação entre páginas
+
+
+---
+
+## FASE 64: GEOLOCALIZAÇÃO E COCKPIT DE HEATMAP DINÂMICO 🗺️
+
+### ✅ Infraestrutura Existente (JÁ PRONTA)
+- [x] Schema com campos latitude, longitude, geocodedAt (clientes, concorrentes, leads)
+- [x] Router tRPC de geocodificação (geo.geocodeAddress, geo.geocodeBatch, geo.getStats)
+- [x] Serviço de integração com Google Maps API
+- [x] Funções de banco para atualizar coordenadas
+- [x] Campo googleMapsApiKey na tabela enrichment_configs
+
+### 64.1 Configuração e Geocodificação da Base Existente
+- [ ] Configurar Google Maps API Key no enrichment_configs
+- [ ] Criar página de gerenciamento de geocodificação (/geo-admin)
+- [ ] Adicionar botão "Geocodificar Base" que chama geo.geocodeBatch
+- [ ] Implementar progress bar para acompanhar geocodificação em lote
+- [ ] Exibir estatísticas: total, geocodificados, pendentes, falhas
+- [ ] Adicionar botão "Testar Conexão" (geo.testConnection)
+- [ ] Executar geocodificação inicial da base completa
+
+### 64.2 Integração Automática no Fluxo de Enriquecimento
+- [ ] Modificar enrichmentFlow.ts para chamar geocoding após ReceitaWS
+- [ ] Modificar enrichmentOptimized.ts para geocodificar novos registros
+- [ ] Adicionar geocodificação em createCliente(), createConcorrente(), createLead()
+- [ ] Implementar fallback: se ReceitaWS falhar, usar cidade+uf
+- [ ] Adicionar logs de geocodificação no enrichment
+- [ ] Testar fluxo completo de enriquecimento com geocodificação
+
+### 64.3 Backend - Queries para Visualização Geográfica
+- [ ] Criar query getGeolocatedData() com filtros (tipo, pesquisaId, mercadoId, status)
+- [ ] Criar query getHeatmapData() com agregação por densidade
+- [ ] Criar query getRegionStats() (estatísticas por UF/cidade)
+- [ ] Criar query getClusterData() (agrupamento de pontos próximos)
+- [ ] Adicionar filtros de qualidade e validação
+- [ ] Otimizar queries com índices geográficos
+
+### 64.4 Backend - Novos Endpoints tRPC
+- [x] Criar geo.getLocations (buscar pontos geolocalizados com filtros)
+- [x] Criar geo.getRegionStats (estatísticas por região)
+- [ ] Criar geo.getHeatmapData (dados agregados para heatmap)
+- [ ] Criar geo.getClusterData (dados para clustering de marcadores)
+
+### 64.5 Frontend - Instalação e Configuração de Leaflet
+- [x] Instalar dependências: leaflet, react-leaflet, leaflet.heat
+- [x] Instalar tipos: @types/leaflet
+- [x] Configurar CSS do Leaflet no index.css
+- [x] Criar componente base MapContainer.tsx
+- [ ] Testar renderização básica do mapa
+
+### 64.6 Frontend - Componentes de Mapa
+- [x] Criar componente MapContainer.tsx (mapa base com controles)
+- [x] Criar componente HeatmapLayer.tsx (layer de densidade)
+- [x] Criar componente CustomMarker.tsx (marcadores customizados)
+- [ ] Criar componente MarkerCluster.tsx (agrupamento de marcadores)
+- [ ] Criar componente MapTooltip.tsx (tooltips informativos)
+- [ ] Criar componente MapLegend.tsx (legenda dinâmica)
+- [ ] Adicionar controles de zoom, pan, fullscreen
+
+### 64.7 Frontend - Cockpit de Visualização Geográfica
+- [x] Criar página GeoCockpit.tsx (/geo-cockpit)
+- [x] Criar layout com mapa principal + painel lateral
+- [x] Implementar painel de filtros:
+  - [ ] Filtro por pesquisa
+  - [ ] Filtro por mercado
+  - [ ] Filtro por tipo (clientes/concorrentes/leads)
+  - [ ] Filtro por período (data)
+  - [ ] Filtro por qualidade (quality score)
+  - [ ] Filtro por status (validado/pendente/descartado)
+- [ ] Criar cards de estatísticas agregadas:
+  - [ ] Total de pontos no mapa
+  - [ ] Densidade média por região
+  - [ ] Top 5 cidades com mais pontos
+  - [ ] Distribuição por tipo
+- [ ] Adicionar modo de visualização (heatmap vs marcadores)
+
+### 64.8 Frontend - Interatividade e UX
+- [ ] Implementar click em marcador para abrir detalhes
+- [ ] Implementar hover para preview rápido
+- [ ] Adicionar drawer lateral com informações detalhadas
+- [ ] Implementar seleção de múltiplos pontos (shift+click)
+- [ ] Adicionar botão "Centralizar no Brasil"
+- [ ] Implementar busca por endereço/cidade
+- [ ] Adicionar modo comparação temporal (slider de data)
+
+### 64.9 Frontend - Análises Avançadas
+- [ ] Criar componente RegionAnalysis.tsx (análise por região)
+- [ ] Implementar drill-down por estado/cidade
+- [ ] Criar gráficos complementares:
+  - [ ] Gráfico de barras: Top 10 cidades
+  - [ ] Gráfico de pizza: Distribuição por tipo
+  - [ ] Gráfico de linha: Evolução temporal por região
+- [ ] Adicionar ranking de regiões por densidade
+- [ ] Implementar comparação entre mercados
+
+### 64.10 Frontend - Exportação e Compartilhamento
+- [ ] Adicionar botão "Exportar Mapa como Imagem" (PNG)
+- [ ] Adicionar botão "Exportar Dados Visíveis" (CSV/Excel)
+- [ ] Implementar exportação de relatório geográfico (PDF)
+- [ ] Adicionar botão "Compartilhar Visualização" (link)
+- [ ] Implementar salvamento de configurações de visualização
+
+### 64.11 Integração com Sistema Existente
+- [ ] Adicionar link no menu lateral (seção Análise)
+- [x] Adicionar rota no App.tsx (/geo-cockpit)
+- [x] Adicionar link no menu lateral (seção Análise)
+- [ ] Integrar com sistema de filtros global
+- [ ] Adicionar mini-mapa nas páginas de detalhes (clientes, concorrentes)
+- [ ] Adicionar botão "Ver no Mapa" nos cards
+
+### 64.12 Performance e Otimização
+- [ ] Implementar virtualização para grandes volumes de pontos
+- [ ] Adicionar loading states e skeletons
+- [ ] Implementar debounce em filtros
+- [ ] Otimizar queries com índices geográficos
+- [ ] Implementar paginação/lazy loading de marcadores
+- [ ] Adicionar cache de tiles do mapa
+
+### 64.13 Testes e Validação
+- [ ] Criar testes unitários para funções de geocodificação
+- [ ] Criar testes para queries geográficas
+- [ ] Testar performance com 1000+ pontos
+- [ ] Testar responsividade em mobile
+- [ ] Validar precisão da geocodificação
+- [ ] Testar filtros e agregações
+- [ ] Validar exportações
+
+### 64.14 Documentação
+- [ ] Documentar API de geocodificação escolhida
+- [ ] Documentar estrutura de dados geográficos
+- [ ] Criar guia de uso do cockpit geográfico
+- [ ] Documentar limitações e rate limits
