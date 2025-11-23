@@ -18,12 +18,14 @@ Esta é uma questão fundamental de **design de sistema**. Vamos analisar os tra
 ### Abordagem 1: Hash com Timestamp (Atual para Concorrentes/Leads)
 
 **Como funciona:**
+
 ```typescript
-hash = `${nome}-${mercadoId}-${Date.now()}`
+hash = `${nome}-${mercadoId}-${Date.now()}`;
 // Exemplo: "empresa-abc-5-1732035600000"
 ```
 
 **Comportamento:**
+
 - ✅ Sempre cria novo registro
 - ✅ Mantém histórico completo
 - ❌ Permite duplicação
@@ -31,19 +33,21 @@ hash = `${nome}-${mercadoId}-${Date.now()}`
 ### Abordagem 2: Hash sem Timestamp + UPSERT (Atual para Clientes)
 
 **Como funciona:**
+
 ```typescript
-hash = `${nome}-${mercadoId}-${projectId}`
+hash = `${nome}-${mercadoId}-${projectId}`;
 // Exemplo: "empresa-abc-5-1"
 
 // Lógica UPSERT
 if (existe) {
-  UPDATE // Atualiza registro existente
+  UPDATE; // Atualiza registro existente
 } else {
-  INSERT // Cria novo registro
+  INSERT; // Cria novo registro
 }
 ```
 
 **Comportamento:**
+
 - ✅ Garante unicidade
 - ✅ Atualiza dados automaticamente
 - ❌ Perde histórico de mudanças
@@ -55,6 +59,7 @@ if (existe) {
 ### Cenário 1: Primeira Execução (Dados Novos)
 
 **Timestamp:**
+
 ```typescript
 // Execução 1 (10:00:00)
 Input: { nome: "Empresa ABC", mercadoId: 5 }
@@ -64,6 +69,7 @@ Resultado: 1 registro criado
 ```
 
 **UPSERT:**
+
 ```typescript
 // Execução 1 (10:00:00)
 Input: { nome: "Empresa ABC", mercadoId: 5 }
@@ -79,6 +85,7 @@ Resultado: 1 registro criado
 ### Cenário 2: Reprocessamento (Mesmos Dados)
 
 **Timestamp:**
+
 ```typescript
 // Execução 2 (10:00:01) - MESMOS dados
 Input: { nome: "Empresa ABC", mercadoId: 5 }
@@ -97,6 +104,7 @@ Total: 10 registros para a mesma empresa
 ```
 
 **UPSERT:**
+
 ```typescript
 // Execução 2 (10:00:01) - MESMOS dados
 Input: { nome: "Empresa ABC", mercadoId: 5 }
@@ -118,20 +126,21 @@ Total: 1 registro (sempre o mesmo)
 ### Cenário 3: Dados Atualizados (Enriquecimento)
 
 **Timestamp:**
+
 ```typescript
 // Execução 1
-Input: { 
-  nome: "Empresa ABC", 
+Input: {
+  nome: "Empresa ABC",
   site: null,
-  email: null 
+  email: null
 }
 Hash: "empresa-abc-5-1732035600000"
 Ação: INSERT
 ID: 1
 
 // Execução 2 (após enriquecer via ReceitaWS)
-Input: { 
-  nome: "Empresa ABC", 
+Input: {
+  nome: "Empresa ABC",
   site: "https://abc.com.br",
   email: "contato@abc.com.br"
 }
@@ -147,20 +156,21 @@ ID: 2
 ```
 
 **UPSERT:**
+
 ```typescript
 // Execução 1
-Input: { 
-  nome: "Empresa ABC", 
+Input: {
+  nome: "Empresa ABC",
   site: null,
-  email: null 
+  email: null
 }
 Hash: "empresa-abc-5-1"
 Ação: INSERT
 ID: 1
 
 // Execução 2 (após enriquecer via ReceitaWS)
-Input: { 
-  nome: "Empresa ABC", 
+Input: {
+  nome: "Empresa ABC",
   site: "https://abc.com.br",
   email: "contato@abc.com.br"
 }
@@ -180,13 +190,14 @@ Ação: UPDATE (ID 1)
 ### Cenário 4: Rastreamento de Mudanças
 
 **Timestamp:**
+
 ```typescript
 // Histórico completo de mudanças
 [
   { id: 1, nome: "ABC", site: null, createdAt: "2025-11-19 10:00:00" },
   { id: 2, nome: "ABC", site: "abc.com", createdAt: "2025-11-19 10:00:01" },
-  { id: 3, nome: "ABC", site: "abc.com.br", createdAt: "2025-11-19 10:00:02" }
-]
+  { id: 3, nome: "ABC", site: "abc.com.br", createdAt: "2025-11-19 10:00:02" },
+];
 
 // Posso ver:
 // - Site mudou de null → abc.com → abc.com.br
@@ -194,11 +205,10 @@ Ação: UPDATE (ID 1)
 ```
 
 **UPSERT:**
+
 ```typescript
 // Apenas estado atual
-[
-  { id: 1, nome: "ABC", site: "abc.com.br", updatedAt: "2025-11-19 10:00:02" }
-]
+[{ id: 1, nome: "ABC", site: "abc.com.br", updatedAt: "2025-11-19 10:00:02" }];
 
 // Posso ver:
 // - Estado atual: site = "abc.com.br"
@@ -215,6 +225,7 @@ Ação: UPDATE (ID 1)
 ### Custo de Armazenamento
 
 **Timestamp (800 clientes, 10 execuções):**
+
 ```
 Clientes: 800 × 10 = 8.000 registros
 Concorrentes: 800 × 23 × 10 = 184.000 registros
@@ -226,6 +237,7 @@ Armazenamento: 376.000 × 2 KB = 752 MB
 ```
 
 **UPSERT (800 clientes, 10 execuções):**
+
 ```
 Clientes: 800 registros (sempre os mesmos)
 Concorrentes: 800 × 23 = 18.400 registros (sempre os mesmos)
@@ -241,6 +253,7 @@ Armazenamento: 37.600 × 2 KB = 75 MB
 ### Custo de APIs
 
 **Timestamp:**
+
 ```
 Execução 1: 800 clientes × 23 concorrentes = 18.400 chamadas SerpAPI
 Execução 2: 800 clientes × 23 concorrentes = 18.400 chamadas SerpAPI
@@ -253,6 +266,7 @@ Custo total: 184.000 × $0.002 = $368
 ```
 
 **UPSERT:**
+
 ```
 Execução 1: 800 clientes × 23 concorrentes = 18.400 chamadas SerpAPI
 Execução 2: 0 chamadas (já existem, apenas UPDATE)
@@ -273,6 +287,7 @@ Custo total: 18.400 × $0.002 = $36.80
 ### Quando Usar TIMESTAMP
 
 **1. Auditoria e Compliance**
+
 ```
 Necessidade: Rastrear TODAS as mudanças
 Exemplo: Sistema financeiro, dados médicos
@@ -280,6 +295,7 @@ Benefício: Histórico completo, imutável
 ```
 
 **2. Análise de Tendências**
+
 ```
 Necessidade: Ver como dados evoluem ao longo do tempo
 Exemplo: Preços de concorrentes, posicionamento de mercado
@@ -287,6 +303,7 @@ Benefício: Análise temporal
 ```
 
 **3. Machine Learning**
+
 ```
 Necessidade: Treinar modelos com dados históricos
 Exemplo: Prever mudanças de preço, detectar padrões
@@ -294,6 +311,7 @@ Benefício: Dataset rico
 ```
 
 **4. Debugging e Troubleshooting**
+
 ```
 Necessidade: Investigar quando/como dados mudaram
 Exemplo: "Por que o score caiu de 100 para 50?"
@@ -303,6 +321,7 @@ Benefício: Rastreabilidade completa
 ### Quando Usar UPSERT
 
 **1. Dados de Referência**
+
 ```
 Necessidade: Manter catálogo atualizado
 Exemplo: Lista de empresas, produtos, mercados
@@ -310,6 +329,7 @@ Benefício: Sempre atualizado, sem duplicatas
 ```
 
 **2. Enriquecimento Incremental**
+
 ```
 Necessidade: Adicionar dados progressivamente
 Exemplo: Começar com nome, depois adicionar email, telefone, etc
@@ -317,6 +337,7 @@ Benefício: Dados se acumulam no mesmo registro
 ```
 
 **3. Integrações Externas**
+
 ```
 Necessidade: Sincronizar com sistemas externos
 Exemplo: CRM, ERP, plataformas de marketing
@@ -324,6 +345,7 @@ Benefício: Evita duplicação entre sistemas
 ```
 
 **4. Performance e Custo**
+
 ```
 Necessidade: Otimizar armazenamento e APIs
 Exemplo: Aplicações com orçamento limitado
@@ -339,14 +361,16 @@ Benefício: 90% de redução de custos
 **Recomendação:** UPSERT (sem timestamp)
 
 **Justificativa:**
+
 - Mercados são **entidades de referência**
 - Raramente mudam (nome, categoria, segmentação)
 - Não precisa de histórico de mudanças
 - Reprocessamento deve atualizar, não duplicar
 
 **Hash Ideal:**
+
 ```typescript
-hash = `${nome}-${projectId}`
+hash = `${nome}-${projectId}`;
 // Exemplo: "embalagens-plasticas-1"
 ```
 
@@ -357,18 +381,20 @@ hash = `${nome}-${projectId}`
 **Recomendação:** UPSERT (sem timestamp) ✅ JÁ IMPLEMENTADO
 
 **Justificativa:**
+
 - Clientes são **entidades principais**
 - Enriquecimento incremental (começa básico, vai melhorando)
 - Não precisa de histórico (apenas estado atual)
 - Reprocessamento deve atualizar dados
 
 **Hash Ideal:**
+
 ```typescript
 // Com CNPJ
-hash = `${nome}-${cnpj}-${projectId}`
+hash = `${nome}-${cnpj}-${projectId}`;
 
 // Sem CNPJ (CORRIGIR)
-hash = `${nome}-${projectId}` // Remover timestamp
+hash = `${nome}-${projectId}`; // Remover timestamp
 ```
 
 ---
@@ -378,6 +404,7 @@ hash = `${nome}-${projectId}` // Remover timestamp
 **Recomendação:** DEPENDE DO CASO DE USO
 
 **Opção A: UPSERT (Recomendado para maioria)**
+
 ```typescript
 hash = `${nome}-${mercadoId}-${projectId}`
 
@@ -393,6 +420,7 @@ Desvantagens:
 ```
 
 **Opção B: Timestamp (Para análise temporal)**
+
 ```typescript
 hash = `${nome}-${mercadoId}-${Date.now()}`
 
@@ -408,10 +436,12 @@ Desvantagens:
 ```
 
 **Decisão:**
+
 - Se você precisa analisar **como concorrentes evoluem** → Timestamp
 - Se você só precisa da **lista atual** → UPSERT
 
 **Para seu caso (Gestor PAV):** UPSERT é mais adequado, pois:
+
 - Você quer **lista atualizada** de concorrentes
 - Não precisa rastrear mudanças históricas
 - Orçamento limitado (evitar custos desnecessários)
@@ -423,21 +453,25 @@ Desvantagens:
 **Recomendação:** UPSERT (sem timestamp)
 
 **Justificativa:**
+
 - Leads são **oportunidades de vendas**
 - Cada lead deve ser **único** no pipeline
 - Duplicação polui o CRM
 - Stage (novo, em_contato, negociacao) deve ser preservado
 
 **Hash Ideal:**
+
 ```typescript
-hash = `${nome}-${mercadoId}-${projectId}`
+hash = `${nome}-${mercadoId}-${projectId}`;
 // Exemplo: "lead-xyz-5-1"
 ```
 
 **Importante:** No UPSERT de leads, **NÃO atualizar o campo `stage`**:
+
 ```typescript
 if (existing.length > 0) {
-  await db.update(leads)
+  await db
+    .update(leads)
     .set({
       nome: data.nome,
       site: data.site || existing[0].site,
@@ -460,18 +494,40 @@ if (existing.length > 0) {
 ```typescript
 // Tabela principal (estado atual)
 clientes = [
-  { id: 1, nome: "ABC", site: "abc.com.br", email: "contato@abc.com.br" }
-]
+  { id: 1, nome: "ABC", site: "abc.com.br", email: "contato@abc.com.br" },
+];
 
 // Tabela de histórico (mudanças)
 clientes_history = [
-  { id: 1, clienteId: 1, field: "site", oldValue: null, newValue: "abc.com", changedAt: "10:00:00" },
-  { id: 2, clienteId: 1, field: "site", oldValue: "abc.com", newValue: "abc.com.br", changedAt: "10:00:01" },
-  { id: 3, clienteId: 1, field: "email", oldValue: null, newValue: "contato@abc.com.br", changedAt: "10:00:02" }
-]
+  {
+    id: 1,
+    clienteId: 1,
+    field: "site",
+    oldValue: null,
+    newValue: "abc.com",
+    changedAt: "10:00:00",
+  },
+  {
+    id: 2,
+    clienteId: 1,
+    field: "site",
+    oldValue: "abc.com",
+    newValue: "abc.com.br",
+    changedAt: "10:00:01",
+  },
+  {
+    id: 3,
+    clienteId: 1,
+    field: "email",
+    oldValue: null,
+    newValue: "contato@abc.com.br",
+    changedAt: "10:00:02",
+  },
+];
 ```
 
 **Vantagens:**
+
 - ✅ Estado atual sempre atualizado (tabela principal)
 - ✅ Histórico completo de mudanças (tabela de histórico)
 - ✅ Sem duplicação na tabela principal
@@ -482,18 +538,18 @@ clientes_history = [
 ```typescript
 export async function createClienteWithHistory(data: { ... }) {
   const db = await getDb();
-  
+
   const clienteHash = `${data.nome}-${data.cnpj}-${data.projectId}`;
-  
+
   // Verificar se existe
   const existing = await db.select().from(clientes)
     .where(eq(clientes.clienteHash, clienteHash))
     .limit(1);
-  
+
   if (existing.length > 0) {
     // Registrar mudanças no histórico
     const changes = [];
-    
+
     if (data.site && data.site !== existing[0].site) {
       changes.push({
         clienteId: existing[0].id,
@@ -502,7 +558,7 @@ export async function createClienteWithHistory(data: { ... }) {
         newValue: data.site
       });
     }
-    
+
     if (data.email && data.email !== existing[0].email) {
       changes.push({
         clienteId: existing[0].id,
@@ -511,20 +567,20 @@ export async function createClienteWithHistory(data: { ... }) {
         newValue: data.email
       });
     }
-    
+
     // Salvar histórico
     if (changes.length > 0) {
       await db.insert(clientesHistory).values(changes);
     }
-    
+
     // Atualizar registro principal
     await db.update(clientes)
       .set({ ...data })
       .where(eq(clientes.id, existing[0].id));
-    
+
     return existing[0];
   }
-  
+
   // Criar novo registro
   const [result] = await db.insert(clientes).values({ ...data });
   return await getClienteById(Number(result.insertId));
@@ -532,6 +588,7 @@ export async function createClienteWithHistory(data: { ... }) {
 ```
 
 **Quando Usar:**
+
 - Você precisa de **histórico** mas também quer **evitar duplicação**
 - Análise temporal é importante mas não crítica
 - Orçamento permite armazenamento adicional (tabela de histórico)
@@ -544,14 +601,15 @@ export async function createClienteWithHistory(data: { ... }) {
 
 **Recomendação Final:**
 
-| Entidade | Abordagem | Justificativa |
-|----------|-----------|---------------|
-| **Mercados** | UPSERT | Referência, raramente muda |
-| **Clientes** | UPSERT | ✅ Já implementado corretamente |
-| **Concorrentes** | UPSERT | Lista atual, sem histórico necessário |
-| **Leads** | UPSERT | Pipeline de vendas, evitar duplicação |
+| Entidade         | Abordagem | Justificativa                         |
+| ---------------- | --------- | ------------------------------------- |
+| **Mercados**     | UPSERT    | Referência, raramente muda            |
+| **Clientes**     | UPSERT    | ✅ Já implementado corretamente       |
+| **Concorrentes** | UPSERT    | Lista atual, sem histórico necessário |
+| **Leads**        | UPSERT    | Pipeline de vendas, evitar duplicação |
 
 **Benefícios:**
+
 - ✅ 90% redução de armazenamento
 - ✅ 90% redução de custos de API
 - ✅ Reprocessamento seguro
@@ -559,6 +617,7 @@ export async function createClienteWithHistory(data: { ... }) {
 - ✅ Sem duplicação
 
 **Trade-off Aceito:**
+
 - ❌ Perde histórico de mudanças
 - ✅ Mas você pode adicionar tabela de histórico se necessário
 
@@ -615,12 +674,14 @@ ALTER TABLE leads ADD UNIQUE KEY (leadHash);
 ## 💡 Conclusão
 
 **Timestamp é útil para:**
+
 - Auditoria e compliance
 - Análise temporal
 - Machine learning
 - Debugging avançado
 
 **UPSERT é melhor para:**
+
 - Dados de referência (seu caso)
 - Enriquecimento incremental (seu caso)
 - Otimização de custos (seu caso)

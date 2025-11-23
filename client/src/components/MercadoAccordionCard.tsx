@@ -28,7 +28,12 @@ import {
   Download,
 } from "lucide-react";
 import { toast } from "sonner";
-import { exportToCSV, exportToExcel, exportToPDF, ExportData } from "@/lib/exportUtils";
+import {
+  exportToCSV,
+  exportToExcel,
+  exportToPDF,
+  ExportData,
+} from "@/lib/exportUtils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,18 +48,22 @@ interface MercadoAccordionCardProps {
   onToggleSelection?: (mercadoId: number) => void;
 }
 
-export function MercadoAccordionCard({ 
-  mercado, 
+export function MercadoAccordionCard({
+  mercado,
   selectedProjectId,
   isSelected = false,
-  onToggleSelection 
+  onToggleSelection,
 }: MercadoAccordionCardProps) {
   const [detailPopupOpen, setDetailPopupOpen] = useState(false);
   const [detailPopupItem, setDetailPopupItem] = useState<any>(null);
-  const [detailPopupType, setDetailPopupType] = useState<"cliente" | "concorrente" | "lead">("cliente");
+  const [detailPopupType, setDetailPopupType] = useState<
+    "cliente" | "concorrente" | "lead"
+  >("cliente");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
-  const [currentTab, setCurrentTab] = useState<"clientes" | "concorrentes" | "leads">("clientes");
+  const [currentTab, setCurrentTab] = useState<
+    "clientes" | "concorrentes" | "leads"
+  >("clientes");
 
   // Queries para buscar entidades do mercado
   const { data: clientesData } = trpc.clientes.byMercado.useQuery(
@@ -80,45 +89,54 @@ export function MercadoAccordionCard({
   const filteredClientes = useMemo(() => {
     if (!searchQuery.trim()) return clientes;
     const query = searchQuery.toLowerCase();
-    return clientes.filter((c: any) => 
-      c.empresa?.toLowerCase().includes(query) ||
-      c.cnpj?.toLowerCase().includes(query) ||
-      c.produtoPrincipal?.toLowerCase().includes(query) ||
-      c.cidade?.toLowerCase().includes(query) ||
-      c.uf?.toLowerCase().includes(query)
+    return clientes.filter(
+      (c: any) =>
+        c.empresa?.toLowerCase().includes(query) ||
+        c.cnpj?.toLowerCase().includes(query) ||
+        c.produtoPrincipal?.toLowerCase().includes(query) ||
+        c.cidade?.toLowerCase().includes(query) ||
+        c.uf?.toLowerCase().includes(query)
     );
   }, [clientes, searchQuery]);
 
   const filteredConcorrentes = useMemo(() => {
     if (!searchQuery.trim()) return concorrentes;
     const query = searchQuery.toLowerCase();
-    return concorrentes.filter((c: any) => 
-      c.nome?.toLowerCase().includes(query) ||
-      c.cnpj?.toLowerCase().includes(query) ||
-      c.produto?.toLowerCase().includes(query) ||
-      c.cidade?.toLowerCase().includes(query)
+    return concorrentes.filter(
+      (c: any) =>
+        c.nome?.toLowerCase().includes(query) ||
+        c.cnpj?.toLowerCase().includes(query) ||
+        c.produto?.toLowerCase().includes(query) ||
+        c.cidade?.toLowerCase().includes(query)
     );
   }, [concorrentes, searchQuery]);
 
   const filteredLeads = useMemo(() => {
     if (!searchQuery.trim()) return leads;
     const query = searchQuery.toLowerCase();
-    return leads.filter((l: any) => 
-      l.nome?.toLowerCase().includes(query) ||
-      l.cnpj?.toLowerCase().includes(query) ||
-      l.setor?.toLowerCase().includes(query) ||
-      l.tipo?.toLowerCase().includes(query)
+    return leads.filter(
+      (l: any) =>
+        l.nome?.toLowerCase().includes(query) ||
+        l.cnpj?.toLowerCase().includes(query) ||
+        l.setor?.toLowerCase().includes(query) ||
+        l.tipo?.toLowerCase().includes(query)
     );
   }, [leads, searchQuery]);
 
   const getStatusIcon = (status: string | null) => {
-    if (status === "rich") return <CheckCircle2 className="w-4 h-4 text-green-500" />;
-    if (status === "needs_adjustment") return <AlertCircle className="w-4 h-4 text-yellow-500" />;
-    if (status === "discarded") return <XCircle className="w-4 h-4 text-red-500" />;
+    if (status === "rich")
+      return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+    if (status === "needs_adjustment")
+      return <AlertCircle className="w-4 h-4 text-yellow-500" />;
+    if (status === "discarded")
+      return <XCircle className="w-4 h-4 text-red-500" />;
     return <Clock className="w-4 h-4 text-muted-foreground" />;
   };
 
-  const handleOpenDetail = (item: any, type: "cliente" | "concorrente" | "lead") => {
+  const handleOpenDetail = (
+    item: any,
+    type: "cliente" | "concorrente" | "lead"
+  ) => {
     setDetailPopupItem(item);
     setDetailPopupType(type);
     setDetailPopupOpen(true);
@@ -149,17 +167,20 @@ export function MercadoAccordionCard({
     setSelectedItems(newSet);
   };
 
-  const batchValidateClientes = trpc.clientes.batchUpdateValidation.useMutation({
-    onSuccess: () => {
-      utils.clientes.byMercado.invalidate();
-    },
-  });
+  const batchValidateClientes = trpc.clientes.batchUpdateValidation.useMutation(
+    {
+      onSuccess: () => {
+        utils.clientes.byMercado.invalidate();
+      },
+    }
+  );
 
-  const batchValidateConcorrentes = trpc.concorrentes.batchUpdateValidation.useMutation({
-    onSuccess: () => {
-      utils.concorrentes.byMercado.invalidate();
-    },
-  });
+  const batchValidateConcorrentes =
+    trpc.concorrentes.batchUpdateValidation.useMutation({
+      onSuccess: () => {
+        utils.concorrentes.byMercado.invalidate();
+      },
+    });
 
   const batchValidateLeads = trpc.leads.batchUpdateValidation.useMutation({
     onSuccess: () => {
@@ -167,14 +188,16 @@ export function MercadoAccordionCard({
     },
   });
 
-  const handleBatchValidate = async (status: "rich" | "needs_adjustment" | "discarded") => {
+  const handleBatchValidate = async (
+    status: "rich" | "needs_adjustment" | "discarded"
+  ) => {
     if (selectedItems.size === 0) {
       toast.error("Nenhum item selecionado");
       return;
     }
 
     const ids = Array.from(selectedItems);
-    
+
     try {
       if (currentTab === "clientes") {
         await batchValidateClientes.mutateAsync({
@@ -212,20 +235,47 @@ export function MercadoAccordionCard({
     if (currentTab === "clientes") {
       data = filteredClientes;
       entityType = "clientes";
-      headers = ["ID", "Empresa", "CNPJ", "Produto", "Segmentação", "Cidade", "UF", "Qualidade (%)", "Status"];
+      headers = [
+        "ID",
+        "Empresa",
+        "CNPJ",
+        "Produto",
+        "Segmentação",
+        "Cidade",
+        "UF",
+        "Qualidade (%)",
+        "Status",
+      ];
     } else if (currentTab === "concorrentes") {
       data = filteredConcorrentes;
       entityType = "concorrentes";
-      headers = ["ID", "Nome", "CNPJ", "Produto", "Porte", "Qualidade (%)", "Status"];
+      headers = [
+        "ID",
+        "Nome",
+        "CNPJ",
+        "Produto",
+        "Porte",
+        "Qualidade (%)",
+        "Status",
+      ];
     } else {
       data = filteredLeads;
       entityType = "leads";
-      headers = ["ID", "Nome", "CNPJ", "Tipo", "Porte", "Região", "Qualidade (%)", "Status"];
+      headers = [
+        "ID",
+        "Nome",
+        "CNPJ",
+        "Tipo",
+        "Porte",
+        "Região",
+        "Qualidade (%)",
+        "Status",
+      ];
     }
 
     const rows = data.map((item): (string | number)[] => {
       const qualityScore = calculateQualityScore(item);
-      
+
       if (currentTab === "clientes") {
         return [
           item.id,
@@ -272,7 +322,7 @@ export function MercadoAccordionCard({
       title: `${mercado.nome} - ${entityType.charAt(0).toUpperCase() + entityType.slice(1)}`,
       metadata: {
         "Data de Geração": new Date().toLocaleString("pt-BR"),
-        "Mercado": mercado.nome,
+        Mercado: mercado.nome,
         "Total de Registros": `${data.length}`,
       },
     };
@@ -285,7 +335,9 @@ export function MercadoAccordionCard({
       } else if (format === "pdf") {
         exportToPDF(exportData);
       }
-      toast.success(`Exportado com sucesso em formato ${format.toUpperCase()}!`);
+      toast.success(
+        `Exportado com sucesso em formato ${format.toUpperCase()}!`
+      );
     } catch (error) {
       toast.error("Erro ao exportar dados");
     }
@@ -294,12 +346,15 @@ export function MercadoAccordionCard({
   return (
     <>
       <Accordion type="multiple" className="w-full">
-        <AccordionItem value={`mercado-${mercado.id}`} className="border border-border/40 rounded-lg mb-2">
+        <AccordionItem
+          value={`mercado-${mercado.id}`}
+          className="border border-border/40 rounded-lg mb-2"
+        >
           <AccordionTrigger className="px-4 py-3 hover:bg-muted/50 rounded-t-lg [&[data-state=open]]:bg-muted/70 transition-colors">
             <div className="flex items-center gap-3 w-full">
               {/* Checkbox para seleção de comparação */}
               {onToggleSelection && (
-                <div onClick={(e) => e.stopPropagation()}>
+                <div onClick={e => e.stopPropagation()}>
                   <Checkbox
                     checked={isSelected}
                     onCheckedChange={() => onToggleSelection(mercado.id)}
@@ -315,11 +370,12 @@ export function MercadoAccordionCard({
                     {mercado.segmentacao}
                   </Badge>
                   <span className="text-xs text-muted-foreground">
-                    {clientes.length} clientes • {concorrentes.length} concorrentes • {leads.length} leads
+                    {clientes.length} clientes • {concorrentes.length}{" "}
+                    concorrentes • {leads.length} leads
                   </span>
                 </div>
               </div>
-              <div onClick={(e) => e.stopPropagation()}>
+              <div onClick={e => e.stopPropagation()}>
                 <EntityTagPicker entityType="mercado" entityId={mercado.id} />
               </div>
             </div>
@@ -333,7 +389,7 @@ export function MercadoAccordionCard({
                 type="text"
                 placeholder="Buscar neste mercado..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="pl-9 pr-9 h-9 text-sm"
               />
               {searchQuery && (
@@ -348,81 +404,110 @@ export function MercadoAccordionCard({
               )}
             </div>
 
-            <Tabs defaultValue="clientes" className="w-full" onValueChange={(value) => {
-              setCurrentTab(value as "clientes" | "concorrentes" | "leads");
-              setSelectedItems(new Set()); // Limpar seleção ao trocar de aba
-            }}>
+            <Tabs
+              defaultValue="clientes"
+              className="w-full"
+              onValueChange={value => {
+                setCurrentTab(value as "clientes" | "concorrentes" | "leads");
+                setSelectedItems(new Set()); // Limpar seleção ao trocar de aba
+              }}
+            >
               <div className="flex items-center justify-between mb-2">
                 <TabsList className="grid grid-cols-3 flex-1">
-                <TabsTrigger value="clientes" className="text-sm">
-                  <Users className="w-4 h-4 mr-2" />
-                  Clientes ({searchQuery ? filteredClientes.length : clientes.length})
-                </TabsTrigger>
-                <TabsTrigger value="concorrentes" className="text-sm">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Concorrentes ({searchQuery ? filteredConcorrentes.length : concorrentes.length})
-                </TabsTrigger>
-                <TabsTrigger value="leads" className="text-sm">
-                  <Target className="w-4 h-4 mr-2" />
-                  Leads ({searchQuery ? filteredLeads.length : leads.length})
-                </TabsTrigger>
-              </TabsList>
+                  <TabsTrigger value="clientes" className="text-sm">
+                    <Users className="w-4 h-4 mr-2" />
+                    Clientes (
+                    {searchQuery ? filteredClientes.length : clientes.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="concorrentes" className="text-sm">
+                    <Building2 className="w-4 h-4 mr-2" />
+                    Concorrentes (
+                    {searchQuery
+                      ? filteredConcorrentes.length
+                      : concorrentes.length}
+                    )
+                  </TabsTrigger>
+                  <TabsTrigger value="leads" className="text-sm">
+                    <Target className="w-4 h-4 mr-2" />
+                    Leads ({searchQuery ? filteredLeads.length : leads.length})
+                  </TabsTrigger>
+                </TabsList>
 
-              {/* Ações em Lote */}
-              <div className="flex items-center gap-2 ml-4">
-                <Checkbox
-                  checked={(() => {
-                    let items: any[] = [];
-                    if (currentTab === "clientes") items = filteredClientes;
-                    else if (currentTab === "concorrentes") items = filteredConcorrentes;
-                    else items = filteredLeads;
-                    return selectedItems.size > 0 && selectedItems.size === items.length;
-                  })()}
-                  onCheckedChange={toggleSelectAll}
-                />
-                <span className="text-xs text-muted-foreground whitespace-nowrap">
-                  {selectedItems.size > 0 ? `${selectedItems.size} selecionados` : "Selecionar todos"}
-                </span>
+                {/* Ações em Lote */}
+                <div className="flex items-center gap-2 ml-4">
+                  <Checkbox
+                    checked={(() => {
+                      let items: any[] = [];
+                      if (currentTab === "clientes") items = filteredClientes;
+                      else if (currentTab === "concorrentes")
+                        items = filteredConcorrentes;
+                      else items = filteredLeads;
+                      return (
+                        selectedItems.size > 0 &&
+                        selectedItems.size === items.length
+                      );
+                    })()}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    {selectedItems.size > 0
+                      ? `${selectedItems.size} selecionados`
+                      : "Selecionar todos"}
+                  </span>
 
-                {selectedItems.size > 0 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleBatchValidate("rich")}
-                    disabled={batchValidateClientes.isPending || batchValidateConcorrentes.isPending || batchValidateLeads.isPending}
-                    className="h-7 px-2 text-xs"
-                  >
-                    {(batchValidateClientes.isPending || batchValidateConcorrentes.isPending || batchValidateLeads.isPending) ? (
-                      <span className="animate-spin mr-1">⏳</span>
-                    ) : (
-                      <CheckCircle2 className="w-3 h-3 mr-1" />
-                    )}
-                    Validar ({selectedItems.size})
-                  </Button>
-                )}
-                
-                {/* Botão Exportar - sempre visível */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                      <Download className="w-3 h-3 mr-1" />
-                      {selectedItems.size > 0 ? `Exportar (${selectedItems.size})` : "Exportar Aba"}
+                  {selectedItems.size > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleBatchValidate("rich")}
+                      disabled={
+                        batchValidateClientes.isPending ||
+                        batchValidateConcorrentes.isPending ||
+                        batchValidateLeads.isPending
+                      }
+                      className="h-7 px-2 text-xs"
+                    >
+                      {batchValidateClientes.isPending ||
+                      batchValidateConcorrentes.isPending ||
+                      batchValidateLeads.isPending ? (
+                        <span className="animate-spin mr-1">⏳</span>
+                      ) : (
+                        <CheckCircle2 className="w-3 h-3 mr-1" />
+                      )}
+                      Validar ({selectedItems.size})
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleExportTab("csv")}>
-                      CSV
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleExportTab("excel")}>
-                      Excel
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleExportTab("pdf")}>
-                      PDF
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  )}
+
+                  {/* Botão Exportar - sempre visível */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                      >
+                        <Download className="w-3 h-3 mr-1" />
+                        {selectedItems.size > 0
+                          ? `Exportar (${selectedItems.size})`
+                          : "Exportar Aba"}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleExportTab("csv")}>
+                        CSV
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleExportTab("excel")}
+                      >
+                        Excel
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExportTab("pdf")}>
+                        PDF
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
-            </div>
 
               {/* Aba de Clientes */}
               <TabsContent value="clientes" className="mt-4 space-y-2">
@@ -443,22 +528,31 @@ export function MercadoAccordionCard({
                       <Checkbox
                         checked={selectedItems.has(cliente.id)}
                         onCheckedChange={() => toggleItemSelection(cliente.id)}
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={e => e.stopPropagation()}
                       />
-                      <div className="flex-1 cursor-pointer" onClick={() => handleOpenDetail(cliente, "cliente")}>
+                      <div
+                        className="flex-1 cursor-pointer"
+                        onClick={() => handleOpenDetail(cliente, "cliente")}
+                      >
                         <div className="flex items-center gap-2">
                           {getStatusIcon(cliente.validationStatus)}
                           <h4 className="text-sm font-medium group-hover:text-primary transition-colors">
                             {cliente.empresa}
                           </h4>
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] px-1.5 py-0"
+                          >
                             {cliente.segmentacaoB2bB2c}
                           </Badge>
                           {(() => {
                             const score = calculateQualityScore(cliente);
                             const quality = classifyQuality(score);
                             return (
-                              <Badge variant={quality.variant} className={`text-[10px] px-1.5 py-0 ${quality.color}`}>
+                              <Badge
+                                variant={quality.variant}
+                                className={`text-[10px] px-1.5 py-0 ${quality.color}`}
+                              >
                                 {score}%
                               </Badge>
                             );
@@ -471,8 +565,11 @@ export function MercadoAccordionCard({
                           {cliente.cidade}, {cliente.uf}
                         </p>
                       </div>
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <EntityTagPicker entityType="cliente" entityId={cliente.id} />
+                      <div onClick={e => e.stopPropagation()}>
+                        <EntityTagPicker
+                          entityType="cliente"
+                          entityId={cliente.id}
+                        />
                       </div>
                     </div>
                   ))
@@ -497,23 +594,36 @@ export function MercadoAccordionCard({
                     >
                       <Checkbox
                         checked={selectedItems.has(concorrente.id)}
-                        onCheckedChange={() => toggleItemSelection(concorrente.id)}
-                        onClick={(e) => e.stopPropagation()}
+                        onCheckedChange={() =>
+                          toggleItemSelection(concorrente.id)
+                        }
+                        onClick={e => e.stopPropagation()}
                       />
-                      <div className="flex-1 cursor-pointer" onClick={() => handleOpenDetail(concorrente, "concorrente")}>
+                      <div
+                        className="flex-1 cursor-pointer"
+                        onClick={() =>
+                          handleOpenDetail(concorrente, "concorrente")
+                        }
+                      >
                         <div className="flex items-center gap-2">
                           {getStatusIcon(concorrente.validationStatus)}
                           <h4 className="text-sm font-medium group-hover:text-primary transition-colors">
                             {concorrente.nome}
                           </h4>
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] px-1.5 py-0"
+                          >
                             {concorrente.porte}
                           </Badge>
                           {(() => {
                             const score = calculateQualityScore(concorrente);
                             const quality = classifyQuality(score);
                             return (
-                              <Badge variant={quality.variant} className={`text-[10px] px-1.5 py-0 ${quality.color}`}>
+                              <Badge
+                                variant={quality.variant}
+                                className={`text-[10px] px-1.5 py-0 ${quality.color}`}
+                              >
                                 {score}%
                               </Badge>
                             );
@@ -523,8 +633,11 @@ export function MercadoAccordionCard({
                           {concorrente.produto}
                         </p>
                       </div>
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <EntityTagPicker entityType="concorrente" entityId={concorrente.id} />
+                      <div onClick={e => e.stopPropagation()}>
+                        <EntityTagPicker
+                          entityType="concorrente"
+                          entityId={concorrente.id}
+                        />
                       </div>
                     </div>
                   ))
@@ -550,22 +663,31 @@ export function MercadoAccordionCard({
                       <Checkbox
                         checked={selectedItems.has(lead.id)}
                         onCheckedChange={() => toggleItemSelection(lead.id)}
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={e => e.stopPropagation()}
                       />
-                      <div className="flex-1 cursor-pointer" onClick={() => handleOpenDetail(lead, "lead")}>
+                      <div
+                        className="flex-1 cursor-pointer"
+                        onClick={() => handleOpenDetail(lead, "lead")}
+                      >
                         <div className="flex items-center gap-2">
                           {getStatusIcon(lead.validationStatus)}
                           <h4 className="text-sm font-medium group-hover:text-primary transition-colors">
                             {lead.nome}
                           </h4>
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] px-1.5 py-0"
+                          >
                             {lead.tipo}
                           </Badge>
                           {(() => {
                             const score = calculateQualityScore(lead);
                             const quality = classifyQuality(score);
                             return (
-                              <Badge variant={quality.variant} className={`text-[10px] px-1.5 py-0 ${quality.color}`}>
+                              <Badge
+                                variant={quality.variant}
+                                className={`text-[10px] px-1.5 py-0 ${quality.color}`}
+                              >
                                 {score}%
                               </Badge>
                             );
@@ -575,7 +697,7 @@ export function MercadoAccordionCard({
                           {lead.setor}
                         </p>
                       </div>
-                      <div onClick={(e) => e.stopPropagation()}>
+                      <div onClick={e => e.stopPropagation()}>
                         <EntityTagPicker entityType="lead" entityId={lead.id} />
                       </div>
                     </div>

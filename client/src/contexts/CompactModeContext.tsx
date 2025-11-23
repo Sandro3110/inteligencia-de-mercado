@@ -1,11 +1,19 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 interface CompactModeContextType {
   isCompact: boolean;
   toggleCompact: () => void;
 }
 
-const CompactModeContext = createContext<CompactModeContextType | undefined>(undefined);
+const CompactModeContext = createContext<CompactModeContextType | undefined>(
+  undefined
+);
 
 export function CompactModeProvider({ children }: { children: ReactNode }) {
   const [isCompact, setIsCompact] = useState(() => {
@@ -15,7 +23,7 @@ export function CompactModeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     localStorage.setItem("compactMode", String(isCompact));
-    
+
     // Aplicar classe no root para ajustar espaçamentos globalmente
     if (isCompact) {
       document.documentElement.classList.add("compact-mode");

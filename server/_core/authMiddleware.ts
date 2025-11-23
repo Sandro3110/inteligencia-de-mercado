@@ -1,13 +1,13 @@
 /**
  * Middleware de Autenticação Compartilhado
- * 
+ *
  * Aplica autenticação baseada em sessão/cookie para endpoints Express
  * que não passam pelo tRPC (SSE, webhooks, etc)
  */
 
-import type { Request, Response, NextFunction } from 'express';
-import { sdk } from './sdk';
-import type { User } from '../../drizzle/schema';
+import type { Request, Response, NextFunction } from "express";
+import { sdk } from "./sdk";
+import type { User } from "../../drizzle/schema";
 
 // Estender tipo Request para incluir user
 declare global {
@@ -29,17 +29,17 @@ export async function requireAuth(
 ): Promise<void> {
   try {
     const user = await sdk.authenticateRequest(req);
-    
+
     if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: "Unauthorized" });
       return;
     }
-    
+
     req.user = user;
     next();
   } catch (error) {
-    console.error('[Auth Middleware] Authentication failed:', error);
-    res.status(401).json({ error: 'Unauthorized' });
+    console.error("[Auth Middleware] Authentication failed:", error);
+    res.status(401).json({ error: "Unauthorized" });
   }
 }
 
@@ -59,6 +59,6 @@ export async function optionalAuth(
     // Autenticação falhou, mas permitimos continuar
     req.user = undefined;
   }
-  
+
   next();
 }

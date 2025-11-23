@@ -3,20 +3,33 @@
  * Fase 42.2 - Upload funcional CSV/Excel
  */
 
-import { useState, useRef, DragEvent, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Upload, FileSpreadsheet, Loader2, AlertCircle, CheckCircle2, X } from 'lucide-react';
-import { trpc } from '@/lib/trpc';
-import type { ResearchWizardData } from '@/types/research-wizard';
-import { ColumnMapper } from '@/components/ColumnMapper';
+import { useState, useRef, DragEvent, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import {
+  Upload,
+  FileSpreadsheet,
+  Loader2,
+  AlertCircle,
+  CheckCircle2,
+  X,
+} from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import type { ResearchWizardData } from "@/types/research-wizard";
+import { ColumnMapper } from "@/components/ColumnMapper";
 
 interface FileUploadZoneProps {
   data: ResearchWizardData;
   updateData: (d: Partial<ResearchWizardData>) => void;
-  tipo: 'mercado' | 'cliente';
+  tipo: "mercado" | "cliente";
 }
 
 interface ParsedRow {
@@ -26,13 +39,20 @@ interface ParsedRow {
   rowNumber: number;
 }
 
-export default function FileUploadZone({ data, updateData, tipo }: FileUploadZoneProps) {
+export default function FileUploadZone({
+  data,
+  updateData,
+  tipo,
+}: FileUploadZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<ParsedRow[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const [showMapping, setShowMapping] = useState(false);
-  const [rawData, setRawData] = useState<{ headers: string[]; rows: any[][] }>({ headers: [], rows: [] });
+  const [rawData, setRawData] = useState<{ headers: string[]; rows: any[][] }>({
+    headers: [],
+    rows: [],
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mutation para fazer upload e parse (endpoint não implementado)
@@ -43,14 +63,14 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
         const validated = result.rows.map((row: any, index: number) => ({
           data: row,
           valid: !!row.nome, // Validação simples: nome é obrigatório
-          errors: !row.nome ? ['Nome é obrigatório'] : [],
-          rowNumber: index + 1
+          errors: !row.nome ? ["Nome é obrigatório"] : [],
+          rowNumber: index + 1,
         }));
 
         setParsedData(validated);
         setShowPreview(true);
       }
-    }
+    },
   });
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -73,11 +93,13 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
   };
 
   const handleFileSelect = (selectedFile: File) => {
-    const validExtensions = ['.csv', '.xlsx', '.xls'];
-    const fileExtension = selectedFile.name.substring(selectedFile.name.lastIndexOf('.')).toLowerCase();
+    const validExtensions = [".csv", ".xlsx", ".xls"];
+    const fileExtension = selectedFile.name
+      .substring(selectedFile.name.lastIndexOf("."))
+      .toLowerCase();
 
     if (!validExtensions.includes(fileExtension)) {
-      alert('Formato inválido. Apenas CSV e Excel (.xlsx, .xls) são aceitos.');
+      alert("Formato inválido. Apenas CSV e Excel (.xlsx, .xls) são aceitos.");
       return;
     }
 
@@ -85,12 +107,12 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
 
     // Ler arquivo e fazer parse
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       const content = e.target?.result as string;
       parseCSV(content);
     };
 
-    if (fileExtension === '.csv') {
+    if (fileExtension === ".csv") {
       reader.readAsText(selectedFile);
     } else {
       reader.readAsArrayBuffer(selectedFile);
@@ -99,65 +121,80 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
 
   // Parse real de CSV
   const parseCSV = useCallback((text: string) => {
-    const lines = text.split('\n').filter(line => line.trim());
+    const lines = text.split("\n").filter(line => line.trim());
     if (lines.length === 0) {
-      alert('Arquivo CSV vazio');
+      alert("Arquivo CSV vazio");
       return;
     }
 
     // Detectar delimitador (vírgula, ponto-e-vírgula ou tab)
     const firstLine = lines[0];
-    const delimiter = firstLine.includes(';') ? ';' : firstLine.includes('\t') ? '\t' : ',';
+    const delimiter = firstLine.includes(";")
+      ? ";"
+      : firstLine.includes("\t")
+        ? "\t"
+        : ",";
 
-    const headers = lines[0].split(delimiter).map(h => h.trim().replace(/^"|"$/g, ''));
+    const headers = lines[0]
+      .split(delimiter)
+      .map(h => h.trim().replace(/^"|"$/g, ""));
     const rows = lines.slice(1).map(line => {
-      return line.split(delimiter).map(cell => cell.trim().replace(/^"|"$/g, ''));
+      return line
+        .split(delimiter)
+        .map(cell => cell.trim().replace(/^"|"$/g, ""));
     });
 
     setRawData({ headers, rows });
     setShowMapping(true);
   }, []);
 
-  const handleMappingComplete = useCallback((mapping: Record<string, string>) => {
-    // Converter dados brutos em formato estruturado usando o mapeamento
-    const mappedRows: ParsedRow[] = rawData.rows.map((row, index) => {
-      const data: any = {};
-      
-      Object.entries(mapping).forEach(([targetField, sourceColumn]) => {
-        const colIndex = rawData.headers.indexOf(sourceColumn);
-        if (colIndex !== -1) {
-          data[targetField] = row[colIndex];
-        }
+  const handleMappingComplete = useCallback(
+    (mapping: Record<string, string>) => {
+      // Converter dados brutos em formato estruturado usando o mapeamento
+      const mappedRows: ParsedRow[] = rawData.rows.map((row, index) => {
+        const data: any = {};
+
+        Object.entries(mapping).forEach(([targetField, sourceColumn]) => {
+          const colIndex = rawData.headers.indexOf(sourceColumn);
+          if (colIndex !== -1) {
+            data[targetField] = row[colIndex];
+          }
+        });
+
+        // Validação simples
+        const valid = !!data.nome;
+        const errors = !data.nome ? ["Nome é obrigatório"] : [];
+
+        return {
+          data,
+          valid,
+          errors,
+          rowNumber: index + 1,
+        };
       });
 
-      // Validação simples
-      const valid = !!data.nome;
-      const errors = !data.nome ? ['Nome é obrigatório'] : [];
-
-      return {
-        data,
-        valid,
-        errors,
-        rowNumber: index + 1
-      };
-    });
-
-    setParsedData(mappedRows);
-    setShowMapping(false);
-    setShowPreview(true);
-  }, [rawData]);
+      setParsedData(mappedRows);
+      setShowMapping(false);
+      setShowPreview(true);
+    },
+    [rawData]
+  );
 
   const handleImportValid = () => {
     const validRows = parsedData.filter(r => r.valid);
 
-    if (tipo === 'mercado') {
+    if (tipo === "mercado") {
       const newMercados = validRows.map(r => ({
         nome: r.data.nome,
-        segmentacao: (r.data.segmentacao || 'B2B') as 'B2B' | 'B2C' | 'B2B2C' | 'B2G'
+        segmentacao: (r.data.segmentacao || "B2B") as
+          | "B2B"
+          | "B2C"
+          | "B2B2C"
+          | "B2G",
       }));
 
       updateData({
-        mercados: [...data.mercados, ...newMercados]
+        mercados: [...data.mercados, ...newMercados],
       });
     } else {
       const newClientes = validRows.map(r => ({
@@ -169,11 +206,17 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
         telefone: r.data.telefone,
         cidade: r.data.cidade,
         uf: r.data.uf,
-        porte: r.data.porte as 'MEI' | 'ME' | 'EPP' | 'Médio' | 'Grande' | undefined
+        porte: r.data.porte as
+          | "MEI"
+          | "ME"
+          | "EPP"
+          | "Médio"
+          | "Grande"
+          | undefined,
       }));
 
       updateData({
-        clientes: [...(data.clientes || []), ...newClientes]
+        clientes: [...(data.clientes || []), ...newClientes],
       });
     }
 
@@ -187,20 +230,38 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
   const invalidCount = parsedData.filter(r => !r.valid).length;
 
   // Definir campos alvo baseado no tipo
-  const targetFields = tipo === 'mercado' ? [
-    { key: 'nome', label: 'Nome', required: true, description: 'Nome do mercado' },
-    { key: 'segmentacao', label: 'Segmentação', required: false, description: 'B2B, B2C, B2B2C ou B2G' },
-  ] : [
-    { key: 'nome', label: 'Nome', required: true, description: 'Nome da empresa' },
-    { key: 'razaoSocial', label: 'Razão Social', required: false },
-    { key: 'cnpj', label: 'CNPJ', required: false },
-    { key: 'site', label: 'Site', required: false },
-    { key: 'email', label: 'Email', required: false },
-    { key: 'telefone', label: 'Telefone', required: false },
-    { key: 'cidade', label: 'Cidade', required: false },
-    { key: 'uf', label: 'UF', required: false },
-    { key: 'porte', label: 'Porte', required: false },
-  ];
+  const targetFields =
+    tipo === "mercado"
+      ? [
+          {
+            key: "nome",
+            label: "Nome",
+            required: true,
+            description: "Nome do mercado",
+          },
+          {
+            key: "segmentacao",
+            label: "Segmentação",
+            required: false,
+            description: "B2B, B2C, B2B2C ou B2G",
+          },
+        ]
+      : [
+          {
+            key: "nome",
+            label: "Nome",
+            required: true,
+            description: "Nome da empresa",
+          },
+          { key: "razaoSocial", label: "Razão Social", required: false },
+          { key: "cnpj", label: "CNPJ", required: false },
+          { key: "site", label: "Site", required: false },
+          { key: "email", label: "Email", required: false },
+          { key: "telefone", label: "Telefone", required: false },
+          { key: "cidade", label: "Cidade", required: false },
+          { key: "uf", label: "UF", required: false },
+          { key: "porte", label: "Porte", required: false },
+        ];
 
   return (
     <div className="space-y-6">
@@ -233,12 +294,14 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
               onDrop={handleDrop}
               className={`
                 border-2 border-dashed rounded-lg p-12 text-center transition-all cursor-pointer
-                ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}
+                ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"}
               `}
               onClick={() => fileInputRef.current?.click()}
             >
-              <Upload className={`w-12 h-12 mx-auto mb-4 ${isDragging ? 'text-blue-600' : 'text-muted-foreground'}`} />
-              
+              <Upload
+                className={`w-12 h-12 mx-auto mb-4 ${isDragging ? "text-blue-600" : "text-muted-foreground"}`}
+              />
+
               {file ? (
                 <div className="space-y-2">
                   <p className="text-lg font-semibold">{file.name}</p>
@@ -247,7 +310,9 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
               ) : (
                 <>
                   <p className="text-lg font-semibold mb-2">
-                    {isDragging ? 'Solte o arquivo aqui' : 'Arraste um arquivo aqui'}
+                    {isDragging
+                      ? "Solte o arquivo aqui"
+                      : "Arraste um arquivo aqui"}
                   </p>
                   <p className="text-sm text-muted-foreground mb-4">
                     ou clique para selecionar
@@ -264,7 +329,7 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
                 type="file"
                 accept=".csv,.xlsx,.xls"
                 className="hidden"
-                onChange={(e) => {
+                onChange={e => {
                   const selectedFile = e.target.files?.[0];
                   if (selectedFile) {
                     handleFileSelect(selectedFile);
@@ -277,8 +342,11 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
             <Alert className="mt-4">
               <AlertCircle className="w-4 h-4" />
               <AlertDescription>
-                <strong>Formato esperado:</strong> A planilha deve conter as colunas: nome (obrigatório), 
-                {tipo === 'mercado' ? ' segmentacao' : ' razaoSocial, cnpj, site, email, telefone, cidade, uf, porte'}
+                <strong>Formato esperado:</strong> A planilha deve conter as
+                colunas: nome (obrigatório),
+                {tipo === "mercado"
+                  ? " segmentacao"
+                  : " razaoSocial, cnpj, site, email, telefone, cidade, uf, porte"}
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -316,7 +384,7 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
                   <tr>
                     <th className="p-2 text-left">#</th>
                     <th className="p-2 text-left">Nome</th>
-                    {tipo === 'cliente' && (
+                    {tipo === "cliente" && (
                       <>
                         <th className="p-2 text-left">Cidade</th>
                         <th className="p-2 text-left">UF</th>
@@ -329,14 +397,18 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
                   {parsedData.map((row, index) => (
                     <tr
                       key={index}
-                      className={`border-t ${row.valid ? '' : 'bg-red-50'}`}
+                      className={`border-t ${row.valid ? "" : "bg-red-50"}`}
                     >
                       <td className="p-2">{row.rowNumber}</td>
-                      <td className="p-2">{row.data.nome || <span className="text-red-500">-</span>}</td>
-                      {tipo === 'cliente' && (
+                      <td className="p-2">
+                        {row.data.nome || (
+                          <span className="text-red-500">-</span>
+                        )}
+                      </td>
+                      {tipo === "cliente" && (
                         <>
-                          <td className="p-2">{row.data.cidade || '-'}</td>
-                          <td className="p-2">{row.data.uf || '-'}</td>
+                          <td className="p-2">{row.data.cidade || "-"}</td>
+                          <td className="p-2">{row.data.uf || "-"}</td>
                         </>
                       )}
                       <td className="p-2">

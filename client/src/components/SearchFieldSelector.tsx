@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Checkbox } from "./ui/checkbox";
 import { Badge } from "./ui/badge";
 
-export type SearchField = 
+export type SearchField =
   | "nome"
   | "cnpj"
   | "produto"
@@ -22,14 +22,46 @@ interface SearchFieldOption {
 }
 
 const FIELD_OPTIONS: SearchFieldOption[] = [
-  { value: "nome", label: "Nome/Empresa", description: "Buscar em nome de mercados, clientes, concorrentes e leads" },
-  { value: "cnpj", label: "CNPJ", description: "Buscar em CNPJ de todas as entidades" },
-  { value: "produto", label: "Produto/Categoria", description: "Buscar em produtos e categorias" },
-  { value: "cidade", label: "Cidade", description: "Buscar em cidade de clientes" },
-  { value: "uf", label: "Estado (UF)", description: "Buscar em UF de clientes" },
-  { value: "email", label: "Email", description: "Buscar em emails de contato" },
-  { value: "telefone", label: "Telefone", description: "Buscar em telefones de contato" },
-  { value: "observacoes", label: "Observações", description: "Buscar em observações e notas" },
+  {
+    value: "nome",
+    label: "Nome/Empresa",
+    description: "Buscar em nome de mercados, clientes, concorrentes e leads",
+  },
+  {
+    value: "cnpj",
+    label: "CNPJ",
+    description: "Buscar em CNPJ de todas as entidades",
+  },
+  {
+    value: "produto",
+    label: "Produto/Categoria",
+    description: "Buscar em produtos e categorias",
+  },
+  {
+    value: "cidade",
+    label: "Cidade",
+    description: "Buscar em cidade de clientes",
+  },
+  {
+    value: "uf",
+    label: "Estado (UF)",
+    description: "Buscar em UF de clientes",
+  },
+  {
+    value: "email",
+    label: "Email",
+    description: "Buscar em emails de contato",
+  },
+  {
+    value: "telefone",
+    label: "Telefone",
+    description: "Buscar em telefones de contato",
+  },
+  {
+    value: "observacoes",
+    label: "Observações",
+    description: "Buscar em observações e notas",
+  },
 ];
 
 interface SearchFieldSelectorProps {
@@ -45,14 +77,14 @@ export function SearchFieldSelector({
 
   const toggleField = (field: SearchField) => {
     if (selectedFields.includes(field)) {
-      onFieldsChange(selectedFields.filter((f) => f !== field));
+      onFieldsChange(selectedFields.filter(f => f !== field));
     } else {
       onFieldsChange([...selectedFields, field]);
     }
   };
 
   const selectAll = () => {
-    onFieldsChange(FIELD_OPTIONS.map((opt) => opt.value));
+    onFieldsChange(FIELD_OPTIONS.map(opt => opt.value));
   };
 
   const clearAll = () => {
@@ -109,7 +141,7 @@ export function SearchFieldSelector({
           </div>
 
           <div className="space-y-2 max-h-[320px] overflow-y-auto">
-            {FIELD_OPTIONS.map((option) => {
+            {FIELD_OPTIONS.map(option => {
               const isSelected = selectedFields.includes(option.value);
               return (
                 <div
@@ -143,8 +175,8 @@ export function SearchFieldSelector({
                 Campos selecionados ({selectedFields.length}):
               </p>
               <div className="flex flex-wrap gap-1">
-                {selectedFields.map((field) => {
-                  const option = FIELD_OPTIONS.find((opt) => opt.value === field);
+                {selectedFields.map(field => {
+                  const option = FIELD_OPTIONS.find(opt => opt.value === field);
                   return (
                     <Badge
                       key={field}
@@ -153,7 +185,7 @@ export function SearchFieldSelector({
                     >
                       {option?.label}
                       <button
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           toggleField(field);
                         }}

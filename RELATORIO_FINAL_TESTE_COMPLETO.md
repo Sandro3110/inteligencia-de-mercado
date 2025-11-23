@@ -1,4 +1,5 @@
 # Relatório Final - Teste Completo End-to-End
+
 ## Sistema de Pré-Pesquisa Inteligente com 4 Melhorias
 
 **Data:** 20 de Novembro de 2025  
@@ -24,6 +25,7 @@ O sistema implementa uma arquitetura em camadas que processa solicitações de p
 ### 1.2 Componentes Principais
 
 **Backend (`server/prePesquisaSimulator.ts`):**
+
 - Simulador de IA com respostas progressivas
 - Função de retry inteligente com até 3 tentativas
 - Separador multi-cliente usando análise de texto
@@ -31,12 +33,14 @@ O sistema implementa uma arquitetura em camadas que processa solicitações de p
 - Motor de pré-pesquisa com dados simulados
 
 **Frontend (`client/src/pages/PrePesquisaTeste.tsx`):**
+
 - Interface de teste interativa com 3 cenários
 - Wizard de refinamento com checkboxes de múltipla escolha
 - Sistema de aprovação/rejeição individual
 - Indicadores visuais de progresso e completude
 
 **API (`server/routers.ts`):**
+
 - Endpoint `prePesquisaTeste.testeRetry` para Cenário 1
 - Endpoint `prePesquisaTeste.testeMultiCliente` para Cenário 2
 - Endpoint `prePesquisaTeste.testeRefinamento` para Cenário 3
@@ -57,23 +61,26 @@ Validar que o sistema tenta automaticamente até 3 vezes quando os dados retorna
 
 ### 2.3 Resultados
 
-| Tentativa | Completude | Campos Preenchidos | Status |
-|-----------|------------|-------------------|--------|
-| 1 | 40% | 4/10 | ❌ Incompleto |
-| 2 | 80% | 8/10 | ⚠️ Quase completo |
-| 3 | 100% | 10/10 | ✅ Aprovado |
+| Tentativa | Completude | Campos Preenchidos | Status            |
+| --------- | ---------- | ------------------ | ----------------- |
+| 1         | 40%        | 4/10               | ❌ Incompleto     |
+| 2         | 80%        | 8/10               | ⚠️ Quase completo |
+| 3         | 100%       | 10/10              | ✅ Aprovado       |
 
 **Evolução dos dados:**
 
 **Tentativa 1 (40%):**
+
 - ✅ Nome: Empresa XYZ Ltda
 - ❌ CNPJ, Site, Telefone, Email, Segmentação, Porte: Faltando
 
 **Tentativa 2 (80%):**
+
 - ✅ Nome, CNPJ, Site, Telefone, Email: Preenchidos
 - ❌ Segmentação, Porte: Faltando
 
 **Tentativa 3 (100%):**
+
 - ✅ Todos os 10 campos preenchidos
 - ✅ Dados aprovados pelo usuário
 
@@ -101,25 +108,28 @@ Validar que o sistema identifica e separa automaticamente múltiplas empresas me
 
 **Separação automática identificou 3 entidades:**
 
-| # | Nome Identificado | Tipo | Pesquisa | Aprovação |
-|---|-------------------|------|----------|-----------|
-| 1 | Cooperativa de Holambra | Específica | ✅ Concluída | ✅ Aprovada |
-| 2 | Carga Pesada Distribuidora | Específica | ✅ Concluída | ✅ Aprovada |
-| 3 | Braskem | Específica | ✅ Concluída | ✅ Aprovada |
+| #   | Nome Identificado          | Tipo       | Pesquisa     | Aprovação   |
+| --- | -------------------------- | ---------- | ------------ | ----------- |
+| 1   | Cooperativa de Holambra    | Específica | ✅ Concluída | ✅ Aprovada |
+| 2   | Carga Pesada Distribuidora | Específica | ✅ Concluída | ✅ Aprovada |
+| 3   | Braskem                    | Específica | ✅ Concluída | ✅ Aprovada |
 
 **Dados retornados:**
 
 **Entidade 1: Cooperativa de Insumos de Holambra**
+
 - CNPJ: 46.331.066/0001-00
 - Produto: Insumos agrícolas
 - Cidade: Holambra, SP
 
 **Entidade 2: Carga Pesada Distribuidora**
+
 - CNPJ: 08.835.655/0001-90
 - Produto: Distribuição de cargas
 - Cidade: São Paulo, SP
 
 **Entidade 3: Braskem S.A.**
+
 - CNPJ: 42.150.391/0001-70
 - Produto: Petroquímica e plásticos
 - Cidade: São Paulo, SP
@@ -142,11 +152,11 @@ Validar que o sistema refina progressivamente contextos genéricos através de u
 
 **Wizard de refinamento:**
 
-| Nível | Pergunta | Opções Selecionadas | Quantidade |
-|-------|----------|---------------------|------------|
-| 1 | Setor específico? | Café, Soja | 2 |
-| 2 | Estado? | Minas Gerais, São Paulo | 2 |
-| 3 | Região em MG? | Sul de Minas, Cerrado Mineiro | 2 |
+| Nível | Pergunta          | Opções Selecionadas           | Quantidade |
+| ----- | ----------------- | ----------------------------- | ---------- |
+| 1     | Setor específico? | Café, Soja                    | 2          |
+| 2     | Estado?           | Minas Gerais, São Paulo       | 2          |
+| 3     | Região em MG?     | Sul de Minas, Cerrado Mineiro | 2          |
 
 **Cálculo de combinações:** 2 × 2 × 2 = **8 combinações**
 
@@ -154,16 +164,16 @@ Validar que o sistema refina progressivamente contextos genéricos através de u
 
 **8 combinações geradas com sucesso:**
 
-| # | Setor | Estado | Região | CNPJ | Porte |
-|---|-------|--------|--------|------|-------|
-| 1 | Café | MG | Sul de Minas | 75.601.909/0001-64 | Grande |
-| 2 | Café | MG | Cerrado Mineiro | 41.568.856/0001-65 | Grande |
-| 3 | Café | SP | Sul de Minas | 36.760.441/0001-10 | Médio |
-| 4 | Café | SP | Cerrado Mineiro | 62.195.454/0001-32 | Médio |
-| 5 | Soja | MG | Sul de Minas | 84.581.393/0001-57 | Médio |
-| 6 | Soja | MG | Cerrado Mineiro | 63.531.835/0001-64 | Médio |
-| 7 | Soja | SP | Sul de Minas | 33.733.215/0001-34 | Médio |
-| 8 | Soja | SP | Cerrado Mineiro | 96.349.116/0001-36 | Médio |
+| #   | Setor | Estado | Região          | CNPJ               | Porte  |
+| --- | ----- | ------ | --------------- | ------------------ | ------ |
+| 1   | Café  | MG     | Sul de Minas    | 75.601.909/0001-64 | Grande |
+| 2   | Café  | MG     | Cerrado Mineiro | 41.568.856/0001-65 | Grande |
+| 3   | Café  | SP     | Sul de Minas    | 36.760.441/0001-10 | Médio  |
+| 4   | Café  | SP     | Cerrado Mineiro | 62.195.454/0001-32 | Médio  |
+| 5   | Soja  | MG     | Sul de Minas    | 84.581.393/0001-57 | Médio  |
+| 6   | Soja  | MG     | Cerrado Mineiro | 63.531.835/0001-64 | Médio  |
+| 7   | Soja  | SP     | Sul de Minas    | 33.733.215/0001-34 | Médio  |
+| 8   | Soja  | SP     | Cerrado Mineiro | 96.349.116/0001-36 | Médio  |
 
 **Exemplo de contexto refinado (Combinação 1):**  
 "Café - Café + Minas Gerais + Sul de Minas"
@@ -190,15 +200,16 @@ Todos os três cenários implementam aprovação obrigatória através de botõe
 
 ### 5.2 Validação
 
-| Cenário | Resultados Gerados | Aprovações Exigidas | Status |
-|---------|-------------------|---------------------|--------|
-| 1 - Retry | 1 empresa | 1 aprovação | ✅ Validado |
-| 2 - Multi-Cliente | 3 empresas | 3 aprovações individuais | ✅ Validado |
-| 3 - Refinamento | 8 combinações | 8 aprovações individuais | ✅ Validado |
+| Cenário           | Resultados Gerados | Aprovações Exigidas      | Status      |
+| ----------------- | ------------------ | ------------------------ | ----------- |
+| 1 - Retry         | 1 empresa          | 1 aprovação              | ✅ Validado |
+| 2 - Multi-Cliente | 3 empresas         | 3 aprovações individuais | ✅ Validado |
+| 3 - Refinamento   | 8 combinações      | 8 aprovações individuais | ✅ Validado |
 
 ### 5.3 Benefícios Observados
 
 O mecanismo de aprovação obrigatória garante que:
+
 - Nenhum dado incorreto seja salvo automaticamente
 - O usuário revise manualmente cada resultado antes do commit
 - Dados de baixa qualidade possam ser rejeitados e reprocessados
@@ -210,34 +221,37 @@ O mecanismo de aprovação obrigatória garante que:
 
 ### 6.1 Taxa de Aprovação por Cenário
 
-| Cenário | Tentativas | Aprovações | Taxa de Sucesso |
-|---------|------------|------------|-----------------|
-| 1 - Retry | 3 | 1 (100% completude) | 100% |
-| 2 - Multi-Cliente | 3 | 3 | 100% |
-| 3 - Refinamento | 8 | 8 (pendentes) | 100% |
+| Cenário           | Tentativas | Aprovações          | Taxa de Sucesso |
+| ----------------- | ---------- | ------------------- | --------------- |
+| 1 - Retry         | 3          | 1 (100% completude) | 100%            |
+| 2 - Multi-Cliente | 3          | 3                   | 100%            |
+| 3 - Refinamento   | 8          | 8 (pendentes)       | 100%            |
 
 ### 6.2 Completude de Dados
 
 **Cenário 1 - Evolução da completude:**
+
 - Tentativa 1: 40%
 - Tentativa 2: 80%
 - Tentativa 3: 100% ✅
 
 **Cenário 2 - Completude média:**
+
 - Cooperativa Holambra: ~80% (sem telefone/email)
 - Carga Pesada: ~80%
 - Braskem: ~70% (dados parciais)
 
 **Cenário 3 - Completude:**
+
 - Todas as 8 combinações: 100% (dados simulados completos)
 
 ### 6.3 Tempo de Processamento (Simulado)
 
-| Operação | Tempo Médio |
-|----------|-------------|
-| Retry (3 tentativas) | ~6 segundos |
-| Separação multi-cliente | ~2 segundos |
-| Refinamento 3 níveis | ~3 segundos |
+| Operação                 | Tempo Médio |
+| ------------------------ | ----------- |
+| Retry (3 tentativas)     | ~6 segundos |
+| Separação multi-cliente  | ~2 segundos |
+| Refinamento 3 níveis     | ~3 segundos |
 | Geração de 8 combinações | ~8 segundos |
 
 ---
@@ -298,6 +312,7 @@ O mecanismo de aprovação obrigatória garante que:
 **Descrição:** Substituir simulador por chamadas reais à OpenAI e APIs de dados empresariais.
 
 **Tarefas:**
+
 - Implementar `invokeLLM()` para retry inteligente
 - Integrar ReceitaWS ou API similar para dados de CNPJ
 - Implementar parsing robusto de respostas da IA
@@ -309,6 +324,7 @@ O mecanismo de aprovação obrigatória garante que:
 **Descrição:** Salvar resultados aprovados no banco de dados.
 
 **Tarefas:**
+
 - Criar tabela `pre_pesquisas` no schema
 - Implementar mutation `salvarPrePesquisa`
 - Adicionar relação com tabela `pesquisas_mercado`
@@ -320,6 +336,7 @@ O mecanismo de aprovação obrigatória garante que:
 **Descrição:** Refinar UX do wizard de refinamento.
 
 **Tarefas:**
+
 - Adicionar breadcrumbs mostrando progresso (Nível 1/3)
 - Implementar botão "Voltar" para editar respostas anteriores
 - Adicionar preview das combinações antes de gerar
@@ -331,6 +348,7 @@ O mecanismo de aprovação obrigatória garante que:
 **Descrição:** Otimizar geração de combinações cartesianas.
 
 **Tarefas:**
+
 - Implementar processamento paralelo para múltiplas combinações
 - Adicionar cache de respostas da IA
 - Implementar paginação para >20 combinações
@@ -354,12 +372,14 @@ A implementação e teste do sistema de pré-pesquisa inteligente foi **100% bem
 A arquitetura redesenhada resolve os principais problemas identificados:
 
 **Antes:**
+
 - Dados incompletos salvos automaticamente
 - Usuário precisava fazer múltiplas pesquisas manualmente
 - Contextos genéricos geravam resultados irrelevantes
 - Sem controle de qualidade antes do salvamento
 
 **Depois:**
+
 - Sistema tenta até 3 vezes para completar dados
 - Texto livre com múltiplas empresas processado automaticamente
 - Wizard refina contextos genéricos em pesquisas específicas
@@ -368,6 +388,7 @@ A arquitetura redesenhada resolve os principais problemas identificados:
 ### 10.3 Recomendações
 
 **Para Produção:**
+
 1. Implementar integração com APIs reais (OpenAI + ReceitaWS)
 2. Adicionar persistência no banco de dados
 3. Implementar testes automatizados (Vitest) para cada cenário
@@ -375,6 +396,7 @@ A arquitetura redesenhada resolve os principais problemas identificados:
 5. Implementar limite de combinações (máx 50) para evitar sobrecarga
 
 **Para UX:**
+
 1. Adicionar tutorial interativo na primeira vez que o usuário acessa
 2. Implementar salvamento de rascunho do wizard
 3. Adicionar histórico de refinamentos anteriores

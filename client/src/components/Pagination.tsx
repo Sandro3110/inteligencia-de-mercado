@@ -48,8 +48,13 @@ export function Pagination({
         {/* Seletor de itens por página */}
         {showPageSizeSelector && onPageSizeChange && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Itens por página:</span>
-            <Select value={pageSize.toString()} onValueChange={onPageSizeChange}>
+            <span className="text-sm text-muted-foreground">
+              Itens por página:
+            </span>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={onPageSizeChange}
+            >
               <SelectTrigger className="w-20 h-8">
                 <SelectValue />
               </SelectTrigger>

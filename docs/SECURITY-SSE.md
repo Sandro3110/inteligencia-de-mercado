@@ -63,6 +63,7 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
 ```
 
 **Responsabilidades:**
+
 - Verificar presença do cookie de sessão
 - Validar token JWT
 - Anexar dados do usuário ao objeto `req`
@@ -88,6 +89,7 @@ export async function verifySessionCookie(cookie: string): Promise<{
 ```
 
 **Validações:**
+
 - Verificação de assinatura JWT
 - Validação de expiração do token
 - Verificação de existência do usuário no banco
@@ -101,11 +103,13 @@ export async function verifySessionCookie(cookie: string): Promise<{
 **Autenticação**: ✅ Protegido com `requireAuth`
 
 **Implementação**:
+
 ```typescript
 app.get("/api/enrichment/progress/:jobId", requireAuth, setupSSE);
 ```
 
 **Validações Adicionais**:
+
 - Verifica se o job pertence ao usuário autenticado
 - Retorna 403 se o usuário não tem permissão
 
@@ -116,11 +120,13 @@ app.get("/api/enrichment/progress/:jobId", requireAuth, setupSSE);
 **Autenticação**: ✅ Protegido com `requireAuth`
 
 **Implementação**:
+
 ```typescript
 app.get("/api/notifications/stream", requireAuth, handleNotificationStream);
 ```
 
 **Validações Adicionais**:
+
 - Filtra notificações apenas do usuário autenticado
 - Implementa heartbeat para manter conexão viva
 
@@ -136,6 +142,7 @@ X-Accel-Buffering: no
 ```
 
 **Justificativas**:
+
 - `text/event-stream`: Identifica o tipo de conteúdo SSE
 - `no-cache`: Previne cache de eventos
 - `keep-alive`: Mantém conexão aberta
@@ -150,6 +157,7 @@ Localização: `server/__tests__/sse-auth.test.ts`
 **Casos de Teste** (8 testes):
 
 1. **Rejeição de Requisições Não Autenticadas**
+
    ```typescript
    it("deve rejeitar requisições sem autenticação", async () => {
      const response = await fetchSSE("/api/enrichment/progress/test-job-123");
@@ -158,16 +166,21 @@ Localização: `server/__tests__/sse-auth.test.ts`
    ```
 
 2. **Aceitação de Requisições Autenticadas**
+
    ```typescript
    it("deve aceitar requisições autenticadas", async () => {
-     const response = await fetch(`${BASE_URL}/api/enrichment/progress/${jobId}`, {
-       credentials: "include",
-     });
+     const response = await fetch(
+       `${BASE_URL}/api/enrichment/progress/${jobId}`,
+       {
+         credentials: "include",
+       }
+     );
      expect(response.status).toBe(200);
    });
    ```
 
 3. **Validação de Cookies Inválidos**
+
    ```typescript
    it("deve rejeitar cookies inválidos", async () => {
      const response = await fetchSSE(
@@ -184,7 +197,9 @@ Localização: `server/__tests__/sse-auth.test.ts`
      const response = await fetch(`${BASE_URL}/api/notifications/stream`, {
        credentials: "include",
      });
-     expect(response.headers.get("content-type")).toContain("text/event-stream");
+     expect(response.headers.get("content-type")).toContain(
+       "text/event-stream"
+     );
    });
    ```
 
@@ -210,6 +225,7 @@ pnpm vitest run
 **Mitigação**: Middleware `requireAuth` rejeita todas as requisições sem cookie válido
 
 **Teste**:
+
 ```bash
 curl -i http://localhost:3000/api/notifications/stream
 # Retorna: 401 Unauthorized
@@ -222,6 +238,7 @@ curl -i http://localhost:3000/api/notifications/stream
 **Mitigação**: Verificação de assinatura JWT com secret seguro
 
 **Teste**:
+
 ```bash
 curl -i http://localhost:3000/api/notifications/stream \
   -H "Cookie: manus_session=fake.token.here"
@@ -243,6 +260,7 @@ curl -i http://localhost:3000/api/notifications/stream \
 **Mitigação**: Cookies com flags `httpOnly` e `secure` (produção)
 
 **Configuração**:
+
 ```typescript
 res.cookie(COOKIE_NAME, token, {
   httpOnly: true,

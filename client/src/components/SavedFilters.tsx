@@ -43,11 +43,11 @@ export function SavedFilters({ onApply }: SavedFiltersProps) {
       <DropdownMenuContent align="start" className="w-[300px]">
         <DropdownMenuLabel>Meus Filtros</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {savedFilters.map((filter) => (
+        {savedFilters.map(filter => (
           <DropdownMenuItem
             key={filter.id}
             className="flex items-center justify-between"
-            onSelect={(e) => {
+            onSelect={e => {
               e.preventDefault();
             }}
           >
@@ -64,7 +64,7 @@ export function SavedFilters({ onApply }: SavedFiltersProps) {
               variant="ghost"
               size="sm"
               className="h-6 w-6 p-0"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 deleteMutation.mutate(filter.id);
               }}

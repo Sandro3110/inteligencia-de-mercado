@@ -1,8 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { motion, AnimatePresence } from "framer-motion";
-import { pageVariants, pageTransition, listVariants, listItemVariants } from "@/lib/animations";
-import { calculateQualityScore, classifyQuality, isValidCNPJFormat, isValidEmailFormat } from "@shared/qualityScore";
+import {
+  pageVariants,
+  pageTransition,
+  listVariants,
+  listItemVariants,
+} from "@/lib/animations";
+import {
+  calculateQualityScore,
+  classifyQuality,
+  isValidCNPJFormat,
+  isValidEmailFormat,
+} from "@shared/qualityScore";
 import { trpc } from "@/lib/trpc";
 import { DetailPopup } from "@/components/DetailPopup";
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
@@ -10,10 +20,18 @@ import { TagManager } from "@/components/TagManager";
 import { EntityTagPicker } from "@/components/EntityTagPicker";
 import { TagFilter } from "@/components/TagFilter";
 import { MultiSelectFilter } from "@/components/MultiSelectFilter";
-import { SearchFieldSelector, SearchField } from "@/components/SearchFieldSelector";
+import {
+  SearchFieldSelector,
+  SearchField,
+} from "@/components/SearchFieldSelector";
 import { SaveFilterDialog } from "@/components/SaveFilterDialog";
 import { SavedFilters } from "@/components/SavedFilters";
-import { SkeletonMercado, SkeletonCliente, SkeletonConcorrente, SkeletonLead } from "@/components/SkeletonLoading";
+import {
+  SkeletonMercado,
+  SkeletonCliente,
+  SkeletonConcorrente,
+  SkeletonLead,
+} from "@/components/SkeletonLoading";
 import { MercadoAccordionCard } from "@/components/MercadoAccordionCard";
 import { CompararMercadosModal } from "@/components/CompararMercadosModal";
 import { Button } from "@/components/ui/button";
@@ -21,10 +39,20 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import {
   Building2,
@@ -52,7 +80,12 @@ import {
   GitCompare,
   History,
 } from "lucide-react";
-import { exportToCSV, exportToExcel, exportToPDF, ExportData } from "@/lib/exportUtils";
+import {
+  exportToCSV,
+  exportToExcel,
+  exportToPDF,
+  ExportData,
+} from "@/lib/exportUtils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -83,13 +116,13 @@ interface CascadeViewContentProps {
  * Componente extraído do CascadeView original
  * Mantém toda a lógica e UI, mas pode ser usado sem header/sidebar
  */
-export default function CascadeViewContent({ 
-  showHeader = true, 
-  showSidebar = false 
+export default function CascadeViewContent({
+  showHeader = true,
+  showSidebar = false,
 }: CascadeViewContentProps) {
   // Todo o conteúdo do CascadeView será copiado aqui
   // Por enquanto, vamos importar o CascadeView original
-  
+
   return (
     <div className="h-full w-full">
       <div className="text-center py-8">

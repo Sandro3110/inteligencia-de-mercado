@@ -12,12 +12,16 @@ export const territorialRouter = router({
       z.object({
         projectId: z.number(),
         pesquisaId: z.number().optional(),
-        entityType: z.enum(['clientes', 'leads', 'concorrentes']).optional(),
+        entityType: z.enum(["clientes", "leads", "concorrentes"]).optional(),
       })
     )
     .query(async ({ input }) => {
-      const { getTerritorialDensity } = await import('../db');
-      return getTerritorialDensity(input.projectId, input.pesquisaId, input.entityType);
+      const { getTerritorialDensity } = await import("../db");
+      return getTerritorialDensity(
+        input.projectId,
+        input.pesquisaId,
+        input.entityType
+      );
     }),
 
   getDensityStats: protectedProcedure
@@ -28,7 +32,7 @@ export const territorialRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const { getDensityStatsByRegion } = await import('../db');
+      const { getDensityStatsByRegion } = await import("../db");
       return getDensityStatsByRegion(input.projectId, input.pesquisaId);
     }),
 

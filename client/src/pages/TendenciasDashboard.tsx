@@ -6,10 +6,22 @@
 
 import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import {
@@ -38,10 +50,12 @@ import {
 } from "lucide-react";
 
 export default function TendenciasDashboard() {
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
+    null
+  );
   const [periodoDias, setPeriodoDias] = useState<number>(30);
-  const [chartType, setChartType] = useState<'line' | 'area' | 'bar'>('line');
-  const [viewMode, setViewMode] = useState<'general' | 'quality'>('general');
+  const [chartType, setChartType] = useState<"line" | "area" | "bar">("line");
+  const [viewMode, setViewMode] = useState<"general" | "quality">("general");
 
   const { data: projects } = trpc.projects.list.useQuery();
   const { data: mercados } = trpc.mercados.byProject.useQuery(
@@ -69,22 +83,31 @@ export default function TendenciasDashboard() {
 
     const melhorTendencia = trends.reduce((best: any, current: any) => {
       if (!current.dataPoints || current.dataPoints.length < 2) return best;
-      const currentTrend = current.dataPoints[current.dataPoints.length - 1].qualidadeMedia - current.dataPoints[0].qualidadeMedia;
-      const bestTrend = best?.dataPoints?.[best.dataPoints.length - 1]?.qualidadeMedia - best?.dataPoints?.[0]?.qualidadeMedia || -Infinity;
+      const currentTrend =
+        current.dataPoints[current.dataPoints.length - 1].qualidadeMedia -
+        current.dataPoints[0].qualidadeMedia;
+      const bestTrend =
+        best?.dataPoints?.[best.dataPoints.length - 1]?.qualidadeMedia -
+          best?.dataPoints?.[0]?.qualidadeMedia || -Infinity;
       return currentTrend > bestTrend ? current : best;
     }, null);
 
     const piorTendencia = trends.reduce((worst: any, current: any) => {
       if (!current.dataPoints || current.dataPoints.length < 2) return worst;
-      const currentTrend = current.dataPoints[current.dataPoints.length - 1].qualidadeMedia - current.dataPoints[0].qualidadeMedia;
-      const worstTrend = worst?.dataPoints?.[worst.dataPoints.length - 1]?.qualidadeMedia - worst?.dataPoints?.[0]?.qualidadeMedia || Infinity;
+      const currentTrend =
+        current.dataPoints[current.dataPoints.length - 1].qualidadeMedia -
+        current.dataPoints[0].qualidadeMedia;
+      const worstTrend =
+        worst?.dataPoints?.[worst.dataPoints.length - 1]?.qualidadeMedia -
+          worst?.dataPoints?.[0]?.qualidadeMedia || Infinity;
       return currentTrend < worstTrend ? current : worst;
     }, null);
 
-    const qualidadeMediaGeral = trends.reduce((sum: number, t: any) => {
-      const ultimoPonto = t.dataPoints[t.dataPoints.length - 1];
-      return sum + (ultimoPonto?.qualidadeMedia || 0);
-    }, 0) / trends.length;
+    const qualidadeMediaGeral =
+      trends.reduce((sum: number, t: any) => {
+        const ultimoPonto = t.dataPoints[t.dataPoints.length - 1];
+        return sum + (ultimoPonto?.qualidadeMedia || 0);
+      }, 0) / trends.length;
 
     return {
       mercadosComQueda,
@@ -106,7 +129,7 @@ export default function TendenciasDashboard() {
 
     const datasOrdenadas = Array.from(todasDatas).sort();
 
-    return datasOrdenadas.map((data) => {
+    return datasOrdenadas.map(data => {
       const ponto: any = { data };
       trends.forEach((t: any) => {
         const dp = t.dataPoints?.find((d: any) => d.data === data);
@@ -117,28 +140,48 @@ export default function TendenciasDashboard() {
   };
 
   const dadosGrafico = prepararDadosGrafico();
-  const cores = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
+  const cores = [
+    "#3b82f6",
+    "#10b981",
+    "#f59e0b",
+    "#ef4444",
+    "#8b5cf6",
+    "#ec4899",
+  ];
 
   // ============= TENDÊNCIAS DE QUALIDADE =============
-  const chartData = trends && trends.length > 0
-    ? trends[0].dataPoints.map((point: any) => ({
-        data: new Date(point.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-        qualidade: point.qualidadeMedia,
-      }))
-    : [];
+  const chartData =
+    trends && trends.length > 0
+      ? trends[0].dataPoints.map((point: any) => ({
+          data: new Date(point.data).toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+          }),
+          qualidade: point.qualidadeMedia,
+        }))
+      : [];
 
-  const stats = chartData.length > 0 ? {
-    atual: chartData[chartData.length - 1]?.qualidade || 0,
-    anterior: chartData[chartData.length - 2]?.qualidade || 0,
-    media: Math.round(chartData.reduce((acc: number, d: any) => acc + d.qualidade, 0) / chartData.length),
-    max: Math.max(...chartData.map((d: any) => d.qualidade)),
-    min: Math.min(...chartData.map((d: any) => d.qualidade)),
-  } : null;
+  const stats =
+    chartData.length > 0
+      ? {
+          atual: chartData[chartData.length - 1]?.qualidade || 0,
+          anterior: chartData[chartData.length - 2]?.qualidade || 0,
+          media: Math.round(
+            chartData.reduce((acc: number, d: any) => acc + d.qualidade, 0) /
+              chartData.length
+          ),
+          max: Math.max(...chartData.map((d: any) => d.qualidade)),
+          min: Math.min(...chartData.map((d: any) => d.qualidade)),
+        }
+      : null;
 
-  const tendencia = stats ? (
-    stats.atual > stats.anterior ? 'up' :
-    stats.atual < stats.anterior ? 'down' : 'stable'
-  ) : null;
+  const tendencia = stats
+    ? stats.atual > stats.anterior
+      ? "up"
+      : stats.atual < stats.anterior
+        ? "down"
+        : "stable"
+    : null;
 
   const renderQualityChart = () => {
     if (!chartData || chartData.length === 0) {
@@ -155,14 +198,14 @@ export default function TendenciasDashboard() {
     };
 
     switch (chartType) {
-      case 'area':
+      case "area":
         return (
           <ResponsiveContainer width="100%" height={400}>
             <AreaChart {...commonProps}>
               <defs>
                 <linearGradient id="colorQualidade" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" />
@@ -182,7 +225,7 @@ export default function TendenciasDashboard() {
           </ResponsiveContainer>
         );
 
-      case 'bar':
+      case "bar":
         return (
           <ResponsiveContainer width="100%" height={400}>
             <BarChart {...commonProps}>
@@ -224,9 +267,12 @@ export default function TendenciasDashboard() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard de Tendências</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Dashboard de Tendências
+          </h1>
           <p className="text-muted-foreground mt-2">
-            Acompanhe a evolução da qualidade dos dados e tendências de mercado ao longo do tempo
+            Acompanhe a evolução da qualidade dos dados e tendências de mercado
+            ao longo do tempo
           </p>
         </div>
 
@@ -235,7 +281,7 @@ export default function TendenciasDashboard() {
           <div className="w-64">
             <Select
               value={selectedProjectId?.toString() || ""}
-              onValueChange={(v) => setSelectedProjectId(parseInt(v))}
+              onValueChange={v => setSelectedProjectId(parseInt(v))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um projeto" />
@@ -253,7 +299,7 @@ export default function TendenciasDashboard() {
           <div className="w-48">
             <Select
               value={periodoDias.toString()}
-              onValueChange={(v) => setPeriodoDias(parseInt(v))}
+              onValueChange={v => setPeriodoDias(parseInt(v))}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -274,7 +320,9 @@ export default function TendenciasDashboard() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center h-64 text-center">
               <BarChart3 className="w-16 h-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Selecione um Projeto</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                Selecione um Projeto
+              </h3>
               <p className="text-muted-foreground">
                 Escolha um projeto acima para visualizar as tendências
               </p>
@@ -422,14 +470,16 @@ export default function TendenciasDashboard() {
                   <CardHeader>
                     <CardTitle>Mercados com Queda de Qualidade</CardTitle>
                     <CardDescription>
-                      Mercados que apresentaram queda superior a 10% nos últimos 7 dias
+                      Mercados que apresentaram queda superior a 10% nos últimos
+                      7 dias
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
                       {insights.mercadosComQueda.map((m: any) => {
                         const primeiro = m.dataPoints[0].qualidadeMedia;
-                        const ultimo = m.dataPoints[m.dataPoints.length - 1].qualidadeMedia;
+                        const ultimo =
+                          m.dataPoints[m.dataPoints.length - 1].qualidadeMedia;
                         const variacao = ((ultimo - primeiro) / primeiro) * 100;
 
                         return (
@@ -464,7 +514,10 @@ export default function TendenciasDashboard() {
                     <LineChartIcon className="w-5 h-5 text-muted-foreground" />
                     <span className="font-medium">Tipo de Visualização</span>
                   </div>
-                  <Select value={chartType} onValueChange={(value: any) => setChartType(value)}>
+                  <Select
+                    value={chartType}
+                    onValueChange={(value: any) => setChartType(value)}
+                  >
                     <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>
@@ -482,47 +535,79 @@ export default function TendenciasDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   <Card className="p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">Atual</span>
-                      {tendencia === 'up' && <TrendingUp className="w-4 h-4 text-green-500" />}
-                      {tendencia === 'down' && <TrendingDown className="w-4 h-4 text-red-500" />}
-                      {tendencia === 'stable' && <Minus className="w-4 h-4 text-gray-500" />}
+                      <span className="text-sm text-muted-foreground">
+                        Atual
+                      </span>
+                      {tendencia === "up" && (
+                        <TrendingUp className="w-4 h-4 text-green-500" />
+                      )}
+                      {tendencia === "down" && (
+                        <TrendingDown className="w-4 h-4 text-red-500" />
+                      )}
+                      {tendencia === "stable" && (
+                        <Minus className="w-4 h-4 text-gray-500" />
+                      )}
                     </div>
                     <p className="text-2xl font-bold">{stats.atual}</p>
                     <Badge
-                      variant={tendencia === 'up' ? 'default' : tendencia === 'down' ? 'destructive' : 'secondary'}
+                      variant={
+                        tendencia === "up"
+                          ? "default"
+                          : tendencia === "down"
+                            ? "destructive"
+                            : "secondary"
+                      }
                       className="mt-2"
                     >
-                      {tendencia === 'up' && '↑ Subindo'}
-                      {tendencia === 'down' && '↓ Caindo'}
-                      {tendencia === 'stable' && '→ Estável'}
+                      {tendencia === "up" && "↑ Subindo"}
+                      {tendencia === "down" && "↓ Caindo"}
+                      {tendencia === "stable" && "→ Estável"}
                     </Badge>
                   </Card>
 
                   <Card className="p-4">
                     <span className="text-sm text-muted-foreground">Média</span>
                     <p className="text-2xl font-bold mt-2">{stats.media}</p>
-                    <p className="text-xs text-muted-foreground mt-2">Período completo</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Período completo
+                    </p>
                   </Card>
 
                   <Card className="p-4">
-                    <span className="text-sm text-muted-foreground">Máximo</span>
-                    <p className="text-2xl font-bold text-green-600 mt-2">{stats.max}</p>
-                    <p className="text-xs text-muted-foreground mt-2">Melhor score</p>
+                    <span className="text-sm text-muted-foreground">
+                      Máximo
+                    </span>
+                    <p className="text-2xl font-bold text-green-600 mt-2">
+                      {stats.max}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Melhor score
+                    </p>
                   </Card>
 
                   <Card className="p-4">
-                    <span className="text-sm text-muted-foreground">Mínimo</span>
-                    <p className="text-2xl font-bold text-red-600 mt-2">{stats.min}</p>
-                    <p className="text-xs text-muted-foreground mt-2">Pior score</p>
+                    <span className="text-sm text-muted-foreground">
+                      Mínimo
+                    </span>
+                    <p className="text-2xl font-bold text-red-600 mt-2">
+                      {stats.min}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Pior score
+                    </p>
                   </Card>
 
                   <Card className="p-4">
-                    <span className="text-sm text-muted-foreground">Variação</span>
+                    <span className="text-sm text-muted-foreground">
+                      Variação
+                    </span>
                     <p className="text-2xl font-bold mt-2">
-                      {stats.atual - stats.anterior > 0 ? '+' : ''}
+                      {stats.atual - stats.anterior > 0 ? "+" : ""}
                       {stats.atual - stats.anterior}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-2">vs. anterior</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      vs. anterior
+                    </p>
                   </Card>
                 </div>
               )}
@@ -530,7 +615,9 @@ export default function TendenciasDashboard() {
               {/* Gráfico de Qualidade */}
               <Card className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-semibold">Evolução da Qualidade</h2>
+                  <h2 className="text-xl font-semibold">
+                    Evolução da Qualidade
+                  </h2>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="w-4 h-4" />
                     {chartData.length} pontos de dados

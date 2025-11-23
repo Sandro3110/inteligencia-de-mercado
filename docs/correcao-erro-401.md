@@ -35,11 +35,11 @@ Console do navegador → "Failed to load resource: 401"
 
 ### Comparação com Endpoints Funcionais
 
-| Endpoint | Middleware | Status |
-|----------|-----------|--------|
-| `/api/trpc/*` | ✅ `createContext` (tRPC) | ✅ Funciona |
-| `/api/notifications/stream` | ❌ Nenhum | ❌ **401 Error** |
-| `/api/enrichment/progress/:jobId` | ❌ Nenhum | ⚠️ Vulnerável |
+| Endpoint                          | Middleware                | Status           |
+| --------------------------------- | ------------------------- | ---------------- |
+| `/api/trpc/*`                     | ✅ `createContext` (tRPC) | ✅ Funciona      |
+| `/api/notifications/stream`       | ❌ Nenhum                 | ❌ **401 Error** |
+| `/api/enrichment/progress/:jobId` | ❌ Nenhum                 | ⚠️ Vulnerável    |
 
 ---
 
@@ -50,9 +50,9 @@ Console do navegador → "Failed to load resource: 401"
 **Arquivo**: `server/_core/authMiddleware.ts`
 
 ```typescript
-import type { Request, Response, NextFunction } from 'express';
-import { sdk } from './sdk';
-import type { User } from '../../drizzle/schema';
+import type { Request, Response, NextFunction } from "express";
+import { sdk } from "./sdk";
+import type { User } from "../../drizzle/schema";
 
 // Estender tipo Request para incluir user
 declare global {
@@ -74,17 +74,17 @@ export async function requireAuth(
 ): Promise<void> {
   try {
     const user = await sdk.authenticateRequest(req);
-    
+
     if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: "Unauthorized" });
       return;
     }
-    
+
     req.user = user;
     next();
   } catch (error) {
-    console.error('[Auth Middleware] Authentication failed:', error);
-    res.status(401).json({ error: 'Unauthorized' });
+    console.error("[Auth Middleware] Authentication failed:", error);
+    res.status(401).json({ error: "Unauthorized" });
   }
 }
 
@@ -103,7 +103,7 @@ export async function optionalAuth(
   } catch (error) {
     req.user = undefined;
   }
-  
+
   next();
 }
 ```
@@ -119,7 +119,7 @@ import { requireAuth } from "./authMiddleware";
 app.get("/api/enrichment/progress/:jobId", requireAuth, setupSSE);
 
 // SSE endpoint for real-time notifications (requer autenticação)
-const { handleNotificationStream } = await import('../notificationStream');
+const { handleNotificationStream } = await import("../notificationStream");
 app.get("/api/notifications/stream", requireAuth, handleNotificationStream);
 ```
 
@@ -133,10 +133,10 @@ export function handleNotificationStream(req: Request, res: Response) {
   const user = req.user;
   if (!user) {
     // Fallback - não deveria acontecer se middleware estiver configurado
-    res.status(401).json({ error: 'Unauthorized' });
+    res.status(401).json({ error: "Unauthorized" });
     return;
   }
-  
+
   // ... resto do código
 }
 ```
@@ -158,6 +158,7 @@ export function handleNotificationStream(req: Request, res: Response) {
 ### Antes vs Depois
 
 **Antes**:
+
 ```
 Console:
 ❌ Failed to load resource: 401 (Unauthorized)
@@ -170,6 +171,7 @@ Server Log:
 ```
 
 **Depois**:
+
 ```
 Console:
 ✅ (limpo - sem erros)
@@ -232,7 +234,7 @@ Conexão SSE estabelecida ✅
 ### Aplicar Autenticação a Novos Endpoints
 
 ```typescript
-import { requireAuth, optionalAuth } from './server/_core/authMiddleware';
+import { requireAuth, optionalAuth } from "./server/_core/authMiddleware";
 
 // Endpoint que REQUER autenticação
 app.get("/api/private/data", requireAuth, (req, res) => {

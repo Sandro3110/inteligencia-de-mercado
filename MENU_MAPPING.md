@@ -1,6 +1,7 @@
 # 📋 Mapeamento Completo - Páginas e Menu
 
 ## 🎯 Objetivo
+
 Reorganizar sidebar com linguagem moderna, intuitiva e minimalista.  
 **Princípio:** "Menos é mais" - máximo 6-8 itens principais, agrupamento lógico.
 
@@ -8,52 +9,57 @@ Reorganizar sidebar com linguagem moderna, intuitiva e minimalista.
 
 ## 📊 Páginas Existentes (22 páginas)
 
-| Página | Rota | No Menu? | Propósito |
-|--------|------|----------|-----------|
-| **CascadeView** | `/` | ✅ Início | Visão em cascata de dados |
-| **Dashboard** | `/dashboard` | ✅ Dashboard | Dashboard principal |
-| **DashboardPage** | `/dashboard-avancado` | ✅ Dashboard Avançado | Dashboard com mais métricas |
-| **Mercados** | `/mercados` | ✅ Mercados | Lista de mercados |
-| **MercadoDetalhes** | `/mercado/:id` | ❌ (dinâmica) | Detalhes de mercado específico |
-| **EnrichmentFlow** | `/enrichment` | ✅ Novo Enriquecimento | Iniciar enriquecimento |
-| **EnrichmentProgress** | `/enrichment-progress` | ✅ Monitorar Progresso | Acompanhar enriquecimento |
-| **ResultadosEnriquecimento** | `/resultados-enriquecimento` | ✅ Resultados | Resultados de enriquecimento |
-| **EnrichmentSettings** | `/enrichment-settings` | ✅ Configurações | Configurar enriquecimento |
-| **AnalyticsPage** | `/analytics` | ✅ Analytics | Analytics interativos |
-| **AnalyticsDashboard** | `/analytics-dashboard` | ✅ Analytics Dashboard | Dashboard de analytics |
-| **ROIDashboard** | `/roi` | ✅ ROI & Conversão | Dashboard de ROI |
-| **FunnelView** | `/funil` | ✅ Funil de Vendas | Funil de conversão |
-| **ReportsPage** | `/relatorios` | ✅ Relatórios | Geração de relatórios PDF |
-| **AtividadePage** | `/atividade` | ✅ Atividades | Log de atividades |
-| **AlertsPage** | `/alertas` | ✅ Alertas | Configuração de alertas |
-| **AlertHistoryPage** | `/alertas/historico` | ✅ Histórico Alertas | Histórico de alertas |
-| **SchedulePage** | `/agendamento` | ✅ Agendamentos | Agendamento de tarefas |
-| **OnboardingPage** | `/onboarding` | ❌ (especial) | Tour inicial |
-| **ComponentShowcase** | ❌ (sem rota) | ❌ | Showcase de componentes (dev) |
-| **NotFound** | `/404` | ❌ (erro) | Página 404 |
+| Página                       | Rota                         | No Menu?               | Propósito                      |
+| ---------------------------- | ---------------------------- | ---------------------- | ------------------------------ |
+| **CascadeView**              | `/`                          | ✅ Início              | Visão em cascata de dados      |
+| **Dashboard**                | `/dashboard`                 | ✅ Dashboard           | Dashboard principal            |
+| **DashboardPage**            | `/dashboard-avancado`        | ✅ Dashboard Avançado  | Dashboard com mais métricas    |
+| **Mercados**                 | `/mercados`                  | ✅ Mercados            | Lista de mercados              |
+| **MercadoDetalhes**          | `/mercado/:id`               | ❌ (dinâmica)          | Detalhes de mercado específico |
+| **EnrichmentFlow**           | `/enrichment`                | ✅ Novo Enriquecimento | Iniciar enriquecimento         |
+| **EnrichmentProgress**       | `/enrichment-progress`       | ✅ Monitorar Progresso | Acompanhar enriquecimento      |
+| **ResultadosEnriquecimento** | `/resultados-enriquecimento` | ✅ Resultados          | Resultados de enriquecimento   |
+| **EnrichmentSettings**       | `/enrichment-settings`       | ✅ Configurações       | Configurar enriquecimento      |
+| **AnalyticsPage**            | `/analytics`                 | ✅ Analytics           | Analytics interativos          |
+| **AnalyticsDashboard**       | `/analytics-dashboard`       | ✅ Analytics Dashboard | Dashboard de analytics         |
+| **ROIDashboard**             | `/roi`                       | ✅ ROI & Conversão     | Dashboard de ROI               |
+| **FunnelView**               | `/funil`                     | ✅ Funil de Vendas     | Funil de conversão             |
+| **ReportsPage**              | `/relatorios`                | ✅ Relatórios          | Geração de relatórios PDF      |
+| **AtividadePage**            | `/atividade`                 | ✅ Atividades          | Log de atividades              |
+| **AlertsPage**               | `/alertas`                   | ✅ Alertas             | Configuração de alertas        |
+| **AlertHistoryPage**         | `/alertas/historico`         | ✅ Histórico Alertas   | Histórico de alertas           |
+| **SchedulePage**             | `/agendamento`               | ✅ Agendamentos        | Agendamento de tarefas         |
+| **OnboardingPage**           | `/onboarding`                | ❌ (especial)          | Tour inicial                   |
+| **ComponentShowcase**        | ❌ (sem rota)                | ❌                     | Showcase de componentes (dev)  |
+| **NotFound**                 | `/404`                       | ❌ (erro)              | Página 404                     |
 
 ---
 
 ## 🎨 Menu Atual (Problemas Identificados)
 
 ### **Seção: Visão Geral**
+
 - ❌ **Duplicado:** "Início" e "Dashboard" fazem coisas similares
 - ❌ **Confuso:** Dois itens para mesma função
 
 ### **Seção: Dados**
+
 - ❌ **Duplicado:** "Visão Geral" aponta para `/` (mesmo que "Início")
 - ✅ **OK:** "Mercados" está claro
 
 ### **Seção: Ações**
+
 - ✅ **OK:** Agrupamento lógico de enriquecimento
 - ⚠️ **Falta:** "Configurações de Enriquecimento" deveria estar aqui
 
 ### **Seção: Análise**
+
 - ❌ **MUITO POLUÍDO:** 7 itens (Analytics, Analytics Dashboard, Dashboard Avançado, ROI, Funil, Relatórios, Atividades)
 - ❌ **Confuso:** "Analytics" vs "Analytics Dashboard" vs "Dashboard Avançado"
 - ❌ **Misturado:** "Atividades" não é análise, é log operacional
 
 ### **Seção: Configurações**
+
 - ⚠️ **Misturado:** Enriquecimento, Alertas, Agendamentos juntos
 - ❌ **Falta:** Separar configurações operacionais de sistema
 
@@ -62,10 +68,12 @@ Reorganizar sidebar com linguagem moderna, intuitiva e minimalista.
 ## ✅ Proposta de Novo Menu (Minimalista e Intuitivo)
 
 ### **🏠 Início**
+
 - **Visão Geral** → `/` (CascadeView)
   - Visão em cascata de todos os dados
 
 ### **📊 Inteligência**
+
 - **Mercados** → `/mercados`
   - Explorar mercados mapeados
 - **Analytics** → `/analytics`
@@ -74,6 +82,7 @@ Reorganizar sidebar com linguagem moderna, intuitiva e minimalista.
   - Gerar relatórios executivos PDF
 
 ### **⚡ Enriquecimento**
+
 - **Iniciar** → `/enrichment`
   - Novo processo de enriquecimento
 - **Acompanhar** → `/enrichment-progress`
@@ -82,6 +91,7 @@ Reorganizar sidebar com linguagem moderna, intuitiva e minimalista.
   - Ver resultados e validar
 
 ### **📈 Performance**
+
 - **Dashboard** → `/dashboard`
   - KPIs principais e métricas gerais
 - **ROI** → `/roi`
@@ -90,6 +100,7 @@ Reorganizar sidebar com linguagem moderna, intuitiva e minimalista.
   - Funil de conversão de leads
 
 ### **⚙️ Configurações**
+
 - **Enriquecimento** → `/enrichment-settings`
   - Configurar fontes e regras
 - **Alertas** → `/alertas`
@@ -98,6 +109,7 @@ Reorganizar sidebar com linguagem moderna, intuitiva e minimalista.
   - Agendar tarefas recorrentes
 
 ### **📋 Sistema** (seção colapsada por padrão)
+
 - **Atividades** → `/atividade`
   - Log de atividades do sistema
 - **Histórico de Alertas** → `/alertas/historico`
@@ -108,17 +120,20 @@ Reorganizar sidebar com linguagem moderna, intuitiva e minimalista.
 ## 🎯 Mudanças Principais
 
 ### **Removidos do Menu:**
+
 1. ❌ **"Dashboard Avançado"** - Redundante com Dashboard principal
 2. ❌ **"Analytics Dashboard"** - Redundante com Analytics
 3. ❌ **Duplicatas** de "Início" e "Visão Geral"
 
 ### **Reorganizados:**
+
 1. ✅ **Inteligência** - Agrupa Mercados, Analytics, Relatórios (core business)
 2. ✅ **Enriquecimento** - Agrupa todo o fluxo de enriquecimento
 3. ✅ **Performance** - Agrupa dashboards de métricas
 4. ✅ **Sistema** - Agrupa logs e históricos (menos usado)
 
 ### **Linguagem Moderna:**
+
 - "Novo Enriquecimento" → **"Iniciar"** (mais direto)
 - "Monitorar Progresso" → **"Acompanhar"** (mais natural)
 - "ROI & Conversão" → **"ROI"** (mais simples)

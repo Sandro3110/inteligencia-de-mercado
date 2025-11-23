@@ -1,5 +1,12 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface TableSkeletonProps {
   /** Número de linhas */
@@ -14,10 +21,10 @@ interface TableSkeletonProps {
  * Skeleton loader que imita a estrutura de uma Table
  * Usado em listagens e relatórios
  */
-export function TableSkeleton({ 
-  rows = 5, 
+export function TableSkeleton({
+  rows = 5,
   columns = 4,
-  showHeader = true 
+  showHeader = true,
 }: TableSkeletonProps) {
   return (
     <div className="rounded-md border">

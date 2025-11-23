@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Bell } from 'lucide-react';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Bell } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useWebSocket } from '@/hooks/useWebSocket';
-import { NotificationPanel } from './NotificationPanel';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/dropdown-menu";
+import { useWebSocket } from "@/hooks/useWebSocket";
+import { NotificationPanel } from "./NotificationPanel";
+import { cn } from "@/lib/utils";
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
@@ -22,22 +22,24 @@ export function NotificationBell() {
           variant="ghost"
           size="icon"
           className="relative"
-          title={isConnected ? 'Notificações em tempo real' : 'Desconectado'}
+          title={isConnected ? "Notificações em tempo real" : "Desconectado"}
         >
-          <Bell className={cn(
-            'h-5 w-5',
-            !isConnected && 'text-muted-foreground'
-          )} />
+          <Bell
+            className={cn("h-5 w-5", !isConnected && "text-muted-foreground")}
+          />
           {unreadCount > 0 && (
             <Badge
               variant="destructive"
               className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
             >
-              {unreadCount > 9 ? '9+' : unreadCount}
+              {unreadCount > 9 ? "9+" : unreadCount}
             </Badge>
           )}
           {!isConnected && (
-            <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-yellow-500" title="Desconectado" />
+            <span
+              className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-yellow-500"
+              title="Desconectado"
+            />
           )}
         </Button>
       </DropdownMenuTrigger>

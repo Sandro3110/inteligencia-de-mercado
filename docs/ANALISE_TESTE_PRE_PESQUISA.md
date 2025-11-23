@@ -12,13 +12,13 @@ Executamos testes completos da funcionalidade de pré-pesquisa com OpenAI usando
 
 ### Métricas Gerais
 
-| Métrica | Resultado |
-|---------|-----------|
-| **Taxa de Sucesso** | 2/2 (100%) |
-| **Completude Média** | 10/10 campos (100%) |
-| **Dados Válidos** | 100% |
-| **Tempo Médio por Consulta** | ~3-5 segundos |
-| **Erros de Validação** | 0 |
+| Métrica                      | Resultado           |
+| ---------------------------- | ------------------- |
+| **Taxa de Sucesso**          | 2/2 (100%)          |
+| **Completude Média**         | 10/10 campos (100%) |
+| **Dados Válidos**            | 100%                |
+| **Tempo Médio por Consulta** | ~3-5 segundos       |
+| **Erros de Validação**       | 0                   |
 
 ---
 
@@ -47,16 +47,16 @@ Executamos testes completos da funcionalidade de pré-pesquisa com OpenAI usando
 
 **Análise de Qualidade:**
 
-| Aspecto | Avaliação | Observação |
-|---------|-----------|------------|
-| **Nome** | ✅ Excelente | Nome oficial completo e correto |
-| **CNPJ** | ✅ Excelente | Formato válido (XX.XXX.XXX/XXXX-XX) |
-| **Site** | ✅ Excelente | URL válida com protocolo https:// |
-| **Produto** | ✅ Excelente | Descrição detalhada e específica |
-| **Localização** | ✅ Excelente | Cidade e UF corretos |
-| **Contato** | ✅ Excelente | Telefone e email válidos |
-| **Segmentação** | ✅ Excelente | Classificação correta (B2B) |
-| **Porte** | ✅ Excelente | Classificação apropriada (Grande) |
+| Aspecto         | Avaliação    | Observação                          |
+| --------------- | ------------ | ----------------------------------- |
+| **Nome**        | ✅ Excelente | Nome oficial completo e correto     |
+| **CNPJ**        | ✅ Excelente | Formato válido (XX.XXX.XXX/XXXX-XX) |
+| **Site**        | ✅ Excelente | URL válida com protocolo https://   |
+| **Produto**     | ✅ Excelente | Descrição detalhada e específica    |
+| **Localização** | ✅ Excelente | Cidade e UF corretos                |
+| **Contato**     | ✅ Excelente | Telefone e email válidos            |
+| **Segmentação** | ✅ Excelente | Classificação correta (B2B)         |
+| **Porte**       | ✅ Excelente | Classificação apropriada (Grande)   |
 
 **Completude:** 10/10 campos (100%)  
 **Validação:** ✅ Todos os dados válidos  
@@ -87,16 +87,16 @@ Executamos testes completos da funcionalidade de pré-pesquisa com OpenAI usando
 
 **Análise de Qualidade:**
 
-| Aspecto | Avaliação | Observação |
-|---------|-----------|------------|
-| **Nome** | ✅ Excelente | Razão social completa |
-| **CNPJ** | ✅ Excelente | Formato válido (XX.XXX.XXX/XXXX-XX) |
-| **Site** | ✅ Excelente | URL válida com protocolo https:// |
-| **Produto** | ✅ Excelente | Descrição específica do nicho |
-| **Localização** | ✅ Excelente | Cidade e UF corretos |
-| **Contato** | ✅ Excelente | Telefone e email válidos |
-| **Segmentação** | ✅ Excelente | Classificação correta (B2B) |
-| **Porte** | ✅ Excelente | Classificação apropriada (Médio) |
+| Aspecto         | Avaliação    | Observação                          |
+| --------------- | ------------ | ----------------------------------- |
+| **Nome**        | ✅ Excelente | Razão social completa               |
+| **CNPJ**        | ✅ Excelente | Formato válido (XX.XXX.XXX/XXXX-XX) |
+| **Site**        | ✅ Excelente | URL válida com protocolo https://   |
+| **Produto**     | ✅ Excelente | Descrição específica do nicho       |
+| **Localização** | ✅ Excelente | Cidade e UF corretos                |
+| **Contato**     | ✅ Excelente | Telefone e email válidos            |
+| **Segmentação** | ✅ Excelente | Classificação correta (B2B)         |
+| **Porte**       | ✅ Excelente | Classificação apropriada (Médio)    |
 
 **Completude:** 10/10 campos (100%)  
 **Validação:** ✅ Todos os dados válidos  
@@ -117,6 +117,7 @@ Em ambos os testes, **todos os 10 campos** foram preenchidos com informações v
 ### 3. Formatação Correta
 
 Todos os dados retornaram no formato esperado:
+
 - **CNPJ:** Formato XX.XXX.XXX/XXXX-XX (com pontos, barra e hífen)
 - **Telefone:** Formato (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
 - **Site:** URLs completas com protocolo https://
@@ -298,6 +299,7 @@ Usuário digita apenas: `"cooperativa de insumos de holambra"`
 ### Passo 3: Sistema Pesquisa com IA
 
 Sistema exibe:
+
 ```
 🔍 Pesquisando informações sobre "cooperativa de insumos de holambra"...
 ⏳ Isso pode levar alguns segundos.

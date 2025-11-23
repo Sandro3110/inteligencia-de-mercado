@@ -1,6 +1,7 @@
 # 🎉 GESTOR PAV - 100% COMPLETO
 
 ## Sistema de Gestão de Pesquisa de Mercado PAV
+
 **Status:** ✅ **IMPLEMENTAÇÃO 100% COMPLETA**
 
 ---
@@ -11,13 +12,13 @@ O **Gestor PAV** é um sistema completo de gestão de pesquisa de mercado com en
 
 ### Módulos Core (100% Completos)
 
-| Módulo | Status | Funcionalidades | Linhas de Código |
-|--------|--------|-----------------|-------------------|
-| **Enriquecimento** | ✅ 100% | Wizard 7 steps, validação, upload, pré-pesquisa, batch processor | ~5.000 |
-| **Exportação** | ✅ 100% | 15 itens, 6 formatos, templates, estimativa, validação | ~3.500 |
-| **Integração** | ✅ 100% | Parâmetros dinâmicos, credenciais configuráveis, LLM wrapper | ~2.000 |
-| **Dashboard** | ✅ 100% | Analytics, métricas, gráficos, filtros avançados | ~2.500 |
-| **Core** | ✅ 100% | Auth, DB, API, schemas, validações | ~2.000 |
+| Módulo             | Status  | Funcionalidades                                                  | Linhas de Código |
+| ------------------ | ------- | ---------------------------------------------------------------- | ---------------- |
+| **Enriquecimento** | ✅ 100% | Wizard 7 steps, validação, upload, pré-pesquisa, batch processor | ~5.000           |
+| **Exportação**     | ✅ 100% | 15 itens, 6 formatos, templates, estimativa, validação           | ~3.500           |
+| **Integração**     | ✅ 100% | Parâmetros dinâmicos, credenciais configuráveis, LLM wrapper     | ~2.000           |
+| **Dashboard**      | ✅ 100% | Analytics, métricas, gráficos, filtros avançados                 | ~2.500           |
+| **Core**           | ✅ 100% | Auth, DB, API, schemas, validações                               | ~2.000           |
 
 **Total:** ~15.000 linhas de código TypeScript/React
 
@@ -40,6 +41,7 @@ Um wizard guiado que simplifica a criação de pesquisas complexas:
 - **Step 7:** Resumo e Iniciar Enriquecimento
 
 **Arquivos:**
+
 - `client/src/pages/ResearchWizard.tsx` (300 linhas)
 - `client/src/components/research-wizard/AllSteps.tsx` (500 linhas)
 - `client/src/components/research-wizard/index.ts`
@@ -59,17 +61,19 @@ Interface conversacional que permite buscar mercados e clientes usando linguagem
 - Integração com credenciais configuráveis
 
 **Arquivos:**
+
 - `server/services/preResearchService.ts` (340 linhas)
 - `client/src/components/research-wizard/PreResearchInterface.tsx` (280 linhas)
 - `server/routers.ts` (endpoints preResearch.execute e preResearch.retry)
 
 **Exemplo de Uso:**
+
 ```typescript
 const result = await trpc.preResearch.execute.mutate({
   prompt: "Hospitais em Curitiba com mais de 100 leitos",
   tipo: "cliente",
   quantidade: 10,
-  projectId: 1
+  projectId: 1,
 });
 // Retorna: { success: true, entidades: [...], metadata: {...} }
 ```
@@ -90,10 +94,12 @@ Componente de drag & drop para importação em massa:
 - Importa apenas registros válidos
 
 **Arquivos:**
+
 - `server/services/spreadsheetParser.ts` (200 linhas)
 - `client/src/components/research-wizard/FileUploadZone.tsx` (350 linhas)
 
 **Formato Esperado (CSV):**
+
 ```csv
 nome,segmentacao,cidade,uf
 Hospital São Lucas,B2B,São Paulo,SP
@@ -114,13 +120,18 @@ Schemas Zod robustos para garantir qualidade dos dados:
 - Bloqueio de dados inválidos
 
 **Arquivos:**
+
 - `server/services/validationSchemas.ts` (250 linhas)
 
 **Exemplo:**
+
 ```typescript
 const clienteSchema = z.object({
   nome: z.string().min(2).max(255),
-  cnpj: z.string().regex(/^\d{14}$/).optional(),
+  cnpj: z
+    .string()
+    .regex(/^\d{14}$/)
+    .optional(),
   email: z.string().email().optional(),
   // ... mais campos
 });
@@ -141,17 +152,20 @@ Sistema de enriquecimento em blocos que **lê parâmetros do wizard**:
 - Checkpoint automático a cada bloco de 50
 
 **Arquivos:**
+
 - `server/enrichmentBatchProcessor.ts` (modificado, +30 linhas)
 
 **Fluxo:**
+
 ```
-Wizard (3 concorrentes, 20 leads) 
+Wizard (3 concorrentes, 20 leads)
   → Banco (pesquisas.qtdConcorrentesPorMercado = 3)
   → Batch Processor (lê do banco)
   → Enriquecimento (respeita limite de 3)
 ```
 
 **Log Exemplo:**
+
 ```
 [BatchProcessor] 🚀 Iniciando enriquecimento em blocos de 50 clientes
 [BatchProcessor] Pesquisa ID: 42
@@ -173,10 +187,12 @@ Sistema que permite usuário configurar suas próprias API keys:
 - Função de validação de credenciais
 
 **Arquivos:**
+
 - `server/services/llmWithConfig.ts` (160 linhas)
 - `server/services/preResearchService.ts` (modificado para usar wrapper)
 
 **Exemplo:**
+
 ```typescript
 // Usuário configura em /enrichment-settings
 await trpc.enrichmentConfig.save.mutate({
@@ -198,6 +214,7 @@ const result = await invokeLLMWithConfig(projectId, { messages: [...] });
 Sistema completo de exportação com 15 funcionalidades avançadas:
 
 #### Itens 1-5 (Base)
+
 1. ✅ Wizard de 4 steps (Seleção → Filtros → Campos → Preview)
 2. ✅ 6 formatos (CSV, Excel, PDF, JSON, Word, HTML)
 3. ✅ Seleção de campos dinâmica
@@ -205,6 +222,7 @@ Sistema completo de exportação com 15 funcionalidades avançadas:
 5. ✅ Preview antes de exportar
 
 #### Itens 6-10 (Avançado)
+
 6. ✅ Estimativa de tamanho de arquivo
 7. ✅ Seletor visual de profundidade (Rápido/Balanceado/Completo)
 8. ✅ Validação de limites (aviso se > 100MB)
@@ -212,6 +230,7 @@ Sistema completo de exportação com 15 funcionalidades avançadas:
 10. ✅ Autocomplete inteligente no contexto
 
 #### Itens 11-15 (Premium)
+
 11. ✅ Sugestões contextuais dinâmicas
 12. ✅ Seletor de modos de relacionamento (1/2/3 níveis)
 13. ✅ Página de admin de templates
@@ -219,6 +238,7 @@ Sistema completo de exportação com 15 funcionalidades avançadas:
 15. ✅ Formato Word/DOCX
 
 **Arquivos:**
+
 - `client/src/pages/ExportWizard.tsx` (600 linhas)
 - `server/services/export/` (13 arquivos, ~2.500 linhas)
 - `client/src/components/export/` (10 componentes, ~1.500 linhas)
@@ -230,6 +250,7 @@ Sistema completo de exportação com 15 funcionalidades avançadas:
 ### Stack Tecnológico
 
 **Frontend:**
+
 - React 19
 - TypeScript
 - Tailwind CSS 4
@@ -238,6 +259,7 @@ Sistema completo de exportação com 15 funcionalidades avançadas:
 - Wouter (routing)
 
 **Backend:**
+
 - Node.js 22
 - Express 4
 - tRPC 11
@@ -246,12 +268,14 @@ Sistema completo de exportação com 15 funcionalidades avançadas:
 - Zod (validação)
 
 **IA/ML:**
+
 - OpenAI API (GPT-4o)
 - Gemini API (2.5-flash)
 - SerpAPI (busca)
 - ReceitaWS (CNPJ)
 
 **Infraestrutura:**
+
 - S3 (armazenamento)
 - Manus Auth (OAuth)
 - Cron Jobs (agregação)
@@ -322,15 +346,15 @@ gestor-pav/
 
 ### Fases Completadas
 
-| Fase | Descrição | Status |
-|------|-----------|--------|
-| 1-27 | Módulos base (projetos, mercados, clientes, dashboard) | ✅ 100% |
-| 28 | Módulo de Exportação (15 itens) | ✅ 100% |
-| 29-38 | Melhorias incrementais | ✅ 100% |
-| 39 | Módulo de Enriquecimento (wizard, validação, upload) | ✅ 100% |
-| 40 | Integração de Pré-Pesquisa | ✅ 100% |
-| 41 | Ajustes Críticos (parâmetros + credenciais) | ✅ 100% |
-| 42 | Finalização (interfaces + testes) | ✅ 100% |
+| Fase  | Descrição                                              | Status  |
+| ----- | ------------------------------------------------------ | ------- |
+| 1-27  | Módulos base (projetos, mercados, clientes, dashboard) | ✅ 100% |
+| 28    | Módulo de Exportação (15 itens)                        | ✅ 100% |
+| 29-38 | Melhorias incrementais                                 | ✅ 100% |
+| 39    | Módulo de Enriquecimento (wizard, validação, upload)   | ✅ 100% |
+| 40    | Integração de Pré-Pesquisa                             | ✅ 100% |
+| 41    | Ajustes Críticos (parâmetros + credenciais)            | ✅ 100% |
+| 42    | Finalização (interfaces + testes)                      | ✅ 100% |
 
 **Total:** 42 fases, 100% completas
 
@@ -434,6 +458,7 @@ Documento completo de testes criado: `TEST_END_TO_END.md`
 ### Schemas de Banco
 
 **Tabelas Principais:**
+
 - `projects` - Projetos
 - `pesquisas` - Pesquisas (com parâmetros)
 - `mercados` - Mercados
@@ -502,6 +527,7 @@ Embora o sistema esteja 100% completo conforme planejamento, possíveis melhoria
 O **Gestor PAV** está **100% completo** conforme especificação original. Todos os módulos core foram implementados, integrados e documentados. O sistema está pronto para uso em produção, com arquitetura escalável, código limpo e documentação abrangente.
 
 **Principais Conquistas:**
+
 - ✅ 42 fases de desenvolvimento completadas
 - ✅ ~15.000 linhas de código TypeScript/React
 - ✅ 2 módulos core 100% completos (Enriquecimento + Exportação)
@@ -513,6 +539,6 @@ O **Gestor PAV** está **100% completo** conforme especificação original. Todo
 
 ---
 
-*Documento gerado em: 2025-01-20*  
-*Versão: 1.0.0*  
-*Checkpoint: Próximo (após este documento)*
+_Documento gerado em: 2025-01-20_  
+_Versão: 1.0.0_  
+_Checkpoint: Próximo (após este documento)_

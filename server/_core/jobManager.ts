@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from "events";
 
 export interface EnrichmentProgress {
   jobId: string;
@@ -8,7 +8,7 @@ export interface EnrichmentProgress {
   message: string;
   progress: number; // 0-100 for current step
   totalProgress: number; // 0-100 overall
-  status: 'running' | 'completed' | 'error';
+  status: "running" | "completed" | "error";
   error?: string;
 }
 
@@ -20,11 +20,11 @@ class JobManager extends EventEmitter {
       jobId,
       step: 0,
       totalSteps,
-      currentStepName: 'Iniciando...',
-      message: 'Preparando processamento',
+      currentStepName: "Iniciando...",
+      message: "Preparando processamento",
       progress: 0,
       totalProgress: 0,
-      status: 'running',
+      status: "running",
     });
     this.emit(`job:${jobId}`, this.jobs.get(jobId));
   }
@@ -34,12 +34,16 @@ class JobManager extends EventEmitter {
     if (!job) return;
 
     const updated = { ...job, ...update };
-    
+
     // Calcular progresso total
     if (updated.step !== undefined && updated.totalSteps) {
       const stepProgress = (updated.step / updated.totalSteps) * 100;
-      const currentStepContribution = (updated.progress || 0) / updated.totalSteps;
-      updated.totalProgress = Math.min(100, stepProgress + currentStepContribution);
+      const currentStepContribution =
+        (updated.progress || 0) / updated.totalSteps;
+      updated.totalProgress = Math.min(
+        100,
+        stepProgress + currentStepContribution
+      );
     }
 
     this.jobs.set(jobId, updated);
@@ -52,19 +56,22 @@ class JobManager extends EventEmitter {
 
     const completed: EnrichmentProgress = {
       ...job,
-      status: 'completed',
+      status: "completed",
       totalProgress: 100,
       progress: 100,
-      message: 'Processamento concluído com sucesso!',
+      message: "Processamento concluído com sucesso!",
     };
 
     this.jobs.set(jobId, completed);
     this.emit(`job:${jobId}`, completed);
 
     // Limpar job após 5 minutos
-    setTimeout(() => {
-      this.jobs.delete(jobId);
-    }, 5 * 60 * 1000);
+    setTimeout(
+      () => {
+        this.jobs.delete(jobId);
+      },
+      5 * 60 * 1000
+    );
   }
 
   errorJob(jobId: string, error: string): void {
@@ -73,7 +80,7 @@ class JobManager extends EventEmitter {
 
     const errored: EnrichmentProgress = {
       ...job,
-      status: 'error',
+      status: "error",
       error,
       message: `Erro: ${error}`,
     };
@@ -82,19 +89,25 @@ class JobManager extends EventEmitter {
     this.emit(`job:${jobId}`, errored);
 
     // Limpar job após 5 minutos
-    setTimeout(() => {
-      this.jobs.delete(jobId);
-    }, 5 * 60 * 1000);
+    setTimeout(
+      () => {
+        this.jobs.delete(jobId);
+      },
+      5 * 60 * 1000
+    );
   }
 
   getJob(jobId: string): EnrichmentProgress | undefined {
     return this.jobs.get(jobId);
   }
 
-  subscribeToJob(jobId: string, callback: (progress: EnrichmentProgress) => void): () => void {
+  subscribeToJob(
+    jobId: string,
+    callback: (progress: EnrichmentProgress) => void
+  ): () => void {
     const listener = (progress: EnrichmentProgress) => callback(progress);
     this.on(`job:${jobId}`, listener);
-    
+
     // Retornar função de cleanup
     return () => {
       this.off(`job:${jobId}`, listener);

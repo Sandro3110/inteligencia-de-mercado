@@ -1,31 +1,31 @@
 /**
  * Geo Cockpit Unificado - Sistema de Visualização em Mapas
- * 
+ *
  * Visualização unificada de todas as entidades (mercados, clientes, produtos, concorrentes, leads)
  * com controles avançados, filtros e clustering inteligente
  */
 
-import { useState, useMemo } from 'react';
-import { trpc } from '@/lib/trpc';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Loader2, Map as MapIcon } from 'lucide-react';
-import MapContainer from '@/components/maps/MapContainer';
-import HeatmapLayer from '@/components/maps/HeatmapLayer';
-import EntityMarker from '@/components/maps/EntityMarker';
-import EntityPopupCard from '@/components/maps/EntityPopupCard';
-import MapLegend from '@/components/maps/MapLegend';
-import MapControls, { MapControlsConfig } from '@/components/maps/MapControls';
-import MapFilters, { MapFiltersState } from '@/components/maps/MapFilters';
-import DashboardLayout from '@/components/DashboardLayout';
-import MarkerClusterGroup from 'react-leaflet-cluster';
-import { useSelectedProject } from '@/hooks/useSelectedProject';
-import { useSelectedPesquisa } from '@/hooks/useSelectedPesquisa';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import { useState, useMemo } from "react";
+import { trpc } from "@/lib/trpc";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Loader2, Map as MapIcon } from "lucide-react";
+import MapContainer from "@/components/maps/MapContainer";
+import HeatmapLayer from "@/components/maps/HeatmapLayer";
+import EntityMarker from "@/components/maps/EntityMarker";
+import EntityPopupCard from "@/components/maps/EntityPopupCard";
+import MapLegend from "@/components/maps/MapLegend";
+import MapControls, { MapControlsConfig } from "@/components/maps/MapControls";
+import MapFilters, { MapFiltersState } from "@/components/maps/MapFilters";
+import DashboardLayout from "@/components/DashboardLayout";
+import MarkerClusterGroup from "react-leaflet-cluster";
+import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { useSelectedPesquisa } from "@/hooks/useSelectedPesquisa";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
-type EntityType = 'mercado' | 'cliente' | 'produto' | 'concorrente' | 'lead';
+type EntityType = "mercado" | "cliente" | "produto" | "concorrente" | "lead";
 
 export default function GeoCockpit() {
   const { selectedProjectId } = useSelectedProject();
@@ -33,12 +33,12 @@ export default function GeoCockpit() {
 
   // Estado de entidades ativas (quais mostrar no mapa)
   const [activeEntityTypes, setActiveEntityTypes] = useState<Set<string>>(
-    new Set(['mercado', 'cliente', 'concorrente', 'lead'])
+    new Set(["mercado", "cliente", "concorrente", "lead"])
   );
 
   // Estado de controles do mapa
   const [mapControls, setMapControls] = useState<MapControlsConfig>({
-    viewMode: 'markers',
+    viewMode: "markers",
     enableClustering: true,
     clusterRadius: 50,
     autoAdjustZoom: true,
@@ -46,7 +46,7 @@ export default function GeoCockpit() {
 
   // Estado de filtros
   const [filters, setFilters] = useState<MapFiltersState>({
-    searchText: '',
+    searchText: "",
     minQuality: 0,
     selectedMercados: [],
     selectedUFs: [],
@@ -59,18 +59,22 @@ export default function GeoCockpit() {
   } | null>(null);
 
   // Buscar todas as entidades do mapa
-  const { data: entities, isLoading: entitiesLoading } = trpc.unifiedMap.getAllEntities.useQuery(
-    {
-      projectId: selectedProjectId!,
-      pesquisaId: selectedPesquisaId ?? undefined,
-      entityTypes: Array.from(activeEntityTypes) as EntityType[],
-      minQuality: filters.minQuality > 0 ? filters.minQuality : undefined,
-      searchText: filters.searchText || undefined,
-      mercadoIds: filters.selectedMercados.length > 0 ? filters.selectedMercados : undefined,
-      ufs: filters.selectedUFs.length > 0 ? filters.selectedUFs : undefined,
-    },
-    { enabled: !!selectedProjectId }
-  );
+  const { data: entities, isLoading: entitiesLoading } =
+    trpc.unifiedMap.getAllEntities.useQuery(
+      {
+        projectId: selectedProjectId!,
+        pesquisaId: selectedPesquisaId ?? undefined,
+        entityTypes: Array.from(activeEntityTypes) as EntityType[],
+        minQuality: filters.minQuality > 0 ? filters.minQuality : undefined,
+        searchText: filters.searchText || undefined,
+        mercadoIds:
+          filters.selectedMercados.length > 0
+            ? filters.selectedMercados
+            : undefined,
+        ufs: filters.selectedUFs.length > 0 ? filters.selectedUFs : undefined,
+      },
+      { enabled: !!selectedProjectId }
+    );
 
   // Buscar estatísticas do mapa
   const { data: mapStats } = trpc.unifiedMap.getMapStats.useQuery(
@@ -90,7 +94,7 @@ export default function GeoCockpit() {
   // Transformar para heatmap
   const heatmapPoints = useMemo(() => {
     if (!filteredEntities) return [];
-    return filteredEntities.map((entity) => ({
+    return filteredEntities.map(entity => ({
       lat: entity.latitude,
       lng: entity.longitude,
       intensity: (entity.qualidadeScore || 50) / 100,
@@ -103,9 +107,11 @@ export default function GeoCockpit() {
       return [-14.235, -51.9253]; // Brasil
     }
     const avgLat =
-      filteredEntities.reduce((sum, e) => sum + e.latitude, 0) / filteredEntities.length;
+      filteredEntities.reduce((sum, e) => sum + e.latitude, 0) /
+      filteredEntities.length;
     const avgLng =
-      filteredEntities.reduce((sum, e) => sum + e.longitude, 0) / filteredEntities.length;
+      filteredEntities.reduce((sum, e) => sum + e.longitude, 0) /
+      filteredEntities.length;
     return [avgLat, avgLng];
   }, [filteredEntities]);
 
@@ -151,7 +157,8 @@ export default function GeoCockpit() {
             Geo Cockpit
           </h1>
           <p className="text-muted-foreground mt-2">
-            Visualização unificada de mercados, clientes, produtos, concorrentes e leads no mapa
+            Visualização unificada de mercados, clientes, produtos, concorrentes
+            e leads no mapa
           </p>
         </div>
 
@@ -186,12 +193,14 @@ export default function GeoCockpit() {
                       zoom={mapControls.autoAdjustZoom ? 5 : undefined}
                     >
                       {/* Heatmap Layer */}
-                      {(mapControls.viewMode === 'heatmap' || mapControls.viewMode === 'hybrid') && (
+                      {(mapControls.viewMode === "heatmap" ||
+                        mapControls.viewMode === "hybrid") && (
                         <HeatmapLayer points={heatmapPoints} />
                       )}
 
                       {/* Markers */}
-                      {(mapControls.viewMode === 'markers' || mapControls.viewMode === 'hybrid') && (
+                      {(mapControls.viewMode === "markers" ||
+                        mapControls.viewMode === "hybrid") && (
                         <>
                           {mapControls.enableClustering ? (
                             <MarkerClusterGroup
@@ -199,27 +208,31 @@ export default function GeoCockpit() {
                               maxClusterRadius={mapControls.clusterRadius}
                               showCoverageOnHover={false}
                             >
-                              {filteredEntities.map((entity) => (
+                              {filteredEntities.map(entity => (
                                 <EntityMarker
                                   key={`${entity.type}-${entity.id}`}
                                   position={[entity.latitude, entity.longitude]}
                                   type={entity.type}
                                   nome={entity.nome}
                                   qualidadeScore={entity.qualidadeScore}
-                                  onClick={() => handleMarkerClick(entity.type, entity.id)}
+                                  onClick={() =>
+                                    handleMarkerClick(entity.type, entity.id)
+                                  }
                                 />
                               ))}
                             </MarkerClusterGroup>
                           ) : (
                             <>
-                              {filteredEntities.map((entity) => (
+                              {filteredEntities.map(entity => (
                                 <EntityMarker
                                   key={`${entity.type}-${entity.id}`}
                                   position={[entity.latitude, entity.longitude]}
                                   type={entity.type}
                                   nome={entity.nome}
                                   qualidadeScore={entity.qualidadeScore}
-                                  onClick={() => handleMarkerClick(entity.type, entity.id)}
+                                  onClick={() =>
+                                    handleMarkerClick(entity.type, entity.id)
+                                  }
                                 />
                               ))}
                             </>
@@ -241,7 +254,8 @@ export default function GeoCockpit() {
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                      Nenhuma entidade com coordenadas encontrada. Execute a geocodificação primeiro.
+                      Nenhuma entidade com coordenadas encontrada. Execute a
+                      geocodificação primeiro.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -266,34 +280,48 @@ export default function GeoCockpit() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-blue-600">Mercados</CardTitle>
+                <CardTitle className="text-sm font-medium text-blue-600">
+                  Mercados
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{mapStats.byType.mercado}</div>
+                <div className="text-2xl font-bold">
+                  {mapStats.byType.mercado}
+                </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-green-600">Clientes</CardTitle>
+                <CardTitle className="text-sm font-medium text-green-600">
+                  Clientes
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{mapStats.byType.cliente}</div>
+                <div className="text-2xl font-bold">
+                  {mapStats.byType.cliente}
+                </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-red-600">Concorrentes</CardTitle>
+                <CardTitle className="text-sm font-medium text-red-600">
+                  Concorrentes
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{mapStats.byType.concorrente}</div>
+                <div className="text-2xl font-bold">
+                  {mapStats.byType.concorrente}
+                </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-purple-600">Leads</CardTitle>
+                <CardTitle className="text-sm font-medium text-purple-600">
+                  Leads
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{mapStats.byType.lead}</div>

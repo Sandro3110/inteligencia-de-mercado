@@ -49,6 +49,7 @@ Retorna para Página 3, 2, ou 1
 ### Sidebar Fixo (280px)
 
 **Seções**:
+
 1. **Header**: Logo + Botão de tema
 2. **KPIs**: 4 cards coloridos (Mercados, Clientes, Concorrentes, Leads)
 3. **Filtros**: Todos, Pendentes, Validados, Descartados
@@ -81,6 +82,7 @@ Retorna para Página 3, 2, ou 1
 **Objetivo**: Selecionar um mercado para explorar
 
 **Card de Mercado**:
+
 ```
 ┌────────────────────────────────────────────────────┐
 │ Nome do Mercado                               [→]  │
@@ -89,15 +91,18 @@ Retorna para Página 3, 2, ou 1
 ```
 
 **Campos exibidos**:
+
 - Nome do mercado (título principal)
 - Badge de segmentação (B2B/B2C/B2B2C)
 - Quantidade de clientes
 - Ícone de seta (→) indicando clicável
 
 **Interação**:
+
 - **Clique no card** → Seleciona mercado e navega para Página 2 (Clientes)
 
 **Botões**:
+
 - Voltar: **Desabilitado** (primeira página)
 - Avançar: **Desabilitado** (precisa selecionar mercado primeiro)
 
@@ -108,6 +113,7 @@ Retorna para Página 3, 2, ou 1
 **Objetivo**: Visualizar clientes do mercado selecionado
 
 **Card de Cliente**:
+
 ```
 ┌────────────────────────────────────────────────────┐
 │ Nome da Empresa                         [Status]   │
@@ -117,6 +123,7 @@ Retorna para Página 3, 2, ou 1
 ```
 
 **Campos exibidos**:
+
 - Nome da empresa (título principal)
 - Ícone de status (⏱️ Pendente, ✅ Validado, ⚠️ Ajuste, ❌ Descartado)
 - Produto principal (descrição, 2 linhas)
@@ -124,9 +131,11 @@ Retorna para Página 3, 2, ou 1
 - Badge de segmentação
 
 **Interação**:
+
 - **Clique no card** → Abre pop-up com detalhes completos do cliente
 
 **Botões**:
+
 - Voltar: **Habilitado** → Volta para Página 1 (Mercados)
 - Avançar: **Habilitado** → Vai para Página 3 (Concorrentes)
 
@@ -137,6 +146,7 @@ Retorna para Página 3, 2, ou 1
 **Objetivo**: Visualizar concorrentes do mercado selecionado
 
 **Card de Concorrente**:
+
 ```
 ┌────────────────────────────────────────────────────┐
 │ Nome do Concorrente                     [Status]   │
@@ -146,6 +156,7 @@ Retorna para Página 3, 2, ou 1
 ```
 
 **Campos exibidos**:
+
 - Nome do concorrente (título principal)
 - Ícone de status
 - Produto/serviço (descrição, 2 linhas)
@@ -153,9 +164,11 @@ Retorna para Página 3, 2, ou 1
 - Score de qualidade (%)
 
 **Interação**:
+
 - **Clique no card** → Abre pop-up com detalhes completos do concorrente
 
 **Botões**:
+
 - Voltar: **Habilitado** → Volta para Página 2 (Clientes)
 - Avançar: **Habilitado** → Vai para Página 4 (Leads)
 
@@ -166,6 +179,7 @@ Retorna para Página 3, 2, ou 1
 **Objetivo**: Visualizar leads do mercado selecionado
 
 **Card de Lead**:
+
 ```
 ┌────────────────────────────────────────────────────┐
 │ Nome do Lead                            [Status]   │
@@ -175,6 +189,7 @@ Retorna para Página 3, 2, ou 1
 ```
 
 **Campos exibidos**:
+
 - Nome do lead (título principal)
 - Ícone de status
 - Região (descrição)
@@ -182,9 +197,11 @@ Retorna para Página 3, 2, ou 1
 - Porte
 
 **Interação**:
+
 - **Clique no card** → Abre pop-up com detalhes completos do lead
 
 **Botões**:
+
 - Voltar: **Habilitado** → Volta para Página 3 (Concorrentes)
 - Avançar: **Desabilitado** (última página)
 
@@ -227,11 +244,13 @@ Retorna para Página 3, 2, ou 1
 ### Cards Ampliados
 
 **Antes** (Grid 3 colunas):
+
 - Largura: ~33% da tela
 - Altura: 150px
 - Fonte: 11px
 
 **Depois** (Lista vertical):
+
 - Largura: 100% da área de conteúdo (max-width: 4xl)
 - Altura: 180-200px
 - Fonte: 14-16px
@@ -241,10 +260,12 @@ Retorna para Página 3, 2, ou 1
 ### Mais Informações Visíveis
 
 **Antes**:
+
 - Nome
 - Status
 
 **Depois**:
+
 - Nome (título maior)
 - Status (ícone colorido)
 - Descrição/Produto (2 linhas)
@@ -333,7 +354,7 @@ Aplicado em todas as páginas (exceto Mercados):
 ```tsx
 const filterByStatus = (items: any[]) => {
   if (statusFilter === "all") return items;
-  return items.filter((item) => item.validationStatus === statusFilter);
+  return items.filter(item => item.validationStatus === statusFilter);
 };
 ```
 
@@ -355,16 +376,19 @@ const { data: clientes } = trpc.clientes.byMercado.useQuery(
 ## 📱 Responsividade
 
 ### Desktop (>1024px)
+
 - Sidebar: 280px fixo
 - Conteúdo: max-width 4xl (896px)
 - Cards: Largura total do conteúdo
 
 ### Tablet (768px - 1024px)
+
 - Sidebar: 280px fixo
 - Conteúdo: max-width 3xl (768px)
 - Cards: Largura total do conteúdo
 
 ### Mobile (<768px)
+
 - Sidebar: Colapsável (botão toggle)
 - Conteúdo: Largura total (padding reduzido)
 - Cards: Largura total
@@ -400,32 +424,31 @@ const { data: clientes } = trpc.clientes.byMercado.useQuery(
 
 ### Visualização
 
-| Métrica | Antes | Depois | Melhoria |
-|:--------|:------|:-------|:---------|
-| Largura do card | 33% | 100% | **+200%** |
-| Altura do card | 150px | 180-200px | **+27%** |
-| Tamanho da fonte | 11px | 14-16px | **+36%** |
-| Campos visíveis | 2 | 5-6 | **+200%** |
+| Métrica          | Antes | Depois    | Melhoria  |
+| :--------------- | :---- | :-------- | :-------- |
+| Largura do card  | 33%   | 100%      | **+200%** |
+| Altura do card   | 150px | 180-200px | **+27%**  |
+| Tamanho da fonte | 11px  | 14-16px   | **+36%**  |
+| Campos visíveis  | 2     | 5-6       | **+200%** |
 
 ### Navegação
 
-| Métrica | Antes | Depois | Melhoria |
-|:--------|:------|:-------|:---------|
-| Cliques para ver leads | 3 | 3 | Igual |
-| Clareza do fluxo | Média | Alta | **+100%** |
-| Facilidade de voltar | Baixa | Alta | **+200%** |
+| Métrica                | Antes | Depois | Melhoria  |
+| :--------------------- | :---- | :----- | :-------- |
+| Cliques para ver leads | 3     | 3      | Igual     |
+| Clareza do fluxo       | Média | Alta   | **+100%** |
+| Facilidade de voltar   | Baixa | Alta   | **+200%** |
 
 ### Performance
 
-| Métrica | Antes | Depois | Melhoria |
-|:--------|:------|:-------|:---------|
-| Queries iniciais | 4 | 1 | **-75%** |
+| Métrica               | Antes  | Depois | Melhoria |
+| :-------------------- | :----- | :----- | :------- |
+| Queries iniciais      | 4      | 1      | **-75%** |
 | Tempo de carregamento | ~800ms | ~200ms | **-75%** |
-| Renderizações | Muitas | Poucas | **-60%** |
+| Renderizações         | Muitas | Poucas | **-60%** |
 
 ---
 
 **Última atualização**: 18 de novembro de 2025  
 **Versão**: 4.0.0  
 **Autor**: Manus AI
-

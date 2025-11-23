@@ -1,4 +1,5 @@
 # Relatório de Auditoria do Banco de Dados
+
 **Data:** 20/11/2025, 16:48:10
 
 ## Resumo Executivo
@@ -14,28 +15,24 @@ Total de problemas encontrados: **1**
 
 ## Problemas Encontrados
 
-
-
-
 ### 1. Mercados com nome duplicado
 
 - **Categoria:** Duplicatas
 - **Severidade:** LOW
 - **Quantidade:** 5 registros
 - **Query de verificação:**
+
 ```sql
 SELECT nome, COUNT(*) as count FROM mercados_unicos GROUP BY nome HAVING count > 1
 ```
-- **Sugestão:** Mercados podem ter nomes iguais em pesquisas diferentes (OK)
 
+- **Sugestão:** Mercados podem ter nomes iguais em pesquisas diferentes (OK)
 
 ---
 
 ## Recomendações
 
 ✅ Nenhum problema crítico encontrado.
-
-
 
 ---
 

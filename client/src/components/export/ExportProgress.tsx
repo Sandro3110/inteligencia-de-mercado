@@ -7,7 +7,7 @@ interface ExportProgressProps {
   totalSteps: number;
   steps: Array<{
     label: string;
-    status: 'pending' | 'running' | 'completed';
+    status: "pending" | "running" | "completed";
     duration?: number;
   }>;
   elapsedTime: number;
@@ -19,7 +19,7 @@ export default function ExportProgress({
   totalSteps,
   steps,
   elapsedTime,
-  estimatedTime
+  estimatedTime,
 }: ExportProgressProps) {
   const progress = (currentStep / totalSteps) * 100;
   const remainingTime = Math.max(0, estimatedTime - elapsedTime);
@@ -49,7 +49,9 @@ export default function ExportProgress({
           <Progress value={progress} className="h-3" />
           <div className="flex justify-between text-sm text-slate-600">
             <span>{Math.round(progress)}% concluído</span>
-            <span>Etapa {currentStep} de {totalSteps}</span>
+            <span>
+              Etapa {currentStep} de {totalSteps}
+            </span>
           </div>
         </div>
 
@@ -59,18 +61,18 @@ export default function ExportProgress({
             <div
               key={index}
               className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                step.status === 'running'
-                  ? 'bg-blue-50 border border-blue-200'
-                  : step.status === 'completed'
-                  ? 'bg-green-50'
-                  : 'bg-slate-50'
+                step.status === "running"
+                  ? "bg-blue-50 border border-blue-200"
+                  : step.status === "completed"
+                    ? "bg-green-50"
+                    : "bg-slate-50"
               }`}
             >
               {/* Icon */}
               <div className="flex-shrink-0">
-                {step.status === 'completed' ? (
+                {step.status === "completed" ? (
                   <CheckCircle2 className="w-5 h-5 text-green-600" />
-                ) : step.status === 'running' ? (
+                ) : step.status === "running" ? (
                   <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
                 ) : (
                   <div className="w-5 h-5 rounded-full border-2 border-slate-300" />
@@ -81,11 +83,11 @@ export default function ExportProgress({
               <div className="flex-1">
                 <span
                   className={`font-medium ${
-                    step.status === 'running'
-                      ? 'text-blue-900'
-                      : step.status === 'completed'
-                      ? 'text-green-900'
-                      : 'text-slate-500'
+                    step.status === "running"
+                      ? "text-blue-900"
+                      : step.status === "completed"
+                        ? "text-green-900"
+                        : "text-slate-500"
                   }`}
                 >
                   {step.label}

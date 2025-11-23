@@ -36,7 +36,9 @@ export function PostponeHibernationDialog({
   };
 
   const getNewHibernationDate = () => {
-    return format(addDays(new Date(), selectedDays), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+    return format(addDays(new Date(), selectedDays), "dd 'de' MMMM 'de' yyyy", {
+      locale: ptBR,
+    });
   };
 
   const options = [
@@ -54,7 +56,8 @@ export function PostponeHibernationDialog({
             Adiar Hibernação
           </DialogTitle>
           <DialogDescription>
-            Escolha por quanto tempo deseja adiar a hibernação do projeto <strong>{projectName}</strong>
+            Escolha por quanto tempo deseja adiar a hibernação do projeto{" "}
+            <strong>{projectName}</strong>
           </DialogDescription>
         </DialogHeader>
 
@@ -64,15 +67,18 @@ export function PostponeHibernationDialog({
             <Label className="text-sm font-medium">Adiar por:</Label>
             <RadioGroup
               value={selectedDays.toString()}
-              onValueChange={(value) => setSelectedDays(Number(value))}
+              onValueChange={value => setSelectedDays(Number(value))}
             >
-              {options.map((option) => (
+              {options.map(option => (
                 <div
                   key={option.days}
                   className="flex items-center space-x-3 rounded-lg border p-4 hover:bg-accent/50 transition-colors cursor-pointer"
                   onClick={() => setSelectedDays(option.days)}
                 >
-                  <RadioGroupItem value={option.days.toString()} id={`option-${option.days}`} />
+                  <RadioGroupItem
+                    value={option.days.toString()}
+                    id={`option-${option.days}`}
+                  />
                   <div className="flex-1">
                     <Label
                       htmlFor={`option-${option.days}`}
@@ -80,7 +86,9 @@ export function PostponeHibernationDialog({
                     >
                       {option.label}
                     </Label>
-                    <p className="text-sm text-muted-foreground">{option.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {option.description}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -92,10 +100,15 @@ export function PostponeHibernationDialog({
             <div className="flex items-start gap-3">
               <Calendar className="h-5 w-5 text-blue-600 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-blue-900">Nova data prevista de hibernação:</p>
-                <p className="text-lg font-bold text-blue-700 mt-1">{getNewHibernationDate()}</p>
+                <p className="text-sm font-medium text-blue-900">
+                  Nova data prevista de hibernação:
+                </p>
+                <p className="text-lg font-bold text-blue-700 mt-1">
+                  {getNewHibernationDate()}
+                </p>
                 <p className="text-xs text-blue-600 mt-1">
-                  O projeto será marcado como ativo novamente e o aviso será removido
+                  O projeto será marcado como ativo novamente e o aviso será
+                  removido
                 </p>
               </div>
             </div>
@@ -106,8 +119,9 @@ export function PostponeHibernationDialog({
             <div className="flex items-start gap-2">
               <AlertCircle className="h-4 w-4 text-orange-600 mt-0.5" />
               <p className="text-xs text-orange-700">
-                Após o adiamento, o projeto voltará a ser monitorado. Se não houver atividade, 
-                um novo aviso será enviado 7 dias antes da nova data de hibernação.
+                Após o adiamento, o projeto voltará a ser monitorado. Se não
+                houver atividade, um novo aviso será enviado 7 dias antes da
+                nova data de hibernação.
               </p>
             </div>
           </div>
@@ -121,10 +135,7 @@ export function PostponeHibernationDialog({
           >
             Cancelar
           </Button>
-          <Button
-            onClick={handleConfirm}
-            disabled={isLoading}
-          >
+          <Button onClick={handleConfirm} disabled={isLoading}>
             {isLoading ? (
               <>
                 <Clock className="h-4 w-4 mr-2 animate-spin" />

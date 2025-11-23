@@ -2,10 +2,22 @@ import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
   Bell,
@@ -34,8 +46,19 @@ import {
   NotificationFiltersState,
 } from "@/components/NotificationFilters";
 import {
-  BarChart, Bar, PieChart, Pie, Cell, LineChart, Line,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from "recharts";
 
 const notificationIcons: Record<string, React.ReactNode> = {
@@ -60,7 +83,16 @@ const notificationLabels: Record<string, string> = {
   export: "Exportação",
 };
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+const COLORS = [
+  "#3b82f6",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#ec4899",
+  "#06b6d4",
+  "#84cc16",
+];
 const FILTERS_STORAGE_KEY = "notification-filters";
 
 interface Notification {
@@ -99,8 +131,8 @@ export default function Notificacoes() {
 
   // Estados para aba Histórico
   const [period, setPeriod] = useState<number>(30);
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // Save filters to localStorage
   useEffect(() => {
@@ -108,7 +140,8 @@ export default function Notificacoes() {
   }, [filters]);
 
   // Queries
-  const { data: notifications = [], isLoading } = trpc.notifications.list.useQuery();
+  const { data: notifications = [], isLoading } =
+    trpc.notifications.list.useQuery();
   const { data: unreadCount = 0 } = trpc.notifications.unreadCount.useQuery();
   const { data: projects = [] } = trpc.projects.list.useQuery();
   const { data: stats } = trpc.notifications.getStats.useQuery(undefined, {
@@ -129,7 +162,7 @@ export default function Notificacoes() {
       utils.notifications.list.invalidate();
       utils.notifications.unreadCount.invalidate();
       utils.notifications.getStats.invalidate();
-      setSseNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      setSseNotifications(prev => prev.map(n => ({ ...n, read: true })));
       toast.success("Todas as notificações foram marcadas como lidas");
     },
   });
@@ -148,36 +181,36 @@ export default function Notificacoes() {
 
     const es = new EventSource("/api/notifications/stream");
 
-    es.addEventListener("connected", (e) => {
+    es.addEventListener("connected", e => {
       const data = JSON.parse(e.data);
       console.log("[SSE] Conectado:", data);
       setIsConnected(true);
     });
 
-    es.addEventListener("initial", (e) => {
+    es.addEventListener("initial", e => {
       const data = JSON.parse(e.data);
       console.log("[SSE] Notificações iniciais:", data.notifications);
       setSseNotifications(data.notifications);
     });
 
-    es.addEventListener("notification", (e) => {
+    es.addEventListener("notification", e => {
       const notification = JSON.parse(e.data);
       console.log("[SSE] Nova notificação:", notification);
-      setSseNotifications((prev) => [notification, ...prev]);
+      setSseNotifications(prev => [notification, ...prev]);
       toast.info(notification.title, {
         description: notification.message,
       });
     });
 
-    es.addEventListener("update", (e) => {
+    es.addEventListener("update", e => {
       const updated = JSON.parse(e.data);
       console.log("[SSE] Notificação atualizada:", updated);
-      setSseNotifications((prev) =>
-        prev.map((n) => (n.id === updated.id ? updated : n))
+      setSseNotifications(prev =>
+        prev.map(n => (n.id === updated.id ? updated : n))
       );
     });
 
-    es.onerror = (error) => {
+    es.onerror = error => {
       console.error("[SSE] Erro:", error);
       setIsConnected(false);
     };
@@ -236,26 +269,34 @@ export default function Notificacoes() {
   }, [notifications, filters]);
 
   // Filtrar notificações para aba Histórico
-  const historyNotifications = notifications?.filter((notif: any) => {
-    const createdDate = new Date(notif.createdAt);
-    const daysDiff = Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (daysDiff > period) return false;
-    if (typeFilter !== 'all' && notif.type !== typeFilter) return false;
-    if (statusFilter === 'read' && notif.isRead === 0) return false;
-    if (statusFilter === 'unread' && notif.isRead === 1) return false;
-    
-    return true;
-  }) || [];
+  const historyNotifications =
+    notifications?.filter((notif: any) => {
+      const createdDate = new Date(notif.createdAt);
+      const daysDiff = Math.floor(
+        (Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      if (daysDiff > period) return false;
+      if (typeFilter !== "all" && notif.type !== typeFilter) return false;
+      if (statusFilter === "read" && notif.isRead === 0) return false;
+      if (statusFilter === "unread" && notif.isRead === 1) return false;
+
+      return true;
+    }) || [];
 
   // Estatísticas para aba Histórico
   const historyStats = {
     total: historyNotifications.length,
     read: historyNotifications.filter((n: any) => n.isRead === 1).length,
     unread: historyNotifications.filter((n: any) => n.isRead === 0).length,
-    readRate: historyNotifications.length > 0 
-      ? Math.round((historyNotifications.filter((n: any) => n.isRead === 1).length / historyNotifications.length) * 100)
-      : 0,
+    readRate:
+      historyNotifications.length > 0
+        ? Math.round(
+            (historyNotifications.filter((n: any) => n.isRead === 1).length /
+              historyNotifications.length) *
+              100
+          )
+        : 0,
   };
 
   // Dados para gráfico de tipos
@@ -271,7 +312,7 @@ export default function Notificacoes() {
 
   // Dados para gráfico de timeline
   const timelineData = historyNotifications.reduce((acc: any, notif: any) => {
-    const date = format(new Date(notif.createdAt), 'dd/MM', { locale: ptBR });
+    const date = format(new Date(notif.createdAt), "dd/MM", { locale: ptBR });
     if (!acc[date]) {
       acc[date] = { date, total: 0, lidas: 0 };
     }
@@ -284,8 +325,8 @@ export default function Notificacoes() {
 
   const handleMarkAsRead = (id: number) => {
     markAsReadMutation.mutate({ id });
-    setSseNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    setSseNotifications(prev =>
+      prev.map(n => (n.id === id ? { ...n, read: true } : n))
     );
   };
 
@@ -295,23 +336,25 @@ export default function Notificacoes() {
 
   const handleExport = () => {
     const csv = [
-      ['Data', 'Tipo', 'Título', 'Mensagem', 'Status'].join(','),
-      ...historyNotifications.map((notif: any) => [
-        format(new Date(notif.createdAt), 'dd/MM/yyyy HH:mm'),
-        notificationLabels[notif.type] || notif.type,
-        `"${notif.title}"`,
-        `"${notif.message}"`,
-        notif.isRead === 1 ? 'Lida' : 'Não lida',
-      ].join(','))
-    ].join('\n');
+      ["Data", "Tipo", "Título", "Mensagem", "Status"].join(","),
+      ...historyNotifications.map((notif: any) =>
+        [
+          format(new Date(notif.createdAt), "dd/MM/yyyy HH:mm"),
+          notificationLabels[notif.type] || notif.type,
+          `"${notif.title}"`,
+          `"${notif.message}"`,
+          notif.isRead === 1 ? "Lida" : "Não lida",
+        ].join(",")
+      ),
+    ].join("\n");
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `notificacoes-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    link.download = `notificacoes-${format(new Date(), "yyyy-MM-dd")}.csv`;
     link.click();
-    
-    toast.success('Histórico exportado com sucesso!');
+
+    toast.success("Histórico exportado com sucesso!");
   };
 
   const getTypeColor = (type: string) => {
@@ -361,7 +404,11 @@ export default function Notificacoes() {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="recentes">
               <Bell className="h-4 w-4 mr-2" />
@@ -423,7 +470,9 @@ export default function Notificacoes() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Não Lidas</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Não Lidas
+                  </CardTitle>
                   <BellOff className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -436,11 +485,15 @@ export default function Notificacoes() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Últimas 24h</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Últimas 24h
+                  </CardTitle>
                   <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats?.last24h || 0}</div>
+                  <div className="text-2xl font-bold">
+                    {stats?.last24h || 0}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     Recebidas recentemente
                   </p>
@@ -464,7 +517,7 @@ export default function Notificacoes() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {sseNotifications.map((notification) => (
+                    {sseNotifications.map(notification => (
                       <div
                         key={notification.id}
                         className={`flex items-start gap-4 p-4 rounded-lg border transition-colors ${
@@ -480,12 +533,17 @@ export default function Notificacoes() {
                         />
                         <div className="flex-1 space-y-1">
                           <div className="flex items-start justify-between">
-                            <h4 className="font-semibold">{notification.title}</h4>
+                            <h4 className="font-semibold">
+                              {notification.title}
+                            </h4>
                             <span className="text-xs text-muted-foreground">
-                              {formatDistanceToNow(new Date(notification.createdAt), {
-                                addSuffix: true,
-                                locale: ptBR,
-                              })}
+                              {formatDistanceToNow(
+                                new Date(notification.createdAt),
+                                {
+                                  addSuffix: true,
+                                  locale: ptBR,
+                                }
+                              )}
                             </span>
                           </div>
                           <p className="text-sm text-muted-foreground">
@@ -542,7 +600,10 @@ export default function Notificacoes() {
                   <label className="text-sm font-medium mb-2 block">
                     Período
                   </label>
-                  <Select value={period.toString()} onValueChange={(v) => setPeriod(Number(v))}>
+                  <Select
+                    value={period.toString()}
+                    onValueChange={v => setPeriod(Number(v))}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -556,18 +617,20 @@ export default function Notificacoes() {
                 </div>
 
                 <div className="flex-1">
-                  <label className="text-sm font-medium mb-2 block">
-                    Tipo
-                  </label>
+                  <label className="text-sm font-medium mb-2 block">Tipo</label>
                   <Select value={typeFilter} onValueChange={setTypeFilter}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todos os tipos</SelectItem>
-                      {Object.entries(notificationLabels).map(([value, label]) => (
-                        <SelectItem key={value} value={value}>{label}</SelectItem>
-                      ))}
+                      {Object.entries(notificationLabels).map(
+                        ([value, label]) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -596,8 +659,12 @@ export default function Notificacoes() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Total</p>
-                      <p className="text-3xl font-bold mt-1">{historyStats.total}</p>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Total
+                      </p>
+                      <p className="text-3xl font-bold mt-1">
+                        {historyStats.total}
+                      </p>
                     </div>
                     <Bell className="w-10 h-10 text-blue-600" />
                   </div>
@@ -608,8 +675,12 @@ export default function Notificacoes() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Lidas</p>
-                      <p className="text-3xl font-bold text-green-600 mt-1">{historyStats.read}</p>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Lidas
+                      </p>
+                      <p className="text-3xl font-bold text-green-600 mt-1">
+                        {historyStats.read}
+                      </p>
                     </div>
                     <CheckCircle2 className="w-10 h-10 text-green-600" />
                   </div>
@@ -620,8 +691,12 @@ export default function Notificacoes() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Não Lidas</p>
-                      <p className="text-3xl font-bold text-orange-600 mt-1">{historyStats.unread}</p>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Não Lidas
+                      </p>
+                      <p className="text-3xl font-bold text-orange-600 mt-1">
+                        {historyStats.unread}
+                      </p>
                     </div>
                     <Clock className="w-10 h-10 text-orange-600" />
                   </div>
@@ -632,8 +707,12 @@ export default function Notificacoes() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Taxa de Leitura</p>
-                      <p className="text-3xl font-bold text-purple-600 mt-1">{historyStats.readRate}%</p>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Taxa de Leitura
+                      </p>
+                      <p className="text-3xl font-bold text-purple-600 mt-1">
+                        {historyStats.readRate}%
+                      </p>
                     </div>
                     <TrendingUp className="w-10 h-10 text-purple-600" />
                   </div>
@@ -647,7 +726,9 @@ export default function Notificacoes() {
               <Card>
                 <CardHeader>
                   <CardTitle>Distribuição por Tipo</CardTitle>
-                  <CardDescription>Quantidade de notificações por tipo</CardDescription>
+                  <CardDescription>
+                    Quantidade de notificações por tipo
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -657,13 +738,16 @@ export default function Notificacoes() {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={(entry) => `${entry.name}: ${entry.value}`}
+                        label={entry => `${entry.name}: ${entry.value}`}
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
                       >
                         {typeData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
                         ))}
                       </Pie>
                       <Tooltip />
@@ -676,7 +760,9 @@ export default function Notificacoes() {
               <Card>
                 <CardHeader>
                   <CardTitle>Timeline de Notificações</CardTitle>
-                  <CardDescription>Notificações recebidas e lidas ao longo do tempo</CardDescription>
+                  <CardDescription>
+                    Notificações recebidas e lidas ao longo do tempo
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -686,8 +772,18 @@ export default function Notificacoes() {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Line type="monotone" dataKey="total" stroke="#3b82f6" name="Total" />
-                      <Line type="monotone" dataKey="lidas" stroke="#10b981" name="Lidas" />
+                      <Line
+                        type="monotone"
+                        dataKey="total"
+                        stroke="#3b82f6"
+                        name="Total"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="lidas"
+                        stroke="#10b981"
+                        name="Lidas"
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -705,19 +801,24 @@ export default function Notificacoes() {
 
             <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>
-                Mostrando {filteredNotifications.length} de {notifications.length} notificações
+                Mostrando {filteredNotifications.length} de{" "}
+                {notifications.length} notificações
               </span>
             </div>
 
             {isLoading ? (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">Carregando notificações...</p>
+                <p className="text-muted-foreground">
+                  Carregando notificações...
+                </p>
               </div>
             ) : filteredNotifications.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
                   <Bell className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Nenhuma notificação encontrada</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Nenhuma notificação encontrada
+                  </h3>
                   <p className="text-muted-foreground">
                     {notifications.length === 0
                       ? "Você ainda não recebeu notificações"
@@ -747,7 +848,9 @@ export default function Notificacoes() {
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <CardTitle className="text-base">{notification.title}</CardTitle>
+                              <CardTitle className="text-base">
+                                {notification.title}
+                              </CardTitle>
                               {!notification.isRead && (
                                 <Badge variant="default" className="text-xs">
                                   Nova
@@ -761,13 +864,17 @@ export default function Notificacoes() {
 
                             <div className="flex items-center gap-3 text-xs text-muted-foreground">
                               <Badge variant="outline" className="text-xs">
-                                {notificationLabels[notification.type] || notification.type}
+                                {notificationLabels[notification.type] ||
+                                  notification.type}
                               </Badge>
                               <span>
-                                {formatDistanceToNow(new Date(notification.createdAt), {
-                                  addSuffix: true,
-                                  locale: ptBR,
-                                })}
+                                {formatDistanceToNow(
+                                  new Date(notification.createdAt),
+                                  {
+                                    addSuffix: true,
+                                    locale: ptBR,
+                                  }
+                                )}
                               </span>
                             </div>
                           </div>

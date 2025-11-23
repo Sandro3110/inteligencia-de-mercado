@@ -69,23 +69,23 @@ analytics_funnel_snapshot (snapshot diário do funil)
 ```typescript
 // server/analytics/queryBuilder.ts
 interface AnalyticsQuery {
-  metrics: string[];           // ['total_leads', 'conversao_rate', ...]
-  dimensions: string[];         // ['mercado', 'uf', 'porte', ...]
-  filters: Filter[];            // [{field: 'uf', op: 'in', value: ['SP','RJ']}]
-  timeRange: TimeRange;         // {from: '2024-01', to: '2024-12'}
-  granularity: 'day'|'week'|'month'|'quarter';
-  groupBy: string[];            // ['mercado', 'mes']
-  orderBy: {field: string, dir: 'asc'|'desc'}[];
+  metrics: string[]; // ['total_leads', 'conversao_rate', ...]
+  dimensions: string[]; // ['mercado', 'uf', 'porte', ...]
+  filters: Filter[]; // [{field: 'uf', op: 'in', value: ['SP','RJ']}]
+  timeRange: TimeRange; // {from: '2024-01', to: '2024-12'}
+  granularity: "day" | "week" | "month" | "quarter";
+  groupBy: string[]; // ['mercado', 'mes']
+  orderBy: { field: string; dir: "asc" | "desc" }[];
 }
 
 // Exemplo de uso:
 const query = buildAnalyticsQuery({
-  metrics: ['total_leads', 'conversao_rate'],
-  dimensions: ['mercado', 'uf'],
-  filters: [{field: 'porte', op: 'in', value: ['Médio', 'Grande']}],
-  timeRange: {from: '2024-01', to: '2024-12'},
-  granularity: 'month',
-  groupBy: ['mercado', 'mes']
+  metrics: ["total_leads", "conversao_rate"],
+  dimensions: ["mercado", "uf"],
+  filters: [{ field: "porte", op: "in", value: ["Médio", "Grande"] }],
+  timeRange: { from: "2024-01", to: "2024-12" },
+  granularity: "month",
+  groupBy: ["mercado", "mes"],
 });
 ```
 
@@ -108,6 +108,7 @@ Cada nível permite:
 ### **Dashboard 1: Executive Overview (Visão Executiva)**
 
 **KPIs Principais:**
+
 - Total de Mercados Mapeados
 - Total de Leads Gerados
 - Taxa de Conversão Global
@@ -115,6 +116,7 @@ Cada nível permite:
 - ROI Estimado
 
 **Gráficos:**
+
 1. **Funil de Conversão Interativo** (com drill-down por mercado)
 2. **Evolução Temporal** (leads, conversões, receita)
 3. **Heatmap Geográfico** (concentração de leads por UF)
@@ -125,6 +127,7 @@ Cada nível permite:
 ### **Dashboard 2: Market Intelligence (Inteligência de Mercado)**
 
 **Análises:**
+
 1. **Matriz BCG** (Crescimento vs Participação de Mercado)
    - Eixo X: Taxa de crescimento do mercado
    - Eixo Y: Participação (nº clientes / total mercado)
@@ -149,6 +152,7 @@ Cada nível permite:
 ### **Dashboard 3: Sales Performance (Performance de Vendas)**
 
 **Métricas:**
+
 1. **Análise de Cohort**
    - Taxa de retenção por coorte mensal
    - Tempo médio até primeira conversão
@@ -175,6 +179,7 @@ Cada nível permite:
 ### **Dashboard 4: Data Quality & Operations (Qualidade de Dados)**
 
 **Monitoramento:**
+
 1. **Score de Qualidade**
    - Distribuição de scores (clientes, concorrentes, leads)
    - Evolução temporal da qualidade
@@ -203,7 +208,7 @@ interface GlobalFilters {
   projectIds: number[];
   pesquisaIds: number[];
   mercadoIds: number[];
-  timeRange: {from: Date, to: Date};
+  timeRange: { from: Date; to: Date };
   dimensions: {
     uf: string[];
     porte: string[];
@@ -216,6 +221,7 @@ interface GlobalFilters {
 ### **2. Comparação Lado a Lado**
 
 Comparar 2-4 entidades simultaneamente:
+
 - Projetos vs Projetos
 - Pesquisas vs Pesquisas
 - Mercados vs Mercados
@@ -224,6 +230,7 @@ Comparar 2-4 entidades simultaneamente:
 ### **3. Alertas Inteligentes**
 
 Alertas baseados em ML/regras:
+
 - Mercado com crescimento acelerado (>50% MoM)
 - Lead com alta probabilidade de conversão
 - Queda abrupta em conversões (>20% WoW)
@@ -316,52 +323,52 @@ Alertas baseados em ML/regras:
 export const METRICS_LIBRARY = {
   // Métricas Básicas
   total_leads: {
-    sql: 'COUNT(DISTINCT leads.id)',
-    label: 'Total de Leads',
-    format: 'number'
+    sql: "COUNT(DISTINCT leads.id)",
+    label: "Total de Leads",
+    format: "number",
   },
-  
+
   // Métricas de Conversão
   conversao_rate: {
     sql: '(COUNT(DISTINCT CASE WHEN stage = "fechado" THEN id END) / COUNT(DISTINCT id)) * 100',
-    label: 'Taxa de Conversão',
-    format: 'percentage'
+    label: "Taxa de Conversão",
+    format: "percentage",
   },
-  
+
   // Métricas de Tempo
   tempo_medio_conversao: {
-    sql: 'AVG(DATEDIFF(validatedAt, createdAt))',
-    label: 'Tempo Médio até Conversão (dias)',
-    format: 'number'
+    sql: "AVG(DATEDIFF(validatedAt, createdAt))",
+    label: "Tempo Médio até Conversão (dias)",
+    format: "number",
   },
-  
+
   // Métricas de Valor
   ticket_medio: {
-    sql: 'AVG(leadConversions.dealValue)',
-    label: 'Ticket Médio',
-    format: 'currency'
+    sql: "AVG(leadConversions.dealValue)",
+    label: "Ticket Médio",
+    format: "currency",
   },
-  
+
   // Métricas de Qualidade
   qualidade_media: {
-    sql: 'AVG(qualidadeScore)',
-    label: 'Score de Qualidade Médio',
-    format: 'number'
+    sql: "AVG(qualidadeScore)",
+    label: "Score de Qualidade Médio",
+    format: "number",
   },
-  
+
   // Métricas de Concentração
   hhi_index: {
-    sql: 'SUM(POW(market_share, 2))',
-    label: 'Índice HHI (Concentração)',
-    format: 'number'
+    sql: "SUM(POW(market_share, 2))",
+    label: "Índice HHI (Concentração)",
+    format: "number",
   },
-  
+
   // Métricas de Crescimento
   growth_rate_mom: {
-    sql: '((current_month - previous_month) / previous_month) * 100',
-    label: 'Crescimento MoM',
-    format: 'percentage'
-  }
+    sql: "((current_month - previous_month) / previous_month) * 100",
+    label: "Crescimento MoM",
+    format: "percentage",
+  },
 };
 ```
 
@@ -370,30 +377,35 @@ export const METRICS_LIBRARY = {
 ## 🚀 Roadmap de Implementação
 
 ### **Fase 1: Fundação (2-3 dias)**
-- [ ] Criar tabelas de agregação (analytics_*)
+
+- [ ] Criar tabelas de agregação (analytics\_\*)
 - [ ] Implementar motor de agregação básico
 - [ ] Criar query builder dinâmico
 - [ ] Implementar biblioteca de métricas
 
 ### **Fase 2: Dashboards Core (3-4 dias)**
+
 - [ ] Dashboard Executive Overview
 - [ ] Dashboard Market Intelligence
 - [ ] Componentes reutilizáveis (AnalyticsCard, DynamicChart)
 - [ ] Sistema de filtros globais
 
 ### **Fase 3: Funcionalidades Avançadas (2-3 dias)**
+
 - [ ] Drill-down hierárquico
 - [ ] Comparação lado a lado
 - [ ] Exportação (Excel, PDF, PNG)
 - [ ] Análise de cohort
 
 ### **Fase 4: Inteligência (3-4 dias)**
+
 - [ ] Análise RFM
 - [ ] Alertas inteligentes
 - [ ] Previsões básicas (lead scoring)
 - [ ] Clusterização de mercados
 
 ### **Fase 5: Performance & Otimização (1-2 dias)**
+
 - [ ] Índices de banco de dados
 - [ ] Cache de queries frequentes
 - [ ] Lazy loading de gráficos
@@ -404,18 +416,21 @@ export const METRICS_LIBRARY = {
 ## 💡 Benefícios Esperados
 
 ### **Para Gestores:**
+
 - ✅ Visão 360° do negócio em tempo real
 - ✅ Identificação rápida de oportunidades e riscos
 - ✅ Decisões baseadas em dados concretos
 - ✅ ROI mensurável de ações comerciais
 
 ### **Para Analistas:**
+
 - ✅ Exploração livre de dados (self-service)
 - ✅ Drill-down ilimitado
 - ✅ Comparações flexíveis
 - ✅ Exportação para análises externas
 
 ### **Para Vendedores:**
+
 - ✅ Leads priorizados por score
 - ✅ Insights de mercado em tempo real
 - ✅ Alertas de oportunidades quentes
@@ -426,18 +441,21 @@ export const METRICS_LIBRARY = {
 ## 🔧 Stack Tecnológico Recomendado
 
 ### **Backend:**
+
 - **Agregação**: Node.js + node-cron
 - **Query Builder**: Drizzle ORM + SQL raw
 - **Cache**: Redis (opcional, para queries frequentes)
 - **ML**: Python + scikit-learn (API separada)
 
 ### **Frontend:**
+
 - **Gráficos**: Recharts (já instalado) + D3.js (para visualizações avançadas)
 - **Tabelas**: TanStack Table (filtros, ordenação, paginação)
 - **Exportação**: html2canvas (PNG), jsPDF (PDF), xlsx (Excel)
 - **Estado**: Zustand (para filtros globais)
 
 ### **Banco de Dados:**
+
 - **OLTP**: MySQL (atual, para transações)
 - **OLAP**: Tabelas de agregação no mesmo MySQL
 - **Futuro**: Considerar ClickHouse para analytics de grande escala

@@ -16,7 +16,9 @@ import {
 export interface EntityFilter {
   projectId: number;
   pesquisaId?: number;
-  entityTypes?: Array<"mercado" | "cliente" | "produto" | "concorrente" | "lead">;
+  entityTypes?: Array<
+    "mercado" | "cliente" | "produto" | "concorrente" | "lead"
+  >;
   mercadoIds?: number[];
   minQuality?: number;
   validationStatus?: string;
@@ -46,12 +48,20 @@ export interface MapEntity {
 /**
  * Busca todas as entidades com coordenadas para exibir no mapa
  */
-export async function getAllMapEntities(filter: EntityFilter): Promise<MapEntity[]> {
+export async function getAllMapEntities(
+  filter: EntityFilter
+): Promise<MapEntity[]> {
   const db = await getDb();
   if (!db) return [];
 
   const entities: MapEntity[] = [];
-  const types = filter.entityTypes || ["mercado", "cliente", "produto", "concorrente", "lead"];
+  const types = filter.entityTypes || [
+    "mercado",
+    "cliente",
+    "produto",
+    "concorrente",
+    "lead",
+  ];
 
   // Helper para construir condições comuns
   const buildCommonConditions = (table: any) => {
@@ -114,7 +124,10 @@ export async function getAllMapEntities(filter: EntityFilter): Promise<MapEntity
         if (cliente.latitude && cliente.longitude) {
           // Buscar mercados do cliente
           const mercadosCliente = await db
-            .select({ mercadoId: sql<number>`cm.mercadoId`, mercadoNome: mercadosUnicos.nome })
+            .select({
+              mercadoId: sql<number>`cm.mercadoId`,
+              mercadoNome: mercadosUnicos.nome,
+            })
             .from(sql`clientes_mercados cm`)
             .innerJoin(mercadosUnicos, eq(sql`cm.mercadoId`, mercadosUnicos.id))
             .where(eq(sql`cm.clienteId`, cliente.id))
@@ -138,7 +151,10 @@ export async function getAllMapEntities(filter: EntityFilter): Promise<MapEntity
               email: cliente.email,
               telefone: cliente.telefone,
               porte: cliente.porte,
-              mercados: mercadosCliente.map((m) => ({ id: m.mercadoId, nome: m.mercadoNome })),
+              mercados: mercadosCliente.map(m => ({
+                id: m.mercadoId,
+                nome: m.mercadoNome,
+              })),
             },
           });
         }
@@ -184,7 +200,8 @@ export async function getAllMapEntities(filter: EntityFilter): Promise<MapEntity
             cidade: concorrente.cidade || undefined,
             uf: concorrente.uf || undefined,
             qualidadeScore: concorrente.qualidadeScore || undefined,
-            qualidadeClassificacao: concorrente.qualidadeClassificacao || undefined,
+            qualidadeClassificacao:
+              concorrente.qualidadeClassificacao || undefined,
             validationStatus: concorrente.validationStatus || undefined,
             mercadoId: concorrente.mercadoId,
             mercadoNome: mercado[0]?.nome,
@@ -267,7 +284,9 @@ export async function getAllMapEntities(filter: EntityFilter): Promise<MapEntity
         .where(
           and(
             eq(mercadosUnicos.projectId, filter.projectId),
-            filter.pesquisaId ? eq(mercadosUnicos.pesquisaId, filter.pesquisaId) : undefined
+            filter.pesquisaId
+              ? eq(mercadosUnicos.pesquisaId, filter.pesquisaId)
+              : undefined
           )
         );
 
@@ -333,7 +352,9 @@ export async function getAllMapEntities(filter: EntityFilter): Promise<MapEntity
         .where(
           and(
             eq(produtos.projectId, filter.projectId),
-            filter.pesquisaId ? eq(produtos.pesquisaId, filter.pesquisaId) : undefined,
+            filter.pesquisaId
+              ? eq(produtos.pesquisaId, filter.pesquisaId)
+              : undefined,
             eq(produtos.ativo, 1)
           )
         );
@@ -391,7 +412,7 @@ export async function getAllMapEntities(filter: EntityFilter): Promise<MapEntity
     if (filter.searchText) {
       const searchLower = filter.searchText.toLowerCase();
       return entities.filter(
-        (e) =>
+        e =>
           e.nome.toLowerCase().includes(searchLower) ||
           e.cidade?.toLowerCase().includes(searchLower) ||
           e.mercadoNome?.toLowerCase().includes(searchLower)
@@ -428,7 +449,10 @@ export async function getEntityDetails(
 
         // Buscar mercados
         const mercadosCliente = await db
-          .select({ mercadoId: sql<number>`cm.mercadoId`, mercadoNome: mercadosUnicos.nome })
+          .select({
+            mercadoId: sql<number>`cm.mercadoId`,
+            mercadoNome: mercadosUnicos.nome,
+          })
           .from(sql`clientes_mercados cm`)
           .innerJoin(mercadosUnicos, eq(sql`cm.mercadoId`, mercadosUnicos.id))
           .where(eq(sql`cm.clienteId`, entityId));

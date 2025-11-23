@@ -17,7 +17,9 @@ export const unifiedMapRouter = router({
         projectId: z.number(),
         pesquisaId: z.number().optional(),
         entityTypes: z
-          .array(z.enum(["mercado", "cliente", "produto", "concorrente", "lead"]))
+          .array(
+            z.enum(["mercado", "cliente", "produto", "concorrente", "lead"])
+          )
           .optional(),
         mercadoIds: z.array(z.number()).optional(),
         minQuality: z.number().min(0).max(100).optional(),
@@ -38,7 +40,13 @@ export const unifiedMapRouter = router({
   getEntityDetails: protectedProcedure
     .input(
       z.object({
-        entityType: z.enum(["mercado", "cliente", "produto", "concorrente", "lead"]),
+        entityType: z.enum([
+          "mercado",
+          "cliente",
+          "produto",
+          "concorrente",
+          "lead",
+        ]),
         entityId: z.number(),
       })
     )
@@ -65,24 +73,24 @@ export const unifiedMapRouter = router({
       const stats = {
         total: allEntities.length,
         byType: {
-          mercado: allEntities.filter((e) => e.type === "mercado").length,
-          cliente: allEntities.filter((e) => e.type === "cliente").length,
-          produto: allEntities.filter((e) => e.type === "produto").length,
-          concorrente: allEntities.filter((e) => e.type === "concorrente").length,
-          lead: allEntities.filter((e) => e.type === "lead").length,
+          mercado: allEntities.filter(e => e.type === "mercado").length,
+          cliente: allEntities.filter(e => e.type === "cliente").length,
+          produto: allEntities.filter(e => e.type === "produto").length,
+          concorrente: allEntities.filter(e => e.type === "concorrente").length,
+          lead: allEntities.filter(e => e.type === "lead").length,
         },
         byUF: {} as Record<string, number>,
         byQuality: {
-          high: allEntities.filter((e) => (e.qualidadeScore || 0) >= 70).length,
+          high: allEntities.filter(e => (e.qualidadeScore || 0) >= 70).length,
           medium: allEntities.filter(
-            (e) => (e.qualidadeScore || 0) >= 40 && (e.qualidadeScore || 0) < 70
+            e => (e.qualidadeScore || 0) >= 40 && (e.qualidadeScore || 0) < 70
           ).length,
-          low: allEntities.filter((e) => (e.qualidadeScore || 0) < 40).length,
+          low: allEntities.filter(e => (e.qualidadeScore || 0) < 40).length,
         },
       };
 
       // Agrupar por UF
-      allEntities.forEach((entity) => {
+      allEntities.forEach(entity => {
         if (entity.uf) {
           stats.byUF[entity.uf] = (stats.byUF[entity.uf] || 0) + 1;
         }

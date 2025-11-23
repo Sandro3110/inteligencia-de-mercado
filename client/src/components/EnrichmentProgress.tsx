@@ -15,14 +15,20 @@ interface EnrichmentProgressProps {
   totalProgress: number;
 }
 
-export function EnrichmentProgress({ steps, currentStep, totalProgress }: EnrichmentProgressProps) {
+export function EnrichmentProgress({
+  steps,
+  currentStep,
+  totalProgress,
+}: EnrichmentProgressProps) {
   return (
     <div className="space-y-6">
       {/* Barra de Progresso Geral */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
           <span className="font-medium">Progresso Geral</span>
-          <span className="text-muted-foreground">{Math.round(totalProgress)}%</span>
+          <span className="text-muted-foreground">
+            {Math.round(totalProgress)}%
+          </span>
         </div>
         <Progress value={totalProgress} className="h-2" />
       </div>
@@ -36,10 +42,10 @@ export function EnrichmentProgress({ steps, currentStep, totalProgress }: Enrich
               step.status === "in_progress"
                 ? "border-primary bg-primary/5"
                 : step.status === "completed"
-                ? "border-green-500/30 bg-green-500/5"
-                : step.status === "error"
-                ? "border-red-500/30 bg-red-500/5"
-                : "border-border/40 bg-background/50"
+                  ? "border-green-500/30 bg-green-500/5"
+                  : step.status === "error"
+                    ? "border-red-500/30 bg-red-500/5"
+                    : "border-border/40 bg-background/50"
             }`}
           >
             {/* Ícone de Status */}
@@ -59,9 +65,12 @@ export function EnrichmentProgress({ steps, currentStep, totalProgress }: Enrich
             <div className="flex-1 space-y-1">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium text-sm">{step.label}</h4>
-                {step.status === "in_progress" && step.progress !== undefined && (
-                  <span className="text-xs text-muted-foreground">{step.progress}%</span>
-                )}
+                {step.status === "in_progress" &&
+                  step.progress !== undefined && (
+                    <span className="text-xs text-muted-foreground">
+                      {step.progress}%
+                    </span>
+                  )}
               </div>
               {step.message && (
                 <p className="text-xs text-muted-foreground">{step.message}</p>

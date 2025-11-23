@@ -148,9 +148,7 @@
       "compositePrimaryKeys": {
         "clientes_id": {
           "name": "clientes_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -194,9 +192,7 @@
       "compositePrimaryKeys": {
         "clientes_mercados_id": {
           "name": "clientes_mercados_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -325,9 +321,7 @@
       "compositePrimaryKeys": {
         "concorrentes_id": {
           "name": "concorrentes_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -477,9 +471,7 @@
       "compositePrimaryKeys": {
         "leads_id": {
           "name": "leads_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -573,9 +565,7 @@
       "compositePrimaryKeys": {
         "mercados_unicos_id": {
           "name": "mercados_unicos_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -642,9 +632,7 @@
       "compositePrimaryKeys": {
         "users_id": {
           "name": "users_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},

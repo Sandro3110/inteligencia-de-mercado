@@ -3,13 +3,20 @@
  * Exibe atividades recentes do sistema (leads, conversões, alertas, enriquecimento)
  */
 
-import { useSelectedProject } from '@/hooks/useSelectedProject';
-import { ProjectSelector } from '@/components/ProjectSelector';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { trpc } from '@/lib/trpc';
-import { Activity, AlertCircle, CheckCircle, TrendingUp, Users, Loader2 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { ProjectSelector } from "@/components/ProjectSelector";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { trpc } from "@/lib/trpc";
+import {
+  Activity,
+  AlertCircle,
+  CheckCircle,
+  TrendingUp,
+  Users,
+  Loader2,
+} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const activityIcons: Record<string, any> = {
   lead_created: TrendingUp,
@@ -19,15 +26,15 @@ const activityIcons: Record<string, any> = {
 };
 
 const activityColors: Record<string, string> = {
-  lead_created: 'text-blue-500',
-  conversion: 'text-green-500',
-  alert: 'text-orange-500',
-  enrichment: 'text-purple-500',
+  lead_created: "text-blue-500",
+  conversion: "text-green-500",
+  alert: "text-orange-500",
+  enrichment: "text-purple-500",
 };
 
 export function LogsTab() {
   const { selectedProjectId } = useSelectedProject();
-  
+
   const { data: activities, isLoading } = trpc.activity.recent.useQuery(
     { projectId: selectedProjectId || 0, limit: 50 },
     { enabled: !!selectedProjectId }
@@ -73,7 +80,8 @@ export function LogsTab() {
       <div className="space-y-4">
         {activities?.map((activity: any) => {
           const Icon = activityIcons[activity.activityType] || Activity;
-          const colorClass = activityColors[activity.activityType] || 'text-gray-500';
+          const colorClass =
+            activityColors[activity.activityType] || "text-gray-500";
 
           return (
             <Card key={activity.id}>

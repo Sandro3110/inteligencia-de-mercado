@@ -16,14 +16,20 @@ export default function AnalyticsPage() {
 
   if (!selectedProjectId) {
     return (
-      <div className={`min-h-screen ${sidebarClass} flex items-center justify-center bg-background transition-all duration-300`}>
-        <p className="text-slate-600">Selecione um projeto para visualizar analytics</p>
+      <div
+        className={`min-h-screen ${sidebarClass} flex items-center justify-center bg-background transition-all duration-300`}
+      >
+        <p className="text-slate-600">
+          Selecione um projeto para visualizar analytics
+        </p>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen ${sidebarClass} bg-background transition-all duration-300`}>
+    <div
+      className={`min-h-screen ${sidebarClass} bg-background transition-all duration-300`}
+    >
       {/* Header */}
       <div className="border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
         <div className="container py-3 border-b border-border/30">
@@ -32,7 +38,9 @@ export default function AnalyticsPage() {
         <div className="container py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Analytics Unificado</h1>
+              <h1 className="text-3xl font-bold text-foreground">
+                Analytics Unificado
+              </h1>
               <p className="text-muted-foreground mt-1">
                 Visualizações e análises completas de dados
               </p>

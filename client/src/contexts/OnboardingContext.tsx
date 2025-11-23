@@ -8,11 +8,17 @@ interface OnboardingContextType {
   markOnboardingComplete: () => void;
 }
 
-const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
+const OnboardingContext = createContext<OnboardingContextType | undefined>(
+  undefined
+);
 
 const ONBOARDING_KEY = "gestor-pav-onboarding-completed";
 
-export function OnboardingProvider({ children }: { children: React.ReactNode }) {
+export function OnboardingProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [isOnboarding, setIsOnboarding] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     return localStorage.getItem(ONBOARDING_KEY) === "true";

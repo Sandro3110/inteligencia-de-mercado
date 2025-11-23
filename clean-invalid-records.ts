@@ -17,8 +17,8 @@ async function cleanInvalidRecords() {
   for (const concorrente of allConcorrentes) {
     const isValid = isRealCompany({
       title: concorrente.nome,
-      link: concorrente.site || '',
-      snippet: '',
+      link: concorrente.site || "",
+      snippet: "",
     });
 
     if (!isValid) {
@@ -38,8 +38,8 @@ async function cleanInvalidRecords() {
   for (const lead of allLeads) {
     const isValid = isRealCompany({
       title: lead.nome,
-      link: lead.site || '',
-      snippet: '',
+      link: lead.site || "",
+      snippet: "",
     });
 
     if (!isValid) {
@@ -51,12 +51,14 @@ async function cleanInvalidRecords() {
   console.log(`   ✅ Leads deletados: ${deletedLeads}\n`);
 
   console.log("✅ Limpeza concluída!");
-  console.log(`   Total deletado: ${deletedConcorrentes + deletedLeads} registros`);
-  
+  console.log(
+    `   Total deletado: ${deletedConcorrentes + deletedLeads} registros`
+  );
+
   process.exit(0);
 }
 
-cleanInvalidRecords().catch((error) => {
+cleanInvalidRecords().catch(error => {
   console.error("❌ Erro:", error);
   process.exit(1);
 });

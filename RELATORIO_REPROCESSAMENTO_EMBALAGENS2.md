@@ -25,15 +25,16 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 
 ### Base Antiga (sem filtros)
 
-| Categoria | Quantidade | Observação |
-|-----------|------------|------------|
-| **Clientes** | 816 | Dados de entrada |
-| **Mercados** | 227 | Identificados via LLM |
-| **Concorrentes** | 639 | **~34% artigos de notícias** |
-| **Leads** | 793 | **~32% artigos de notícias** |
-| **Precisão** | 30% | Muitos falsos positivos |
+| Categoria        | Quantidade | Observação                   |
+| ---------------- | ---------- | ---------------------------- |
+| **Clientes**     | 816        | Dados de entrada             |
+| **Mercados**     | 227        | Identificados via LLM        |
+| **Concorrentes** | 639        | **~34% artigos de notícias** |
+| **Leads**        | 793        | **~32% artigos de notícias** |
+| **Precisão**     | 30%        | Muitos falsos positivos      |
 
 **Problemas Identificados:**
+
 - ❌ 219 concorrentes eram artigos (ex: "As 25 maiores montadoras...")
 - ❌ 256 leads eram artigos (ex: "Os 15 melhores distribuidores...")
 - ❌ Domínios bloqueados (globo.com, econodata.com.br, etc)
@@ -44,15 +45,16 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 
 ### Base Nova (com filtros avançados)
 
-| Categoria | Quantidade | Observação |
-|-----------|------------|------------|
-| **Clientes** | 816 | Mesmos dados de entrada |
-| **Mercados** | 227 | Mesmos mercados |
-| **Concorrentes** | 420 | **100% empresas reais** ✅ |
-| **Leads** | 537 | **100% empresas reais** ✅ |
-| **Precisão** | 100% | Zero falsos positivos |
+| Categoria        | Quantidade | Observação                 |
+| ---------------- | ---------- | -------------------------- |
+| **Clientes**     | 816        | Mesmos dados de entrada    |
+| **Mercados**     | 227        | Mesmos mercados            |
+| **Concorrentes** | 420        | **100% empresas reais** ✅ |
+| **Leads**        | 537        | **100% empresas reais** ✅ |
+| **Precisão**     | 100%       | Zero falsos positivos      |
 
 **Melhorias Aplicadas:**
+
 - ✅ 219 artigos removidos de concorrentes (34.3%)
 - ✅ 256 artigos removidos de leads (32.3%)
 - ✅ Apenas domínios corporativos (.com.br, .ind.br)
@@ -65,14 +67,15 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 
 ### Concorrentes
 
-| Métrica | Antes | Depois | Melhoria |
-|---------|-------|--------|----------|
-| **Total** | 639 | 420 | -34.3% |
-| **Empresas reais** | ~420 (66%) | 420 (100%) | **+34%** |
-| **Artigos removidos** | 0 | 219 | **100%** |
-| **Precisão** | 66% | 100% | **+51%** |
+| Métrica               | Antes      | Depois     | Melhoria |
+| --------------------- | ---------- | ---------- | -------- |
+| **Total**             | 639        | 420        | -34.3%   |
+| **Empresas reais**    | ~420 (66%) | 420 (100%) | **+34%** |
+| **Artigos removidos** | 0          | 219        | **100%** |
+| **Precisão**          | 66%        | 100%       | **+51%** |
 
 **Exemplos de Concorrentes Removidos:**
+
 - ❌ "As 25 maiores montadoras e empresas de peças do Brasil" (Valor Econômico)
 - ❌ "23 Maiores Empresas de Industria Automotiva no Brasil" (Econodata)
 - ❌ "Conheça as principais fabricantes de carros no Brasil" (Blog)
@@ -80,6 +83,7 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 - ❌ "Ranking: 10 maiores empresas automotivas no Brasil"
 
 **Exemplos de Concorrentes Aprovados:**
+
 - ✅ Anfavea (www.anfavea.com.br)
 - ✅ AutoArremate (www.autoarremate.com.br)
 - ✅ Bosch Brasil (domínio corporativo)
@@ -89,20 +93,22 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 
 ### Leads
 
-| Métrica | Antes | Depois | Melhoria |
-|---------|-------|--------|----------|
-| **Total** | 793 | 537 | -32.3% |
-| **Empresas reais** | ~537 (68%) | 537 (100%) | **+32%** |
-| **Artigos removidos** | 0 | 256 | **100%** |
-| **Precisão** | 68% | 100% | **+47%** |
+| Métrica               | Antes      | Depois     | Melhoria |
+| --------------------- | ---------- | ---------- | -------- |
+| **Total**             | 793        | 537        | -32.3%   |
+| **Empresas reais**    | ~537 (68%) | 537 (100%) | **+32%** |
+| **Artigos removidos** | 0          | 256        | **100%** |
+| **Precisão**          | 68%        | 100%       | **+47%** |
 
 **Exemplos de Leads Removidos:**
+
 - ❌ "Os 15 melhores distribuidores de peças automotivas do..." (Artigo)
 - ❌ "Lista Fabricantes" (photon.com.br/lista-fabricantes/)
 - ❌ "Quais são as maiores distribuidoras de autopeças no Brasil?" (Artigo)
 - ❌ "Fornecedores de embalagens: conheça os principais" (Artigo)
 
 **Exemplos de Leads Aprovados:**
+
 - ✅ Sama (samaautopecas.com.br)
 - ✅ SK Automotive (skautomotive.com.br)
 - ✅ Scherer Autopeças (scherer-sa.com.br)
@@ -119,18 +125,21 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 ### 1. **Domínios Bloqueados** (40+ sites)
 
 **Portais de notícias:**
+
 - globo.com, valor.globo.com
 - uol.com.br, estadao.com.br
 - exame.com, infomoney.com.br
 - cnnbrasil.com.br, r7.com
 
 **Portais automotivos:**
+
 - motor1.uol.com.br
 - autoesporte.globo.com
 - quatrorodas.abril.com.br
 - guiadoauto.com.br
 
 **Sites de listagens:**
+
 - econodata.com.br
 - listafabricantes.com.br
 
@@ -141,6 +150,7 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 ### 2. **Padrões de URL**
 
 **Padrões rejeitados:**
+
 - `/blog/` → Artigos de blog
 - `/noticias/`, `/noticia/` → Notícias
 - `/artigos/`, `/artigo/` → Artigos
@@ -155,6 +165,7 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 ### 3. **Palavras-chave de Títulos**
 
 **Palavras rejeitadas:**
+
 - "maiores empresas", "principais empresas"
 - "top 10", "top 20", "ranking"
 - "lista de", "conheça as", "veja as"
@@ -168,6 +179,7 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 ### 4. **Validações Adicionais**
 
 **Nomes que iniciam com número:**
+
 - ❌ "50 Maiores Empresas de Comércio"
 - ❌ "23 Maiores Empresas de Industria"
 - ❌ "100 Melhores Fornecedores"
@@ -177,6 +189,7 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 ---
 
 **Pontuação excessiva (`:`, `?`):**
+
 - ❌ "Indústrias Artefama : Móveis e"
 - ❌ "Coppertal: Distribuidor de aço e"
 - ❌ "Forbes Global 2000: As 10"
@@ -186,6 +199,7 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 ---
 
 **Nomes muito longos (>80 caracteres):**
+
 - Provavelmente títulos de artigos
 
 **Casos bloqueados:** Não quantificado
@@ -193,6 +207,7 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 ---
 
 **Nomes genéricos:**
+
 - ❌ "Lista", "Ranking", "Guia", "Portal"
 
 **Casos bloqueados:** 57 registros
@@ -220,6 +235,7 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 ### Antes dos Filtros
 
 **Problemas:**
+
 - 34% dos concorrentes eram artigos inválidos
 - 32% dos leads eram artigos inválidos
 - Impossível enriquecer via ReceitaWS (sem CNPJ)
@@ -233,6 +249,7 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 ### Depois dos Filtros
 
 **Benefícios:**
+
 - 100% dos concorrentes são empresas reais
 - 100% dos leads são empresas reais
 - Domínios corporativos validados
@@ -250,6 +267,7 @@ Demonstrar o impacto dos **filtros avançados** na qualidade dos dados, comparan
 **Problema:** 174 empresas sem CNPJ e sem domínio corporativo claro
 
 **Solução:**
+
 ```typescript
 async function scrapeCNPJFromWebsite(url: string): Promise<string | null> {
   const html = await fetch(url).then(r => r.text());
@@ -267,11 +285,12 @@ async function scrapeCNPJFromWebsite(url: string): Promise<string | null> {
 **Problema:** Apenas 1-5 concorrentes/leads por mercado
 
 **Solução:**
+
 ```typescript
 const queries = [
   '"Automotivo" CNPJ site:.com.br',
-  'Automotivo site:.ind.br -noticia -blog',
-  'Automotivo empresa CNPJ -ranking -lista',
+  "Automotivo site:.ind.br -noticia -blog",
+  "Automotivo empresa CNPJ -ranking -lista",
 ];
 ```
 
@@ -284,9 +303,10 @@ const queries = [
 **Problema:** Sites inativos (404, timeout) salvos no banco
 
 **Solução:**
+
 ```typescript
 async function isActiveSite(url: string): Promise<boolean> {
-  const response = await fetch(url, { method: 'HEAD', timeout: 5000 });
+  const response = await fetch(url, { method: "HEAD", timeout: 5000 });
   return response.status === 200 || response.status === 301;
 }
 ```
@@ -300,6 +320,7 @@ async function isActiveSite(url: string): Promise<boolean> {
 **Problema:** Score de qualidade baixo (15-30/100) sem contatos
 
 **Solução:**
+
 ```typescript
 async function scrapeContactInfo(url: string) {
   const html = await fetch(url).then(r => r.text());
@@ -318,6 +339,7 @@ async function scrapeContactInfo(url: string) {
 Os **filtros avançados** foram aplicados com sucesso à base de dados completa, removendo **475 artigos de notícias** (34.3% de concorrentes + 32.3% de leads) e aumentando a precisão de **30% para 100%**.
 
 **Principais Conquistas:**
+
 - ✅ **+233% de precisão** (30% → 100%)
 - ✅ **475 artigos removidos** automaticamente
 - ✅ **957 empresas reais validadas** (420 concorrentes + 537 leads)

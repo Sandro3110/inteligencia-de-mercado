@@ -10,7 +10,7 @@ async function insertTestWarnings() {
     const activeProjects = await db
       .select()
       .from(projects)
-      .where(eq(projects.status, 'active'))
+      .where(eq(projects.status, "active"))
       .limit(3);
 
     if (activeProjects.length === 0) {
@@ -23,7 +23,7 @@ async function insertTestWarnings() {
     // Inserir avisos de hibernação para os primeiros 2 projetos
     for (let i = 0; i < Math.min(2, activeProjects.length); i++) {
       const project = activeProjects[i];
-      
+
       // Atualizar lastActivityAt para 25 dias atrás (para simular inatividade)
       const twentyFiveDaysAgo = new Date(Date.now() - 25 * 24 * 60 * 60 * 1000);
       await db
@@ -38,10 +38,12 @@ async function insertTestWarnings() {
         scheduledFor: scheduledFor,
         notified: 1,
         hibernated: 0,
-        createdAt: new Date()
+        createdAt: new Date(),
       });
 
-      console.log(`✅ Aviso criado para projeto: ${project.nome} (ID: ${project.id})`);
+      console.log(
+        `✅ Aviso criado para projeto: ${project.nome} (ID: ${project.id})`
+      );
       console.log(`   - lastActivityAt: ${twentyFiveDaysAgo.toISOString()}`);
       console.log(`   - scheduledFor: ${scheduledFor.toISOString()}`);
     }

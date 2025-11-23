@@ -1,17 +1,17 @@
 /**
  * Componente Base de Mapa usando Leaflet
- * 
+ *
  * Wrapper do react-leaflet com configurações padrão para o Brasil
  */
 
-import { ReactNode } from 'react';
-import { MapContainer as LeafletMapContainer, TileLayer } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import { ReactNode } from "react";
+import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 // Fix para ícones do Leaflet no Vite
-import L from 'leaflet';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import L from "leaflet";
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -41,7 +41,7 @@ interface MapContainerProps {
 
 /**
  * Componente de mapa base com configurações padrão para o Brasil
- * 
+ *
  * @example
  * ```tsx
  * <MapContainer center={[-14.235, -51.925]} zoom={4}>
@@ -54,10 +54,10 @@ interface MapContainerProps {
 export default function MapContainer({
   center = [-14.235, -51.925], // Centro do Brasil
   zoom = 4,
-  height = '100%',
-  width = '100%',
+  height = "100%",
+  width = "100%",
   children,
-  className = '',
+  className = "",
   onClick,
 }: MapContainerProps) {
   return (
@@ -65,7 +65,7 @@ export default function MapContainer({
       <LeafletMapContainer
         center={center}
         zoom={zoom}
-        style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}
+        style={{ height: "100%", width: "100%", borderRadius: "0.5rem" }}
         scrollWheelZoom={true}
         zoomControl={true}
         attributionControl={true}
@@ -76,7 +76,7 @@ export default function MapContainer({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           maxZoom={18}
         />
-        
+
         {children}
       </LeafletMapContainer>
     </div>

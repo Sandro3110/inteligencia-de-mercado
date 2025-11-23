@@ -7,11 +7,11 @@
 
 ## 📋 Resumo Executivo
 
-| Regra | Status Atual | Implementação | Observações |
-|-------|--------------|---------------|-------------|
-| **1. Constraints UNIQUE** | ⚠️ **Parcial** | Lógica no código | Falta constraint no banco |
-| **2. Timestamps Automáticos** | ✅ **Implementado** | Schema Drizzle | createdAt, updatedAt |
-| **3. Upsert** | ⚠️ **Parcial** | Apenas mercados | Falta produtos, concorrentes, leads |
+| Regra                         | Status Atual        | Implementação    | Observações                         |
+| ----------------------------- | ------------------- | ---------------- | ----------------------------------- |
+| **1. Constraints UNIQUE**     | ⚠️ **Parcial**      | Lógica no código | Falta constraint no banco           |
+| **2. Timestamps Automáticos** | ✅ **Implementado** | Schema Drizzle   | createdAt, updatedAt                |
+| **3. Upsert**                 | ⚠️ **Parcial**      | Apenas mercados  | Falta produtos, concorrentes, leads |
 
 ---
 
@@ -20,12 +20,15 @@
 ### ✅ O que está funcionando
 
 **Mercados Únicos:**
+
 ```typescript
 // Hash único: nome + projectId
 const hash = normalizeHash(`${mercadoData.nome}-${projectId}`);
 
 // Verifica se já existe ANTES de inserir
-const [existing] = await db.select().from(mercadosUnicos)
+const [existing] = await db
+  .select()
+  .from(mercadosUnicos)
   .where(eq(mercadosUnicos.mercadoHash, hash))
   .limit(1);
 
@@ -37,12 +40,17 @@ if (existing) {
 ```
 
 **Concorrentes Únicos:**
+
 ```typescript
 // Hash único: nome + cnpj
-const hash = normalizeHash(`${concorrenteData.nome}-${concorrenteData.cnpj || ""}`);
+const hash = normalizeHash(
+  `${concorrenteData.nome}-${concorrenteData.cnpj || ""}`
+);
 
 // Verifica se já existe
-const [existing] = await db.select().from(concorrentes)
+const [existing] = await db
+  .select()
+  .from(concorrentes)
   .where(eq(concorrentes.concorrenteHash, hash))
   .limit(1);
 
@@ -52,12 +60,15 @@ if (!existing) {
 ```
 
 **Leads Únicos:**
+
 ```typescript
 // Hash único: nome + cnpj
 const hash = normalizeHash(`${leadData.nome}-${leadData.cnpj || ""}`);
 
 // Verifica se já existe
-const [existing] = await db.select().from(leads)
+const [existing] = await db
+  .select()
+  .from(leads)
   .where(eq(leads.leadHash, hash))
   .limit(1);
 
@@ -98,28 +109,33 @@ Com constraints no banco, podemos usar `INSERT IGNORE` ou `ON DUPLICATE KEY UPDA
 Todos os schemas têm timestamps automáticos:
 
 **Clientes:**
+
 ```typescript
 createdAt: timestamp("createdAt").defaultNow(),
 updatedAt: timestamp("updatedAt").defaultNow(),
 ```
 
 **Mercados:**
+
 ```typescript
 createdAt: timestamp("createdAt").defaultNow(),
 ```
 
 **Produtos:**
+
 ```typescript
 createdAt: timestamp("createdAt").defaultNow(),
 updatedAt: timestamp("updatedAt").defaultNow(),
 ```
 
 **Concorrentes:**
+
 ```typescript
 createdAt: timestamp("createdAt").defaultNow(),
 ```
 
 **Leads:**
+
 ```typescript
 createdAt: timestamp("createdAt").defaultNow(),
 ```
@@ -129,24 +145,29 @@ createdAt: timestamp("createdAt").defaultNow(),
 O `updatedAt` tem `.defaultNow()` mas **NÃO atualiza automaticamente** em updates.
 
 **Solução 1: Trigger no banco (recomendado)**
+
 ```sql
-CREATE TRIGGER update_clientes_timestamp 
+CREATE TRIGGER update_clientes_timestamp
 BEFORE UPDATE ON clientes
-FOR EACH ROW 
+FOR EACH ROW
 SET NEW.updatedAt = NOW();
 
-CREATE TRIGGER update_produtos_timestamp 
+CREATE TRIGGER update_produtos_timestamp
 BEFORE UPDATE ON produtos
-FOR EACH ROW 
+FOR EACH ROW
 SET NEW.updatedAt = NOW();
 ```
 
 **Solução 2: Atualizar manualmente no código**
+
 ```typescript
-await db.update(clientes).set({
-  ...updateData,
-  updatedAt: new Date()
-}).where(eq(clientes.id, clienteId));
+await db
+  .update(clientes)
+  .set({
+    ...updateData,
+    updatedAt: new Date(),
+  })
+  .where(eq(clientes.id, clienteId));
 ```
 
 ---
@@ -156,6 +177,7 @@ await db.update(clientes).set({
 ### ✅ O que está funcionando
 
 **Mercados (UPSERT completo):**
+
 ```typescript
 if (existing) {
   mercadoId = existing.id; // Reutiliza (não atualiza)
@@ -165,12 +187,17 @@ if (existing) {
 ```
 
 **Clientes_Mercados (UPSERT completo):**
+
 ```typescript
-const [assoc] = await db.select().from(clientesMercados)
-  .where(and(
-    eq(clientesMercados.clienteId, clienteId),
-    eq(clientesMercados.mercadoId, mercadoId)
-  ))
+const [assoc] = await db
+  .select()
+  .from(clientesMercados)
+  .where(
+    and(
+      eq(clientesMercados.clienteId, clienteId),
+      eq(clientesMercados.mercadoId, mercadoId)
+    )
+  )
   .limit(1);
 
 if (!assoc) {
@@ -181,6 +208,7 @@ if (!assoc) {
 ### ⚠️ O que está faltando
 
 **Produtos (SEM UPSERT):**
+
 ```typescript
 // ❌ Sempre insere, mesmo se já existir
 await db.insert(produtos).values({
@@ -195,34 +223,47 @@ await db.insert(produtos).values({
 **Problema:** Se executar enriquecimento 2x no mesmo cliente, vai duplicar produtos.
 
 **Solução:**
+
 ```typescript
 // ✅ Verificar se produto já existe
-const [existingProduto] = await db.select().from(produtos)
-  .where(and(
-    eq(produtos.clienteId, clienteId),
-    eq(produtos.mercadoId, produtoData.mercadoId),
-    eq(produtos.nome, produtoData.nome)
-  ))
+const [existingProduto] = await db
+  .select()
+  .from(produtos)
+  .where(
+    and(
+      eq(produtos.clienteId, clienteId),
+      eq(produtos.mercadoId, produtoData.mercadoId),
+      eq(produtos.nome, produtoData.nome)
+    )
+  )
   .limit(1);
 
 if (existingProduto) {
   // UPDATE: atualizar preço, descrição, etc
-  await db.update(produtos).set({
-    descricao: produtoData.descricao,
-    categoria: produtoData.categoria,
-    preco: produtoData.preco,
-    updatedAt: new Date()
-  }).where(eq(produtos.id, existingProduto.id));
+  await db
+    .update(produtos)
+    .set({
+      descricao: produtoData.descricao,
+      categoria: produtoData.categoria,
+      preco: produtoData.preco,
+      updatedAt: new Date(),
+    })
+    .where(eq(produtos.id, existingProduto.id));
 } else {
   // INSERT: criar novo
-  await db.insert(produtos).values({ /* ... */ });
+  await db.insert(produtos).values({
+    /* ... */
+  });
 }
 ```
 
 **Concorrentes (INSERT ONLY):**
+
 ```typescript
 if (!existing) {
-  await db.insert(concorrentes).values({ /* ... */ });
+  await db.insert(concorrentes).values({
+    /* ... */
+  });
 }
 // ❌ Se já existe, não faz nada (não atualiza)
 ```
@@ -230,15 +271,19 @@ if (!existing) {
 **Problema:** Se dados do concorrente mudarem (novo site, telefone, etc), não atualiza.
 
 **Solução:**
+
 ```typescript
 if (existing) {
   // UPDATE: atualizar dados
-  await db.update(concorrentes).set({
-    site: concorrenteData.site,
-    produto: concorrenteData.produto,
-    cidade: concorrenteData.cidade,
-    // ... outros campos
-  }).where(eq(concorrentes.id, existing.id));
+  await db
+    .update(concorrentes)
+    .set({
+      site: concorrenteData.site,
+      produto: concorrenteData.produto,
+      cidade: concorrenteData.cidade,
+      // ... outros campos
+    })
+    .where(eq(concorrentes.id, existing.id));
 } else {
   // INSERT: criar novo
 }
@@ -251,14 +296,14 @@ Mesmo problema dos concorrentes.
 
 ## 📊 Tabela Comparativa
 
-| Entidade | Unique Hash | Verifica Duplicata | Insert | Update | Upsert Completo |
-|----------|-------------|-------------------|--------|--------|-----------------|
-| **Clientes** | ❌ | ❌ | ✅ | ✅ | ⚠️ Parcial |
-| **Mercados** | ✅ | ✅ | ✅ | ❌ | ⚠️ Parcial |
-| **Produtos** | ❌ | ❌ | ✅ | ❌ | ❌ |
-| **Concorrentes** | ✅ | ✅ | ✅ | ❌ | ⚠️ Parcial |
-| **Leads** | ✅ | ✅ | ✅ | ❌ | ⚠️ Parcial |
-| **Clientes_Mercados** | ❌ | ✅ | ✅ | ❌ | ⚠️ Parcial |
+| Entidade              | Unique Hash | Verifica Duplicata | Insert | Update | Upsert Completo |
+| --------------------- | ----------- | ------------------ | ------ | ------ | --------------- |
+| **Clientes**          | ❌          | ❌                 | ✅     | ✅     | ⚠️ Parcial      |
+| **Mercados**          | ✅          | ✅                 | ✅     | ❌     | ⚠️ Parcial      |
+| **Produtos**          | ❌          | ❌                 | ✅     | ❌     | ❌              |
+| **Concorrentes**      | ✅          | ✅                 | ✅     | ❌     | ⚠️ Parcial      |
+| **Leads**             | ✅          | ✅                 | ✅     | ❌     | ⚠️ Parcial      |
+| **Clientes_Mercados** | ❌          | ✅                 | ✅     | ❌     | ⚠️ Parcial      |
 
 ---
 
@@ -267,6 +312,7 @@ Mesmo problema dos concorrentes.
 ### Prioridade ALTA
 
 1. **Adicionar constraint UNIQUE no banco**
+
    ```sql
    ALTER TABLE mercados_unicos ADD UNIQUE INDEX idx_mercado_hash (mercadoHash);
    ALTER TABLE concorrentes ADD UNIQUE INDEX idx_concorrente_hash (concorrenteHash);
@@ -309,20 +355,22 @@ Mesmo problema dos concorrentes.
 ## 🧪 Testes Necessários
 
 ### Teste 1: Duplicação de Produtos
+
 ```typescript
 // Executar enriquecimento 2x no mesmo cliente
 await enrichClienteCompleto(1, 1);
 await enrichClienteCompleto(1, 1);
 
 // Verificar se produtos duplicaram
-SELECT nome, COUNT(*) as qtd 
-FROM produtos 
-WHERE clienteId = 1 
-GROUP BY nome 
+SELECT nome, COUNT(*) as qtd
+FROM produtos
+WHERE clienteId = 1
+GROUP BY nome
 HAVING qtd > 1;
 ```
 
 ### Teste 2: Atualização de Concorrentes
+
 ```typescript
 // 1. Enriquecer cliente A (gera concorrente X)
 await enrichClienteCompleto(1, 1);
@@ -335,6 +383,7 @@ SELECT * FROM concorrentes WHERE nome = 'Concorrente X';
 ```
 
 ### Teste 3: Race Condition
+
 ```typescript
 // Executar 2 enriquecimentos simultâneos
 await Promise.all([
@@ -343,9 +392,9 @@ await Promise.all([
 ]);
 
 // Verificar se mercados duplicaram
-SELECT mercadoHash, COUNT(*) as qtd 
-FROM mercados_unicos 
-GROUP BY mercadoHash 
+SELECT mercadoHash, COUNT(*) as qtd
+FROM mercados_unicos
+GROUP BY mercadoHash
 HAVING qtd > 1;
 ```
 

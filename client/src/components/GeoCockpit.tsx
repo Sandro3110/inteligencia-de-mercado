@@ -1,12 +1,24 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { CheckCircle2, MapPin, Navigation } from "lucide-react";
 import { useEffect, useState } from "react";
-import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+  useMapEvents,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -33,9 +45,13 @@ interface GeoCockpitProps {
   onSave: (lat: number, lng: number) => Promise<void>;
 }
 
-function MapClickHandler({ onClick }: { onClick: (lat: number, lng: number) => void }) {
+function MapClickHandler({
+  onClick,
+}: {
+  onClick: (lat: number, lng: number) => void;
+}) {
   useMapEvents({
-    click: (e) => {
+    click: e => {
       onClick(e.latlng.lat, e.latlng.lng);
     },
   });
@@ -54,8 +70,12 @@ export default function GeoCockpit({
   const [step, setStep] = useState(1);
   const [lat, setLat] = useState<number>(initialLat || -23.5505);
   const [lng, setLng] = useState<number>(initialLng || -46.6333);
-  const [manualLat, setManualLat] = useState<string>(String(initialLat || -23.5505));
-  const [manualLng, setManualLng] = useState<string>(String(initialLng || -46.6333));
+  const [manualLat, setManualLat] = useState<string>(
+    String(initialLat || -23.5505)
+  );
+  const [manualLng, setManualLng] = useState<string>(
+    String(initialLng || -46.6333)
+  );
   const [isValidated, setIsValidated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -129,7 +149,8 @@ export default function GeoCockpit({
       setStep(3);
     } catch (error) {
       toast.error("Erro ao salvar", {
-        description: error instanceof Error ? error.message : "Erro desconhecido",
+        description:
+          error instanceof Error ? error.message : "Erro desconhecido",
       });
     } finally {
       setIsSaving(false);
@@ -147,13 +168,19 @@ export default function GeoCockpit({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${step >= 1 ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+          <div
+            className={`flex items-center gap-2 px-3 py-1 rounded-full ${step >= 1 ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+          >
             <span className="text-xs font-medium">1. Validar</span>
           </div>
-          <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${step >= 2 ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+          <div
+            className={`flex items-center gap-2 px-3 py-1 rounded-full ${step >= 2 ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+          >
             <span className="text-xs font-medium">2. Ajustar</span>
           </div>
-          <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${step >= 3 ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+          <div
+            className={`flex items-center gap-2 px-3 py-1 rounded-full ${step >= 3 ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+          >
             <span className="text-xs font-medium">3. Salvar</span>
           </div>
         </div>
@@ -169,7 +196,8 @@ export default function GeoCockpit({
             {entityName}
           </CardTitle>
           <CardDescription>
-            {entityType.charAt(0).toUpperCase() + entityType.slice(1)} #{entityId}
+            {entityType.charAt(0).toUpperCase() + entityType.slice(1)} #
+            {entityId}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -180,11 +208,15 @@ export default function GeoCockpit({
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-xs text-muted-foreground">Latitude</Label>
+                <Label className="text-xs text-muted-foreground">
+                  Latitude
+                </Label>
                 <p className="text-sm font-mono">{lat.toFixed(6)}</p>
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground">Longitude</Label>
+                <Label className="text-xs text-muted-foreground">
+                  Longitude
+                </Label>
                 <p className="text-sm font-mono">{lng.toFixed(6)}</p>
               </div>
             </div>
@@ -276,7 +308,7 @@ export default function GeoCockpit({
                   type="number"
                   step="0.000001"
                   value={manualLat}
-                  onChange={(e) => setManualLat(e.target.value)}
+                  onChange={e => setManualLat(e.target.value)}
                   placeholder="-23.550500"
                 />
               </div>
@@ -287,7 +319,7 @@ export default function GeoCockpit({
                   type="number"
                   step="0.000001"
                   value={manualLng}
-                  onChange={(e) => setManualLng(e.target.value)}
+                  onChange={e => setManualLng(e.target.value)}
                   placeholder="-46.633300"
                 />
               </div>

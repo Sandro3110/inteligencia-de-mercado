@@ -2,14 +2,35 @@ import { useState, useEffect } from "react";
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { ProjectSelector } from "@/components/ProjectSelector";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Settings, Key, CheckCircle, XCircle, Loader2, Zap, Brain, Sparkles } from "lucide-react";
+import {
+  Settings,
+  Key,
+  CheckCircle,
+  XCircle,
+  Loader2,
+  Zap,
+  Brain,
+  Sparkles,
+} from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { adminLLMSchema, type AdminLLMFormData } from "@shared/formSchemas";
 
@@ -24,12 +45,22 @@ interface ProviderConfig {
 
 export default function AdminLLM() {
   const { selectedProjectId } = useSelectedProject();
-  
+
   // Estado dos provedores
   const [providers, setProviders] = useState<ProviderConfig[]>([
     { provider: "openai", apiKey: "", model: "gpt-4o", enabled: true },
-    { provider: "gemini", apiKey: "", model: "gemini-2.0-flash-exp", enabled: false },
-    { provider: "anthropic", apiKey: "", model: "claude-3-5-sonnet-20241022", enabled: false },
+    {
+      provider: "gemini",
+      apiKey: "",
+      model: "gemini-2.0-flash-exp",
+      enabled: false,
+    },
+    {
+      provider: "anthropic",
+      apiKey: "",
+      model: "claude-3-5-sonnet-20241022",
+      enabled: false,
+    },
   ]);
 
   const [activeProvider, setActiveProvider] = useState<LLMProvider>("openai");
@@ -38,7 +69,9 @@ export default function AdminLLM() {
     gemini: false,
     anthropic: false,
   });
-  const [testResults, setTestResults] = useState<Record<LLMProvider, { success: boolean; message: string } | null>>({
+  const [testResults, setTestResults] = useState<
+    Record<LLMProvider, { success: boolean; message: string } | null>
+  >({
     openai: null,
     gemini: null,
     anthropic: null,
@@ -52,7 +85,7 @@ export default function AdminLLM() {
 
   // Salvar configuração
   const saveMutation = trpc.adminLLM.saveConfig.useMutation();
-  
+
   // Testar conexão
   const testMutation = trpc.adminLLM.testConnection.useMutation();
 
@@ -60,30 +93,31 @@ export default function AdminLLM() {
   useEffect(() => {
     if (config) {
       const newProviders = [...providers];
-      
+
       // OpenAI
       if (config.openaiApiKey) {
         newProviders[0].apiKey = config.openaiApiKey;
-        newProviders[0].model = config.openaiModel || 'gpt-4o';
+        newProviders[0].model = config.openaiModel || "gpt-4o";
         newProviders[0].enabled = config.openaiEnabled === 1;
       }
-      
+
       // Gemini
       if (config.geminiApiKey) {
         newProviders[1].apiKey = config.geminiApiKey;
-        newProviders[1].model = config.geminiModel || 'gemini-2.0-flash-exp';
+        newProviders[1].model = config.geminiModel || "gemini-2.0-flash-exp";
         newProviders[1].enabled = config.geminiEnabled === 1;
       }
-      
+
       // Anthropic
       if (config.anthropicApiKey) {
         newProviders[2].apiKey = config.anthropicApiKey;
-        newProviders[2].model = config.anthropicModel || 'claude-3-5-sonnet-20241022';
+        newProviders[2].model =
+          config.anthropicModel || "claude-3-5-sonnet-20241022";
         newProviders[2].enabled = config.anthropicEnabled === 1;
       }
-      
+
       setProviders(newProviders);
-      
+
       // Definir provedor ativo
       if (config.activeProvider) {
         setActiveProvider(config.activeProvider);
@@ -91,25 +125,28 @@ export default function AdminLLM() {
     }
   }, [config]);
 
-  const updateProvider = (provider: LLMProvider, updates: Partial<ProviderConfig>) => {
-    setProviders(prev => prev.map(p => 
-      p.provider === provider ? { ...p, ...updates } : p
-    ));
+  const updateProvider = (
+    provider: LLMProvider,
+    updates: Partial<ProviderConfig>
+  ) => {
+    setProviders(prev =>
+      prev.map(p => (p.provider === provider ? { ...p, ...updates } : p))
+    );
   };
 
   const testProvider = async (provider: LLMProvider) => {
     const providerConfig = providers.find(p => p.provider === provider);
-    
+
     // Validar com Zod
     try {
       adminLLMSchema.parse({
         provider: providerConfig?.provider,
         apiKey: providerConfig?.apiKey,
-        model: providerConfig?.model
+        model: providerConfig?.model,
       });
     } catch (error: any) {
       const firstError = error.errors?.[0];
-      toast.error(firstError?.message || 'Dados inválidos');
+      toast.error(firstError?.message || "Dados inválidos");
       return;
     }
     if (!providerConfig?.apiKey) {
@@ -126,12 +163,12 @@ export default function AdminLLM() {
         apiKey: providerConfig.apiKey,
         model: providerConfig.model,
       });
-      
+
       setTestResults(prev => ({
         ...prev,
         [provider]: result,
       }));
-      
+
       if (result.success) {
         toast.success(`${provider.toUpperCase()} conectado com sucesso!`);
       } else {
@@ -159,7 +196,9 @@ export default function AdminLLM() {
 
     const activeConfig = providers.find(p => p.provider === activeProvider);
     if (!activeConfig?.apiKey) {
-      toast.error(`API Key do provedor ativo (${activeProvider}) é obrigatória`);
+      toast.error(
+        `API Key do provedor ativo (${activeProvider}) é obrigatória`
+      );
       return;
     }
 
@@ -177,7 +216,7 @@ export default function AdminLLM() {
         anthropicModel: providers[2].model,
         anthropicEnabled: providers[2].enabled ? 1 : 0,
       });
-      
+
       toast.success("Configurações salvas com sucesso!");
     } catch (error: any) {
       toast.error(`Erro ao salvar: ${error.message}`);
@@ -186,17 +225,23 @@ export default function AdminLLM() {
 
   const getProviderIcon = (provider: LLMProvider) => {
     switch (provider) {
-      case "openai": return <Zap className="w-5 h-5" />;
-      case "gemini": return <Sparkles className="w-5 h-5" />;
-      case "anthropic": return <Brain className="w-5 h-5" />;
+      case "openai":
+        return <Zap className="w-5 h-5" />;
+      case "gemini":
+        return <Sparkles className="w-5 h-5" />;
+      case "anthropic":
+        return <Brain className="w-5 h-5" />;
     }
   };
 
   const getProviderColor = (provider: LLMProvider) => {
     switch (provider) {
-      case "openai": return "text-green-600";
-      case "gemini": return "text-blue-600";
-      case "anthropic": return "text-purple-600";
+      case "openai":
+        return "text-green-600";
+      case "gemini":
+        return "text-blue-600";
+      case "anthropic":
+        return "text-purple-600";
     }
   };
 
@@ -210,7 +255,9 @@ export default function AdminLLM() {
           </div>
           <Card>
             <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">Selecione um projeto para configurar os provedores LLM</p>
+              <p className="text-muted-foreground">
+                Selecione um projeto para configurar os provedores LLM
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -240,7 +287,9 @@ export default function AdminLLM() {
           <Card>
             <CardContent className="py-12 text-center">
               <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-              <p className="text-muted-foreground">Carregando configurações...</p>
+              <p className="text-muted-foreground">
+                Carregando configurações...
+              </p>
             </CardContent>
           </Card>
         ) : (
@@ -254,20 +303,31 @@ export default function AdminLLM() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Select value={activeProvider} onValueChange={(v) => setActiveProvider(v as LLMProvider)}>
+                <Select
+                  value={activeProvider}
+                  onValueChange={v => setActiveProvider(v as LLMProvider)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {providers.map(p => (
-                      <SelectItem key={p.provider} value={p.provider} disabled={!p.enabled || !p.apiKey}>
+                      <SelectItem
+                        key={p.provider}
+                        value={p.provider}
+                        disabled={!p.enabled || !p.apiKey}
+                      >
                         <div className="flex items-center gap-2">
                           {getProviderIcon(p.provider)}
                           <span className="capitalize">{p.provider}</span>
                           {p.provider === activeProvider && (
-                            <Badge variant="default" className="ml-2">Ativo</Badge>
+                            <Badge variant="default" className="ml-2">
+                              Ativo
+                            </Badge>
                           )}
-                          {!p.enabled && <Badge variant="outline">Desabilitado</Badge>}
+                          {!p.enabled && (
+                            <Badge variant="outline">Desabilitado</Badge>
+                          )}
                         </div>
                       </SelectItem>
                     ))}
@@ -285,20 +345,29 @@ export default function AdminLLM() {
                       <div className={getProviderColor(provider.provider)}>
                         {getProviderIcon(provider.provider)}
                       </div>
-                      <CardTitle className="capitalize">{provider.provider}</CardTitle>
+                      <CardTitle className="capitalize">
+                        {provider.provider}
+                      </CardTitle>
                       {provider.provider === activeProvider && (
                         <Badge variant="default">Ativo</Badge>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Label htmlFor={`${provider.provider}-enabled`} className="text-sm">
+                      <Label
+                        htmlFor={`${provider.provider}-enabled`}
+                        className="text-sm"
+                      >
                         Habilitado
                       </Label>
                       <input
                         id={`${provider.provider}-enabled`}
                         type="checkbox"
                         checked={provider.enabled}
-                        onChange={(e) => updateProvider(provider.provider, { enabled: e.target.checked })}
+                        onChange={e =>
+                          updateProvider(provider.provider, {
+                            enabled: e.target.checked,
+                          })
+                        }
                         className="w-4 h-4"
                       />
                     </div>
@@ -308,14 +377,21 @@ export default function AdminLLM() {
                   {/* API Key */}
                   <div className="space-y-2">
                     <Label htmlFor={`${provider.provider}-key`}>
-                      API Key {provider.provider === activeProvider && <span className="text-destructive">*</span>}
+                      API Key{" "}
+                      {provider.provider === activeProvider && (
+                        <span className="text-destructive">*</span>
+                      )}
                     </Label>
                     <Input
                       id={`${provider.provider}-key`}
                       type="password"
                       placeholder="sk-..."
                       value={provider.apiKey}
-                      onChange={(e) => updateProvider(provider.provider, { apiKey: e.target.value })}
+                      onChange={e =>
+                        updateProvider(provider.provider, {
+                          apiKey: e.target.value,
+                        })
+                      }
                       disabled={!provider.enabled}
                     />
                   </div>
@@ -326,7 +402,11 @@ export default function AdminLLM() {
                     <Input
                       id={`${provider.provider}-model`}
                       value={provider.model}
-                      onChange={(e) => updateProvider(provider.provider, { model: e.target.value })}
+                      onChange={e =>
+                        updateProvider(provider.provider, {
+                          model: e.target.value,
+                        })
+                      }
                       disabled={!provider.enabled}
                     />
                   </div>
@@ -335,7 +415,11 @@ export default function AdminLLM() {
                   <div className="flex items-center gap-4 pt-4 border-t">
                     <Button
                       onClick={() => testProvider(provider.provider)}
-                      disabled={isTesting[provider.provider] || !provider.apiKey || !provider.enabled}
+                      disabled={
+                        isTesting[provider.provider] ||
+                        !provider.apiKey ||
+                        !provider.enabled
+                      }
                       variant="outline"
                       size="sm"
                     >

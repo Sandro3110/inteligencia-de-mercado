@@ -3,16 +3,22 @@
  * Monitora atividade e inatividade dos projetos
  */
 
-import { useState } from 'react';
-import { trpc } from '@/lib/trpc';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Activity, 
-  Moon, 
-  AlertCircle, 
+import { useState } from "react";
+import { trpc } from "@/lib/trpc";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Activity,
+  Moon,
+  AlertCircle,
   TrendingDown,
   Clock,
   CheckCircle2,
@@ -20,30 +26,34 @@ import {
   FileEdit,
   Trash2,
   RefreshCw,
-  Loader2
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { formatDistanceToNow } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { PostponeHibernationDialog } from '@/components/PostponeHibernationDialog';
+  Loader2,
+} from "lucide-react";
+import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { PostponeHibernationDialog } from "@/components/PostponeHibernationDialog";
 
 export function ActivityTab() {
   const [selectedPeriod, setSelectedPeriod] = useState<30 | 60 | 90>(30);
   const [postponeDialogOpen, setPostponeDialogOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<{ id: number; nome: string } | null>(null);
+  const [selectedProject, setSelectedProject] = useState<{
+    id: number;
+    nome: string;
+  } | null>(null);
   const utils = trpc.useUtils();
 
-  const { data: activityData, isLoading } = trpc.projects.getActivity.useQuery();
-  
+  const { data: activityData, isLoading } =
+    trpc.projects.getActivity.useQuery();
+
   const autoHibernateMutation = trpc.projects.autoHibernate.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       toast.success(`${data.hibernated} projeto(s) hibernado(s) com sucesso!`);
       utils.projects.getActivity.invalidate();
       utils.projects.list.invalidate();
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao hibernar projetos: ${error.message}`);
-    }
+    },
   });
 
   const postponeMutation = trpc.projects.postponeHibernation.useMutation({
@@ -54,13 +64,17 @@ export function ActivityTab() {
       setPostponeDialogOpen(false);
       setSelectedProject(null);
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao adiar hibernação: ${error.message}`);
-    }
+    },
   });
 
   const handleAutoHibernate = () => {
-    if (!confirm(`Deseja hibernar todos os projetos inativos há mais de ${selectedPeriod} dias?`)) {
+    if (
+      !confirm(
+        `Deseja hibernar todos os projetos inativos há mais de ${selectedPeriod} dias?`
+      )
+    ) {
       return;
     }
     autoHibernateMutation.mutate({ days: selectedPeriod });
@@ -73,27 +87,36 @@ export function ActivityTab() {
 
   const handleConfirmPostpone = (days: number) => {
     if (!selectedProject) return;
-    postponeMutation.mutate({ projectId: selectedProject.id, postponeDays: days });
+    postponeMutation.mutate({
+      projectId: selectedProject.id,
+      postponeDays: days,
+    });
   };
 
   const getActionIcon = (action: string) => {
     switch (action) {
-      case 'created': return <CheckCircle2 className="h-4 w-4 text-green-600" />;
-      case 'updated': return <FileEdit className="h-4 w-4 text-blue-600" />;
-      case 'hibernated': return <Moon className="h-4 w-4 text-purple-600" />;
-      case 'reactivated': return <RefreshCw className="h-4 w-4 text-green-600" />;
-      case 'deleted': return <Trash2 className="h-4 w-4 text-red-600" />;
-      default: return <Activity className="h-4 w-4 text-gray-600" />;
+      case "created":
+        return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+      case "updated":
+        return <FileEdit className="h-4 w-4 text-blue-600" />;
+      case "hibernated":
+        return <Moon className="h-4 w-4 text-purple-600" />;
+      case "reactivated":
+        return <RefreshCw className="h-4 w-4 text-green-600" />;
+      case "deleted":
+        return <Trash2 className="h-4 w-4 text-red-600" />;
+      default:
+        return <Activity className="h-4 w-4 text-gray-600" />;
     }
   };
 
   const getActionLabel = (action: string) => {
     const labels: Record<string, string> = {
-      created: 'Criado',
-      updated: 'Atualizado',
-      hibernated: 'Hibernado',
-      reactivated: 'Reativado',
-      deleted: 'Deletado'
+      created: "Criado",
+      updated: "Atualizado",
+      hibernated: "Hibernado",
+      reactivated: "Reativado",
+      deleted: "Deletado",
     };
     return labels[action] || action;
   };
@@ -113,20 +136,26 @@ export function ActivityTab() {
     return (
       <div className="text-center py-12">
         <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-        <p className="text-muted-foreground">Nenhum dado de atividade disponível</p>
+        <p className="text-muted-foreground">
+          Nenhum dado de atividade disponível
+        </p>
       </div>
     );
   }
 
-  const inactiveCount = selectedPeriod === 30 
-    ? activityData.inactiveProjects30 
-    : selectedPeriod === 60 
-    ? activityData.inactiveProjects60 
-    : activityData.inactiveProjects90;
+  const inactiveCount =
+    selectedPeriod === 30
+      ? activityData.inactiveProjects30
+      : selectedPeriod === 60
+        ? activityData.inactiveProjects60
+        : activityData.inactiveProjects90;
 
   const inactiveProjects = activityData.projectsWithActivity.filter(p => {
-    if (p.status !== 'active') return false;
-    return p.hasWarning || (p.daysSinceActivity && p.daysSinceActivity >= selectedPeriod);
+    if (p.status !== "active") return false;
+    return (
+      p.hasWarning ||
+      (p.daysSinceActivity && p.daysSinceActivity >= selectedPeriod)
+    );
   });
 
   return (
@@ -135,11 +164,15 @@ export function ActivityTab() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Projetos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total de Projetos
+            </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{activityData.totalProjects}</div>
+            <div className="text-2xl font-bold">
+              {activityData.totalProjects}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               Todos os projetos cadastrados
             </p>
@@ -148,37 +181,57 @@ export function ActivityTab() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Projetos Ativos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Projetos Ativos
+            </CardTitle>
             <CheckCircle2 className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{activityData.activeProjects}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {activityData.activeProjects}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {((activityData.activeProjects / activityData.totalProjects) * 100).toFixed(0)}% do total
+              {(
+                (activityData.activeProjects / activityData.totalProjects) *
+                100
+              ).toFixed(0)}
+              % do total
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Projetos Hibernados</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Projetos Hibernados
+            </CardTitle>
             <Moon className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{activityData.hibernatedProjects}</div>
+            <div className="text-2xl font-bold text-purple-600">
+              {activityData.hibernatedProjects}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {((activityData.hibernatedProjects / activityData.totalProjects) * 100).toFixed(0)}% do total
+              {(
+                (activityData.hibernatedProjects / activityData.totalProjects) *
+                100
+              ).toFixed(0)}
+              % do total
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Inativos ({selectedPeriod}+ dias)</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Inativos ({selectedPeriod}+ dias)
+            </CardTitle>
             <TrendingDown className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{inactiveCount}</div>
+            <div className="text-2xl font-bold text-orange-600">
+              {inactiveCount}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               Sem atividade recente
             </p>
@@ -199,7 +252,9 @@ export function ActivityTab() {
               </label>
               <Select
                 value={selectedPeriod.toString()}
-                onValueChange={(v) => setSelectedPeriod(parseInt(v) as 30 | 60 | 90)}
+                onValueChange={v =>
+                  setSelectedPeriod(parseInt(v) as 30 | 60 | 90)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -217,11 +272,15 @@ export function ActivityTab() {
               </label>
               <Button
                 onClick={handleAutoHibernate}
-                disabled={autoHibernateMutation.isPending || inactiveCount === 0}
+                disabled={
+                  autoHibernateMutation.isPending || inactiveCount === 0
+                }
                 variant="outline"
                 className="w-full"
               >
-                {autoHibernateMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                {autoHibernateMutation.isPending && (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                )}
                 <Moon className="h-4 w-4 mr-2" />
                 Hibernar Inativos ({inactiveCount})
               </Button>
@@ -234,11 +293,13 @@ export function ActivityTab() {
       {inactiveProjects.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Projetos Inativos (últimos {selectedPeriod} dias)</CardTitle>
+            <CardTitle>
+              Projetos Inativos (últimos {selectedPeriod} dias)
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {inactiveProjects.map((project) => (
+              {inactiveProjects.map(project => (
                 <div
                   key={project.id}
                   className="flex items-center justify-between p-3 border rounded-lg"
@@ -260,10 +321,14 @@ export function ActivityTab() {
                       </span>
                       {project.lastActivityAt && (
                         <span>
-                          Última atividade: {formatDistanceToNow(new Date(project.lastActivityAt), {
-                            addSuffix: true,
-                            locale: ptBR
-                          })}
+                          Última atividade:{" "}
+                          {formatDistanceToNow(
+                            new Date(project.lastActivityAt),
+                            {
+                              addSuffix: true,
+                              locale: ptBR,
+                            }
+                          )}
                         </span>
                       )}
                     </div>
@@ -283,13 +348,11 @@ export function ActivityTab() {
         </Card>
       )}
 
-
-
       {/* Dialog de Adiamento */}
       <PostponeHibernationDialog
         open={postponeDialogOpen}
         onOpenChange={setPostponeDialogOpen}
-        projectName={selectedProject?.nome || ''}
+        projectName={selectedProject?.nome || ""}
         onConfirm={handleConfirmPostpone}
         isLoading={postponeMutation.isPending}
       />

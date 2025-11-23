@@ -9,11 +9,13 @@
 ## 🎯 Visão Geral
 
 O sistema de enriquecimento garante **unicidade de entidades** através de:
+
 1. **Hash único** calculado por entidade
 2. **Constraint UNIQUE** no banco de dados
 3. **Lógica UPSERT** (atualiza se existe, cria se não existe)
 
 **Benefícios:**
+
 - ✅ Evita duplicação de dados
 - ✅ Permite reprocessamento seguro
 - ✅ Mantém histórico de enriquecimento
@@ -32,16 +34,16 @@ O sistema de enriquecimento garante **unicidade de entidades** através de:
 #### Regra de Hash
 
 ```typescript
-mercadoHash = `${nome}-${projectId}`
-  .toLowerCase()
-  .replace(/\s+/g, '-');
+mercadoHash = `${nome}-${projectId}`.toLowerCase().replace(/\s+/g, "-");
 ```
 
 **Componentes:**
+
 - `nome` - Nome do mercado (ex: "Embalagens Plásticas")
 - `projectId` - ID do projeto
 
 **Exemplo:**
+
 ```typescript
 Input:
   nome: "Embalagens Plásticas"
@@ -64,6 +66,7 @@ const [result] = await db.insert(mercadosUnicos).values({
 ```
 
 **Comportamento:**
+
 - ✅ Se hash não existe → Cria novo mercado
 - ❌ Se hash existe → **Erro de duplicação** (não há tratamento)
 
@@ -83,18 +86,20 @@ Mercados **não têm UPSERT**, apenas INSERT. Se tentar criar mercado duplicado,
 ```typescript
 clienteHash = `${nome}-${cnpj || Date.now()}-${projectId}`
   .toLowerCase()
-  .replace(/[^a-z0-9-]/g, '-')
-  .replace(/-+/g, '-')
-  .replace(/^-|-$/g, '');
+  .replace(/[^a-z0-9-]/g, "-")
+  .replace(/-+/g, "-")
+  .replace(/^-|-$/g, "");
 ```
 
 **Componentes:**
+
 - `nome` - Nome do cliente (normalizado)
 - `cnpj` - CNPJ do cliente (se disponível)
 - `Date.now()` - Timestamp atual (se CNPJ não disponível)
 - `projectId` - ID do projeto
 
 **Normalização:**
+
 1. Converte para minúsculas
 2. Remove caracteres especiais (mantém apenas a-z, 0-9, -)
 3. Remove hífens duplicados
@@ -127,16 +132,21 @@ Hash gerado:
 
 ```typescript
 // 1. Verificar se já existe
-const existing = await db.select().from(clientes)
-  .where(and(
-    eq(clientes.clienteHash, clienteHash),
-    eq(clientes.projectId, data.projectId)
-  ))
+const existing = await db
+  .select()
+  .from(clientes)
+  .where(
+    and(
+      eq(clientes.clienteHash, clienteHash),
+      eq(clientes.projectId, data.projectId)
+    )
+  )
   .limit(1);
 
 // 2. Se existe, ATUALIZAR
 if (existing.length > 0) {
-  await db.update(clientes)
+  await db
+    .update(clientes)
     .set({
       nome: data.nome,
       cnpj: data.cnpj || null,
@@ -145,7 +155,7 @@ if (existing.length > 0) {
       qualidadeScore: data.qualidadeScore || existing[0].qualidadeScore,
     })
     .where(eq(clientes.id, existing[0].id));
-  
+
   return existing[0]; // Retorna registro existente
 }
 
@@ -159,18 +169,21 @@ const [result] = await db.insert(clientes).values({
 ```
 
 **Comportamento:**
+
 - ✅ Se hash não existe → Cria novo cliente
 - ✅ Se hash existe → **Atualiza** cliente existente (UPSERT)
 - ✅ Mantém ID original
 - ✅ Preserva dados não fornecidos
 
 **Campos Atualizados no UPSERT:**
+
 - `nome`, `cnpj`, `siteOficial`, `produtoPrincipal`
 - `segmentacaoB2bB2c`, `email`, `telefone`
 - `linkedin`, `instagram`, `cidade`, `uf`
 - `cnae`, `porte`, `qualidadeScore`, `qualidadeClassificacao`
 
 **Campos Preservados:**
+
 - `id` (nunca muda)
 - `projectId` (nunca muda)
 - `clienteHash` (nunca muda)
@@ -190,10 +203,11 @@ const [result] = await db.insert(clientes).values({
 ```typescript
 concorrenteHash = `${nome}-${mercadoId}-${Date.now()}`
   .toLowerCase()
-  .replace(/\s+/g, '-');
+  .replace(/\s+/g, "-");
 ```
 
 **Componentes:**
+
 - `nome` - Nome do concorrente
 - `mercadoId` - ID do mercado
 - `Date.now()` - Timestamp atual
@@ -236,6 +250,7 @@ const [result] = await db.insert(concorrentes).values({
 ```
 
 **Comportamento:**
+
 - ✅ Sempre cria novo concorrente
 - ❌ **Permite duplicação** (hash sempre único por timestamp)
 - ❌ Não há verificação de existência
@@ -253,10 +268,11 @@ const [result] = await db.insert(concorrentes).values({
 ```typescript
 leadHash = `${nome}-${mercadoId}-${Date.now()}`
   .toLowerCase()
-  .replace(/\s+/g, '-');
+  .replace(/\s+/g, "-");
 ```
 
 **Componentes:**
+
 - `nome` - Nome do lead
 - `mercadoId` - ID do mercado
 - `Date.now()` - Timestamp atual
@@ -299,6 +315,7 @@ const result = await db.execute(sql`
 ```
 
 **Comportamento:**
+
 - ✅ Sempre cria novo lead
 - ❌ **Permite duplicação** (hash sempre único por timestamp)
 - ❌ Não há verificação de existência
@@ -312,6 +329,7 @@ const result = await db.execute(sql`
 **Objetivo:** Organizar dados em projetos isolados
 
 **Lógica:**
+
 ```typescript
 if (input.projectId) {
   // Reusar projeto existente
@@ -320,7 +338,7 @@ if (input.projectId) {
   // Criar novo projeto
   project = await createProject({
     nome: input.projectName,
-    descricao: input.projectDescription
+    descricao: input.projectDescription,
   });
 }
 ```
@@ -353,9 +371,9 @@ for (const produto of produtosUnicos) {
     }],
     response_format: { type: 'json_schema', ... }
   });
-  
+
   const data = JSON.parse(response.choices[0].message.content);
-  
+
   // 3. Criar mercado se não existir
   if (!mercadosMap.has(data.mercado)) {
     const mercado = await createMercado({
@@ -364,13 +382,14 @@ for (const produto of produtosUnicos) {
       categoria: data.categoria,
       segmentacao: data.segmentacao
     });
-    
+
     mercadosMap.set(data.mercado, mercado.id);
   }
 }
 ```
 
 **Unicidade:**
+
 - Hash: `${nome}-${projectId}`
 - Exemplo: `"embalagens-plásticas-1"`
 - ✅ Mesmo mercado no mesmo projeto = **não duplica**
@@ -383,7 +402,7 @@ for (const produto of produtosUnicos) {
 clientes = [
   { nome: "Empresa A", produto: "Embalagens plásticas flexíveis" },
   { nome: "Empresa B", produto: "Embalagens de plástico para alimentos" },
-  { nome: "Empresa C", produto: "Potes plásticos" }
+  { nome: "Empresa C", produto: "Potes plásticos" },
 ];
 
 // Gemini identifica:
@@ -392,9 +411,7 @@ clientes = [
 // - Cliente C → Mercado: "Embalagens Plásticas" (mesmo!)
 
 // Resultado: 1 mercado criado
-mercados = [
-  { id: 1, nome: "Embalagens Plásticas", projectId: 1 }
-];
+mercados = [{ id: 1, nome: "Embalagens Plásticas", projectId: 1 }];
 ```
 
 ---
@@ -410,11 +427,11 @@ for (const cliente of clientes) {
   // 1. Consultar ReceitaWS se tem CNPJ
   let dadosEnriquecidos = null;
   if (cliente.cnpj) {
-    const cnpjLimpo = cliente.cnpj.replace(/\D/g, '');
+    const cnpjLimpo = cliente.cnpj.replace(/\D/g, "");
     if (cnpjLimpo.length === 14) {
       // Verificar cache primeiro
       dadosEnriquecidos = await getCachedEnrichment(cnpjLimpo);
-      
+
       if (!dadosEnriquecidos) {
         // Consultar ReceitaWS
         const receitaData = await consultarCNPJ(cnpjLimpo);
@@ -426,31 +443,34 @@ for (const cliente of clientes) {
             cidade: receitaData.municipio,
             uf: receitaData.uf,
             porte: extractPorte(receitaData),
-            cnae: extractCNAE(receitaData)
+            cnae: extractCNAE(receitaData),
           };
-          
+
           // Salvar no cache
-          await setCachedEnrichment(cnpjLimpo, dadosEnriquecidos, 'receitaws');
+          await setCachedEnrichment(cnpjLimpo, dadosEnriquecidos, "receitaws");
         }
       }
     }
   }
-  
+
   // 2. Identificar mercado do cliente via Gemini
   let mercadoId = null;
   if (cliente.produto) {
     const response = await invokeLLM({
-      messages: [{
-        role: 'system',
-        content: 'Identifique o mercado para este produto.'
-      }, {
-        role: 'user',
-        content: `Produto: ${cliente.produto}`
-      }]
+      messages: [
+        {
+          role: "system",
+          content: "Identifique o mercado para este produto.",
+        },
+        {
+          role: "user",
+          content: `Produto: ${cliente.produto}`,
+        },
+      ],
     });
-    
+
     const mercadoNome = response.choices[0].message.content;
-    
+
     // Buscar mercado correspondente
     for (const [nome, id] of mercadosMap.entries()) {
       if (mercadoNome.toLowerCase().includes(nome.toLowerCase())) {
@@ -459,7 +479,7 @@ for (const cliente of clientes) {
       }
     }
   }
-  
+
   // 3. Calcular score de qualidade
   const qualidadeScore = calculateQualityScore({
     cnpj: cliente.cnpj,
@@ -471,7 +491,7 @@ for (const cliente of clientes) {
     uf: dadosEnriquecidos?.uf,
     // ... outros campos
   });
-  
+
   // 4. Criar ou atualizar cliente (UPSERT)
   const novoCliente = await createCliente({
     projectId,
@@ -484,9 +504,9 @@ for (const cliente of clientes) {
     uf: dadosEnriquecidos?.uf,
     produtoPrincipal: cliente.produto,
     qualidadeScore,
-    qualidadeClassificacao: classifyQuality(qualidadeScore)
+    qualidadeClassificacao: classifyQuality(qualidadeScore),
   });
-  
+
   // 5. Associar cliente ao mercado
   if (novoCliente && mercadoId) {
     await associateClienteToMercado(novoCliente.id, mercadoId);
@@ -495,6 +515,7 @@ for (const cliente of clientes) {
 ```
 
 **Unicidade:**
+
 - Hash: `${nome}-${cnpj || Date.now()}-${projectId}`
 - Exemplo com CNPJ: `"empresa-abc-12345678000190-1"`
 - Exemplo sem CNPJ: `"empresa-xyz-1732035600000-1"`
@@ -541,16 +562,16 @@ Campos atualizados:
 for (const [mercadoNome, mercadoId] of mercadosMap.entries()) {
   // 1. Buscar concorrentes via SerpAPI (ou Gemini)
   const rawResults = await searchCompetitors(mercadoNome, undefined, 20);
-  
+
   // 2. Filtrar apenas empresas reais
   const searchResults = filterRealCompanies(rawResults);
-  
+
   // 3. Remover duplicatas (clientes existentes)
   const concorrentesFiltrados = filterDuplicates(
     searchResults,
     clientes // Excluir clientes
   );
-  
+
   // 4. Criar concorrentes (máximo 20 por mercado)
   for (const comp of concorrentesFiltrados.slice(0, 20)) {
     const qualidadeScore = calculateQualityScore({
@@ -558,7 +579,7 @@ for (const [mercadoNome, mercadoId] of mercadosMap.entries()) {
       produto: comp.produto,
       // ... outros campos
     });
-    
+
     await createConcorrente({
       projectId,
       mercadoId,
@@ -566,13 +587,14 @@ for (const [mercadoNome, mercadoId] of mercadosMap.entries()) {
       site: comp.site,
       produto: comp.produto,
       qualidadeScore,
-      qualidadeClassificacao: classifyQuality(qualidadeScore)
+      qualidadeClassificacao: classifyQuality(qualidadeScore),
     });
   }
 }
 ```
 
 **Unicidade:**
+
 - Hash: `${nome}-${mercadoId}-${Date.now()}`
 - Exemplo: `"concorrente-abc-5-1732035600000"`
 - ❌ **Sempre cria novo** (timestamp sempre diferente)
@@ -613,42 +635,43 @@ ID: 201
 ```typescript
 for (const [mercadoNome, mercadoId] of mercadosMap.entries()) {
   // 1. Buscar leads via SerpAPI (ou Gemini)
-  const rawResults = await searchLeads(mercadoNome, 'fornecedores', 20);
-  
+  const rawResults = await searchLeads(mercadoNome, "fornecedores", 20);
+
   // 2. Filtrar apenas empresas reais
   const searchResults = filterRealCompanies(rawResults);
-  
+
   // 3. Remover duplicatas (clientes e concorrentes)
   const leadsFiltrados = filterDuplicates(
     searchResults,
-    clientes,      // Excluir clientes
-    concorrentes   // Excluir concorrentes
+    clientes, // Excluir clientes
+    concorrentes // Excluir concorrentes
   );
-  
+
   // 4. Criar leads (máximo 20 por mercado)
   for (const lead of leadsFiltrados.slice(0, 20)) {
     const qualidadeScore = calculateQualityScore({
       site: lead.site,
       // ... outros campos
     });
-    
+
     await createLead({
       projectId,
       mercadoId,
       nome: lead.nome,
       site: lead.site,
-      tipo: 'outbound',
-      regiao: 'Brasil',
+      tipo: "outbound",
+      regiao: "Brasil",
       setor: mercadoNome,
       qualidadeScore,
       qualidadeClassificacao: classifyQuality(qualidadeScore),
-      stage: 'novo'
+      stage: "novo",
     });
   }
 }
 ```
 
 **Unicidade:**
+
 - Hash: `${nome}-${mercadoId}-${Date.now()}`
 - Exemplo: `"lead-xyz-5-1732035600000"`
 - ❌ **Sempre cria novo** (timestamp sempre diferente)
@@ -685,10 +708,12 @@ ID: 301
 ### 1. Mercados: Sem UPSERT
 
 **Problema:**
+
 - Mercados **não têm lógica UPSERT**
 - Se tentar criar mercado duplicado → **Erro de duplicação**
 
 **Impacto:**
+
 - ❌ Reprocessamento falha se mercado já existe
 - ❌ Não permite atualizar dados de mercado existente
 
@@ -721,7 +746,7 @@ export async function createMercado(data: { ... }) {
         // ... outros campos
       })
       .where(eq(mercadosUnicos.id, existing[0].id));
-    
+
     return existing[0];
   }
 
@@ -742,10 +767,12 @@ export async function createMercado(data: { ... }) {
 ### 2. Concorrentes: Hash com Timestamp
 
 **Problema:**
+
 - Hash inclui `Date.now()` → **sempre único**
 - Mesmo concorrente = **múltiplos registros**
 
 **Impacto:**
+
 - ❌ Duplicação massiva em reprocessamentos
 - ❌ Banco cresce desnecessariamente
 - ❌ Dificulta análise (mesmo concorrente aparece N vezes)
@@ -782,7 +809,7 @@ export async function createConcorrente(data: { ... }) {
         // ... outros campos
       })
       .where(eq(concorrentes.id, existing[0].id));
-    
+
     return existing[0];
   }
 
@@ -804,10 +831,12 @@ export async function createConcorrente(data: { ... }) {
 ### 3. Leads: Hash com Timestamp
 
 **Problema:**
+
 - Mesma situação dos concorrentes
 - Hash inclui `Date.now()` → **sempre único**
 
 **Impacto:**
+
 - ❌ Duplicação massiva em reprocessamentos
 - ❌ Leads duplicados poluem pipeline de vendas
 
@@ -845,7 +874,7 @@ export async function createLead(data: { ... }) {
         // ⚠️ Não atualizar 'stage' para preservar progresso de vendas
       })
       .where(eq(leads.id, existing[0].id));
-    
+
     return existing[0];
   }
 
@@ -867,10 +896,12 @@ export async function createLead(data: { ... }) {
 ### 4. Clientes Sem CNPJ: Hash com Timestamp
 
 **Problema:**
+
 - Clientes sem CNPJ usam `Date.now()` no hash
 - Reprocessamento cria **duplicatas**
 
 **Impacto:**
+
 - ❌ Mesmo cliente sem CNPJ = múltiplos registros
 - ❌ Dificulta rastreamento de enriquecimento
 
@@ -878,15 +909,15 @@ export async function createLead(data: { ... }) {
 
 ```typescript
 // ✅ Usar apenas nome + projectId para clientes sem CNPJ
-const clienteHash = data.cnpj 
+const clienteHash = data.cnpj
   ? `${data.nome}-${data.cnpj}-${data.projectId}`
   : `${data.nome}-${data.projectId}`;
 
 clienteHash = clienteHash
   .toLowerCase()
-  .replace(/[^a-z0-9-]/g, '-')
-  .replace(/-+/g, '-')
-  .replace(/^-|-$/g, '');
+  .replace(/[^a-z0-9-]/g, "-")
+  .replace(/-+/g, "-")
+  .replace(/^-|-$/g, "");
 ```
 
 **Exemplo:**
@@ -903,13 +934,13 @@ Hash: "empresa-xyz-1" (sem timestamp!)
 
 ## 📋 Resumo das Regras de Unicidade
 
-| Entidade | Hash Atual | Problema | UPSERT | Constraint |
-|----------|-----------|----------|--------|------------|
-| **Mercados** | `nome-projectId` | ❌ Sem UPSERT | ❌ Não | ⚠️ Implícito |
-| **Clientes** | `nome-cnpj-projectId` | ✅ OK (com CNPJ) | ✅ Sim | ✅ UNIQUE |
-| | `nome-timestamp-projectId` | ❌ Duplica (sem CNPJ) | ✅ Sim | ✅ UNIQUE |
-| **Concorrentes** | `nome-mercadoId-timestamp` | ❌ Sempre duplica | ❌ Não | ⚠️ Implícito |
-| **Leads** | `nome-mercadoId-timestamp` | ❌ Sempre duplica | ❌ Não | ⚠️ Implícito |
+| Entidade         | Hash Atual                 | Problema              | UPSERT | Constraint   |
+| ---------------- | -------------------------- | --------------------- | ------ | ------------ |
+| **Mercados**     | `nome-projectId`           | ❌ Sem UPSERT         | ❌ Não | ⚠️ Implícito |
+| **Clientes**     | `nome-cnpj-projectId`      | ✅ OK (com CNPJ)      | ✅ Sim | ✅ UNIQUE    |
+|                  | `nome-timestamp-projectId` | ❌ Duplica (sem CNPJ) | ✅ Sim | ✅ UNIQUE    |
+| **Concorrentes** | `nome-mercadoId-timestamp` | ❌ Sempre duplica     | ❌ Não | ⚠️ Implícito |
+| **Leads**        | `nome-mercadoId-timestamp` | ❌ Sempre duplica     | ❌ Não | ⚠️ Implícito |
 
 ---
 
@@ -939,14 +970,15 @@ Hash: "empresa-xyz-1" (sem timestamp!)
 ### Prioridade MÉDIA
 
 5. **Adicionar Constraints UNIQUE no Banco**
+
    ```sql
-   ALTER TABLE mercados_unicos 
+   ALTER TABLE mercados_unicos
    ADD UNIQUE KEY unique_mercado_hash (mercadoHash);
-   
-   ALTER TABLE concorrentes 
+
+   ALTER TABLE concorrentes
    ADD UNIQUE KEY unique_concorrente_hash (concorrenteHash);
-   
-   ALTER TABLE leads 
+
+   ALTER TABLE leads
    ADD UNIQUE KEY unique_lead_hash (leadHash);
    ```
 
@@ -960,12 +992,14 @@ Hash: "empresa-xyz-1" (sem timestamp!)
 ## 🎯 Benefícios Após Correções
 
 **Antes:**
+
 - ❌ Reprocessamento cria 10k+ duplicatas
 - ❌ Banco cresce desnecessariamente
 - ❌ Análises poluídas com dados repetidos
 - ❌ Custos de API desperdiçados
 
 **Depois:**
+
 - ✅ Reprocessamento seguro (UPSERT)
 - ✅ Banco limpo e organizado
 - ✅ Análises precisas

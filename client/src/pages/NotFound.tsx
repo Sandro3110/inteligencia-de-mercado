@@ -37,10 +37,7 @@ export default function NotFound() {
             id="not-found-button-group"
             className="flex flex-col sm:flex-row gap-3 justify-center"
           >
-            <Button
-              onClick={handleGoHome}
-              className="px-6 py-2.5"
-            >
+            <Button onClick={handleGoHome} className="px-6 py-2.5">
               <Home className="w-4 h-4 mr-2" />
               Go Home
             </Button>

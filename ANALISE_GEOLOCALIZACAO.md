@@ -9,33 +9,37 @@
 
 ### **Tabelas Analisadas**
 
-| Tabela | Total Registros | Com Cidade | Com UF | Com Ambos (Cidade + UF) |
-|--------|----------------|------------|--------|-------------------------|
-| **clientes** | 3 | 3 | 3 | 3 (100%) |
-| **concorrentes** | 0 | 0 | 0 | 0 |
-| **leads** | 0 | 0 | 0 | 0 |
+| Tabela           | Total Registros | Com Cidade | Com UF | Com Ambos (Cidade + UF) |
+| ---------------- | --------------- | ---------- | ------ | ----------------------- |
+| **clientes**     | 3               | 3          | 3      | 3 (100%)                |
+| **concorrentes** | 0               | 0          | 0      | 0                       |
+| **leads**        | 0               | 0          | 0      | 0                       |
 
 ### **Campos Existentes no Schema**
 
 ✅ **Clientes** (`drizzle/schema.ts` linha 131-159):
+
 ```typescript
 cidade: varchar({ length: 100 }),
 uf: varchar({ length: 2 }),
 ```
 
 ✅ **Concorrentes** (`drizzle/schema.ts` linha 204-205):
+
 ```typescript
 cidade: varchar({ length: 100 }),
 uf: varchar({ length: 2 }),
 ```
 
 ✅ **Leads** (`drizzle/schema.ts` linha 408-409):
+
 ```typescript
 cidade: varchar({ length: 100 }),
 uf: varchar({ length: 2 }),
 ```
 
 ### **Conclusão Banco:**
+
 ✅ **Todos os campos necessários já existem!**  
 ✅ **Os 3 clientes de teste já têm cidade e UF preenchidos**
 
@@ -54,13 +58,14 @@ uf: varchar({ length: 2 }),
    - ReceitaWS retorna: `municipio`, `uf`, `logradouro`, `numero`, `bairro`, `cep`
 
 2. **Extração de Dados** (linha 460-470):
+
    ```typescript
    dadosEnriquecidos = {
      nome: receitaData.fantasia || receitaData.nome,
      razaoSocial: receitaData.nome,
      cnpj: receitaData.cnpj,
      porte: extractPorte(receitaData),
-     endereco: extractEndereco(receitaData),  // ⚠️ PROBLEMA AQUI
+     endereco: extractEndereco(receitaData), // ⚠️ PROBLEMA AQUI
      cnae: extractCNAE(receitaData),
      email: receitaData.email,
      telefone: receitaData.telefone,
@@ -85,6 +90,7 @@ uf: varchar({ length: 2 }),
 **Arquivo:** `server/_core/receitaws.ts` (linha 145-157)
 
 A função `extractEndereco()` concatena TUDO em uma string:
+
 ```typescript
 export function extractEndereco(data: ReceitaWSResponse): string {
   const parts = [
@@ -92,21 +98,23 @@ export function extractEndereco(data: ReceitaWSResponse): string {
     data.numero,
     data.complemento,
     data.bairro,
-    data.municipio,  // ← Cidade está aqui
-    data.uf,         // ← UF está aqui
+    data.municipio, // ← Cidade está aqui
+    data.uf, // ← UF está aqui
     data.cep,
   ].filter(Boolean);
-  
-  return parts.join(', ');  // ← Vira string única "Rua X, 123, Bairro Y, São Paulo, SP, 01234-567"
+
+  return parts.join(", "); // ← Vira string única "Rua X, 123, Bairro Y, São Paulo, SP, 01234-567"
 }
 ```
 
 **Resultado:**
+
 - `dadosEnriquecidos.endereco` = "Rua X, 123, Bairro Y, São Paulo, SP, 01234-567" ✅
 - `dadosEnriquecidos.cidade` = **UNDEFINED** ❌
 - `dadosEnriquecidos.uf` = **UNDEFINED** ❌
 
 **Por isso no banco:**
+
 ```typescript
 cidade: dadosEnriquecidos?.cidade || null,  // Sempre NULL
 uf: dadosEnriquecidos?.uf || null,          // Sempre NULL
@@ -127,9 +135,9 @@ dadosEnriquecidos = {
   cnpj: receitaData.cnpj,
   porte: extractPorte(receitaData),
   endereco: extractEndereco(receitaData),
-  cidade: receitaData.municipio,        // ← ADICIONAR
-  uf: receitaData.uf,                   // ← ADICIONAR
-  cep: receitaData.cep,                 // ← ADICIONAR (bônus)
+  cidade: receitaData.municipio, // ← ADICIONAR
+  uf: receitaData.uf, // ← ADICIONAR
+  cep: receitaData.cep, // ← ADICIONAR (bônus)
   cnae: extractCNAE(receitaData),
   email: receitaData.email,
   telefone: receitaData.telefone,
@@ -138,6 +146,7 @@ dadosEnriquecidos = {
 ```
 
 **Vantagens:**
+
 - ✅ Simples e direto
 - ✅ Mantém compatibilidade com código existente
 - ✅ Cidade e UF ficam separados para geocoding
@@ -172,6 +181,7 @@ export function extractCEP(data: ReceitaWSResponse): string | null {
 ```
 
 **Depois usar no enrichmentFlow.ts:**
+
 ```typescript
 dadosEnriquecidos = {
   // ... outros campos
@@ -184,6 +194,7 @@ dadosEnriquecidos = {
 ```
 
 **Vantagens:**
+
 - ✅ Mais organizado
 - ✅ Reutilizável em outros lugares
 - ✅ Consistente com padrão `extractPorte()`, `extractCNAE()`
@@ -193,11 +204,13 @@ dadosEnriquecidos = {
 ## 🗺️ 5. PRÓXIMOS PASSOS PARA O MAPA
 
 ### **Fase 1: Corrigir Enriquecimento (URGENTE)**
+
 1. ✅ Implementar Opção 1 ou 2 acima
 2. ✅ Testar com novo enriquecimento
 3. ✅ Verificar se cidade/UF são salvos corretamente
 
 ### **Fase 2: Adicionar Campos de Geolocalização**
+
 ```sql
 ALTER TABLE clientes ADD COLUMN latitude DECIMAL(10, 8);
 ALTER TABLE clientes ADD COLUMN longitude DECIMAL(11, 8);
@@ -213,11 +226,13 @@ ALTER TABLE leads ADD COLUMN geocoded_at TIMESTAMP;
 ```
 
 ### **Fase 3: Implementar Geocoding**
+
 - Criar função para converter "cidade, UF" → lat/lng
 - Usar API gratuita: Nominatim (OpenStreetMap)
 - Exemplo: "São Paulo, SP" → `-23.5505, -46.6333`
 
 ### **Fase 4: Criar Página do Mapa**
+
 - Leaflet.js para renderizar mapa
 - Carregar marcadores dinamicamente
 - Filtros por tipo, estado, qualidade
@@ -227,16 +242,19 @@ ALTER TABLE leads ADD COLUMN geocoded_at TIMESTAMP;
 ## 📋 6. CHECKLIST DE AÇÕES
 
 ### **Imediato (Hoje):**
+
 - [ ] Corrigir `enrichmentFlow.ts` para extrair cidade/UF
 - [ ] Adicionar campos `latitude`, `longitude`, `geocoded_at` no schema
 - [ ] Rodar `pnpm db:push` para aplicar mudanças
 
 ### **Curto Prazo (Esta Semana):**
+
 - [ ] Criar função de geocoding
 - [ ] Geocodificar registros existentes (3 clientes)
 - [ ] Testar geocoding com novos enriquecimentos
 
 ### **Médio Prazo (Próxima Semana):**
+
 - [ ] Criar página `/inteligencia-geografica`
 - [ ] Implementar mapa básico com Leaflet
 - [ ] Adicionar filtros dinâmicos

@@ -12,13 +12,13 @@ A aplicação **Inteligência de Mercado** (anteriormente Gestor PAV) evoluiu si
 
 ### Estatísticas Gerais
 
-| Métrica | Valor |
-|---------|-------|
-| **Páginas/Rotas** | 23 rotas implementadas |
-| **Tabelas no Banco** | 34 tabelas (schema.ts: 836 linhas) |
-| **Endpoints tRPC** | ~80 endpoints (routers.ts: 1560 linhas) |
-| **Componentes React** | 23 páginas + componentes auxiliares |
-| **Fases de Desenvolvimento** | 32 fases concluídas |
+| Métrica                      | Valor                                   |
+| ---------------------------- | --------------------------------------- |
+| **Páginas/Rotas**            | 23 rotas implementadas                  |
+| **Tabelas no Banco**         | 34 tabelas (schema.ts: 836 linhas)      |
+| **Endpoints tRPC**           | ~80 endpoints (routers.ts: 1560 linhas) |
+| **Componentes React**        | 23 páginas + componentes auxiliares     |
+| **Fases de Desenvolvimento** | 32 fases concluídas                     |
 
 ---
 
@@ -26,21 +26,21 @@ A aplicação **Inteligência de Mercado** (anteriormente Gestor PAV) evoluiu si
 
 ### Stack Tecnológico
 
-| Camada | Tecnologia | Versão | Status |
-|--------|------------|--------|--------|
-| **Frontend** | React | 19 | ✅ Implementado |
-| **Estilização** | Tailwind CSS | 4 | ✅ Implementado |
-| **Componentes** | shadcn/ui | - | ✅ Implementado |
-| **Backend** | Express | 4 | ✅ Implementado |
-| **API** | tRPC | 11 | ✅ Implementado |
-| **Banco de Dados** | MySQL/TiDB | - | ✅ Implementado |
-| **ORM** | Drizzle | - | ✅ Implementado |
-| **Autenticação** | Manus OAuth | - | ✅ Implementado |
+| Camada             | Tecnologia   | Versão | Status          |
+| ------------------ | ------------ | ------ | --------------- |
+| **Frontend**       | React        | 19     | ✅ Implementado |
+| **Estilização**    | Tailwind CSS | 4      | ✅ Implementado |
+| **Componentes**    | shadcn/ui    | -      | ✅ Implementado |
+| **Backend**        | Express      | 4      | ✅ Implementado |
+| **API**            | tRPC         | 11     | ✅ Implementado |
+| **Banco de Dados** | MySQL/TiDB   | -      | ✅ Implementado |
+| **ORM**            | Drizzle      | -      | ✅ Implementado |
+| **Autenticação**   | Manus OAuth  | -      | ✅ Implementado |
 
 ### Hierarquia de Dados (Implementada na Fase 22)
 
 ```
-PROJECT (nível 1) 
+PROJECT (nível 1)
   └─> PESQUISA (nível 2)
       └─> MERCADOS/CLIENTES/CONCORRENTES/LEADS (nível 3)
 ```
@@ -51,34 +51,34 @@ PROJECT (nível 1)
 
 ### Rotas Ativas (23 rotas)
 
-| # | Rota | Componente | Descrição | Status Doc Original |
-|---|------|------------|-----------|---------------------|
-| 1 | `/` | CascadeView | Página inicial com visão em cascata | ✅ Documentado |
-| 2 | `/dashboard` | Dashboard | Dashboard principal | ✅ Documentado |
-| 3 | `/dashboard-avancado` | DashboardPage | Dashboard avançado | ✅ Documentado |
-| 4 | `/mercados` | Mercados | Lista de mercados | ✅ Documentado |
-| 5 | `/mercado/:id` | MercadoDetalhes | Detalhes do mercado | ✅ Documentado |
-| 6 | `/enrichment` | EnrichmentFlow | Fluxo de enriquecimento | ✅ Documentado |
-| 7 | `/analytics` | AnalyticsPage | Analytics principal | ✅ Documentado |
-| 8 | `/analytics-dashboard` | AnalyticsDashboard | Dashboard de analytics | ⚠️ Novo (Fase 29) |
-| 9 | `/enrichment-progress` | EnrichmentProgress | Monitoramento de progresso | ✅ Documentado |
-| 10 | `/alertas` | AlertsPage | Configuração de alertas | ✅ Documentado |
-| 11 | `/alertas/historico` | AlertHistoryPage | Histórico de alertas | ✅ Documentado |
-| 12 | `/relatorios` | ReportsPage | Geração de relatórios | ✅ Documentado |
-| 13 | `/roi` | ROIDashboard | Dashboard de ROI | ✅ Documentado |
-| 14 | `/funil` | FunnelView | Funil de vendas | ✅ Documentado |
-| 15 | `/agendamento` | SchedulePage | Agendamento de tarefas | ✅ Documentado |
-| 16 | `/atividade` | AtividadePage | Log de atividades | ✅ Documentado |
-| 17 | `/enrichment-settings` | EnrichmentSettings | Configurações de enriquecimento | ⚠️ Novo |
-| 18 | `/onboarding` | OnboardingPage | Tour guiado (Fase 27) | ❌ Não documentado |
-| 19 | `/resultados-enriquecimento` | ResultadosEnriquecimento | Resultados de enriquecimento | ⚠️ Novo |
-| 20 | `/research-overview` | ResearchOverview | Dashboard Research Overview (Fase 32) | ❌ Não documentado |
-| 21 | `/404` | NotFound | Página não encontrada | - |
+| #   | Rota                         | Componente               | Descrição                             | Status Doc Original |
+| --- | ---------------------------- | ------------------------ | ------------------------------------- | ------------------- |
+| 1   | `/`                          | CascadeView              | Página inicial com visão em cascata   | ✅ Documentado      |
+| 2   | `/dashboard`                 | Dashboard                | Dashboard principal                   | ✅ Documentado      |
+| 3   | `/dashboard-avancado`        | DashboardPage            | Dashboard avançado                    | ✅ Documentado      |
+| 4   | `/mercados`                  | Mercados                 | Lista de mercados                     | ✅ Documentado      |
+| 5   | `/mercado/:id`               | MercadoDetalhes          | Detalhes do mercado                   | ✅ Documentado      |
+| 6   | `/enrichment`                | EnrichmentFlow           | Fluxo de enriquecimento               | ✅ Documentado      |
+| 7   | `/analytics`                 | AnalyticsPage            | Analytics principal                   | ✅ Documentado      |
+| 8   | `/analytics-dashboard`       | AnalyticsDashboard       | Dashboard de analytics                | ⚠️ Novo (Fase 29)   |
+| 9   | `/enrichment-progress`       | EnrichmentProgress       | Monitoramento de progresso            | ✅ Documentado      |
+| 10  | `/alertas`                   | AlertsPage               | Configuração de alertas               | ✅ Documentado      |
+| 11  | `/alertas/historico`         | AlertHistoryPage         | Histórico de alertas                  | ✅ Documentado      |
+| 12  | `/relatorios`                | ReportsPage              | Geração de relatórios                 | ✅ Documentado      |
+| 13  | `/roi`                       | ROIDashboard             | Dashboard de ROI                      | ✅ Documentado      |
+| 14  | `/funil`                     | FunnelView               | Funil de vendas                       | ✅ Documentado      |
+| 15  | `/agendamento`               | SchedulePage             | Agendamento de tarefas                | ✅ Documentado      |
+| 16  | `/atividade`                 | AtividadePage            | Log de atividades                     | ✅ Documentado      |
+| 17  | `/enrichment-settings`       | EnrichmentSettings       | Configurações de enriquecimento       | ⚠️ Novo             |
+| 18  | `/onboarding`                | OnboardingPage           | Tour guiado (Fase 27)                 | ❌ Não documentado  |
+| 19  | `/resultados-enriquecimento` | ResultadosEnriquecimento | Resultados de enriquecimento          | ⚠️ Novo             |
+| 20  | `/research-overview`         | ResearchOverview         | Dashboard Research Overview (Fase 32) | ❌ Não documentado  |
+| 21  | `/404`                       | NotFound                 | Página não encontrada                 | -                   |
 
 ### Páginas Adicionais (não roteadas)
 
-| Componente | Descrição | Status |
-|------------|-----------|--------|
+| Componente        | Descrição               | Status          |
+| ----------------- | ----------------------- | --------------- |
 | ComponentShowcase | Showcase de componentes | Desenvolvimento |
 
 ---
@@ -89,87 +89,87 @@ PROJECT (nível 1)
 
 #### 1. **Entidades Core**
 
-| Tabela | Registros (Exemplo) | Descrição | Status Doc |
-|--------|---------------------|-----------|------------|
-| `users` | - | Usuários do sistema | ✅ |
-| `projects` | 3 ativos | Projetos (workspaces) | ✅ |
-| `pesquisas` | - | Batches de pesquisa | ✅ |
+| Tabela      | Registros (Exemplo) | Descrição             | Status Doc |
+| ----------- | ------------------- | --------------------- | ---------- |
+| `users`     | -                   | Usuários do sistema   | ✅         |
+| `projects`  | 3 ativos            | Projetos (workspaces) | ✅         |
+| `pesquisas` | -                   | Batches de pesquisa   | ✅         |
 
 #### 2. **Entidades de Dados**
 
-| Tabela | Registros (19/11/2025) | Descrição | Status Doc |
-|--------|------------------------|-----------|------------|
-| `mercados_unicos` | 1.619 | Mercados identificados | ✅ |
-| `clientes` | 1.494 (1.474 únicos) | Clientes B2C/B2B2C | ✅ |
-| `concorrentes` | 12.908 | Concorrentes mapeados | ✅ |
-| `leads` | 12.885 | Leads qualificados | ✅ |
-| `produtos` | - | Catálogo de produtos | ⚠️ Novo |
+| Tabela            | Registros (19/11/2025) | Descrição              | Status Doc |
+| ----------------- | ---------------------- | ---------------------- | ---------- |
+| `mercados_unicos` | 1.619                  | Mercados identificados | ✅         |
+| `clientes`        | 1.494 (1.474 únicos)   | Clientes B2C/B2B2C     | ✅         |
+| `concorrentes`    | 12.908                 | Concorrentes mapeados  | ✅         |
+| `leads`           | 12.885                 | Leads qualificados     | ✅         |
+| `produtos`        | -                      | Catálogo de produtos   | ⚠️ Novo    |
 
 #### 3. **Relacionamentos**
 
-| Tabela | Descrição | Status Doc |
-|--------|-----------|------------|
-| `clientes_mercados` | Junction table (clientes ↔ mercados) | ✅ |
+| Tabela              | Descrição                             | Status Doc |
+| ------------------- | ------------------------------------- | ---------- |
+| `clientes_mercados` | Junction table (clientes ↔ mercados) | ✅         |
 
 #### 4. **Gerenciamento**
 
-| Tabela | Descrição | Status Doc |
-|--------|-----------|------------|
-| `tags` | Tags personalizadas | ✅ |
-| `entity_tags` | Associação de tags | ✅ |
-| `saved_filters` | Filtros salvos | ✅ |
-| `project_templates` | Templates de projeto | ⚠️ Novo |
+| Tabela              | Descrição            | Status Doc |
+| ------------------- | -------------------- | ---------- |
+| `tags`              | Tags personalizadas  | ✅         |
+| `entity_tags`       | Associação de tags   | ✅         |
+| `saved_filters`     | Filtros salvos       | ✅         |
+| `project_templates` | Templates de projeto | ⚠️ Novo    |
 
 #### 5. **Notificações e Alertas**
 
-| Tabela | Descrição | Status Doc |
-|--------|-----------|------------|
-| `notifications` | Notificações do sistema | ✅ |
-| `alert_configs` | Configurações de alertas | ✅ |
-| `alert_history` | Histórico de alertas | ✅ |
-| `operational_alerts` | Alertas operacionais | ❌ Novo (Fase 30) |
+| Tabela               | Descrição                | Status Doc        |
+| -------------------- | ------------------------ | ----------------- |
+| `notifications`      | Notificações do sistema  | ✅                |
+| `alert_configs`      | Configurações de alertas | ✅                |
+| `alert_history`      | Histórico de alertas     | ✅                |
+| `operational_alerts` | Alertas operacionais     | ❌ Novo (Fase 30) |
 
 #### 6. **Enriquecimento**
 
-| Tabela | Descrição | Status Doc |
-|--------|-----------|------------|
-| `enrichment_cache` | Cache de enriquecimento | ✅ |
-| `enrichment_runs` | Execuções de enriquecimento | ✅ |
-| `enrichment_jobs` | Jobs de enriquecimento | ✅ |
-| `enrichment_configs` | Configurações de enriquecimento | ⚠️ Novo |
-| `scheduled_enrichments` | Agendamentos de enriquecimento | ✅ |
+| Tabela                  | Descrição                       | Status Doc |
+| ----------------------- | ------------------------------- | ---------- |
+| `enrichment_cache`      | Cache de enriquecimento         | ✅         |
+| `enrichment_runs`       | Execuções de enriquecimento     | ✅         |
+| `enrichment_jobs`       | Jobs de enriquecimento          | ✅         |
+| `enrichment_configs`    | Configurações de enriquecimento | ⚠️ Novo    |
+| `scheduled_enrichments` | Agendamentos de enriquecimento  | ✅         |
 
 #### 7. **Analytics (Fase 30-32)**
 
-| Tabela | Descrição | Status Doc |
-|--------|-----------|------------|
-| `analytics_mercados` | Métricas agregadas por mercado | ❌ Novo (Fase 30) |
-| `analytics_pesquisas` | Métricas agregadas por pesquisa | ❌ Novo (Fase 30) |
+| Tabela                | Descrição                                    | Status Doc        |
+| --------------------- | -------------------------------------------- | ----------------- |
+| `analytics_mercados`  | Métricas agregadas por mercado               | ❌ Novo (Fase 30) |
+| `analytics_pesquisas` | Métricas agregadas por pesquisa              | ❌ Novo (Fase 30) |
 | `analytics_dimensoes` | Eficácia por dimensão (UF/Porte/Segmentação) | ❌ Novo (Fase 30) |
-| `analytics_timeline` | Evolução temporal diária | ❌ Novo (Fase 30) |
+| `analytics_timeline`  | Evolução temporal diária                     | ❌ Novo (Fase 30) |
 
 #### 8. **Conversões e ROI**
 
-| Tabela | Descrição | Status Doc |
-|--------|-----------|------------|
-| `lead_conversions` | Conversões de leads | ✅ |
+| Tabela             | Descrição           | Status Doc |
+| ------------------ | ------------------- | ---------- |
+| `lead_conversions` | Conversões de leads | ✅         |
 
 #### 9. **Auditoria e Histórico**
 
-| Tabela | Descrição | Status Doc |
-|--------|-----------|------------|
-| `activity_log` | Log de atividades | ✅ |
-| `mercados_history` | Histórico de alterações (mercados) | ⚠️ Novo |
-| `clientes_history` | Histórico de alterações (clientes) | ⚠️ Novo |
-| `concorrentes_history` | Histórico de alterações (concorrentes) | ⚠️ Novo |
-| `leads_history` | Histórico de alterações (leads) | ⚠️ Novo |
+| Tabela                 | Descrição                              | Status Doc |
+| ---------------------- | -------------------------------------- | ---------- |
+| `activity_log`         | Log de atividades                      | ✅         |
+| `mercados_history`     | Histórico de alterações (mercados)     | ⚠️ Novo    |
+| `clientes_history`     | Histórico de alterações (clientes)     | ⚠️ Novo    |
+| `concorrentes_history` | Histórico de alterações (concorrentes) | ⚠️ Novo    |
+| `leads_history`        | Histórico de alterações (leads)        | ⚠️ Novo    |
 
 #### 10. **Integrações**
 
-| Tabela | Descrição | Status Doc |
-|--------|-----------|------------|
+| Tabela                | Descrição                       | Status Doc        |
+| --------------------- | ------------------------------- | ----------------- |
 | `salesforce_sync_log` | Log de sincronização Salesforce | ❌ Novo (Fase 30) |
-| `recommendations` | Recomendações automáticas | ❌ Novo (Fase 30) |
+| `recommendations`     | Recomendações automáticas       | ❌ Novo (Fase 30) |
 
 ---
 
@@ -178,12 +178,14 @@ PROJECT (nível 1)
 ### Grupos de Endpoints
 
 #### 1. **Auth** (2 endpoints)
+
 - `auth.me` - Obter usuário atual
 - `auth.logout` - Logout
 
 #### 2. **Analytics** (20+ endpoints)
 
 **Analytics Básicos:**
+
 - `analytics.getProgress` - Progresso de analytics
 - `analytics.leadsByStage` - Leads por estágio
 - `analytics.leadsByMercado` - Leads por mercado
@@ -195,6 +197,7 @@ PROJECT (nível 1)
 - `analytics.segmentation` - Distribuição por segmentação (com filtro de pesquisa)
 
 **Analytics de Lead Generation (Fase 32):**
+
 - `analytics.byMercado` - Métricas por mercado
 - `analytics.byPesquisa` - Métricas por pesquisa
 - `analytics.byDimensao` - Métricas por dimensão
@@ -204,6 +207,7 @@ PROJECT (nível 1)
 - `analytics.runAggregation` - Executar agregação manual
 
 #### 3. **Projects** (5+ endpoints)
+
 - `projects.list` - Listar projetos
 - `projects.getById` - Buscar projeto por ID
 - `projects.create` - Criar projeto
@@ -211,6 +215,7 @@ PROJECT (nível 1)
 - `projects.delete` - Deletar projeto
 
 #### 4. **Pesquisas** (5+ endpoints)
+
 - `pesquisas.list` - Listar pesquisas
 - `pesquisas.getById` - Buscar pesquisa por ID
 - `pesquisas.getByProject` - Pesquisas de um projeto
@@ -218,6 +223,7 @@ PROJECT (nível 1)
 - `pesquisas.update` - Atualizar pesquisa
 
 #### 5. **Mercados** (10+ endpoints)
+
 - `mercados.list` - Listar mercados
 - `mercados.getById` - Buscar mercado por ID
 - `mercados.create` - Criar mercado
@@ -229,18 +235,23 @@ PROJECT (nível 1)
 - `mercados.getHistory` - Histórico de alterações
 
 #### 6. **Clientes** (10+ endpoints)
+
 - Similar aos mercados (list, getById, create, update, delete, validate, etc.)
 
 #### 7. **Concorrentes** (10+ endpoints)
+
 - Similar aos mercados
 
 #### 8. **Leads** (10+ endpoints)
+
 - Similar aos mercados + conversões
 
 #### 9. **Produtos** (5+ endpoints)
+
 - `produtos.list`, `produtos.create`, etc.
 
 #### 10. **Enriquecimento** (10+ endpoints)
+
 - `enrichment.start` - Iniciar enriquecimento
 - `enrichment.pause` - Pausar enriquecimento
 - `enrichment.resume` - Retomar enriquecimento
@@ -251,20 +262,25 @@ PROJECT (nível 1)
 - `enrichment.updateConfig` - Atualizar configuração
 
 #### 11. **Alertas** (5+ endpoints)
+
 - `alerts.list`, `alerts.create`, `alerts.update`, `alerts.delete`, `alerts.getHistory`
 
 #### 12. **Relatórios** (3+ endpoints)
+
 - `reports.generate` - Gerar relatório (com filtro de pesquisa - Fase 29)
 - `reports.list` - Listar relatórios
 - `reports.download` - Download de relatório
 
 #### 13. **Tags** (5+ endpoints)
+
 - `tags.list`, `tags.create`, `tags.update`, `tags.delete`, `tags.assign`
 
 #### 14. **Filtros** (5+ endpoints)
+
 - `filters.list`, `filters.save`, `filters.load`, `filters.delete`
 
 #### 15. **Dashboard** (5+ endpoints)
+
 - `dashboard.getStats` - Estatísticas gerais
 - `dashboard.getKPIs` - KPIs principais
 - `dashboard.getCharts` - Dados para gráficos
@@ -311,6 +327,7 @@ PROJECT (nível 1)
    - Agendamentos
 
 **Funcionalidades do Sidebar:**
+
 - ✅ Colapsável (60px collapsed, 240px expanded)
 - ✅ Persistência de estado (localStorage)
 - ✅ Atalhos de teclado (Ctrl+1, Ctrl+2, Ctrl+3, Ctrl+4, Ctrl+B)
@@ -357,6 +374,7 @@ PROJECT (nível 1)
 ### 1. Página Inicial (CascadeView) - Rota: `/`
 
 **Funcionalidades Implementadas:**
+
 - ✅ Seletor de projeto (dropdown dinâmico)
 - ✅ Estatísticas globais (4 KPIs)
 - ✅ Barra de ações (Dashboard, Monitorar, Exportar, Novo Projeto, Tags)
@@ -368,6 +386,7 @@ PROJECT (nível 1)
 - ✅ Navegação em cascata (Mercado → Clientes → Concorrentes → Leads)
 
 **Mudanças desde o documento original:**
+
 - ⚠️ Sidebar lateral substituiu estatísticas internas
 - ⚠️ Filtros movidos para área principal
 - ⚠️ Título alterado de "GESTOR PAV" para "Inteligência de Mercado"
@@ -376,6 +395,7 @@ PROJECT (nível 1)
 ### 2. Mercados - Rota: `/mercados`
 
 **Funcionalidades Implementadas:**
+
 - ✅ Lista de mercados (tabela com ordenação)
 - ✅ Busca por nome ou características
 - ✅ Indicadores visuais de status
@@ -391,6 +411,7 @@ PROJECT (nível 1)
 ### 3. Dashboard - Rota: `/dashboard`
 
 **Funcionalidades Implementadas:**
+
 - ✅ Cards de métricas (com variação percentual)
 - ✅ Gráficos principais:
   - Distribuição por Segmentação (pie chart)
@@ -405,6 +426,7 @@ PROJECT (nível 1)
 ### 4. Analytics - Rota: `/analytics`
 
 **Funcionalidades Implementadas:**
+
 - ✅ Análise de Mercado (mapa de calor, saturação, oportunidades)
 - ✅ Análise de Clientes (segmentação por porte, faturamento, distribuição geográfica)
 - ✅ Análise de Concorrentes (matriz competitiva, market share, gaps)
@@ -415,12 +437,14 @@ PROJECT (nível 1)
 - ✅ Drill-down em gráficos
 
 **Mudanças desde o documento original:**
+
 - ⚠️ Adicionado filtro por pesquisa (Fase 29)
 - ⚠️ Correções de tema light (Fase 29)
 
 ### 5. Enriquecimento - Rota: `/enrichment`
 
 **Funcionalidades Implementadas:**
+
 - ✅ Seletor de template
 - ✅ Seletor de modo (Parallel/Sequential)
 - ✅ Configurações de enriquecimento
@@ -434,6 +458,7 @@ PROJECT (nível 1)
 ### 6. Monitoramento - Rota: `/enrichment-progress`
 
 **Funcionalidades Implementadas:**
+
 - ✅ Indicador de progresso (barra 0-100%)
 - ✅ Métricas detalhadas (processados, erros, pendentes, taxa de sucesso)
 - ✅ Log de execução em tempo real
@@ -450,6 +475,7 @@ PROJECT (nível 1)
 ### 8. Alertas - Rota: `/alertas`
 
 **Funcionalidades Implementadas:**
+
 - ✅ Lista de alertas configurados
 - ✅ Formulário de criação de alerta
 - ✅ Histórico de alertas (/alertas/historico)
@@ -462,6 +488,7 @@ PROJECT (nível 1)
 ### 9. Relatórios - Rota: `/relatorios`
 
 **Funcionalidades Implementadas:**
+
 - ✅ Seletor de tipo de relatório (Executivo, Mercados, Clientes, Concorrentes, Leads, Personalizado)
 - ✅ Configurações do relatório (período, filtros, seções)
 - ✅ Preview do relatório
@@ -471,12 +498,14 @@ PROJECT (nível 1)
 - ✅ Filtro por pesquisa (Fase 29)
 
 **Mudanças desde o documento original:**
+
 - ⚠️ Adicionado filtro por pesquisa (Fase 29)
 - ⚠️ Correções de tema light (Fase 29)
 
 ### 10. ROI - Rota: `/roi`
 
 **Funcionalidades Implementadas:**
+
 - ✅ Cards de métricas financeiras (ROI Total, Custo por Lead, Taxa de Conversão)
 - ✅ Gráficos de ROI
 - ✅ Análise de custos
@@ -487,6 +516,7 @@ PROJECT (nível 1)
 ### 11. Funil - Rota: `/funil`
 
 **Funcionalidades Implementadas:**
+
 - ✅ Visualização de funil de vendas
 - ✅ Evolução de leads pelos estágios
 - ✅ Identificação de gargalos
@@ -497,6 +527,7 @@ PROJECT (nível 1)
 ### 12. Agendamento - Rota: `/agendamento`
 
 **Funcionalidades Implementadas:**
+
 - ✅ Configuração de execução recorrente
 - ✅ Calendário de agendamentos
 - ✅ Histórico de execuções
@@ -506,6 +537,7 @@ PROJECT (nível 1)
 ### 13. Atividade - Rota: `/atividade`
 
 **Funcionalidades Implementadas:**
+
 - ✅ Log de atividades do sistema
 - ✅ Filtros por tipo de ação
 - ✅ Filtros por usuário
@@ -516,6 +548,7 @@ PROJECT (nível 1)
 ### 14. Research Overview - Rota: `/research-overview` (NOVO - Fase 32)
 
 **Funcionalidades Implementadas:**
+
 - ✅ 4 KPIs principais (Mercados, Leads, Qualidade Média, Taxa de Aprovação)
 - ✅ Funil de Qualificação (BarChart horizontal)
 - ✅ Distribuição de Qualidade (PieChart)
@@ -592,39 +625,39 @@ PROJECT (nível 1)
 
 ### Totais no Banco de Dados
 
-| Entidade | Quantidade | % do Total |
-|----------|------------|------------|
-| Mercados Únicos | 1.619 | 5.6% |
-| Clientes | 1.494 (1.474 únicos) | 5.0% |
-| Concorrentes | 12.908 | 44.7% |
-| Leads | 12.885 | 44.6% |
-| **TOTAL** | **28.869** | **100%** |
+| Entidade        | Quantidade           | % do Total |
+| --------------- | -------------------- | ---------- |
+| Mercados Únicos | 1.619                | 5.6%       |
+| Clientes        | 1.494 (1.474 únicos) | 5.0%       |
+| Concorrentes    | 12.908               | 44.7%      |
+| Leads           | 12.885               | 44.6%      |
+| **TOTAL**       | **28.869**           | **100%**   |
 
 ### Projetos Ativos
 
-| # | Nome | Status | Dados |
-|---|------|--------|-------|
-| 1 | Agro | Ativo | 0 registros |
-| 2 | Embalagens | Ativo | 470 clientes, 806 mercados, 3453 concorrentes, 2433 leads |
-| 3 | (Terceiro projeto) | Ativo | - |
+| #   | Nome               | Status | Dados                                                     |
+| --- | ------------------ | ------ | --------------------------------------------------------- |
+| 1   | Agro               | Ativo  | 0 registros                                               |
+| 2   | Embalagens         | Ativo  | 470 clientes, 806 mercados, 3453 concorrentes, 2433 leads |
+| 3   | (Terceiro projeto) | Ativo  | -                                                         |
 
 ### Métricas de Enriquecimento
 
-| Métrica | Valor |
-|---------|-------|
-| Total de Execuções | 3 |
-| Execuções Completas | 2 (66.7%) |
-| Em Execução | 1 (33.3%) |
-| Com Erro | 0 (0%) |
-| Taxa de Sucesso | 100% (execuções finalizadas) |
+| Métrica             | Valor                        |
+| ------------------- | ---------------------------- |
+| Total de Execuções  | 3                            |
+| Execuções Completas | 2 (66.7%)                    |
+| Em Execução         | 1 (33.3%)                    |
+| Com Erro            | 0 (0%)                       |
+| Taxa de Sucesso     | 100% (execuções finalizadas) |
 
 ### Duplicação de Dados
 
-| Tipo | Quantidade | Taxa |
-|------|------------|------|
-| Clientes duplicados por nome | 10 (20 registros) | 1.3% |
-| Clientes duplicados por email | 10 (20 registros) | 1.3% |
-| **Taxa total de duplicação** | **1.3%** | **Excelente** |
+| Tipo                          | Quantidade        | Taxa          |
+| ----------------------------- | ----------------- | ------------- |
+| Clientes duplicados por nome  | 10 (20 registros) | 1.3%          |
+| Clientes duplicados por email | 10 (20 registros) | 1.3%          |
+| **Taxa total de duplicação**  | **1.3%**          | **Excelente** |
 
 ---
 
@@ -722,24 +755,24 @@ PROJECT (nível 1)
 
 ## 🎯 Status de Implementação por Módulo
 
-| Módulo | Status Doc Original | Status Atual | Mudanças |
-|--------|---------------------|--------------|----------|
-| Início (CascadeView) | ✅ Documentado | ✅ Implementado | ⚠️ UI refatorada |
-| Mercados | ✅ Documentado | ✅ Implementado | ✅ Conforme |
-| Dashboard | ✅ Documentado | ✅ Implementado | ✅ Conforme |
-| Analytics | ✅ Documentado | ✅ Implementado | ⚠️ Filtro de pesquisa adicionado |
-| Enriquecimento | ✅ Documentado | ✅ Implementado | ✅ Conforme |
-| Monitoramento | ✅ Documentado | ✅ Implementado | ✅ Conforme |
-| Evolução | ✅ Documentado | ❓ Rota não encontrada | ⚠️ Removido? |
-| Alertas | ✅ Documentado | ✅ Implementado | ✅ Conforme |
-| Relatórios | ✅ Documentado | ✅ Implementado | ⚠️ Filtro de pesquisa adicionado |
-| ROI | ✅ Documentado | ✅ Implementado | ✅ Conforme |
-| Funil | ✅ Documentado | ✅ Implementado | ✅ Conforme |
-| Agendamento | ✅ Documentado | ✅ Implementado | ✅ Conforme |
-| Atividade | ✅ Documentado | ✅ Implementado | ✅ Conforme |
-| Research Overview | ❌ Não documentado | ✅ Implementado (Fase 32) | ❌ Novo |
-| Onboarding | ❌ Não documentado | ✅ Implementado (Fase 27) | ❌ Novo |
-| Analytics Dashboard | ❌ Não documentado | ✅ Implementado (Fase 29) | ❌ Novo |
+| Módulo               | Status Doc Original | Status Atual              | Mudanças                         |
+| -------------------- | ------------------- | ------------------------- | -------------------------------- |
+| Início (CascadeView) | ✅ Documentado      | ✅ Implementado           | ⚠️ UI refatorada                 |
+| Mercados             | ✅ Documentado      | ✅ Implementado           | ✅ Conforme                      |
+| Dashboard            | ✅ Documentado      | ✅ Implementado           | ✅ Conforme                      |
+| Analytics            | ✅ Documentado      | ✅ Implementado           | ⚠️ Filtro de pesquisa adicionado |
+| Enriquecimento       | ✅ Documentado      | ✅ Implementado           | ✅ Conforme                      |
+| Monitoramento        | ✅ Documentado      | ✅ Implementado           | ✅ Conforme                      |
+| Evolução             | ✅ Documentado      | ❓ Rota não encontrada    | ⚠️ Removido?                     |
+| Alertas              | ✅ Documentado      | ✅ Implementado           | ✅ Conforme                      |
+| Relatórios           | ✅ Documentado      | ✅ Implementado           | ⚠️ Filtro de pesquisa adicionado |
+| ROI                  | ✅ Documentado      | ✅ Implementado           | ✅ Conforme                      |
+| Funil                | ✅ Documentado      | ✅ Implementado           | ✅ Conforme                      |
+| Agendamento          | ✅ Documentado      | ✅ Implementado           | ✅ Conforme                      |
+| Atividade            | ✅ Documentado      | ✅ Implementado           | ✅ Conforme                      |
+| Research Overview    | ❌ Não documentado  | ✅ Implementado (Fase 32) | ❌ Novo                          |
+| Onboarding           | ❌ Não documentado  | ✅ Implementado (Fase 27) | ❌ Novo                          |
+| Analytics Dashboard  | ❌ Não documentado  | ✅ Implementado (Fase 29) | ❌ Novo                          |
 
 ---
 

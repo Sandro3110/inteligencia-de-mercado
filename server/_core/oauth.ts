@@ -28,7 +28,7 @@ export function registerOAuthRoutes(app: Express) {
         return;
       }
 
-      const { toMySQLTimestamp } = await import('../dateUtils');
+      const { toMySQLTimestamp } = await import("../dateUtils");
       await db.upsertUser({
         id: userInfo.openId,
         name: userInfo.name || null,
@@ -43,7 +43,10 @@ export function registerOAuthRoutes(app: Express) {
       });
 
       const cookieOptions = getSessionCookieOptions(req);
-      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+      res.cookie(COOKIE_NAME, sessionToken, {
+        ...cookieOptions,
+        maxAge: ONE_YEAR_MS,
+      });
 
       res.redirect(302, "/");
     } catch (error) {

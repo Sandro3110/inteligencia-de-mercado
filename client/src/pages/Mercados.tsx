@@ -5,7 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { Search, Building2, ArrowLeft, TrendingUp, Users, Download, Filter, X } from "lucide-react";
+import {
+  Search,
+  Building2,
+  ArrowLeft,
+  TrendingUp,
+  Users,
+  Download,
+  Filter,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { ProjectSelector } from "@/components/ProjectSelector";
@@ -18,22 +27,22 @@ export default function Mercados() {
   const [showFilters, setShowFilters] = useState(false);
   const { selectedProjectId } = useSelectedProject();
   const { sidebarClass } = useSidebarState();
-  const { data: mercados, isLoading } = trpc.mercados.list.useQuery({ 
-    search, 
+  const { data: mercados, isLoading } = trpc.mercados.list.useQuery({
+    search,
     categoria: categoria || undefined,
-    segmentacao: segmentacao || undefined
+    segmentacao: segmentacao || undefined,
   });
   // const exportMutation = trpc.export.mercados.useMutation(); // Endpoint não implementado
 
   const handleExport = async () => {
     if (!selectedProjectId) {
-      toast.error('Selecione um projeto primeiro');
+      toast.error("Selecione um projeto primeiro");
       return;
     }
-    
-    toast.error('Funcionalidade de exportação não implementada');
+
+    toast.error("Funcionalidade de exportação não implementada");
     return;
-    
+
     /* try {
       toast.info('Gerando arquivo Excel...');
       const result = await exportMutation.mutateAsync({ projectId: selectedProjectId });
@@ -61,7 +70,9 @@ export default function Mercados() {
 
   if (isLoading) {
     return (
-      <div className={`min-h-screen ${sidebarClass} flex items-center justify-center transition-all duration-300`}>
+      <div
+        className={`min-h-screen ${sidebarClass} flex items-center justify-center transition-all duration-300`}
+      >
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
@@ -70,24 +81,25 @@ export default function Mercados() {
   return (
     <div className={`min-h-screen ${sidebarClass} transition-all duration-300`}>
       {/* Header */}
-      <div className="border-b border-border/50">        <div className="container py-2 border-b border-border/30">
+      <div className="border-b border-border/50">
+        {" "}
+        <div className="container py-2 border-b border-border/30">
           <DynamicBreadcrumbs />
         </div>
-
         <div className="container py-6">
           <div className="flex items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-4">
-            <Link href="/">
-              <Button variant="ghost" size="icon" className="hover-lift">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </Link>
-            <div>
-              <h2 className="section-title">Lista de Mercados</h2>
-              <h1 className="text-2xl font-semibold text-foreground">
-                {mercados?.length || 0} Mercados Únicos
-              </h1>
-            </div>
+              <Link href="/">
+                <Button variant="ghost" size="icon" className="hover-lift">
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+              </Link>
+              <div>
+                <h2 className="section-title">Lista de Mercados</h2>
+                <h1 className="text-2xl font-semibold text-foreground">
+                  {mercados?.length || 0} Mercados Únicos
+                </h1>
+              </div>
             </div>
             <ProjectSelector />
           </div>
@@ -101,7 +113,7 @@ export default function Mercados() {
                 <Input
                   placeholder="Buscar por nome ou categoria..."
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={e => setSearch(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -120,27 +132,31 @@ export default function Mercados() {
                 className="gap-2"
               >
                 <Download className="w-4 h-4" />
-                {'Exportar Excel'}
+                {"Exportar Excel"}
               </Button>
             </div>
-            
+
             {/* Painel de Filtros */}
             {showFilters && (
               <div className="mt-4 p-4 bg-muted/50 rounded-lg border border-border">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Categoria/CNAE</label>
+                    <label className="text-sm font-medium mb-2 block">
+                      Categoria/CNAE
+                    </label>
                     <Input
                       placeholder="Ex: Tecnologia, Saúde..."
                       value={categoria}
-                      onChange={(e) => setCategoria(e.target.value)}
+                      onChange={e => setCategoria(e.target.value)}
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Segmentação</label>
+                    <label className="text-sm font-medium mb-2 block">
+                      Segmentação
+                    </label>
                     <select
                       value={segmentacao}
-                      onChange={(e) => setSegmentacao(e.target.value)}
+                      onChange={e => setSegmentacao(e.target.value)}
                       className="w-full px-3 py-2 border border-input bg-background rounded-md"
                     >
                       <option value="">Todos</option>
@@ -164,9 +180,12 @@ export default function Mercados() {
                 </div>
                 {(categoria || segmentacao) && (
                   <div className="mt-3 text-sm text-muted-foreground">
-                    {[categoria && `Categoria: ${categoria}`, segmentacao && `Segmentação: ${segmentacao}`]
+                    {[
+                      categoria && `Categoria: ${categoria}`,
+                      segmentacao && `Segmentação: ${segmentacao}`,
+                    ]
                       .filter(Boolean)
-                      .join(' • ')}
+                      .join(" • ")}
                   </div>
                 )}
               </div>
@@ -178,7 +197,7 @@ export default function Mercados() {
       {/* Mercados Grid */}
       <div className="container py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {mercados?.map((mercado) => (
+          {mercados?.map(mercado => (
             <Link key={mercado.id} href={`/mercado/${mercado.id}`}>
               <Card className="bg-white border-slate-200 shadow-sm cursor-pointer h-full">
                 <CardContent className="p-6">
@@ -188,7 +207,7 @@ export default function Mercados() {
                     </div>
                     <span className="pill-badge">
                       <span className="status-dot info"></span>
-                      {mercado.segmentacao || 'N/A'}
+                      {mercado.segmentacao || "N/A"}
                     </span>
                   </div>
 
@@ -210,7 +229,9 @@ export default function Mercados() {
                     {mercado.crescimentoAnual && (
                       <div className="flex items-center gap-1 text-green-600">
                         <TrendingUp className="h-4 w-4" />
-                        <span className="text-xs">{mercado.crescimentoAnual.substring(0, 10)}</span>
+                        <span className="text-xs">
+                          {mercado.crescimentoAnual.substring(0, 10)}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -235,4 +256,3 @@ export default function Mercados() {
     </div>
   );
 }
-

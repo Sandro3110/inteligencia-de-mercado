@@ -1,17 +1,20 @@
-import { useState, useEffect } from 'react';
-import { trpc } from '@/lib/trpc';
+import { useState, useEffect } from "react";
+import { trpc } from "@/lib/trpc";
 
-const STORAGE_KEY = 'selected-pesquisa-id';
+const STORAGE_KEY = "selected-pesquisa-id";
 
 export function useSelectedPesquisa(projectId?: number | null) {
-  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(null);
+  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   // Buscar lista de pesquisas do projeto
-  const { data: pesquisas = [], isLoading: isLoadingPesquisas } = trpc.pesquisas.list.useQuery(
-    { projectId: projectId! },
-    { enabled: !!projectId }
-  );
+  const { data: pesquisas = [], isLoading: isLoadingPesquisas } =
+    trpc.pesquisas.list.useQuery(
+      { projectId: projectId! },
+      { enabled: !!projectId }
+    );
 
   // Inicializar pesquisa selecionada
   useEffect(() => {

@@ -1,18 +1,18 @@
 import { Link, useLocation } from "wouter";
-import { 
-  ChevronRight, 
-  Home, 
-  BarChart3, 
-  Target, 
-  TrendingUp, 
-  Filter, 
-  FileText, 
-  Activity, 
-  Bell, 
+import {
+  ChevronRight,
+  Home,
+  BarChart3,
+  Target,
+  TrendingUp,
+  Filter,
+  FileText,
+  Activity,
+  Bell,
   Calendar,
   Settings,
   Zap,
-  ArrowLeft
+  ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -45,23 +45,22 @@ const routeMap: Record<string, { label: string; icon?: any }> = {
 
 export function DynamicBreadcrumbs() {
   const [location] = useLocation();
-  
+
   // Se estiver na home, não mostrar breadcrumbs
   if (location === "/") {
     return null;
   }
 
   const pathSegments = location.split("/").filter(Boolean);
-  const breadcrumbs: BreadcrumbItem[] = [
-    { label: "Início", href: "/" }
-  ];
+  const breadcrumbs: BreadcrumbItem[] = [{ label: "Início", href: "/" }];
 
   // Construir breadcrumbs baseado nos segmentos da URL
   let currentPath = "";
   for (const segment of pathSegments) {
     currentPath += `/${segment}`;
     const routeInfo = routeMap[currentPath];
-    const label = routeInfo?.label || segment.charAt(0).toUpperCase() + segment.slice(1);
+    const label =
+      routeInfo?.label || segment.charAt(0).toUpperCase() + segment.slice(1);
     breadcrumbs.push({ label, href: currentPath });
   }
 
@@ -80,39 +79,41 @@ export function DynamicBreadcrumbs() {
           <ArrowLeft className="w-4 h-4" />
         </Button>
       )}
-      
+
       <div className="flex items-center gap-2 text-muted-foreground">
-      {breadcrumbs.map((item, index) => {
-        const isLast = index === breadcrumbs.length - 1;
-        const isFirst = index === 0;
-        
-        return (
-          <div key={item.href} className="flex items-center gap-2">
-            {index > 0 && <ChevronRight className="w-4 h-4 text-slate-400" />}
-            {(() => {
-              const routeInfo = routeMap[item.href];
-              const Icon = routeInfo?.icon;
-              
-              return isLast ? (
-                <span className="font-medium text-foreground flex items-center gap-1.5">
-                  {Icon && <Icon className="w-4 h-4" />}
-                  {item.label}
-                </span>
-              ) : (
-                <Link href={item.href}>
-                  <span className={cn(
-                    "hover:text-blue-600 transition-colors cursor-pointer flex items-center gap-1.5",
-                    "hover:underline"
-                  )}>
+        {breadcrumbs.map((item, index) => {
+          const isLast = index === breadcrumbs.length - 1;
+          const isFirst = index === 0;
+
+          return (
+            <div key={item.href} className="flex items-center gap-2">
+              {index > 0 && <ChevronRight className="w-4 h-4 text-slate-400" />}
+              {(() => {
+                const routeInfo = routeMap[item.href];
+                const Icon = routeInfo?.icon;
+
+                return isLast ? (
+                  <span className="font-medium text-foreground flex items-center gap-1.5">
                     {Icon && <Icon className="w-4 h-4" />}
                     {item.label}
                   </span>
-                </Link>
-              );
-            })()}
-          </div>
-        );
-      })}
+                ) : (
+                  <Link href={item.href}>
+                    <span
+                      className={cn(
+                        "hover:text-blue-600 transition-colors cursor-pointer flex items-center gap-1.5",
+                        "hover:underline"
+                      )}
+                    >
+                      {Icon && <Icon className="w-4 h-4" />}
+                      {item.label}
+                    </span>
+                  </Link>
+                );
+              })()}
+            </div>
+          );
+        })}
       </div>
     </nav>
   );

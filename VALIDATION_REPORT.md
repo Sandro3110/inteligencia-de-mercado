@@ -21,6 +21,7 @@ Este relatório documenta a execução dos **3 passos de validação final** sol
 ### ✅ Testes que Passaram (16/30)
 
 #### Módulo de Enriquecimento (5 testes)
+
 - ✅ Validação de schema de mercado
 - ✅ Validação de schema de cliente
 - ✅ Parser de planilhas (parseSpreadsheet)
@@ -28,6 +29,7 @@ Este relatório documenta a execução dos **3 passos de validação final** sol
 - ✅ Batch processor (enrichBatch)
 
 #### Módulo de Exportação (8 testes)
+
 - ✅ Interpretation Service
 - ✅ Query Builder Service
 - ✅ CSV Renderer
@@ -38,17 +40,20 @@ Este relatório documenta a execução dos **3 passos de validação final** sol
 - ✅ File Size Estimator
 
 #### Documentação (4 testes)
+
 - ✅ EXPORT_MODULE_100_COMPLETE.md
 - ✅ ENRICHMENT_MODULE_100_COMPLETE.md
 - ✅ TEST_END_TO_END.md
 - ✅ FINAL_100_PERCENT.md
 
 #### Integração (1 teste)
+
 - ✅ Batch processor lê parâmetros dinâmicos do banco
 
 ### ❌ Testes que Falharam (14/30)
 
 **Motivos principais:**
+
 1. **Componentes React não criados** - Alguns componentes listados nos testes ainda não foram implementados
 2. **Diferenças de nomenclatura** - Funções com nomes diferentes do esperado (ex: `getLLMConfig` vs `getEnrichmentConfig`)
 3. **Arquivos faltantes** - 5 arquivos esperados não encontrados (16/21 = 76% dos arquivos core existem)
@@ -66,24 +71,28 @@ Este relatório documenta a execução dos **3 passos de validação final** sol
 O guia de teste end-to-end documenta 3 cenários completos:
 
 #### Cenário 1: Pequena Empresa (10 clientes)
+
 - Wizard de configuração
 - Upload de planilha
 - Enriquecimento batch
 - Exportação em múltiplos formatos
 
 #### Cenário 2: Média Empresa (100 clientes)
+
 - Pré-pesquisa inteligente
 - Validação de dados
 - Processamento em lotes
 - Relatórios avançados
 
 #### Cenário 3: Grande Empresa (1000+ clientes)
+
 - Credenciais personalizadas
 - Processamento paralelo
 - Exportação otimizada
 - Monitoramento de progresso
 
 **Validação:**
+
 - ✅ Wizard → Banco (parâmetros salvos)
 - ✅ Banco → Batch Processor (parâmetros lidos)
 - ✅ Batch Processor → Enriquecimento (LLM invocado)
@@ -100,33 +109,38 @@ O guia de teste end-to-end documenta 3 cenários completos:
 ### Funcionalidades Implementadas
 
 #### 1. Wrapper de LLM com Configuração
+
 ```typescript
 export async function invokeLLMWithConfig(
   projectId: number,
   params: InvokeParams
-): Promise<InvokeResult>
+): Promise<InvokeResult>;
 ```
 
 **Comportamento:**
+
 1. Busca credenciais do banco (`enrichment_configs` table)
 2. Se encontrar → usa credenciais do projeto
 3. Se não encontrar → fallback para ENV (sistema padrão)
 
 #### 2. Cache de Configurações
+
 - Cache em memória com TTL de 5 minutos
 - Reduz consultas ao banco
 - Função `clearLLMConfigCache()` para invalidar
 
 #### 3. Validação de Credenciais
+
 ```typescript
 export async function validateLLMConfig(projectId: number): Promise<{
   valid: boolean;
   provider?: string;
   error?: string;
-}>
+}>;
 ```
 
 **Teste de validação:**
+
 - Faz chamada simples ao LLM
 - Retorna status de sucesso/erro
 - Identifica provedor usado
@@ -134,19 +148,21 @@ export async function validateLLMConfig(projectId: number): Promise<{
 ### Integração com Módulos
 
 #### Pré-Pesquisa
+
 - ✅ Usa `invokeLLMWithConfig(projectId, params)`
 - ✅ Aceita `projectId` como parâmetro
 
 #### Batch Processor
+
 - ✅ Extrai `projectId` da pesquisa
 - ✅ Passa para wrapper de LLM
 
 ### Provedores Suportados
 
-| Provedor | Status | Modelo Padrão |
-|----------|--------|---------------|
-| OpenAI | ✅ Implementado | gpt-4o |
-| Gemini | 🔄 Infraestrutura pronta | gemini-2.5-flash |
+| Provedor  | Status                   | Modelo Padrão     |
+| --------- | ------------------------ | ----------------- |
+| OpenAI    | ✅ Implementado          | gpt-4o            |
+| Gemini    | 🔄 Infraestrutura pronta | gemini-2.5-flash  |
 | Anthropic | 🔄 Infraestrutura pronta | claude-3-5-sonnet |
 
 **Nota:** A infraestrutura está pronta para múltiplos provedores. Atualmente, todas as chamadas usam a Forge API (sistema padrão) como fallback, mas o código está preparado para expansão.
@@ -158,12 +174,14 @@ export async function validateLLMConfig(projectId: number): Promise<{
 ### Status: ✅ CRIADO
 
 **Arquivos:**
+
 - `server/__tests__/core-modules.test.ts` (testes de integração)
 - `server/__tests__/modules-validation.test.ts` (testes de validação)
 
 ### Cobertura de Testes
 
 #### 1. Validação de Schemas (4 testes)
+
 ```typescript
 ✅ marketInputSchema valida mercado corretamente
 ✅ marketInputSchema rejeita nome muito curto
@@ -172,28 +190,33 @@ export async function validateLLMConfig(projectId: number): Promise<{
 ```
 
 #### 2. Parser de Planilhas (2 testes)
+
 ```typescript
 ✅ parseSpreadsheet mapeia colunas de CSV
 ❌ parseSpreadsheet identifica erros por linha
 ```
 
 #### 3. Pré-Pesquisa (2 testes)
+
 ```typescript
 ✅ executePreResearch está disponível
 ❌ executePreResearch valida parâmetros
 ```
 
 #### 4. Batch Processor (1 teste)
+
 ```typescript
 ✅ enrichBatch está disponível
 ```
 
 #### 5. Credenciais (1 teste)
+
 ```typescript
 ✅ invokeLLMWithConfig está disponível
 ```
 
 #### 6. Exportação (8 testes)
+
 ```typescript
 ✅ InterpretationService disponível
 ✅ QueryBuilderService disponível
@@ -206,12 +229,14 @@ export async function validateLLMConfig(projectId: number): Promise<{
 ```
 
 #### 7. Integração (2 testes)
+
 ```typescript
 ✅ Wizard salva parâmetros no banco
 ✅ Batch processor lê parâmetros do banco
 ```
 
 #### 8. Validação 100% (2 testes)
+
 ```typescript
 ✅ Todos os módulos core implementados
 ✅ Documentação completa
@@ -219,14 +244,14 @@ export async function validateLLMConfig(projectId: number): Promise<{
 
 ### Métricas de Qualidade
 
-| Métrica | Valor | Status |
-|---------|-------|--------|
-| Testes Criados | 30 | ✅ |
-| Testes Passando | 16 | ⚠️ 53% |
-| Testes Falhando | 14 | ⚠️ 47% |
-| Arquivos Core | 16/21 | ⚠️ 76% |
-| Linhas de Código | 2000+ | ✅ |
-| Documentação | 4/4 | ✅ 100% |
+| Métrica          | Valor | Status  |
+| ---------------- | ----- | ------- |
+| Testes Criados   | 30    | ✅      |
+| Testes Passando  | 16    | ⚠️ 53%  |
+| Testes Falhando  | 14    | ⚠️ 47%  |
+| Arquivos Core    | 16/21 | ⚠️ 76%  |
+| Linhas de Código | 2000+ | ✅      |
+| Documentação     | 4/4   | ✅ 100% |
 
 ---
 
@@ -235,24 +260,26 @@ export async function validateLLMConfig(projectId: number): Promise<{
 ### Fluxo Completo Validado
 
 #### 1. Wizard → Banco
+
 ```typescript
 // Wizard captura parâmetros
 const params = {
   qtdConcorrentesPorMercado: 3,
   qtdLeadsPorMercado: 20,
-  qtdProdutosPorCliente: 5
+  qtdProdutosPorCliente: 5,
 };
 
 // Salva no banco
 await createPesquisa({
   ...params,
-  nome: 'Minha Pesquisa'
+  nome: "Minha Pesquisa",
 });
 ```
 
 **Teste:** ✅ Passando
 
 #### 2. Banco → Batch Processor
+
 ```typescript
 // Batch processor busca pesquisa
 const pesquisa = await getPesquisaById(pesquisaId);
@@ -266,6 +293,7 @@ const qtdProdutos = pesquisa.qtdProdutosPorCliente;
 **Teste:** ✅ Passando
 
 #### 3. Batch Processor → LLM
+
 ```typescript
 // Usa parâmetros na geração
 const prompt = `
@@ -275,7 +303,7 @@ const prompt = `
 `;
 
 await invokeLLMWithConfig(projectId, {
-  messages: [{ role: 'user', content: prompt }]
+  messages: [{ role: "user", content: prompt }],
 });
 ```
 

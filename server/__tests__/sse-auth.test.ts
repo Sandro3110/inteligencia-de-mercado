@@ -49,7 +49,9 @@ describe("SSE Authentication Tests", () => {
       const user = await trpc.auth.me.query();
       if (user) {
         userId = user.id;
-        console.log(`[Test Setup] Usuário autenticado: ${user.name} (${user.id})`);
+        console.log(
+          `[Test Setup] Usuário autenticado: ${user.name} (${user.id})`
+        );
       }
     } catch (error) {
       console.warn("[Test Setup] Não foi possível autenticar via tRPC:", error);
@@ -59,14 +61,16 @@ describe("SSE Authentication Tests", () => {
   describe("Endpoint /api/enrichment/progress/:jobId", () => {
     it("deve rejeitar requisições sem autenticação", async () => {
       const response = await fetchSSE("/api/enrichment/progress/test-job-123");
-      
+
       expect(response.status).toBe(401);
       expect(response.ok).toBe(false);
     });
 
     it("deve aceitar requisições autenticadas", async () => {
       if (!userId) {
-        console.warn("[Test] Pulando teste autenticado - usuário não disponível");
+        console.warn(
+          "[Test] Pulando teste autenticado - usuário não disponível"
+        );
         return;
       }
 
@@ -94,14 +98,19 @@ describe("SSE Authentication Tests", () => {
         });
 
         // Tentar acessar SSE com autenticação
-        const response = await fetch(`${BASE_URL}/api/enrichment/progress/${job.id}`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${BASE_URL}/api/enrichment/progress/${job.id}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
 
         expect(response.status).toBe(200);
-        expect(response.headers.get("content-type")).toContain("text/event-stream");
-        
+        expect(response.headers.get("content-type")).toContain(
+          "text/event-stream"
+        );
+
         // Fechar a conexão
         response.body?.cancel();
       } catch (error) {
@@ -114,14 +123,16 @@ describe("SSE Authentication Tests", () => {
   describe("Endpoint /api/notifications/stream", () => {
     it("deve rejeitar requisições sem autenticação", async () => {
       const response = await fetchSSE("/api/notifications/stream");
-      
+
       expect(response.status).toBe(401);
       expect(response.ok).toBe(false);
     });
 
     it("deve aceitar requisições autenticadas e retornar SSE", async () => {
       if (!userId) {
-        console.warn("[Test] Pulando teste autenticado - usuário não disponível");
+        console.warn(
+          "[Test] Pulando teste autenticado - usuário não disponível"
+        );
         return;
       }
 
@@ -131,17 +142,21 @@ describe("SSE Authentication Tests", () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.headers.get("content-type")).toContain("text/event-stream");
+      expect(response.headers.get("content-type")).toContain(
+        "text/event-stream"
+      );
       expect(response.headers.get("cache-control")).toBe("no-cache");
       expect(response.headers.get("connection")).toBe("keep-alive");
-      
+
       // Fechar a conexão
       response.body?.cancel();
     });
 
     it("deve enviar eventos SSE formatados corretamente", async () => {
       if (!userId) {
-        console.warn("[Test] Pulando teste autenticado - usuário não disponível");
+        console.warn(
+          "[Test] Pulando teste autenticado - usuário não disponível"
+        );
         return;
       }
 
@@ -156,11 +171,11 @@ describe("SSE Authentication Tests", () => {
       // Ler primeiro evento (heartbeat ou notificação)
       const reader = response.body!.getReader();
       const decoder = new TextDecoder();
-      
+
       try {
         const { value, done } = await Promise.race([
           reader.read(),
-          new Promise<{ value: undefined; done: true }>((resolve) => 
+          new Promise<{ value: undefined; done: true }>(resolve =>
             setTimeout(() => resolve({ value: undefined, done: true }), 5000)
           ),
         ]);
@@ -168,7 +183,7 @@ describe("SSE Authentication Tests", () => {
         if (!done && value) {
           const chunk = decoder.decode(value);
           console.log("[Test] Primeiro chunk SSE:", chunk);
-          
+
           // Verificar formato SSE
           expect(chunk).toMatch(/^(data:|event:|id:|:\s)/m);
         }
@@ -185,7 +200,7 @@ describe("SSE Authentication Tests", () => {
         "/api/notifications/stream",
         "manus_session=invalid-token-12345"
       );
-      
+
       expect(response.status).toBe(401);
     });
 
@@ -207,7 +222,9 @@ describe("SSE Authentication Tests", () => {
   describe("Headers de Segurança", () => {
     it("deve incluir headers de segurança adequados", async () => {
       if (!userId) {
-        console.warn("[Test] Pulando teste autenticado - usuário não disponível");
+        console.warn(
+          "[Test] Pulando teste autenticado - usuário não disponível"
+        );
         return;
       }
 
@@ -217,10 +234,12 @@ describe("SSE Authentication Tests", () => {
       });
 
       // Verificar headers SSE
-      expect(response.headers.get("content-type")).toContain("text/event-stream");
+      expect(response.headers.get("content-type")).toContain(
+        "text/event-stream"
+      );
       expect(response.headers.get("cache-control")).toBe("no-cache");
       expect(response.headers.get("connection")).toBe("keep-alive");
-      
+
       response.body?.cancel();
     });
   });

@@ -1,4 +1,5 @@
 # Testes End-to-End - Gestor PAV
+
 ## Fase 42.3 - Validação Completa dos Módulos Core
 
 ---
@@ -6,43 +7,51 @@
 ## ✅ TESTE 1: Wizard de Criação de Pesquisa (7 Steps)
 
 ### Objetivo
+
 Validar que o wizard completo funciona de ponta a ponta, salvando dados corretamente no banco.
 
 ### Passos
 
 **Step 1: Selecionar Projeto**
+
 - [ ] Abrir `/research/new`
 - [ ] Verificar que lista de projetos carrega
 - [ ] Selecionar um projeto existente
 - [ ] Clicar "Próximo"
 
 **Step 2: Nomear Pesquisa**
+
 - [ ] Inserir nome: "Teste End-to-End"
 - [ ] Inserir descrição: "Validação completa do sistema"
 - [ ] Clicar "Próximo"
 
 **Step 3: Configurar Parâmetros**
+
 - [ ] Definir qtdConcorrentes: **3** (customizado)
 - [ ] Definir qtdLeads: **20** (customizado)
 - [ ] Definir qtdProdutos: **5** (customizado)
 - [ ] Clicar "Próximo"
 
 **Step 4: Escolher Método**
+
 - [ ] Selecionar "Entrada Manual"
 - [ ] Clicar "Próximo"
 
 **Step 5: Inserir Dados**
+
 - [ ] Adicionar mercado: "Hospitais"
 - [ ] Adicionar mercado: "Clínicas"
 - [ ] Verificar que 2 mercados aparecem na lista
 - [ ] Clicar "Próximo"
 
 **Step 6: Validar Dados**
+
 - [ ] Verificar que preview mostra 2 mercados
 - [ ] Marcar checkbox "Confirmo que os dados estão corretos"
 - [ ] Clicar "Próximo"
 
 **Step 7: Resumo e Iniciar**
+
 - [ ] Verificar resumo:
   - Nome: "Teste End-to-End"
   - Parâmetros: 3 concorrentes, 20 leads, 5 produtos
@@ -57,8 +66,8 @@ Validar que o wizard completo funciona de ponta a ponta, salvando dados corretam
 SELECT * FROM pesquisas WHERE nome = 'Teste End-to-End';
 
 -- Verificar parâmetros customizados
-SELECT qtdConcorrentesPorMercado, qtdLeadsPorMercado, qtdProdutosPorCliente 
-FROM pesquisas 
+SELECT qtdConcorrentesPorMercado, qtdLeadsPorMercado, qtdProdutosPorCliente
+FROM pesquisas
 WHERE nome = 'Teste End-to-End';
 -- Esperado: 3, 20, 5
 
@@ -68,6 +77,7 @@ SELECT * FROM mercados WHERE pesquisaId = (SELECT id FROM pesquisas WHERE nome =
 ```
 
 ### Resultado Esperado
+
 ✅ Pesquisa criada com parâmetros customizados  
 ✅ Mercados salvos corretamente  
 ✅ Status inicial: "pending"
@@ -77,16 +87,19 @@ SELECT * FROM mercados WHERE pesquisaId = (SELECT id FROM pesquisas WHERE nome =
 ## ✅ TESTE 2: Batch Processor Respeita Parâmetros
 
 ### Objetivo
+
 Validar que o batch processor lê os parâmetros do wizard e os respeita durante enriquecimento.
 
 ### Passos
 
 1. **Iniciar Enriquecimento**
+
    ```bash
    # No dashboard, clicar em "Iniciar Enriquecimento" para a pesquisa criada
    ```
 
 2. **Verificar Logs do Servidor**
+
    ```bash
    # Buscar no console do servidor:
    [BatchProcessor] 🚀 Iniciando enriquecimento em blocos de 50 clientes
@@ -99,6 +112,7 @@ Validar que o batch processor lê os parâmetros do wizard e os respeita durante
    - [ ] Não mostram valores fixos (5, 10, 3)
 
 ### Resultado Esperado
+
 ✅ Batch processor lê parâmetros do banco  
 ✅ Logs confirmam valores customizados (3, 20, 5)  
 ✅ Enriquecimento respeita limites configurados
@@ -108,6 +122,7 @@ Validar que o batch processor lê os parâmetros do wizard e os respeita durante
 ## ✅ TESTE 3: Credenciais Configuráveis
 
 ### Objetivo
+
 Validar que o sistema usa credenciais do banco quando configuradas.
 
 ### Passos
@@ -125,6 +140,7 @@ Validar que o sistema usa credenciais do banco quando configuradas.
    - Clicar "Executar"
 
 3. **Verificar Logs**
+
    ```bash
    # Buscar no console:
    [LLM] Usando credenciais do projeto X (openai)
@@ -139,6 +155,7 @@ Validar que o sistema usa credenciais do banco quando configuradas.
    ```
 
 ### Resultado Esperado
+
 ✅ Sistema usa credenciais do banco quando disponíveis  
 ✅ Fallback para ENV funciona  
 ✅ Logs confirmam fonte das credenciais
@@ -148,6 +165,7 @@ Validar que o sistema usa credenciais do banco quando configuradas.
 ## ✅ TESTE 4: Pré-Pesquisa Integrada
 
 ### Objetivo
+
 Validar que a pré-pesquisa funciona no wizard e adiciona dados corretamente.
 
 ### Passos
@@ -178,6 +196,7 @@ Validar que a pré-pesquisa funciona no wizard e adiciona dados corretamente.
    - Completar wizard
 
 ### Resultado Esperado
+
 ✅ Pré-pesquisa executa com sucesso  
 ✅ Resultados são exibidos corretamente  
 ✅ Dados selecionados são adicionados ao wizard  
@@ -188,11 +207,13 @@ Validar que a pré-pesquisa funciona no wizard e adiciona dados corretamente.
 ## ✅ TESTE 5: Upload de Planilha
 
 ### Objetivo
+
 Validar que o upload de CSV/Excel funciona e valida dados.
 
 ### Passos
 
 1. **Criar Planilha de Teste**
+
    ```csv
    nome,segmentacao
    Hospital São Lucas,B2B
@@ -200,6 +221,7 @@ Validar que o upload de CSV/Excel funciona e valida dados.
    ,B2B
    Hospital Santa Casa,B2B
    ```
+
    Salvar como `teste.csv`
 
 2. **Iniciar Wizard**
@@ -222,6 +244,7 @@ Validar que o upload de CSV/Excel funciona e valida dados.
    - Linha inválida foi ignorada
 
 ### Resultado Esperado
+
 ✅ Upload funciona com drag & drop  
 ✅ Preview exibe dados corretamente  
 ✅ Validação identifica erros  
@@ -232,6 +255,7 @@ Validar que o upload de CSV/Excel funciona e valida dados.
 ## ✅ TESTE 6: Fluxo Completo End-to-End
 
 ### Objetivo
+
 Validar o fluxo completo: Wizard → Banco → Enriquecimento → Exportação
 
 ### Passos
@@ -244,6 +268,7 @@ Validar o fluxo completo: Wizard → Banco → Enriquecimento → Exportação
    - Adicionar 2 resultados
 
 2. **Validar no Banco**
+
    ```sql
    SELECT * FROM pesquisas WHERE nome = 'Teste Completo E2E';
    SELECT * FROM mercados WHERE pesquisaId = (SELECT id FROM pesquisas WHERE nome = 'Teste Completo E2E');
@@ -254,6 +279,7 @@ Validar o fluxo completo: Wizard → Banco → Enriquecimento → Exportação
    - Aguardar conclusão (ou pausar após 1 bloco)
 
 4. **Verificar Dados Enriquecidos**
+
    ```sql
    SELECT * FROM clientes WHERE pesquisaId = (SELECT id FROM pesquisas WHERE nome = 'Teste Completo E2E');
    SELECT * FROM concorrentes WHERE mercadoId IN (SELECT id FROM mercados WHERE pesquisaId = ...);
@@ -267,6 +293,7 @@ Validar o fluxo completo: Wizard → Banco → Enriquecimento → Exportação
    - Validar que contém dados enriquecidos
 
 ### Resultado Esperado
+
 ✅ Wizard → Banco: Dados salvos corretamente  
 ✅ Banco → Enriquecimento: Parâmetros respeitados  
 ✅ Enriquecimento → Exportação: Dados completos  
@@ -276,14 +303,14 @@ Validar o fluxo completo: Wizard → Banco → Enriquecimento → Exportação
 
 ## 📊 Resumo dos Testes
 
-| # | Teste | Status | Observações |
-|---|-------|--------|-------------|
-| 1 | Wizard 7 Steps | ⏳ Pendente | Validar manualmente |
-| 2 | Batch Processor | ⏳ Pendente | Verificar logs |
-| 3 | Credenciais Configuráveis | ⏳ Pendente | Testar com/sem config |
-| 4 | Pré-Pesquisa | ⏳ Pendente | Validar integração |
-| 5 | Upload Planilha | ⏳ Pendente | Testar CSV e Excel |
-| 6 | Fluxo Completo E2E | ⏳ Pendente | Teste mais importante |
+| #   | Teste                     | Status      | Observações           |
+| --- | ------------------------- | ----------- | --------------------- |
+| 1   | Wizard 7 Steps            | ⏳ Pendente | Validar manualmente   |
+| 2   | Batch Processor           | ⏳ Pendente | Verificar logs        |
+| 3   | Credenciais Configuráveis | ⏳ Pendente | Testar com/sem config |
+| 4   | Pré-Pesquisa              | ⏳ Pendente | Validar integração    |
+| 5   | Upload Planilha           | ⏳ Pendente | Testar CSV e Excel    |
+| 6   | Fluxo Completo E2E        | ⏳ Pendente | Teste mais importante |
 
 ---
 

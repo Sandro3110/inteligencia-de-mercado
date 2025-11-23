@@ -19,6 +19,7 @@ O banco possui **11 tabelas principais** organizadas em 4 categorias:
 Tabela central que agrupa clientes, concorrentes e leads por segmento de mercado.
 
 **Campos para preencher:**
+
 - ✅ `id` - Auto-incremento
 - ✅ `projectId` - ID do projeto
 - ✅ `mercadoHash` - Hash único (nome normalizado)
@@ -41,6 +42,7 @@ Tabela central que agrupa clientes, concorrentes e leads por segmento de mercado
 Empresas que são clientes da PAV.
 
 **Campos para preencher:**
+
 - ✅ `id` - Auto-incremento
 - ✅ `projectId` - ID do projeto
 - ✅ `clienteHash` - Hash único (nome + CNPJ + projectId)
@@ -74,6 +76,7 @@ Empresas que são clientes da PAV.
 Empresas concorrentes identificadas por mercado.
 
 **Campos para preencher:**
+
 - ✅ `id` - Auto-incremento
 - ✅ `projectId` - ID do projeto
 - ✅ `concorrenteHash` - Hash único (nome + CNPJ + projectId)
@@ -101,6 +104,7 @@ Empresas concorrentes identificadas por mercado.
 Potenciais clientes identificados por mercado.
 
 **Campos para preencher:**
+
 - ✅ `id` - Auto-incremento
 - ✅ `projectId` - ID do projeto
 - ✅ `leadHash` - Hash único (nome + CNPJ + projectId)
@@ -151,7 +155,7 @@ Potenciais clientes identificados por mercado.
 
 2. MERCADO (input: produto do cliente)
    ↓
-   Gemini → nome, segmentacao, categoria, tamanhoMercado, 
+   Gemini → nome, segmentacao, categoria, tamanhoMercado,
             crescimentoAnual, tendencias, principaisPlayers
    ↓
    Salvar MERCADO completo
@@ -184,6 +188,7 @@ Potenciais clientes identificados por mercado.
 **Cálculo do qualidadeScore (0-100):**
 
 ### Clientes
+
 - CNPJ válido: 20 pontos
 - Site oficial: 15 pontos
 - Email: 10 pontos
@@ -194,6 +199,7 @@ Potenciais clientes identificados por mercado.
 - CNAE: 10 pontos
 
 ### Concorrentes
+
 - CNPJ válido: 25 pontos
 - Site: 20 pontos
 - Produto: 20 pontos
@@ -201,6 +207,7 @@ Potenciais clientes identificados por mercado.
 - Faturamento estimado: 20 pontos
 
 ### Leads
+
 - CNPJ válido: 20 pontos
 - Site: 15 pontos
 - Email: 20 pontos
@@ -210,6 +217,7 @@ Potenciais clientes identificados por mercado.
 - Setor: 5 pontos
 
 **Classificação:**
+
 - 0-40: Baixa
 - 41-70: Média
 - 71-100: Alta

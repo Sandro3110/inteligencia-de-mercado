@@ -1,70 +1,89 @@
-import { useState } from 'react';
-import { trpc } from '@/lib/trpc';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Clock, Repeat, Trash2, X } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { trpc } from "@/lib/trpc";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar, Clock, Repeat, Trash2, X } from "lucide-react";
+import { toast } from "sonner";
 
 interface ScheduleEnrichmentProps {
   projectId: number;
   onClose?: () => void;
 }
 
-export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentProps) {
-  const [scheduledDate, setScheduledDate] = useState('');
-  const [scheduledTime, setScheduledTime] = useState('');
-  const [recurrence, setRecurrence] = useState<'once' | 'daily' | 'weekly'>('once');
+export function ScheduleEnrichment({
+  projectId,
+  onClose,
+}: ScheduleEnrichmentProps) {
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("");
+  const [recurrence, setRecurrence] = useState<"once" | "daily" | "weekly">(
+    "once"
+  );
   const [batchSize, setBatchSize] = useState(50);
   const [maxClients, setMaxClients] = useState<number | undefined>();
 
   const utils = trpc.useUtils();
-  const { data: schedules, isLoading } = trpc.enrichment.listSchedules.useQuery({ projectId });
-  
+  const { data: schedules, isLoading } = trpc.enrichment.listSchedules.useQuery(
+    { projectId }
+  );
+
   const createMutation = trpc.enrichment.createSchedule.useMutation({
     onSuccess: () => {
-      toast.success('Agendamento criado com sucesso!');
+      toast.success("Agendamento criado com sucesso!");
       utils.enrichment.listSchedules.invalidate();
       // Reset form
-      setScheduledDate('');
-      setScheduledTime('');
-      setRecurrence('once');
+      setScheduledDate("");
+      setScheduledTime("");
+      setRecurrence("once");
       setBatchSize(50);
       setMaxClients(undefined);
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao criar agendamento: ${error.message}`);
     },
   });
 
   const cancelMutation = trpc.enrichment.cancelSchedule.useMutation({
     onSuccess: () => {
-      toast.success('Agendamento cancelado');
+      toast.success("Agendamento cancelado");
       utils.enrichment.listSchedules.invalidate();
     },
   });
 
   const deleteMutation = trpc.enrichment.deleteSchedule.useMutation({
     onSuccess: () => {
-      toast.success('Agendamento deletado');
+      toast.success("Agendamento deletado");
       utils.enrichment.listSchedules.invalidate();
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!scheduledDate || !scheduledTime) {
-      toast.error('Por favor, preencha data e hora');
+      toast.error("Por favor, preencha data e hora");
       return;
     }
 
     const scheduledAt = new Date(`${scheduledDate}T${scheduledTime}`);
-    
+
     if (scheduledAt < new Date()) {
-      toast.error('Data/hora deve ser no futuro');
+      toast.error("Data/hora deve ser no futuro");
       return;
     }
 
@@ -79,20 +98,20 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
 
   const getRecurrenceLabel = (rec: string) => {
     const labels: Record<string, string> = {
-      once: 'Única',
-      daily: 'Diária',
-      weekly: 'Semanal',
+      once: "Única",
+      daily: "Diária",
+      weekly: "Semanal",
     };
     return labels[rec] || rec;
   };
 
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      pending: 'bg-blue-500/20 text-blue-400',
-      running: 'bg-green-500/20 text-green-400',
-      completed: 'bg-gray-500/20 text-gray-400',
-      cancelled: 'bg-red-500/20 text-red-400',
-      error: 'bg-red-500/20 text-red-400',
+      pending: "bg-blue-500/20 text-blue-400",
+      running: "bg-green-500/20 text-green-400",
+      completed: "bg-gray-500/20 text-gray-400",
+      cancelled: "bg-red-500/20 text-red-400",
+      error: "bg-red-500/20 text-red-400",
     };
     return colors[status] || colors.pending;
   };
@@ -103,8 +122,12 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
       <Card className="bg-white/50 border-slate-700">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-xl text-slate-100">Agendar Enriquecimento</CardTitle>
-            <CardDescription>Configure quando e como executar o enriquecimento</CardDescription>
+            <CardTitle className="text-xl text-slate-100">
+              Agendar Enriquecimento
+            </CardTitle>
+            <CardDescription>
+              Configure quando e como executar o enriquecimento
+            </CardDescription>
           </div>
           {onClose && (
             <Button variant="ghost" size="icon" onClick={onClose}>
@@ -125,7 +148,7 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
                   id="date"
                   type="date"
                   value={scheduledDate}
-                  onChange={(e) => setScheduledDate(e.target.value)}
+                  onChange={e => setScheduledDate(e.target.value)}
                   required
                   className="bg-slate-50 border-slate-700"
                 />
@@ -141,7 +164,7 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
                   id="time"
                   type="time"
                   value={scheduledTime}
-                  onChange={(e) => setScheduledTime(e.target.value)}
+                  onChange={e => setScheduledTime(e.target.value)}
                   required
                   className="bg-slate-50 border-slate-700"
                 />
@@ -153,7 +176,10 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
                   <Repeat className="h-4 w-4" />
                   Recorrência
                 </Label>
-                <Select value={recurrence} onValueChange={(v: any) => setRecurrence(v)}>
+                <Select
+                  value={recurrence}
+                  onValueChange={(v: any) => setRecurrence(v)}
+                >
                   <SelectTrigger className="bg-slate-50 border-slate-700">
                     <SelectValue />
                   </SelectTrigger>
@@ -174,32 +200,40 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
                   min={1}
                   max={100}
                   value={batchSize}
-                  onChange={(e) => setBatchSize(parseInt(e.target.value))}
+                  onChange={e => setBatchSize(parseInt(e.target.value))}
                   className="bg-slate-50 border-slate-700"
                 />
               </div>
 
               {/* Máximo de Clientes */}
               <div className="space-y-2">
-                <Label htmlFor="maxClients">Máximo de Clientes (opcional)</Label>
+                <Label htmlFor="maxClients">
+                  Máximo de Clientes (opcional)
+                </Label>
                 <Input
                   id="maxClients"
                   type="number"
                   min={1}
-                  value={maxClients || ''}
-                  onChange={(e) => setMaxClients(e.target.value ? parseInt(e.target.value) : undefined)}
+                  value={maxClients || ""}
+                  onChange={e =>
+                    setMaxClients(
+                      e.target.value ? parseInt(e.target.value) : undefined
+                    )
+                  }
                   placeholder="Todos"
                   className="bg-slate-50 border-slate-700"
                 />
               </div>
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full"
               disabled={createMutation.isPending}
             >
-              {createMutation.isPending ? 'Agendando...' : 'Agendar Enriquecimento'}
+              {createMutation.isPending
+                ? "Agendando..."
+                : "Agendar Enriquecimento"}
             </Button>
           </form>
         </CardContent>
@@ -208,7 +242,9 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
       {/* Lista de Agendamentos */}
       <Card className="bg-white/50 border-slate-700">
         <CardHeader>
-          <CardTitle className="text-xl text-slate-100">Agendamentos Futuros</CardTitle>
+          <CardTitle className="text-xl text-slate-100">
+            Agendamentos Futuros
+          </CardTitle>
           <CardDescription>Próximas execuções programadas</CardDescription>
         </CardHeader>
         <CardContent>
@@ -221,17 +257,19 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
           ) : (
             <div className="space-y-3">
               {schedules.map((schedule: any) => (
-                <div 
+                <div
                   key={schedule.id}
                   className="flex items-center justify-between p-4 rounded-lg bg-slate-50/50 border border-slate-700"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusBadge(schedule.status)}`}>
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-medium ${getStatusBadge(schedule.status)}`}
+                      >
                         {schedule.status}
                       </span>
                       <span className="text-slate-300">
-                        {new Date(schedule.scheduledAt).toLocaleString('pt-BR')}
+                        {new Date(schedule.scheduledAt).toLocaleString("pt-BR")}
                       </span>
                       <span className="text-slate-500 text-sm">
                         • {getRecurrenceLabel(schedule.recurrence)}
@@ -239,16 +277,19 @@ export function ScheduleEnrichment({ projectId, onClose }: ScheduleEnrichmentPro
                     </div>
                     <div className="text-sm text-slate-400 mt-1">
                       Lote: {schedule.batchSize} clientes
-                      {schedule.maxClients && ` • Máximo: ${schedule.maxClients}`}
+                      {schedule.maxClients &&
+                        ` • Máximo: ${schedule.maxClients}`}
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-2">
-                    {schedule.status === 'pending' && (
+                    {schedule.status === "pending" && (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => cancelMutation.mutate({ id: schedule.id })}
+                        onClick={() =>
+                          cancelMutation.mutate({ id: schedule.id })
+                        }
                         disabled={cancelMutation.isPending}
                       >
                         Cancelar

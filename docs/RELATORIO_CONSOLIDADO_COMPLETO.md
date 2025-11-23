@@ -34,16 +34,16 @@ O **Inteligência de Mercado** é uma plataforma full-stack desenvolvida para ge
 
 A aplicação utiliza uma arquitetura **full-stack TypeScript** com as seguintes tecnologias principais:
 
-| Camada | Tecnologia | Versão | Descrição |
-|--------|------------|--------|-----------|
-| **Frontend** | React | 19 | Interface de usuário moderna e responsiva |
-| **Estilização** | Tailwind CSS | 4 | Design system consistente |
-| **Componentes** | shadcn/ui | - | Biblioteca de componentes acessíveis |
-| **Backend** | Express | 4 | Servidor HTTP robusto |
-| **API** | tRPC | 11 | Comunicação type-safe entre frontend e backend |
-| **Banco de Dados** | MySQL/TiDB | - | Armazenamento persistente |
-| **ORM** | Drizzle | - | Mapeamento objeto-relacional |
-| **Autenticação** | Manus OAuth | - | Sistema de autenticação integrado |
+| Camada             | Tecnologia   | Versão | Descrição                                      |
+| ------------------ | ------------ | ------ | ---------------------------------------------- |
+| **Frontend**       | React        | 19     | Interface de usuário moderna e responsiva      |
+| **Estilização**    | Tailwind CSS | 4      | Design system consistente                      |
+| **Componentes**    | shadcn/ui    | -      | Biblioteca de componentes acessíveis           |
+| **Backend**        | Express      | 4      | Servidor HTTP robusto                          |
+| **API**            | tRPC         | 11     | Comunicação type-safe entre frontend e backend |
+| **Banco de Dados** | MySQL/TiDB   | -      | Armazenamento persistente                      |
+| **ORM**            | Drizzle      | -      | Mapeamento objeto-relacional                   |
+| **Autenticação**   | Manus OAuth  | -      | Sistema de autenticação integrado              |
 
 ### 1.3 Hierarquia de Dados
 
@@ -56,6 +56,7 @@ PROJECT (nível 1) - Workspace isolado por unidade de negócio
 ```
 
 Esta estrutura permite:
+
 - **Isolamento de dados** por projeto (ex: Agro, Embalagens)
 - **Rastreabilidade** de cada batch de enriquecimento
 - **Análises comparativas** entre pesquisas e projetos
@@ -63,15 +64,15 @@ Esta estrutura permite:
 
 ### 1.4 Estatísticas Gerais do Sistema
 
-| Métrica | Valor Atual |
-|---------|-------------|
-| **Páginas/Rotas Implementadas** | 23 rotas funcionais |
-| **Tabelas no Banco de Dados** | 34 tabelas (schema.ts: 836 linhas) |
-| **Endpoints tRPC** | ~80 endpoints (routers.ts: 1560 linhas) |
-| **Componentes React** | 23 páginas + componentes auxiliares |
-| **Fases de Desenvolvimento** | 32 fases concluídas |
-| **Projetos Ativos** | 3 projetos (Agro, Embalagens, +1) |
-| **Registros no Banco** | 28.869 registros (snapshot 19/11/2025) |
+| Métrica                         | Valor Atual                             |
+| ------------------------------- | --------------------------------------- |
+| **Páginas/Rotas Implementadas** | 23 rotas funcionais                     |
+| **Tabelas no Banco de Dados**   | 34 tabelas (schema.ts: 836 linhas)      |
+| **Endpoints tRPC**              | ~80 endpoints (routers.ts: 1560 linhas) |
+| **Componentes React**           | 23 páginas + componentes auxiliares     |
+| **Fases de Desenvolvimento**    | 32 fases concluídas                     |
+| **Projetos Ativos**             | 3 projetos (Agro, Embalagens, +1)       |
+| **Registros no Banco**          | 28.869 registros (snapshot 19/11/2025)  |
 
 ---
 
@@ -85,13 +86,13 @@ Esta estrutura permite:
 
 O sistema possui uma base de dados robusta com **28.869 registros** distribuídos da seguinte forma:
 
-| Entidade | Quantidade | % do Total | Média por Mercado |
-|----------|------------|------------|-------------------|
-| **Mercados Únicos** | 1.619 | 5.6% | - |
-| **Clientes** | 1.457 | 5.0% | 0.9 clientes/mercado |
-| **Concorrentes** | 12.908 | 44.7% | 8.0 concorrentes/mercado |
-| **Leads** | 12.885 | 44.6% | 8.0 leads/mercado |
-| **TOTAL GERAL** | **28.869** | **100%** | - |
+| Entidade            | Quantidade | % do Total | Média por Mercado        |
+| ------------------- | ---------- | ---------- | ------------------------ |
+| **Mercados Únicos** | 1.619      | 5.6%       | -                        |
+| **Clientes**        | 1.457      | 5.0%       | 0.9 clientes/mercado     |
+| **Concorrentes**    | 12.908     | 44.7%      | 8.0 concorrentes/mercado |
+| **Leads**           | 12.885     | 44.6%      | 8.0 leads/mercado        |
+| **TOTAL GERAL**     | **28.869** | **100%**   | -                        |
 
 **Insights da Distribuição:**
 
@@ -101,19 +102,20 @@ A distribuição equilibrada entre concorrentes (44.7%) e leads (44.6%) indica q
 
 **Execuções Realizadas:**
 
-| Métrica | Valor | Status |
-|---------|-------|--------|
-| Total de Execuções | 3 | ✅ |
-| Execuções Completas | 2 | ✅ |
-| Em Execução | 1 | 🔄 |
-| Com Erro | 0 | ✅ |
-| **Taxa de Sucesso** | **66.7%** | ⚠️ |
+| Métrica             | Valor     | Status |
+| ------------------- | --------- | ------ |
+| Total de Execuções  | 3         | ✅     |
+| Execuções Completas | 2         | ✅     |
+| Em Execução         | 1         | 🔄     |
+| Com Erro            | 0         | ✅     |
+| **Taxa de Sucesso** | **66.7%** | ⚠️     |
 
 **Análise de Performance:**
 
 A taxa de sucesso aparente de 66.7% é enganosa, pois 1 execução ainda estava em andamento no momento do snapshot. A **taxa real de sucesso** para execuções finalizadas é de **100%** (2 de 2 completas sem erros), o que é excelente. A última execução foi instantânea (< 1 segundo) e não processou registros, indicando uma execução de teste ou validação.
 
 **Última Execução:**
+
 - **Início:** 19/11/2025 16:24:34 (GMT-3)
 - **Término:** 19/11/2025 16:24:34 (GMT-3)
 - **Duração:** < 1 segundo
@@ -122,43 +124,43 @@ A taxa de sucesso aparente de 66.7% é enganosa, pois 1 execução ainda estava 
 
 #### 2.1.3 Fila de Processamento
 
-| Métrica | Valor | Status |
-|---------|-------|--------|
-| Total de Jobs na Fila | 0 | ✅ Vazio |
-| Jobs Pendentes | 0 | ✅ |
-| Jobs em Execução | 0 | ✅ |
-| Jobs com Erro | 0 | ✅ |
+| Métrica               | Valor | Status   |
+| --------------------- | ----- | -------- |
+| Total de Jobs na Fila | 0     | ✅ Vazio |
+| Jobs Pendentes        | 0     | ✅       |
+| Jobs em Execução      | 0     | ✅       |
+| Jobs com Erro         | 0     | ✅       |
 
 A fila de processamento está **vazia**, indicando que o sistema está pronto para receber novos jobs sem backlog.
 
 #### 2.1.4 Configuração Geral
 
-| Componente | Quantidade | Status | Observação |
-|------------|------------|--------|------------|
-| **Projetos Ativos** | 3 | ✅ Ativo | Agro, Embalagens, +1 |
-| **Tags Configuradas** | 1 | ⚠️ Baixo | Recomenda-se criar mais tags |
-| **Atividades (Últimas 24h)** | 0 | ⚠️ Baixa | Sistema em período de baixa utilização |
+| Componente                   | Quantidade | Status   | Observação                             |
+| ---------------------------- | ---------- | -------- | -------------------------------------- |
+| **Projetos Ativos**          | 3          | ✅ Ativo | Agro, Embalagens, +1                   |
+| **Tags Configuradas**        | 1          | ⚠️ Baixo | Recomenda-se criar mais tags           |
+| **Atividades (Últimas 24h)** | 0          | ⚠️ Baixa | Sistema em período de baixa utilização |
 
 **Recomendação:** Criar tags adicionais para melhor categorização (ex: "Alta Prioridade", "B2C", "B2B2C", "Validado", "Em Análise").
 
 #### 2.1.5 Status dos Serviços
 
-| Serviço | Status | Última Verificação |
-|---------|--------|-------------------|
-| **Banco de Dados** | ✅ Online | 19/11/2025 13:05 |
-| **API Backend** | ✅ Online | 19/11/2025 13:05 |
-| **Fila de Processamento** | ✅ Online | 19/11/2025 13:05 |
-| **Sistema de Cache** | ✅ Online | 19/11/2025 13:05 |
+| Serviço                   | Status    | Última Verificação |
+| ------------------------- | --------- | ------------------ |
+| **Banco de Dados**        | ✅ Online | 19/11/2025 13:05   |
+| **API Backend**           | ✅ Online | 19/11/2025 13:05   |
+| **Fila de Processamento** | ✅ Online | 19/11/2025 13:05   |
+| **Sistema de Cache**      | ✅ Online | 19/11/2025 13:05   |
 
 #### 2.1.6 Resumo de Saúde do Sistema
 
-| Componente | Status | Nota |
-|------------|--------|------|
-| **Banco de Dados** | ✅ Excelente | 28.869 registros |
-| **Enriquecimento** | ⚠️ Atenção | 1 execução em andamento |
-| **Fila** | ✅ Excelente | Vazia e pronta |
-| **Performance** | ✅ Excelente | 0% de erros |
-| **Configuração** | ⚠️ Atenção | Poucas tags configuradas |
+| Componente         | Status       | Nota                     |
+| ------------------ | ------------ | ------------------------ |
+| **Banco de Dados** | ✅ Excelente | 28.869 registros         |
+| **Enriquecimento** | ⚠️ Atenção   | 1 execução em andamento  |
+| **Fila**           | ✅ Excelente | Vazia e pronta           |
+| **Performance**    | ✅ Excelente | 0% de erros              |
+| **Configuração**   | ⚠️ Atenção   | Poucas tags configuradas |
 
 **Nota Geral: 8.5/10**
 
@@ -176,11 +178,11 @@ O número de clientes aumentou de **800 para 1.494** (aumento de **86.75%** ou *
 
 **✅ Enriquecimento Legítimo (Principal Causa)**
 
-| Data de Criação | Quantidade | Percentual |
-|----------------|------------|------------|
-| **21/10/2025** | 800 | 53.5% (Base original) |
-| **19/11/2025** | 694 | 46.5% (Enriquecimento) |
-| **TOTAL** | **1.494** | **100%** |
+| Data de Criação | Quantidade | Percentual             |
+| --------------- | ---------- | ---------------------- |
+| **21/10/2025**  | 800        | 53.5% (Base original)  |
+| **19/11/2025**  | 694        | 46.5% (Enriquecimento) |
+| **TOTAL**       | **1.494**  | **100%**               |
 
 **Conclusão:** O sistema funcionou corretamente, descobrindo automaticamente 694 novos clientes durante o enriquecimento de mercados.
 
@@ -190,25 +192,25 @@ O número de clientes aumentou de **800 para 1.494** (aumento de **86.75%** ou *
 
 10 clientes duplicados por nome (20 registros no total, considerando pares).
 
-| Nome | Ocorrências |
-|------|-------------|
-| AGUAS PRATA LTDA | 4 |
-| ROSSET E CIA LTDA | 4 |
-| FOSECO INDL E COML LTDA | 2 |
-| METAPLASTIC EMBALAGENS LTDA | 2 |
-| KINGSPAN ISOESTE CONSTRUTIVOS ISOTERMICOS S/A | 2 |
+| Nome                                          | Ocorrências |
+| --------------------------------------------- | ----------- |
+| AGUAS PRATA LTDA                              | 4           |
+| ROSSET E CIA LTDA                             | 4           |
+| FOSECO INDL E COML LTDA                       | 2           |
+| METAPLASTIC EMBALAGENS LTDA                   | 2           |
+| KINGSPAN ISOESTE CONSTRUTIVOS ISOTERMICOS S/A | 2           |
 
 **Duplicação por Email:**
 
 10 clientes duplicados por email (20 registros no total).
 
-| Email | Ocorrências |
-|-------|-------------|
-| contato@envelopackinddeembal.com.br | 2 |
-| contato@anhur.com.br | 2 |
-| contato.brasil@smurfitkappa.com | 2 |
-| contato@rossecialtda.com.br | 2 |
-| contato@freseniusmedicalcare.com.br | 2 |
+| Email                               | Ocorrências |
+| ----------------------------------- | ----------- |
+| contato@envelopackinddeembal.com.br | 2           |
+| contato@anhur.com.br                | 2           |
+| contato.brasil@smurfitkappa.com     | 2           |
+| contato@rossecialtda.com.br         | 2           |
+| contato@freseniusmedicalcare.com.br | 2           |
 
 **Taxa de Duplicação:** 1.3% (20 de 1.494) - **Excelente**
 
@@ -216,23 +218,23 @@ O número de clientes aumentou de **800 para 1.494** (aumento de **86.75%** ou *
 
 #### 2.2.4 Análise de Relacionamentos Múltiplos
 
-| Métrica | Valor |
-|---------|-------|
-| **Clientes Únicos** | 697 |
-| **Total de Relacionamentos** | 2.063 |
+| Métrica                           | Valor    |
+| --------------------------------- | -------- |
+| **Clientes Únicos**               | 697      |
+| **Total de Relacionamentos**      | 2.063    |
 | **Média de Mercados por Cliente** | **2.96** |
 
 **Interpretação:** Cada cliente está associado, em média, a **3 mercados diferentes**, o que explica parcialmente o número maior de registros e é um comportamento esperado.
 
 **Clientes Multi-Mercado (Top 5):**
 
-| Cliente | Número de Mercados |
-|---------|-------------------|
-| OSWALDO CRUZ QUIMICA IND E COM LTDA | 3 |
-| RTL MUDANCAS E TRANSPORTES LTDA | 3 |
-| INJETRIO INDUSTRIA DE PLASTICO LTDA | 3 |
-| AGRONILSEN COMERCIO DE PRODUTOS AGRICOLAS LTDA | 3 |
-| DURATEX S/A | 3 |
+| Cliente                                        | Número de Mercados |
+| ---------------------------------------------- | ------------------ |
+| OSWALDO CRUZ QUIMICA IND E COM LTDA            | 3                  |
+| RTL MUDANCAS E TRANSPORTES LTDA                | 3                  |
+| INJETRIO INDUSTRIA DE PLASTICO LTDA            | 3                  |
+| AGRONILSEN COMERCIO DE PRODUTOS AGRICOLAS LTDA | 3                  |
+| DURATEX S/A                                    | 3                  |
 
 #### 2.2.5 Cálculo de Clientes Únicos Reais
 
@@ -247,11 +249,11 @@ Clientes únicos reais: 1.474 clientes
 
 #### 2.2.6 Linha do Tempo
 
-| Data | Evento | Clientes |
-|------|--------|----------|
-| **21/10/2025** | Importação inicial | 800 |
-| **19/11/2025** | Enriquecimento automático | +694 |
-| **19/11/2025** | Total atual | **1.494** |
+| Data           | Evento                    | Clientes  |
+| -------------- | ------------------------- | --------- |
+| **21/10/2025** | Importação inicial        | 800       |
+| **19/11/2025** | Enriquecimento automático | +694      |
+| **19/11/2025** | Total atual               | **1.494** |
 
 **Crescimento:** +86.75% em 29 dias  
 **Taxa diária:** +23.9 clientes/dia
@@ -340,6 +342,7 @@ A tela de início apresenta uma **visualização em cascata** que permite navega
    - Paginação para grandes volumes
 
 **Mudanças desde o Documento Original:**
+
 - ⚠️ Sidebar lateral substituiu estatísticas internas
 - ⚠️ Filtros movidos para área principal
 - ⚠️ Título alterado de "GESTOR PAV" para "Inteligência de Mercado"
@@ -444,6 +447,7 @@ O módulo de analytics oferece **análises aprofundadas** com cruzamento de dado
    - Recomendações de priorização
 
 **Mudanças desde o Documento Original:**
+
 - ⚠️ Adicionado filtro por pesquisa (Fase 29)
 - ⚠️ Correções de tema light (Fase 29)
 - ⚠️ Adicionado DynamicBreadcrumbs (Fase 27)
@@ -590,6 +594,7 @@ O módulo de relatórios permite gerar **documentos executivos em formato PDF** 
    - **Salvar Template:** Salvar configuração para reutilização
 
 **Mudanças desde o Documento Original:**
+
 - ⚠️ Adicionado filtro por pesquisa (Fase 29)
 - ⚠️ Correções de tema light (Fase 29)
 
@@ -815,25 +820,25 @@ O módulo Resultados Enriquecimento apresenta os **resultados detalhados** de ca
 
 ### 3.3 Resumo de Implementação
 
-| Módulo | Rota | Status Doc Original | Status Atual |
-|--------|------|---------------------|--------------|
-| Início (CascadeView) | `/` | ✅ Documentado | ✅ Implementado (UI refatorada) |
-| Mercados | `/mercados` | ✅ Documentado | ✅ Implementado |
-| Dashboard | `/dashboard` | ✅ Documentado | ✅ Implementado |
-| Analytics | `/analytics` | ✅ Documentado | ✅ Implementado (+ filtro pesquisa) |
-| Enriquecimento | `/enrichment` | ✅ Documentado | ✅ Implementado |
-| Monitoramento | `/enrichment-progress` | ✅ Documentado | ✅ Implementado |
-| Alertas | `/alertas` | ✅ Documentado | ✅ Implementado |
-| Relatórios | `/relatorios` | ✅ Documentado | ✅ Implementado (+ filtro pesquisa) |
-| ROI | `/roi` | ✅ Documentado | ✅ Implementado |
-| Funil | `/funil` | ✅ Documentado | ✅ Implementado |
-| Agendamento | `/agendamento` | ✅ Documentado | ✅ Implementado |
-| Atividade | `/atividade` | ✅ Documentado | ✅ Implementado |
-| **Research Overview** | `/research-overview` | ❌ Não documentado | ✅ Implementado (Fase 32) |
-| **Onboarding** | `/onboarding` | ❌ Não documentado | ✅ Implementado (Fase 27) |
-| **Analytics Dashboard** | `/analytics-dashboard` | ❌ Não documentado | ✅ Implementado (Fase 29) |
-| **Enrichment Settings** | `/enrichment-settings` | ❌ Não documentado | ✅ Implementado |
-| **Resultados Enriquecimento** | `/resultados-enriquecimento` | ❌ Não documentado | ✅ Implementado |
+| Módulo                        | Rota                         | Status Doc Original | Status Atual                        |
+| ----------------------------- | ---------------------------- | ------------------- | ----------------------------------- |
+| Início (CascadeView)          | `/`                          | ✅ Documentado      | ✅ Implementado (UI refatorada)     |
+| Mercados                      | `/mercados`                  | ✅ Documentado      | ✅ Implementado                     |
+| Dashboard                     | `/dashboard`                 | ✅ Documentado      | ✅ Implementado                     |
+| Analytics                     | `/analytics`                 | ✅ Documentado      | ✅ Implementado (+ filtro pesquisa) |
+| Enriquecimento                | `/enrichment`                | ✅ Documentado      | ✅ Implementado                     |
+| Monitoramento                 | `/enrichment-progress`       | ✅ Documentado      | ✅ Implementado                     |
+| Alertas                       | `/alertas`                   | ✅ Documentado      | ✅ Implementado                     |
+| Relatórios                    | `/relatorios`                | ✅ Documentado      | ✅ Implementado (+ filtro pesquisa) |
+| ROI                           | `/roi`                       | ✅ Documentado      | ✅ Implementado                     |
+| Funil                         | `/funil`                     | ✅ Documentado      | ✅ Implementado                     |
+| Agendamento                   | `/agendamento`               | ✅ Documentado      | ✅ Implementado                     |
+| Atividade                     | `/atividade`                 | ✅ Documentado      | ✅ Implementado                     |
+| **Research Overview**         | `/research-overview`         | ❌ Não documentado  | ✅ Implementado (Fase 32)           |
+| **Onboarding**                | `/onboarding`                | ❌ Não documentado  | ✅ Implementado (Fase 27)           |
+| **Analytics Dashboard**       | `/analytics-dashboard`       | ❌ Não documentado  | ✅ Implementado (Fase 29)           |
+| **Enrichment Settings**       | `/enrichment-settings`       | ❌ Não documentado  | ✅ Implementado                     |
+| **Resultados Enriquecimento** | `/resultados-enriquecimento` | ❌ Não documentado  | ✅ Implementado                     |
 
 **Total:** 17 módulos documentados + 5 módulos novos = **22 módulos implementados**
 
@@ -847,87 +852,87 @@ O banco de dados utiliza **MySQL/TiDB** com 34 tabelas organizadas em 10 categor
 
 #### 4.1.1 Entidades Core (3 tabelas)
 
-| Tabela | Descrição | Campos Principais |
-|--------|-----------|-------------------|
-| `users` | Usuários do sistema | id, name, email, role, createdAt |
-| `projects` | Projetos (workspaces) | id, nome, descricao, cor, ativo |
-| `pesquisas` | Batches de pesquisa | id, projectId, nome, dataImportacao, status |
+| Tabela      | Descrição             | Campos Principais                           |
+| ----------- | --------------------- | ------------------------------------------- |
+| `users`     | Usuários do sistema   | id, name, email, role, createdAt            |
+| `projects`  | Projetos (workspaces) | id, nome, descricao, cor, ativo             |
+| `pesquisas` | Batches de pesquisa   | id, projectId, nome, dataImportacao, status |
 
 #### 4.1.2 Entidades de Dados (5 tabelas)
 
-| Tabela | Registros (19/11) | Descrição |
-|--------|-------------------|-----------|
-| `mercados_unicos` | 1.619 | Mercados identificados |
-| `clientes` | 1.494 | Clientes B2C/B2B2C |
-| `concorrentes` | 12.908 | Concorrentes mapeados |
-| `leads` | 12.885 | Leads qualificados |
-| `produtos` | - | Catálogo de produtos |
+| Tabela            | Registros (19/11) | Descrição              |
+| ----------------- | ----------------- | ---------------------- |
+| `mercados_unicos` | 1.619             | Mercados identificados |
+| `clientes`        | 1.494             | Clientes B2C/B2B2C     |
+| `concorrentes`    | 12.908            | Concorrentes mapeados  |
+| `leads`           | 12.885            | Leads qualificados     |
+| `produtos`        | -                 | Catálogo de produtos   |
 
 #### 4.1.3 Relacionamentos (1 tabela)
 
-| Tabela | Descrição |
-|--------|-----------|
+| Tabela              | Descrição                             |
+| ------------------- | ------------------------------------- |
 | `clientes_mercados` | Junction table (clientes ↔ mercados) |
 
 #### 4.1.4 Gerenciamento (4 tabelas)
 
-| Tabela | Descrição |
-|--------|-----------|
-| `tags` | Tags personalizadas |
-| `entity_tags` | Associação de tags |
-| `saved_filters` | Filtros salvos |
+| Tabela              | Descrição            |
+| ------------------- | -------------------- |
+| `tags`              | Tags personalizadas  |
+| `entity_tags`       | Associação de tags   |
+| `saved_filters`     | Filtros salvos       |
 | `project_templates` | Templates de projeto |
 
 #### 4.1.5 Notificações e Alertas (4 tabelas)
 
-| Tabela | Descrição |
-|--------|-----------|
-| `notifications` | Notificações do sistema |
-| `alert_configs` | Configurações de alertas |
-| `alert_history` | Histórico de alertas |
+| Tabela               | Descrição                      |
+| -------------------- | ------------------------------ |
+| `notifications`      | Notificações do sistema        |
+| `alert_configs`      | Configurações de alertas       |
+| `alert_history`      | Histórico de alertas           |
 | `operational_alerts` | Alertas operacionais (Fase 30) |
 
 #### 4.1.6 Enriquecimento (5 tabelas)
 
-| Tabela | Descrição |
-|--------|-----------|
-| `enrichment_cache` | Cache de enriquecimento |
-| `enrichment_runs` | Execuções de enriquecimento |
-| `enrichment_jobs` | Jobs de enriquecimento |
-| `enrichment_configs` | Configurações de enriquecimento |
-| `scheduled_enrichments` | Agendamentos de enriquecimento |
+| Tabela                  | Descrição                       |
+| ----------------------- | ------------------------------- |
+| `enrichment_cache`      | Cache de enriquecimento         |
+| `enrichment_runs`       | Execuções de enriquecimento     |
+| `enrichment_jobs`       | Jobs de enriquecimento          |
+| `enrichment_configs`    | Configurações de enriquecimento |
+| `scheduled_enrichments` | Agendamentos de enriquecimento  |
 
 #### 4.1.7 Analytics (4 tabelas - NOVO Fase 30)
 
-| Tabela | Descrição |
-|--------|-----------|
-| `analytics_mercados` | Métricas agregadas por mercado |
-| `analytics_pesquisas` | Métricas agregadas por pesquisa |
+| Tabela                | Descrição                                    |
+| --------------------- | -------------------------------------------- |
+| `analytics_mercados`  | Métricas agregadas por mercado               |
+| `analytics_pesquisas` | Métricas agregadas por pesquisa              |
 | `analytics_dimensoes` | Eficácia por dimensão (UF/Porte/Segmentação) |
-| `analytics_timeline` | Evolução temporal diária |
+| `analytics_timeline`  | Evolução temporal diária                     |
 
 #### 4.1.8 Conversões e ROI (1 tabela)
 
-| Tabela | Descrição |
-|--------|-----------|
+| Tabela             | Descrição           |
+| ------------------ | ------------------- |
 | `lead_conversions` | Conversões de leads |
 
 #### 4.1.9 Auditoria e Histórico (5 tabelas)
 
-| Tabela | Descrição |
-|--------|-----------|
-| `activity_log` | Log de atividades |
-| `mercados_history` | Histórico de alterações (mercados) |
-| `clientes_history` | Histórico de alterações (clientes) |
+| Tabela                 | Descrição                              |
+| ---------------------- | -------------------------------------- |
+| `activity_log`         | Log de atividades                      |
+| `mercados_history`     | Histórico de alterações (mercados)     |
+| `clientes_history`     | Histórico de alterações (clientes)     |
 | `concorrentes_history` | Histórico de alterações (concorrentes) |
-| `leads_history` | Histórico de alterações (leads) |
+| `leads_history`        | Histórico de alterações (leads)        |
 
 #### 4.1.10 Integrações (2 tabelas - NOVO Fase 30)
 
-| Tabela | Descrição |
-|--------|-----------|
+| Tabela                | Descrição                       |
+| --------------------- | ------------------------------- |
 | `salesforce_sync_log` | Log de sincronização Salesforce |
-| `recommendations` | Recomendações automáticas |
+| `recommendations`     | Recomendações automáticas       |
 
 ### 4.2 Campos Principais por Entidade
 
@@ -1053,12 +1058,12 @@ O banco de dados utiliza **MySQL/TiDB** com 34 tabelas organizadas em 10 categor
 
 ### 4.3 Enums e Tipos
 
-| Enum | Valores | Uso |
-|------|---------|-----|
-| `validationStatus` | pending, rich, needs_adjustment, discarded | Status de validação |
-| `leadStage` | novo, em_contato, negociacao, fechado, perdido | Estágio do lead |
-| `role` | user, admin | Papel do usuário |
-| `status` (pesquisa) | importado, enriquecendo, concluido, erro | Status da pesquisa |
+| Enum                | Valores                                        | Uso                 |
+| ------------------- | ---------------------------------------------- | ------------------- |
+| `validationStatus`  | pending, rich, needs_adjustment, discarded     | Status de validação |
+| `leadStage`         | novo, em_contato, negociacao, fechado, perdido | Estágio do lead     |
+| `role`              | user, admin                                    | Papel do usuário    |
+| `status` (pesquisa) | importado, enriquecendo, concluido, erro       | Status da pesquisa  |
 
 ---
 
@@ -1074,6 +1079,7 @@ O banco de dados utiliza **MySQL/TiDB** com 34 tabelas organizadas em 10 categor
 #### 5.1.2 Analytics (20+ endpoints)
 
 **Analytics Básicos:**
+
 - `analytics.getProgress` - Progresso de analytics
 - `analytics.leadsByStage` - Leads por estágio
 - `analytics.leadsByMercado` - Leads por mercado
@@ -1085,6 +1091,7 @@ O banco de dados utiliza **MySQL/TiDB** com 34 tabelas organizadas em 10 categor
 - `analytics.segmentation` - Distribuição por segmentação (com filtro de pesquisa)
 
 **Analytics de Lead Generation (Fase 32):**
+
 - `analytics.byMercado` - Métricas por mercado
 - `analytics.byPesquisa` - Métricas por pesquisa
 - `analytics.byDimensao` - Métricas por dimensão
@@ -1165,6 +1172,7 @@ analytics.byMercado: publicProcedure
 ```
 
 **Benefícios:**
+
 - ✅ Type-safety end-to-end
 - ✅ Validação automática de inputs (Zod)
 - ✅ Autocomplete no frontend
@@ -1212,6 +1220,7 @@ analytics.byMercado: publicProcedure
    - Agendamentos
 
 **Funcionalidades:**
+
 - ✅ Colapsável (60px collapsed, 240px expanded)
 - ✅ Persistência de estado (localStorage)
 - ✅ Atalhos de teclado (Ctrl+1, Ctrl+2, Ctrl+3, Ctrl+4, Ctrl+B)
@@ -1321,45 +1330,45 @@ analytics.byMercado: publicProcedure
 
 ### 8.1 Funcionalidades Adicionadas
 
-| Funcionalidade | Fase | Status Doc Original | Status Atual |
-|----------------|------|---------------------|--------------|
-| Sidebar Lateral Fixo | 25 | ❌ Não existia | ✅ Implementado |
-| Breadcrumbs Dinâmicos | 27 | ❌ Não documentado | ✅ Implementado |
-| Onboarding/Tour Guiado | 27 | ❌ Não documentado | ✅ Implementado |
-| Atalhos de Teclado | 26 | ❌ Não documentado | ✅ Implementado |
-| Filtro por Pesquisa (Analytics) | 29 | ❌ Não documentado | ✅ Implementado |
-| Filtro por Pesquisa (Relatórios) | 29 | ❌ Não documentado | ✅ Implementado |
-| Analytics de Lead Generation | 30-32 | ❌ Não documentado | ✅ Implementado |
-| Motor de Agregação (Cron Job) | 32 | ❌ Não documentado | ✅ Implementado |
-| Dashboard Research Overview | 32 | ❌ Não documentado | ✅ Implementado |
-| Produtos (tabela e CRUD) | ? | ❌ Não documentado | ✅ Implementado |
-| Histórico de Alterações | ? | ❌ Não documentado | ✅ Implementado |
+| Funcionalidade                   | Fase  | Status Doc Original | Status Atual    |
+| -------------------------------- | ----- | ------------------- | --------------- |
+| Sidebar Lateral Fixo             | 25    | ❌ Não existia      | ✅ Implementado |
+| Breadcrumbs Dinâmicos            | 27    | ❌ Não documentado  | ✅ Implementado |
+| Onboarding/Tour Guiado           | 27    | ❌ Não documentado  | ✅ Implementado |
+| Atalhos de Teclado               | 26    | ❌ Não documentado  | ✅ Implementado |
+| Filtro por Pesquisa (Analytics)  | 29    | ❌ Não documentado  | ✅ Implementado |
+| Filtro por Pesquisa (Relatórios) | 29    | ❌ Não documentado  | ✅ Implementado |
+| Analytics de Lead Generation     | 30-32 | ❌ Não documentado  | ✅ Implementado |
+| Motor de Agregação (Cron Job)    | 32    | ❌ Não documentado  | ✅ Implementado |
+| Dashboard Research Overview      | 32    | ❌ Não documentado  | ✅ Implementado |
+| Produtos (tabela e CRUD)         | ?     | ❌ Não documentado  | ✅ Implementado |
+| Histórico de Alterações          | ?     | ❌ Não documentado  | ✅ Implementado |
 
 ### 8.2 Funcionalidades Removidas/Alteradas
 
-| Funcionalidade | Status Doc Original | Status Atual | Observação |
-|----------------|---------------------|--------------|------------|
-| Evolução (/enrichment-evolution) | ✅ Documentado | ❓ Rota não encontrada | Possivelmente integrada em outro módulo |
-| Navegação Superior (MainNav.tsx) | ✅ Existia | ❌ Removida (Fase 25) | Substituída por AppSidebar |
-| Estatísticas Internas (Página Inicial) | ✅ Documentado | ⚠️ Movidas para sidebar | Área principal simplificada |
+| Funcionalidade                         | Status Doc Original | Status Atual            | Observação                              |
+| -------------------------------------- | ------------------- | ----------------------- | --------------------------------------- |
+| Evolução (/enrichment-evolution)       | ✅ Documentado      | ❓ Rota não encontrada  | Possivelmente integrada em outro módulo |
+| Navegação Superior (MainNav.tsx)       | ✅ Existia          | ❌ Removida (Fase 25)   | Substituída por AppSidebar              |
+| Estatísticas Internas (Página Inicial) | ✅ Documentado      | ⚠️ Movidas para sidebar | Área principal simplificada             |
 
 ### 8.3 Mudanças de Nomenclatura
 
-| Original | Atual | Fase |
-|----------|-------|------|
-| "GESTOR PAV" | "Inteligência de Mercado" | 23 |
-| Botões de texto | Ícones com tooltips | 23 |
+| Original        | Atual                     | Fase |
+| --------------- | ------------------------- | ---- |
+| "GESTOR PAV"    | "Inteligência de Mercado" | 23   |
+| Botões de texto | Ícones com tooltips       | 23   |
 
 ### 8.4 Mudanças de UI/UX
 
-| Aspecto | Documento Original | Estado Atual |
-|---------|-------------------|--------------|
-| **Navegação** | Navegação superior + estatísticas laterais | Sidebar lateral fixo colapsável |
-| **Breadcrumbs** | Não mencionado | Breadcrumbs dinâmicos em todas as páginas |
-| **Onboarding** | Não mencionado | Tour guiado interativo |
-| **Atalhos** | Não mencionado | Ctrl+1/2/3/4/B |
-| **Tema** | Não especificado | Light theme padronizado |
-| **Filtros** | Botões de texto | Ícones com tooltips |
+| Aspecto         | Documento Original                         | Estado Atual                              |
+| --------------- | ------------------------------------------ | ----------------------------------------- |
+| **Navegação**   | Navegação superior + estatísticas laterais | Sidebar lateral fixo colapsável           |
+| **Breadcrumbs** | Não mencionado                             | Breadcrumbs dinâmicos em todas as páginas |
+| **Onboarding**  | Não mencionado                             | Tour guiado interativo                    |
+| **Atalhos**     | Não mencionado                             | Ctrl+1/2/3/4/B                            |
+| **Tema**        | Não especificado                           | Light theme padronizado                   |
+| **Filtros**     | Botões de texto                            | Ícones com tooltips                       |
 
 ---
 
@@ -1367,48 +1376,48 @@ analytics.byMercado: publicProcedure
 
 ### 9.1 Snapshot de Dados (19/11/2025)
 
-| Entidade | Quantidade | % do Total | Média por Mercado |
-|----------|------------|------------|-------------------|
-| **Mercados Únicos** | 1.619 | 5.6% | - |
-| **Clientes** | 1.494 (1.474 únicos) | 5.0% | 0.9 clientes/mercado |
-| **Concorrentes** | 12.908 | 44.7% | 8.0 concorrentes/mercado |
-| **Leads** | 12.885 | 44.6% | 8.0 leads/mercado |
-| **TOTAL GERAL** | **28.869** | **100%** | - |
+| Entidade            | Quantidade           | % do Total | Média por Mercado        |
+| ------------------- | -------------------- | ---------- | ------------------------ |
+| **Mercados Únicos** | 1.619                | 5.6%       | -                        |
+| **Clientes**        | 1.494 (1.474 únicos) | 5.0%       | 0.9 clientes/mercado     |
+| **Concorrentes**    | 12.908               | 44.7%      | 8.0 concorrentes/mercado |
+| **Leads**           | 12.885               | 44.6%      | 8.0 leads/mercado        |
+| **TOTAL GERAL**     | **28.869**           | **100%**   | -                        |
 
 ### 9.2 Projetos Ativos
 
-| # | Nome | Status | Dados (19/11/2025) |
-|---|------|--------|-------------------|
-| 1 | Agro | Ativo | 0 registros |
-| 2 | Embalagens | Ativo | 470 clientes, 806 mercados, 3453 concorrentes, 2433 leads |
-| 3 | (Terceiro projeto) | Ativo | - |
+| #   | Nome               | Status | Dados (19/11/2025)                                        |
+| --- | ------------------ | ------ | --------------------------------------------------------- |
+| 1   | Agro               | Ativo  | 0 registros                                               |
+| 2   | Embalagens         | Ativo  | 470 clientes, 806 mercados, 3453 concorrentes, 2433 leads |
+| 3   | (Terceiro projeto) | Ativo  | -                                                         |
 
 ### 9.3 Métricas de Enriquecimento
 
-| Métrica | Valor | Status |
-|---------|-------|--------|
-| Total de Execuções | 3 | ✅ |
-| Execuções Completas | 2 (66.7%) | ✅ |
-| Em Execução | 1 (33.3%) | 🔄 |
-| Com Erro | 0 (0%) | ✅ |
-| Taxa de Sucesso (finalizadas) | 100% | ✅ Excelente |
+| Métrica                       | Valor     | Status       |
+| ----------------------------- | --------- | ------------ |
+| Total de Execuções            | 3         | ✅           |
+| Execuções Completas           | 2 (66.7%) | ✅           |
+| Em Execução                   | 1 (33.3%) | 🔄           |
+| Com Erro                      | 0 (0%)    | ✅           |
+| Taxa de Sucesso (finalizadas) | 100%      | ✅ Excelente |
 
 ### 9.4 Qualidade de Dados
 
-| Métrica | Valor | Avaliação |
-|---------|-------|-----------|
-| Taxa de duplicação (clientes) | 1.3% | ✅ Excelente |
-| Clientes multi-mercado | 10 clientes (3 mercados cada) | ✅ Esperado |
-| Proporção leads/clientes | 8.8:1 | ✅ Alto potencial |
-| Média de concorrentes/mercado | 8.0 | ✅ Alta competitividade |
+| Métrica                       | Valor                         | Avaliação               |
+| ----------------------------- | ----------------------------- | ----------------------- |
+| Taxa de duplicação (clientes) | 1.3%                          | ✅ Excelente            |
+| Clientes multi-mercado        | 10 clientes (3 mercados cada) | ✅ Esperado             |
+| Proporção leads/clientes      | 8.8:1                         | ✅ Alto potencial       |
+| Média de concorrentes/mercado | 8.0                           | ✅ Alta competitividade |
 
 ### 9.5 Crescimento
 
-| Período | Métrica | Valor |
-|---------|---------|-------|
-| 21/10/2025 - 19/11/2025 | Crescimento de clientes | +86.75% (800 → 1.494) |
-| 29 dias | Taxa diária | +23.9 clientes/dia |
-| 19/11/2025 | Enriquecimento automático | +694 clientes (46.5% do total) |
+| Período                 | Métrica                   | Valor                          |
+| ----------------------- | ------------------------- | ------------------------------ |
+| 21/10/2025 - 19/11/2025 | Crescimento de clientes   | +86.75% (800 → 1.494)          |
+| 29 dias                 | Taxa diária               | +23.9 clientes/dia             |
+| 19/11/2025              | Enriquecimento automático | +694 clientes (46.5% do total) |
 
 ---
 
@@ -1594,15 +1603,15 @@ analytics.byMercado: publicProcedure
 
 ### 13.1 Componentes
 
-| Componente | Status | Nota | Observação |
-|------------|--------|------|------------|
-| **Banco de Dados** | ✅ Excelente | 28.869 registros | Online e responsivo |
-| **Enriquecimento** | ⚠️ Atenção | 1 execução em andamento | Taxa de sucesso 100% (finalizadas) |
-| **Fila** | ✅ Excelente | Vazia e pronta | Sem backlog |
-| **Performance** | ✅ Excelente | 0% de erros | Nenhum erro registrado |
-| **Configuração** | ⚠️ Atenção | Poucas tags | Recomenda-se criar mais tags |
-| **UI/UX** | ✅ Excelente | Refatorada (Fase 25-27) | Sidebar, breadcrumbs, onboarding |
-| **Analytics** | ✅ Excelente | Implementado (Fase 30-32) | Lead generation analytics |
+| Componente         | Status       | Nota                      | Observação                         |
+| ------------------ | ------------ | ------------------------- | ---------------------------------- |
+| **Banco de Dados** | ✅ Excelente | 28.869 registros          | Online e responsivo                |
+| **Enriquecimento** | ⚠️ Atenção   | 1 execução em andamento   | Taxa de sucesso 100% (finalizadas) |
+| **Fila**           | ✅ Excelente | Vazia e pronta            | Sem backlog                        |
+| **Performance**    | ✅ Excelente | 0% de erros               | Nenhum erro registrado             |
+| **Configuração**   | ⚠️ Atenção   | Poucas tags               | Recomenda-se criar mais tags       |
+| **UI/UX**          | ✅ Excelente | Refatorada (Fase 25-27)   | Sidebar, breadcrumbs, onboarding   |
+| **Analytics**      | ✅ Excelente | Implementado (Fase 30-32) | Lead generation analytics          |
 
 ### 13.2 Nota Geral: 8.5/10
 
@@ -1706,28 +1715,31 @@ O sistema está **operacional, estável e pronto para escalar**, com excelente t
 
 ### Anexo C: Dashboards Disponíveis
 
-| Dashboard | Rota | Descrição |
-|-----------|------|-----------|
-| **Monitoramento** | `/enrichment-progress` | Progresso em tempo real |
-| **Evolução** | ❓ Rota não encontrada | Gráficos de evolução e ETA |
-| **Cache** | `/admin/cache` (?) | Métricas de performance |
-| **Histórico** | `/admin/queue-history` (?) | Histórico completo de jobs |
-| **Métricas da Fila** | `/admin/queue-metrics` (?) | Performance da fila |
-| **Research Overview** | `/research-overview` | Analytics de lead generation |
+| Dashboard             | Rota                       | Descrição                    |
+| --------------------- | -------------------------- | ---------------------------- |
+| **Monitoramento**     | `/enrichment-progress`     | Progresso em tempo real      |
+| **Evolução**          | ❓ Rota não encontrada     | Gráficos de evolução e ETA   |
+| **Cache**             | `/admin/cache` (?)         | Métricas de performance      |
+| **Histórico**         | `/admin/queue-history` (?) | Histórico completo de jobs   |
+| **Métricas da Fila**  | `/admin/queue-metrics` (?) | Performance da fila          |
+| **Research Overview** | `/research-overview`       | Analytics de lead generation |
 
 ### Anexo D: Casos de Teste (Exemplos)
 
 #### Teste CV-01: Seleção de Projeto
+
 - **Cenário:** Seleção de projeto
 - **Ação:** Selecionar projeto no dropdown
 - **Resultado Esperado:** Estatísticas e mercados atualizados
 
 #### Teste MER-02: Validar Mercado
+
 - **Cenário:** Validar mercado
 - **Ação:** Clicar em "Validar"
 - **Resultado Esperado:** Status alterado para "Validado"
 
 #### Teste DASH-01: Visualizar Métricas
+
 - **Cenário:** Visualizar métricas
 - **Ação:** Acessar dashboard
 - **Resultado Esperado:** Cards com números atualizados

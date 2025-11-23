@@ -1,13 +1,13 @@
 /**
  * Componente de Layer de Heatmap para Leaflet
- * 
+ *
  * Usa leaflet.heat para criar visualização de densidade
  */
 
-import { useEffect } from 'react';
-import { useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet.heat';
+import { useEffect } from "react";
+import { useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet.heat";
 
 export interface HeatmapPoint {
   lat: number;
@@ -35,7 +35,7 @@ interface HeatmapLayerProps {
 
 /**
  * Layer de heatmap para visualização de densidade de pontos
- * 
+ *
  * @example
  * ```tsx
  * <MapContainer>
@@ -49,7 +49,10 @@ interface HeatmapLayerProps {
  * </MapContainer>
  * ```
  */
-export default function HeatmapLayer({ points, options = {} }: HeatmapLayerProps) {
+export default function HeatmapLayer({
+  points,
+  options = {},
+}: HeatmapLayerProps) {
   const map = useMap();
 
   useEffect(() => {
@@ -61,7 +64,7 @@ export default function HeatmapLayer({ points, options = {} }: HeatmapLayerProps
     const heatPoints: [number, number, number][] = points.map(p => [
       p.lat,
       p.lng,
-      p.intensity ?? 1.0
+      p.intensity ?? 1.0,
     ]);
 
     // Criar layer de heatmap
@@ -71,12 +74,12 @@ export default function HeatmapLayer({ points, options = {} }: HeatmapLayerProps
       maxZoom: options.maxZoom || 17,
       max: options.max || 1.0,
       gradient: options.gradient || {
-        0.0: 'blue',
-        0.5: 'lime',
-        0.7: 'yellow',
-        0.9: 'orange',
-        1.0: 'red'
-      }
+        0.0: "blue",
+        0.5: "lime",
+        0.7: "yellow",
+        0.9: "orange",
+        1.0: "red",
+      },
     });
 
     // Adicionar ao mapa

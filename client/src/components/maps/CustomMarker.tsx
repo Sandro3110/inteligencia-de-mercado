@@ -1,15 +1,15 @@
 /**
  * Componente de Marcador Personalizado
- * 
+ *
  * Marcadores customizados por tipo (cliente, concorrente, lead)
  */
 
-import { Marker, Popup } from 'react-leaflet';
-import L, { DivIcon } from 'leaflet';
-import { Building2, Users, Target } from 'lucide-react';
-import { renderToString } from 'react-dom/server';
+import { Marker, Popup } from "react-leaflet";
+import L, { DivIcon } from "leaflet";
+import { Building2, Users, Target } from "lucide-react";
+import { renderToString } from "react-dom/server";
 
-export type MarkerType = 'cliente' | 'concorrente' | 'lead';
+export type MarkerType = "cliente" | "concorrente" | "lead";
 
 interface CustomMarkerProps {
   /** Posição [latitude, longitude] */
@@ -35,7 +35,7 @@ function createCustomIcon(type: MarkerType): DivIcon {
   };
 
   const Icon = icons[type];
-  
+
   const iconHtml = renderToString(
     <div className={`custom-marker-icon marker-${type}`}>
       <Icon size={18} />
@@ -44,7 +44,7 @@ function createCustomIcon(type: MarkerType): DivIcon {
 
   return L.divIcon({
     html: iconHtml,
-    className: 'custom-marker',
+    className: "custom-marker",
     iconSize: [32, 32],
     iconAnchor: [16, 16],
     popupAnchor: [0, -16],
@@ -53,7 +53,7 @@ function createCustomIcon(type: MarkerType): DivIcon {
 
 /**
  * Marcador customizado com ícones por tipo
- * 
+ *
  * @example
  * ```tsx
  * <MapContainer>

@@ -34,7 +34,12 @@ import {
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 
-export type EntityType = "mercado" | "cliente" | "produto" | "concorrente" | "lead";
+export type EntityType =
+  | "mercado"
+  | "cliente"
+  | "produto"
+  | "concorrente"
+  | "lead";
 
 export interface EntityPopupCardProps {
   isOpen: boolean;
@@ -144,7 +149,9 @@ export default function EntityPopupCard({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Erro</DialogTitle>
-            <DialogDescription>Não foi possível carregar os detalhes da entidade.</DialogDescription>
+            <DialogDescription>
+              Não foi possível carregar os detalhes da entidade.
+            </DialogDescription>
           </DialogHeader>
         </DialogContent>
       </Dialog>
@@ -169,8 +176,8 @@ export default function EntityPopupCard({
                       entity.qualidadeScore >= 70
                         ? "default"
                         : entity.qualidadeScore >= 40
-                        ? "secondary"
-                        : "destructive"
+                          ? "secondary"
+                          : "destructive"
                     }
                   >
                     <Star className="w-3 h-3 mr-1" />
@@ -205,7 +212,9 @@ export default function EntityPopupCard({
               <Building className="w-4 h-4 mt-0.5 text-muted-foreground" />
               <div>
                 <p className="text-sm font-medium">Mercado</p>
-                <p className="text-sm text-muted-foreground">{entity.mercado.nome}</p>
+                <p className="text-sm text-muted-foreground">
+                  {entity.mercado.nome}
+                </p>
               </div>
             </div>
           )}
@@ -218,7 +227,11 @@ export default function EntityPopupCard({
                 <p className="text-sm font-medium">Mercados</p>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {entity.mercados.map((m: any) => (
-                    <Badge key={m.mercadoId} variant="outline" className="text-xs">
+                    <Badge
+                      key={m.mercadoId}
+                      variant="outline"
+                      className="text-xs"
+                    >
                       {m.mercadoNome}
                     </Badge>
                   ))}
@@ -233,7 +246,10 @@ export default function EntityPopupCard({
               {entity.email && (
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-muted-foreground" />
-                  <a href={`mailto:${entity.email}`} className="text-sm text-blue-600 hover:underline">
+                  <a
+                    href={`mailto:${entity.email}`}
+                    className="text-sm text-blue-600 hover:underline"
+                  >
                     {entity.email}
                   </a>
                 </div>
@@ -241,7 +257,10 @@ export default function EntityPopupCard({
               {entity.telefone && (
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-muted-foreground" />
-                  <a href={`tel:${entity.telefone}`} className="text-sm text-blue-600 hover:underline">
+                  <a
+                    href={`tel:${entity.telefone}`}
+                    className="text-sm text-blue-600 hover:underline"
+                  >
                     {entity.telefone}
                   </a>
                 </div>
@@ -290,19 +309,27 @@ export default function EntityPopupCard({
             <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
               <div>
                 <p className="text-xs text-muted-foreground">Clientes</p>
-                <p className="text-lg font-semibold">{entity.stats.totalClientes || 0}</p>
+                <p className="text-lg font-semibold">
+                  {entity.stats.totalClientes || 0}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Concorrentes</p>
-                <p className="text-lg font-semibold">{entity.stats.totalConcorrentes || 0}</p>
+                <p className="text-lg font-semibold">
+                  {entity.stats.totalConcorrentes || 0}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Leads</p>
-                <p className="text-lg font-semibold">{entity.stats.totalLeads || 0}</p>
+                <p className="text-lg font-semibold">
+                  {entity.stats.totalLeads || 0}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Produtos</p>
-                <p className="text-lg font-semibold">{entity.stats.totalProdutos || 0}</p>
+                <p className="text-lg font-semibold">
+                  {entity.stats.totalProdutos || 0}
+                </p>
               </div>
             </div>
           )}
@@ -313,7 +340,9 @@ export default function EntityPopupCard({
               <Users className="w-4 h-4 mt-0.5 text-muted-foreground" />
               <div>
                 <p className="text-sm font-medium">Cliente</p>
-                <p className="text-sm text-muted-foreground">{entity.cliente.nome}</p>
+                <p className="text-sm text-muted-foreground">
+                  {entity.cliente.nome}
+                </p>
               </div>
             </div>
           )}

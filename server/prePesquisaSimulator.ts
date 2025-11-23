@@ -1,6 +1,6 @@
 /**
  * Módulo de Simulação de IA para Testes de Pré-Pesquisa Inteligente
- * 
+ *
  * Simula respostas da OpenAI para testar os 4 fluxos principais:
  * 1. Retry Inteligente
  * 2. Processamento Multi-Cliente
@@ -48,15 +48,23 @@ export interface RetryResult {
  */
 export function calcularCompletude(empresa: EmpresaInfo): number {
   const campos = [
-    'nome', 'cnpj', 'site', 'produto', 'cidade',
-    'uf', 'telefone', 'email', 'segmentacao', 'porte'
+    "nome",
+    "cnpj",
+    "site",
+    "produto",
+    "cidade",
+    "uf",
+    "telefone",
+    "email",
+    "segmentacao",
+    "porte",
   ];
-  
+
   const preenchidos = campos.filter(campo => {
     const valor = empresa[campo as keyof EmpresaInfo];
-    return valor !== null && valor !== '';
+    return valor !== null && valor !== "";
   }).length;
-  
+
   return Math.round((preenchidos / campos.length) * 100);
 }
 
@@ -65,13 +73,21 @@ export function calcularCompletude(empresa: EmpresaInfo): number {
  */
 export function identificarCamposFaltantes(empresa: EmpresaInfo): string[] {
   const campos = [
-    'nome', 'cnpj', 'site', 'produto', 'cidade',
-    'uf', 'telefone', 'email', 'segmentacao', 'porte'
+    "nome",
+    "cnpj",
+    "site",
+    "produto",
+    "cidade",
+    "uf",
+    "telefone",
+    "email",
+    "segmentacao",
+    "porte",
   ];
-  
+
   return campos.filter(campo => {
     const valor = empresa[campo as keyof EmpresaInfo];
-    return valor === null || valor === '';
+    return valor === null || valor === "";
   });
 }
 
@@ -79,9 +95,11 @@ export function identificarCamposFaltantes(empresa: EmpresaInfo): string[] {
  * FLUXO 1: RETRY INTELIGENTE
  * Simula 3 tentativas progressivas de pré-pesquisa
  */
-export async function simularRetryInteligente(query: string): Promise<RetryResult[]> {
+export async function simularRetryInteligente(
+  query: string
+): Promise<RetryResult[]> {
   const resultados: RetryResult[] = [];
-  
+
   // Tentativa 1: Dados parciais (40% completude)
   const tentativa1: EmpresaInfo = {
     nome: "Empresa XYZ Ltda",
@@ -95,17 +113,17 @@ export async function simularRetryInteligente(query: string): Promise<RetryResul
     segmentacao: null,
     porte: null,
   };
-  
+
   resultados.push({
     tentativa: 1,
     completude: calcularCompletude(tentativa1),
     dados: tentativa1,
     camposFaltantes: identificarCamposFaltantes(tentativa1),
   });
-  
+
   // Simular delay de 2 segundos
   await new Promise(resolve => setTimeout(resolve, 2000));
-  
+
   // Tentativa 2: Dados melhorados (70% completude)
   const tentativa2: EmpresaInfo = {
     ...tentativa1,
@@ -114,31 +132,31 @@ export async function simularRetryInteligente(query: string): Promise<RetryResul
     telefone: "(11) 1234-5678",
     email: "contato@empresaxyz.com.br",
   };
-  
+
   resultados.push({
     tentativa: 2,
     completude: calcularCompletude(tentativa2),
     dados: tentativa2,
     camposFaltantes: identificarCamposFaltantes(tentativa2),
   });
-  
+
   // Simular delay de 2 segundos
   await new Promise(resolve => setTimeout(resolve, 2000));
-  
+
   // Tentativa 3: Dados completos (100% completude)
   const tentativa3: EmpresaInfo = {
     ...tentativa2,
     segmentacao: "B2B",
     porte: "Médio",
   };
-  
+
   resultados.push({
     tentativa: 3,
     completude: calcularCompletude(tentativa3),
     dados: tentativa3,
     camposFaltantes: identificarCamposFaltantes(tentativa3),
   });
-  
+
   return resultados;
 }
 
@@ -146,12 +164,17 @@ export async function simularRetryInteligente(query: string): Promise<RetryResul
  * FLUXO 2: PROCESSAMENTO MULTI-CLIENTE
  * Simula separação de entidades em texto livre
  */
-export async function simularSeparacaoMultiCliente(textoLivre: string): Promise<EntidadeSeparada[]> {
+export async function simularSeparacaoMultiCliente(
+  textoLivre: string
+): Promise<EntidadeSeparada[]> {
   // Simular delay de processamento
   await new Promise(resolve => setTimeout(resolve, 1500));
-  
+
   // Exemplo: "Pesquisei cooperativas agrícolas de café em Minas Gerais e distribuidoras de insumos em São Paulo"
-  if (textoLivre.toLowerCase().includes("cooperativas") && textoLivre.toLowerCase().includes("distribuidoras")) {
+  if (
+    textoLivre.toLowerCase().includes("cooperativas") &&
+    textoLivre.toLowerCase().includes("distribuidoras")
+  ) {
     return [
       {
         tipo: "contexto",
@@ -165,9 +188,12 @@ export async function simularSeparacaoMultiCliente(textoLivre: string): Promise<
       },
     ];
   }
-  
+
   // Exemplo: "Quero pesquisar a Cooperativa de Holambra, a Carga Pesada Distribuidora e a Braskem"
-  if (textoLivre.toLowerCase().includes("holambra") && textoLivre.toLowerCase().includes("braskem")) {
+  if (
+    textoLivre.toLowerCase().includes("holambra") &&
+    textoLivre.toLowerCase().includes("braskem")
+  ) {
     return [
       {
         tipo: "especifica",
@@ -186,7 +212,7 @@ export async function simularSeparacaoMultiCliente(textoLivre: string): Promise<
       },
     ];
   }
-  
+
   // Fallback: Retornar query única
   return [
     {
@@ -200,10 +226,12 @@ export async function simularSeparacaoMultiCliente(textoLivre: string): Promise<
 /**
  * FLUXO 2: Pré-pesquisa de entidade específica
  */
-export async function simularPrePesquisaEntidade(entidade: EntidadeSeparada): Promise<EmpresaInfo> {
+export async function simularPrePesquisaEntidade(
+  entidade: EntidadeSeparada
+): Promise<EmpresaInfo> {
   // Simular delay de pesquisa
   await new Promise(resolve => setTimeout(resolve, 2000));
-  
+
   // Dados simulados baseados na query
   if (entidade.query.toLowerCase().includes("holambra")) {
     return {
@@ -219,7 +247,7 @@ export async function simularPrePesquisaEntidade(entidade: EntidadeSeparada): Pr
       porte: "Grande",
     };
   }
-  
+
   if (entidade.query.toLowerCase().includes("carga pesada")) {
     return {
       nome: "Carga Pesada Distribuidora",
@@ -234,7 +262,7 @@ export async function simularPrePesquisaEntidade(entidade: EntidadeSeparada): Pr
       porte: "Médio",
     };
   }
-  
+
   if (entidade.query.toLowerCase().includes("braskem")) {
     return {
       nome: "Braskem S.A.",
@@ -249,7 +277,7 @@ export async function simularPrePesquisaEntidade(entidade: EntidadeSeparada): Pr
       porte: "Grande",
     };
   }
-  
+
   // Fallback: Dados genéricos
   return {
     nome: entidade.query,
@@ -269,10 +297,12 @@ export async function simularPrePesquisaEntidade(entidade: EntidadeSeparada): Pr
  * FLUXO 4: REFINAMENTO DE CONTEXTO (3 NÍVEIS)
  * Simula geração de perguntas de refinamento
  */
-export async function simularPerguntaNivel1(contextoInicial: string): Promise<PerguntaRefinamento> {
+export async function simularPerguntaNivel1(
+  contextoInicial: string
+): Promise<PerguntaRefinamento> {
   // Simular delay de processamento
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
+
   if (contextoInicial.toLowerCase().includes("cooperativas agrícolas")) {
     return {
       pergunta: "Cooperativas agrícolas de qual setor específico?",
@@ -288,7 +318,7 @@ export async function simularPerguntaNivel1(contextoInicial: string): Promise<Pe
       ],
     };
   }
-  
+
   if (contextoInicial.toLowerCase().includes("distribuidoras")) {
     return {
       pergunta: "Distribuidoras de qual tipo de produto?",
@@ -303,7 +333,7 @@ export async function simularPerguntaNivel1(contextoInicial: string): Promise<Pe
       ],
     };
   }
-  
+
   // Fallback genérico
   return {
     pergunta: "Qual o setor ou tipo de produto específico?",
@@ -325,9 +355,9 @@ export async function simularPerguntaNivel2(
 ): Promise<PerguntaRefinamento> {
   // Simular delay de processamento
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
+
   const primeiraResposta = respostasNivel1[0] || "";
-  
+
   if (primeiraResposta.toLowerCase().includes("café")) {
     return {
       pergunta: "Cooperativas agrícolas de café em qual estado?",
@@ -342,7 +372,7 @@ export async function simularPerguntaNivel2(
       ],
     };
   }
-  
+
   if (primeiraResposta.toLowerCase().includes("insumos")) {
     return {
       pergunta: "Distribuidoras de insumos em qual estado?",
@@ -357,7 +387,7 @@ export async function simularPerguntaNivel2(
       ],
     };
   }
-  
+
   // Fallback genérico
   return {
     pergunta: "Em qual estado?",
@@ -380,9 +410,9 @@ export async function simularPerguntaNivel3(
 ): Promise<PerguntaRefinamento> {
   // Simular delay de processamento
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
+
   const primeiraResposta2 = respostasNivel2[0] || "";
-  
+
   if (primeiraResposta2.toLowerCase().includes("minas gerais")) {
     return {
       pergunta: "Há alguma cidade ou região específica em Minas Gerais?",
@@ -396,7 +426,7 @@ export async function simularPerguntaNivel3(
       ],
     };
   }
-  
+
   if (primeiraResposta2.toLowerCase().includes("são paulo")) {
     return {
       pergunta: "Há alguma cidade ou região específica em São Paulo?",
@@ -411,7 +441,7 @@ export async function simularPerguntaNivel3(
       ],
     };
   }
-  
+
   // Fallback genérico
   return {
     pergunta: "Há alguma cidade ou região específica?",
@@ -436,7 +466,7 @@ export async function simularPrePesquisaRefinada(
 ): Promise<EmpresaInfo[]> {
   // Simular delay de pesquisa
   await new Promise(resolve => setTimeout(resolve, 3000));
-  
+
   // Exemplo: Cooperativas de café no Sul de Minas
   if (
     respostaNivel1.toLowerCase().includes("café") &&
@@ -482,7 +512,7 @@ export async function simularPrePesquisaRefinada(
       },
     ];
   }
-  
+
   // Fallback: Retornar 1 resultado genérico
   return [
     {
@@ -511,31 +541,37 @@ export async function simularPrePesquisaRefinadaMultipla(
 ): Promise<EmpresaInfo[]> {
   // Simular delay de processamento
   await new Promise(resolve => setTimeout(resolve, 2000));
-  
+
   const resultados: EmpresaInfo[] = [];
-  
+
   // Gerar produto cartesiano: N1 × N2 × N3
   for (const r1 of respostasNivel1) {
     for (const r2 of respostasNivel2) {
       for (const r3 of respostasNivel3) {
         // Gerar empresa fictícia para cada combinação
         const combinacao = `${r1} + ${r2} + ${r3}`;
-        
+
         resultados.push({
           nome: `Cooperativa ${r1} - ${r3}`,
           cnpj: `${Math.floor(Math.random() * 90 + 10)}.${Math.floor(Math.random() * 900 + 100)}.${Math.floor(Math.random() * 900 + 100)}/0001-${Math.floor(Math.random() * 90 + 10)}`,
-          site: `https://www.coop-${r1.toLowerCase().replace(/\s+/g, '-')}.com.br`,
+          site: `https://www.coop-${r1.toLowerCase().replace(/\s+/g, "-")}.com.br`,
           produto: `${r1} - ${combinacao}`,
           cidade: r3,
-          uf: r2.includes("Minas") ? "MG" : r2.includes("São Paulo") ? "SP" : r2.includes("Paraná") ? "PR" : "RS",
+          uf: r2.includes("Minas")
+            ? "MG"
+            : r2.includes("São Paulo")
+              ? "SP"
+              : r2.includes("Paraná")
+                ? "PR"
+                : "RS",
           telefone: `(${Math.floor(Math.random() * 90 + 10)}) ${Math.floor(Math.random() * 9000 + 1000)}-${Math.floor(Math.random() * 9000 + 1000)}`,
-          email: `contato@coop-${r1.toLowerCase().replace(/\s+/g, '-')}.com.br`,
+          email: `contato@coop-${r1.toLowerCase().replace(/\s+/g, "-")}.com.br`,
           segmentacao: "B2B",
           porte: Math.random() > 0.5 ? "Grande" : "Médio",
         });
       }
     }
   }
-  
+
   return resultados;
 }

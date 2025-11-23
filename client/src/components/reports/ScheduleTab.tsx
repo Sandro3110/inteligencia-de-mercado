@@ -3,56 +3,68 @@
  * Migrado de SchedulePage.tsx
  */
 
-import { useState } from 'react';
-import { trpc } from '@/lib/trpc';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { useSelectedProject } from '@/hooks/useSelectedProject';
-import { Calendar, Clock, Trash2, X, Plus, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { formatDistanceToNow } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { useState } from "react";
+import { trpc } from "@/lib/trpc";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { Calendar, Clock, Trash2, X, Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export function ScheduleTab() {
   const { selectedProjectId } = useSelectedProject();
   const [showForm, setShowForm] = useState(false);
-  const [scheduledAt, setScheduledAt] = useState('');
-  const [recurrence, setRecurrence] = useState<'once' | 'daily' | 'weekly'>('once');
-  const [batchSize, setBatchSize] = useState('50');
+  const [scheduledAt, setScheduledAt] = useState("");
+  const [recurrence, setRecurrence] = useState<"once" | "daily" | "weekly">(
+    "once"
+  );
+  const [batchSize, setBatchSize] = useState("50");
 
-  const { data: schedules, refetch, isLoading } = trpc.schedule.list.useQuery(
+  const {
+    data: schedules,
+    refetch,
+    isLoading,
+  } = trpc.schedule.list.useQuery(
     { projectId: selectedProjectId! },
     { enabled: !!selectedProjectId }
   );
 
   const createMutation = trpc.schedule.create.useMutation({
     onSuccess: () => {
-      toast.success('Agendamento criado com sucesso!');
+      toast.success("Agendamento criado com sucesso!");
       setShowForm(false);
-      setScheduledAt('');
-      setRecurrence('once');
-      setBatchSize('50');
+      setScheduledAt("");
+      setRecurrence("once");
+      setBatchSize("50");
       refetch();
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao criar agendamento: ${error.message}`);
     },
   });
 
   const cancelMutation = trpc.schedule.cancel.useMutation({
     onSuccess: () => {
-      toast.success('Agendamento cancelado!');
+      toast.success("Agendamento cancelado!");
       refetch();
     },
   });
 
   const deleteMutation = trpc.schedule.delete.useMutation({
     onSuccess: () => {
-      toast.success('Agendamento excluído!');
+      toast.success("Agendamento excluído!");
       refetch();
     },
   });
@@ -60,7 +72,7 @@ export function ScheduleTab() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProjectId || !scheduledAt) {
-      toast.error('Preencha todos os campos obrigatórios');
+      toast.error("Preencha todos os campos obrigatórios");
       return;
     }
 
@@ -74,33 +86,33 @@ export function ScheduleTab() {
 
   function getRecurrenceLabel(rec: string) {
     const labels: Record<string, string> = {
-      once: 'Uma vez',
-      daily: 'Diário',
-      weekly: 'Semanal',
+      once: "Uma vez",
+      daily: "Diário",
+      weekly: "Semanal",
     };
     return labels[rec] || rec;
   }
 
   function getStatusLabel(status: string) {
     const labels: Record<string, string> = {
-      pending: 'Pendente',
-      running: 'Executando',
-      completed: 'Concluído',
-      cancelled: 'Cancelado',
-      error: 'Erro',
+      pending: "Pendente",
+      running: "Executando",
+      completed: "Concluído",
+      cancelled: "Cancelado",
+      error: "Erro",
     };
     return labels[status] || status;
   }
 
   function getStatusColor(status: string) {
     const colors: Record<string, string> = {
-      pending: 'bg-blue-100 text-blue-800',
-      running: 'bg-yellow-100 text-yellow-800',
-      completed: 'bg-green-100 text-green-800',
-      cancelled: 'bg-gray-100 text-gray-800',
-      error: 'bg-red-100 text-red-800',
+      pending: "bg-blue-100 text-blue-800",
+      running: "bg-yellow-100 text-yellow-800",
+      completed: "bg-green-100 text-green-800",
+      cancelled: "bg-gray-100 text-gray-800",
+      error: "bg-red-100 text-red-800",
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || "bg-gray-100 text-gray-800";
   }
 
   if (!selectedProjectId) {
@@ -151,14 +163,17 @@ export function ScheduleTab() {
                     id="scheduledAt"
                     type="datetime-local"
                     value={scheduledAt}
-                    onChange={(e) => setScheduledAt(e.target.value)}
+                    onChange={e => setScheduledAt(e.target.value)}
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="recurrence">Recorrência *</Label>
-                  <Select value={recurrence} onValueChange={(v: any) => setRecurrence(v)}>
+                  <Select
+                    value={recurrence}
+                    onValueChange={(v: any) => setRecurrence(v)}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -176,7 +191,7 @@ export function ScheduleTab() {
                     id="batchSize"
                     type="number"
                     value={batchSize}
-                    onChange={(e) => setBatchSize(e.target.value)}
+                    onChange={e => setBatchSize(e.target.value)}
                     min="1"
                     max="1000"
                   />
@@ -184,11 +199,17 @@ export function ScheduleTab() {
               </div>
 
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowForm(false)}
+                >
                   Cancelar
                 </Button>
                 <Button type="submit" disabled={createMutation.isPending}>
-                  {createMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  {createMutation.isPending && (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  )}
                   Criar Agendamento
                 </Button>
               </div>
@@ -219,13 +240,15 @@ export function ScheduleTab() {
                       <Badge className={getStatusColor(schedule.status)}>
                         {getStatusLabel(schedule.status)}
                       </Badge>
-                      <Badge variant="outline">{getRecurrenceLabel(schedule.recurrence)}</Badge>
+                      <Badge variant="outline">
+                        {getRecurrenceLabel(schedule.recurrence)}
+                      </Badge>
                     </div>
 
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        {new Date(schedule.scheduledAt).toLocaleString('pt-BR')}
+                        {new Date(schedule.scheduledAt).toLocaleString("pt-BR")}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
@@ -237,18 +260,20 @@ export function ScheduleTab() {
                     </div>
 
                     <div className="text-sm">
-                      <span className="font-medium">Tamanho do lote:</span> {schedule.batchSize}
+                      <span className="font-medium">Tamanho do lote:</span>{" "}
+                      {schedule.batchSize}
                     </div>
 
                     {schedule.executedAt && (
                       <div className="text-sm text-muted-foreground">
-                        Executado em: {new Date(schedule.executedAt).toLocaleString('pt-BR')}
+                        Executado em:{" "}
+                        {new Date(schedule.executedAt).toLocaleString("pt-BR")}
                       </div>
                     )}
                   </div>
 
                   <div className="flex gap-2">
-                    {schedule.status === 'pending' && (
+                    {schedule.status === "pending" && (
                       <Button
                         size="sm"
                         variant="outline"

@@ -3,13 +3,13 @@
  * Renderiza dados em formato PDF (lista/tabela)
  */
 
-import PDFDocument from 'pdfkit';
+import PDFDocument from "pdfkit";
 
 export interface PDFOptions {
   title?: string;
   includeHeaders?: boolean;
-  pageSize?: 'A4' | 'LETTER';
-  orientation?: 'portrait' | 'landscape';
+  pageSize?: "A4" | "LETTER";
+  orientation?: "portrait" | "landscape";
 }
 
 export class PDFListRenderer {
@@ -17,10 +17,10 @@ export class PDFListRenderer {
 
   constructor(options: PDFOptions = {}) {
     this.options = {
-      title: options.title || 'Exportação de Dados',
+      title: options.title || "Exportação de Dados",
       includeHeaders: options.includeHeaders !== false,
-      pageSize: options.pageSize || 'A4',
-      orientation: options.orientation || 'landscape',
+      pageSize: options.pageSize || "A4",
+      orientation: options.orientation || "landscape",
     };
   }
 
@@ -38,22 +38,29 @@ export class PDFListRenderer {
 
         const chunks: Buffer[] = [];
 
-        doc.on('data', chunk => chunks.push(chunk));
-        doc.on('end', () => resolve(Buffer.concat(chunks)));
-        doc.on('error', reject);
+        doc.on("data", chunk => chunks.push(chunk));
+        doc.on("end", () => resolve(Buffer.concat(chunks)));
+        doc.on("error", reject);
 
         // Título
-        doc.fontSize(16).font('Helvetica-Bold').text(this.options.title, { align: 'center' });
+        doc
+          .fontSize(16)
+          .font("Helvetica-Bold")
+          .text(this.options.title, { align: "center" });
         doc.moveDown();
 
         // Metadados
-        doc.fontSize(10).font('Helvetica')
-          .text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, { align: 'right' })
-          .text(`Total de registros: ${data.length}`, { align: 'right' });
+        doc
+          .fontSize(10)
+          .font("Helvetica")
+          .text(`Data: ${new Date().toLocaleDateString("pt-BR")}`, {
+            align: "right",
+          })
+          .text(`Total de registros: ${data.length}`, { align: "right" });
         doc.moveDown();
 
         if (data.length === 0) {
-          doc.fontSize(12).text('Nenhum dado para exibir.');
+          doc.fontSize(12).text("Nenhum dado para exibir.");
           doc.end();
           return;
         }
@@ -65,20 +72,18 @@ export class PDFListRenderer {
 
         // Headers
         if (this.options.includeHeaders) {
-          doc.fontSize(10).font('Helvetica-Bold');
+          doc.fontSize(10).font("Helvetica-Bold");
           fields.forEach((field, i) => {
-            doc.text(
-              this.truncate(field, 20),
-              50 + i * columnWidth,
-              tableTop,
-              { width: columnWidth - 5, align: 'left' }
-            );
+            doc.text(this.truncate(field, 20), 50 + i * columnWidth, tableTop, {
+              width: columnWidth - 5,
+              align: "left",
+            });
           });
           doc.moveDown();
         }
 
         // Data rows
-        doc.fontSize(9).font('Helvetica');
+        doc.fontSize(9).font("Helvetica");
         let currentY = doc.y;
 
         data.forEach((row, rowIndex) => {
@@ -94,7 +99,7 @@ export class PDFListRenderer {
               this.truncate(value, 30),
               50 + colIndex * columnWidth,
               currentY,
-              { width: columnWidth - 5, align: 'left' }
+              { width: columnWidth - 5, align: "left" }
             );
           });
 
@@ -106,12 +111,11 @@ export class PDFListRenderer {
         const pageCount = doc.bufferedPageRange().count;
         for (let i = 0; i < pageCount; i++) {
           doc.switchToPage(i);
-          doc.fontSize(8).text(
-            `Página ${i + 1} de ${pageCount}`,
-            50,
-            doc.page.height - 50,
-            { align: 'center' }
-          );
+          doc
+            .fontSize(8)
+            .text(`Página ${i + 1} de ${pageCount}`, 50, doc.page.height - 50, {
+              align: "center",
+            });
         }
 
         doc.end();
@@ -126,14 +130,14 @@ export class PDFListRenderer {
    */
   private formatValue(value: any): string {
     if (value === null || value === undefined) {
-      return '';
+      return "";
     }
 
     if (value instanceof Date) {
-      return value.toLocaleDateString('pt-BR');
+      return value.toLocaleDateString("pt-BR");
     }
 
-    if (typeof value === 'object') {
+    if (typeof value === "object") {
       return JSON.stringify(value);
     }
 
@@ -147,20 +151,20 @@ export class PDFListRenderer {
     if (text.length <= maxLength) {
       return text;
     }
-    return text.substring(0, maxLength - 3) + '...';
+    return text.substring(0, maxLength - 3) + "...";
   }
 
   /**
    * Retorna o MIME type
    */
   getMimeType(): string {
-    return 'application/pdf';
+    return "application/pdf";
   }
 
   /**
    * Retorna a extensão do arquivo
    */
   getFileExtension(): string {
-    return 'pdf';
+    return "pdf";
   }
 }

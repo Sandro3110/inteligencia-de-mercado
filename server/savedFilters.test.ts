@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { getSavedFilters, createSavedFilter, deleteSavedFilter, upsertUser } from "./db";
+import {
+  getSavedFilters,
+  createSavedFilter,
+  deleteSavedFilter,
+  upsertUser,
+} from "./db";
 
 describe("Saved Filters", () => {
   const testUserId = "test-user-saved-filters-123";
@@ -33,11 +38,11 @@ describe("Saved Filters", () => {
 
     const filters = await getSavedFilters(testUserId);
     expect(filters.length).toBeGreaterThan(0);
-    
+
     const lastFilter = filters[filters.length - 1];
     expect(lastFilter.name).toBe("B2B SP Validados");
     expect(lastFilter.userId).toBe(testUserId);
-    
+
     createdFilterId = lastFilter.id;
   });
 
@@ -45,19 +50,19 @@ describe("Saved Filters", () => {
     const filters = await getSavedFilters(testUserId);
     expect(Array.isArray(filters)).toBe(true);
     expect(filters.length).toBeGreaterThan(0);
-    
-    const filter = filters.find((f) => f.id === createdFilterId);
+
+    const filter = filters.find(f => f.id === createdFilterId);
     expect(filter).toBeDefined();
     expect(filter?.name).toBe("B2B SP Validados");
   });
 
   it("should parse filtersJson correctly", async () => {
     const filters = await getSavedFilters(testUserId);
-    const filter = filters.find((f) => f.id === createdFilterId);
-    
+    const filter = filters.find(f => f.id === createdFilterId);
+
     expect(filter).toBeDefined();
     const parsed = JSON.parse(filter!.filtersJson);
-    
+
     expect(parsed.searchQuery).toBe("São Paulo");
     expect(parsed.searchFields).toEqual(["nome", "cidade"]);
     expect(parsed.selectedTagIds).toEqual([1, 2]);
@@ -68,9 +73,9 @@ describe("Saved Filters", () => {
 
   it("should delete a saved filter", async () => {
     await deleteSavedFilter(createdFilterId);
-    
+
     const filters = await getSavedFilters(testUserId);
-    const deletedFilter = filters.find((f) => f.id === createdFilterId);
+    const deletedFilter = filters.find(f => f.id === createdFilterId);
     expect(deletedFilter).toBeUndefined();
   });
 

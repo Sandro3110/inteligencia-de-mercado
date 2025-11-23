@@ -19,11 +19,11 @@ O número de clientes **aumentou de 800 para 1.494** (aumento de **86.75%** ou *
 
 **694 novos clientes** foram criados em **19/11/2025** através do processo de enriquecimento automático.
 
-| Data de Criação | Quantidade | Percentual |
-|----------------|------------|------------|
-| **21/10/2025** | 800 | 53.5% (Base original) |
-| **19/11/2025** | 694 | 46.5% (Enriquecimento) |
-| **TOTAL** | **1.494** | **100%** |
+| Data de Criação | Quantidade | Percentual             |
+| --------------- | ---------- | ---------------------- |
+| **21/10/2025**  | 800        | 53.5% (Base original)  |
+| **19/11/2025**  | 694        | 46.5% (Enriquecimento) |
+| **TOTAL**       | **1.494**  | **100%**               |
 
 **Conclusão:** O sistema funcionou corretamente, descobrindo automaticamente 694 novos clientes durante o enriquecimento de mercados.
 
@@ -35,13 +35,13 @@ O número de clientes **aumentou de 800 para 1.494** (aumento de **86.75%** ou *
 
 **10 clientes duplicados** por nome (20 registros no total, considerando pares).
 
-| Nome | Ocorrências |
-|------|-------------|
-| AGUAS PRATA LTDA | 4 |
-| ROSSET E CIA LTDA | 4 |
-| FOSECO INDL E COML LTDA | 2 |
-| METAPLASTIC EMBALAGENS LTDA | 2 |
-| KINGSPAN ISOESTE CONSTRUTIVOS ISOTERMICOS S/A | 2 |
+| Nome                                          | Ocorrências |
+| --------------------------------------------- | ----------- |
+| AGUAS PRATA LTDA                              | 4           |
+| ROSSET E CIA LTDA                             | 4           |
+| FOSECO INDL E COML LTDA                       | 2           |
+| METAPLASTIC EMBALAGENS LTDA                   | 2           |
+| KINGSPAN ISOESTE CONSTRUTIVOS ISOTERMICOS S/A | 2           |
 
 **Taxa de Duplicação:** 1.3% (20 de 1.494)
 
@@ -49,13 +49,13 @@ O número de clientes **aumentou de 800 para 1.494** (aumento de **86.75%** ou *
 
 **10 clientes duplicados** por email (20 registros no total).
 
-| Email | Ocorrências |
-|-------|-------------|
-| contato@envelopackinddeembal.com.br | 2 |
-| contato@anhur.com.br | 2 |
-| contato.brasil@smurfitkappa.com | 2 |
-| contato@rossecialtda.com.br | 2 |
-| contato@freseniusmedicalcare.com.br | 2 |
+| Email                               | Ocorrências |
+| ----------------------------------- | ----------- |
+| contato@envelopackinddeembal.com.br | 2           |
+| contato@anhur.com.br                | 2           |
+| contato.brasil@smurfitkappa.com     | 2           |
+| contato@rossecialtda.com.br         | 2           |
+| contato@freseniusmedicalcare.com.br | 2           |
 
 ### ⚠️ Observação
 
@@ -70,23 +70,23 @@ A duplicação é **mínima** e pode ser causada por:
 
 ### Estatísticas de Relacionamentos
 
-| Métrica | Valor |
-|---------|-------|
-| **Clientes Únicos** | 697 |
-| **Total de Relacionamentos** | 2.063 |
+| Métrica                           | Valor    |
+| --------------------------------- | -------- |
+| **Clientes Únicos**               | 697      |
+| **Total de Relacionamentos**      | 2.063    |
 | **Média de Mercados por Cliente** | **2.96** |
 
 **Interpretação:** Cada cliente está associado, em média, a **3 mercados diferentes**, o que explica parcialmente o número maior de registros.
 
 ### Clientes Multi-Mercado (Top 5)
 
-| Cliente | Número de Mercados |
-|---------|-------------------|
-| OSWALDO CRUZ QUIMICA IND E COM LTDA | 3 |
-| RTL MUDANCAS E TRANSPORTES LTDA | 3 |
-| INJETRIO INDUSTRIA DE PLASTICO LTDA | 3 |
-| AGRONILSEN COMERCIO DE PRODUTOS AGRICOLAS LTDA | 3 |
-| DURATEX S/A | 3 |
+| Cliente                                        | Número de Mercados |
+| ---------------------------------------------- | ------------------ |
+| OSWALDO CRUZ QUIMICA IND E COM LTDA            | 3                  |
+| RTL MUDANCAS E TRANSPORTES LTDA                | 3                  |
+| INJETRIO INDUSTRIA DE PLASTICO LTDA            | 3                  |
+| AGRONILSEN COMERCIO DE PRODUTOS AGRICOLAS LTDA | 3                  |
+| DURATEX S/A                                    | 3                  |
 
 **Total de Clientes Multi-Mercado:** 10 clientes
 
@@ -190,11 +190,11 @@ ADD UNIQUE INDEX idx_unique_cliente (nome, email);
 
 ## 📅 Linha do Tempo
 
-| Data | Evento | Clientes |
-|------|--------|----------|
-| **21/10/2025** | Importação inicial | 800 |
-| **19/11/2025** | Enriquecimento automático | +694 |
-| **19/11/2025** | Total atual | **1.494** |
+| Data           | Evento                    | Clientes  |
+| -------------- | ------------------------- | --------- |
+| **21/10/2025** | Importação inicial        | 800       |
+| **19/11/2025** | Enriquecimento automático | +694      |
+| **19/11/2025** | Total atual               | **1.494** |
 
 **Crescimento:** +86.75% em 29 dias  
 **Taxa diária:** +23.9 clientes/dia

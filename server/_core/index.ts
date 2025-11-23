@@ -38,14 +38,14 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
-  
+
   // SSE endpoint for enrichment progress (requer autenticação)
   app.get("/api/enrichment/progress/:jobId", requireAuth, setupSSE);
-  
+
   // SSE endpoint for real-time notifications (requer autenticação)
-  const { handleNotificationStream } = await import('../notificationStream');
+  const { handleNotificationStream } = await import("../notificationStream");
   app.get("/api/notifications/stream", requireAuth, handleNotificationStream);
-  
+
   // tRPC API
   app.use(
     "/api/trpc",
@@ -70,16 +70,18 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
-    
+
     // Inicializar WebSocket
     initializeWebSocket(server);
-    
+
     // Inicializar cron jobs
-    import("../cronJobs").then(({ initializeCronJobs }) => {
-      initializeCronJobs();
-    }).catch(err => {
-      console.error("[Server] Erro ao inicializar cron jobs:", err);
-    });
+    import("../cronJobs")
+      .then(({ initializeCronJobs }) => {
+        initializeCronJobs();
+      })
+      .catch(err => {
+        console.error("[Server] Erro ao inicializar cron jobs:", err);
+      });
   });
 }
 

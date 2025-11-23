@@ -27,6 +27,7 @@ O Dashboard é a tela inicial que apresenta uma visão geral dos dados:
 Acesse através do botão "Ver Mercados" no Dashboard.
 
 **Recursos**:
+
 - Grid de cards com todos os mercados identificados
 - Busca por nome ou categoria
 - Informações exibidas em cada card:
@@ -42,9 +43,11 @@ Acesse através do botão "Ver Mercados" no Dashboard.
 Tela principal de trabalho com 3 abas interativas:
 
 #### Aba "Clientes"
+
 Exibe todos os clientes associados ao mercado selecionado.
 
 **Colunas da tabela**:
+
 - Nome (com link para site oficial)
 - Produto Principal
 - Segmentação (B2B/B2C)
@@ -54,9 +57,11 @@ Exibe todos os clientes associados ao mercado selecionado.
 - Ações (Botão "Validar")
 
 #### Aba "Concorrentes"
+
 Lista os concorrentes mapeados para o mercado.
 
 **Colunas da tabela**:
+
 - Nome (com link para site)
 - Produto
 - Porte (Grande/Médio/Pequeno)
@@ -66,9 +71,11 @@ Lista os concorrentes mapeados para o mercado.
 - Ações (Botão "Validar")
 
 #### Aba "Leads"
+
 Apresenta os leads qualificados para o mercado.
 
 **Colunas da tabela**:
+
 - Nome (com link para site)
 - Tipo (B2B/B2C)
 - Porte
@@ -91,16 +98,19 @@ Apresenta os leads qualificados para o mercado.
 #### Status de Validação
 
 **✅ Rico** - Dados completos e validados
+
 - Use quando o item possui todas as informações necessárias
 - Dados estão corretos e verificados
 - Pronto para uso
 
 **⚠️ Precisa Ajuste** - Requer correções ou complementos
+
 - Use quando faltam informações importantes
 - Dados precisam ser atualizados ou corrigidos
 - Requer ação futura
 
 **❌ Descartado** - Dados incorretos ou irrelevantes
+
 - Use quando o item não é relevante para o projeto
 - Informações estão incorretas ou duplicadas
 - Não será usado
@@ -140,6 +150,7 @@ A aplicação permite exportar todos os dados em formato CSV para análise exter
 3. Uma notificação de sucesso será exibida
 
 **Formato do CSV**:
+
 - Codificação UTF-8 com BOM (compatível com Excel)
 - Separador: vírgula (,)
 - Campos com vírgulas são automaticamente escapados com aspas
@@ -160,10 +171,12 @@ A aplicação permite exportar todos os dados em formato CSV para análise exter
 ### Navegação
 
 **Breadcrumb implícito**:
+
 - Dashboard → Lista de Mercados → Detalhes do Mercado
 - Botão "Voltar" (seta) em cada tela para retornar
 
 **Atalhos**:
+
 - Logo/Título sempre leva ao Dashboard
 - Botão "Ver Mercados" no Dashboard
 
@@ -224,4 +237,3 @@ Para dúvidas, sugestões ou problemas técnicos, entre em contato com a equipe 
 
 **Versão**: 1.0  
 **Última atualização**: Novembro 2025
-

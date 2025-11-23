@@ -10,13 +10,17 @@ interface ContextualTourProps {
 
 /**
  * Componente reutilizável para tours contextuais
- * 
+ *
  * Uso:
  * ```tsx
  * <ContextualTour tourId="project-creation" autoStart />
  * ```
  */
-export function ContextualTour({ tourId, autoStart = false, onComplete }: ContextualTourProps) {
+export function ContextualTour({
+  tourId,
+  autoStart = false,
+  onComplete,
+}: ContextualTourProps) {
   const { isRunning, hasCompleted, startTour, completeTour } = useTour(tourId);
 
   useEffect(() => {

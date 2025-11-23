@@ -92,7 +92,7 @@ export async function generateTerritorialReportPDF(
     { label: "Leads Gerados", value: data.totalLeads },
   ];
 
-  metrics.forEach((metric) => {
+  metrics.forEach(metric => {
     doc.text(`• ${metric.label}: ${metric.value}`, 20, yPosition);
     yPosition += 7;
   });
@@ -109,13 +109,15 @@ export async function generateTerritorialReportPDF(
   autoTable(doc, {
     startY: yPosition,
     head: [["Estado", "Clientes", "Concorrentes", "Leads", "Score"]],
-    body: data.stateRanking.slice(0, 10).map((s) => [
-      s.state,
-      s.clients.toString(),
-      s.competitors.toString(),
-      s.leads.toString(),
-      s.score.toFixed(1),
-    ]),
+    body: data.stateRanking
+      .slice(0, 10)
+      .map(s => [
+        s.state,
+        s.clients.toString(),
+        s.competitors.toString(),
+        s.leads.toString(),
+        s.score.toFixed(1),
+      ]),
     theme: "grid",
     headStyles: { fillColor: [59, 130, 246], textColor: 255 },
     styles: { fontSize: 10 },
@@ -133,14 +135,16 @@ export async function generateTerritorialReportPDF(
   autoTable(doc, {
     startY: yPosition,
     head: [["Cidade", "Estado", "Clientes", "Concorrentes", "Leads", "Score"]],
-    body: data.cityRanking.slice(0, 10).map((c) => [
-      c.city,
-      c.state,
-      c.clients.toString(),
-      c.competitors.toString(),
-      c.leads.toString(),
-      c.score.toFixed(1),
-    ]),
+    body: data.cityRanking
+      .slice(0, 10)
+      .map(c => [
+        c.city,
+        c.state,
+        c.clients.toString(),
+        c.competitors.toString(),
+        c.leads.toString(),
+        c.score.toFixed(1),
+      ]),
     theme: "grid",
     headStyles: { fillColor: [59, 130, 246], textColor: 255 },
     styles: { fontSize: 9 },
@@ -158,7 +162,7 @@ export async function generateTerritorialReportPDF(
 
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
-    data.insights.forEach((insight) => {
+    data.insights.forEach(insight => {
       checkPageBreak(15);
       const lines = doc.splitTextToSize(`• ${insight}`, pageWidth - 30);
       doc.text(lines, 20, yPosition);
@@ -181,10 +185,7 @@ export async function generateTerritorialReportPDF(
     doc.setFont("helvetica", "normal");
     data.recommendations.forEach((rec, index) => {
       checkPageBreak(15);
-      const lines = doc.splitTextToSize(
-        `${index + 1}. ${rec}`,
-        pageWidth - 30
-      );
+      const lines = doc.splitTextToSize(`${index + 1}. ${rec}`, pageWidth - 30);
       doc.text(lines, 20, yPosition);
       yPosition += lines.length * 7;
     });

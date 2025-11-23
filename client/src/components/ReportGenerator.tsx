@@ -1,12 +1,27 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { FileText, Download, Loader2, CheckCircle2, TrendingUp, Target, Users, Filter } from "lucide-react";
+import {
+  FileText,
+  Download,
+  Loader2,
+  CheckCircle2,
+  TrendingUp,
+  Target,
+  Users,
+  Filter,
+} from "lucide-react";
 import { generateExecutivePDF } from "@/lib/generatePDF";
 
 export function ReportGenerator() {
@@ -15,16 +30,21 @@ export function ReportGenerator() {
   const [showFilters, setShowFilters] = useState(false);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(null);
-
-  // Buscar pesquisas do projeto selecionado
-  const { data: pesquisas } = trpc.pesquisas.list.useQuery(
-    undefined,
-    { enabled: !!selectedProjectId }
+  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(
+    null
   );
 
-  const { data: reportData, refetch, isLoading } = trpc.executiveReports.generate.useQuery(
-    { 
+  // Buscar pesquisas do projeto selecionado
+  const { data: pesquisas } = trpc.pesquisas.list.useQuery(undefined, {
+    enabled: !!selectedProjectId,
+  });
+
+  const {
+    data: reportData,
+    refetch,
+    isLoading,
+  } = trpc.executiveReports.generate.useQuery(
+    {
       projectId: selectedProjectId!,
       pesquisaId: selectedPesquisaId ?? undefined,
       dateFrom: dateFrom || undefined,
@@ -45,7 +65,7 @@ export function ReportGenerator() {
 
     try {
       const result = await refetch();
-      
+
       if (result.data) {
         // Gerar PDF
         generateExecutivePDF(result.data);
@@ -84,7 +104,8 @@ export function ReportGenerator() {
             Relatório Executivo Completo
           </CardTitle>
           <CardDescription>
-            Análise estratégica com insights, top mercados, leads prioritários e análise competitiva
+            Análise estratégica com insights, top mercados, leads prioritários e
+            análise competitiva
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -101,14 +122,20 @@ export function ReportGenerator() {
 
             {showFilters && (
               <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-4">
-                <h3 className="font-medium text-slate-900 mb-3">Filtros do Relatório</h3>
-                
+                <h3 className="font-medium text-slate-900 mb-3">
+                  Filtros do Relatório
+                </h3>
+
                 <div className="space-y-2">
                   <Label htmlFor="pesquisa">Pesquisa</Label>
                   <select
                     id="pesquisa"
                     value={selectedPesquisaId || ""}
-                    onChange={(e) => setSelectedPesquisaId(e.target.value ? Number(e.target.value) : null)}
+                    onChange={e =>
+                      setSelectedPesquisaId(
+                        e.target.value ? Number(e.target.value) : null
+                      )
+                    }
                     className="w-full px-3 py-2 border border-slate-300 rounded-md text-slate-700 bg-white"
                   >
                     <option value="">Todas as Pesquisas</option>
@@ -127,17 +154,17 @@ export function ReportGenerator() {
                       id="dateFrom"
                       type="date"
                       value={dateFrom}
-                      onChange={(e) => setDateFrom(e.target.value)}
+                      onChange={e => setDateFrom(e.target.value)}
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="dateTo">Data Fim</Label>
                     <Input
                       id="dateTo"
                       type="date"
                       value={dateTo}
-                      onChange={(e) => setDateTo(e.target.value)}
+                      onChange={e => setDateTo(e.target.value)}
                     />
                   </div>
                 </div>
@@ -146,9 +173,12 @@ export function ReportGenerator() {
                   <div className="flex items-center gap-2 text-sm text-slate-600">
                     <CheckCircle2 className="w-4 h-4 text-green-500" />
                     <span>
-                      Filtros ativos: {dateFrom && `De ${new Date(dateFrom).toLocaleDateString('pt-BR')}`}
+                      Filtros ativos:{" "}
+                      {dateFrom &&
+                        `De ${new Date(dateFrom).toLocaleDateString("pt-BR")}`}
                       {dateFrom && dateTo && " "}
-                      {dateTo && `Até ${new Date(dateTo).toLocaleDateString('pt-BR')}`}
+                      {dateTo &&
+                        `Até ${new Date(dateTo).toLocaleDateString("pt-BR")}`}
                     </span>
                   </div>
                 )}
@@ -173,7 +203,9 @@ export function ReportGenerator() {
             <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
               <div className="flex items-center gap-3 mb-2">
                 <TrendingUp className="w-5 h-5 text-green-500" />
-                <h3 className="font-medium text-slate-900">Sumário Executivo</h3>
+                <h3 className="font-medium text-slate-900">
+                  Sumário Executivo
+                </h3>
               </div>
               <p className="text-sm text-slate-600">
                 Estatísticas gerais do projeto com métricas-chave
@@ -193,7 +225,9 @@ export function ReportGenerator() {
             <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
               <div className="flex items-center gap-3 mb-2">
                 <Users className="w-5 h-5 text-purple-500" />
-                <h3 className="font-medium text-slate-900">Leads Prioritários</h3>
+                <h3 className="font-medium text-slate-900">
+                  Leads Prioritários
+                </h3>
               </div>
               <p className="text-sm text-slate-600">
                 Top 20 leads com score ≥ 80 e informações de contato
@@ -205,12 +239,16 @@ export function ReportGenerator() {
           <div className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200">
             <div className="flex items-center gap-2 mb-3">
               <CheckCircle2 className="w-5 h-5 text-blue-600" />
-              <h3 className="font-medium text-slate-900">Insights Estratégicos Incluídos</h3>
+              <h3 className="font-medium text-slate-900">
+                Insights Estratégicos Incluídos
+              </h3>
             </div>
             <ul className="space-y-2 text-sm text-slate-700">
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 mt-1">•</span>
-                <span>Percentual de leads de alta qualidade e potencial de conversão</span>
+                <span>
+                  Percentual de leads de alta qualidade e potencial de conversão
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 mt-1">•</span>
@@ -218,11 +256,16 @@ export function ReportGenerator() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 mt-1">•</span>
-                <span>Análise de densidade competitiva e estratégias de diferenciação</span>
+                <span>
+                  Análise de densidade competitiva e estratégias de
+                  diferenciação
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 mt-1">•</span>
-                <span>Identificação de oportunidades de entrada facilitada</span>
+                <span>
+                  Identificação de oportunidades de entrada facilitada
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 mt-1">•</span>
@@ -265,29 +308,41 @@ export function ReportGenerator() {
       {reportData && (
         <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-slate-900 text-sm">Preview dos Dados</CardTitle>
+            <CardTitle className="text-slate-900 text-sm">
+              Preview dos Dados
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
               <div>
                 <p className="text-slate-600">Mercados</p>
-                <p className="text-xl font-bold text-slate-900">{reportData.summary.totalMercados}</p>
+                <p className="text-xl font-bold text-slate-900">
+                  {reportData.summary.totalMercados}
+                </p>
               </div>
               <div>
                 <p className="text-slate-600">Clientes</p>
-                <p className="text-xl font-bold text-slate-900">{reportData.summary.totalClientes}</p>
+                <p className="text-xl font-bold text-slate-900">
+                  {reportData.summary.totalClientes}
+                </p>
               </div>
               <div>
                 <p className="text-slate-600">Concorrentes</p>
-                <p className="text-xl font-bold text-slate-900">{reportData.summary.totalConcorrentes}</p>
+                <p className="text-xl font-bold text-slate-900">
+                  {reportData.summary.totalConcorrentes}
+                </p>
               </div>
               <div>
                 <p className="text-slate-600">Leads</p>
-                <p className="text-xl font-bold text-slate-900">{reportData.summary.totalLeads}</p>
+                <p className="text-xl font-bold text-slate-900">
+                  {reportData.summary.totalLeads}
+                </p>
               </div>
               <div>
                 <p className="text-slate-600">Alta Qualidade</p>
-                <p className="text-xl font-bold text-green-400">{reportData.summary.leadsHighQuality}</p>
+                <p className="text-xl font-bold text-green-400">
+                  {reportData.summary.leadsHighQuality}
+                </p>
               </div>
             </div>
           </CardContent>

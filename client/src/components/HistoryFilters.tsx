@@ -72,7 +72,7 @@ export default function HistoryFilters({
             id="dateFrom"
             type="date"
             value={filters.dateFrom}
-            onChange={(e) => handleFilterChange("dateFrom", e.target.value)}
+            onChange={e => handleFilterChange("dateFrom", e.target.value)}
             className="w-full"
           />
         </div>
@@ -83,7 +83,7 @@ export default function HistoryFilters({
             id="dateTo"
             type="date"
             value={filters.dateTo}
-            onChange={(e) => handleFilterChange("dateTo", e.target.value)}
+            onChange={e => handleFilterChange("dateTo", e.target.value)}
             className="w-full"
           />
         </div>
@@ -93,7 +93,7 @@ export default function HistoryFilters({
           <Label htmlFor="status">Status</Label>
           <Select
             value={filters.status}
-            onValueChange={(value) => handleFilterChange("status", value)}
+            onValueChange={value => handleFilterChange("status", value)}
           >
             <SelectTrigger id="status">
               <SelectValue placeholder="Todos" />
@@ -116,7 +116,7 @@ export default function HistoryFilters({
             type="number"
             placeholder="0"
             value={filters.durationMin}
-            onChange={(e) => handleFilterChange("durationMin", e.target.value)}
+            onChange={e => handleFilterChange("durationMin", e.target.value)}
             className="w-full"
           />
         </div>
@@ -128,7 +128,7 @@ export default function HistoryFilters({
             type="number"
             placeholder="999"
             value={filters.durationMax}
-            onChange={(e) => handleFilterChange("durationMax", e.target.value)}
+            onChange={e => handleFilterChange("durationMax", e.target.value)}
             className="w-full"
           />
         </div>

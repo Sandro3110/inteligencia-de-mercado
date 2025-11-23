@@ -40,7 +40,13 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -58,15 +64,21 @@ export default function DraftRecoveryModal({
 }: DraftRecoveryModalProps) {
   const [draftToDelete, setDraftToDelete] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // Filtros
   const [projectIdFilter, setProjectIdFilter] = useState<number | undefined>();
-  const [progressStatusFilter, setProgressStatusFilter] = useState<'started' | 'in_progress' | 'almost_done' | undefined>();
+  const [progressStatusFilter, setProgressStatusFilter] = useState<
+    "started" | "in_progress" | "almost_done" | undefined
+  >();
   const [daysAgoFilter, setDaysAgoFilter] = useState<number | undefined>();
   const [searchText, setSearchText] = useState("");
 
   // Query para listar drafts (com ou sem filtros)
-  const { data: drafts, isLoading, refetch } = trpc.drafts.getFiltered.useQuery(
+  const {
+    data: drafts,
+    isLoading,
+    refetch,
+  } = trpc.drafts.getFiltered.useQuery(
     {
       projectId: projectIdFilter,
       progressStatus: progressStatusFilter,
@@ -85,7 +97,7 @@ export default function DraftRecoveryModal({
       refetch();
       setDraftToDelete(null);
     },
-    onError: (error) => {
+    onError: error => {
       toast.error("Erro ao excluir rascunho", {
         description: error.message,
       });
@@ -176,22 +188,34 @@ export default function DraftRecoveryModal({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="projectFilter" className="text-xs">Projeto</Label>
+                  <Label htmlFor="projectFilter" className="text-xs">
+                    Projeto
+                  </Label>
                   <Input
                     id="projectFilter"
                     type="number"
                     placeholder="ID do projeto"
                     value={projectIdFilter ?? ""}
-                    onChange={(e) => setProjectIdFilter(e.target.value ? Number(e.target.value) : undefined)}
+                    onChange={e =>
+                      setProjectIdFilter(
+                        e.target.value ? Number(e.target.value) : undefined
+                      )
+                    }
                     className="h-8 text-sm"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="statusFilter" className="text-xs">Status de Progresso</Label>
+                  <Label htmlFor="statusFilter" className="text-xs">
+                    Status de Progresso
+                  </Label>
                   <Select
                     value={progressStatusFilter ?? "all"}
-                    onValueChange={(v) => setProgressStatusFilter(v === "all" ? undefined : v as any)}
+                    onValueChange={v =>
+                      setProgressStatusFilter(
+                        v === "all" ? undefined : (v as any)
+                      )
+                    }
                   >
                     <SelectTrigger className="h-8 text-sm">
                       <SelectValue />
@@ -206,10 +230,14 @@ export default function DraftRecoveryModal({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="daysFilter" className="text-xs">Período</Label>
+                  <Label htmlFor="daysFilter" className="text-xs">
+                    Período
+                  </Label>
                   <Select
                     value={daysAgoFilter?.toString() ?? "all"}
-                    onValueChange={(v) => setDaysAgoFilter(v === "all" ? undefined : Number(v))}
+                    onValueChange={v =>
+                      setDaysAgoFilter(v === "all" ? undefined : Number(v))
+                    }
                   >
                     <SelectTrigger className="h-8 text-sm">
                       <SelectValue />
@@ -224,12 +252,14 @@ export default function DraftRecoveryModal({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="searchFilter" className="text-xs">Buscar</Label>
+                  <Label htmlFor="searchFilter" className="text-xs">
+                    Buscar
+                  </Label>
                   <Input
                     id="searchFilter"
                     placeholder="Buscar no conteúdo..."
                     value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
+                    onChange={e => setSearchText(e.target.value)}
                     className="h-8 text-sm"
                   />
                 </div>
@@ -260,7 +290,10 @@ export default function DraftRecoveryModal({
             <ScrollArea className="max-h-[50vh] pr-4">
               <div className="space-y-3">
                 {drafts.map((draft: any) => (
-                  <Card key={draft.id} className="hover:border-primary/50 transition-colors">
+                  <Card
+                    key={draft.id}
+                    className="hover:border-primary/50 transition-colors"
+                  >
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="space-y-1 flex-1">
@@ -288,7 +321,12 @@ export default function DraftRecoveryModal({
                       <div className="space-y-1">
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
                           <span>{getStepLabel(draft.currentStep)}</span>
-                          <span>{getProgressPercentage(draft.currentStep).toFixed(0)}%</span>
+                          <span>
+                            {getProgressPercentage(draft.currentStep).toFixed(
+                              0
+                            )}
+                            %
+                          </span>
                         </div>
                         <div className="w-full bg-secondary rounded-full h-2">
                           <div
@@ -356,7 +394,7 @@ export default function DraftRecoveryModal({
       {/* Alert Dialog de Confirmação de Exclusão */}
       <AlertDialog
         open={draftToDelete !== null}
-        onOpenChange={(open) => !open && setDraftToDelete(null)}
+        onOpenChange={open => !open && setDraftToDelete(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>

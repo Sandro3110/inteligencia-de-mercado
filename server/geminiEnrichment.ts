@@ -1,6 +1,6 @@
 /**
  * Enriquecimento Completo com Gemini LLM
- * 
+ *
  * Este módulo usa a LLM Gemini do Manus para preencher TODOS os campos
  * das tabelas de forma inteligente, com foco em QUALIDADE > QUANTIDADE
  */
@@ -47,8 +47,12 @@ Retorne APENAS o JSON, sem explicações.`;
   try {
     const response = await invokeLLM({
       messages: [
-        { role: "system", content: "Você é um assistente que retorna apenas JSON válido, sem texto adicional." },
-        { role: "user", content: prompt }
+        {
+          role: "system",
+          content:
+            "Você é um assistente que retorna apenas JSON válido, sem texto adicional.",
+        },
+        { role: "user", content: prompt },
       ],
       response_format: {
         type: "json_schema",
@@ -59,14 +63,28 @@ Retorne APENAS o JSON, sem explicações.`;
             type: "object",
             properties: {
               produtoPrincipal: { type: "string" },
-              segmentacaoB2bB2c: { type: "string", enum: ["B2B", "B2C", "B2B2C", "Não disponível"] },
+              segmentacaoB2bB2c: {
+                type: "string",
+                enum: ["B2B", "B2C", "B2B2C", "Não disponível"],
+              },
               email: { type: "string" },
               telefone: { type: "string" },
               linkedin: { type: "string" },
               instagram: { type: "string" },
-              porte: { type: "string", enum: ["Micro", "Pequena", "Média", "Grande", "Não disponível"] },
+              porte: {
+                type: "string",
+                enum: ["Micro", "Pequena", "Média", "Grande", "Não disponível"],
+              },
             },
-            required: ["produtoPrincipal", "segmentacaoB2bB2c", "email", "telefone", "linkedin", "instagram", "porte"],
+            required: [
+              "produtoPrincipal",
+              "segmentacaoB2bB2c",
+              "email",
+              "telefone",
+              "linkedin",
+              "instagram",
+              "porte",
+            ],
             additionalProperties: false,
           },
         },
@@ -84,14 +102,28 @@ Retorne APENAS o JSON, sem explicações.`;
     let qualidadeScore = 0;
     if (cliente.cnpj) qualidadeScore += 20;
     if (cliente.siteOficial) qualidadeScore += 15;
-    if (enrichedData.email && !enrichedData.email.includes("Não disponível")) qualidadeScore += 10;
-    if (enrichedData.telefone && !enrichedData.telefone.includes("Não disponível")) qualidadeScore += 10;
-    if (enrichedData.linkedin && !enrichedData.linkedin.includes("Não disponível")) qualidadeScore += 10;
-    if (enrichedData.produtoPrincipal && !enrichedData.produtoPrincipal.includes("Não disponível")) qualidadeScore += 15;
+    if (enrichedData.email && !enrichedData.email.includes("Não disponível"))
+      qualidadeScore += 10;
+    if (
+      enrichedData.telefone &&
+      !enrichedData.telefone.includes("Não disponível")
+    )
+      qualidadeScore += 10;
+    if (
+      enrichedData.linkedin &&
+      !enrichedData.linkedin.includes("Não disponível")
+    )
+      qualidadeScore += 10;
+    if (
+      enrichedData.produtoPrincipal &&
+      !enrichedData.produtoPrincipal.includes("Não disponível")
+    )
+      qualidadeScore += 15;
     if (cliente.cidade) qualidadeScore += 10;
     if (cliente.cnae) qualidadeScore += 10;
 
-    const qualidadeClassificacao = qualidadeScore >= 71 ? "Alta" : qualidadeScore >= 41 ? "Média" : "Baixa";
+    const qualidadeClassificacao =
+      qualidadeScore >= 71 ? "Alta" : qualidadeScore >= 41 ? "Média" : "Baixa";
 
     return {
       ...enrichedData,
@@ -107,7 +139,10 @@ Retorne APENAS o JSON, sem explicações.`;
 /**
  * Enriquece dados de um MERCADO usando Gemini
  */
-export async function enrichMercadoWithGemini(mercadoNome: string, produtosClientes: string[]) {
+export async function enrichMercadoWithGemini(
+  mercadoNome: string,
+  produtosClientes: string[]
+) {
   const prompt = `Você é um analista de mercado B2B especializado em inteligência competitiva.
 
 MERCADO: ${mercadoNome}
@@ -133,8 +168,12 @@ Retorne APENAS o JSON, sem explicações.`;
   try {
     const response = await invokeLLM({
       messages: [
-        { role: "system", content: "Você é um assistente que retorna apenas JSON válido, sem texto adicional." },
-        { role: "user", content: prompt }
+        {
+          role: "system",
+          content:
+            "Você é um assistente que retorna apenas JSON válido, sem texto adicional.",
+        },
+        { role: "user", content: prompt },
       ],
       response_format: {
         type: "json_schema",
@@ -151,7 +190,14 @@ Retorne APENAS o JSON, sem explicações.`;
               tendencias: { type: "string" },
               principaisPlayers: { type: "string" },
             },
-            required: ["segmentacao", "categoria", "tamanhoMercado", "crescimentoAnual", "tendencias", "principaisPlayers"],
+            required: [
+              "segmentacao",
+              "categoria",
+              "tamanhoMercado",
+              "crescimentoAnual",
+              "tendencias",
+              "principaisPlayers",
+            ],
             additionalProperties: false,
           },
         },
@@ -205,8 +251,12 @@ Retorne APENAS o JSON, sem explicações.`;
   try {
     const response = await invokeLLM({
       messages: [
-        { role: "system", content: "Você é um assistente que retorna apenas JSON válido, sem texto adicional." },
-        { role: "user", content: prompt }
+        {
+          role: "system",
+          content:
+            "Você é um assistente que retorna apenas JSON válido, sem texto adicional.",
+        },
+        { role: "user", content: prompt },
       ],
       response_format: {
         type: "json_schema",
@@ -217,12 +267,27 @@ Retorne APENAS o JSON, sem explicações.`;
             type: "object",
             properties: {
               produto: { type: "string" },
-              porte: { type: "string", enum: ["Micro", "Pequena", "Média", "Grande", "Informação não disponível"] },
+              porte: {
+                type: "string",
+                enum: [
+                  "Micro",
+                  "Pequena",
+                  "Média",
+                  "Grande",
+                  "Informação não disponível",
+                ],
+              },
               faturamentoEstimado: { type: "string" },
               cidade: { type: "string" },
               uf: { type: "string" },
             },
-            required: ["produto", "porte", "faturamentoEstimado", "cidade", "uf"],
+            required: [
+              "produto",
+              "porte",
+              "faturamentoEstimado",
+              "cidade",
+              "uf",
+            ],
             additionalProperties: false,
           },
         },
@@ -239,11 +304,21 @@ Retorne APENAS o JSON, sem explicações.`;
     // Calcular score de qualidade
     let qualidadeScore = 0;
     if (concorrente.site) qualidadeScore += 20;
-    if (enrichedData.produto && !enrichedData.produto.includes("não disponível")) qualidadeScore += 20;
-    if (enrichedData.porte && !enrichedData.porte.includes("não disponível")) qualidadeScore += 15;
-    if (enrichedData.faturamentoEstimado && !enrichedData.faturamentoEstimado.includes("não disponível")) qualidadeScore += 20;
+    if (
+      enrichedData.produto &&
+      !enrichedData.produto.includes("não disponível")
+    )
+      qualidadeScore += 20;
+    if (enrichedData.porte && !enrichedData.porte.includes("não disponível"))
+      qualidadeScore += 15;
+    if (
+      enrichedData.faturamentoEstimado &&
+      !enrichedData.faturamentoEstimado.includes("não disponível")
+    )
+      qualidadeScore += 20;
 
-    const qualidadeClassificacao = qualidadeScore >= 71 ? "Alta" : qualidadeScore >= 41 ? "Média" : "Baixa";
+    const qualidadeClassificacao =
+      qualidadeScore >= 71 ? "Alta" : qualidadeScore >= 41 ? "Média" : "Baixa";
 
     return {
       ...enrichedData,
@@ -292,8 +367,12 @@ Retorne APENAS o JSON, sem explicações.`;
   try {
     const response = await invokeLLM({
       messages: [
-        { role: "system", content: "Você é um assistente que retorna apenas JSON válido, sem texto adicional." },
-        { role: "user", content: prompt }
+        {
+          role: "system",
+          content:
+            "Você é um assistente que retorna apenas JSON válido, sem texto adicional.",
+        },
+        { role: "user", content: prompt },
       ],
       response_format: {
         type: "json_schema",
@@ -303,8 +382,25 @@ Retorne APENAS o JSON, sem explicações.`;
           schema: {
             type: "object",
             properties: {
-              tipo: { type: "string", enum: ["fornecedor", "distribuidor", "parceiro", "Informação não disponível"] },
-              porte: { type: "string", enum: ["Micro", "Pequena", "Média", "Grande", "Informação não disponível"] },
+              tipo: {
+                type: "string",
+                enum: [
+                  "fornecedor",
+                  "distribuidor",
+                  "parceiro",
+                  "Informação não disponível",
+                ],
+              },
+              porte: {
+                type: "string",
+                enum: [
+                  "Micro",
+                  "Pequena",
+                  "Média",
+                  "Grande",
+                  "Informação não disponível",
+                ],
+              },
               regiao: { type: "string" },
               setor: { type: "string" },
               cidade: { type: "string" },
@@ -327,11 +423,15 @@ Retorne APENAS o JSON, sem explicações.`;
     // Calcular score de qualidade
     let qualidadeScore = 0;
     if (lead.site) qualidadeScore += 15;
-    if (enrichedData.tipo && !enrichedData.tipo.includes("não disponível")) qualidadeScore += 10;
-    if (enrichedData.porte && !enrichedData.porte.includes("não disponível")) qualidadeScore += 10;
-    if (enrichedData.setor && !enrichedData.setor.includes("não disponível")) qualidadeScore += 5;
+    if (enrichedData.tipo && !enrichedData.tipo.includes("não disponível"))
+      qualidadeScore += 10;
+    if (enrichedData.porte && !enrichedData.porte.includes("não disponível"))
+      qualidadeScore += 10;
+    if (enrichedData.setor && !enrichedData.setor.includes("não disponível"))
+      qualidadeScore += 5;
 
-    const qualidadeClassificacao = qualidadeScore >= 71 ? "Alta" : qualidadeScore >= 41 ? "Média" : "Baixa";
+    const qualidadeClassificacao =
+      qualidadeScore >= 71 ? "Alta" : qualidadeScore >= 41 ? "Média" : "Baixa";
 
     return {
       ...enrichedData,

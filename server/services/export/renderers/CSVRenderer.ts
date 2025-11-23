@@ -14,9 +14,9 @@ export class CSVRenderer {
 
   constructor(options: CSVOptions = {}) {
     this.options = {
-      delimiter: options.delimiter || ',',
+      delimiter: options.delimiter || ",",
       includeHeaders: options.includeHeaders !== false,
-      encoding: options.encoding || 'utf-8',
+      encoding: options.encoding || "utf-8",
     };
   }
 
@@ -25,14 +25,16 @@ export class CSVRenderer {
    */
   render(data: any[], fields: string[]): string {
     if (!data || data.length === 0) {
-      return '';
+      return "";
     }
 
     const lines: string[] = [];
 
     // Headers
     if (this.options.includeHeaders) {
-      lines.push(fields.map(f => this.escapeCSV(f)).join(this.options.delimiter));
+      lines.push(
+        fields.map(f => this.escapeCSV(f)).join(this.options.delimiter)
+      );
     }
 
     // Data rows
@@ -44,23 +46,25 @@ export class CSVRenderer {
       lines.push(values.join(this.options.delimiter));
     });
 
-    return lines.join('\n');
+    return lines.join("\n");
   }
 
   /**
    * Escapa valores CSV (adiciona aspas se necessário)
    */
   private escapeCSV(value: string): string {
-    if (!value) return '';
-    
+    if (!value) return "";
+
     const stringValue = String(value);
-    
-    if (stringValue.includes(this.options.delimiter) || 
-        stringValue.includes('"') || 
-        stringValue.includes('\n')) {
+
+    if (
+      stringValue.includes(this.options.delimiter) ||
+      stringValue.includes('"') ||
+      stringValue.includes("\n")
+    ) {
       return `"${stringValue.replace(/"/g, '""')}"`;
     }
-    
+
     return stringValue;
   }
 
@@ -69,14 +73,14 @@ export class CSVRenderer {
    */
   private formatValue(value: any): string {
     if (value === null || value === undefined) {
-      return '';
+      return "";
     }
 
     if (value instanceof Date) {
-      return value.toISOString().split('T')[0];
+      return value.toISOString().split("T")[0];
     }
 
-    if (typeof value === 'object') {
+    if (typeof value === "object") {
       return JSON.stringify(value);
     }
 
@@ -87,13 +91,13 @@ export class CSVRenderer {
    * Retorna o MIME type
    */
   getMimeType(): string {
-    return 'text/csv';
+    return "text/csv";
   }
 
   /**
    * Retorna a extensão do arquivo
    */
   getFileExtension(): string {
-    return 'csv';
+    return "csv";
   }
 }

@@ -7,14 +7,14 @@
 
 ### Breakdown por Fase:
 
-| Fase | Descrição | Tempo Estimado | % do Total |
-|------|-----------|----------------|------------|
-| 1 | Enriquecer Cliente (1 chamada LLM) | ~5s | 3% |
-| 2 | Identificar Produtos (1 chamada LLM) | ~5s | 3% |
-| 3 | Identificar Mercados (1 chamada LLM + 3 INSERTs) | ~10s | 6% |
-| 4 | Gerar 20 Concorrentes (1-2 chamadas LLM + 20 INSERTs) | ~60s | 33% |
-| 5 | Gerar 20 Leads (1-2 chamadas LLM + 20 INSERTs) | ~60s | 33% |
-| - | Consultas de unicidade (50+ SELECTs) | ~40s | 22% |
+| Fase | Descrição                                             | Tempo Estimado | % do Total |
+| ---- | ----------------------------------------------------- | -------------- | ---------- |
+| 1    | Enriquecer Cliente (1 chamada LLM)                    | ~5s            | 3%         |
+| 2    | Identificar Produtos (1 chamada LLM)                  | ~5s            | 3%         |
+| 3    | Identificar Mercados (1 chamada LLM + 3 INSERTs)      | ~10s           | 6%         |
+| 4    | Gerar 20 Concorrentes (1-2 chamadas LLM + 20 INSERTs) | ~60s           | 33%        |
+| 5    | Gerar 20 Leads (1-2 chamadas LLM + 20 INSERTs)        | ~60s           | 33%        |
+| -    | Consultas de unicidade (50+ SELECTs)                  | ~40s           | 22%        |
 
 **Gargalos Identificados:**
 
@@ -32,6 +32,7 @@
 **Ganho Estimado:** -60s (33% mais rápido)
 
 **Implementação:**
+
 ```typescript
 // ANTES (sequencial)
 const fase4 = await enrichClienteFase4(...);
@@ -53,6 +54,7 @@ const [fase4, fase5] = await Promise.all([
 **Ganho Estimado:** -10s (6% mais rápido)
 
 **Implementação:**
+
 ```typescript
 // ANTES (20 INSERTs individuais)
 for (const concorrente of concorrentes) {
@@ -72,6 +74,7 @@ await db.insert(concorrentes).values(concorrentesData);
 **Ganho Estimado:** -30s (17% mais rápido)
 
 **Implementação:**
+
 ```typescript
 // ANTES (50+ SELECTs)
 for (const empresa of empresas) {
@@ -93,6 +96,7 @@ const existe = cache.has(normalizarNome(empresa.nome));
 **Ganho Estimado:** -10s (6% mais rápido)
 
 **Implementação:**
+
 ```typescript
 // ANTES: Gera 30 (1.5x) para garantir 20 únicos
 const quantidade = Math.ceil(quantidadeDesejada * 1.5);
@@ -110,6 +114,7 @@ const quantidade = Math.ceil(quantidadeDesejada * 1.25);
 **Ganho Estimado:** -5s (3% mais rápido)
 
 **Implementação:**
+
 - Processar resultados conforme chegam (não esperar resposta completa)
 - Requer mudança na API do Gemini (usar `stream: true`)
 
@@ -119,13 +124,13 @@ const quantidade = Math.ceil(quantidadeDesejada * 1.25);
 
 ## 📈 Performance Projetada (Após Otimizações)
 
-| Otimização | Ganho | Tempo Acumulado |
-|------------|-------|-----------------|
-| **Baseline** | - | 180s |
-| Paralelização (Fases 4+5) | -60s | **120s** ✅ |
-| Batch Insert | -10s | **110s** ✅ |
-| Cache de Empresas | -30s | **80s** ✅ |
-| Reduzir Overhead | -10s | **70s** ✅ |
+| Otimização                | Ganho | Tempo Acumulado |
+| ------------------------- | ----- | --------------- |
+| **Baseline**              | -     | 180s            |
+| Paralelização (Fases 4+5) | -60s  | **120s** ✅     |
+| Batch Insert              | -10s  | **110s** ✅     |
+| Cache de Empresas         | -30s  | **80s** ✅      |
+| Reduzir Overhead          | -10s  | **70s** ✅      |
 
 **Resultado Final:** **70 segundos** (~1 minuto)  
 **Melhoria:** **61% mais rápido** (de 3min para 1min)
@@ -135,16 +140,19 @@ const quantidade = Math.ceil(quantidadeDesejada * 1.25);
 ## 🎯 Plano de Implementação
 
 ### Fase 1: Otimizações de Alto Impacto (Prioridade ALTA)
+
 1. ✅ Implementar paralelização de Fases 4 e 5
 2. ✅ Implementar cache de empresas existentes
 3. ✅ Testar e validar (ganho esperado: -90s)
 
 ### Fase 2: Otimizações de Médio Impacto (Prioridade MÉDIA)
+
 4. ✅ Implementar batch insert
 5. ✅ Reduzir overhead de geração
 6. ✅ Testar e validar (ganho esperado: -20s)
 
 ### Fase 3: Validação Final
+
 7. ✅ Comparar performance antes/depois
 8. ✅ Validar que não há regressão de qualidade
 9. ✅ Criar checkpoint com otimizações
@@ -163,16 +171,19 @@ const quantidade = Math.ceil(quantidadeDesejada * 1.25);
 ## 🔧 Considerações Técnicas
 
 ### Paralelização
+
 - **Vantagem:** Reduz tempo total significativamente
 - **Desvantagem:** Aumenta consumo de memória (2 chamadas LLM simultâneas)
 - **Mitigação:** Limitar paralelização a 2-3 chamadas simultâneas
 
 ### Cache de Empresas
+
 - **Vantagem:** Reduz drasticamente consultas ao banco
 - **Desvantagem:** Pode ficar desatualizado se outro processo inserir empresas
 - **Mitigação:** Recarregar cache a cada nova fase ou usar TTL de 5 minutos
 
 ### Batch Insert
+
 - **Vantagem:** Reduz round-trips ao banco
 - **Desvantagem:** Falha em 1 registro cancela todo o batch
 - **Mitigação:** Validar todos os registros antes do INSERT

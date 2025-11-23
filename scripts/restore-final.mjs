@@ -1,25 +1,35 @@
-import mysql from 'mysql2/promise';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import mysql from "mysql2/promise";
+import { readFileSync } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 async function restoreData() {
   let connection;
-  
+
   try {
-    console.log('🔄 Iniciando restauração dos dados...\n');
+    console.log("🔄 Iniciando restauração dos dados...\n");
 
     connection = await mysql.createConnection(process.env.DATABASE_URL);
 
     // Ler arquivos JSON
-    const mercados = JSON.parse(readFileSync(join(__dirname, 'data_mercados_unicos.json'), 'utf-8'));
-    const clientes = JSON.parse(readFileSync(join(__dirname, 'data_clientes.json'), 'utf-8'));
-    const clientesMercados = JSON.parse(readFileSync(join(__dirname, 'data_clientes_mercados.json'), 'utf-8'));
-    const concorrentes = JSON.parse(readFileSync(join(__dirname, 'data_concorrentes.json'), 'utf-8'));
-    const leads = JSON.parse(readFileSync(join(__dirname, 'data_leads.json'), 'utf-8'));
+    const mercados = JSON.parse(
+      readFileSync(join(__dirname, "data_mercados_unicos.json"), "utf-8")
+    );
+    const clientes = JSON.parse(
+      readFileSync(join(__dirname, "data_clientes.json"), "utf-8")
+    );
+    const clientesMercados = JSON.parse(
+      readFileSync(join(__dirname, "data_clientes_mercados.json"), "utf-8")
+    );
+    const concorrentes = JSON.parse(
+      readFileSync(join(__dirname, "data_concorrentes.json"), "utf-8")
+    );
+    const leads = JSON.parse(
+      readFileSync(join(__dirname, "data_leads.json"), "utf-8")
+    );
 
     console.log(`📊 Dados encontrados:`);
     console.log(`  - ${mercados.length} mercados`);
@@ -29,7 +39,7 @@ async function restoreData() {
     console.log(`  - ${leads.length} leads\n`);
 
     // Importar mercados
-    console.log('📥 Importando mercados...');
+    console.log("📥 Importando mercados...");
     let count = 0;
     for (const m of mercados) {
       await connection.execute(
@@ -47,16 +57,17 @@ async function restoreData() {
           m.tendencias || null,
           m.principais_players || null,
           m.quantidade_clientes || 0,
-          m.created_at || new Date()
+          m.created_at || new Date(),
         ]
       );
       count++;
-      if (count % 10 === 0) process.stdout.write(`\r  ${count}/${mercados.length}`);
+      if (count % 10 === 0)
+        process.stdout.write(`\r  ${count}/${mercados.length}`);
     }
     console.log(`\n✅ ${mercados.length} mercados importados\n`);
 
     // Importar clientes
-    console.log('📥 Importando clientes...');
+    console.log("📥 Importando clientes...");
     count = 0;
     for (const c of clientes) {
       await connection.execute(
@@ -79,17 +90,18 @@ async function restoreData() {
           c.cidade || null,
           c.uf || null,
           c.cnae || null,
-          c.validation_status || 'pending',
-          c.created_at || new Date()
+          c.validation_status || "pending",
+          c.created_at || new Date(),
         ]
       );
       count++;
-      if (count % 50 === 0) process.stdout.write(`\r  ${count}/${clientes.length}`);
+      if (count % 50 === 0)
+        process.stdout.write(`\r  ${count}/${clientes.length}`);
     }
     console.log(`\n✅ ${clientes.length} clientes importados\n`);
 
     // Importar relações
-    console.log('📥 Importando relações cliente-mercado...');
+    console.log("📥 Importando relações cliente-mercado...");
     count = 0;
     for (const r of clientesMercados) {
       await connection.execute(
@@ -99,12 +111,13 @@ async function restoreData() {
         [r.id, r.cliente_id, r.mercado_id, r.created_at || new Date()]
       );
       count++;
-      if (count % 50 === 0) process.stdout.write(`\r  ${count}/${clientesMercados.length}`);
+      if (count % 50 === 0)
+        process.stdout.write(`\r  ${count}/${clientesMercados.length}`);
     }
     console.log(`\n✅ ${clientesMercados.length} relações importadas\n`);
 
     // Importar concorrentes
-    console.log('📥 Importando concorrentes...');
+    console.log("📥 Importando concorrentes...");
     count = 0;
     for (const c of concorrentes) {
       await connection.execute(
@@ -124,17 +137,18 @@ async function restoreData() {
           c.faturamento_estimado || null,
           c.qualidade_score || null,
           c.qualidade_classificacao || null,
-          c.validation_status || 'pending',
-          c.created_at || new Date()
+          c.validation_status || "pending",
+          c.created_at || new Date(),
         ]
       );
       count++;
-      if (count % 50 === 0) process.stdout.write(`\r  ${count}/${concorrentes.length}`);
+      if (count % 50 === 0)
+        process.stdout.write(`\r  ${count}/${concorrentes.length}`);
     }
     console.log(`\n✅ ${concorrentes.length} concorrentes importados\n`);
 
     // Importar leads
-    console.log('📥 Importando leads...');
+    console.log("📥 Importando leads...");
     count = 0;
     for (const l of leads) {
       await connection.execute(
@@ -152,21 +166,22 @@ async function restoreData() {
           l.porte || null,
           l.qualidade_score || null,
           l.qualidade_classificacao || null,
-          l.validation_status || 'pending',
-          l.created_at || new Date()
+          l.validation_status || "pending",
+          l.created_at || new Date(),
         ]
       );
       count++;
-      if (count % 50 === 0) process.stdout.write(`\r  ${count}/${leads.length}`);
+      if (count % 50 === 0)
+        process.stdout.write(`\r  ${count}/${leads.length}`);
     }
     console.log(`\n✅ ${leads.length} leads importados\n`);
 
-    console.log('🎉 Restauração concluída com sucesso!');
-    
+    console.log("🎉 Restauração concluída com sucesso!");
+
     await connection.end();
     process.exit(0);
   } catch (error) {
-    console.error('❌ Erro na restauração:', error);
+    console.error("❌ Erro na restauração:", error);
     if (connection) await connection.end();
     process.exit(1);
   }

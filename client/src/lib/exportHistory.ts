@@ -17,7 +17,10 @@ interface EnrichmentRun {
 /**
  * Exporta histórico para CSV
  */
-export function exportToCSV(runs: EnrichmentRun[], filename = "historico-enriquecimento.csv") {
+export function exportToCSV(
+  runs: EnrichmentRun[],
+  filename = "historico-enriquecimento.csv"
+) {
   // Cabeçalhos
   const headers = [
     "ID",
@@ -31,10 +34,12 @@ export function exportToCSV(runs: EnrichmentRun[], filename = "historico-enrique
   ];
 
   // Linhas de dados
-  const rows = runs.map((run) => [
+  const rows = runs.map(run => [
     run.id,
     new Date(run.startedAt).toLocaleString("pt-BR"),
-    run.completedAt ? new Date(run.completedAt).toLocaleString("pt-BR") : "Em andamento",
+    run.completedAt
+      ? new Date(run.completedAt).toLocaleString("pt-BR")
+      : "Em andamento",
     translateStatus(run.status),
     run.totalClients,
     run.processedClients,
@@ -45,7 +50,7 @@ export function exportToCSV(runs: EnrichmentRun[], filename = "historico-enrique
   // Montar CSV
   const csvContent = [
     headers.join(","),
-    ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+    ...rows.map(row => row.map(cell => `"${cell}"`).join(",")),
   ].join("\n");
 
   // Download
@@ -55,7 +60,10 @@ export function exportToCSV(runs: EnrichmentRun[], filename = "historico-enrique
 /**
  * Exporta histórico para PDF (via HTML)
  */
-export function exportToPDF(runs: EnrichmentRun[], filename = "historico-enriquecimento.pdf") {
+export function exportToPDF(
+  runs: EnrichmentRun[],
+  filename = "historico-enriquecimento.pdf"
+) {
   // Gerar HTML para impressão
   const html = `
     <!DOCTYPE html>
@@ -122,7 +130,7 @@ export function exportToPDF(runs: EnrichmentRun[], filename = "historico-enrique
         <tbody>
           ${runs
             .map(
-              (run) => `
+              run => `
             <tr>
               <td>${run.id}</td>
               <td>${new Date(run.startedAt).toLocaleString("pt-BR")}</td>
@@ -150,7 +158,7 @@ export function exportToPDF(runs: EnrichmentRun[], filename = "historico-enrique
   if (printWindow) {
     printWindow.document.write(html);
     printWindow.document.close();
-    
+
     // Aguardar carregar e imprimir
     printWindow.onload = () => {
       printWindow.print();

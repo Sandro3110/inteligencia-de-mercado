@@ -3,9 +3,9 @@
  * Constrói queries SQL dinâmicas para exportação
  */
 
-import { getDb } from '../../db';
-import { sql } from 'drizzle-orm';
-import type { InterpretedQuery } from './interpretation';
+import { getDb } from "../../db";
+import { sql } from "drizzle-orm";
+import type { InterpretedQuery } from "./interpretation";
 
 export interface QueryBuilderOptions {
   includeMetadata?: boolean;
@@ -22,14 +22,17 @@ export async function executeExportQuery(
 ): Promise<any[]> {
   const db = await getDb();
   if (!db) {
-    throw new Error('Database not available');
+    throw new Error("Database not available");
   }
 
   const { sql: rawSql, params } = interpretedQuery;
   // Substituir placeholders manualmente
   let finalSql = rawSql;
-  params.forEach((param) => {
-    finalSql = finalSql.replace('?', typeof param === 'string' ? `'${param}'` : String(param));
+  params.forEach(param => {
+    finalSql = finalSql.replace(
+      "?",
+      typeof param === "string" ? `'${param}'` : String(param)
+    );
   });
   const query = sql.raw(finalSql);
   const results: any = await db.execute(query);
@@ -46,10 +49,10 @@ export async function executeExportQuery(
  */
 function formatDatesInRow(row: any): any {
   const formatted = { ...row };
-  
+
   Object.keys(formatted).forEach(key => {
     if (formatted[key] instanceof Date) {
-      formatted[key] = formatted[key].toISOString().split('T')[0];
+      formatted[key] = formatted[key].toISOString().split("T")[0];
     }
   });
 
@@ -59,20 +62,28 @@ function formatDatesInRow(row: any): any {
 /**
  * Conta o total de registros que serão exportados
  */
-export async function countExportRecords(interpretedQuery: InterpretedQuery): Promise<number> {
+export async function countExportRecords(
+  interpretedQuery: InterpretedQuery
+): Promise<number> {
   const db = await getDb();
   if (!db) {
-    throw new Error('Database not available');
+    throw new Error("Database not available");
   }
 
   const { sql: rawSql, params } = interpretedQuery;
-  let countSql = rawSql.replace(/SELECT .+ FROM/, 'SELECT COUNT(*) as total FROM').replace(/ORDER BY.+/, '').replace(/LIMIT.+/, '');
-  
+  let countSql = rawSql
+    .replace(/SELECT .+ FROM/, "SELECT COUNT(*) as total FROM")
+    .replace(/ORDER BY.+/, "")
+    .replace(/LIMIT.+/, "");
+
   // Substituir placeholders manualmente
-  params.forEach((param) => {
-    countSql = countSql.replace('?', typeof param === 'string' ? `'${param}'` : String(param));
+  params.forEach(param => {
+    countSql = countSql.replace(
+      "?",
+      typeof param === "string" ? `'${param}'` : String(param)
+    );
   });
-  
+
   const query = sql.raw(countSql);
   const result: any = await db.execute(query);
   return result[0]?.total || 0;

@@ -26,17 +26,17 @@ O sistema permite que empresas identifiquem mercados potenciais, mapeiem cliente
 
 A aplicação utiliza uma arquitetura **full-stack TypeScript** com comunicação type-safe entre frontend e backend através de tRPC. A stack tecnológica foi escolhida para garantir produtividade de desenvolvimento, manutenibilidade e escalabilidade.
 
-| Camada | Tecnologia | Versão | Descrição |
-|--------|------------|--------|-----------|
-| **Frontend** | React | 19 | Interface de usuário moderna e responsiva |
-| **Estilização** | Tailwind CSS | 4 | Design system consistente e customizável |
-| **Componentes** | shadcn/ui | - | Biblioteca de componentes acessíveis e reutilizáveis |
-| **Backend** | Express | 4 | Servidor HTTP robusto e performático |
-| **API** | tRPC | 11 | Comunicação type-safe com validação automática |
-| **Banco de Dados** | MySQL/TiDB | - | Armazenamento persistente e escalável |
-| **ORM** | Drizzle | - | Mapeamento objeto-relacional type-safe |
-| **Autenticação** | Manus OAuth | - | Sistema de autenticação integrado e seguro |
-| **Agendamento** | node-cron | - | Execução de tarefas recorrentes |
+| Camada             | Tecnologia   | Versão | Descrição                                            |
+| ------------------ | ------------ | ------ | ---------------------------------------------------- |
+| **Frontend**       | React        | 19     | Interface de usuário moderna e responsiva            |
+| **Estilização**    | Tailwind CSS | 4      | Design system consistente e customizável             |
+| **Componentes**    | shadcn/ui    | -      | Biblioteca de componentes acessíveis e reutilizáveis |
+| **Backend**        | Express      | 4      | Servidor HTTP robusto e performático                 |
+| **API**            | tRPC         | 11     | Comunicação type-safe com validação automática       |
+| **Banco de Dados** | MySQL/TiDB   | -      | Armazenamento persistente e escalável                |
+| **ORM**            | Drizzle      | -      | Mapeamento objeto-relacional type-safe               |
+| **Autenticação**   | Manus OAuth  | -      | Sistema de autenticação integrado e seguro           |
+| **Agendamento**    | node-cron    | -      | Execução de tarefas recorrentes                      |
 
 ### Hierarquia de Dados
 
@@ -59,14 +59,14 @@ PROJECT (Nível 1) - Workspace isolado por unidade de negócio
 
 ### Estatísticas Gerais
 
-| Métrica | Valor Atual |
-|---------|-------------|
-| **Páginas/Rotas Implementadas** | 23 rotas funcionais |
-| **Tabelas no Banco de Dados** | 34 tabelas (schema.ts: 836 linhas) |
-| **Endpoints tRPC** | ~80 endpoints (routers.ts: 1560 linhas) |
-| **Componentes React** | 23 páginas + componentes auxiliares |
-| **Projetos Ativos** | 3 projetos configurados |
-| **Registros no Banco** | 28.869 registros (snapshot 19/11/2025) |
+| Métrica                         | Valor Atual                             |
+| ------------------------------- | --------------------------------------- |
+| **Páginas/Rotas Implementadas** | 23 rotas funcionais                     |
+| **Tabelas no Banco de Dados**   | 34 tabelas (schema.ts: 836 linhas)      |
+| **Endpoints tRPC**              | ~80 endpoints (routers.ts: 1560 linhas) |
+| **Componentes React**           | 23 páginas + componentes auxiliares     |
+| **Projetos Ativos**             | 3 projetos configurados                 |
+| **Registros no Banco**          | 28.869 registros (snapshot 19/11/2025)  |
 
 ---
 
@@ -131,12 +131,12 @@ Configurações e automações do sistema.
 
 O sistema oferece atalhos de teclado para navegação rápida entre módulos principais.
 
-| Atalho | Ação |
-|--------|------|
-| **Ctrl+1** | Navegar para Dashboard |
-| **Ctrl+2** | Navegar para Mercados |
-| **Ctrl+3** | Navegar para Analytics |
-| **Ctrl+4** | Navegar para ROI |
+| Atalho     | Ação                               |
+| ---------- | ---------------------------------- |
+| **Ctrl+1** | Navegar para Dashboard             |
+| **Ctrl+2** | Navegar para Mercados              |
+| **Ctrl+3** | Navegar para Analytics             |
+| **Ctrl+4** | Navegar para ROI                   |
 | **Ctrl+B** | Toggle sidebar (expandir/colapsar) |
 
 ### Breadcrumbs Dinâmicos
@@ -1046,13 +1046,13 @@ Cards com métricas principais:
 
 Tabela detalhada por estágio:
 
-| Estágio | Leads | % do Total | Tempo Médio | Taxa de Conversão | Taxa de Abandono |
-|---------|-------|------------|-------------|-------------------|------------------|
-| Novo | 1000 | 100% | 3 dias | 80% | 20% |
-| Em Contato | 800 | 80% | 7 dias | 62.5% | 37.5% |
-| Negociação | 500 | 50% | 14 dias | 60% | 40% |
-| Fechado | 300 | 30% | - | - | - |
-| Perdido | 700 | 70% | - | - | - |
+| Estágio    | Leads | % do Total | Tempo Médio | Taxa de Conversão | Taxa de Abandono |
+| ---------- | ----- | ---------- | ----------- | ----------------- | ---------------- |
+| Novo       | 1000  | 100%       | 3 dias      | 80%               | 20%              |
+| Em Contato | 800   | 80%        | 7 dias      | 62.5%             | 37.5%            |
+| Negociação | 500   | 50%        | 14 dias     | 60%               | 40%              |
+| Fechado    | 300   | 30%        | -           | -                 | -                |
+| Perdido    | 700   | 70%        | -           | -                 | -                |
 
 **Identificação de Gargalos**
 
@@ -1365,12 +1365,12 @@ Permite identificar correlação entre volume e qualidade ao longo do tempo.
 
 Tabela com os 10 mercados que geraram mais leads:
 
-| Mercado | Total de Leads | Qualidade Média | Taxa de Aprovação |
-|---------|----------------|-----------------|-------------------|
-| Embalagens Plásticas | 450 | 78 | 65% |
-| Materiais de Construção | 320 | 82 | 72% |
-| Varejo Alimentício | 280 | 71 | 58% |
-| ... | ... | ... | ... |
+| Mercado                 | Total de Leads | Qualidade Média | Taxa de Aprovação |
+| ----------------------- | -------------- | --------------- | ----------------- |
+| Embalagens Plásticas    | 450            | 78              | 65%               |
+| Materiais de Construção | 320            | 82              | 72%               |
+| Varejo Alimentício      | 280            | 71              | 58%               |
+| ...                     | ...            | ...             | ...               |
 
 Tabela ordenável por qualquer coluna. Clique em mercado redireciona para `/mercado/:id`.
 
@@ -1483,47 +1483,47 @@ Tabelas fundamentais para operação do sistema.
 
 Armazena usuários do sistema com autenticação via Manus OAuth.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | varchar(64) PK | ID único do usuário (gerado pelo OAuth) |
-| name | text | Nome completo do usuário |
-| email | varchar(320) | Email do usuário |
-| loginMethod | varchar(64) | Método de login utilizado (oauth/email) |
-| role | enum('user', 'admin') | Papel do usuário no sistema |
-| createdAt | timestamp | Data de criação do registro |
-| lastSignedIn | timestamp | Data do último login |
+| Campo        | Tipo                  | Descrição                               |
+| ------------ | --------------------- | --------------------------------------- |
+| id           | varchar(64) PK        | ID único do usuário (gerado pelo OAuth) |
+| name         | text                  | Nome completo do usuário                |
+| email        | varchar(320)          | Email do usuário                        |
+| loginMethod  | varchar(64)           | Método de login utilizado (oauth/email) |
+| role         | enum('user', 'admin') | Papel do usuário no sistema             |
+| createdAt    | timestamp             | Data de criação do registro             |
+| lastSignedIn | timestamp             | Data do último login                    |
 
 **projects**
 
 Representa workspaces isolados por unidade de negócio.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do projeto |
-| nome | varchar(255) | Nome do projeto |
-| descricao | text | Descrição do projeto |
-| cor | varchar(7) | Cor hex para identificação visual |
-| ativo | int | Flag de ativo (1) ou inativo (0) |
-| createdAt | timestamp | Data de criação |
-| updatedAt | timestamp | Data da última atualização |
+| Campo     | Tipo                  | Descrição                         |
+| --------- | --------------------- | --------------------------------- |
+| id        | int PK AUTO_INCREMENT | ID único do projeto               |
+| nome      | varchar(255)          | Nome do projeto                   |
+| descricao | text                  | Descrição do projeto              |
+| cor       | varchar(7)            | Cor hex para identificação visual |
+| ativo     | int                   | Flag de ativo (1) ou inativo (0)  |
+| createdAt | timestamp             | Data de criação                   |
+| updatedAt | timestamp             | Data da última atualização        |
 
 **pesquisas**
 
 Representa batches de importação/enriquecimento dentro de projetos.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da pesquisa |
-| projectId | int FK | Referência ao projeto |
-| nome | varchar(255) | Nome da pesquisa |
-| descricao | text | Descrição da pesquisa |
-| dataImportacao | timestamp | Data de importação dos dados |
-| totalClientes | int | Total de clientes importados |
-| clientesEnriquecidos | int | Total de clientes enriquecidos |
-| status | enum | Status (importado/enriquecendo/concluido/erro) |
-| ativo | int | Flag de ativo (1) ou inativo (0) |
-| createdAt | timestamp | Data de criação |
-| updatedAt | timestamp | Data da última atualização |
+| Campo                | Tipo                  | Descrição                                      |
+| -------------------- | --------------------- | ---------------------------------------------- |
+| id                   | int PK AUTO_INCREMENT | ID único da pesquisa                           |
+| projectId            | int FK                | Referência ao projeto                          |
+| nome                 | varchar(255)          | Nome da pesquisa                               |
+| descricao            | text                  | Descrição da pesquisa                          |
+| dataImportacao       | timestamp             | Data de importação dos dados                   |
+| totalClientes        | int                   | Total de clientes importados                   |
+| clientesEnriquecidos | int                   | Total de clientes enriquecidos                 |
+| status               | enum                  | Status (importado/enriquecendo/concluido/erro) |
+| ativo                | int                   | Flag de ativo (1) ou inativo (0)               |
+| createdAt            | timestamp             | Data de criação                                |
+| updatedAt            | timestamp             | Data da última atualização                     |
 
 #### 2. Entidades de Dados (5 tabelas)
 
@@ -1533,137 +1533,137 @@ Tabelas que armazenam os dados principais do sistema.
 
 Mercados únicos identificados durante pesquisa.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do mercado |
-| projectId | int FK | Referência ao projeto |
-| pesquisaId | int FK | Referência à pesquisa |
-| mercadoHash | varchar(255) | Hash único para deduplicação |
-| nome | varchar(255) | Nome do mercado |
-| segmentacao | varchar(50) | Tipo de segmentação (B2C/B2B2C/B2B) |
-| categoria | varchar(100) | Categoria do mercado |
-| tamanhoMercado | text | Tamanho estimado do mercado |
-| crescimentoAnual | text | Taxa de crescimento anual |
-| tendencias | text | Tendências identificadas |
-| principaisPlayers | text | Principais players do mercado |
-| quantidadeClientes | int | Número de clientes associados |
-| createdAt | timestamp | Data de criação |
+| Campo              | Tipo                  | Descrição                           |
+| ------------------ | --------------------- | ----------------------------------- |
+| id                 | int PK AUTO_INCREMENT | ID único do mercado                 |
+| projectId          | int FK                | Referência ao projeto               |
+| pesquisaId         | int FK                | Referência à pesquisa               |
+| mercadoHash        | varchar(255)          | Hash único para deduplicação        |
+| nome               | varchar(255)          | Nome do mercado                     |
+| segmentacao        | varchar(50)           | Tipo de segmentação (B2C/B2B2C/B2B) |
+| categoria          | varchar(100)          | Categoria do mercado                |
+| tamanhoMercado     | text                  | Tamanho estimado do mercado         |
+| crescimentoAnual   | text                  | Taxa de crescimento anual           |
+| tendencias         | text                  | Tendências identificadas            |
+| principaisPlayers  | text                  | Principais players do mercado       |
+| quantidadeClientes | int                   | Número de clientes associados       |
+| createdAt          | timestamp             | Data de criação                     |
 
 **clientes**
 
 Empresas B2C ou B2B2C identificadas.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do cliente |
-| projectId | int FK | Referência ao projeto |
-| pesquisaId | int FK | Referência à pesquisa |
-| clienteHash | varchar(255) | Hash único para deduplicação |
-| nome | varchar(255) | Nome da empresa |
-| cnpj | varchar(20) | CNPJ da empresa |
-| siteOficial | varchar(500) | URL do site oficial |
-| produtoPrincipal | text | Produto principal oferecido |
-| segmentacaoB2bB2c | varchar(20) | Tipo de segmentação |
-| email | varchar(320) | Email de contato |
-| telefone | varchar(50) | Telefone de contato |
-| linkedin | varchar(500) | URL do LinkedIn |
-| instagram | varchar(500) | URL do Instagram |
-| cidade | varchar(100) | Cidade da sede |
-| uf | varchar(2) | Estado da sede |
-| regiao | varchar(100) | Região geográfica |
-| cnae | varchar(20) | Código CNAE |
-| porte | varchar(50) | Porte da empresa (pequeno/médio/grande) |
-| faturamentoDeclarado | text | Faturamento declarado |
-| numeroEstabelecimentos | text | Número de estabelecimentos |
-| qualidadeScore | int | Score de qualidade (0-100) |
-| qualidadeClassificacao | varchar(50) | Classificação de qualidade |
-| validationStatus | enum | Status de validação |
-| validationNotes | text | Notas de validação |
-| validatedBy | varchar(64) FK | ID do usuário que validou |
-| validatedAt | timestamp | Data de validação |
-| createdAt | timestamp | Data de criação |
+| Campo                  | Tipo                  | Descrição                               |
+| ---------------------- | --------------------- | --------------------------------------- |
+| id                     | int PK AUTO_INCREMENT | ID único do cliente                     |
+| projectId              | int FK                | Referência ao projeto                   |
+| pesquisaId             | int FK                | Referência à pesquisa                   |
+| clienteHash            | varchar(255)          | Hash único para deduplicação            |
+| nome                   | varchar(255)          | Nome da empresa                         |
+| cnpj                   | varchar(20)           | CNPJ da empresa                         |
+| siteOficial            | varchar(500)          | URL do site oficial                     |
+| produtoPrincipal       | text                  | Produto principal oferecido             |
+| segmentacaoB2bB2c      | varchar(20)           | Tipo de segmentação                     |
+| email                  | varchar(320)          | Email de contato                        |
+| telefone               | varchar(50)           | Telefone de contato                     |
+| linkedin               | varchar(500)          | URL do LinkedIn                         |
+| instagram              | varchar(500)          | URL do Instagram                        |
+| cidade                 | varchar(100)          | Cidade da sede                          |
+| uf                     | varchar(2)            | Estado da sede                          |
+| regiao                 | varchar(100)          | Região geográfica                       |
+| cnae                   | varchar(20)           | Código CNAE                             |
+| porte                  | varchar(50)           | Porte da empresa (pequeno/médio/grande) |
+| faturamentoDeclarado   | text                  | Faturamento declarado                   |
+| numeroEstabelecimentos | text                  | Número de estabelecimentos              |
+| qualidadeScore         | int                   | Score de qualidade (0-100)              |
+| qualidadeClassificacao | varchar(50)           | Classificação de qualidade              |
+| validationStatus       | enum                  | Status de validação                     |
+| validationNotes        | text                  | Notas de validação                      |
+| validatedBy            | varchar(64) FK        | ID do usuário que validou               |
+| validatedAt            | timestamp             | Data de validação                       |
+| createdAt              | timestamp             | Data de criação                         |
 
 **concorrentes**
 
 Concorrentes identificados nos mercados.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do concorrente |
-| projectId | int FK | Referência ao projeto |
-| pesquisaId | int FK | Referência à pesquisa |
-| concorrenteHash | varchar(255) | Hash único para deduplicação |
-| mercadoId | int FK | Referência ao mercado |
-| nome | varchar(255) | Nome da empresa concorrente |
-| cnpj | varchar(20) | CNPJ da empresa |
-| site | varchar(500) | URL do site |
-| produto | text | Produto oferecido |
-| cidade | varchar(100) | Cidade da sede |
-| uf | varchar(2) | Estado da sede |
-| porte | varchar(50) | Porte da empresa |
-| faturamentoEstimado | text | Faturamento estimado |
-| faturamentoDeclarado | text | Faturamento declarado |
-| numeroEstabelecimentos | text | Número de estabelecimentos |
-| qualidadeScore | int | Score de qualidade (0-100) |
-| qualidadeClassificacao | varchar(50) | Classificação de qualidade |
-| validationStatus | enum | Status de validação |
-| validationNotes | text | Notas de validação |
-| validatedBy | varchar(64) FK | ID do usuário que validou |
-| validatedAt | timestamp | Data de validação |
-| createdAt | timestamp | Data de criação |
+| Campo                  | Tipo                  | Descrição                    |
+| ---------------------- | --------------------- | ---------------------------- |
+| id                     | int PK AUTO_INCREMENT | ID único do concorrente      |
+| projectId              | int FK                | Referência ao projeto        |
+| pesquisaId             | int FK                | Referência à pesquisa        |
+| concorrenteHash        | varchar(255)          | Hash único para deduplicação |
+| mercadoId              | int FK                | Referência ao mercado        |
+| nome                   | varchar(255)          | Nome da empresa concorrente  |
+| cnpj                   | varchar(20)           | CNPJ da empresa              |
+| site                   | varchar(500)          | URL do site                  |
+| produto                | text                  | Produto oferecido            |
+| cidade                 | varchar(100)          | Cidade da sede               |
+| uf                     | varchar(2)            | Estado da sede               |
+| porte                  | varchar(50)           | Porte da empresa             |
+| faturamentoEstimado    | text                  | Faturamento estimado         |
+| faturamentoDeclarado   | text                  | Faturamento declarado        |
+| numeroEstabelecimentos | text                  | Número de estabelecimentos   |
+| qualidadeScore         | int                   | Score de qualidade (0-100)   |
+| qualidadeClassificacao | varchar(50)           | Classificação de qualidade   |
+| validationStatus       | enum                  | Status de validação          |
+| validationNotes        | text                  | Notas de validação           |
+| validatedBy            | varchar(64) FK        | ID do usuário que validou    |
+| validatedAt            | timestamp             | Data de validação            |
+| createdAt              | timestamp             | Data de criação              |
 
 **leads**
 
 Leads qualificados para prospecção.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do lead |
-| projectId | int FK | Referência ao projeto |
-| pesquisaId | int FK | Referência à pesquisa |
-| leadHash | varchar(255) | Hash único para deduplicação |
-| mercadoId | int FK | Referência ao mercado |
-| nome | varchar(255) | Nome da empresa lead |
-| cnpj | varchar(20) | CNPJ da empresa |
-| email | varchar(320) | Email de contato |
-| telefone | varchar(50) | Telefone de contato |
-| site | varchar(500) | URL do site |
-| linkedin | varchar(500) | URL do LinkedIn |
-| cidade | varchar(100) | Cidade da sede |
-| uf | varchar(2) | Estado da sede |
-| porte | varchar(50) | Porte da empresa |
-| segmentacao | varchar(50) | Tipo de segmentação |
-| produto | text | Produto oferecido |
-| faturamentoEstimado | text | Faturamento estimado |
-| numeroFuncionarios | text | Número de funcionários |
-| qualidadeScore | int | Score de qualidade (0-100) |
-| qualidadeClassificacao | varchar(50) | Classificação de qualidade |
-| leadStage | enum | Estágio do lead no funil |
-| validationStatus | enum | Status de validação |
-| validationNotes | text | Notas de validação |
-| validatedBy | varchar(64) FK | ID do usuário que validou |
-| validatedAt | timestamp | Data de validação |
-| createdAt | timestamp | Data de criação |
+| Campo                  | Tipo                  | Descrição                    |
+| ---------------------- | --------------------- | ---------------------------- |
+| id                     | int PK AUTO_INCREMENT | ID único do lead             |
+| projectId              | int FK                | Referência ao projeto        |
+| pesquisaId             | int FK                | Referência à pesquisa        |
+| leadHash               | varchar(255)          | Hash único para deduplicação |
+| mercadoId              | int FK                | Referência ao mercado        |
+| nome                   | varchar(255)          | Nome da empresa lead         |
+| cnpj                   | varchar(20)           | CNPJ da empresa              |
+| email                  | varchar(320)          | Email de contato             |
+| telefone               | varchar(50)           | Telefone de contato          |
+| site                   | varchar(500)          | URL do site                  |
+| linkedin               | varchar(500)          | URL do LinkedIn              |
+| cidade                 | varchar(100)          | Cidade da sede               |
+| uf                     | varchar(2)            | Estado da sede               |
+| porte                  | varchar(50)           | Porte da empresa             |
+| segmentacao            | varchar(50)           | Tipo de segmentação          |
+| produto                | text                  | Produto oferecido            |
+| faturamentoEstimado    | text                  | Faturamento estimado         |
+| numeroFuncionarios     | text                  | Número de funcionários       |
+| qualidadeScore         | int                   | Score de qualidade (0-100)   |
+| qualidadeClassificacao | varchar(50)           | Classificação de qualidade   |
+| leadStage              | enum                  | Estágio do lead no funil     |
+| validationStatus       | enum                  | Status de validação          |
+| validationNotes        | text                  | Notas de validação           |
+| validatedBy            | varchar(64) FK        | ID do usuário que validou    |
+| validatedAt            | timestamp             | Data de validação            |
+| createdAt              | timestamp             | Data de criação              |
 
 **produtos**
 
 Catálogo de produtos por cliente e mercado.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do produto |
-| projectId | int FK | Referência ao projeto |
-| pesquisaId | int FK | Referência à pesquisa |
-| clienteId | int FK | Referência ao cliente |
-| mercadoId | int FK | Referência ao mercado |
-| nome | varchar(255) | Nome do produto |
-| descricao | text | Descrição do produto |
-| categoria | varchar(100) | Categoria do produto |
-| preco | text | Preço do produto |
-| unidade | varchar(50) | Unidade (kg/litro/unidade) |
-| ativo | int | Flag de ativo (1) ou inativo (0) |
-| createdAt | timestamp | Data de criação |
-| updatedAt | timestamp | Data da última atualização |
+| Campo      | Tipo                  | Descrição                        |
+| ---------- | --------------------- | -------------------------------- |
+| id         | int PK AUTO_INCREMENT | ID único do produto              |
+| projectId  | int FK                | Referência ao projeto            |
+| pesquisaId | int FK                | Referência à pesquisa            |
+| clienteId  | int FK                | Referência ao cliente            |
+| mercadoId  | int FK                | Referência ao mercado            |
+| nome       | varchar(255)          | Nome do produto                  |
+| descricao  | text                  | Descrição do produto             |
+| categoria  | varchar(100)          | Categoria do produto             |
+| preco      | text                  | Preço do produto                 |
+| unidade    | varchar(50)           | Unidade (kg/litro/unidade)       |
+| ativo      | int                   | Flag de ativo (1) ou inativo (0) |
+| createdAt  | timestamp             | Data de criação                  |
+| updatedAt  | timestamp             | Data da última atualização       |
 
 #### 3. Relacionamentos (1 tabela)
 
@@ -1671,12 +1671,12 @@ Catálogo de produtos por cliente e mercado.
 
 Junction table para relacionamento many-to-many entre clientes e mercados.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do relacionamento |
-| clienteId | int FK | Referência ao cliente |
-| mercadoId | int FK | Referência ao mercado |
-| createdAt | timestamp | Data de criação |
+| Campo     | Tipo                  | Descrição                  |
+| --------- | --------------------- | -------------------------- |
+| id        | int PK AUTO_INCREMENT | ID único do relacionamento |
+| clienteId | int FK                | Referência ao cliente      |
+| mercadoId | int FK                | Referência ao mercado      |
+| createdAt | timestamp             | Data de criação            |
 
 #### 4. Gerenciamento (4 tabelas)
 
@@ -1684,50 +1684,50 @@ Junction table para relacionamento many-to-many entre clientes e mercados.
 
 Tags personalizadas para categorização.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da tag |
-| projectId | int FK | Referência ao projeto |
-| nome | varchar(100) | Nome da tag |
-| cor | varchar(7) | Cor hex para identificação visual |
-| createdAt | timestamp | Data de criação |
+| Campo     | Tipo                  | Descrição                         |
+| --------- | --------------------- | --------------------------------- |
+| id        | int PK AUTO_INCREMENT | ID único da tag                   |
+| projectId | int FK                | Referência ao projeto             |
+| nome      | varchar(100)          | Nome da tag                       |
+| cor       | varchar(7)            | Cor hex para identificação visual |
+| createdAt | timestamp             | Data de criação                   |
 
 **entity_tags**
 
 Associação de tags a entidades.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da associação |
-| tagId | int FK | Referência à tag |
-| entityType | varchar(50) | Tipo de entidade (mercado/cliente/concorrente/lead) |
-| entityId | int | ID da entidade |
-| createdAt | timestamp | Data de criação |
+| Campo      | Tipo                  | Descrição                                           |
+| ---------- | --------------------- | --------------------------------------------------- |
+| id         | int PK AUTO_INCREMENT | ID único da associação                              |
+| tagId      | int FK                | Referência à tag                                    |
+| entityType | varchar(50)           | Tipo de entidade (mercado/cliente/concorrente/lead) |
+| entityId   | int                   | ID da entidade                                      |
+| createdAt  | timestamp             | Data de criação                                     |
 
 **saved_filters**
 
 Filtros salvos para reutilização.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do filtro |
-| userId | varchar(64) FK | Referência ao usuário |
-| projectId | int FK | Referência ao projeto |
-| nome | varchar(255) | Nome do filtro |
-| filterConfig | text | Configuração do filtro (JSON) |
-| createdAt | timestamp | Data de criação |
+| Campo        | Tipo                  | Descrição                     |
+| ------------ | --------------------- | ----------------------------- |
+| id           | int PK AUTO_INCREMENT | ID único do filtro            |
+| userId       | varchar(64) FK        | Referência ao usuário         |
+| projectId    | int FK                | Referência ao projeto         |
+| nome         | varchar(255)          | Nome do filtro                |
+| filterConfig | text                  | Configuração do filtro (JSON) |
+| createdAt    | timestamp             | Data de criação               |
 
 **project_templates**
 
 Templates de projeto para reutilização.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do template |
-| nome | varchar(255) | Nome do template |
-| descricao | text | Descrição do template |
-| config | text | Configuração do template (JSON) |
-| createdAt | timestamp | Data de criação |
+| Campo     | Tipo                  | Descrição                       |
+| --------- | --------------------- | ------------------------------- |
+| id        | int PK AUTO_INCREMENT | ID único do template            |
+| nome      | varchar(255)          | Nome do template                |
+| descricao | text                  | Descrição do template           |
+| config    | text                  | Configuração do template (JSON) |
+| createdAt | timestamp             | Data de criação                 |
 
 #### 5. Notificações e Alertas (4 tabelas)
 
@@ -1735,61 +1735,61 @@ Templates de projeto para reutilização.
 
 Notificações do sistema.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da notificação |
-| userId | varchar(64) FK | Referência ao usuário |
-| tipo | varchar(50) | Tipo de notificação |
-| titulo | varchar(255) | Título da notificação |
-| mensagem | text | Mensagem da notificação |
-| lida | int | Flag de lida (1) ou não lida (0) |
-| createdAt | timestamp | Data de criação |
+| Campo     | Tipo                  | Descrição                        |
+| --------- | --------------------- | -------------------------------- |
+| id        | int PK AUTO_INCREMENT | ID único da notificação          |
+| userId    | varchar(64) FK        | Referência ao usuário            |
+| tipo      | varchar(50)           | Tipo de notificação              |
+| titulo    | varchar(255)          | Título da notificação            |
+| mensagem  | text                  | Mensagem da notificação          |
+| lida      | int                   | Flag de lida (1) ou não lida (0) |
+| createdAt | timestamp             | Data de criação                  |
 
 **alert_configs**
 
 Configurações de alertas personalizados.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do alerta |
-| userId | varchar(64) FK | Referência ao usuário |
-| projectId | int FK | Referência ao projeto |
-| nome | varchar(255) | Nome do alerta |
-| entityType | varchar(50) | Tipo de entidade monitorada |
-| condition | text | Condição de disparo (JSON) |
-| channels | text | Canais de notificação (JSON) |
-| frequency | varchar(50) | Frequência (imediato/diário/semanal) |
-| ativo | int | Flag de ativo (1) ou inativo (0) |
-| createdAt | timestamp | Data de criação |
+| Campo      | Tipo                  | Descrição                            |
+| ---------- | --------------------- | ------------------------------------ |
+| id         | int PK AUTO_INCREMENT | ID único do alerta                   |
+| userId     | varchar(64) FK        | Referência ao usuário                |
+| projectId  | int FK                | Referência ao projeto                |
+| nome       | varchar(255)          | Nome do alerta                       |
+| entityType | varchar(50)           | Tipo de entidade monitorada          |
+| condition  | text                  | Condição de disparo (JSON)           |
+| channels   | text                  | Canais de notificação (JSON)         |
+| frequency  | varchar(50)           | Frequência (imediato/diário/semanal) |
+| ativo      | int                   | Flag de ativo (1) ou inativo (0)     |
+| createdAt  | timestamp             | Data de criação                      |
 
 **alert_history**
 
 Histórico de alertas disparados.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do histórico |
-| alertConfigId | int FK | Referência à configuração de alerta |
-| triggeredAt | timestamp | Data e hora do disparo |
-| condition | text | Condição que acionou o alerta |
-| deliveryStatus | varchar(50) | Status de entrega (enviado/falha) |
-| payload | text | Payload completo (JSON) |
+| Campo          | Tipo                  | Descrição                           |
+| -------------- | --------------------- | ----------------------------------- |
+| id             | int PK AUTO_INCREMENT | ID único do histórico               |
+| alertConfigId  | int FK                | Referência à configuração de alerta |
+| triggeredAt    | timestamp             | Data e hora do disparo              |
+| condition      | text                  | Condição que acionou o alerta       |
+| deliveryStatus | varchar(50)           | Status de entrega (enviado/falha)   |
+| payload        | text                  | Payload completo (JSON)             |
 
 **operational_alerts**
 
 Alertas operacionais do sistema.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do alerta |
-| projectId | int FK | Referência ao projeto |
-| alertType | varchar(50) | Tipo de alerta operacional |
-| severity | varchar(50) | Severidade (info/warning/error) |
-| message | text | Mensagem do alerta |
-| metadata | text | Metadados adicionais (JSON) |
-| resolved | int | Flag de resolvido (1) ou não (0) |
-| resolvedAt | timestamp | Data de resolução |
-| createdAt | timestamp | Data de criação |
+| Campo      | Tipo                  | Descrição                        |
+| ---------- | --------------------- | -------------------------------- |
+| id         | int PK AUTO_INCREMENT | ID único do alerta               |
+| projectId  | int FK                | Referência ao projeto            |
+| alertType  | varchar(50)           | Tipo de alerta operacional       |
+| severity   | varchar(50)           | Severidade (info/warning/error)  |
+| message    | text                  | Mensagem do alerta               |
+| metadata   | text                  | Metadados adicionais (JSON)      |
+| resolved   | int                   | Flag de resolvido (1) ou não (0) |
+| resolvedAt | timestamp             | Data de resolução                |
+| createdAt  | timestamp             | Data de criação                  |
 
 #### 6. Enriquecimento (5 tabelas)
 
@@ -1797,81 +1797,81 @@ Alertas operacionais do sistema.
 
 Cache de enriquecimento para evitar chamadas duplicadas.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do cache |
-| entityType | varchar(50) | Tipo de entidade |
-| entityId | int | ID da entidade |
-| source | varchar(100) | Fonte de enriquecimento |
-| data | text | Dados enriquecidos (JSON) |
-| expiresAt | timestamp | Data de expiração do cache |
-| createdAt | timestamp | Data de criação |
+| Campo      | Tipo                  | Descrição                  |
+| ---------- | --------------------- | -------------------------- |
+| id         | int PK AUTO_INCREMENT | ID único do cache          |
+| entityType | varchar(50)           | Tipo de entidade           |
+| entityId   | int                   | ID da entidade             |
+| source     | varchar(100)          | Fonte de enriquecimento    |
+| data       | text                  | Dados enriquecidos (JSON)  |
+| expiresAt  | timestamp             | Data de expiração do cache |
+| createdAt  | timestamp             | Data de criação            |
 
 **enrichment_runs**
 
 Execuções de enriquecimento.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da execução |
-| projectId | int FK | Referência ao projeto |
-| pesquisaId | int FK | Referência à pesquisa |
-| templateId | int FK | Referência ao template |
-| mode | varchar(50) | Modo de execução (parallel/sequential) |
-| status | varchar(50) | Status (running/completed/error/paused) |
-| totalRecords | int | Total de registros a processar |
-| processedRecords | int | Registros processados |
-| successRecords | int | Registros com sucesso |
-| errorRecords | int | Registros com erro |
-| startedAt | timestamp | Data de início |
-| completedAt | timestamp | Data de conclusão |
-| createdAt | timestamp | Data de criação |
+| Campo            | Tipo                  | Descrição                               |
+| ---------------- | --------------------- | --------------------------------------- |
+| id               | int PK AUTO_INCREMENT | ID único da execução                    |
+| projectId        | int FK                | Referência ao projeto                   |
+| pesquisaId       | int FK                | Referência à pesquisa                   |
+| templateId       | int FK                | Referência ao template                  |
+| mode             | varchar(50)           | Modo de execução (parallel/sequential)  |
+| status           | varchar(50)           | Status (running/completed/error/paused) |
+| totalRecords     | int                   | Total de registros a processar          |
+| processedRecords | int                   | Registros processados                   |
+| successRecords   | int                   | Registros com sucesso                   |
+| errorRecords     | int                   | Registros com erro                      |
+| startedAt        | timestamp             | Data de início                          |
+| completedAt      | timestamp             | Data de conclusão                       |
+| createdAt        | timestamp             | Data de criação                         |
 
 **enrichment_jobs**
 
 Jobs individuais de enriquecimento.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do job |
-| runId | int FK | Referência à execução |
-| entityType | varchar(50) | Tipo de entidade |
-| entityId | int | ID da entidade |
-| status | varchar(50) | Status (pending/processing/success/error) |
-| priority | int | Prioridade do job |
-| attempts | int | Número de tentativas |
-| error | text | Mensagem de erro (se houver) |
-| startedAt | timestamp | Data de início |
-| completedAt | timestamp | Data de conclusão |
-| createdAt | timestamp | Data de criação |
+| Campo       | Tipo                  | Descrição                                 |
+| ----------- | --------------------- | ----------------------------------------- |
+| id          | int PK AUTO_INCREMENT | ID único do job                           |
+| runId       | int FK                | Referência à execução                     |
+| entityType  | varchar(50)           | Tipo de entidade                          |
+| entityId    | int                   | ID da entidade                            |
+| status      | varchar(50)           | Status (pending/processing/success/error) |
+| priority    | int                   | Prioridade do job                         |
+| attempts    | int                   | Número de tentativas                      |
+| error       | text                  | Mensagem de erro (se houver)              |
+| startedAt   | timestamp             | Data de início                            |
+| completedAt | timestamp             | Data de conclusão                         |
+| createdAt   | timestamp             | Data de criação                           |
 
 **enrichment_configs**
 
 Configurações de enriquecimento.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da configuração |
-| projectId | int FK | Referência ao projeto |
-| templateName | varchar(255) | Nome do template |
-| config | text | Configuração completa (JSON) |
-| createdAt | timestamp | Data de criação |
-| updatedAt | timestamp | Data da última atualização |
+| Campo        | Tipo                  | Descrição                    |
+| ------------ | --------------------- | ---------------------------- |
+| id           | int PK AUTO_INCREMENT | ID único da configuração     |
+| projectId    | int FK                | Referência ao projeto        |
+| templateName | varchar(255)          | Nome do template             |
+| config       | text                  | Configuração completa (JSON) |
+| createdAt    | timestamp             | Data de criação              |
+| updatedAt    | timestamp             | Data da última atualização   |
 
 **scheduled_enrichments**
 
 Agendamentos de enriquecimento.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do agendamento |
-| projectId | int FK | Referência ao projeto |
-| configId | int FK | Referência à configuração |
-| frequency | varchar(50) | Frequência (daily/weekly/monthly) |
-| schedule | text | Configuração de schedule (JSON) |
-| nextRun | timestamp | Data da próxima execução |
-| ativo | int | Flag de ativo (1) ou inativo (0) |
-| createdAt | timestamp | Data de criação |
+| Campo     | Tipo                  | Descrição                         |
+| --------- | --------------------- | --------------------------------- |
+| id        | int PK AUTO_INCREMENT | ID único do agendamento           |
+| projectId | int FK                | Referência ao projeto             |
+| configId  | int FK                | Referência à configuração         |
+| frequency | varchar(50)           | Frequência (daily/weekly/monthly) |
+| schedule  | text                  | Configuração de schedule (JSON)   |
+| nextRun   | timestamp             | Data da próxima execução          |
+| ativo     | int                   | Flag de ativo (1) ou inativo (0)  |
+| createdAt | timestamp             | Data de criação                   |
 
 #### 7. Analytics (4 tabelas)
 
@@ -1879,85 +1879,85 @@ Agendamentos de enriquecimento.
 
 Métricas agregadas por mercado.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da métrica |
-| projectId | int FK | Referência ao projeto |
-| pesquisaId | int FK | Referência à pesquisa |
-| mercadoId | int FK | Referência ao mercado |
-| dataAgregacao | date | Data da agregação |
-| totalClientes | int | Total de clientes no mercado |
-| totalConcorrentes | int | Total de concorrentes no mercado |
-| totalLeads | int | Total de leads no mercado |
-| leadsEnriquecidos | int | Leads com dados enriquecidos |
-| leadsValidados | int | Leads validados manualmente |
-| leadsAprovados | int | Leads com status "rich" |
-| leadsExportados | int | Leads exportados para Salesforce |
-| qualidadeMedia | decimal(5,2) | Qualidade média dos leads (0-100) |
-| taxaAprovacao | decimal(5,2) | Taxa de aprovação (%) |
-| taxaExportacao | decimal(5,2) | Taxa de exportação (%) |
-| createdAt | timestamp | Data de criação |
-| updatedAt | timestamp | Data da última atualização |
+| Campo             | Tipo                  | Descrição                         |
+| ----------------- | --------------------- | --------------------------------- |
+| id                | int PK AUTO_INCREMENT | ID único da métrica               |
+| projectId         | int FK                | Referência ao projeto             |
+| pesquisaId        | int FK                | Referência à pesquisa             |
+| mercadoId         | int FK                | Referência ao mercado             |
+| dataAgregacao     | date                  | Data da agregação                 |
+| totalClientes     | int                   | Total de clientes no mercado      |
+| totalConcorrentes | int                   | Total de concorrentes no mercado  |
+| totalLeads        | int                   | Total de leads no mercado         |
+| leadsEnriquecidos | int                   | Leads com dados enriquecidos      |
+| leadsValidados    | int                   | Leads validados manualmente       |
+| leadsAprovados    | int                   | Leads com status "rich"           |
+| leadsExportados   | int                   | Leads exportados para Salesforce  |
+| qualidadeMedia    | decimal(5,2)          | Qualidade média dos leads (0-100) |
+| taxaAprovacao     | decimal(5,2)          | Taxa de aprovação (%)             |
+| taxaExportacao    | decimal(5,2)          | Taxa de exportação (%)            |
+| createdAt         | timestamp             | Data de criação                   |
+| updatedAt         | timestamp             | Data da última atualização        |
 
 **analytics_pesquisas**
 
 Métricas agregadas por pesquisa.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da métrica |
-| projectId | int FK | Referência ao projeto |
-| pesquisaId | int FK | Referência à pesquisa |
-| dataAgregacao | date | Data da agregação |
-| totalMercados | int | Total de mercados na pesquisa |
-| totalClientes | int | Total de clientes na pesquisa |
-| totalConcorrentes | int | Total de concorrentes na pesquisa |
-| totalLeads | int | Total de leads na pesquisa |
-| leadsEnriquecidos | int | Leads com dados enriquecidos |
-| leadsValidados | int | Leads validados manualmente |
-| leadsAprovados | int | Leads com status "rich" |
-| leadsExportados | int | Leads exportados para Salesforce |
-| qualidadeMedia | decimal(5,2) | Qualidade média dos leads (0-100) |
-| taxaAprovacao | decimal(5,2) | Taxa de aprovação (%) |
-| taxaExportacao | decimal(5,2) | Taxa de exportação (%) |
-| createdAt | timestamp | Data de criação |
-| updatedAt | timestamp | Data da última atualização |
+| Campo             | Tipo                  | Descrição                         |
+| ----------------- | --------------------- | --------------------------------- |
+| id                | int PK AUTO_INCREMENT | ID único da métrica               |
+| projectId         | int FK                | Referência ao projeto             |
+| pesquisaId        | int FK                | Referência à pesquisa             |
+| dataAgregacao     | date                  | Data da agregação                 |
+| totalMercados     | int                   | Total de mercados na pesquisa     |
+| totalClientes     | int                   | Total de clientes na pesquisa     |
+| totalConcorrentes | int                   | Total de concorrentes na pesquisa |
+| totalLeads        | int                   | Total de leads na pesquisa        |
+| leadsEnriquecidos | int                   | Leads com dados enriquecidos      |
+| leadsValidados    | int                   | Leads validados manualmente       |
+| leadsAprovados    | int                   | Leads com status "rich"           |
+| leadsExportados   | int                   | Leads exportados para Salesforce  |
+| qualidadeMedia    | decimal(5,2)          | Qualidade média dos leads (0-100) |
+| taxaAprovacao     | decimal(5,2)          | Taxa de aprovação (%)             |
+| taxaExportacao    | decimal(5,2)          | Taxa de exportação (%)            |
+| createdAt         | timestamp             | Data de criação                   |
+| updatedAt         | timestamp             | Data da última atualização        |
 
 **analytics_dimensoes**
 
 Eficácia por dimensão (UF/Porte/Segmentação/Categoria).
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da métrica |
-| projectId | int FK | Referência ao projeto |
-| pesquisaId | int FK | Referência à pesquisa |
-| dataAgregacao | date | Data da agregação |
-| dimensaoTipo | varchar(50) | Tipo de dimensão (uf/porte/segmentacao/categoria) |
-| dimensaoValor | varchar(100) | Valor da dimensão (ex: "SP", "Grande", "B2C") |
-| totalLeads | int | Total de leads nesta dimensão |
-| leadsAprovados | int | Leads aprovados nesta dimensão |
-| qualidadeMedia | decimal(5,2) | Qualidade média dos leads (0-100) |
-| taxaAprovacao | decimal(5,2) | Taxa de aprovação (%) |
-| createdAt | timestamp | Data de criação |
-| updatedAt | timestamp | Data da última atualização |
+| Campo          | Tipo                  | Descrição                                         |
+| -------------- | --------------------- | ------------------------------------------------- |
+| id             | int PK AUTO_INCREMENT | ID único da métrica                               |
+| projectId      | int FK                | Referência ao projeto                             |
+| pesquisaId     | int FK                | Referência à pesquisa                             |
+| dataAgregacao  | date                  | Data da agregação                                 |
+| dimensaoTipo   | varchar(50)           | Tipo de dimensão (uf/porte/segmentacao/categoria) |
+| dimensaoValor  | varchar(100)          | Valor da dimensão (ex: "SP", "Grande", "B2C")     |
+| totalLeads     | int                   | Total de leads nesta dimensão                     |
+| leadsAprovados | int                   | Leads aprovados nesta dimensão                    |
+| qualidadeMedia | decimal(5,2)          | Qualidade média dos leads (0-100)                 |
+| taxaAprovacao  | decimal(5,2)          | Taxa de aprovação (%)                             |
+| createdAt      | timestamp             | Data de criação                                   |
+| updatedAt      | timestamp             | Data da última atualização                        |
 
 **analytics_timeline**
 
 Evolução temporal diária.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da métrica |
-| projectId | int FK | Referência ao projeto |
-| pesquisaId | int FK | Referência à pesquisa |
-| data | date | Data da métrica |
-| leadsGerados | int | Leads gerados no dia |
-| leadsEnriquecidos | int | Leads enriquecidos no dia |
-| leadsValidados | int | Leads validados no dia |
-| leadsAprovados | int | Leads aprovados no dia |
-| qualidadeMedia | decimal(5,2) | Qualidade média do dia (0-100) |
-| createdAt | timestamp | Data de criação |
+| Campo             | Tipo                  | Descrição                      |
+| ----------------- | --------------------- | ------------------------------ |
+| id                | int PK AUTO_INCREMENT | ID único da métrica            |
+| projectId         | int FK                | Referência ao projeto          |
+| pesquisaId        | int FK                | Referência à pesquisa          |
+| data              | date                  | Data da métrica                |
+| leadsGerados      | int                   | Leads gerados no dia           |
+| leadsEnriquecidos | int                   | Leads enriquecidos no dia      |
+| leadsValidados    | int                   | Leads validados no dia         |
+| leadsAprovados    | int                   | Leads aprovados no dia         |
+| qualidadeMedia    | decimal(5,2)          | Qualidade média do dia (0-100) |
+| createdAt         | timestamp             | Data de criação                |
 
 #### 8. Conversões e ROI (1 tabela)
 
@@ -1965,17 +1965,17 @@ Evolução temporal diária.
 
 Conversões de leads em oportunidades.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da conversão |
-| leadId | int FK | Referência ao lead |
-| projectId | int FK | Referência ao projeto |
-| convertedAt | timestamp | Data da conversão |
-| dealValue | decimal(15,2) | Valor do negócio |
-| stage | varchar(50) | Estágio da oportunidade |
-| closedAt | timestamp | Data de fechamento |
-| notes | text | Notas sobre a conversão |
-| createdAt | timestamp | Data de criação |
+| Campo       | Tipo                  | Descrição               |
+| ----------- | --------------------- | ----------------------- |
+| id          | int PK AUTO_INCREMENT | ID único da conversão   |
+| leadId      | int FK                | Referência ao lead      |
+| projectId   | int FK                | Referência ao projeto   |
+| convertedAt | timestamp             | Data da conversão       |
+| dealValue   | decimal(15,2)         | Valor do negócio        |
+| stage       | varchar(50)           | Estágio da oportunidade |
+| closedAt    | timestamp             | Data de fechamento      |
+| notes       | text                  | Notas sobre a conversão |
+| createdAt   | timestamp             | Data de criação         |
 
 #### 9. Auditoria e Histórico (5 tabelas)
 
@@ -1983,77 +1983,77 @@ Conversões de leads em oportunidades.
 
 Log de atividades do sistema.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da atividade |
-| userId | varchar(64) FK | Referência ao usuário |
-| projectId | int FK | Referência ao projeto |
-| actionType | varchar(50) | Tipo de ação (create/edit/delete/validate) |
-| entityType | varchar(50) | Tipo de entidade afetada |
-| entityId | int | ID da entidade afetada |
-| details | text | Detalhes da ação (JSON) |
-| ipAddress | varchar(45) | IP do usuário |
-| createdAt | timestamp | Data da ação |
+| Campo      | Tipo                  | Descrição                                  |
+| ---------- | --------------------- | ------------------------------------------ |
+| id         | int PK AUTO_INCREMENT | ID único da atividade                      |
+| userId     | varchar(64) FK        | Referência ao usuário                      |
+| projectId  | int FK                | Referência ao projeto                      |
+| actionType | varchar(50)           | Tipo de ação (create/edit/delete/validate) |
+| entityType | varchar(50)           | Tipo de entidade afetada                   |
+| entityId   | int                   | ID da entidade afetada                     |
+| details    | text                  | Detalhes da ação (JSON)                    |
+| ipAddress  | varchar(45)           | IP do usuário                              |
+| createdAt  | timestamp             | Data da ação                               |
 
 **mercados_history**
 
 Histórico de alterações em mercados.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do histórico |
-| mercadoId | int FK | Referência ao mercado |
-| changedBy | varchar(64) FK | ID do usuário que alterou |
-| changeType | varchar(50) | Tipo de alteração (create/edit/validate/discard) |
-| fieldName | varchar(100) | Nome do campo alterado |
-| oldValue | text | Valor anterior |
-| newValue | text | Novo valor |
-| createdAt | timestamp | Data da alteração |
+| Campo      | Tipo                  | Descrição                                        |
+| ---------- | --------------------- | ------------------------------------------------ |
+| id         | int PK AUTO_INCREMENT | ID único do histórico                            |
+| mercadoId  | int FK                | Referência ao mercado                            |
+| changedBy  | varchar(64) FK        | ID do usuário que alterou                        |
+| changeType | varchar(50)           | Tipo de alteração (create/edit/validate/discard) |
+| fieldName  | varchar(100)          | Nome do campo alterado                           |
+| oldValue   | text                  | Valor anterior                                   |
+| newValue   | text                  | Novo valor                                       |
+| createdAt  | timestamp             | Data da alteração                                |
 
 **clientes_history**
 
 Histórico de alterações em clientes.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do histórico |
-| clienteId | int FK | Referência ao cliente |
-| changedBy | varchar(64) FK | ID do usuário que alterou |
-| changeType | varchar(50) | Tipo de alteração |
-| fieldName | varchar(100) | Nome do campo alterado |
-| oldValue | text | Valor anterior |
-| newValue | text | Novo valor |
-| createdAt | timestamp | Data da alteração |
+| Campo      | Tipo                  | Descrição                 |
+| ---------- | --------------------- | ------------------------- |
+| id         | int PK AUTO_INCREMENT | ID único do histórico     |
+| clienteId  | int FK                | Referência ao cliente     |
+| changedBy  | varchar(64) FK        | ID do usuário que alterou |
+| changeType | varchar(50)           | Tipo de alteração         |
+| fieldName  | varchar(100)          | Nome do campo alterado    |
+| oldValue   | text                  | Valor anterior            |
+| newValue   | text                  | Novo valor                |
+| createdAt  | timestamp             | Data da alteração         |
 
 **concorrentes_history**
 
 Histórico de alterações em concorrentes.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do histórico |
-| concorrenteId | int FK | Referência ao concorrente |
-| changedBy | varchar(64) FK | ID do usuário que alterou |
-| changeType | varchar(50) | Tipo de alteração |
-| fieldName | varchar(100) | Nome do campo alterado |
-| oldValue | text | Valor anterior |
-| newValue | text | Novo valor |
-| createdAt | timestamp | Data da alteração |
+| Campo         | Tipo                  | Descrição                 |
+| ------------- | --------------------- | ------------------------- |
+| id            | int PK AUTO_INCREMENT | ID único do histórico     |
+| concorrenteId | int FK                | Referência ao concorrente |
+| changedBy     | varchar(64) FK        | ID do usuário que alterou |
+| changeType    | varchar(50)           | Tipo de alteração         |
+| fieldName     | varchar(100)          | Nome do campo alterado    |
+| oldValue      | text                  | Valor anterior            |
+| newValue      | text                  | Novo valor                |
+| createdAt     | timestamp             | Data da alteração         |
 
 **leads_history**
 
 Histórico de alterações em leads.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do histórico |
-| leadId | int FK | Referência ao lead |
-| changedBy | varchar(64) FK | ID do usuário que alterou |
-| changeType | varchar(50) | Tipo de alteração |
-| fieldName | varchar(100) | Nome do campo alterado |
-| oldValue | text | Valor anterior |
-| newValue | text | Novo valor |
-| createdAt | timestamp | Data da alteração |
+| Campo      | Tipo                  | Descrição                 |
+| ---------- | --------------------- | ------------------------- |
+| id         | int PK AUTO_INCREMENT | ID único do histórico     |
+| leadId     | int FK                | Referência ao lead        |
+| changedBy  | varchar(64) FK        | ID do usuário que alterou |
+| changeType | varchar(50)           | Tipo de alteração         |
+| fieldName  | varchar(100)          | Nome do campo alterado    |
+| oldValue   | text                  | Valor anterior            |
+| newValue   | text                  | Novo valor                |
+| createdAt  | timestamp             | Data da alteração         |
 
 #### 10. Integrações (2 tabelas)
 
@@ -2061,42 +2061,42 @@ Histórico de alterações em leads.
 
 Log de sincronização com Salesforce.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único do log |
-| projectId | int FK | Referência ao projeto |
-| leadId | int FK | Referência ao lead |
-| syncType | varchar(50) | Tipo de sincronização (export/import/update) |
-| status | varchar(50) | Status (success/error) |
-| salesforceId | varchar(100) | ID do registro no Salesforce |
-| error | text | Mensagem de erro (se houver) |
-| createdAt | timestamp | Data da sincronização |
+| Campo        | Tipo                  | Descrição                                    |
+| ------------ | --------------------- | -------------------------------------------- |
+| id           | int PK AUTO_INCREMENT | ID único do log                              |
+| projectId    | int FK                | Referência ao projeto                        |
+| leadId       | int FK                | Referência ao lead                           |
+| syncType     | varchar(50)           | Tipo de sincronização (export/import/update) |
+| status       | varchar(50)           | Status (success/error)                       |
+| salesforceId | varchar(100)          | ID do registro no Salesforce                 |
+| error        | text                  | Mensagem de erro (se houver)                 |
+| createdAt    | timestamp             | Data da sincronização                        |
 
 **recommendations**
 
 Recomendações automáticas do sistema.
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | int PK AUTO_INCREMENT | ID único da recomendação |
-| projectId | int FK | Referência ao projeto |
-| recommendationType | varchar(50) | Tipo de recomendação |
-| entityType | varchar(50) | Tipo de entidade relacionada |
-| entityId | int | ID da entidade relacionada |
-| title | varchar(255) | Título da recomendação |
-| description | text | Descrição da recomendação |
-| priority | varchar(50) | Prioridade (low/medium/high) |
-| status | varchar(50) | Status (pending/accepted/rejected) |
-| createdAt | timestamp | Data de criação |
+| Campo              | Tipo                  | Descrição                          |
+| ------------------ | --------------------- | ---------------------------------- |
+| id                 | int PK AUTO_INCREMENT | ID único da recomendação           |
+| projectId          | int FK                | Referência ao projeto              |
+| recommendationType | varchar(50)           | Tipo de recomendação               |
+| entityType         | varchar(50)           | Tipo de entidade relacionada       |
+| entityId           | int                   | ID da entidade relacionada         |
+| title              | varchar(255)          | Título da recomendação             |
+| description        | text                  | Descrição da recomendação          |
+| priority           | varchar(50)           | Prioridade (low/medium/high)       |
+| status             | varchar(50)           | Status (pending/accepted/rejected) |
+| createdAt          | timestamp             | Data de criação                    |
 
 ### Enums e Tipos
 
-| Enum | Valores | Uso |
-|------|---------|-----|
-| `validationStatus` | pending, rich, needs_adjustment, discarded | Status de validação de entidades |
-| `leadStage` | novo, em_contato, negociacao, fechado, perdido | Estágio do lead no funil de vendas |
-| `role` | user, admin | Papel do usuário no sistema |
-| `status` (pesquisa) | importado, enriquecendo, concluido, erro | Status da pesquisa |
+| Enum                | Valores                                        | Uso                                |
+| ------------------- | ---------------------------------------------- | ---------------------------------- |
+| `validationStatus`  | pending, rich, needs_adjustment, discarded     | Status de validação de entidades   |
+| `leadStage`         | novo, em_contato, negociacao, fechado, perdido | Estágio do lead no funil de vendas |
+| `role`              | user, admin                                    | Papel do usuário no sistema        |
+| `status` (pesquisa) | importado, enriquecendo, concluido, erro       | Status da pesquisa                 |
 
 ---
 
@@ -2735,48 +2735,48 @@ Integração com APIs de dados empresariais:
 
 ### Totais no Banco de Dados (19/11/2025)
 
-| Entidade | Quantidade | % do Total | Observação |
-|----------|------------|------------|------------|
-| **Mercados Únicos** | 1.619 | 5.6% | Mercados identificados |
-| **Clientes** | 1.494 (1.474 únicos) | 5.0% | Taxa de duplicação: 1.3% |
-| **Concorrentes** | 12.908 | 44.7% | Média: 8.0 concorrentes/mercado |
-| **Leads** | 12.885 | 44.6% | Média: 8.0 leads/mercado |
-| **TOTAL GERAL** | **28.869** | **100%** | - |
+| Entidade            | Quantidade           | % do Total | Observação                      |
+| ------------------- | -------------------- | ---------- | ------------------------------- |
+| **Mercados Únicos** | 1.619                | 5.6%       | Mercados identificados          |
+| **Clientes**        | 1.494 (1.474 únicos) | 5.0%       | Taxa de duplicação: 1.3%        |
+| **Concorrentes**    | 12.908               | 44.7%      | Média: 8.0 concorrentes/mercado |
+| **Leads**           | 12.885               | 44.6%      | Média: 8.0 leads/mercado        |
+| **TOTAL GERAL**     | **28.869**           | **100%**   | -                               |
 
 ### Projetos Ativos
 
-| # | Nome | Status | Descrição |
-|---|------|--------|-----------|
-| 1 | Agro | Ativo | Projeto de pesquisa no setor agrícola |
-| 2 | Embalagens | Ativo | Projeto de pesquisa no setor de embalagens |
-| 3 | (Terceiro projeto) | Ativo | - |
+| #   | Nome               | Status | Descrição                                  |
+| --- | ------------------ | ------ | ------------------------------------------ |
+| 1   | Agro               | Ativo  | Projeto de pesquisa no setor agrícola      |
+| 2   | Embalagens         | Ativo  | Projeto de pesquisa no setor de embalagens |
+| 3   | (Terceiro projeto) | Ativo  | -                                          |
 
 ### Métricas de Enriquecimento
 
-| Métrica | Valor | Status |
-|---------|-------|--------|
-| **Total de Execuções** | 3 | ✅ |
-| **Execuções Completas** | 2 | ✅ |
-| **Em Execução** | 1 | 🔄 |
-| **Com Erro** | 0 | ✅ |
-| **Taxa de Sucesso (finalizadas)** | 100% | ✅ Excelente |
+| Métrica                           | Valor | Status       |
+| --------------------------------- | ----- | ------------ |
+| **Total de Execuções**            | 3     | ✅           |
+| **Execuções Completas**           | 2     | ✅           |
+| **Em Execução**                   | 1     | 🔄           |
+| **Com Erro**                      | 0     | ✅           |
+| **Taxa de Sucesso (finalizadas)** | 100%  | ✅ Excelente |
 
 ### Qualidade de Dados
 
-| Métrica | Valor | Avaliação |
-|---------|-------|-----------|
-| **Taxa de duplicação (clientes)** | 1.3% (20 de 1.494) | ✅ Excelente |
-| **Clientes multi-mercado** | 10 clientes (3 mercados cada) | ✅ Esperado |
-| **Proporção leads/clientes** | 8.8:1 | ✅ Alto potencial |
-| **Média de concorrentes/mercado** | 8.0 | ✅ Alta competitividade |
+| Métrica                           | Valor                         | Avaliação               |
+| --------------------------------- | ----------------------------- | ----------------------- |
+| **Taxa de duplicação (clientes)** | 1.3% (20 de 1.494)            | ✅ Excelente            |
+| **Clientes multi-mercado**        | 10 clientes (3 mercados cada) | ✅ Esperado             |
+| **Proporção leads/clientes**      | 8.8:1                         | ✅ Alto potencial       |
+| **Média de concorrentes/mercado** | 8.0                           | ✅ Alta competitividade |
 
 ### Crescimento
 
-| Período | Métrica | Valor |
-|---------|---------|-------|
-| **21/10/2025 - 19/11/2025** | Crescimento de clientes | +86.75% (800 → 1.494) |
-| **29 dias** | Taxa diária | +23.9 clientes/dia |
-| **19/11/2025** | Enriquecimento automático | +694 clientes (46.5% do total) |
+| Período                     | Métrica                   | Valor                          |
+| --------------------------- | ------------------------- | ------------------------------ |
+| **21/10/2025 - 19/11/2025** | Crescimento de clientes   | +86.75% (800 → 1.494)          |
+| **29 dias**                 | Taxa diária               | +23.9 clientes/dia             |
+| **19/11/2025**              | Enriquecimento automático | +694 clientes (46.5% do total) |
 
 ---
 
@@ -2784,17 +2784,17 @@ Integração com APIs de dados empresariais:
 
 ### Status dos Componentes
 
-| Componente | Status | Nota | Observação |
-|------------|--------|------|------------|
-| **Banco de Dados** | ✅ Excelente | 28.869 registros | Online e responsivo |
-| **API Backend** | ✅ Excelente | ~80 endpoints | Sem erros reportados |
-| **Enriquecimento** | ⚠️ Atenção | 1 execução em andamento | Taxa de sucesso 100% (finalizadas) |
-| **Fila de Processamento** | ✅ Excelente | Vazia e pronta | Sem backlog |
-| **Performance** | ✅ Excelente | 0% de erros | Nenhum erro registrado |
-| **Configuração** | ⚠️ Atenção | Poucas tags | Recomenda-se criar mais tags |
-| **UI/UX** | ✅ Excelente | Refatorada | Sidebar, breadcrumbs, onboarding |
-| **Analytics** | ✅ Excelente | Implementado | Lead generation analytics |
-| **Cron Jobs** | ✅ Excelente | Ativo | Job diário às 00:00 |
+| Componente                | Status       | Nota                    | Observação                         |
+| ------------------------- | ------------ | ----------------------- | ---------------------------------- |
+| **Banco de Dados**        | ✅ Excelente | 28.869 registros        | Online e responsivo                |
+| **API Backend**           | ✅ Excelente | ~80 endpoints           | Sem erros reportados               |
+| **Enriquecimento**        | ⚠️ Atenção   | 1 execução em andamento | Taxa de sucesso 100% (finalizadas) |
+| **Fila de Processamento** | ✅ Excelente | Vazia e pronta          | Sem backlog                        |
+| **Performance**           | ✅ Excelente | 0% de erros             | Nenhum erro registrado             |
+| **Configuração**          | ⚠️ Atenção   | Poucas tags             | Recomenda-se criar mais tags       |
+| **UI/UX**                 | ✅ Excelente | Refatorada              | Sidebar, breadcrumbs, onboarding   |
+| **Analytics**             | ✅ Excelente | Implementado            | Lead generation analytics          |
+| **Cron Jobs**             | ✅ Excelente | Ativo                   | Job diário às 00:00                |
 
 ### Nota Geral: 8.5/10
 

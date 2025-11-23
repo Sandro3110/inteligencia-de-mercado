@@ -267,7 +267,7 @@ class SDKServer {
     }
 
     const sessionUserId = session.openId;
-    const { toMySQLTimestamp } = await import('../dateUtils');
+    const { toMySQLTimestamp } = await import("../dateUtils");
     const signedInAt = toMySQLTimestamp(new Date());
     let user = await db.getUser(sessionUserId);
 

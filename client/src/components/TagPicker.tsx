@@ -13,19 +13,24 @@ interface TagPickerProps {
   onTagsChange?: () => void;
 }
 
-export function TagPicker({ entityType, entityId, currentTags, onTagsChange }: TagPickerProps) {
+export function TagPicker({
+  entityType,
+  entityId,
+  currentTags,
+  onTagsChange,
+}: TagPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const utils = trpc.useUtils();
   const { data: allTags = [] } = trpc.tags.list.useQuery();
-  
+
   const addMutation = trpc.tags.addToEntity.useMutation({
     onSuccess: () => {
       utils.tags.getEntityTags.invalidate({ entityType, entityId });
       onTagsChange?.();
       toast.success("Tag adicionada!");
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao adicionar tag: ${error.message}`);
     },
   });
@@ -36,13 +41,13 @@ export function TagPicker({ entityType, entityId, currentTags, onTagsChange }: T
       onTagsChange?.();
       toast.success("Tag removida!");
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao remover tag: ${error.message}`);
     },
   });
 
-  const currentTagIds = new Set(currentTags.map((t) => t.tagId));
-  const availableTags = allTags.filter((tag) => !currentTagIds.has(tag.id));
+  const currentTagIds = new Set(currentTags.map(t => t.tagId));
+  const availableTags = allTags.filter(tag => !currentTagIds.has(tag.id));
 
   const handleAddTag = (tagId: number) => {
     addMutation.mutate({ tagId, entityType, entityId });
@@ -55,7 +60,7 @@ export function TagPicker({ entityType, entityId, currentTags, onTagsChange }: T
   return (
     <div className="flex flex-wrap gap-1.5 items-center">
       {/* Current tags */}
-      {currentTags.map((tag) => (
+      {currentTags.map(tag => (
         <TagBadge
           key={tag.tagId}
           name={tag.name}
@@ -85,7 +90,7 @@ export function TagPicker({ entityType, entityId, currentTags, onTagsChange }: T
                   : "Todas as tags já foram adicionadas"}
               </p>
             ) : (
-              availableTags.map((tag) => (
+              availableTags.map(tag => (
                 <button
                   key={tag.id}
                   onClick={() => {
@@ -95,7 +100,11 @@ export function TagPicker({ entityType, entityId, currentTags, onTagsChange }: T
                   disabled={addMutation.isPending}
                   className="w-full flex items-center justify-between p-2 rounded hover:bg-accent transition-colors text-left"
                 >
-                  <TagBadge name={tag.name} color={tag.color || "#3b82f6"} size="sm" />
+                  <TagBadge
+                    name={tag.name}
+                    color={tag.color || "#3b82f6"}
+                    size="sm"
+                  />
                   <Check className="w-3 h-3 text-muted-foreground" />
                 </button>
               ))

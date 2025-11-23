@@ -1,5 +1,30 @@
 import { useState } from "react";
-import { X, Building2, Mail, Phone, Globe, MapPin, Hash, FileText, Linkedin, Instagram, TrendingUp, Users, Package, Briefcase, Calendar, AlertCircle, CheckCircle2, XCircle, Clock, Edit, Trash2, History, ShoppingBag, ExternalLink } from "lucide-react";
+import {
+  X,
+  Building2,
+  Mail,
+  Phone,
+  Globe,
+  MapPin,
+  Hash,
+  FileText,
+  Linkedin,
+  Instagram,
+  TrendingUp,
+  Users,
+  Package,
+  Briefcase,
+  Calendar,
+  AlertCircle,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Edit,
+  Trash2,
+  History,
+  ShoppingBag,
+  ExternalLink,
+} from "lucide-react";
 import MiniMap from "@/components/MiniMap";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -64,17 +89,18 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
     },
   });
 
-  const validateConcorrenteMutation = trpc.concorrentes.updateValidation.useMutation({
-    onSuccess: () => {
-      toast.success("Status atualizado com sucesso!");
-      utils.concorrentes.list.invalidate();
-      utils.concorrentes.byMercado.invalidate();
-      onClose();
-    },
-    onError: () => {
-      toast.error("Erro ao atualizar status");
-    },
-  });
+  const validateConcorrenteMutation =
+    trpc.concorrentes.updateValidation.useMutation({
+      onSuccess: () => {
+        toast.success("Status atualizado com sucesso!");
+        utils.concorrentes.list.invalidate();
+        utils.concorrentes.byMercado.invalidate();
+        onClose();
+      },
+      onError: () => {
+        toast.error("Erro ao atualizar status");
+      },
+    });
 
   const validateLeadMutation = trpc.leads.updateValidation.useMutation({
     onSuccess: () => {
@@ -136,13 +162,31 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
 
   const getLeadStageBadge = (stage: string) => {
     const stages: Record<string, { label: string; color: string }> = {
-      novo: { label: "Novo", color: "bg-blue-100 text-blue-700 border-blue-200" },
-      em_contato: { label: "Em Contato", color: "bg-purple-100 text-purple-700 border-purple-200" },
-      negociacao: { label: "Negociação", color: "bg-orange-100 text-orange-700 border-orange-200" },
-      fechado: { label: "Fechado", color: "bg-green-100 text-green-700 border-green-200" },
-      perdido: { label: "Perdido", color: "bg-red-100 text-red-700 border-red-200" },
+      novo: {
+        label: "Novo",
+        color: "bg-blue-100 text-blue-700 border-blue-200",
+      },
+      em_contato: {
+        label: "Em Contato",
+        color: "bg-purple-100 text-purple-700 border-purple-200",
+      },
+      negociacao: {
+        label: "Negociação",
+        color: "bg-orange-100 text-orange-700 border-orange-200",
+      },
+      fechado: {
+        label: "Fechado",
+        color: "bg-green-100 text-green-700 border-green-200",
+      },
+      perdido: {
+        label: "Perdido",
+        color: "bg-red-100 text-red-700 border-red-200",
+      },
     };
-    const stageInfo = stages[stage] || { label: stage, color: "bg-slate-100 text-slate-700 border-slate-200" };
+    const stageInfo = stages[stage] || {
+      label: stage,
+      color: "bg-slate-100 text-slate-700 border-slate-200",
+    };
     return <Badge className={stageInfo.color}>{stageInfo.label}</Badge>;
   };
 
@@ -158,11 +202,23 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
 
   const handleDiscard = () => {
     if (type === "cliente") {
-      validateMutation.mutate({ id: item.id, status: "discarded", notes: "Descartado pelo usuário" });
+      validateMutation.mutate({
+        id: item.id,
+        status: "discarded",
+        notes: "Descartado pelo usuário",
+      });
     } else if (type === "concorrente") {
-      validateConcorrenteMutation.mutate({ id: item.id, status: "discarded", notes: "Descartado pelo usuário" });
+      validateConcorrenteMutation.mutate({
+        id: item.id,
+        status: "discarded",
+        notes: "Descartado pelo usuário",
+      });
     } else if (type === "lead") {
-      validateLeadMutation.mutate({ id: item.id, status: "discarded", notes: "Descartado pelo usuário" });
+      validateLeadMutation.mutate({
+        id: item.id,
+        status: "discarded",
+        notes: "Descartado pelo usuário",
+      });
     }
     setShowDiscardDialog(false);
   };
@@ -182,7 +238,12 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
     }
   };
 
-  const currentHistory = type === "cliente" ? history : type === "concorrente" ? concorrenteHistory : leadHistory;
+  const currentHistory =
+    type === "cliente"
+      ? history
+      : type === "concorrente"
+        ? concorrenteHistory
+        : leadHistory;
 
   return (
     <>
@@ -196,7 +257,7 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
           className="bg-white rounded-xl border border-slate-200 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden pointer-events-auto animate-in zoom-in-95 duration-200"
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-slate-200 p-6">
@@ -210,7 +271,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                     <h2 className="text-2xl font-bold text-slate-900">
                       {item.nome || item.empresa}
                     </h2>
-                    <p className="text-sm text-slate-600 mt-0.5">{getTypeLabel()}</p>
+                    <p className="text-sm text-slate-600 mt-0.5">
+                      {getTypeLabel()}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
@@ -238,7 +301,12 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                   )}
                 </div>
               </div>
-              <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-white/50">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                className="rounded-full hover:bg-white/50"
+              >
                 <X className="h-5 w-5" />
               </Button>
             </div>
@@ -281,7 +349,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                         <Hash className="h-4 w-4 text-slate-500 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-slate-500 mb-1">CNPJ</p>
-                          <p className="text-sm font-medium text-slate-900 truncate">{item.cnpj}</p>
+                          <p className="text-sm font-medium text-slate-900 truncate">
+                            {item.cnpj}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -290,7 +360,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                         <FileText className="h-4 w-4 text-slate-500 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-slate-500 mb-1">CNAE</p>
-                          <p className="text-sm font-medium text-slate-900 truncate">{item.cnae}</p>
+                          <p className="text-sm font-medium text-slate-900 truncate">
+                            {item.cnae}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -299,7 +371,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                         <Package className="h-4 w-4 text-slate-500 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-slate-500 mb-1">Porte</p>
-                          <p className="text-sm font-medium text-slate-900">{item.porte}</p>
+                          <p className="text-sm font-medium text-slate-900">
+                            {item.porte}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -308,7 +382,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                         <Briefcase className="h-4 w-4 text-slate-500 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-slate-500 mb-1">Setor</p>
-                          <p className="text-sm font-medium text-slate-900">{item.setor}</p>
+                          <p className="text-sm font-medium text-slate-900">
+                            {item.setor}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -317,7 +393,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                         <Building2 className="h-4 w-4 text-slate-500 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-slate-500 mb-1">Tipo</p>
-                          <p className="text-sm font-medium text-slate-900">{item.tipo}</p>
+                          <p className="text-sm font-medium text-slate-900">
+                            {item.tipo}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -367,7 +445,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                       <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                         <Phone className="h-4 w-4 text-slate-500 mt-0.5" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-slate-500 mb-1">Telefone</p>
+                          <p className="text-xs text-slate-500 mb-1">
+                            Telefone
+                          </p>
                           <a
                             href={`tel:${item.telefone}`}
                             className="text-sm font-medium text-slate-900"
@@ -381,7 +461,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                       <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                         <Linkedin className="h-4 w-4 text-slate-500 mt-0.5" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-slate-500 mb-1">LinkedIn</p>
+                          <p className="text-xs text-slate-500 mb-1">
+                            LinkedIn
+                          </p>
                           <a
                             href={item.linkedin}
                             target="_blank"
@@ -397,7 +479,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                       <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                         <Instagram className="h-4 w-4 text-slate-500 mt-0.5" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-slate-500 mb-1">Instagram</p>
+                          <p className="text-xs text-slate-500 mb-1">
+                            Instagram
+                          </p>
                           <a
                             href={item.instagram}
                             target="_blank"
@@ -425,7 +509,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                       <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                         <MapPin className="h-4 w-4 text-slate-500 mt-0.5" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-slate-500 mb-1">Cidade/Estado</p>
+                          <p className="text-xs text-slate-500 mb-1">
+                            Cidade/Estado
+                          </p>
                           <p className="text-sm font-medium text-slate-900">
                             {[item.cidade, item.uf].filter(Boolean).join(", ")}
                           </p>
@@ -437,12 +523,14 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                         <MapPin className="h-4 w-4 text-slate-500 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-slate-500 mb-1">Região</p>
-                          <p className="text-sm font-medium text-slate-900">{item.regiao}</p>
+                          <p className="text-sm font-medium text-slate-900">
+                            {item.regiao}
+                          </p>
                         </div>
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Mini Mapa */}
                   {(item.latitude || item.longitude) && (
                     <div className="mt-4">
@@ -478,7 +566,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                 )}
 
                 {/* Informações Financeiras */}
-                {(item.faturamentoEstimado || item.faturamentoDeclarado || item.numeroEstabelecimentos) && (
+                {(item.faturamentoEstimado ||
+                  item.faturamentoDeclarado ||
+                  item.numeroEstabelecimentos) && (
                   <>
                     <div>
                       <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
@@ -490,8 +580,12 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                           <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                             <TrendingUp className="h-4 w-4 text-slate-500 mt-0.5" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs text-slate-500 mb-1">Faturamento Estimado</p>
-                              <p className="text-sm font-medium text-slate-900">{item.faturamentoEstimado}</p>
+                              <p className="text-xs text-slate-500 mb-1">
+                                Faturamento Estimado
+                              </p>
+                              <p className="text-sm font-medium text-slate-900">
+                                {item.faturamentoEstimado}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -499,8 +593,12 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                           <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                             <TrendingUp className="h-4 w-4 text-slate-500 mt-0.5" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs text-slate-500 mb-1">Faturamento Declarado</p>
-                              <p className="text-sm font-medium text-slate-900">{item.faturamentoDeclarado}</p>
+                              <p className="text-xs text-slate-500 mb-1">
+                                Faturamento Declarado
+                              </p>
+                              <p className="text-sm font-medium text-slate-900">
+                                {item.faturamentoDeclarado}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -508,8 +606,12 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                           <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                             <Users className="h-4 w-4 text-slate-500 mt-0.5" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs text-slate-500 mb-1">Número de Estabelecimentos</p>
-                              <p className="text-sm font-medium text-slate-900">{item.numeroEstabelecimentos}</p>
+                              <p className="text-xs text-slate-500 mb-1">
+                                Número de Estabelecimentos
+                              </p>
+                              <p className="text-sm font-medium text-slate-900">
+                                {item.numeroEstabelecimentos}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -520,7 +622,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                 )}
 
                 {/* Validação */}
-                {(item.validationNotes || item.validatedBy || item.validatedAt) && (
+                {(item.validationNotes ||
+                  item.validatedBy ||
+                  item.validatedAt) && (
                   <div>
                     <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-blue-600" />
@@ -529,8 +633,12 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                     <div className="space-y-3">
                       {item.validationNotes && (
                         <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                          <p className="text-xs text-amber-700 mb-2 font-medium">Notas de Validação</p>
-                          <p className="text-sm text-slate-900 leading-relaxed">{item.validationNotes}</p>
+                          <p className="text-xs text-amber-700 mb-2 font-medium">
+                            Notas de Validação
+                          </p>
+                          <p className="text-sm text-slate-900 leading-relaxed">
+                            {item.validationNotes}
+                          </p>
                         </div>
                       )}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -538,8 +646,12 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                           <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                             <Users className="h-4 w-4 text-slate-500 mt-0.5" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs text-slate-500 mb-1">Validado por</p>
-                              <p className="text-sm font-medium text-slate-900">{item.validatedBy}</p>
+                              <p className="text-xs text-slate-500 mb-1">
+                                Validado por
+                              </p>
+                              <p className="text-sm font-medium text-slate-900">
+                                {item.validatedBy}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -547,9 +659,13 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                           <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                             <Calendar className="h-4 w-4 text-slate-500 mt-0.5" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs text-slate-500 mb-1">Data de Validação</p>
+                              <p className="text-xs text-slate-500 mb-1">
+                                Data de Validação
+                              </p>
                               <p className="text-sm font-medium text-slate-900">
-                                {new Date(item.validatedAt).toLocaleDateString("pt-BR")}
+                                {new Date(item.validatedAt).toLocaleDateString(
+                                  "pt-BR"
+                                )}
                               </p>
                             </div>
                           </div>
@@ -570,14 +686,22 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                       </h3>
                       <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-slate-700">Classificação</span>
-                          <Badge className="bg-blue-600 text-white">{item.qualidadeClassificacao}</Badge>
+                          <span className="text-sm font-medium text-slate-700">
+                            Classificação
+                          </span>
+                          <Badge className="bg-blue-600 text-white">
+                            {item.qualidadeClassificacao}
+                          </Badge>
                         </div>
                         {item.qualidadeScore !== undefined && (
                           <div className="mt-3">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-xs text-slate-600">Score de Qualidade</span>
-                              <span className="text-sm font-bold text-blue-600">{item.qualidadeScore}%</span>
+                              <span className="text-xs text-slate-600">
+                                Score de Qualidade
+                              </span>
+                              <span className="text-sm font-bold text-blue-600">
+                                {item.qualidadeScore}%
+                              </span>
                             </div>
                             <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                               <div
@@ -597,7 +721,8 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                   <>
                     <Separator />
                     <div className="text-xs text-slate-500 text-center">
-                      Criado em {new Date(item.createdAt).toLocaleDateString("pt-BR")} às{" "}
+                      Criado em{" "}
+                      {new Date(item.createdAt).toLocaleDateString("pt-BR")} às{" "}
                       {new Date(item.createdAt).toLocaleTimeString("pt-BR")}
                     </div>
                   </>
@@ -609,12 +734,17 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                 {currentHistory.length === 0 ? (
                   <div className="text-center py-12">
                     <History className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                    <p className="text-slate-500">Nenhum histórico de alterações</p>
+                    <p className="text-slate-500">
+                      Nenhum histórico de alterações
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {currentHistory.map((change: any, index: number) => (
-                      <div key={index} className="flex gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                      <div
+                        key={index}
+                        className="flex gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200"
+                      >
                         <div className="flex-shrink-0 mt-1">
                           {getChangeIcon(change.changeType)}
                         </div>
@@ -622,10 +752,15 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <div>
                               <p className="text-sm font-medium text-slate-900">
-                                {change.field === "_created" ? "Criação" : `Campo: ${change.field}`}
+                                {change.field === "_created"
+                                  ? "Criação"
+                                  : `Campo: ${change.field}`}
                               </p>
                               <p className="text-xs text-slate-500">
-                                {change.changedBy} • {new Date(change.changedAt).toLocaleString("pt-BR")}
+                                {change.changedBy} •{" "}
+                                {new Date(change.changedAt).toLocaleString(
+                                  "pt-BR"
+                                )}
                               </p>
                             </div>
                             <Badge variant="outline" className="text-xs">
@@ -635,15 +770,27 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                           {change.field !== "_created" && (
                             <div className="grid grid-cols-2 gap-3 mt-2">
                               <div className="p-2 bg-red-50 border border-red-200 rounded">
-                                <p className="text-xs text-red-700 mb-1">Anterior</p>
+                                <p className="text-xs text-red-700 mb-1">
+                                  Anterior
+                                </p>
                                 <p className="text-sm text-slate-900 truncate">
-                                  {change.oldValue || <span className="text-slate-400 italic">vazio</span>}
+                                  {change.oldValue || (
+                                    <span className="text-slate-400 italic">
+                                      vazio
+                                    </span>
+                                  )}
                                 </p>
                               </div>
                               <div className="p-2 bg-green-50 border border-green-200 rounded">
-                                <p className="text-xs text-green-700 mb-1">Novo</p>
+                                <p className="text-xs text-green-700 mb-1">
+                                  Novo
+                                </p>
                                 <p className="text-sm text-slate-900 truncate">
-                                  {change.newValue || <span className="text-slate-400 italic">vazio</span>}
+                                  {change.newValue || (
+                                    <span className="text-slate-400 italic">
+                                      vazio
+                                    </span>
+                                  )}
                                 </p>
                               </div>
                             </div>
@@ -661,18 +808,27 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                   {produtos.length === 0 ? (
                     <div className="text-center py-12">
                       <ShoppingBag className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                      <p className="text-slate-500">Nenhum produto cadastrado</p>
+                      <p className="text-slate-500">
+                        Nenhum produto cadastrado
+                      </p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {produtos.map((produto: any) => (
-                        <div key={produto.id} className="p-4 bg-slate-50 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
+                        <div
+                          key={produto.id}
+                          className="p-4 bg-slate-50 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors"
+                        >
                           <div className="flex items-start justify-between gap-2 mb-2">
-                            <h4 className="text-sm font-semibold text-slate-900">{produto.nome}</h4>
+                            <h4 className="text-sm font-semibold text-slate-900">
+                              {produto.nome}
+                            </h4>
                             <Package className="w-4 h-4 text-blue-600 flex-shrink-0" />
                           </div>
                           {produto.descricao && (
-                            <p className="text-xs text-slate-600 mb-3 line-clamp-2">{produto.descricao}</p>
+                            <p className="text-xs text-slate-600 mb-3 line-clamp-2">
+                              {produto.descricao}
+                            </p>
                           )}
                           {produto.categoria && (
                             <Badge variant="outline" className="text-xs mb-2">
@@ -682,7 +838,9 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                           {produto.mercadoNome && (
                             <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-200">
                               <Building2 className="w-3 h-3 text-slate-500" />
-                              <span className="text-xs text-slate-600 truncate">{produto.mercadoNome}</span>
+                              <span className="text-xs text-slate-600 truncate">
+                                {produto.mercadoNome}
+                              </span>
                               <ExternalLink className="w-3 h-3 text-slate-400 ml-auto flex-shrink-0" />
                             </div>
                           )}
@@ -708,7 +866,11 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                   variant="default"
                   className="bg-green-600 hover:bg-green-700 text-white"
                   onClick={handleValidate}
-                  disabled={validateMutation.isPending || validateConcorrenteMutation.isPending || validateLeadMutation.isPending}
+                  disabled={
+                    validateMutation.isPending ||
+                    validateConcorrenteMutation.isPending ||
+                    validateLeadMutation.isPending
+                  }
                 >
                   <CheckCircle2 className="w-4 h-4 mr-2" />
                   Validar como Rico
@@ -718,7 +880,11 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
                 <Button
                   variant="destructive"
                   onClick={() => setShowDiscardDialog(true)}
-                  disabled={validateMutation.isPending || validateConcorrenteMutation.isPending || validateLeadMutation.isPending}
+                  disabled={
+                    validateMutation.isPending ||
+                    validateConcorrenteMutation.isPending ||
+                    validateLeadMutation.isPending
+                  }
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Descartar
@@ -735,8 +901,10 @@ export function DetailPopup({ isOpen, onClose, item, type }: DetailPopupProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Descartar {getTypeLabel()}?</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja descartar <strong>{item.nome || item.empresa}</strong>? 
-              Esta ação marcará o registro como descartado e ele não aparecerá mais nos filtros ativos.
+              Tem certeza que deseja descartar{" "}
+              <strong>{item.nome || item.empresa}</strong>? Esta ação marcará o
+              registro como descartado e ele não aparecerá mais nos filtros
+              ativos.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

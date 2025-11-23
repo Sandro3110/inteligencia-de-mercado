@@ -12,12 +12,12 @@ A aplicação estava completamente quebrada (tela branca) desde a Fase 67. Após
 
 ### Checkpoints Analisados
 
-| Checkpoint | Status | Descrição |
-|------------|--------|-----------|
-| **Fase 69** (53ab94f7) | ❌ Quebrado | Sistema de notificações em tempo real (SSE) |
-| **Fase 68** (e94e539) | ❌ Quebrado | Badge de contador de notificações |
-| **Fase 67** (b723f2b) | ❌ Quebrado | Sistema completo de notificações |
-| **Fase 66** (8e992e6b) | ✅ **FUNCIONAL** | Último checkpoint estável |
+| Checkpoint             | Status           | Descrição                                   |
+| ---------------------- | ---------------- | ------------------------------------------- |
+| **Fase 69** (53ab94f7) | ❌ Quebrado      | Sistema de notificações em tempo real (SSE) |
+| **Fase 68** (e94e539)  | ❌ Quebrado      | Badge de contador de notificações           |
+| **Fase 67** (b723f2b)  | ❌ Quebrado      | Sistema completo de notificações            |
+| **Fase 66** (8e992e6b) | ✅ **FUNCIONAL** | Último checkpoint estável                   |
 
 ---
 
@@ -43,6 +43,7 @@ No arquivo `server/routers.ts`, existiam **DUAS definições** do router `notifi
 ## ✅ Solução Implementada
 
 ### 1. Rollback Seguro
+
 - Voltamos para **Fase 66** (commit `8e992e6b`)
 - Validamos integridade do banco de dados
 - Confirmamos estado limpo do código
@@ -50,6 +51,7 @@ No arquivo `server/routers.ts`, existiam **DUAS definições** do router `notifi
 ### 2. Reimplementação Conservadora
 
 **Estratégia adotada:**
+
 - ✅ Manter schema atual (sem mudanças no banco)
 - ✅ Manter router inline existente (funcional)
 - ✅ Criar página `/notificacoes` simples e funcional
@@ -60,12 +62,12 @@ No arquivo `server/routers.ts`, existiam **DUAS definições** do router `notifi
 
 ### 3. Arquivos Modificados
 
-| Arquivo | Ação | Descrição |
-|---------|------|-----------|
-| `client/src/pages/Notificacoes.tsx` | ✅ Criado | Página de notificações limpa e funcional |
-| `client/src/App.tsx` | ✅ Editado | Adicionada rota `/notificacoes` |
-| `client/src/components/AppSidebar.tsx` | ✅ Editado | Adicionado item "Notificações" no menu Sistema |
-| `todo.md` | ✅ Atualizado | Documentada Fase 70 |
+| Arquivo                                | Ação          | Descrição                                      |
+| -------------------------------------- | ------------- | ---------------------------------------------- |
+| `client/src/pages/Notificacoes.tsx`    | ✅ Criado     | Página de notificações limpa e funcional       |
+| `client/src/App.tsx`                   | ✅ Editado    | Adicionada rota `/notificacoes`                |
+| `client/src/components/AppSidebar.tsx` | ✅ Editado    | Adicionado item "Notificações" no menu Sistema |
+| `todo.md`                              | ✅ Atualizado | Documentada Fase 70                            |
 
 ---
 
@@ -73,15 +75,15 @@ No arquivo `server/routers.ts`, existiam **DUAS definições** do router `notifi
 
 ### Páginas Validadas (7/7)
 
-| # | Página | URL | Status |
-|---|--------|-----|--------|
-| 1 | **Visão Geral** | `/` | ✅ OK |
-| 2 | **Notificações** | `/notificacoes` | ✅ OK |
-| 3 | **Enriquecimento** | `/enrichment` | ✅ OK |
-| 4 | **Gerenciar Projetos** | `/projetos` | ✅ OK |
-| 5 | **Exportação** | `/export` | ✅ OK |
-| 6 | **Analytics** | `/analytics` | ✅ OK |
-| 7 | **Nova Pesquisa** | `/research/new` | ✅ OK |
+| #   | Página                 | URL             | Status |
+| --- | ---------------------- | --------------- | ------ |
+| 1   | **Visão Geral**        | `/`             | ✅ OK  |
+| 2   | **Notificações**       | `/notificacoes` | ✅ OK  |
+| 3   | **Enriquecimento**     | `/enrichment`   | ✅ OK  |
+| 4   | **Gerenciar Projetos** | `/projetos`     | ✅ OK  |
+| 5   | **Exportação**         | `/export`       | ✅ OK  |
+| 6   | **Analytics**          | `/analytics`    | ✅ OK  |
+| 7   | **Nova Pesquisa**      | `/research/new` | ✅ OK  |
 
 ### Funcionalidades Testadas
 
@@ -98,23 +100,23 @@ No arquivo `server/routers.ts`, existiam **DUAS definições** do router `notifi
 
 ### Antes (Fases 67-69)
 
-| Aspecto | Status |
-|---------|--------|
-| **Aplicação** | ❌ Tela branca (erro fatal) |
-| **Router notifications** | ❌ Duplicado (conflito) |
-| **Schema** | ❌ Inconsistente |
-| **Funções DB** | ❌ Duplicadas |
-| **Complexidade** | ❌ SSE/WebSocket desnecessário |
+| Aspecto                  | Status                         |
+| ------------------------ | ------------------------------ |
+| **Aplicação**            | ❌ Tela branca (erro fatal)    |
+| **Router notifications** | ❌ Duplicado (conflito)        |
+| **Schema**               | ❌ Inconsistente               |
+| **Funções DB**           | ❌ Duplicadas                  |
+| **Complexidade**         | ❌ SSE/WebSocket desnecessário |
 
 ### Depois (Fase 70)
 
-| Aspecto | Status |
-|---------|--------|
-| **Aplicação** | ✅ 100% funcional |
-| **Router notifications** | ✅ Único (inline) |
-| **Schema** | ✅ Estável (sem mudanças) |
-| **Funções DB** | ✅ Consolidadas |
-| **Complexidade** | ✅ Simples e eficaz |
+| Aspecto                  | Status                    |
+| ------------------------ | ------------------------- |
+| **Aplicação**            | ✅ 100% funcional         |
+| **Router notifications** | ✅ Único (inline)         |
+| **Schema**               | ✅ Estável (sem mudanças) |
+| **Funções DB**           | ✅ Consolidadas           |
+| **Complexidade**         | ✅ Simples e eficaz       |
 
 ---
 

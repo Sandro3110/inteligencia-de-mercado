@@ -3,14 +3,21 @@
  * Fase 39.3 - Wizard de Criação de Pesquisa
  */
 
-import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, ChevronRight, Check, Loader2, Save, CheckCircle2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { trpc } from '@/lib/trpc';
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  Loader2,
+  Save,
+  CheckCircle2,
+} from "lucide-react";
+import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 // Steps
 import {
@@ -20,11 +27,11 @@ import {
   Step4ChooseMethod,
   Step5InsertData,
   Step6ValidateData,
-  Step7Summary
-} from '@/components/research-wizard';
-import { StepPreview } from '@/components/research-wizard/StepPreview';
+  Step7Summary,
+} from "@/components/research-wizard";
+import { StepPreview } from "@/components/research-wizard/StepPreview";
 
-import type { ResearchWizardData } from '@/types/research-wizard';
+import type { ResearchWizardData } from "@/types/research-wizard";
 
 // Re-export para compatibilidade
 export type { ResearchWizardData };
@@ -61,13 +68,13 @@ interface ResearchWizardData {
 */
 
 const STEPS = [
-  { id: 1, title: 'Projeto', description: 'Selecionar ou criar projeto' },
-  { id: 2, title: 'Pesquisa', description: 'Nomear e descrever' },
-  { id: 3, title: 'Parâmetros', description: 'Configurar quantidades' },
-  { id: 4, title: 'Método', description: 'Escolher forma de entrada' },
-  { id: 5, title: 'Dados', description: 'Inserir ou importar' },
-  { id: 6, title: 'Validação', description: 'Revisar e aprovar' },
-  { id: 7, title: 'Resumo', description: 'Confirmar e iniciar' },
+  { id: 1, title: "Projeto", description: "Selecionar ou criar projeto" },
+  { id: 2, title: "Pesquisa", description: "Nomear e descrever" },
+  { id: 3, title: "Parâmetros", description: "Configurar quantidades" },
+  { id: 4, title: "Método", description: "Escolher forma de entrada" },
+  { id: 5, title: "Dados", description: "Inserir ou importar" },
+  { id: 6, title: "Validação", description: "Revisar e aprovar" },
+  { id: 7, title: "Resumo", description: "Confirmar e iniciar" },
 ];
 
 export default function ResearchWizard() {
@@ -75,13 +82,13 @@ export default function ResearchWizard() {
   const [currentStep, setCurrentStep] = useState(1);
   const [wizardData, setWizardData] = useState<ResearchWizardData>({
     projectId: null,
-    projectName: '',
-    researchName: '',
-    researchDescription: '',
+    projectName: "",
+    researchName: "",
+    researchDescription: "",
     qtdConcorrentes: 5,
     qtdLeads: 10,
     qtdProdutos: 3,
-    inputMethod: 'manual',
+    inputMethod: "manual",
     mercados: [],
     clientes: [],
     validatedData: {
@@ -104,7 +111,7 @@ export default function ResearchWizard() {
       setCurrentStep(savedDraft.currentStep);
       setDraftId(savedDraft.id);
       setDraftLoaded(true);
-      toast.success('Rascunho anterior carregado!');
+      toast.success("Rascunho anterior carregado!");
     }
   }, [savedDraft, draftLoaded]);
 
@@ -114,17 +121,20 @@ export default function ResearchWizard() {
   useEffect(() => {
     if (draftLoaded) {
       const timer = setTimeout(() => {
-        saveDraftMutation.mutate({
-          draftData: wizardData,
-          currentStep,
-          projectId: wizardData.projectId,
-        }, {
-          onSuccess: (draft) => {
-            if (draft) {
-              setDraftId(draft.id);
-            }
+        saveDraftMutation.mutate(
+          {
+            draftData: wizardData,
+            currentStep,
+            projectId: wizardData.projectId,
           },
-        });
+          {
+            onSuccess: draft => {
+              if (draft) {
+                setDraftId(draft.id);
+              }
+            },
+          }
+        );
       }, 2000); // Auto-save após 2 segundos de inatividade
 
       return () => clearTimeout(timer);
@@ -134,15 +144,17 @@ export default function ResearchWizard() {
   const deleteDraftMutation = trpc.drafts.delete.useMutation();
 
   const createPesquisaMutation = trpc.pesquisas.create.useMutation({
-    onSuccess: (pesquisa) => {
+    onSuccess: pesquisa => {
       // Deletar draft após criar pesquisa com sucesso
       if (draftId) {
         deleteDraftMutation.mutate({ draftId });
       }
-      toast.success(`Pesquisa "${pesquisa.nome}" criada com sucesso! Iniciando enriquecimento...`);
-      setLocation('/enrichment-progress');
+      toast.success(
+        `Pesquisa "${pesquisa.nome}" criada com sucesso! Iniciando enriquecimento...`
+      );
+      setLocation("/enrichment-progress");
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao criar pesquisa: ${error.message}`);
     },
   });
@@ -164,7 +176,10 @@ export default function ResearchWizard() {
       case 5:
         return wizardData.mercados.length > 0 || wizardData.clientes.length > 0;
       case 6:
-        return wizardData.validatedData.mercados.length > 0 || wizardData.validatedData.clientes.length > 0;
+        return (
+          wizardData.validatedData.mercados.length > 0 ||
+          wizardData.validatedData.clientes.length > 0
+        );
       case 7:
         return true;
       default:
@@ -173,38 +188,40 @@ export default function ResearchWizard() {
   };
 
   const handleNext = () => {
-    console.log('[Wizard] handleNext chamado - Step atual:', currentStep);
-    console.log('[Wizard] Dados atuais:', wizardData);
-    
+    console.log("[Wizard] handleNext chamado - Step atual:", currentStep);
+    console.log("[Wizard] Dados atuais:", wizardData);
+
     const canProceedResult = canProceed();
-    console.log('[Wizard] canProceed():', canProceedResult);
-    
+    console.log("[Wizard] canProceed():", canProceedResult);
+
     if (!canProceedResult) {
       // Mensagens específicas por step
-      let errorMessage = 'Preencha todos os campos obrigatórios antes de continuar';
-      
+      let errorMessage =
+        "Preencha todos os campos obrigatórios antes de continuar";
+
       switch (currentStep) {
         case 1:
-          errorMessage = 'Selecione um projeto antes de continuar';
+          errorMessage = "Selecione um projeto antes de continuar";
           break;
         case 2:
-          errorMessage = 'Digite um nome para a pesquisa (mínimo 3 caracteres)';
+          errorMessage = "Digite um nome para a pesquisa (mínimo 3 caracteres)";
           break;
         case 5:
-          errorMessage = 'Adicione pelo menos um mercado ou cliente antes de continuar';
+          errorMessage =
+            "Adicione pelo menos um mercado ou cliente antes de continuar";
           break;
         case 6:
-          errorMessage = 'Valide os dados antes de continuar';
+          errorMessage = "Valide os dados antes de continuar";
           break;
       }
-      
-      console.log('[Wizard] Navegação bloqueada:', errorMessage);
+
+      console.log("[Wizard] Navegação bloqueada:", errorMessage);
       toast.error(errorMessage);
       return;
     }
 
     if (currentStep < 7) {
-      console.log('[Wizard] Avançando para step:', currentStep + 1);
+      console.log("[Wizard] Avançando para step:", currentStep + 1);
       setCurrentStep(currentStep + 1);
       toast.success(`Avançado para: ${STEPS[currentStep].title}`);
     }
@@ -217,25 +234,42 @@ export default function ResearchWizard() {
   };
 
   const handleCancel = () => {
-    if (confirm('Tem certeza que deseja cancelar? Todos os dados serão perdidos.')) {
-      setLocation('/enrichment');
+    if (
+      confirm("Tem certeza que deseja cancelar? Todos os dados serão perdidos.")
+    ) {
+      setLocation("/enrichment");
     }
   };
 
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <Step1SelectProject data={wizardData} updateData={updateWizardData} />;
+        return (
+          <Step1SelectProject data={wizardData} updateData={updateWizardData} />
+        );
       case 2:
-        return <Step2NameResearch data={wizardData} updateData={updateWizardData} />;
+        return (
+          <Step2NameResearch data={wizardData} updateData={updateWizardData} />
+        );
       case 3:
-        return <Step3ConfigureParams data={wizardData} updateData={updateWizardData} />;
+        return (
+          <Step3ConfigureParams
+            data={wizardData}
+            updateData={updateWizardData}
+          />
+        );
       case 4:
-        return <Step4ChooseMethod data={wizardData} updateData={updateWizardData} />;
+        return (
+          <Step4ChooseMethod data={wizardData} updateData={updateWizardData} />
+        );
       case 5:
-        return <Step5InsertData data={wizardData} updateData={updateWizardData} />;
+        return (
+          <Step5InsertData data={wizardData} updateData={updateWizardData} />
+        );
       case 6:
-        return <Step6ValidateData data={wizardData} updateData={updateWizardData} />;
+        return (
+          <Step6ValidateData data={wizardData} updateData={updateWizardData} />
+        );
       case 7:
         return <Step7Summary data={wizardData} updateData={updateWizardData} />;
       default:
@@ -252,9 +286,12 @@ export default function ResearchWizard() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Nova Pesquisa de Mercado</h1>
+              <h1 className="text-3xl font-bold mb-2">
+                Nova Pesquisa de Mercado
+              </h1>
               <p className="text-muted-foreground">
-                Siga os 7 passos para criar uma pesquisa completa com enriquecimento automático
+                Siga os 7 passos para criar uma pesquisa completa com
+                enriquecimento automático
               </p>
             </div>
             {draftLoaded && (
@@ -267,7 +304,9 @@ export default function ResearchWizard() {
                 ) : (
                   <>
                     <CheckCircle2 className="w-4 h-4 text-green-500" />
-                    <span className="text-muted-foreground">Salvo automaticamente</span>
+                    <span className="text-muted-foreground">
+                      Salvo automaticamente
+                    </span>
                   </>
                 )}
               </div>
@@ -299,14 +338,18 @@ export default function ResearchWizard() {
                       w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
                       ${
                         step.id < currentStep
-                          ? 'bg-green-500 text-white'
+                          ? "bg-green-500 text-white"
                           : step.id === currentStep
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-200 text-gray-500'
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-200 text-gray-500"
                       }
                     `}
                   >
-                    {step.id < currentStep ? <Check className="w-5 h-5" /> : step.id}
+                    {step.id < currentStep ? (
+                      <Check className="w-5 h-5" />
+                    ) : (
+                      step.id
+                    )}
                   </div>
                   <div className="mt-2 text-center">
                     <div className="text-xs font-medium">{step.title}</div>
@@ -319,7 +362,7 @@ export default function ResearchWizard() {
                   <div
                     className={`
                       w-12 h-1 mx-2 mt-[-24px]
-                      ${step.id < currentStep ? 'bg-green-500' : 'bg-gray-200'}
+                      ${step.id < currentStep ? "bg-green-500" : "bg-gray-200"}
                     `}
                   />
                 )}
@@ -336,10 +379,7 @@ export default function ResearchWizard() {
 
         {/* Navigation Buttons */}
         <div className="flex items-center justify-between">
-          <Button
-            variant="outline"
-            onClick={handleCancel}
-          >
+          <Button variant="outline" onClick={handleCancel}>
             Cancelar
           </Button>
 
@@ -357,8 +397,12 @@ export default function ResearchWizard() {
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className={!canProceed() ? 'opacity-50 cursor-not-allowed' : ''}
-                title={!canProceed() ? 'Preencha os campos obrigatórios' : 'Avançar para o próximo passo'}
+                className={!canProceed() ? "opacity-50 cursor-not-allowed" : ""}
+                title={
+                  !canProceed()
+                    ? "Preencha os campos obrigatórios"
+                    : "Avançar para o próximo passo"
+                }
               >
                 Próximo
                 <ChevronRight className="w-4 h-4 ml-2" />
@@ -367,7 +411,7 @@ export default function ResearchWizard() {
               <Button
                 onClick={() => {
                   if (!wizardData.projectId) {
-                    toast.error('Projeto não selecionado');
+                    toast.error("Projeto não selecionado");
                     return;
                   }
 

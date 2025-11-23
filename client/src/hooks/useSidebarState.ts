@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-const STORAGE_KEY = 'sidebar-collapsed';
+const STORAGE_KEY = "sidebar-collapsed";
 
 export function useSidebarState() {
   const [collapsed, setCollapsed] = useState(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored === 'true';
+    return stored === "true";
   });
 
   useEffect(() => {
@@ -13,9 +13,16 @@ export function useSidebarState() {
       setCollapsed(e.detail.collapsed);
     };
 
-    window.addEventListener('sidebar-toggle', handleSidebarToggle as EventListener);
-    return () => window.removeEventListener('sidebar-toggle', handleSidebarToggle as EventListener);
+    window.addEventListener(
+      "sidebar-toggle",
+      handleSidebarToggle as EventListener
+    );
+    return () =>
+      window.removeEventListener(
+        "sidebar-toggle",
+        handleSidebarToggle as EventListener
+      );
   }, []);
 
-  return { collapsed, sidebarClass: collapsed ? 'ml-16' : 'ml-60' };
+  return { collapsed, sidebarClass: collapsed ? "ml-16" : "ml-60" };
 }

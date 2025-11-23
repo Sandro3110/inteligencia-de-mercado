@@ -57,7 +57,11 @@ const ENTITY_CONFIG = {
   },
 };
 
-export default function MapLegend({ stats, activeTypes, onToggleType }: MapLegendProps) {
+export default function MapLegend({
+  stats,
+  activeTypes,
+  onToggleType,
+}: MapLegendProps) {
   const total = Object.values(stats).reduce((sum, count) => sum + count, 0);
 
   return (
@@ -86,8 +90,12 @@ export default function MapLegend({ stats, activeTypes, onToggleType }: MapLegen
               >
                 <div className="flex items-center gap-2">
                   <div className={`w-3 h-3 rounded-full ${config.color}`} />
-                  <Icon className={`w-4 h-4 ${isActive ? config.textColor : "text-gray-400"}`} />
-                  <span className={`text-sm ${isActive ? "font-medium" : "text-gray-400"}`}>
+                  <Icon
+                    className={`w-4 h-4 ${isActive ? config.textColor : "text-gray-400"}`}
+                  />
+                  <span
+                    className={`text-sm ${isActive ? "font-medium" : "text-gray-400"}`}
+                  >
                     {config.label}
                   </span>
                 </div>

@@ -3,20 +3,48 @@
  * Migrado de ReportSchedules.tsx
  */
 
-import { useState } from 'react';
-import { trpc } from '@/lib/trpc';
-import { useSelectedProject } from '@/hooks/useSelectedProject';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
-import { Calendar, Clock, Mail, Plus, Trash2, Edit, Loader2, FileText } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { useState } from "react";
+import { trpc } from "@/lib/trpc";
+import { useSelectedProject } from "@/hooks/useSelectedProject";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import {
+  Calendar,
+  Clock,
+  Mail,
+  Plus,
+  Trash2,
+  Edit,
+  Loader2,
+  FileText,
+} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export function AutomationTab() {
   const { selectedProjectId } = useSelectedProject();
@@ -24,10 +52,10 @@ export function AutomationTab() {
   const [editingSchedule, setEditingSchedule] = useState<any>(null);
 
   // Form state
-  const [name, setName] = useState('');
-  const [frequency, setFrequency] = useState<'weekly' | 'monthly'>('weekly');
-  const [recipients, setRecipients] = useState('');
-  const [nextRunDate, setNextRunDate] = useState('');
+  const [name, setName] = useState("");
+  const [frequency, setFrequency] = useState<"weekly" | "monthly">("weekly");
+  const [recipients, setRecipients] = useState("");
+  const [nextRunDate, setNextRunDate] = useState("");
 
   const utils = trpc.useUtils();
 
@@ -40,71 +68,77 @@ export function AutomationTab() {
   // Mutations
   const createMutation = trpc.reports.createSchedule.useMutation({
     onSuccess: () => {
-      toast.success('Agendamento criado com sucesso!');
+      toast.success("Agendamento criado com sucesso!");
       utils.reports.getSchedules.invalidate();
       resetForm();
       setIsCreateDialogOpen(false);
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao criar agendamento: ${error.message}`);
     },
   });
 
   const updateMutation = trpc.reports.updateSchedule.useMutation({
     onSuccess: () => {
-      toast.success('Agendamento atualizado com sucesso!');
+      toast.success("Agendamento atualizado com sucesso!");
       utils.reports.getSchedules.invalidate();
       setEditingSchedule(null);
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao atualizar agendamento: ${error.message}`);
     },
   });
 
   const deleteMutation = trpc.reports.deleteSchedule.useMutation({
     onSuccess: () => {
-      toast.success('Agendamento deletado com sucesso!');
+      toast.success("Agendamento deletado com sucesso!");
       utils.reports.getSchedules.invalidate();
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao deletar agendamento: ${error.message}`);
     },
   });
 
   const resetForm = () => {
-    setName('');
-    setFrequency('weekly');
-    setRecipients('');
-    setNextRunDate('');
+    setName("");
+    setFrequency("weekly");
+    setRecipients("");
+    setNextRunDate("");
   };
 
   const handleCreate = () => {
     if (!selectedProjectId) {
-      toast.error('Selecione um projeto');
+      toast.error("Selecione um projeto");
       return;
     }
 
     if (!name || !recipients || !nextRunDate) {
-      toast.error('Preencha todos os campos obrigatórios');
+      toast.error("Preencha todos os campos obrigatórios");
       return;
     }
 
-    const emailList = recipients.split(',').map((e) => e.trim()).filter(Boolean);
+    const emailList = recipients
+      .split(",")
+      .map(e => e.trim())
+      .filter(Boolean);
     if (emailList.length === 0) {
-      toast.error('Adicione pelo menos um email');
+      toast.error("Adicione pelo menos um email");
       return;
     }
 
     // Validar emails
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const invalidEmails = emailList.filter((e) => !emailRegex.test(e));
+    const invalidEmails = emailList.filter(e => !emailRegex.test(e));
     if (invalidEmails.length > 0) {
-      toast.error(`Emails inválidos: ${invalidEmails.join(', ')}`);
+      toast.error(`Emails inválidos: ${invalidEmails.join(", ")}`);
       return;
     }
 
     // Converter data para formato MySQL timestamp
-    const nextRunTimestamp = new Date(nextRunDate).toISOString().slice(0, 19).replace('T', ' ');
+    const nextRunTimestamp = new Date(nextRunDate)
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
 
     createMutation.mutate({
       projectId: selectedProjectId,
@@ -120,7 +154,7 @@ export function AutomationTab() {
     setEditingSchedule(schedule);
     setName(schedule.name);
     setFrequency(schedule.frequency);
-    setRecipients(schedule.recipients.join(', '));
+    setRecipients(schedule.recipients.join(", "));
     setNextRunDate(new Date(schedule.nextRun).toISOString().slice(0, 16));
   };
 
@@ -128,12 +162,18 @@ export function AutomationTab() {
     if (!editingSchedule) return;
 
     if (!name || !recipients || !nextRunDate) {
-      toast.error('Preencha todos os campos obrigatórios');
+      toast.error("Preencha todos os campos obrigatórios");
       return;
     }
 
-    const emailList = recipients.split(',').map((e) => e.trim()).filter(Boolean);
-    const nextRunTimestamp = new Date(nextRunDate).toISOString().slice(0, 19).replace('T', ' ');
+    const emailList = recipients
+      .split(",")
+      .map(e => e.trim())
+      .filter(Boolean);
+    const nextRunTimestamp = new Date(nextRunDate)
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
 
     updateMutation.mutate({
       id: editingSchedule.id,
@@ -145,15 +185,15 @@ export function AutomationTab() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('Tem certeza que deseja deletar este agendamento?')) {
+    if (confirm("Tem certeza que deseja deletar este agendamento?")) {
       deleteMutation.mutate({ id });
     }
   };
 
   const getFrequencyLabel = (freq: string) => {
     const labels: Record<string, string> = {
-      weekly: 'Semanal',
-      monthly: 'Mensal',
+      weekly: "Semanal",
+      monthly: "Mensal",
     };
     return labels[freq] || freq;
   };
@@ -207,7 +247,9 @@ export function AutomationTab() {
           <CardContent className="py-12 text-center text-muted-foreground">
             <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p>Nenhuma automação configurada</p>
-            <p className="text-sm mt-2">Crie sua primeira automação de relatórios</p>
+            <p className="text-sm mt-2">
+              Crie sua primeira automação de relatórios
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -225,8 +267,9 @@ export function AutomationTab() {
                       <div className="flex flex-col gap-1">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          {getFrequencyLabel(schedule.frequency)} - Próxima execução:{' '}
-                          {new Date(schedule.nextRun).toLocaleString('pt-BR')}
+                          {getFrequencyLabel(schedule.frequency)} - Próxima
+                          execução:{" "}
+                          {new Date(schedule.nextRun).toLocaleString("pt-BR")}
                         </span>
                         <span className="flex items-center gap-1">
                           <Mail className="w-3 h-3" />
@@ -235,7 +278,7 @@ export function AutomationTab() {
                         {schedule.lastRun && (
                           <span className="flex items-center gap-1">
                             <Clock className="w-3 h-3" />
-                            Última execução:{' '}
+                            Última execução:{" "}
                             {formatDistanceToNow(new Date(schedule.lastRun), {
                               addSuffix: true,
                               locale: ptBR,
@@ -270,7 +313,11 @@ export function AutomationTab() {
                     <span className="font-medium">Destinatários:</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {schedule.recipients.map((email: string, idx: number) => (
-                        <Badge key={idx} variant="secondary" className="text-xs">
+                        <Badge
+                          key={idx}
+                          variant="secondary"
+                          className="text-xs"
+                        >
                           {email}
                         </Badge>
                       ))}
@@ -298,14 +345,17 @@ export function AutomationTab() {
               <Input
                 id="name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
                 placeholder="Ex: Relatório Semanal de Vendas"
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="frequency">Frequência *</Label>
-              <Select value={frequency} onValueChange={(v: any) => setFrequency(v)}>
+              <Select
+                value={frequency}
+                onValueChange={(v: any) => setFrequency(v)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -322,16 +372,18 @@ export function AutomationTab() {
                 id="nextRun"
                 type="datetime-local"
                 value={nextRunDate}
-                onChange={(e) => setNextRunDate(e.target.value)}
+                onChange={e => setNextRunDate(e.target.value)}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="recipients">Destinatários (separados por vírgula) *</Label>
+              <Label htmlFor="recipients">
+                Destinatários (separados por vírgula) *
+              </Label>
               <Input
                 id="recipients"
                 value={recipients}
-                onChange={(e) => setRecipients(e.target.value)}
+                onChange={e => setRecipients(e.target.value)}
                 placeholder="email1@example.com, email2@example.com"
               />
               <p className="text-xs text-muted-foreground">
@@ -340,11 +392,16 @@ export function AutomationTab() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateDialogOpen(false)}
+            >
               Cancelar
             </Button>
             <Button onClick={handleCreate} disabled={createMutation.isPending}>
-              {createMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {createMutation.isPending && (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              )}
               Criar Automação
             </Button>
           </DialogFooter>
@@ -352,7 +409,10 @@ export function AutomationTab() {
       </Dialog>
 
       {/* Dialog: Editar Automação */}
-      <Dialog open={!!editingSchedule} onOpenChange={() => setEditingSchedule(null)}>
+      <Dialog
+        open={!!editingSchedule}
+        onOpenChange={() => setEditingSchedule(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Automação</DialogTitle>
@@ -366,13 +426,16 @@ export function AutomationTab() {
               <Input
                 id="edit-name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="edit-frequency">Frequência *</Label>
-              <Select value={frequency} onValueChange={(v: any) => setFrequency(v)}>
+              <Select
+                value={frequency}
+                onValueChange={(v: any) => setFrequency(v)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -389,7 +452,7 @@ export function AutomationTab() {
                 id="edit-nextRun"
                 type="datetime-local"
                 value={nextRunDate}
-                onChange={(e) => setNextRunDate(e.target.value)}
+                onChange={e => setNextRunDate(e.target.value)}
               />
             </div>
 
@@ -398,7 +461,7 @@ export function AutomationTab() {
               <Input
                 id="edit-recipients"
                 value={recipients}
-                onChange={(e) => setRecipients(e.target.value)}
+                onChange={e => setRecipients(e.target.value)}
               />
             </div>
           </div>
@@ -407,7 +470,9 @@ export function AutomationTab() {
               Cancelar
             </Button>
             <Button onClick={handleUpdate} disabled={updateMutation.isPending}>
-              {updateMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {updateMutation.isPending && (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              )}
               Salvar Alterações
             </Button>
           </DialogFooter>

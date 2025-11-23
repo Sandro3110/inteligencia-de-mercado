@@ -1,14 +1,17 @@
-import { useState, useEffect } from 'react';
-import { trpc } from '@/lib/trpc';
+import { useState, useEffect } from "react";
+import { trpc } from "@/lib/trpc";
 
-const STORAGE_KEY = 'selected-project-id';
+const STORAGE_KEY = "selected-project-id";
 
 export function useSelectedProject() {
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   // Buscar lista de projetos
-  const { data: projects = [], isLoading: isLoadingProjects } = trpc.projects.list.useQuery();
+  const { data: projects = [], isLoading: isLoadingProjects } =
+    trpc.projects.list.useQuery();
 
   // Inicializar projeto selecionado
   useEffect(() => {

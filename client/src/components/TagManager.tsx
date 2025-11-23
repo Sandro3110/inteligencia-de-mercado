@@ -3,7 +3,13 @@ import { Plus, Trash2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
 import { TagBadge } from "./TagBadge";
 import { toast } from "sonner";
 
@@ -31,7 +37,7 @@ export function TagManager() {
       setNewTagName("");
       toast.success("Tag criada com sucesso!");
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao criar tag: ${error.message}`);
     },
   });
@@ -40,7 +46,7 @@ export function TagManager() {
       utils.tags.list.invalidate();
       toast.success("Tag removida com sucesso!");
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao remover tag: ${error.message}`);
     },
   });
@@ -54,7 +60,11 @@ export function TagManager() {
   };
 
   const handleDelete = (tagId: number) => {
-    if (confirm("Tem certeza que deseja remover esta tag? Ela será removida de todas as entidades.")) {
+    if (
+      confirm(
+        "Tem certeza que deseja remover esta tag? Ela será removida de todas as entidades."
+      )
+    ) {
       deleteMutation.mutate(tagId);
     }
   };
@@ -71,7 +81,7 @@ export function TagManager() {
         <DialogHeader>
           <DialogTitle>Gerenciar Tags</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           {/* Create new tag */}
           <div className="space-y-3">
@@ -80,8 +90,8 @@ export function TagManager() {
               <Input
                 placeholder="Nome da tag"
                 value={newTagName}
-                onChange={(e) => setNewTagName(e.target.value)}
-                onKeyDown={(e) => {
+                onChange={e => setNewTagName(e.target.value)}
+                onKeyDown={e => {
                   if (e.key === "Enter") {
                     handleCreate();
                   }
@@ -96,15 +106,17 @@ export function TagManager() {
                 <Plus className="w-4 h-4" />
               </Button>
             </div>
-            
+
             {/* Color picker */}
             <div className="flex gap-2">
-              {PRESET_COLORS.map((color) => (
+              {PRESET_COLORS.map(color => (
                 <button
                   key={color}
                   onClick={() => setSelectedColor(color)}
                   className={`w-8 h-8 rounded-full border-2 transition-all ${
-                    selectedColor === color ? "border-white scale-110" : "border-transparent"
+                    selectedColor === color
+                      ? "border-white scale-110"
+                      : "border-transparent"
                   }`}
                   style={{ backgroundColor: color }}
                   aria-label={`Selecionar cor ${color}`}
@@ -115,14 +127,16 @@ export function TagManager() {
 
           {/* List existing tags */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Tags Existentes ({tags.length})</label>
+            <label className="text-sm font-medium">
+              Tags Existentes ({tags.length})
+            </label>
             <div className="max-h-[300px] overflow-y-auto space-y-2">
               {tags.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">
                   Nenhuma tag criada ainda
                 </p>
               ) : (
-                tags.map((tag) => (
+                tags.map(tag => (
                   <div
                     key={tag.id}
                     className="flex items-center justify-between p-2 rounded-lg border border-border/50 hover:bg-accent/50 transition-colors"

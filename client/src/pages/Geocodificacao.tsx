@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -17,7 +23,9 @@ import {
 import DashboardLayout from "@/components/DashboardLayout";
 
 export default function Geocodificacao() {
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
+    null
+  );
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -38,10 +46,11 @@ export default function Geocodificacao() {
   );
 
   // Buscar registros sem coordenadas
-  const { data: recordsSemCoord, refetch: refetchRecords } = trpc.geo.getRecordsSemCoordenadas.useQuery(
-    { projetoId: selectedProjectId! },
-    { enabled: !!selectedProjectId }
-  );
+  const { data: recordsSemCoord, refetch: refetchRecords } =
+    trpc.geo.getRecordsSemCoordenadas.useQuery(
+      { projetoId: selectedProjectId! },
+      { enabled: !!selectedProjectId }
+    );
 
   // Mutations
   const geocodeAddress = trpc.geo.geocodeAddress.useMutation();
@@ -125,9 +134,11 @@ export default function Geocodificacao() {
     );
   }
 
-  const clientesSemCoord = recordsSemCoord?.filter((r) => r.tipo === "cliente") || [];
-  const concorrentesSemCoord = recordsSemCoord?.filter((r) => r.tipo === "concorrente") || [];
-  const leadsSemCoord = recordsSemCoord?.filter((r) => r.tipo === "lead") || [];
+  const clientesSemCoord =
+    recordsSemCoord?.filter(r => r.tipo === "cliente") || [];
+  const concorrentesSemCoord =
+    recordsSemCoord?.filter(r => r.tipo === "concorrente") || [];
+  const leadsSemCoord = recordsSemCoord?.filter(r => r.tipo === "lead") || [];
 
   return (
     <DashboardLayout>
@@ -136,7 +147,8 @@ export default function Geocodificacao() {
         <div>
           <h1 className="text-3xl font-bold">Geocodificação</h1>
           <p className="text-muted-foreground mt-2">
-            Adicione coordenadas geográficas aos registros usando Google Maps API
+            Adicione coordenadas geográficas aos registros usando Google Maps
+            API
           </p>
         </div>
 
@@ -149,7 +161,8 @@ export default function Geocodificacao() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {stats?.clientes.comCoordenadas || 0}/{stats?.clientes.total || 0}
+                {stats?.clientes.comCoordenadas || 0}/
+                {stats?.clientes.total || 0}
               </div>
               <Progress
                 value={stats?.clientes.percentual || 0}
@@ -163,12 +176,15 @@ export default function Geocodificacao() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Concorrentes</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Concorrentes
+              </CardTitle>
               <MapPin className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {stats?.concorrentes.comCoordenadas || 0}/{stats?.concorrentes.total || 0}
+                {stats?.concorrentes.comCoordenadas || 0}/
+                {stats?.concorrentes.total || 0}
               </div>
               <Progress
                 value={stats?.concorrentes.percentual || 0}
@@ -189,10 +205,7 @@ export default function Geocodificacao() {
               <div className="text-2xl font-bold">
                 {stats?.leads.comCoordenadas || 0}/{stats?.leads.total || 0}
               </div>
-              <Progress
-                value={stats?.leads.percentual || 0}
-                className="mt-2"
-              />
+              <Progress value={stats?.leads.percentual || 0} className="mt-2" />
               <p className="text-xs text-muted-foreground mt-2">
                 {stats?.leads.percentual || 0}% com coordenadas
               </p>
@@ -208,10 +221,7 @@ export default function Geocodificacao() {
               <div className="text-2xl font-bold">
                 {stats?.total.comCoordenadas || 0}/{stats?.total.total || 0}
               </div>
-              <Progress
-                value={stats?.total.percentual || 0}
-                className="mt-2"
-              />
+              <Progress value={stats?.total.percentual || 0} className="mt-2" />
               <p className="text-xs text-muted-foreground mt-2">
                 {stats?.total.percentual || 0}% com coordenadas
               </p>
@@ -234,14 +244,16 @@ export default function Geocodificacao() {
                   {stats?.total.semCoordenadas || 0} registros sem coordenadas
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Clientes: {stats?.clientes.semCoordenadas || 0} | 
-                  Concorrentes: {stats?.concorrentes.semCoordenadas || 0} | 
+                  Clientes: {stats?.clientes.semCoordenadas || 0} |
+                  Concorrentes: {stats?.concorrentes.semCoordenadas || 0} |
                   Leads: {stats?.leads.semCoordenadas || 0}
                 </p>
               </div>
               <Button
                 onClick={handleGeocodeAll}
-                disabled={isGeocoding || (stats?.total.semCoordenadas || 0) === 0}
+                disabled={
+                  isGeocoding || (stats?.total.semCoordenadas || 0) === 0
+                }
               >
                 {isGeocoding ? (
                   <>
@@ -273,7 +285,8 @@ export default function Geocodificacao() {
           <CardHeader>
             <CardTitle>Registros Sem Coordenadas</CardTitle>
             <CardDescription>
-              Geocodifique registros individualmente ou visualize os que precisam de atenção
+              Geocodifique registros individualmente ou visualize os que
+              precisam de atenção
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -297,7 +310,7 @@ export default function Geocodificacao() {
                     <p>Todos os clientes têm coordenadas!</p>
                   </div>
                 ) : (
-                  clientesSemCoord.map((record) => (
+                  clientesSemCoord.map(record => (
                     <div
                       key={`cliente-${record.id}`}
                       className="flex items-center justify-between p-3 border rounded-lg"
@@ -336,7 +349,7 @@ export default function Geocodificacao() {
                     <p>Todos os concorrentes têm coordenadas!</p>
                   </div>
                 ) : (
-                  concorrentesSemCoord.map((record) => (
+                  concorrentesSemCoord.map(record => (
                     <div
                       key={`concorrente-${record.id}`}
                       className="flex items-center justify-between p-3 border rounded-lg"
@@ -375,7 +388,7 @@ export default function Geocodificacao() {
                     <p>Todos os leads têm coordenadas!</p>
                   </div>
                 ) : (
-                  leadsSemCoord.map((record) => (
+                  leadsSemCoord.map(record => (
                     <div
                       key={`lead-${record.id}`}
                       className="flex items-center justify-between p-3 border rounded-lg"

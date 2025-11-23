@@ -21,13 +21,13 @@ O documento apresenta um **snapshot operacional** do sistema Inteligência de Me
 
 ### Totais no Banco de Dados
 
-| Entidade | Quantidade | % do Total | Status |
-|----------|------------|------------|--------|
-| **Mercados Únicos** | 1.619 | 5.6% | ✅ Ativo |
-| **Clientes** | 1.457 | 5.0% | ✅ Ativo |
-| **Concorrentes** | 12.908 | 44.7% | ✅ Ativo |
-| **Leads** | 12.885 | 44.6% | ✅ Ativo |
-| **TOTAL GERAL** | 28.869 | 100% | ✅ Ativo |
+| Entidade            | Quantidade | % do Total | Status   |
+| ------------------- | ---------- | ---------- | -------- |
+| **Mercados Únicos** | 1.619      | 5.6%       | ✅ Ativo |
+| **Clientes**        | 1.457      | 5.0%       | ✅ Ativo |
+| **Concorrentes**    | 12.908     | 44.7%      | ✅ Ativo |
+| **Leads**           | 12.885     | 44.6%      | ✅ Ativo |
+| **TOTAL GERAL**     | 28.869     | 100%       | ✅ Ativo |
 
 ### Insights da Distribuição
 
@@ -45,12 +45,12 @@ O documento apresenta um **snapshot operacional** do sistema Inteligência de Me
 
 ### Execuções Realizadas
 
-| Métrica | Valor | Status |
-|---------|-------|--------|
-| Total de Execuções | 3 | ✅ |
-| Execuções Completas | 2 | ✅ |
-| Em Execução | 1 | 🔄 |
-| Com Erro | 0 | ✅ |
+| Métrica             | Valor     | Status     |
+| ------------------- | --------- | ---------- |
+| Total de Execuções  | 3         | ✅         |
+| Execuções Completas | 2         | ✅         |
+| Em Execução         | 1         | 🔄         |
+| Com Erro            | 0         | ✅         |
 | **Taxa de Sucesso** | **66.7%** | ⚠️ Atenção |
 
 ### Performance
@@ -70,6 +70,7 @@ O documento apresenta um **snapshot operacional** do sistema Inteligência de Me
 ### ⚠️ Observações
 
 A última execução foi **instantânea** (< 1 segundo) e não processou registros, indicando:
+
 - Execução de teste ou validação
 - Nenhum registro pendente de enriquecimento
 - Configuração de limite de registros zerado
@@ -80,17 +81,18 @@ A última execução foi **instantânea** (< 1 segundo) e não processou registr
 
 ## 📋 Fila de Processamento
 
-| Métrica | Valor | Status |
-|---------|-------|--------|
-| Total de Jobs na Fila | 0 | ✅ Vazio |
-| Jobs Pendentes | 0 | ✅ |
-| Jobs em Execução | 0 | ✅ |
-| Jobs Concluídos | 0 | - |
-| Jobs com Erro | 0 | ✅ |
+| Métrica               | Valor | Status   |
+| --------------------- | ----- | -------- |
+| Total de Jobs na Fila | 0     | ✅ Vazio |
+| Jobs Pendentes        | 0     | ✅       |
+| Jobs em Execução      | 0     | ✅       |
+| Jobs Concluídos       | 0     | -        |
+| Jobs com Erro         | 0     | ✅       |
 
 ### Status da Fila
 
 A fila de processamento está **vazia**, indicando que:
+
 - ✅ Não há jobs aguardando processamento
 - ✅ Não há jobs em execução no momento
 - ✅ Sistema pronto para receber novos jobs
@@ -99,11 +101,11 @@ A fila de processamento está **vazia**, indicando que:
 
 ## 🔧 Configuração Geral
 
-| Componente | Quantidade | Status |
-|------------|------------|--------|
-| **Projetos Ativos** | 3 | ✅ Ativo |
-| **Tags Configuradas** | 1 | ✅ Ativo |
-| **Atividades (Últimas 24h)** | 0 | ⚠️ Baixa |
+| Componente                   | Quantidade | Status   |
+| ---------------------------- | ---------- | -------- |
+| **Projetos Ativos**          | 3          | ✅ Ativo |
+| **Tags Configuradas**        | 1          | ✅ Ativo |
+| **Atividades (Últimas 24h)** | 0          | ⚠️ Baixa |
 
 ### Projetos
 
@@ -120,6 +122,7 @@ Apenas **1 tag** está configurada no sistema.
 **Nenhuma atividade** foi registrada nas últimas 24 horas.
 
 **Possíveis Causas:**
+
 - Sistema em período de baixa utilização
 - Logs de atividade não configurados corretamente
 - Primeira execução ou ambiente de testes
@@ -133,6 +136,7 @@ Apenas **1 tag** está configurada no sistema.
 **66.7%** (2 de 3 execuções completas)
 
 **Análise:**
+
 - Taxa **abaixo do ideal** (alvo: > 90%)
 - ✅ **Nenhuma execução com erro** (0%)
 - 🔄 **1 execução ainda em andamento** (33.3%)
@@ -156,6 +160,7 @@ Apenas **1 tag** está configurada no sistema.
 Os **mercados únicos** representam nichos de mercado identificados durante a pesquisa. Com 1.619 mercados, o sistema possui uma base sólida para análise estratégica.
 
 **Distribuição Estimada:**
+
 - **B2C:** ~60% (971 mercados)
 - **B2B2C:** ~40% (648 mercados)
 
@@ -168,6 +173,7 @@ Os **mercados únicos** representam nichos de mercado identificados durante a pe
 Com **12.908 concorrentes**, o sistema possui a maior base de dados de competidores, representando **44.7% do total**. Isso indica uma análise competitiva robusta, com média de **8 concorrentes por mercado**.
 
 **Insights:**
+
 - Alta competitividade nos mercados identificados
 - Oportunidade de análise de market share
 - Base sólida para benchmarking
@@ -177,6 +183,7 @@ Com **12.908 concorrentes**, o sistema possui a maior base de dados de competido
 **12.885 leads** qualificados representam oportunidades de negócio. A quantidade similar à de concorrentes (diferença de apenas 23 registros) sugere que o sistema está identificando tanto players existentes quanto potenciais novos entrantes.
 
 **Métricas de Qualificação:**
+
 - Média de **8 leads por mercado**
 - Proporção leads/clientes: **8.8:1**
 - Potencial de conversão significativo
@@ -241,34 +248,34 @@ Com **12.908 concorrentes**, o sistema possui a maior base de dados de competido
 
 ### Dashboards Disponíveis
 
-| Dashboard | Rota | Descrição |
-|-----------|------|-----------|
-| **Monitoramento** | `/enrichment-progress` | Progresso em tempo real |
-| **Evolução** | `/enrichment-evolution` | Gráficos de evolução e ETA |
-| **Cache** | `/admin/cache` | Métricas de performance |
-| **Histórico** | `/admin/queue-history` | Histórico completo de jobs |
-| **Métricas da Fila** | `/admin/queue-metrics` | Performance da fila |
+| Dashboard            | Rota                    | Descrição                  |
+| -------------------- | ----------------------- | -------------------------- |
+| **Monitoramento**    | `/enrichment-progress`  | Progresso em tempo real    |
+| **Evolução**         | `/enrichment-evolution` | Gráficos de evolução e ETA |
+| **Cache**            | `/admin/cache`          | Métricas de performance    |
+| **Histórico**        | `/admin/queue-history`  | Histórico completo de jobs |
+| **Métricas da Fila** | `/admin/queue-metrics`  | Performance da fila        |
 
 ### Status dos Serviços
 
-| Serviço | Status | Última Verificação |
-|---------|--------|-------------------|
-| **Banco de Dados** | ✅ Online | 19/11/2025 13:05 |
-| **API Backend** | ✅ Online | 19/11/2025 13:05 |
-| **Fila de Processamento** | ✅ Online | 19/11/2025 13:05 |
-| **Sistema de Cache** | ✅ Online | 19/11/2025 13:05 |
+| Serviço                   | Status    | Última Verificação |
+| ------------------------- | --------- | ------------------ |
+| **Banco de Dados**        | ✅ Online | 19/11/2025 13:05   |
+| **API Backend**           | ✅ Online | 19/11/2025 13:05   |
+| **Fila de Processamento** | ✅ Online | 19/11/2025 13:05   |
+| **Sistema de Cache**      | ✅ Online | 19/11/2025 13:05   |
 
 ---
 
 ## 🏥 Resumo de Saúde do Sistema
 
-| Componente | Status | Nota |
-|------------|--------|------|
-| **Banco de Dados** | ✅ Excelente | 28.869 registros |
-| **Enriquecimento** | ⚠️ Atenção | 1 execução em andamento |
-| **Fila** | ✅ Excelente | Vazia e pronta |
-| **Performance** | ✅ Excelente | 0% de erros |
-| **Configuração** | ⚠️ Atenção | Poucas tags configuradas |
+| Componente         | Status       | Nota                     |
+| ------------------ | ------------ | ------------------------ |
+| **Banco de Dados** | ✅ Excelente | 28.869 registros         |
+| **Enriquecimento** | ⚠️ Atenção   | 1 execução em andamento  |
+| **Fila**           | ✅ Excelente | Vazia e pronta           |
+| **Performance**    | ✅ Excelente | 0% de erros              |
+| **Configuração**   | ⚠️ Atenção   | Poucas tags configuradas |
 
 ### Nota Geral: 8.5/10
 

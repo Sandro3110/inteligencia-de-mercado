@@ -1,20 +1,20 @@
-import { useWebSocket, Notification } from '@/hooks/useWebSocket';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { 
-  CheckCheck, 
-  Trash2, 
-  Check, 
+import { useWebSocket, Notification } from "@/hooks/useWebSocket";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  CheckCheck,
+  Trash2,
+  Check,
   Bell,
   TrendingUp,
   AlertTriangle,
   Info,
-  Zap
-} from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+  Zap,
+} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export function NotificationPanel() {
   const {
@@ -26,31 +26,59 @@ export function NotificationPanel() {
     clearNotifications,
   } = useWebSocket();
 
-  const getNotificationIcon = (type: Notification['type']) => {
+  const getNotificationIcon = (type: Notification["type"]) => {
     switch (type) {
-      case 'enrichment_complete':
+      case "enrichment_complete":
         return <Zap className="h-4 w-4 text-green-500" />;
-      case 'new_lead':
+      case "new_lead":
         return <TrendingUp className="h-4 w-4 text-blue-500" />;
-      case 'quality_alert':
+      case "quality_alert":
         return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      case 'system':
+      case "system":
         return <Bell className="h-4 w-4 text-purple-500" />;
       default:
         return <Info className="h-4 w-4 text-gray-500" />;
     }
   };
 
-  const getNotificationBadge = (type: Notification['type']) => {
+  const getNotificationBadge = (type: Notification["type"]) => {
     switch (type) {
-      case 'enrichment_complete':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Concluído</Badge>;
-      case 'new_lead':
-        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Novo Lead</Badge>;
-      case 'quality_alert':
-        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Alerta</Badge>;
-      case 'system':
-        return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Sistema</Badge>;
+      case "enrichment_complete":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-green-50 text-green-700 border-green-200"
+          >
+            Concluído
+          </Badge>
+        );
+      case "new_lead":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-blue-50 text-blue-700 border-blue-200"
+          >
+            Novo Lead
+          </Badge>
+        );
+      case "quality_alert":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-yellow-50 text-yellow-700 border-yellow-200"
+          >
+            Alerta
+          </Badge>
+        );
+      case "system":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-purple-50 text-purple-700 border-purple-200"
+          >
+            Sistema
+          </Badge>
+        );
       default:
         return <Badge variant="outline">Info</Badge>;
     }
@@ -64,14 +92,17 @@ export function NotificationPanel() {
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-sm">Notificações</h3>
             {!isConnected && (
-              <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 text-xs">
+              <Badge
+                variant="outline"
+                className="bg-yellow-50 text-yellow-700 border-yellow-200 text-xs"
+              >
                 Desconectado
               </Badge>
             )}
           </div>
           {unreadCount > 0 && (
             <Badge variant="default" className="text-xs">
-              {unreadCount} {unreadCount === 1 ? 'nova' : 'novas'}
+              {unreadCount} {unreadCount === 1 ? "nova" : "novas"}
             </Badge>
           )}
         </div>
@@ -108,20 +139,18 @@ export function NotificationPanel() {
         {notifications.length === 0 ? (
           <div className="p-8 text-center">
             <Bell className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
-            <p className="text-sm text-muted-foreground">
-              Nenhuma notificação
-            </p>
+            <p className="text-sm text-muted-foreground">Nenhuma notificação</p>
             <p className="text-xs text-muted-foreground mt-1">
               Você receberá notificações em tempo real aqui
             </p>
           </div>
         ) : (
           <div className="divide-y">
-            {notifications.map((notification) => (
+            {notifications.map(notification => (
               <div
                 key={notification.id}
                 className={`p-3 hover:bg-accent/50 transition-colors ${
-                  !notification.read ? 'bg-primary/5' : ''
+                  !notification.read ? "bg-primary/5" : ""
                 }`}
               >
                 <div className="flex items-start gap-3">

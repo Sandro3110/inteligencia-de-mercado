@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 import { storagePut } from "../storage";
 
 /**
@@ -23,14 +23,14 @@ export class ExcelRenderer {
     additionalSheets?: ExcelSheetConfig[]
   ): Promise<{ url: string; size: number }> {
     if (data.length === 0) {
-      throw new Error('Nenhum dado para exportar');
+      throw new Error("Nenhum dado para exportar");
     }
 
     // Cria workbook
     const workbook = XLSX.utils.book_new();
 
     // Adiciona aba principal
-    this.addSheet(workbook, 'Dados Principais', data, selectedFields);
+    this.addSheet(workbook, "Dados Principais", data, selectedFields);
 
     // Adiciona abas adicionais (se fornecidas)
     if (additionalSheets) {
@@ -43,19 +43,19 @@ export class ExcelRenderer {
     this.addMetadataSheet(workbook, data.length, selectedFields.length);
 
     // Gera buffer
-    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
 
     // Faz upload para S3
     const filename = `export_${Date.now()}.xlsx`;
     const { url } = await storagePut(
       `exports/${filename}`,
       buffer as Buffer,
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
 
     return {
       url,
-      size: (buffer as Buffer).length
+      size: (buffer as Buffer).length,
     };
   }
 
@@ -82,9 +82,9 @@ export class ExcelRenderer {
 
     // Ajusta largura das colunas
     const colWidths = fields.map(field => ({
-      wch: Math.max(field.length, 15)
+      wch: Math.max(field.length, 15),
     }));
-    worksheet['!cols'] = colWidths;
+    worksheet["!cols"] = colWidths;
 
     // Adiciona ao workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
@@ -99,23 +99,23 @@ export class ExcelRenderer {
     fieldCount: number
   ): void {
     const metadata = [
-      { Campo: 'Data de Exportação', Valor: new Date().toISOString() },
-      { Campo: 'Total de Registros', Valor: recordCount },
-      { Campo: 'Total de Campos', Valor: fieldCount },
-      { Campo: 'Sistema', Valor: 'Gestor PAV - Inteligência de Mercado' }
+      { Campo: "Data de Exportação", Valor: new Date().toISOString() },
+      { Campo: "Total de Registros", Valor: recordCount },
+      { Campo: "Total de Campos", Valor: fieldCount },
+      { Campo: "Sistema", Valor: "Gestor PAV - Inteligência de Mercado" },
     ];
 
     const worksheet = XLSX.utils.json_to_sheet(metadata);
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Metadados');
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Metadados");
   }
 
   /**
    * Formata valor para Excel
    */
   private formatValue(value: any): any {
-    if (value === null || value === undefined) return '';
+    if (value === null || value === undefined) return "";
     if (value instanceof Date) return value;
-    if (typeof value === 'object') return JSON.stringify(value);
+    if (typeof value === "object") return JSON.stringify(value);
     return value;
   }
 }

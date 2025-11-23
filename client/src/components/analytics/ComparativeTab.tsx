@@ -1,12 +1,47 @@
-import { useState } from 'react';
-import { trpc } from '@/lib/trpc';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { TrendingUp, Users, Target, Award } from 'lucide-react';
+import { useState } from "react";
+import { trpc } from "@/lib/trpc";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { TrendingUp, Users, Target, Award } from "lucide-react";
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+const COLORS = [
+  "#3b82f6",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#ec4899",
+];
 
 interface ComparativeTabProps {
   projectId: number;
@@ -37,34 +72,46 @@ export function ComparativeTab({ projectId }: ComparativeTabProps) {
   );
 
   // Formatar dados para gráficos
-  const stageData = leadsByStage?.map((item: any) => ({
-    name: item.stage || 'Sem estágio',
-    value: Number(item.count),
-  })) || [];
+  const stageData =
+    leadsByStage?.map((item: any) => ({
+      name: item.stage || "Sem estágio",
+      value: Number(item.count),
+    })) || [];
 
-  const mercadoData = leadsByMercado?.map((item: any) => ({
-    nome: item.mercadoNome || 'Sem mercado',
-    leads: Number(item.leadCount),
-  })) || [];
+  const mercadoData =
+    leadsByMercado?.map((item: any) => ({
+      nome: item.mercadoNome || "Sem mercado",
+      leads: Number(item.leadCount),
+    })) || [];
 
-  const qualityData = qualityEvolution?.map((item: any) => ({
-    date: new Date(item.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-    score: Number(item.avgScore).toFixed(1),
-    count: Number(item.count),
-  })) || [];
+  const qualityData =
+    qualityEvolution?.map((item: any) => ({
+      date: new Date(item.date).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+      }),
+      score: Number(item.avgScore).toFixed(1),
+      count: Number(item.count),
+    })) || [];
 
-  const growthData = leadsGrowth?.map((item: any) => ({
-    date: new Date(item.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-    novos: Number(item.count),
-    total: Number(item.cumulative),
-  })) || [];
+  const growthData =
+    leadsGrowth?.map((item: any) => ({
+      date: new Date(item.date).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+      }),
+      novos: Number(item.count),
+      total: Number(item.cumulative),
+    })) || [];
 
   return (
     <div className="space-y-6">
       {/* Header com controles */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">Análises Comparativas</h2>
+          <h2 className="text-xl font-semibold text-slate-900">
+            Análises Comparativas
+          </h2>
           <p className="text-sm text-muted-foreground">
             Visualize métricas e insights detalhados
           </p>
@@ -72,7 +119,7 @@ export function ComparativeTab({ projectId }: ComparativeTabProps) {
 
         <Select
           value={period.toString()}
-          onValueChange={(value) => setPeriod(Number(value))}
+          onValueChange={value => setPeriod(Number(value))}
         >
           <SelectTrigger className="w-[150px]">
             <SelectValue />
@@ -89,7 +136,9 @@ export function ComparativeTab({ projectId }: ComparativeTabProps) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Leads</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total de Leads
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -99,12 +148,16 @@ export function ComparativeTab({ projectId }: ComparativeTabProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Taxa de Conversão</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Taxa de Conversão
+            </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {kpis?.conversionRate ? `${kpis.conversionRate.toFixed(1)}%` : '0%'}
+              {kpis?.conversionRate
+                ? `${kpis.conversionRate.toFixed(1)}%`
+                : "0%"}
             </div>
             <p className="text-xs text-muted-foreground">
               {kpis?.closedLeads || 0} fechados
@@ -119,7 +172,7 @@ export function ComparativeTab({ projectId }: ComparativeTabProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {kpis?.avgQualityScore ? kpis.avgQualityScore.toFixed(1) : '0'}
+              {kpis?.avgQualityScore ? kpis.avgQualityScore.toFixed(1) : "0"}
             </div>
             <p className="text-xs text-muted-foreground">de 100</p>
           </CardContent>
@@ -127,7 +180,9 @@ export function ComparativeTab({ projectId }: ComparativeTabProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Mercados Ativos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Mercados Ativos
+            </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -164,13 +219,18 @@ export function ComparativeTab({ projectId }: ComparativeTabProps) {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) =>
+                      `${name}: ${(percent * 100).toFixed(0)}%`
+                    }
                     outerRadius={120}
                     fill="#8884d8"
                     dataKey="value"
                   >
                     {stageData.map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -192,7 +252,12 @@ export function ComparativeTab({ projectId }: ComparativeTabProps) {
               <ResponsiveContainer width="100%" height={350}>
                 <BarChart data={mercadoData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="nome" angle={-45} textAnchor="end" height={100} />
+                  <XAxis
+                    dataKey="nome"
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                  />
                   <YAxis />
                   <Tooltip />
                   <Bar dataKey="leads" fill="#3b82f6" />
@@ -218,7 +283,13 @@ export function ComparativeTab({ projectId }: ComparativeTabProps) {
                   <YAxis domain={[0, 100]} />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="score" stroke="#10b981" strokeWidth={2} name="Score Médio" />
+                  <Line
+                    type="monotone"
+                    dataKey="score"
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    name="Score Médio"
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
@@ -241,8 +312,22 @@ export function ComparativeTab({ projectId }: ComparativeTabProps) {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Area type="monotone" dataKey="novos" stackId="1" stroke="#3b82f6" fill="#3b82f6" name="Novos Leads" />
-                  <Area type="monotone" dataKey="total" stackId="2" stroke="#8b5cf6" fill="#8b5cf6" name="Total Acumulado" />
+                  <Area
+                    type="monotone"
+                    dataKey="novos"
+                    stackId="1"
+                    stroke="#3b82f6"
+                    fill="#3b82f6"
+                    name="Novos Leads"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="total"
+                    stackId="2"
+                    stroke="#8b5cf6"
+                    fill="#8b5cf6"
+                    name="Total Acumulado"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>

@@ -47,17 +47,20 @@ Validar a funcionalidade de exportação de dados nas abas de **Clientes**, **Co
 **Status:** ✅ **PASSOU**
 
 **Detalhes:**
+
 - **Arquivo gerado:** `Acessórios Automotivos para Veículos Leves_clientes_2025-11-22T04-12-36.csv`
 - **Tamanho:** 232 bytes
 - **Data/Hora:** 21 Nov 23:12
 
 **Conteúdo do Arquivo:**
+
 ```csv
 ID,Empresa,CNPJ,Produto,Segmentação,Cidade,UF,Qualidade (%),Status
 "331644","","24604230000128","Distribuição e atacado de acessórios automotivos e peças de reposição para veículos leves e pesados.","","","","35","rich"
 ```
 
 **Validações:**
+
 - ✅ Headers corretos
 - ✅ Dados completos
 - ✅ Qualidade calculada (35%)
@@ -73,16 +76,19 @@ ID,Empresa,CNPJ,Produto,Segmentação,Cidade,UF,Qualidade (%),Status
 **Status:** ✅ **PASSOU**
 
 **Detalhes:**
+
 - **Arquivo gerado:** `Acessórios Automotivos para Veículos Leves_concorrentes_2025-11-22T04-14-27.xlsx`
 - **Tamanho:** 18K
 - **Data/Hora:** 21 Nov 23:14
 
 **Concorrentes Exportados:**
+
 1. Autopeças São Paulo (Médio, 17%)
 2. Acessórios e Peças Brasil (Médio, 17%)
 3. Peças e Acessórios do Brasil (Médio, 17%)
 
 **Validações:**
+
 - ✅ Arquivo Excel válido
 - ✅ 3 concorrentes exportados
 - ✅ Qualidade calculada para cada item
@@ -98,15 +104,18 @@ ID,Empresa,CNPJ,Produto,Segmentação,Cidade,UF,Qualidade (%),Status
 **Status:** ✅ **PASSOU**
 
 **Detalhes:**
+
 - **Arquivo gerado:** `Acessórios Automotivos para Veículos Leves_leads_2025-11-22T04-16-05.pdf`
 - **Tamanho:** 9.0K
 - **Data/Hora:** 21 Nov 23:16
 
 **Leads Exportados:**
+
 1. Oficina Mecânica XYZ (Alto, 2%)
 2. Revenda de Autopeças ABC (Médio, 2%)
 
 **Validações:**
+
 - ✅ Arquivo PDF válido
 - ✅ 2 leads exportados
 - ✅ Formatação adequada
@@ -121,18 +130,21 @@ ID,Empresa,CNPJ,Produto,Segmentação,Cidade,UF,Qualidade (%),Status
 O botão de exportação agora aparece **sempre** nas abas de mercados expandidos, não dependendo mais de haver itens selecionados.
 
 **Comportamento:**
+
 - **Sem seleção:** Exibe "Exportar Aba" e exporta todos os itens da aba atual
 - **Com seleção:** Exibe "Exportar (N)" onde N é o número de itens selecionados
 
 ### 2. Texto Dinâmico ✅
 
 O texto do botão muda dinamicamente conforme a seleção:
+
 - `selectedItems.size === 0` → "Exportar Aba"
 - `selectedItems.size > 0` → "Exportar (N)"
 
 ### 3. Três Formatos Suportados ✅
 
 Todos os três formatos de exportação estão funcionando corretamente:
+
 - **CSV** - Arquivo de texto separado por vírgulas
 - **Excel** - Planilha .xlsx com formatação
 - **PDF** - Documento formatado com tabela
@@ -140,6 +152,7 @@ Todos os três formatos de exportação estão funcionando corretamente:
 ### 4. Exportação em Todas as Abas ✅
 
 A funcionalidade foi testada e confirmada em:
+
 - ✅ Aba de Clientes
 - ✅ Aba de Concorrentes
 - ✅ Aba de Leads
@@ -147,11 +160,13 @@ A funcionalidade foi testada e confirmada em:
 ### 5. Nomenclatura de Arquivos ✅
 
 Os arquivos seguem o padrão:
+
 ```
 {nome_do_mercado}_{tipo_de_entidade}_{timestamp}.{extensão}
 ```
 
 Exemplo:
+
 ```
 Acessórios Automotivos para Veículos Leves_clientes_2025-11-22T04-12-36.csv
 ```
@@ -165,30 +180,38 @@ Acessórios Automotivos para Veículos Leves_clientes_2025-11-22T04-12-36.csv
 **Linha 387-423:** Movido o botão "Exportar" para fora da condição `selectedItems.size > 0`
 
 **Antes:**
+
 ```tsx
-{selectedItems.size > 0 && (
-  <>
-    <Button>Validar</Button>
-    <DropdownMenu>
-      <Button>Exportar</Button>
-      ...
-    </DropdownMenu>
-  </>
-)}
+{
+  selectedItems.size > 0 && (
+    <>
+      <Button>Validar</Button>
+      <DropdownMenu>
+        <Button>Exportar</Button>
+        ...
+      </DropdownMenu>
+    </>
+  );
+}
 ```
 
 **Depois:**
-```tsx
-{selectedItems.size > 0 && (
-  <Button>Validar ({selectedItems.size})</Button>
-)}
 
-{/* Botão Exportar - sempre visível */}
+```tsx
+{
+  selectedItems.size > 0 && <Button>Validar ({selectedItems.size})</Button>;
+}
+
+{
+  /* Botão Exportar - sempre visível */
+}
 <DropdownMenu>
   <DropdownMenuTrigger asChild>
     <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
       <Download className="w-3 h-3 mr-1" />
-      {selectedItems.size > 0 ? `Exportar (${selectedItems.size})` : "Exportar Aba"}
+      {selectedItems.size > 0
+        ? `Exportar (${selectedItems.size})`
+        : "Exportar Aba"}
     </Button>
   </DropdownMenuTrigger>
   <DropdownMenuContent align="end">
@@ -202,25 +225,25 @@ Acessórios Automotivos para Veículos Leves_clientes_2025-11-22T04-12-36.csv
       PDF
     </DropdownMenuItem>
   </DropdownMenuContent>
-</DropdownMenu>
+</DropdownMenu>;
 ```
 
 ---
 
 ## Cobertura de Testes
 
-| Funcionalidade | Status | Observações |
-|---|---|---|
-| Botão sempre visível | ✅ Passou | Aparece independentemente de seleção |
-| Texto dinâmico | ✅ Passou | Muda conforme seleção |
-| Exportação CSV | ✅ Passou | Arquivo gerado corretamente |
-| Exportação Excel | ✅ Passou | Planilha válida com dados |
-| Exportação PDF | ✅ Passou | Documento formatado |
-| Aba Clientes | ✅ Passou | Exportação funcional |
-| Aba Concorrentes | ✅ Passou | Exportação funcional |
-| Aba Leads | ✅ Passou | Exportação funcional |
-| Nomenclatura de arquivos | ✅ Passou | Padrão consistente |
-| Integridade dos dados | ✅ Passou | Dados completos e corretos |
+| Funcionalidade           | Status    | Observações                          |
+| ------------------------ | --------- | ------------------------------------ |
+| Botão sempre visível     | ✅ Passou | Aparece independentemente de seleção |
+| Texto dinâmico           | ✅ Passou | Muda conforme seleção                |
+| Exportação CSV           | ✅ Passou | Arquivo gerado corretamente          |
+| Exportação Excel         | ✅ Passou | Planilha válida com dados            |
+| Exportação PDF           | ✅ Passou | Documento formatado                  |
+| Aba Clientes             | ✅ Passou | Exportação funcional                 |
+| Aba Concorrentes         | ✅ Passou | Exportação funcional                 |
+| Aba Leads                | ✅ Passou | Exportação funcional                 |
+| Nomenclatura de arquivos | ✅ Passou | Padrão consistente                   |
+| Integridade dos dados    | ✅ Passou | Dados completos e corretos           |
 
 **Taxa de Sucesso:** 10/10 (100%)
 

@@ -17,7 +17,7 @@ export function TagFilter({ selectedTags, onTagsChange }: TagFilterProps) {
 
   const toggleTag = (tagId: number) => {
     if (selectedTags.includes(tagId)) {
-      onTagsChange(selectedTags.filter((id) => id !== tagId));
+      onTagsChange(selectedTags.filter(id => id !== tagId));
     } else {
       onTagsChange([...selectedTags, tagId]);
     }
@@ -28,7 +28,9 @@ export function TagFilter({ selectedTags, onTagsChange }: TagFilterProps) {
     setIsOpen(false);
   };
 
-  const selectedTagObjects = allTags.filter((tag) => selectedTags.includes(tag.id));
+  const selectedTagObjects = allTags.filter(tag =>
+    selectedTags.includes(tag.id)
+  );
 
   return (
     <div className="flex items-center gap-2">
@@ -38,7 +40,10 @@ export function TagFilter({ selectedTags, onTagsChange }: TagFilterProps) {
             <Filter className="w-4 h-4" />
             Filtrar por Tags
             {selectedTags.length > 0 && (
-              <Badge variant="secondary" className="ml-1 px-1.5 py-0 text-[10px]">
+              <Badge
+                variant="secondary"
+                className="ml-1 px-1.5 py-0 text-[10px]"
+              >
                 {selectedTags.length}
               </Badge>
             )}
@@ -66,7 +71,7 @@ export function TagFilter({ selectedTags, onTagsChange }: TagFilterProps) {
                   Nenhuma tag disponível. Crie tags no Gerenciador de Tags.
                 </p>
               ) : (
-                allTags.map((tag) => {
+                allTags.map(tag => {
                   const isSelected = selectedTags.includes(tag.id);
                   return (
                     <button
@@ -78,7 +83,11 @@ export function TagFilter({ selectedTags, onTagsChange }: TagFilterProps) {
                           : "hover:bg-accent/50 border border-transparent"
                       }`}
                     >
-                      <TagBadge name={tag.name} color={tag.color || "#3b82f6"} size="sm" />
+                      <TagBadge
+                        name={tag.name}
+                        color={tag.color || "#3b82f6"}
+                        size="sm"
+                      />
                       {isSelected && (
                         <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
                           <X className="w-3 h-3 text-primary-foreground" />
@@ -96,7 +105,7 @@ export function TagFilter({ selectedTags, onTagsChange }: TagFilterProps) {
       {/* Selected tags preview */}
       {selectedTagObjects.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
-          {selectedTagObjects.map((tag) => (
+          {selectedTagObjects.map(tag => (
             <TagBadge
               key={tag.id}
               name={tag.name}

@@ -16,40 +16,45 @@
 
 ## 🎯 Resultados do Enriquecimento
 
-| Etapa | Resultado | Status |
-|-------|-----------|--------|
+| Etapa                            | Resultado                   | Status     |
+| -------------------------------- | --------------------------- | ---------- |
 | **1. Enriquecimento do Cliente** | Todos os campos preenchidos | ✅ Sucesso |
-| **2. Identificação de Mercados** | 4 mercados identificados | ✅ Sucesso |
-| **3. Criação de Produtos** | 8 produtos criados | ✅ Sucesso |
-| **4. Busca de Concorrentes** | 5 concorrentes encontrados | ✅ Sucesso |
-| **5. Busca de Leads** | 5 leads gerados | ✅ Sucesso |
+| **2. Identificação de Mercados** | 4 mercados identificados    | ✅ Sucesso |
+| **3. Criação de Produtos**       | 8 produtos criados          | ✅ Sucesso |
+| **4. Busca de Concorrentes**     | 5 concorrentes encontrados  | ✅ Sucesso |
+| **5. Busca de Leads**            | 5 leads gerados             | ✅ Sucesso |
 
 ---
 
 ## 👤 Dados do Cliente Enriquecidos
 
 ### Informações Básicas
+
 - **Nome:** INCOFAL INDUSTRIA E COMERCIO LTDA
 - **CNPJ:** 03.873.286/0001-08
 - **Produto Principal:** Fabricação e comercialização de utensílios de cozinha em alumínio e antiaderente
 
 ### Informações de Contato
+
 - **Email:** incofal@incofal.com.br
 - **Telefone:** (11) 3931-4122
 - **Site:** https://incofal.com.br
 
 ### Localização
+
 - **Cidade:** Santa Gertrudes
 - **UF:** SP
 - **Região:** Sudeste
 
 ### Informações Corporativas
+
 - **Porte:** Média
 - **Faturamento Declarado:** R$ 10 milhões/ano
 - **Número de Estabelecimentos:** Não informado
 - **CNAE:** Não informado
 
 ### Qualidade dos Dados
+
 - **Quality Score:** 100/100
 - **Classificação:** Excelente
 
@@ -78,6 +83,7 @@
 ## 📦 Produtos Criados (8)
 
 ### Mercado: Distribuição Atacadista
+
 1. **Kit Atacado Panelas Alumínio Polido Reforçado (Série 300)**
    - Categoria: Utensílios de Cozinha Básicos
    - Preço: R$ 45,00 - R$ 65,00/conjunto
@@ -89,6 +95,7 @@
    - Unidade: unidade
 
 ### Mercado: Redes de Varejo
+
 3. **Conjunto Gourmet Antiaderente Cerâmico (5 Peças)**
    - Categoria: Conjuntos Especiais para Varejo
    - Preço: R$ 250,00 - R$ 380,00/conjunto
@@ -100,6 +107,7 @@
    - Unidade: unidade
 
 ### Mercado: Food Service (HORECA)
+
 5. **Caldeirão Industrial Alumínio Reforçado (Capacidade 30L)**
    - Categoria: Utensílios Industriais Pesados
    - Preço: R$ 350,00 - R$ 500,00/unidade
@@ -111,6 +119,7 @@
    - Unidade: unidade
 
 ### Mercado: Programas de Fidelidade
+
 7. **Kit Chef Compacto (3 Peças) Personalizável**
    - Categoria: Kits Promocionais
    - Preço: R$ 90,00 - R$ 130,00/kit
@@ -182,16 +191,17 @@
 
 ### Tempo por Etapa (estimado)
 
-| Etapa | Tempo | % do Total |
-|-------|-------|------------|
-| Enriquecimento do Cliente | ~8s | 26% |
-| Identificação de Mercados | ~6s | 19% |
-| Criação de Produtos | ~8s | 26% |
-| Busca de Concorrentes | ~4s | 13% |
-| Busca de Leads | ~5s | 16% |
-| **TOTAL** | **30,81s** | **100%** |
+| Etapa                     | Tempo      | % do Total |
+| ------------------------- | ---------- | ---------- |
+| Enriquecimento do Cliente | ~8s        | 26%        |
+| Identificação de Mercados | ~6s        | 19%        |
+| Criação de Produtos       | ~8s        | 26%        |
+| Busca de Concorrentes     | ~4s        | 13%        |
+| Busca de Leads            | ~5s        | 16%        |
+| **TOTAL**                 | **30,81s** | **100%**   |
 
 ### Velocidade Média
+
 - **Por mercado:** 7,7s
 - **Por produto:** 3,85s
 - **Por concorrente:** 6,16s
@@ -203,14 +213,14 @@
 
 ### Consumo de Tokens Estimado
 
-| Etapa | Tokens | Custo (USD) |
-|-------|--------|-------------|
-| Enriquecimento do Cliente | ~1.500 | $0,00023 |
-| Identificação de Mercados | ~1.200 | $0,00018 |
-| Criação de Produtos | ~2.000 | $0,00030 |
-| Busca de Concorrentes | ~1.500 | $0,00023 |
-| Busca de Leads | ~1.800 | $0,00027 |
-| **TOTAL** | **~8.000** | **~$0,0012** |
+| Etapa                     | Tokens     | Custo (USD)  |
+| ------------------------- | ---------- | ------------ |
+| Enriquecimento do Cliente | ~1.500     | $0,00023     |
+| Identificação de Mercados | ~1.200     | $0,00018     |
+| Criação de Produtos       | ~2.000     | $0,00030     |
+| Busca de Concorrentes     | ~1.500     | $0,00023     |
+| Busca de Leads            | ~1.800     | $0,00027     |
+| **TOTAL**                 | **~8.000** | **~$0,0012** |
 
 ### Projeção para 801 Clientes
 
@@ -225,17 +235,20 @@
 ## ✅ Validações de Qualidade
 
 ### Unicidade
+
 - ✅ Mercados sem duplicação (hash único)
 - ✅ Produtos com chave única (clienteId + mercadoId + nome)
 - ⚠️ Concorrentes reutilizados de outros clientes (comportamento esperado para deduplicação)
 - ✅ Leads únicos e relevantes
 
 ### Validações Cruzadas
+
 - ✅ Nenhum concorrente é cliente
 - ✅ Nenhum lead é cliente ou concorrente
 - ✅ Todos os CNPJs válidos (quando informados)
 
 ### Qualidade dos Dados
+
 - ✅ Cliente com quality score 100/100 (Excelente)
 - ✅ Todos os campos principais preenchidos
 - ✅ Informações coerentes e realistas
@@ -248,6 +261,7 @@
 ## 🐛 Problemas Encontrados e Corrigidos
 
 ### 1. Erro no Campo `preco` (Produtos)
+
 **Problema:** Campo definido como `decimal(10,2)` mas Gemini retornava faixas de preço como texto (ex: "R$ 18,00 - R$ 25,00")
 
 **Solução:** Alterado para `text` no schema
@@ -255,6 +269,7 @@
 **Status:** ✅ Corrigido
 
 ### 2. Erro no Campo `numeroEstabelecimentos`
+
 **Problema:** Campo definido como `int` mas Gemini retornava valores como "Múltiplos", "Alto", etc.
 
 **Solução:** Alterado para `text` em clientes, concorrentes e leads
@@ -262,6 +277,7 @@
 **Status:** ✅ Corrigido
 
 ### 3. Concorrentes Incorretos
+
 **Problema:** Concorrentes listados são de outro mercado (filmes plásticos) ao invés de utensílios de cozinha
 
 **Causa:** Sistema está reutilizando concorrentes de enriquecimentos anteriores (comportamento de deduplicação)
@@ -272,22 +288,23 @@
 
 ## 📈 Métricas de Sucesso
 
-| Métrica | Alvo | Resultado | Status |
-|---------|------|-----------|--------|
-| Tempo de execução | < 60s | 30,81s | ✅ Excelente |
-| Success rate | 100% | 100% | ✅ Perfeito |
-| Mercados identificados | 1-5 | 4 | ✅ Dentro do esperado |
-| Produtos criados | 2-10 | 8 | ✅ Ótimo |
-| Concorrentes encontrados | 5 | 5 | ✅ Perfeito |
-| Leads gerados | 5 | 5 | ✅ Perfeito |
-| Quality score | > 50 | 100 | ✅ Excelente |
-| Custo | < $0,002 | $0,0012 | ✅ Ótimo |
+| Métrica                  | Alvo     | Resultado | Status                |
+| ------------------------ | -------- | --------- | --------------------- |
+| Tempo de execução        | < 60s    | 30,81s    | ✅ Excelente          |
+| Success rate             | 100%     | 100%      | ✅ Perfeito           |
+| Mercados identificados   | 1-5      | 4         | ✅ Dentro do esperado |
+| Produtos criados         | 2-10     | 8         | ✅ Ótimo              |
+| Concorrentes encontrados | 5        | 5         | ✅ Perfeito           |
+| Leads gerados            | 5        | 5         | ✅ Perfeito           |
+| Quality score            | > 50     | 100       | ✅ Excelente          |
+| Custo                    | < $0,002 | $0,0012   | ✅ Ótimo              |
 
 ---
 
 ## 🎯 Conclusões
 
 ### Pontos Positivos
+
 1. ✅ **Performance excelente:** 30,81s para enriquecimento completo
 2. ✅ **Custo muito baixo:** $0,0012 por cliente
 3. ✅ **Qualidade dos dados:** Score 100/100
@@ -296,11 +313,13 @@
 6. ✅ **Mercados bem segmentados:** 4 mercados distintos e relevantes
 
 ### Pontos de Atenção
+
 1. ⚠️ **Concorrentes genéricos:** Sistema reutilizando concorrentes de outros mercados
 2. ⚠️ **Validação de CNPJs:** Alguns concorrentes sem CNPJ
 3. ⚠️ **Faturamento:** Nem sempre disponível
 
 ### Recomendações
+
 1. **Melhorar prompt de concorrentes:** Adicionar contexto mais específico do mercado
 2. **Validar CNPJs:** Implementar validação de formato e existência
 3. **Checkpoint automático:** Salvar progresso a cada 50 clientes

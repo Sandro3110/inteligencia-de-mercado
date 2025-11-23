@@ -1,11 +1,11 @@
-import { drizzle } from 'drizzle-orm/mysql2';
-import mysql from 'mysql2/promise';
-import { sql } from 'drizzle-orm';
+import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
+import { sql } from "drizzle-orm";
 
 const connection = await mysql.createConnection(process.env.DATABASE_URL);
 const db = drizzle(connection);
 
-console.log('Verificando dados no banco...\n');
+console.log("Verificando dados no banco...\n");
 
 const result = await db.execute(sql`
   SELECT 
@@ -17,8 +17,8 @@ const result = await db.execute(sql`
     (SELECT COUNT(*) FROM pesquisas) as total_pesquisas
 `);
 
-console.log('📊 Estatísticas do Banco de Dados:');
-console.log('===================================');
+console.log("📊 Estatísticas do Banco de Dados:");
+console.log("===================================");
 console.log(`Projetos: ${result[0][0].total_projects}`);
 console.log(`Pesquisas: ${result[0][0].total_pesquisas}`);
 console.log(`Mercados: ${result[0][0].total_mercados}`);

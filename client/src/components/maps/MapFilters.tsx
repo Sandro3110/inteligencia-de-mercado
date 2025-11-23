@@ -31,12 +31,41 @@ export interface MapFiltersProps {
 }
 
 const UFS_BRASIL = [
-  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
-  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
-  "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+  "AC",
+  "AL",
+  "AP",
+  "AM",
+  "BA",
+  "CE",
+  "DF",
+  "ES",
+  "GO",
+  "MA",
+  "MT",
+  "MS",
+  "MG",
+  "PA",
+  "PB",
+  "PR",
+  "PE",
+  "PI",
+  "RJ",
+  "RN",
+  "RS",
+  "RO",
+  "RR",
+  "SC",
+  "SP",
+  "SE",
+  "TO",
 ];
 
-export default function MapFilters({ projectId, pesquisaId, filters, onChange }: MapFiltersProps) {
+export default function MapFilters({
+  projectId,
+  pesquisaId,
+  filters,
+  onChange,
+}: MapFiltersProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Buscar mercados disponíveis
@@ -55,14 +84,14 @@ export default function MapFilters({ projectId, pesquisaId, filters, onChange }:
 
   const handleMercadoToggle = (mercadoId: number) => {
     const selected = filters.selectedMercados.includes(mercadoId)
-      ? filters.selectedMercados.filter((id) => id !== mercadoId)
+      ? filters.selectedMercados.filter(id => id !== mercadoId)
       : [...filters.selectedMercados, mercadoId];
     onChange({ ...filters, selectedMercados: selected });
   };
 
   const handleUFToggle = (uf: string) => {
     const selected = filters.selectedUFs.includes(uf)
-      ? filters.selectedUFs.filter((u) => u !== uf)
+      ? filters.selectedUFs.filter(u => u !== uf)
       : [...filters.selectedUFs, uf];
     onChange({ ...filters, selectedUFs: selected });
   };
@@ -109,7 +138,7 @@ export default function MapFilters({ projectId, pesquisaId, filters, onChange }:
             <Input
               placeholder="Nome, cidade..."
               value={filters.searchText}
-              onChange={(e) => handleSearchChange(e.target.value)}
+              onChange={e => handleSearchChange(e.target.value)}
               className="pl-8"
             />
             {filters.searchText && (
@@ -127,7 +156,9 @@ export default function MapFilters({ projectId, pesquisaId, filters, onChange }:
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-xs">Qualidade Mínima</Label>
-            <span className="text-xs text-muted-foreground">{filters.minQuality}%</span>
+            <span className="text-xs text-muted-foreground">
+              {filters.minQuality}%
+            </span>
           </div>
           <Slider
             value={[filters.minQuality]}
@@ -157,8 +188,11 @@ export default function MapFilters({ projectId, pesquisaId, filters, onChange }:
               <div className="space-y-2">
                 <Label className="text-xs">Mercados</Label>
                 <div className="max-h-40 overflow-y-auto space-y-2 border rounded-md p-2">
-                  {mercados.map((mercado) => (
-                    <div key={mercado.id} className="flex items-center space-x-2">
+                  {mercados.map(mercado => (
+                    <div
+                      key={mercado.id}
+                      className="flex items-center space-x-2"
+                    >
                       <Checkbox
                         id={`mercado-${mercado.id}`}
                         checked={filters.selectedMercados.includes(mercado.id)}
@@ -180,14 +214,17 @@ export default function MapFilters({ projectId, pesquisaId, filters, onChange }:
             <div className="space-y-2">
               <Label className="text-xs">Estados (UF)</Label>
               <div className="max-h-40 overflow-y-auto grid grid-cols-3 gap-2 border rounded-md p-2">
-                {UFS_BRASIL.map((uf) => (
+                {UFS_BRASIL.map(uf => (
                   <div key={uf} className="flex items-center space-x-2">
                     <Checkbox
                       id={`uf-${uf}`}
                       checked={filters.selectedUFs.includes(uf)}
                       onCheckedChange={() => handleUFToggle(uf)}
                     />
-                    <label htmlFor={`uf-${uf}`} className="text-xs cursor-pointer">
+                    <label
+                      htmlFor={`uf-${uf}`}
+                      className="text-xs cursor-pointer"
+                    >
                       {uf}
                     </label>
                   </div>
@@ -199,7 +236,12 @@ export default function MapFilters({ projectId, pesquisaId, filters, onChange }:
 
         {/* Botão limpar filtros */}
         {activeFiltersCount > 0 && (
-          <Button variant="ghost" size="sm" onClick={handleClearFilters} className="w-full">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleClearFilters}
+            className="w-full"
+          >
             <X className="w-4 h-4 mr-2" />
             Limpar Filtros
           </Button>

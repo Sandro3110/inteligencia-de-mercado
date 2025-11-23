@@ -59,7 +59,7 @@ describe("Sistema de Notificações em Tempo Real", () => {
 
       // 2. Criar uma notificação de teste
       console.log("[Monitor] Criando notificação de teste...");
-      
+
       const notification = await trpc.notifications.create.mutate({
         title: "Teste de Monitoramento SSE",
         content: `Notificação criada em ${new Date().toISOString()}`,
@@ -69,7 +69,7 @@ describe("Sistema de Notificações em Tempo Real", () => {
       console.log(`[Monitor] Notificação criada: ${notification.id}`);
 
       // 3. Aguardar evento SSE (timeout de 10 segundos)
-      const timeout = new Promise<void>((resolve) => setTimeout(resolve, 10000));
+      const timeout = new Promise<void>(resolve => setTimeout(resolve, 10000));
       const readSSE = async () => {
         try {
           while (!receivedNotification) {
@@ -91,7 +91,10 @@ describe("Sistema de Notificações em Tempo Real", () => {
                   if (parsed.id === notification.id) {
                     receivedNotification = true;
                     notificationData = parsed;
-                    console.log("[Monitor] ✅ Notificação recebida via SSE:", parsed);
+                    console.log(
+                      "[Monitor] ✅ Notificação recebida via SSE:",
+                      parsed
+                    );
                     break;
                   }
                 } catch (e) {
@@ -157,7 +160,7 @@ describe("Sistema de Notificações em Tempo Real", () => {
         }),
       ]);
 
-      const expectedIds = new Set(notifications.map((n) => n.id));
+      const expectedIds = new Set(notifications.map(n => n.id));
       console.log("[Monitor] IDs esperados:", Array.from(expectedIds));
 
       // Ler eventos por 10 segundos
@@ -168,7 +171,7 @@ describe("Sistema de Notificações em Tempo Real", () => {
         while (Date.now() - startTime < maxDuration && receivedIds.size < 3) {
           const { value, done } = await Promise.race([
             reader.read(),
-            new Promise<{ value: undefined; done: true }>((resolve) =>
+            new Promise<{ value: undefined; done: true }>(resolve =>
               setTimeout(() => resolve({ value: undefined, done: true }), 1000)
             ),
           ]);
@@ -184,7 +187,9 @@ describe("Sistema de Notificações em Tempo Real", () => {
                 const parsed = JSON.parse(line.substring(6));
                 if (expectedIds.has(parsed.id)) {
                   receivedIds.add(parsed.id);
-                  console.log(`[Monitor] ✅ Recebida ${receivedIds.size}/3: ${parsed.title}`);
+                  console.log(
+                    `[Monitor] ✅ Recebida ${receivedIds.size}/3: ${parsed.title}`
+                  );
                 }
               } catch (e) {
                 // Ignorar
@@ -211,9 +216,9 @@ describe("Sistema de Notificações em Tempo Real", () => {
 
       const unread = await trpc.notifications.getUnread.query();
       console.log(`[Monitor] Notificações não lidas: ${unread.length}`);
-      
+
       expect(Array.isArray(unread)).toBe(true);
-      
+
       if (unread.length > 0) {
         const first = unread[0];
         expect(first).toHaveProperty("id");
@@ -242,8 +247,8 @@ describe("Sistema de Notificações em Tempo Real", () => {
 
       // Verificar
       const all = await trpc.notifications.getAll.query();
-      const found = all.find((n) => n.id === notification.id);
-      
+      const found = all.find(n => n.id === notification.id);
+
       expect(found).toBeDefined();
       expect(found?.isRead).toBe(true);
     });
@@ -266,8 +271,8 @@ describe("Sistema de Notificações em Tempo Real", () => {
 
       // Verificar que não existe mais
       const all = await trpc.notifications.getAll.query();
-      const found = all.find((n) => n.id === notification.id);
-      
+      const found = all.find(n => n.id === notification.id);
+
       expect(found).toBeUndefined();
     });
   });
@@ -296,10 +301,10 @@ describe("Sistema de Notificações em Tempo Real", () => {
       ]);
 
       // Verificar que todas conectaram
-      expect(connections.every((r) => r.status === 200)).toBe(true);
+      expect(connections.every(r => r.status === 200)).toBe(true);
 
       // Fechar todas
-      connections.forEach((r) => r.body?.cancel());
+      connections.forEach(r => r.body?.cancel());
 
       console.log("[Monitor] ✅ 3 conexões SSE simultâneas funcionaram");
     });
@@ -326,7 +331,7 @@ describe("Sistema de Notificações em Tempo Real", () => {
         while (Date.now() - startTime < 30000) {
           const { value, done } = await Promise.race([
             reader.read(),
-            new Promise<{ value: undefined; done: true }>((resolve) =>
+            new Promise<{ value: undefined; done: true }>(resolve =>
               setTimeout(() => resolve({ value: undefined, done: true }), 5000)
             ),
           ]);
@@ -345,8 +350,10 @@ describe("Sistema de Notificações em Tempo Real", () => {
       }
 
       const duration = Date.now() - startTime;
-      console.log(`[Monitor] Conexão mantida por ${duration}ms com ${heartbeatCount} heartbeats`);
-      
+      console.log(
+        `[Monitor] Conexão mantida por ${duration}ms com ${heartbeatCount} heartbeats`
+      );
+
       expect(duration).toBeGreaterThanOrEqual(29000);
       expect(heartbeatCount).toBeGreaterThan(0);
     }, 35000);

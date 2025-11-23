@@ -25,10 +25,12 @@ Ao expandir um mercado, você visualiza simultaneamente os três tipos de dados 
 O header fixo no topo contém todos os controles globais:
 
 **Lado Esquerdo**:
+
 - **Logo e Título**: "GESTOR PAV"
 - **Subtitle**: Mostra o total de mercados disponíveis
 
 **Centro**:
+
 - **Filtros de Status**: 4 botões para filtrar dados
   - **Todos**: Exibe todos os itens (padrão)
   - **Pendentes**: Apenas itens não validados
@@ -36,6 +38,7 @@ O header fixo no topo contém todos os controles globais:
   - **Descartados**: Apenas itens descartados
 
 **Lado Direito**:
+
 - **Botão Fila**: Abre o painel lateral com itens selecionados (badge mostra quantidade)
 - **Botão Light/Dark**: Ícone de sol/lua para alternar tema
 
@@ -48,6 +51,7 @@ O header fixo no topo contém todos os controles globais:
 A tela inicial exibe todos os 73 mercados em cards compactos:
 
 **Informações em cada card**:
+
 - Nome do mercado
 - Segmentação (B2B, B2C, B2B2C) em pill badge
 - Categoria (se disponível)
@@ -58,6 +62,7 @@ A tela inicial exibe todos os 73 mercados em cards compactos:
 - Ícone de expansão (chevron)
 
 **Interação**:
+
 - **Clique no card**: Expande o mercado e mostra as 3 colunas
 - **Hover**: Leve elevação do card
 - **Mercado expandido**: Borda colorida destacada
@@ -67,6 +72,7 @@ A tela inicial exibe todos os 73 mercados em cards compactos:
 Ao clicar em um mercado, aparecem 3 colunas lado a lado:
 
 #### Coluna 1: Clientes
+
 - Lista de todos os clientes associados ao mercado
 - Cada item mostra:
   - **Checkbox**: Para seleção múltipla
@@ -75,14 +81,17 @@ Ao clicar em um mercado, aparecem 3 colunas lado a lado:
   - **Botão "Validar"**: Abre modal de validação individual
 
 #### Coluna 2: Concorrentes
+
 - Lista de concorrentes mapeados para o mercado
 - Mesma estrutura da coluna de clientes
 
 #### Coluna 3: Leads
+
 - Lista de leads qualificados para o mercado
 - Mesma estrutura da coluna de clientes
 
 **Comportamento**:
+
 - **Scroll independente**: Cada coluna tem scroll próprio (altura máxima: 96 unidades)
 - **Filtro aplicado**: As colunas respeitam o filtro de status selecionado no header
 - **Animação**: Expansão suave com slide-in (300ms)
@@ -91,6 +100,7 @@ Ao clicar em um mercado, aparecem 3 colunas lado a lado:
 ### Colapsar Mercado
 
 Para colapsar um mercado expandido:
+
 - Clique novamente no card do mercado
 - Clique em outro mercado (o anterior colapsa automaticamente - accordion behavior)
 
@@ -114,6 +124,7 @@ A fila de trabalho permite organizar itens para validação em lote.
 Clique no botão **"Fila"** no header para abrir o painel lateral.
 
 **Conteúdo do painel**:
+
 - **Header**: Título e contador de itens
 - **Lista agrupada por mercado**: Itens organizados por mercado de origem
 - **Badges de tipo**: Cada item mostra se é Cliente/Concorrente/Lead
@@ -148,6 +159,7 @@ Para validar um item específico com mais controle:
 4. **Confirme** clicando em "Salvar"
 
 **Quando usar**:
+
 - Itens que precisam de notas detalhadas
 - Validação com status "Precisa Ajuste" (não disponível em lote)
 - Revisão cuidadosa de itens críticos
@@ -159,20 +171,24 @@ Para validar um item específico com mais controle:
 Os filtros no header afetam **todos os níveis** da interface:
 
 ### Filtro "Todos" (padrão)
+
 - Exibe todos os mercados
 - Nas colunas expandidas, mostra todos os itens
 
 ### Filtro "Pendentes"
+
 - Exibe apenas mercados que têm itens pendentes
 - Nas colunas, mostra apenas itens com status "Pendente"
 - **Uso recomendado**: Identificar rapidamente o que precisa ser validado
 
 ### Filtro "Validados"
+
 - Exibe apenas mercados com itens validados
 - Nas colunas, mostra apenas itens com status "Rico"
 - **Uso recomendado**: Revisar trabalho concluído
 
 ### Filtro "Descartados"
+
 - Exibe apenas mercados com itens descartados
 - Nas colunas, mostra apenas itens com status "Descartado"
 - **Uso recomendado**: Revisar decisões de descarte
@@ -186,11 +202,13 @@ Os filtros no header afetam **todos os níveis** da interface:
 O sistema salva automaticamente seu progresso:
 
 ### LocalStorage
+
 - **Fila de trabalho**: Itens selecionados são salvos no navegador
 - **Restauração automática**: Ao reabrir o sistema, a fila é restaurada
 - **Independente de sessão**: Funciona mesmo após fechar o navegador
 
 ### Banco de Dados
+
 - **Status de validação**: Salvo permanentemente no banco
 - **Notas**: Observações são armazenadas junto com cada item
 - **Timestamp**: Data e hora da última validação
@@ -280,11 +298,13 @@ O sistema salva automaticamente seu progresso:
 O sistema suporta dois temas:
 
 ### Tema Dark (padrão)
+
 - Background radial gradient profundo (#020617)
 - Cards com glassmorphism
 - Ideal para trabalho prolongado (menos cansaço visual)
 
 ### Tema Light
+
 - Background claro
 - Cards com bordas sutis
 - Ideal para ambientes bem iluminados
@@ -296,6 +316,7 @@ O sistema suporta dois temas:
 ## Estatísticas e Dados
 
 ### Totais
+
 - **73 mercados** únicos
 - **800 clientes** enriquecidos
 - **591 concorrentes** mapeados
@@ -303,6 +324,7 @@ O sistema suporta dois temas:
 - **Total**: 2.991 registros
 
 ### Média por Mercado
+
 - ~10.96 clientes/mercado
 - ~8.10 concorrentes/mercado
 - ~9.96 leads/mercado
@@ -348,4 +370,3 @@ Funcionalidades planejadas para futuras versões:
 **Documentação preparada por**: Manus AI  
 **Projeto**: Gestor de Pesquisa de Mercado PAV  
 **Versão**: Navegação em Cascata 2.0
-

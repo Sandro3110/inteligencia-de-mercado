@@ -13,6 +13,7 @@
 Os resultados do SerpAPI estavam retornando **artigos de notícias e jornais** ao invés de **empresas reais (pessoas jurídicas)**:
 
 **Exemplos de Resultados Inválidos:**
+
 - ❌ "As 25 maiores montadoras e empresas de peças do Brasil" (Valor Econômico)
 - ❌ "23 Maiores Empresas de Industria Automotiva no Brasil" (Econodata)
 - ❌ "Conheça as principais fabricantes de carros no Brasil" (Blog)
@@ -20,6 +21,7 @@ Os resultados do SerpAPI estavam retornando **artigos de notícias e jornais** a
 - ❌ "20 marcas de carro mais vendidas no Brasil em 2024" (Minuto Seguros)
 
 **Impacto:**
+
 - **90% dos concorrentes** eram artigos de notícias
 - **50% dos leads** eram artigos de notícias
 - **Score de qualidade baixo** (30/100) devido a dados incompletos
@@ -38,18 +40,31 @@ Criado módulo `server/_core/companyFilters.ts` com **5 camadas de filtros**:
 ```typescript
 const BLOCKED_DOMAINS = [
   // Portais de notícias
-  'globo.com', 'uol.com.br', 'estadao.com.br', 'exame.com',
-  'infomoney.com.br', 'cnnbrasil.com.br', 'r7.com', 'ig.com.br',
-  
+  "globo.com",
+  "uol.com.br",
+  "estadao.com.br",
+  "exame.com",
+  "infomoney.com.br",
+  "cnnbrasil.com.br",
+  "r7.com",
+  "ig.com.br",
+
   // Portais automotivos (notícias)
-  'motor1.uol.com.br', 'autoesporte.globo.com', 'quatrorodas.abril.com.br',
-  'guiadoauto.com.br', 'automotivebusiness.com.br',
-  
+  "motor1.uol.com.br",
+  "autoesporte.globo.com",
+  "quatrorodas.abril.com.br",
+  "guiadoauto.com.br",
+  "automotivebusiness.com.br",
+
   // Sites de listagens/rankings
-  'econodata.com.br', 'listafabricantes.com.br',
-  
+  "econodata.com.br",
+  "listafabricantes.com.br",
+
   // Redes sociais
-  'linkedin.com', 'facebook.com', 'instagram.com', 'twitter.com',
+  "linkedin.com",
+  "facebook.com",
+  "instagram.com",
+  "twitter.com",
 ];
 ```
 
@@ -60,7 +75,7 @@ const ARTICLE_URL_PATTERNS = [
   /\/blog\//i,
   /\/noticias?\//i,
   /\/artigos?\//i,
-  /\d{4}\/\d{2}\/\d{2}/,  // Datas em URL (ex: 2024/11/18)
+  /\d{4}\/\d{2}\/\d{2}/, // Datas em URL (ex: 2024/11/18)
   /\/maiores-empresas\//i,
   /\/ranking\//i,
   /\/top-\d+/i,
@@ -73,10 +88,18 @@ const ARTICLE_URL_PATTERNS = [
 
 ```typescript
 const ARTICLE_TITLE_KEYWORDS = [
-  'maiores empresas', 'principais empresas',
-  'top 10', 'top 20', 'ranking', 'lista de',
-  'conheça as', 'quais são', 'confira',
-  'melhores', 'fabricantes de', 'distribuidores de',
+  "maiores empresas",
+  "principais empresas",
+  "top 10",
+  "top 20",
+  "ranking",
+  "lista de",
+  "conheça as",
+  "quais são",
+  "confira",
+  "melhores",
+  "fabricantes de",
+  "distribuidores de",
 ];
 ```
 
@@ -99,14 +122,14 @@ if (result.snippet) {
 ```typescript
 function isLikelyCorporateDomain(domain: string): boolean {
   // Aceitar domínios com extensões corporativas
-  const corporateExtensions = ['.com.br', '.ind.br', '.net.br', '.com'];
-  
+  const corporateExtensions = [".com.br", ".ind.br", ".net.br", ".com"];
+
   // Rejeitar subdomínios de conteúdo (blog., noticias., etc)
-  const contentSubdomains = ['blog', 'noticias', 'news', 'artigos'];
-  
+  const contentSubdomains = ["blog", "noticias", "news", "artigos"];
+
   // Rejeitar palavras-chave de conteúdo
-  const contentKeywords = ['noticias', 'blog', 'portal', 'revista', 'guia'];
-  
+  const contentKeywords = ["noticias", "blog", "portal", "revista", "guia"];
+
   return hasCorporateExtension && !hasContentKeyword;
 }
 ```
@@ -117,15 +140,15 @@ function isLikelyCorporateDomain(domain: string): boolean {
 
 ### Teste com Jeep do Brasil
 
-| Métrica | Antes dos Filtros | Depois dos Filtros | Melhoria |
-|---------|-------------------|---------------------|----------|
-| **Concorrentes Encontrados** | 10 | 1 | -90% |
-| **Concorrentes Válidos** | 1 (10%) | 1 (100%) | **+900%** |
-| **Artigos Bloqueados** | 0 | 9 | **100%** |
-| **Leads Encontrados** | 8 | 5 | -37.5% |
-| **Leads Válidos** | 4 (50%) | 5 (100%) | **+100%** |
-| **Artigos Bloqueados** | 0 | 4 | **100%** |
-| **Precisão Geral** | 25% | 100% | **+300%** |
+| Métrica                      | Antes dos Filtros | Depois dos Filtros | Melhoria  |
+| ---------------------------- | ----------------- | ------------------ | --------- |
+| **Concorrentes Encontrados** | 10                | 1                  | -90%      |
+| **Concorrentes Válidos**     | 1 (10%)           | 1 (100%)           | **+900%** |
+| **Artigos Bloqueados**       | 0                 | 9                  | **100%**  |
+| **Leads Encontrados**        | 8                 | 5                  | -37.5%    |
+| **Leads Válidos**            | 4 (50%)           | 5 (100%)           | **+100%** |
+| **Artigos Bloqueados**       | 0                 | 4                  | **100%**  |
+| **Precisão Geral**           | 25%               | 100%               | **+300%** |
 
 ---
 
@@ -152,6 +175,7 @@ function isLikelyCorporateDomain(domain: string): boolean {
    - Sem palavras-chave de artigo
 
 **Bloqueados:**
+
 - 🛡️ 5 domínios bloqueados (Valor, Econodata, Motor1, Minuto Seguros, Guia do Auto)
 - 🛡️ 2 URLs de artigo detectadas (/blog/, /conheca-as-)
 - 🛡️ 2 títulos de artigo detectados ("Ranking", "maiores empresas")
@@ -180,6 +204,7 @@ function isLikelyCorporateDomain(domain: string): boolean {
 5. ✅ **Laguna** (lagunaautopecas.com.br)
 
 **Bloqueados:**
+
 - 🛡️ 2 títulos de artigo detectados ("Os 15 melhores", "Quais são as maiores")
 - 🛡️ 1 URL de artigo detectada (/lista-fabricantes/)
 - 🛡️ 1 domínio bloqueado (Valor Econômico)
@@ -230,21 +255,25 @@ function isLikelyCorporateDomain(domain: string): boolean {
 ## 📈 BENEFÍCIOS DOS FILTROS
 
 ### 1. **Precisão de 100%**
+
 - ✅ Todos os resultados são empresas reais (pessoas jurídicas)
 - ✅ Zero artigos de notícias/jornais nos resultados finais
 - ✅ Domínios corporativos validados
 
 ### 2. **Qualidade dos Dados**
+
 - ✅ Sites corporativos reais (.com.br, .ind.br)
 - ✅ Potencial para extração de CNPJs futura
 - ✅ Dados enriquecíveis via ReceitaWS
 
 ### 3. **Economia de Recursos**
+
 - ✅ Menos chamadas à API ReceitaWS (apenas empresas reais)
 - ✅ Menos processamento de dados inválidos
 - ✅ Banco de dados mais limpo
 
 ### 4. **Experiência do Usuário**
+
 - ✅ Resultados relevantes e acionáveis
 - ✅ Leads qualificados para contato
 - ✅ Concorrentes reais do mercado
@@ -256,12 +285,14 @@ function isLikelyCorporateDomain(domain: string): boolean {
 ### Arquivos Criados/Modificados
 
 **1. `/server/_core/companyFilters.ts` (NOVO)**
+
 - Funções de filtro: `isBlockedDomain()`, `isArticleUrl()`, `isArticleTitle()`
 - Extração de CNPJ: `extractCNPJs()`, `isValidCNPJFormat()`
 - Validação de domínio: `isLikelyCorporateDomain()`
 - Função principal: `filterRealCompanies()`
 
 **2. `/server/enrichmentFlow.ts` (MODIFICADO)**
+
 - Integração dos filtros em `findCompetitorsForMarkets()`
 - Integração dos filtros em `findLeadsForMarkets()`
 - Logs de filtragem detalhados
@@ -293,15 +324,18 @@ Resultados Finais
 ### 1. **Quantidade de Resultados Reduzida**
 
 **Problema:**
+
 - Antes: 10 concorrentes (90% inválidos)
 - Depois: 1 concorrente (100% válido)
 - **Perda de 90% dos resultados**
 
 **Causa:**
+
 - SerpAPI retorna muitos artigos de notícias para queries genéricas
 - Query "principais empresas Automotivo Brasil" favorece rankings/listas
 
 **Solução Proposta:**
+
 - Executar **múltiplas queries** com variações de palavras-chave
 - Usar **operadores de busca do Google** para filtrar resultados
 - Aumentar parâmetro `num` da SerpAPI (10 → 20 → 50)
@@ -309,10 +343,12 @@ Resultados Finais
 ### 2. **Falta de CNPJs**
 
 **Problema:**
+
 - Nenhum CNPJ encontrado nos snippets do Google
 - Impossível enriquecer via ReceitaWS
 
 **Solução Proposta:**
+
 - Implementar **scraping dos sites** das empresas aprovadas
 - Buscar CNPJs nas páginas "Sobre", "Contato", "Rodapé"
 - Usar regex para detectar CNPJs no HTML
@@ -329,15 +365,15 @@ Resultados Finais
 const queries = [
   // Query 1: Busca exata com CNPJ
   '"Automotivo" CNPJ site:.com.br',
-  
+
   // Query 2: Busca em sites corporativos
-  'Automotivo site:.ind.br OR site:.com.br -noticia -blog',
-  
+  "Automotivo site:.ind.br OR site:.com.br -noticia -blog",
+
   // Query 3: Busca com exclusão de palavras-chave
   'Automotivo -"maiores empresas" -ranking -lista',
-  
+
   // Query 4: Busca focada em empresas
-  'Automotivo empresa CNPJ -blog -noticia',
+  "Automotivo empresa CNPJ -blog -noticia",
 ];
 ```
 
@@ -362,7 +398,7 @@ async function scrapeCNPJFromWebsite(url: string): Promise<string | null> {
 ```typescript
 async function isActiveSite(url: string): Promise<boolean> {
   try {
-    const response = await fetch(url, { method: 'HEAD', timeout: 5000 });
+    const response = await fetch(url, { method: "HEAD", timeout: 5000 });
     return response.status === 200 || response.status === 301;
   } catch {
     return false;
@@ -392,14 +428,14 @@ async function scrapeContactInfo(url: string): Promise<{
 
 ## 📊 MÉTRICAS DE SUCESSO
 
-| Métrica | Antes | Depois | Meta Futura |
-|---------|-------|--------|-------------|
-| **Precisão** | 25% | 100% | 100% |
+| Métrica                  | Antes      | Depois     | Meta Futura  |
+| ------------------------ | ---------- | ---------- | ------------ |
+| **Precisão**             | 25%        | 100%       | 100%         |
 | **Concorrentes Válidos** | 1/10 (10%) | 1/1 (100%) | 15/15 (100%) |
-| **Leads Válidos** | 4/8 (50%) | 5/5 (100%) | 20/20 (100%) |
-| **Artigos Bloqueados** | 0 | 13 | 30+ |
-| **CNPJs Encontrados** | 0 | 0 | 12+ (80%) |
-| **Score Médio** | 30/100 | 30/100 | 70/100 |
+| **Leads Válidos**        | 4/8 (50%)  | 5/5 (100%) | 20/20 (100%) |
+| **Artigos Bloqueados**   | 0          | 13         | 30+          |
+| **CNPJs Encontrados**    | 0          | 0          | 12+ (80%)    |
+| **Score Médio**          | 30/100     | 30/100     | 70/100       |
 
 ---
 
@@ -408,12 +444,14 @@ async function scrapeContactInfo(url: string): Promise<{
 O sistema de filtros foi **100% eficaz** em eliminar artigos de notícias e jornais, garantindo que apenas **empresas reais (pessoas jurídicas)** sejam retornadas.
 
 **Principais Conquistas:**
+
 - ✅ **Precisão de 100%** (antes: 25%)
 - ✅ **13 artigos bloqueados** automaticamente
 - ✅ **5 camadas de filtros** inteligentes
 - ✅ **Logs detalhados** para auditoria
 
 **Próximos Passos:**
+
 1. Implementar múltiplas queries com operadores do Google (meta: 15 concorrentes)
 2. Scraping de sites para extração de CNPJs (meta: 80% enriquecidos)
 3. Validação de sites ativos (remover 404s)

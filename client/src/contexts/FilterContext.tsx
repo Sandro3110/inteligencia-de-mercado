@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 export interface GlobalFilters {
   // Filtros geográficos
@@ -68,7 +74,7 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   }, [filters]);
 
   const updateFilters = (newFilters: Partial<GlobalFilters>) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setFilters(prev => ({ ...prev, ...newFilters }));
   };
 
   const clearFilters = () => {

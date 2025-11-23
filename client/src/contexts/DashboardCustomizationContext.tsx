@@ -15,7 +15,9 @@ interface DashboardCustomizationContextType {
   resetLayout: () => void;
 }
 
-const DashboardCustomizationContext = createContext<DashboardCustomizationContextType | undefined>(undefined);
+const DashboardCustomizationContext = createContext<
+  DashboardCustomizationContextType | undefined
+>(undefined);
 
 const LAYOUT_KEY = "gestor-pav-dashboard-layout";
 const WIDGETS_KEY = "gestor-pav-dashboard-widgets";
@@ -39,7 +41,11 @@ const defaultWidgets: DashboardWidget[] = [
   { id: "chart-distribution", title: "Distribuição Geográfica", visible: true },
 ];
 
-export function DashboardCustomizationProvider({ children }: { children: React.ReactNode }) {
+export function DashboardCustomizationProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [layout, setLayoutState] = useState<Layout[]>(() => {
     const saved = localStorage.getItem(LAYOUT_KEY);
     return saved ? JSON.parse(saved) : defaultLayout;
@@ -95,7 +101,9 @@ export function DashboardCustomizationProvider({ children }: { children: React.R
 export function useDashboardCustomization() {
   const context = useContext(DashboardCustomizationContext);
   if (!context) {
-    throw new Error("useDashboardCustomization must be used within DashboardCustomizationProvider");
+    throw new Error(
+      "useDashboardCustomization must be used within DashboardCustomizationProvider"
+    );
   }
   return context;
 }

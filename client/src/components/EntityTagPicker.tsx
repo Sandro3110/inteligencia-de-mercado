@@ -12,14 +12,17 @@ interface EntityTagPickerProps {
   entityId: number;
 }
 
-export function EntityTagPicker({ entityType, entityId }: EntityTagPickerProps) {
+export function EntityTagPicker({
+  entityType,
+  entityId,
+}: EntityTagPickerProps) {
   const { data: entityTags = [] } = trpc.tags.getEntityTags.useQuery({
     entityType,
     entityId,
   });
 
   // Map tags to ensure color is string (not null)
-  const mappedTags: EntityTag[] = entityTags.map((tag) => ({
+  const mappedTags: EntityTag[] = entityTags.map(tag => ({
     tagId: tag.tagId,
     name: tag.name,
     color: tag.color || "#3b82f6",

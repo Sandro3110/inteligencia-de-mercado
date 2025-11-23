@@ -3,7 +3,13 @@ import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { ProjectSelector } from "@/components/ProjectSelector";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Activity, AlertCircle, CheckCircle, TrendingUp, Users } from "lucide-react";
+import {
+  Activity,
+  AlertCircle,
+  CheckCircle,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -31,10 +37,10 @@ export default function AtividadePage() {
   if (isLoading) {
     return (
       <div className="container py-8">
-      <div className="flex items-center justify-between mb-6">
-        <Breadcrumbs items={[{ label: "Atividades" }]} />
-        <ProjectSelector />
-      </div>
+        <div className="flex items-center justify-between mb-6">
+          <Breadcrumbs items={[{ label: "Atividades" }]} />
+          <ProjectSelector />
+        </div>
         <p className="text-muted-foreground">Carregando atividades...</p>
       </div>
     );
@@ -48,13 +54,16 @@ export default function AtividadePage() {
       </div>
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Atividade Recente</h1>
-        <p className="text-muted-foreground">Últimas 50 atividades do sistema</p>
+        <p className="text-muted-foreground">
+          Últimas 50 atividades do sistema
+        </p>
       </div>
 
       <div className="space-y-4">
-        {activities?.map((activity) => {
+        {activities?.map(activity => {
           const Icon = activityIcons[activity.activityType] || Activity;
-          const colorClass = activityColors[activity.activityType] || "text-gray-500";
+          const colorClass =
+            activityColors[activity.activityType] || "text-gray-500";
 
           return (
             <Card key={activity.id}>
@@ -79,18 +88,19 @@ export default function AtividadePage() {
           );
         })}
 
-        {!activities || activities.length === 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Nenhuma atividade registrada</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                As atividades do sistema aparecerão aqui.
-              </p>
-            </CardContent>
-          </Card>
-        )}
+        {!activities ||
+          (activities.length === 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Nenhuma atividade registrada</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  As atividades do sistema aparecerão aqui.
+                </p>
+              </CardContent>
+            </Card>
+          ))}
       </div>
     </div>
   );

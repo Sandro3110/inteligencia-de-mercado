@@ -227,28 +227,28 @@ Após dados gravados, o sistema inicia o enriquecimento:
 A tabela `pesquisas` precisa de **dois novos campos** para armazenar os parâmetros configuráveis:
 
 ```sql
-ALTER TABLE pesquisas 
+ALTER TABLE pesquisas
 ADD COLUMN qtd_concorrentes INT DEFAULT 10 COMMENT 'Quantidade de concorrentes a buscar por mercado',
 ADD COLUMN qtd_leads INT DEFAULT 10 COMMENT 'Quantidade de leads a gerar por mercado';
 ```
 
 **Schema Atualizado:**
 
-| Campo | Tipo | Descrição | Padrão |
-|-------|------|-----------|--------|
-| id | int PK AUTO_INCREMENT | ID único da pesquisa | - |
-| projectId | int FK | Referência ao projeto | - |
-| nome | varchar(255) | Nome da pesquisa | - |
-| descricao | text | Descrição da pesquisa | NULL |
-| dataImportacao | timestamp | Data de importação dos dados | NOW() |
-| totalClientes | int | Total de clientes importados | 0 |
-| clientesEnriquecidos | int | Total de clientes enriquecidos | 0 |
-| status | enum | Status (importado/enriquecendo/concluido/erro) | 'importado' |
-| **qtd_concorrentes** | **int** | **Quantidade de concorrentes a buscar** | **10** |
-| **qtd_leads** | **int** | **Quantidade de leads a gerar** | **10** |
-| ativo | int | Flag de ativo (1) ou inativo (0) | 1 |
-| createdAt | timestamp | Data de criação | NOW() |
-| updatedAt | timestamp | Data da última atualização | NOW() |
+| Campo                | Tipo                  | Descrição                                      | Padrão      |
+| -------------------- | --------------------- | ---------------------------------------------- | ----------- |
+| id                   | int PK AUTO_INCREMENT | ID único da pesquisa                           | -           |
+| projectId            | int FK                | Referência ao projeto                          | -           |
+| nome                 | varchar(255)          | Nome da pesquisa                               | -           |
+| descricao            | text                  | Descrição da pesquisa                          | NULL        |
+| dataImportacao       | timestamp             | Data de importação dos dados                   | NOW()       |
+| totalClientes        | int                   | Total de clientes importados                   | 0           |
+| clientesEnriquecidos | int                   | Total de clientes enriquecidos                 | 0           |
+| status               | enum                  | Status (importado/enriquecendo/concluido/erro) | 'importado' |
+| **qtd_concorrentes** | **int**               | **Quantidade de concorrentes a buscar**        | **10**      |
+| **qtd_leads**        | **int**               | **Quantidade de leads a gerar**                | **10**      |
+| ativo                | int                   | Flag de ativo (1) ou inativo (0)               | 1           |
+| createdAt            | timestamp             | Data de criação                                | NOW()       |
+| updatedAt            | timestamp             | Data da última atualização                     | NOW()       |
 
 **Validações:**
 
@@ -274,12 +274,12 @@ CREATE TABLE pesquisa_configs (
 
 **Exemplos de Configurações:**
 
-| pesquisaId | configKey | configValue |
-|------------|-----------|-------------|
-| 1 | qtd_concorrentes | 20 |
-| 1 | qtd_leads | 50 |
-| 1 | filtros_geograficos | {"ufs": ["SP", "RJ", "MG"]} |
-| 1 | filtros_porte | {"portes": ["Médio", "Grande"]} |
+| pesquisaId | configKey           | configValue                     |
+| ---------- | ------------------- | ------------------------------- |
+| 1          | qtd_concorrentes    | 20                              |
+| 1          | qtd_leads           | 50                              |
+| 1          | filtros_geograficos | {"ufs": ["SP", "RJ", "MG"]}     |
+| 1          | filtros_porte       | {"portes": ["Médio", "Grande"]} |
 
 ---
 
@@ -794,7 +794,7 @@ pesquisas.validateName: publicProcedure
         )
       )
       .limit(1);
-    
+
     return { isUnique: existing.length === 0 };
   });
 ```
@@ -938,26 +938,23 @@ pesquisas.createWithClientes: protectedProcedure
 **Schema Validation (Zod)**
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
-export const ClienteSchema = z.object({
-  nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres'),
-  cnpj: z.string()
-    .regex(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, 'CNPJ inválido')
-    .optional()
-    .or(z.literal('')),
-  site: z.string()
-    .url('URL inválida')
-    .optional()
-    .or(z.literal('')),
-  produto: z.string().optional()
-}).refine(
-  (data) => data.cnpj || data.site,
-  {
-    message: 'CNPJ ou Site deve ser fornecido',
-    path: ['cnpj']
-  }
-);
+export const ClienteSchema = z
+  .object({
+    nome: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
+    cnpj: z
+      .string()
+      .regex(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, "CNPJ inválido")
+      .optional()
+      .or(z.literal("")),
+    site: z.string().url("URL inválida").optional().or(z.literal("")),
+    produto: z.string().optional(),
+  })
+  .refine(data => data.cnpj || data.site, {
+    message: "CNPJ ou Site deve ser fornecido",
+    path: ["cnpj"],
+  });
 
 export function validateClienteData(data: unknown) {
   return ClienteSchema.parse(data);
@@ -967,17 +964,16 @@ export function validateClienteData(data: unknown) {
 **Business Rules Validation**
 
 ```typescript
-export async function validatePesquisaNome(projectId: number, nome: string): Promise<boolean> {
-  const existing = await db.select()
+export async function validatePesquisaNome(
+  projectId: number,
+  nome: string
+): Promise<boolean> {
+  const existing = await db
+    .select()
     .from(pesquisas)
-    .where(
-      and(
-        eq(pesquisas.projectId, projectId),
-        eq(pesquisas.nome, nome)
-      )
-    )
+    .where(and(eq(pesquisas.projectId, projectId), eq(pesquisas.nome, nome)))
     .limit(1);
-  
+
   return existing.length === 0;
 }
 
@@ -1011,15 +1007,16 @@ export async function executeEnrichmentFlow(
 ): Promise<void> {
   // Buscar parâmetros da pesquisa
   const pesquisa = await getPesquisaById(input.pesquisaId);
-  
-  const qtd_concorrentes = input.qtd_concorrentes ?? pesquisa.qtd_concorrentes ?? 10;
+
+  const qtd_concorrentes =
+    input.qtd_concorrentes ?? pesquisa.qtd_concorrentes ?? 10;
   const qtd_leads = input.qtd_leads ?? pesquisa.qtd_leads ?? 10;
 
   // Usar parâmetros dinâmicos no enriquecimento
   for (const mercado of mercados) {
     // Buscar concorrentes (quantidade configurável)
     const concorrentes = await buscarConcorrentes(mercado, qtd_concorrentes);
-    
+
     // Gerar leads (quantidade configurável)
     const leads = await gerarLeads(mercado, qtd_leads);
   }
@@ -1067,16 +1064,16 @@ Valida qualidade dos dados (ex: CNPJ com dígitos verificadores válidos, site a
 
 ### Mensagens de Erro Padronizadas
 
-| Erro | Mensagem |
-|------|----------|
-| Nome vazio | "Nome da empresa é obrigatório" |
-| Nome curto | "Nome deve ter no mínimo 3 caracteres" |
-| CNPJ inválido | "CNPJ inválido. Formato esperado: XX.XXX.XXX/XXXX-XX" |
-| Site inválido | "URL inválida. Deve iniciar com http:// ou https://" |
-| CNPJ e Site vazios | "CNPJ ou Site deve ser fornecido para garantir enriquecimento" |
-| Nome de pesquisa duplicado | "Já existe uma pesquisa com este nome neste projeto" |
-| Qtd concorrentes fora do limite | "Quantidade de concorrentes deve estar entre 1 e 50" |
-| Qtd leads fora do limite | "Quantidade de leads deve estar entre 1 e 100" |
+| Erro                            | Mensagem                                                       |
+| ------------------------------- | -------------------------------------------------------------- |
+| Nome vazio                      | "Nome da empresa é obrigatório"                                |
+| Nome curto                      | "Nome deve ter no mínimo 3 caracteres"                         |
+| CNPJ inválido                   | "CNPJ inválido. Formato esperado: XX.XXX.XXX/XXXX-XX"          |
+| Site inválido                   | "URL inválida. Deve iniciar com http:// ou https://"           |
+| CNPJ e Site vazios              | "CNPJ ou Site deve ser fornecido para garantir enriquecimento" |
+| Nome de pesquisa duplicado      | "Já existe uma pesquisa com este nome neste projeto"           |
+| Qtd concorrentes fora do limite | "Quantidade de concorrentes deve estar entre 1 e 50"           |
+| Qtd leads fora do limite        | "Quantidade de leads deve estar entre 1 e 100"                 |
 
 ---
 
@@ -1100,6 +1097,7 @@ João seleciona projeto existente "Agro" no dropdown. Clica em "Próximo".
 **3. Step 2: Nomear Pesquisa**
 
 João preenche:
+
 - Nome: "Embalagens Plásticas Q4 2025"
 - Descrição: "Pesquisa de mercado para identificar clientes potenciais no setor de embalagens plásticas para produtos agrícolas"
 
@@ -1108,6 +1106,7 @@ Sistema valida em tempo real que nome é único. Clica em "Próximo".
 **4. Step 3: Configurar Parâmetros**
 
 João define:
+
 - Quantidade de concorrentes: 20 (mercado altamente competitivo)
 - Quantidade de leads: 50 (alto potencial de prospecção)
 
@@ -1122,6 +1121,7 @@ João seleciona "Pré-Pesquisa com IA" (quer testar automação). Clica em "Pró
 João fornece apenas nomes de empresas:
 
 **Cliente 1:**
+
 - Input: "Plastipak"
 - Clica em "Pesquisar com IA"
 - Sistema retorna:
@@ -1134,6 +1134,7 @@ João fornece apenas nomes de empresas:
 - João revisa e confirma
 
 **Cliente 2:**
+
 - Input: "https://www.braskem.com.br"
 - Clica em "Pesquisar com IA"
 - Sistema retorna:
@@ -1150,6 +1151,7 @@ João adiciona mais 3 clientes da mesma forma. Clica em "Próximo".
 **7. Step 6: Revisar e Confirmar**
 
 Sistema exibe resumo:
+
 - Projeto: Agro
 - Pesquisa: Embalagens Plásticas Q4 2025
 - Concorrentes por mercado: 20
@@ -1161,6 +1163,7 @@ João revisa e clica em "Confirmar e Gravar Dados".
 **8. Step 7: Gravar e Iniciar**
 
 Sistema executa:
+
 1. ✓ Pesquisa criada (ID: 12)
 2. ✓ 5 clientes gravados no banco
 3. ✓ Enrichment run criado (ID: 45)
@@ -1171,11 +1174,13 @@ Sistema redireciona para `/enrichment-progress?runId=45`.
 **9. Monitoramento**
 
 João acompanha progresso em tempo real:
+
 - Barra de progresso: 0% → 100%
 - Log de execução mostrando cada etapa
 - Notificações toast a cada 25% de progresso
 
 Após 15 minutos, enriquecimento concluído:
+
 - 5 mercados identificados
 - 100 concorrentes encontrados (20 por mercado)
 - 250 leads gerados (50 por mercado)
@@ -1282,12 +1287,12 @@ João acessa dashboard para analisar resultados.
 
 ### Componentes Principais
 
-| Componente | Descrição | Tecnologia |
-|------------|-----------|------------|
-| **Wizard UI** | Interface guiada de 7 steps | React + shadcn/ui |
-| **Validação Multi-Camada** | Schema + Business Rules + Data Quality | Zod + Custom Functions |
-| **Pré-Pesquisa com IA** | Automação de entrada de dados | OpenAI GPT-4 |
-| **Persistência Flexível** | Armazenamento de parâmetros configuráveis | MySQL + Drizzle ORM |
+| Componente                  | Descrição                                        | Tecnologia              |
+| --------------------------- | ------------------------------------------------ | ----------------------- |
+| **Wizard UI**               | Interface guiada de 7 steps                      | React + shadcn/ui       |
+| **Validação Multi-Camada**  | Schema + Business Rules + Data Quality           | Zod + Custom Functions  |
+| **Pré-Pesquisa com IA**     | Automação de entrada de dados                    | OpenAI GPT-4            |
+| **Persistência Flexível**   | Armazenamento de parâmetros configuráveis        | MySQL + Drizzle ORM     |
 | **Enriquecimento Dinâmico** | Motor de enriquecimento com parâmetros flexíveis | Node.js + APIs Externas |
 
 ### Benefícios Esperados

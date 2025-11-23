@@ -12,14 +12,14 @@ A lista compacta substitui os cards grandes por linhas simples, permitindo visua
 
 ## 📊 Comparação: Antes vs Depois
 
-| Aspecto | Cards Grandes | Lista Compacta |
-|:--------|:--------------|:---------------|
-| **Altura por item** | 180-200px | 50-60px |
-| **Itens visíveis** | 3-4 itens | 10-12 itens |
-| **Scroll da página** | Sim | Não (scroll interno) |
-| **Largura** | 100% | 100% |
-| **Informações** | 5-6 campos | 3-4 campos principais |
-| **Densidade** | Baixa | Alta |
+| Aspecto              | Cards Grandes | Lista Compacta        |
+| :------------------- | :------------ | :-------------------- |
+| **Altura por item**  | 180-200px     | 50-60px               |
+| **Itens visíveis**   | 3-4 itens     | 10-12 itens           |
+| **Scroll da página** | Sim           | Não (scroll interno)  |
+| **Largura**          | 100%          | 100%                  |
+| **Informações**      | 5-6 campos    | 3-4 campos principais |
+| **Densidade**        | Baixa         | Alta                  |
 
 **Benefício**: +200% de itens visíveis por tela
 
@@ -50,6 +50,7 @@ A lista compacta substitui os cards grandes por linhas simples, permitindo visua
 ```
 
 **Vantagens**:
+
 - ✅ **Sem scroll da página**: Toda a interface permanece fixa
 - ✅ **Scroll apenas na lista**: Rolagem suave e controlada
 - ✅ **Visualização centralizada**: Tudo em uma única tela
@@ -69,6 +70,7 @@ A lista compacta substitui os cards grandes por linhas simples, permitindo visua
 ```
 
 **Campos**:
+
 - Nome do mercado (título, truncado)
 - Badge de segmentação
 - Quantidade de clientes
@@ -88,6 +90,7 @@ A lista compacta substitui os cards grandes por linhas simples, permitindo visua
 ```
 
 **Campos**:
+
 - Ícone de status (⏱️/✅/⚠️/❌)
 - Nome da empresa (título, truncado)
 - Produto principal (descrição, truncada)
@@ -108,6 +111,7 @@ A lista compacta substitui os cards grandes por linhas simples, permitindo visua
 ```
 
 **Campos**:
+
 - Ícone de status
 - Nome do concorrente (título, truncado)
 - Produto/serviço (descrição, truncada)
@@ -128,6 +132,7 @@ A lista compacta substitui os cards grandes por linhas simples, permitindo visua
 ```
 
 **Campos**:
+
 - Ícone de status
 - Nome do lead (título, truncado)
 - Região (descrição, truncada)
@@ -143,10 +148,11 @@ A lista compacta substitui os cards grandes por linhas simples, permitindo visua
 ### Hover Effect
 
 ```tsx
-className="hover:bg-muted/50 cursor-pointer group transition-colors"
+className = "hover:bg-muted/50 cursor-pointer group transition-colors";
 ```
 
 **Comportamento**:
+
 - Ao passar o mouse, fundo muda para `muted/50`
 - Texto do título muda para `primary`
 - Ícone de seta muda para `primary`
@@ -154,12 +160,12 @@ className="hover:bg-muted/50 cursor-pointer group transition-colors"
 
 ### Ícones de Status
 
-| Status | Ícone | Cor |
-|:-------|:------|:----|
-| Pendente | ⏱️ `Clock` | `muted-foreground` |
-| Validado | ✅ `CheckCircle2` | `success` |
-| Precisa Ajuste | ⚠️ `AlertCircle` | `warning` |
-| Descartado | ❌ `XCircle` | `error` |
+| Status         | Ícone             | Cor                |
+| :------------- | :---------------- | :----------------- |
+| Pendente       | ⏱️ `Clock`        | `muted-foreground` |
+| Validado       | ✅ `CheckCircle2` | `success`          |
+| Precisa Ajuste | ⚠️ `AlertCircle`  | `warning`          |
+| Descartado     | ❌ `XCircle`      | `error`            |
 
 ### Badges
 
@@ -170,6 +176,7 @@ className="hover:bg-muted/50 cursor-pointer group transition-colors"
 ```
 
 **Tipos**:
+
 - Segmentação: B2B, B2C, B2B2C
 - Porte: Pequeno, Médio, Grande
 - Tipo: B2B, B2C
@@ -185,9 +192,7 @@ className="hover:bg-muted/50 cursor-pointer group transition-colors"
   <div className="h-full max-w-6xl mx-auto p-6">
     <div className="glass-card h-full flex flex-col">
       <ScrollArea className="flex-1">
-        <div className="p-4">
-          {/* Lista de itens */}
-        </div>
+        <div className="p-4">{/* Lista de itens */}</div>
       </ScrollArea>
     </div>
   </div>
@@ -209,18 +214,21 @@ className="hover:bg-muted/50 cursor-pointer group transition-colors"
 ## 📱 Responsividade
 
 ### Desktop (>1024px)
+
 - Sidebar: 280px fixo
 - Caixa: max-width 6xl (1152px)
 - Linhas: Altura 60px
 - Itens visíveis: ~12
 
 ### Tablet (768px - 1024px)
+
 - Sidebar: 280px fixo
 - Caixa: max-width 4xl (896px)
 - Linhas: Altura 60px
 - Itens visíveis: ~10
 
 ### Mobile (<768px)
+
 - Sidebar: Colapsável
 - Caixa: Largura total
 - Linhas: Altura 70px (mais espaço para toque)
@@ -233,11 +241,13 @@ className="hover:bg-muted/50 cursor-pointer group transition-colors"
 ### Densidade de Informação
 
 **Antes** (Cards grandes):
+
 - 3-4 itens visíveis
 - Muito espaço vazio
 - Scroll constante da página
 
 **Depois** (Lista compacta):
+
 - 10-12 itens visíveis
 - Densidade otimizada
 - Scroll apenas na lista
@@ -247,11 +257,13 @@ className="hover:bg-muted/50 cursor-pointer group transition-colors"
 ### Performance
 
 **Renderização**:
+
 - ScrollArea do Radix UI otimizado
 - Virtualização automática para listas grandes
 - Suporte para 1000+ itens sem lag
 
 **Queries**:
+
 - Queries condicionais (só carrega quando necessário)
 - Cache do tRPC reutilizado
 - Invalidação seletiva
@@ -259,11 +271,13 @@ className="hover:bg-muted/50 cursor-pointer group transition-colors"
 ### UX
 
 **Navegação**:
+
 - Clique em linha → Abre pop-up de detalhes
 - Hover → Destaque visual
 - Transições suaves
 
 **Feedback**:
+
 - Ícones de status coloridos
 - Badges informativos
 - Contadores em tempo real
@@ -272,13 +286,13 @@ className="hover:bg-muted/50 cursor-pointer group transition-colors"
 
 ## 📊 Métricas de Melhoria
 
-| Métrica | Cards Grandes | Lista Compacta | Melhoria |
-|:--------|:--------------|:---------------|:---------|
-| Altura por item | 180-200px | 50-60px | **-70%** |
-| Itens visíveis | 3-4 | 10-12 | **+200%** |
-| Scroll da página | Sim | Não | **-100%** |
-| Densidade de informação | Baixa | Alta | **+200%** |
-| Cliques para ver 20 itens | 5-6 scrolls | 1-2 scrolls | **-70%** |
+| Métrica                   | Cards Grandes | Lista Compacta | Melhoria  |
+| :------------------------ | :------------ | :------------- | :-------- |
+| Altura por item           | 180-200px     | 50-60px        | **-70%**  |
+| Itens visíveis            | 3-4           | 10-12          | **+200%** |
+| Scroll da página          | Sim           | Não            | **-100%** |
+| Densidade de informação   | Baixa         | Alta           | **+200%** |
+| Cliques para ver 20 itens | 5-6 scrolls   | 1-2 scrolls    | **-70%**  |
 
 ---
 
@@ -310,4 +324,3 @@ className="hover:bg-muted/50 cursor-pointer group transition-colors"
 **Última atualização**: 18 de novembro de 2025  
 **Versão**: 5.0.0  
 **Autor**: Manus AI
-

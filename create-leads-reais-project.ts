@@ -1,7 +1,10 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import { eq } from "drizzle-orm";
 import { clientes } from "./drizzle/schema";
-import { executeEnrichmentFlow, type EnrichmentInput } from "./server/enrichmentFlow";
+import {
+  executeEnrichmentFlow,
+  type EnrichmentInput,
+} from "./server/enrichmentFlow";
 
 const db = drizzle(process.env.DATABASE_URL!);
 
@@ -14,13 +17,14 @@ async function createLeadsReaisProject() {
     .select()
     .from(clientes)
     .where(eq(clientes.projectId, 1));
-  
+
   console.log(`   ✅ ${allClientes.length} clientes encontrados\n`);
 
   // 2. Preparar input para enriquecimento
   const enrichmentInput: EnrichmentInput = {
     projectName: "Leads Reais",
-    projectDescription: "Projeto com filtros avançados - apenas empresas reais validadas",
+    projectDescription:
+      "Projeto com filtros avançados - apenas empresas reais validadas",
     clientes: allClientes.map(c => ({
       nome: c.nome,
       cnpj: c.cnpj || undefined,
@@ -39,14 +43,13 @@ async function createLeadsReaisProject() {
   console.log("   (Isso pode levar 30-60 minutos para 800 clientes)\n");
 
   try {
-    const result = await executeEnrichmentFlow(
-      enrichmentInput,
-      (progress) => {
-        console.log(`   [${progress.currentStep}/${progress.totalSteps}] ${progress.message}`);
-      }
-    );
+    const result = await executeEnrichmentFlow(enrichmentInput, progress => {
+      console.log(
+        `   [${progress.currentStep}/${progress.totalSteps}] ${progress.message}`
+      );
+    });
 
-    if (result.status === 'completed' && result.data) {
+    if (result.status === "completed" && result.data) {
       console.log("\n✅ Enriquecimento concluído!");
       console.log(`   Projeto ID: ${result.data.projectId}`);
       console.log(`   Mercados: ${result.data.mercadosCount}`);
@@ -55,7 +58,7 @@ async function createLeadsReaisProject() {
       console.log(`   Leads: ${result.data.leadsCount}`);
       return result.data;
     } else {
-      throw new Error(result.message || 'Enriquecimento falhou');
+      throw new Error(result.message || "Enriquecimento falhou");
     }
   } catch (error) {
     console.error("\n❌ Erro durante enriquecimento:", error);
@@ -68,7 +71,7 @@ createLeadsReaisProject()
     console.log("\n🎉 Processo concluído com sucesso!");
     process.exit(0);
   })
-  .catch((error) => {
+  .catch(error => {
     console.error("\n❌ Erro fatal:", error);
     process.exit(1);
   });

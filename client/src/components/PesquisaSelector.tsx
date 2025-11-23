@@ -1,20 +1,25 @@
-import { useSelectedPesquisa } from '@/hooks/useSelectedPesquisa';
+import { useSelectedPesquisa } from "@/hooks/useSelectedPesquisa";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { FileText, Loader2 } from 'lucide-react';
+} from "@/components/ui/select";
+import { FileText, Loader2 } from "lucide-react";
 
 interface PesquisaSelectorProps {
   projectId?: number | null;
 }
 
 export function PesquisaSelector({ projectId }: PesquisaSelectorProps) {
-  const { selectedPesquisaId, selectedPesquisa, pesquisas, selectPesquisa, isLoading } =
-    useSelectedPesquisa(projectId);
+  const {
+    selectedPesquisaId,
+    selectedPesquisa,
+    pesquisas,
+    selectPesquisa,
+    isLoading,
+  } = useSelectedPesquisa(projectId);
 
   if (!projectId) {
     return (
@@ -48,7 +53,7 @@ export function PesquisaSelector({ projectId }: PesquisaSelectorProps) {
       <FileText className="h-4 w-4 text-muted-foreground" />
       <Select
         value={selectedPesquisaId?.toString() || "all"}
-        onValueChange={(value) => {
+        onValueChange={value => {
           if (value === "all") {
             selectPesquisa(null);
           } else {
@@ -63,7 +68,7 @@ export function PesquisaSelector({ projectId }: PesquisaSelectorProps) {
           <SelectItem value="all">
             <span className="text-muted-foreground">Todas as pesquisas</span>
           </SelectItem>
-          {pesquisas.map((pesquisa) => (
+          {pesquisas.map(pesquisa => (
             <SelectItem key={pesquisa.id} value={pesquisa.id.toString()}>
               <div className="flex items-center gap-2">
                 <span>{pesquisa.nome}</span>

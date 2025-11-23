@@ -8,7 +8,11 @@ import { useEffect, useRef, useState } from "react";
 import { MapPin, ExternalLink, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Link } from "wouter";
 
 interface MiniMapProps {
@@ -121,7 +125,10 @@ export default function MiniMap({
   // Fallback quando não há coordenadas
   if (!hasValidCoordinates) {
     return (
-      <Card className={`flex items-center justify-center bg-muted/30 ${className}`} style={{ height }}>
+      <Card
+        className={`flex items-center justify-center bg-muted/30 ${className}`}
+        style={{ height }}
+      >
         <div className="text-center text-muted-foreground p-4">
           <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
           <p className="text-sm">Localização não disponível</p>
@@ -133,7 +140,10 @@ export default function MiniMap({
   // Fallback quando há erro
   if (mapError) {
     return (
-      <Card className={`flex items-center justify-center bg-muted/30 ${className}`} style={{ height }}>
+      <Card
+        className={`flex items-center justify-center bg-muted/30 ${className}`}
+        style={{ height }}
+      >
         <div className="text-center text-muted-foreground p-4">
           <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
           <p className="text-sm">Erro ao carregar mapa</p>
@@ -170,7 +180,11 @@ export default function MiniMap({
           <Tooltip>
             <TooltipTrigger asChild>
               <Link href="/geocockpit">
-                <Button size="sm" variant="secondary" className="h-8 w-8 p-0 shadow-md">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-8 w-8 p-0 shadow-md"
+                >
                   <ExternalLink className="w-4 h-4" />
                 </Button>
               </Link>

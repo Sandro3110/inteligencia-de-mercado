@@ -30,7 +30,7 @@ export function addSSEClient(userId: string, res: Response): string {
  * Remove um cliente SSE
  */
 function removeSSEClient(clientId: string) {
-  const index = clients.findIndex((c) => c.id === clientId);
+  const index = clients.findIndex(c => c.id === clientId);
   if (index !== -1) {
     clients.splice(index, 1);
   }
@@ -40,8 +40,8 @@ function removeSSEClient(clientId: string) {
  * Envia evento SSE para um usuário específico
  */
 export function sendSSEToUser(userId: string, event: string, data: any) {
-  const userClients = clients.filter((c) => c.userId === userId);
-  userClients.forEach((client) => {
+  const userClients = clients.filter(c => c.userId === userId);
+  userClients.forEach(client => {
     client.res.write(`event: ${event}\n`);
     client.res.write(`data: ${JSON.stringify(data)}\n\n`);
   });
@@ -51,7 +51,7 @@ export function sendSSEToUser(userId: string, event: string, data: any) {
  * Envia evento SSE para todos os clientes
  */
 export function broadcastSSE(event: string, data: any) {
-  clients.forEach((client) => {
+  clients.forEach(client => {
     client.res.write(`event: ${event}\n`);
     client.res.write(`data: ${JSON.stringify(data)}\n\n`);
   });
@@ -93,7 +93,9 @@ export async function handleSSEConnection(req: Request, res: Response) {
         .limit(10);
 
       res.write(`event: initial\n`);
-      res.write(`data: ${JSON.stringify({ notifications: userNotifications })}\n\n`);
+      res.write(
+        `data: ${JSON.stringify({ notifications: userNotifications })}\n\n`
+      );
     }
   } catch (error) {
     console.error("[SSE] Error fetching initial notifications:", error);

@@ -14,10 +14,10 @@ interface CardSkeletonProps {
  * Skeleton loader que imita a estrutura de um Card
  * Usado em dashboards e listagens
  */
-export function CardSkeleton({ 
-  count = 1, 
+export function CardSkeleton({
+  count = 1,
   showHeader = true,
-  contentHeight = "h-24"
+  contentHeight = "h-24",
 }: CardSkeletonProps) {
   return (
     <>

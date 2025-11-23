@@ -9,7 +9,7 @@ Sistema de enriquecimento sequencial em 5 etapas usando **apenas Gemini LLM**, p
 ## 🔄 Fluxo Sequencial
 
 ```
-CLIENTES (801) 
+CLIENTES (801)
     ↓ Etapa 1: Enriquecimento
 CLIENTES ENRIQUECIDOS (801)
     ↓ Etapa 2: Identificação
@@ -27,9 +27,11 @@ LEADS B2B/B2C/B2B2C (P)
 ## 📊 Etapa 1: Enriquecimento de Clientes
 
 ### Objetivo
+
 Preencher campos vazios da tabela `clientes` usando dados existentes (nome, CNPJ, produtoPrincipal).
 
 ### Input
+
 ```json
 {
   "nome": "Empresa XYZ Ltda",
@@ -39,6 +41,7 @@ Preencher campos vazios da tabela `clientes` usando dados existentes (nome, CNPJ
 ```
 
 ### Prompt Gemini
+
 ```
 Você é um especialista em inteligência de mercado B2B brasileiro.
 
@@ -65,6 +68,7 @@ Seja preciso e use dados reais. Se não encontrar, retorne null.
 ```
 
 ### Output Esperado
+
 ```json
 {
   "siteOficial": "https://empresaxyz.com.br",
@@ -81,6 +85,7 @@ Seja preciso e use dados reais. Se não encontrar, retorne null.
 ```
 
 ### Regras
+
 - ✅ Atualizar apenas campos NULL/vazios
 - ✅ Manter dados existentes intactos
 - ✅ Validar formato de email, telefone, URLs
@@ -91,9 +96,11 @@ Seja preciso e use dados reais. Se não encontrar, retorne null.
 ## 📊 Etapa 2: Identificação de Mercados
 
 ### Objetivo
+
 Identificar todos os mercados em que o cliente atua e criar registros únicos na tabela `mercados_unicos`.
 
 ### Input
+
 ```json
 {
   "nome": "Empresa XYZ Ltda",
@@ -104,6 +111,7 @@ Identificar todos os mercados em que o cliente atua e criar registros únicos na
 ```
 
 ### Prompt Gemini
+
 ```
 Você é um especialista em segmentação de mercado B2B brasileiro.
 
@@ -130,6 +138,7 @@ Seja específico e baseado em dados reais do mercado brasileiro.
 ```
 
 ### Output Esperado
+
 ```json
 [
   {
@@ -154,6 +163,7 @@ Seja específico e baseado em dados reais do mercado brasileiro.
 ```
 
 ### Regras de Unicidade
+
 - ✅ Hash: `nome-projectId` (normalizado, lowercase, sem caracteres especiais)
 - ✅ Verificar se mercado já existe antes de inserir
 - ✅ Se existir, reusar ID do mercado existente
@@ -165,22 +175,25 @@ Seja específico e baseado em dados reais do mercado brasileiro.
 ## 📊 Etapa 3: Criação de Produtos
 
 ### Objetivo
+
 Mapear produtos específicos que o cliente oferece para cada mercado, criando chave única `cliente × produto × mercado`.
 
 ### Input
+
 ```json
 {
   "clienteId": 1,
   "clienteNome": "Empresa XYZ Ltda",
   "produtoPrincipal": "Embalagens plásticas",
   "mercados": [
-    {"id": 10, "nome": "Embalagens Plásticas para Alimentos"},
-    {"id": 11, "nome": "Embalagens para Cosméticos"}
+    { "id": 10, "nome": "Embalagens Plásticas para Alimentos" },
+    { "id": 11, "nome": "Embalagens para Cosméticos" }
   ]
 }
 ```
 
 ### Prompt Gemini
+
 ```
 Você é um especialista em catálogo de produtos B2B.
 
@@ -205,6 +218,7 @@ Seja específico e técnico. Produtos devem ser reais e comercializados no Brasi
 ```
 
 ### Output Esperado
+
 ```json
 [
   {
@@ -235,6 +249,7 @@ Seja específico e técnico. Produtos devem ser reais e comercializados no Brasi
 ```
 
 ### Regras de Unicidade
+
 - ✅ Chave única: `clienteId + mercadoId + nome` (normalizado)
 - ✅ Verificar se produto já existe antes de inserir
 - ✅ Um cliente pode ter múltiplos produtos no mesmo mercado
@@ -245,9 +260,11 @@ Seja específico e técnico. Produtos devem ser reais e comercializados no Brasi
 ## 📊 Etapa 4: Busca de Concorrentes
 
 ### Objetivo
+
 Identificar empresas concorrentes que atuam com os mesmos produtos e mercados, criando registros únicos na tabela `concorrentes`.
 
 ### Input
+
 ```json
 {
   "produtos": [
@@ -269,6 +286,7 @@ Identificar empresas concorrentes que atuam com os mesmos produtos e mercados, c
 ```
 
 ### Prompt Gemini
+
 ```
 Você é um especialista em mapeamento competitivo B2B brasileiro.
 
@@ -300,34 +318,36 @@ Seja preciso e use dados reais do mercado brasileiro.
 ```
 
 ### Output Esperado
+
 ```json
 [
   {
-  "mercadoId": 10,
-  "nome": "Plasútil Embalagens Ltda",
-  "cnpj": "98.765.432/0001-10",
-  "site": "https://plasutil.com.br",
-  "produto": "Potes plásticos, tampas, embalagens para alimentos",
-  "cidade": "São Paulo",
-  "uf": "SP",
-  "porte": "Média",
-  "faturamentoEstimado": "R$ 50-100 milhões/ano"
+    "mercadoId": 10,
+    "nome": "Plasútil Embalagens Ltda",
+    "cnpj": "98.765.432/0001-10",
+    "site": "https://plasutil.com.br",
+    "produto": "Potes plásticos, tampas, embalagens para alimentos",
+    "cidade": "São Paulo",
+    "uf": "SP",
+    "porte": "Média",
+    "faturamentoEstimado": "R$ 50-100 milhões/ano"
   },
   {
-  "mercadoId": 10,
-  "nome": "Embraplas Indústria de Plásticos",
-  "cnpj": "87.654.321/0001-20",
-  "site": "https://embraplas.com.br",
-  "produto": "Filmes plásticos, embalagens flexíveis, stretch",
-  "cidade": "Campinas",
-  "uf": "SP",
-  "porte": "Grande",
-  "faturamentoEstimado": "R$ 200-500 milhões/ano"
+    "mercadoId": 10,
+    "nome": "Embraplas Indústria de Plásticos",
+    "cnpj": "87.654.321/0001-20",
+    "site": "https://embraplas.com.br",
+    "produto": "Filmes plásticos, embalagens flexíveis, stretch",
+    "cidade": "Campinas",
+    "uf": "SP",
+    "porte": "Grande",
+    "faturamentoEstimado": "R$ 200-500 milhões/ano"
   }
 ]
 ```
 
 ### Regras de Unicidade
+
 - ✅ Hash: `nome-mercadoId` (normalizado)
 - ✅ Verificar se concorrente já existe antes de inserir
 - ✅ Um concorrente pode atuar em múltiplos mercados (registros separados)
@@ -336,10 +356,11 @@ Seja preciso e use dados reais do mercado brasileiro.
 - ✅ Calcular qualidadeScore baseado em campos preenchidos
 
 ### Validação Cruzada
+
 ```sql
 -- Antes de inserir concorrente, verificar:
-SELECT COUNT(*) FROM clientes 
-WHERE LOWER(nome) = LOWER('{nome_concorrente}') 
+SELECT COUNT(*) FROM clientes
+WHERE LOWER(nome) = LOWER('{nome_concorrente}')
    OR cnpj = '{cnpj_concorrente}';
 
 -- Se COUNT > 0, DESCARTAR o concorrente
@@ -350,9 +371,11 @@ WHERE LOWER(nome) = LOWER('{nome_concorrente}')
 ## 📊 Etapa 5: Busca de Leads (Busca Semântica)
 
 ### Objetivo
+
 Identificar empresas que são **potenciais compradores** dos produtos oferecidos por clientes e concorrentes (B2B, B2C ou B2B2C).
 
 ### Input
+
 ```json
 {
   "produtos": [
@@ -373,6 +396,7 @@ Identificar empresas que são **potenciais compradores** dos produtos oferecidos
 ```
 
 ### Prompt Gemini
+
 ```
 Você é um especialista em prospecção de leads B2B/B2C brasileiro.
 
@@ -416,54 +440,56 @@ Seja preciso e use dados reais do mercado brasileiro.
 ```
 
 ### Output Esperado
+
 ```json
 [
   {
-  "mercadoId": 10,
-  "nome": "Laticínios Bom Gosto Ltda",
-  "cnpj": "76.543.210/0001-30",
-  "site": "https://bomgosto.com.br",
-  "email": "compras@bomgosto.com.br",
-  "telefone": "(11) 4567-8901",
-  "tipo": "Cliente Potencial",
-  "cidade": "São Paulo",
-  "uf": "SP",
-  "porte": "Média",
-  "regiao": "Sudeste",
-  "setor": "Alimentos e Bebidas - Laticínios"
+    "mercadoId": 10,
+    "nome": "Laticínios Bom Gosto Ltda",
+    "cnpj": "76.543.210/0001-30",
+    "site": "https://bomgosto.com.br",
+    "email": "compras@bomgosto.com.br",
+    "telefone": "(11) 4567-8901",
+    "tipo": "Cliente Potencial",
+    "cidade": "São Paulo",
+    "uf": "SP",
+    "porte": "Média",
+    "regiao": "Sudeste",
+    "setor": "Alimentos e Bebidas - Laticínios"
   },
   {
-  "mercadoId": 10,
-  "nome": "Rede de Supermercados Super Preço",
-  "cnpj": "65.432.109/0001-40",
-  "site": "https://superpreco.com.br",
-  "email": "fornecedores@superpreco.com.br",
-  "telefone": "(21) 3456-7890",
-  "tipo": "Distribuidor",
-  "cidade": "Rio de Janeiro",
-  "uf": "RJ",
-  "porte": "Grande",
-  "regiao": "Sudeste",
-  "setor": "Varejo - Supermercados"
+    "mercadoId": 10,
+    "nome": "Rede de Supermercados Super Preço",
+    "cnpj": "65.432.109/0001-40",
+    "site": "https://superpreco.com.br",
+    "email": "fornecedores@superpreco.com.br",
+    "telefone": "(21) 3456-7890",
+    "tipo": "Distribuidor",
+    "cidade": "Rio de Janeiro",
+    "uf": "RJ",
+    "porte": "Grande",
+    "regiao": "Sudeste",
+    "setor": "Varejo - Supermercados"
   },
   {
-  "mercadoId": 10,
-  "nome": "Doceria Artesanal Doce Sabor",
-  "cnpj": null,
-  "site": "https://docesabor.com.br",
-  "email": "contato@docesabor.com.br",
-  "telefone": "(11) 98765-4321",
-  "tipo": "Cliente Potencial",
-  "cidade": "São Paulo",
-  "uf": "SP",
-  "porte": "Pequena",
-  "regiao": "Sudeste",
-  "setor": "Alimentos e Bebidas - Confeitaria"
+    "mercadoId": 10,
+    "nome": "Doceria Artesanal Doce Sabor",
+    "cnpj": null,
+    "site": "https://docesabor.com.br",
+    "email": "contato@docesabor.com.br",
+    "telefone": "(11) 98765-4321",
+    "tipo": "Cliente Potencial",
+    "cidade": "São Paulo",
+    "uf": "SP",
+    "porte": "Pequena",
+    "regiao": "Sudeste",
+    "setor": "Alimentos e Bebidas - Confeitaria"
   }
 ]
 ```
 
 ### Regras de Unicidade
+
 - ✅ Hash: `nome-mercadoId` (normalizado)
 - ✅ Verificar se lead já existe antes de inserir
 - ✅ Um lead pode atuar em múltiplos mercados (registros separados)
@@ -472,6 +498,7 @@ Seja preciso e use dados reais do mercado brasileiro.
 - ✅ Calcular qualidadeScore baseado em campos preenchidos
 
 ### Validação Cruzada
+
 ```sql
 -- Antes de inserir lead, verificar:
 SELECT COUNT(*) FROM (
@@ -479,7 +506,7 @@ SELECT COUNT(*) FROM (
   UNION ALL
   SELECT nome, cnpj FROM concorrentes
 ) AS combined
-WHERE LOWER(nome) = LOWER('{nome_lead}') 
+WHERE LOWER(nome) = LOWER('{nome_lead}')
    OR (cnpj IS NOT NULL AND cnpj = '{cnpj_lead}');
 
 -- Se COUNT > 0, DESCARTAR o lead
@@ -490,6 +517,7 @@ WHERE LOWER(nome) = LOWER('{nome_lead}')
 ## 🎯 Sistema de Controle e Checkpoint
 
 ### Controle de Execução
+
 ```json
 {
   "enrichmentRunId": 1,
@@ -505,12 +533,14 @@ WHERE LOWER(nome) = LOWER('{nome_lead}')
 ```
 
 ### Checkpoint Entre Etapas
+
 - ✅ Salvar progresso após cada cliente processado
 - ✅ Permitir pausar/retomar em qualquer etapa
 - ✅ Rollback automático em caso de erro crítico
 - ✅ Notificações a cada 25% de progresso (200 clientes)
 
 ### Logs Detalhados
+
 ```json
 {
   "timestamp": "2025-11-19T16:35:22Z",
@@ -531,6 +561,7 @@ WHERE LOWER(nome) = LOWER('{nome_lead}')
 ## 📈 Métricas de Qualidade
 
 ### Score de Qualidade (0-100)
+
 ```javascript
 function calculateQualityScore(entity) {
   const weights = {
@@ -544,14 +575,14 @@ function calculateQualityScore(entity) {
     uf: 5,
     cnae: 10,
     porte: 10,
-    
+
     // Concorrentes
     cnpj: 25,
     site: 20,
     produto: 15,
     porte: 15,
     faturamentoEstimado: 25,
-    
+
     // Leads
     cnpj: 20,
     email: 20,
@@ -559,12 +590,12 @@ function calculateQualityScore(entity) {
     site: 15,
     tipo: 10,
     porte: 10,
-    setor: 10
+    setor: 10,
   };
-  
+
   let score = 0;
   for (const field in weights) {
-    if (entity[field] && entity[field] !== null && entity[field] !== '') {
+    if (entity[field] && entity[field] !== null && entity[field] !== "") {
       score += weights[field];
     }
   }
@@ -573,6 +604,7 @@ function calculateQualityScore(entity) {
 ```
 
 ### Classificação
+
 - **90-100**: Excelente (dados completos e validados)
 - **70-89**: Bom (maioria dos campos preenchidos)
 - **50-69**: Regular (campos essenciais preenchidos)
@@ -583,6 +615,7 @@ function calculateQualityScore(entity) {
 ## 🚀 Resumo de Execução
 
 ### Ordem de Processamento
+
 1. **Etapa 1**: Enriquecer 801 clientes (preencher campos vazios)
 2. **Etapa 2**: Identificar mercados únicos (1-5 por cliente → ~1.000-2.000 mercados)
 3. **Etapa 3**: Criar produtos (2-5 por mercado → ~3.000-8.000 produtos)
@@ -590,6 +623,7 @@ function calculateQualityScore(entity) {
 5. **Etapa 5**: Buscar leads (15-20 por produto → ~15.000-30.000 leads únicos)
 
 ### Tempo Estimado
+
 - **Etapa 1**: ~2-3 horas (801 clientes × 10-15s/cliente)
 - **Etapa 2**: ~2-3 horas (801 clientes × 10-15s/cliente)
 - **Etapa 3**: ~3-4 horas (2.000 mercados × 5-8s/mercado)
@@ -599,6 +633,7 @@ function calculateQualityScore(entity) {
 **Total**: ~21-28 horas de processamento contínuo
 
 ### Custos Estimados (Gemini API)
+
 - **Input**: ~50M tokens (prompts + contexto)
 - **Output**: ~30M tokens (respostas JSON)
 - **Total**: ~80M tokens × $0.00015/1k tokens = **~$12 USD**
@@ -608,6 +643,7 @@ function calculateQualityScore(entity) {
 ## ✅ Validações Finais
 
 ### Antes de Aprovar
+
 - [ ] Prompts Gemini estão claros e específicos?
 - [ ] Regras de unicidade estão bem definidas?
 - [ ] Validações cruzadas (cliente ≠ concorrente ≠ lead) estão corretas?
@@ -616,6 +652,7 @@ function calculateQualityScore(entity) {
 - [ ] Tempo e custo estimados são aceitáveis?
 
 ### Ajustes Possíveis
+
 - Quantidade de concorrentes/leads por produto
 - Campos obrigatórios vs opcionais
 - Pesos do score de qualidade

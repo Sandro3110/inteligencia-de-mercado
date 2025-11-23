@@ -3,7 +3,7 @@
  * Renderiza dados em formato Excel (XLSX)
  */
 
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 export interface ExcelOptions {
   sheetName?: string;
@@ -16,7 +16,7 @@ export class ExcelRenderer {
 
   constructor(options: ExcelOptions = {}) {
     this.options = {
-      sheetName: options.sheetName || 'Dados',
+      sheetName: options.sheetName || "Dados",
       includeHeaders: options.includeHeaders !== false,
       autoWidth: options.autoWidth !== false,
     };
@@ -31,7 +31,7 @@ export class ExcelRenderer {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet([[]]);
       XLSX.utils.book_append_sheet(wb, ws, this.options.sheetName);
-      return Buffer.from(XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' }));
+      return Buffer.from(XLSX.write(wb, { type: "buffer", bookType: "xlsx" }));
     }
 
     // Preparar dados
@@ -61,13 +61,13 @@ export class ExcelRenderer {
         );
         return { wch: Math.min(maxLength + 2, 50) };
       });
-      ws['!cols'] = colWidths;
+      ws["!cols"] = colWidths;
     }
 
     XLSX.utils.book_append_sheet(wb, ws, this.options.sheetName);
 
     // Retornar buffer
-    return Buffer.from(XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' }));
+    return Buffer.from(XLSX.write(wb, { type: "buffer", bookType: "xlsx" }));
   }
 
   /**
@@ -75,14 +75,14 @@ export class ExcelRenderer {
    */
   private formatValue(value: any): any {
     if (value === null || value === undefined) {
-      return '';
+      return "";
     }
 
     if (value instanceof Date) {
-      return value.toISOString().split('T')[0];
+      return value.toISOString().split("T")[0];
     }
 
-    if (typeof value === 'object') {
+    if (typeof value === "object") {
       return JSON.stringify(value);
     }
 
@@ -93,13 +93,13 @@ export class ExcelRenderer {
    * Retorna o MIME type
    */
   getMimeType(): string {
-    return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
   }
 
   /**
    * Retorna a extensão do arquivo
    */
   getFileExtension(): string {
-    return 'xlsx';
+    return "xlsx";
   }
 }

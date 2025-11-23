@@ -1,14 +1,20 @@
 /**
  * Central de Exportação Unificada - Fusão de 3 páginas em 1
- * 
+ *
  * Abas disponíveis:
  * - Nova Exportação: Wizard de exportação em 4 steps
  * - Templates: Gerenciamento de templates de exportação
  * - Histórico: Exportações anteriores
  */
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -58,14 +64,14 @@ import Step3Fields from "@/components/export/Step3Fields";
 import Step4Output from "@/components/export/Step4Output";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import DashboardLayout from '@/components/DashboardLayout';
+import DashboardLayout from "@/components/DashboardLayout";
 
 export interface ExportState {
   // Step 1: Contexto
   context: string;
-  entityType: 'mercados' | 'clientes' | 'concorrentes' | 'leads' | 'produtos';
+  entityType: "mercados" | "clientes" | "concorrentes" | "leads" | "produtos";
   projectId?: string;
-  
+
   // Step 2: Filtros
   filters: {
     geography?: {
@@ -92,33 +98,33 @@ export interface ExportState {
       updatedWithin?: number;
     };
   };
-  
+
   // Step 3: Campos
   selectedFields: string[];
   includeRelationships: boolean;
-  
+
   // Step 4: Saída
-  format: 'csv' | 'excel' | 'pdf' | 'json';
-  outputType: 'simple' | 'complete' | 'report';
-  templateType?: 'market' | 'client' | 'competitive' | 'lead';
+  format: "csv" | "excel" | "pdf" | "json";
+  outputType: "simple" | "complete" | "report";
+  templateType?: "market" | "client" | "competitive" | "lead";
   title: string;
 }
 
 export default function ExportWizard() {
-  const [activeTab, setActiveTab] = useState('export');
+  const [activeTab, setActiveTab] = useState("export");
 
   // Estados do Wizard
   const [currentStep, setCurrentStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [exportState, setExportState] = useState<ExportState>({
-    context: '',
-    entityType: 'clientes',
+    context: "",
+    entityType: "clientes",
     filters: {},
     selectedFields: [],
     includeRelationships: false,
-    format: 'csv',
-    outputType: 'simple',
-    title: 'Exportação'
+    format: "csv",
+    outputType: "simple",
+    title: "Exportação",
   });
 
   // Estados do Templates
@@ -138,10 +144,17 @@ export default function ExportWizard() {
   const renderMutation = trpc.export.renderOutput.useMutation();
 
   // Queries do Histórico
-  const { data: historyData, isLoading: historyLoading, refetch: refetchHistory } = trpc.export.listHistory.useQuery({
-    limit: pageSize,
-    offset: page * pageSize,
-  }, { enabled: activeTab === 'history' });
+  const {
+    data: historyData,
+    isLoading: historyLoading,
+    refetch: refetchHistory,
+  } = trpc.export.listHistory.useQuery(
+    {
+      limit: pageSize,
+      offset: page * pageSize,
+    },
+    { enabled: activeTab === "history" }
+  );
 
   const deleteHistoryMutation = trpc.export.deleteHistory.useMutation({
     onSuccess: () => {
@@ -149,16 +162,16 @@ export default function ExportWizard() {
       refetchHistory();
       setDeleteId(null);
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao deletar: ${error.message}`);
     },
   });
 
   const steps = [
-    { id: 1, title: 'Contexto', description: 'Defina o que deseja exportar' },
-    { id: 2, title: 'Filtros', description: 'Refine os critérios' },
-    { id: 3, title: 'Campos', description: 'Selecione os dados' },
-    { id: 4, title: 'Saída', description: 'Configure o formato' },
+    { id: 1, title: "Contexto", description: "Defina o que deseja exportar" },
+    { id: 2, title: "Filtros", description: "Refine os critérios" },
+    { id: 3, title: "Campos", description: "Selecione os dados" },
+    { id: 4, title: "Saída", description: "Configure o formato" },
   ];
 
   const handleNext = async () => {
@@ -185,20 +198,20 @@ export default function ExportWizard() {
         selectedFields: exportState.selectedFields,
         title: exportState.title,
       });
-      
+
       if (result.url) {
-        window.open(result.url, '_blank');
-        toast.success('Exportação concluída!');
+        window.open(result.url, "_blank");
+        toast.success("Exportação concluída!");
         setCurrentStep(1);
         setExportState({
-          context: '',
-          entityType: 'clientes',
+          context: "",
+          entityType: "clientes",
           filters: {},
           selectedFields: [],
           includeRelationships: false,
-          format: 'csv',
-          outputType: 'simple',
-          title: 'Exportação'
+          format: "csv",
+          outputType: "simple",
+          title: "Exportação",
         });
       }
     } catch (error: any) {
@@ -227,9 +240,9 @@ export default function ExportWizard() {
 
   const getFormatIcon = (format: string) => {
     switch (format) {
-      case 'csv':
+      case "csv":
         return <FileText className="h-4 w-4" />;
-      case 'excel':
+      case "excel":
         return <FileSpreadsheet className="h-4 w-4" />;
       default:
         return <FileIcon className="h-4 w-4" />;
@@ -238,52 +251,53 @@ export default function ExportWizard() {
 
   const getTypeColor = (type: string) => {
     const colors = {
-      market: 'bg-green-100 text-green-800',
-      client: 'bg-blue-100 text-blue-800',
-      competitive: 'bg-orange-100 text-orange-800',
-      lead: 'bg-purple-100 text-purple-800',
+      market: "bg-green-100 text-green-800",
+      client: "bg-blue-100 text-blue-800",
+      competitive: "bg-orange-100 text-orange-800",
+      lead: "bg-purple-100 text-purple-800",
     };
-    return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
 
   // Templates simulados (implementar tRPC real)
   const templates = [
     {
-      id: '1',
-      name: 'Análise de Mercado Completa',
-      description: 'Template para análise detalhada de mercados com insights estratégicos',
-      templateType: 'market',
+      id: "1",
+      name: "Análise de Mercado Completa",
+      description:
+        "Template para análise detalhada de mercados com insights estratégicos",
+      templateType: "market",
       isSystem: true,
       usageCount: 45,
-      createdAt: new Date('2025-01-01')
+      createdAt: new Date("2025-01-01"),
     },
     {
-      id: '2',
-      name: 'Relatório de Clientes',
-      description: 'Exportação de clientes com produtos e mercados associados',
-      templateType: 'client',
+      id: "2",
+      name: "Relatório de Clientes",
+      description: "Exportação de clientes com produtos e mercados associados",
+      templateType: "client",
       isSystem: false,
       usageCount: 23,
-      createdAt: new Date('2025-01-15')
+      createdAt: new Date("2025-01-15"),
     },
     {
-      id: '3',
-      name: 'Análise Competitiva',
-      description: 'Comparação de concorrentes por mercado e segmento',
-      templateType: 'competitive',
+      id: "3",
+      name: "Análise Competitiva",
+      description: "Comparação de concorrentes por mercado e segmento",
+      templateType: "competitive",
       isSystem: true,
       usageCount: 67,
-      createdAt: new Date('2025-01-10')
+      createdAt: new Date("2025-01-10"),
     },
     {
-      id: '4',
-      name: 'Leads Qualificados',
-      description: 'Exportação de leads com score alto e análise de conversão',
-      templateType: 'lead',
+      id: "4",
+      name: "Leads Qualificados",
+      description: "Exportação de leads com score alto e análise de conversão",
+      templateType: "lead",
       isSystem: false,
       usageCount: 12,
-      createdAt: new Date('2025-01-20')
-    }
+      createdAt: new Date("2025-01-20"),
+    },
   ];
 
   // Renderizar Aba de Exportação
@@ -294,21 +308,25 @@ export default function ExportWizard() {
         <CardHeader>
           <CardTitle>Progresso da Exportação</CardTitle>
           <CardDescription>
-            Passo {currentStep} de {steps.length}: {steps[currentStep - 1].title}
+            Passo {currentStep} de {steps.length}:{" "}
+            {steps[currentStep - 1].title}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Progress value={(currentStep / steps.length) * 100} className="mb-4" />
+          <Progress
+            value={(currentStep / steps.length) * 100}
+            className="mb-4"
+          />
           <div className="grid grid-cols-4 gap-4">
-            {steps.map((step) => (
+            {steps.map(step => (
               <div
                 key={step.id}
                 className={`text-center p-2 rounded ${
                   currentStep === step.id
-                    ? 'bg-primary text-primary-foreground'
+                    ? "bg-primary text-primary-foreground"
                     : currentStep > step.id
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-muted'
+                      ? "bg-green-100 text-green-800"
+                      : "bg-muted"
                 }`}
               >
                 <div className="font-semibold">{step.title}</div>
@@ -323,28 +341,16 @@ export default function ExportWizard() {
       <Card>
         <CardContent className="pt-6">
           {currentStep === 1 && (
-            <Step1Context
-              state={exportState}
-              setState={setExportState}
-            />
+            <Step1Context state={exportState} setState={setExportState} />
           )}
           {currentStep === 2 && (
-            <Step2Filters
-              state={exportState}
-              setState={setExportState}
-            />
+            <Step2Filters state={exportState} setState={setExportState} />
           )}
           {currentStep === 3 && (
-            <Step3Fields
-              state={exportState}
-              setState={setExportState}
-            />
+            <Step3Fields state={exportState} setState={setExportState} />
           )}
           {currentStep === 4 && (
-            <Step4Output
-              state={exportState}
-              setState={setExportState}
-            />
+            <Step4Output state={exportState} setState={setExportState} />
           )}
         </CardContent>
       </Card>
@@ -359,10 +365,7 @@ export default function ExportWizard() {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Voltar
         </Button>
-        <Button
-          onClick={handleNext}
-          disabled={isGenerating}
-        >
+        <Button onClick={handleNext} disabled={isGenerating}>
           {isGenerating ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -401,7 +404,7 @@ export default function ExportWizard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {templates.map((template) => (
+        {templates.map(template => (
           <Card key={template.id}>
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -424,7 +427,7 @@ export default function ExportWizard() {
             <CardContent>
               <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
                 <span>Usado {template.usageCount}x</span>
-                <span>{template.createdAt.toLocaleDateString('pt-BR')}</span>
+                <span>{template.createdAt.toLocaleDateString("pt-BR")}</span>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="flex-1">
@@ -493,7 +496,9 @@ export default function ExportWizard() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{item.format.toUpperCase()}</Badge>
+                      <Badge variant="outline">
+                        {item.format.toUpperCase()}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1 text-muted-foreground">
@@ -510,18 +515,18 @@ export default function ExportWizard() {
                     <TableCell>
                       <Badge
                         variant={
-                          item.status === 'completed'
-                            ? 'default'
-                            : item.status === 'processing'
-                            ? 'secondary'
-                            : 'destructive'
+                          item.status === "completed"
+                            ? "default"
+                            : item.status === "processing"
+                              ? "secondary"
+                              : "destructive"
                         }
                       >
-                        {item.status === 'completed'
-                          ? 'Concluído'
-                          : item.status === 'processing'
-                          ? 'Processando'
-                          : 'Erro'}
+                        {item.status === "completed"
+                          ? "Concluído"
+                          : item.status === "processing"
+                            ? "Processando"
+                            : "Erro"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -530,7 +535,9 @@ export default function ExportWizard() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => window.open(item.downloadUrl, '_blank')}
+                            onClick={() =>
+                              window.open(item.downloadUrl, "_blank")
+                            }
                           >
                             <Download className="h-4 w-4" />
                           </Button>
@@ -585,7 +592,8 @@ export default function ExportWizard() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir este histórico de exportação? Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir este histórico de exportação? Esta
+              ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

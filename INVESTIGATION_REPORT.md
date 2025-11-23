@@ -15,6 +15,7 @@ O problema **NÃO é** na API OpenAI nem na gravação no banco. Os dados **EST�
 ## 🔬 METODOLOGIA DE INVESTIGAÇÃO
 
 ### 1. Teste da API OpenAI
+
 - **Arquivo**: `test-veolia.ts`
 - **Resultado**: ✅ API retornou dados completos
   - 1 mercado: "Gestão de Resíduos Sólidos"
@@ -24,6 +25,7 @@ O problema **NÃO é** na API OpenAI nem na gravação no banco. Os dados **EST�
   - Tempo: 23.97s
 
 ### 2. Verificação do Banco de Dados
+
 - **Resultado**: ✅ Dados gravados com sucesso
   - 156 mercados
   - 1.173 produtos
@@ -31,6 +33,7 @@ O problema **NÃO é** na API OpenAI nem na gravação no banco. Os dados **EST�
   - 1.564 leads
 
 ### 3. Busca do Cliente Veolia
+
 - **Resultado**: ❌ Cliente "Veolia" não encontrado no banco
 - **Conclusão**: Cliente nunca foi criado, logo nenhum dado foi associado
 
@@ -39,6 +42,7 @@ O problema **NÃO é** na API OpenAI nem na gravação no banco. Os dados **EST�
 ## 🔴 PROBLEMA RAIZ IDENTIFICADO
 
 ### Localização do Bug
+
 **Arquivo**: `server/enrichmentFlow.ts`  
 **Função**: `enrichClientes()`  
 **Linha**: 476
@@ -47,7 +51,7 @@ O problema **NÃO é** na API OpenAI nem na gravação no banco. Os dados **EST�
 
 ```typescript
 const novoCliente = await createCliente({
-  projectId,              // ✅ Presente
+  projectId, // ✅ Presente
   nome: dadosEnriquecidos?.nome || cliente.nome,
   cnpj: cliente.cnpj || null,
   siteOficial: dadosEnriquecidos?.site || cliente.site || null,
@@ -58,7 +62,7 @@ const novoCliente = await createCliente({
   produtoPrincipal: cliente.produto || null,
   qualidadeScore,
   qualidadeClassificacao,
-  validationStatus: 'pending',
+  validationStatus: "pending",
   // ❌ FALTA: pesquisaId
 });
 ```
@@ -91,13 +95,13 @@ SELECT * FROM mercados_unicos WHERE pesquisaId = ?; -- ❌ Retorna vazio
 
 ### Estado Atual do Banco
 
-| Tabela | Total Registros | Com projectId | Com pesquisaId |
-|--------|----------------|---------------|----------------|
-| clientes | ~100 | 100 | **0** ❌ |
-| mercados_unicos | 156 | 156 | **?** |
-| produtos | 1.173 | 1.173 | **?** |
-| concorrentes | 1.564 | 1.564 | **?** |
-| leads | 1.564 | 1.564 | **?** |
+| Tabela          | Total Registros | Com projectId | Com pesquisaId |
+| --------------- | --------------- | ------------- | -------------- |
+| clientes        | ~100            | 100           | **0** ❌       |
+| mercados_unicos | 156             | 156           | **?**          |
+| produtos        | 1.173           | 1.173         | **?**          |
+| concorrentes    | 1.564           | 1.564         | **?**          |
+| leads           | 1.564           | 1.564         | **?**          |
 
 ### Projetos Cadastrados
 
@@ -153,12 +157,12 @@ Pesquisa (pesquisaId)
 
 ```typescript
 // Após criar/reusar projeto:
-const { createPesquisa } = await import('./db');
+const { createPesquisa } = await import("./db");
 const pesquisa = await createPesquisa({
   projectId: project.id,
   nome: input.projectName || `Pesquisa ${new Date().toLocaleDateString()}`,
-  descricao: 'Pesquisa criada automaticamente via fluxo de enriquecimento',
-  status: 'em_andamento',
+  descricao: "Pesquisa criada automaticamente via fluxo de enriquecimento",
+  status: "em_andamento",
 });
 
 // Passar pesquisaId para todas as funções:
@@ -171,11 +175,13 @@ const clientesEnriquecidos = await enrichClientes(
 ```
 
 **Vantagens**:
+
 - ✅ Mantém hierarquia correta
 - ✅ Compatível com sistema existente
 - ✅ Permite múltiplas pesquisas por projeto
 
 **Desvantagens**:
+
 - ⚠️ Requer modificação em várias funções
 
 ---
@@ -186,25 +192,29 @@ const clientesEnriquecidos = await enrichClientes(
 
 ```typescript
 // Antes:
-const mercados = await db.select()
+const mercados = await db
+  .select()
   .from(mercadosUnicos)
   .where(eq(mercadosUnicos.pesquisaId, pesquisaId));
 
 // Depois:
-const mercados = await db.select()
+const mercados = await db
+  .select()
   .from(mercadosUnicos)
   .where(
-    pesquisaId 
+    pesquisaId
       ? eq(mercadosUnicos.pesquisaId, pesquisaId)
       : eq(mercadosUnicos.projectId, projectId)
   );
 ```
 
 **Vantagens**:
+
 - ✅ Correção rápida
 - ✅ Mostra dados existentes imediatamente
 
 **Desvantagens**:
+
 - ❌ Quebra hierarquia Projeto → Pesquisa
 - ❌ Mistura dados de diferentes pesquisas
 

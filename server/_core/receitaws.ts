@@ -41,7 +41,7 @@ export interface ReceitaWSResponse {
  * Normaliza CNPJ removendo caracteres não numéricos
  */
 export function normalizeCNPJ(cnpj: string): string {
-  return cnpj.replace(/\D/g, '');
+  return cnpj.replace(/\D/g, "");
 }
 
 /**
@@ -58,69 +58,72 @@ export function isValidCNPJ(cnpj: string): boolean {
 export function formatCNPJ(cnpj: string): string {
   const normalized = normalizeCNPJ(cnpj);
   if (normalized.length !== 14) return cnpj;
-  
+
   return normalized.replace(
     /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
-    '$1.$2.$3/$4-$5'
+    "$1.$2.$3/$4-$5"
   );
 }
 
 /**
  * Consulta dados de CNPJ na ReceitaWS
- * 
+ *
  * Rate limits:
  * - 3 requisições por minuto
  * - Recomendado: usar cache para evitar consultas repetidas
- * 
+ *
  * @param cnpj CNPJ com ou sem formatação
  * @returns Dados da empresa ou null se não encontrado
  */
-export async function consultarCNPJ(cnpj: string): Promise<ReceitaWSResponse | null> {
+export async function consultarCNPJ(
+  cnpj: string
+): Promise<ReceitaWSResponse | null> {
   const normalized = normalizeCNPJ(cnpj);
-  
+
   if (!isValidCNPJ(normalized)) {
     console.log(`[ReceitaWS] CNPJ inválido: ${cnpj}`);
     return null;
   }
-  
+
   const url = `https://receitaws.com.br/v1/cnpj/${normalized}`;
-  
+
   try {
     console.log(`[ReceitaWS] Consultando CNPJ: ${formatCNPJ(normalized)}`);
-    
+
     const response = await fetch(url, {
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
     });
-    
+
     if (!response.ok) {
       if (response.status === 429) {
-        console.warn('[ReceitaWS] Rate limit excedido (3 req/min)');
+        console.warn("[ReceitaWS] Rate limit excedido (3 req/min)");
         return null;
       }
-      
+
       if (response.status === 404) {
-        console.log(`[ReceitaWS] CNPJ não encontrado: ${formatCNPJ(normalized)}`);
+        console.log(
+          `[ReceitaWS] CNPJ não encontrado: ${formatCNPJ(normalized)}`
+        );
         return null;
       }
-      
+
       console.error(`[ReceitaWS] Erro HTTP ${response.status}`);
       return null;
     }
-    
+
     const data: ReceitaWSResponse = await response.json();
-    
-    if (data.status === 'ERROR') {
+
+    if (data.status === "ERROR") {
       console.log(`[ReceitaWS] Erro na consulta: ${data.message}`);
       return null;
     }
-    
+
     console.log(`[ReceitaWS] Dados encontrados: ${data.nome}`);
     return data;
-    
   } catch (error) {
-    console.error('[ReceitaWS] Erro na requisição:', error);
+    console.error("[ReceitaWS] Erro na requisição:", error);
     return null;
   }
 }
@@ -131,12 +134,12 @@ export async function consultarCNPJ(cnpj: string): Promise<ReceitaWSResponse | n
 export function extractPorte(data: ReceitaWSResponse): string {
   // ReceitaWS retorna: "DEMAIS", "ME", "EPP", etc.
   const porteMap: Record<string, string> = {
-    'ME': 'Microempresa',
-    'EPP': 'Pequena',
-    'DEMAIS': 'Média/Grande',
+    ME: "Microempresa",
+    EPP: "Pequena",
+    DEMAIS: "Média/Grande",
   };
-  
-  return porteMap[data.porte] || data.porte || 'Desconhecido';
+
+  return porteMap[data.porte] || data.porte || "Desconhecido";
 }
 
 /**
@@ -152,8 +155,8 @@ export function extractEndereco(data: ReceitaWSResponse): string {
     data.uf,
     data.cep,
   ].filter(Boolean);
-  
-  return parts.join(', ');
+
+  return parts.join(", ");
 }
 
 /**
@@ -164,5 +167,5 @@ export function extractCNAE(data: ReceitaWSResponse): string {
     const cnae = data.atividade_principal[0];
     return `${cnae.code} - ${cnae.text}`;
   }
-  return '';
+  return "";
 }

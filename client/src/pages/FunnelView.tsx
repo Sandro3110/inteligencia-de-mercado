@@ -3,7 +3,13 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { TrendingDown, TrendingUp } from "lucide-react";
-import { FunnelChart, Funnel, LabelList, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  FunnelChart,
+  Funnel,
+  LabelList,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 export default function FunnelView() {
@@ -73,33 +79,49 @@ export default function FunnelView() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Funil de Vendas</h1>
-          <p className="text-slate-600 mt-1">Visualize o fluxo de leads através dos estágios</p>
+          <p className="text-slate-600 mt-1">
+            Visualize o fluxo de leads através dos estágios
+          </p>
         </div>
 
         {/* Métrica Total */}
         <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-slate-900">Total de Leads no Funil</CardTitle>
+            <CardTitle className="text-slate-900">
+              Total de Leads no Funil
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold text-slate-900">{funnelData.totalLeads}</div>
+            <div className="text-4xl font-bold text-slate-900">
+              {funnelData.totalLeads}
+            </div>
           </CardContent>
         </Card>
 
         {/* Gráfico de Funil */}
         <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-slate-900">Visualização do Funil</CardTitle>
+            <CardTitle className="text-slate-900">
+              Visualização do Funil
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={400}>
               <FunnelChart>
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#1e293b", border: "1px solid #334155" }}
+                  contentStyle={{
+                    backgroundColor: "#1e293b",
+                    border: "1px solid #334155",
+                  }}
                   labelStyle={{ color: "#f1f5f9" }}
                 />
                 <Funnel dataKey="value" data={chartData} isAnimationActive>
-                  <LabelList position="right" fill="#fff" stroke="none" dataKey="name" />
+                  <LabelList
+                    position="right"
+                    fill="#fff"
+                    stroke="none"
+                    dataKey="name"
+                  />
                 </Funnel>
               </FunnelChart>
             </ResponsiveContainer>
@@ -109,17 +131,26 @@ export default function FunnelView() {
         {/* Taxas de Conversão */}
         <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-slate-900">Taxas de Conversão Entre Estágios</CardTitle>
+            <CardTitle className="text-slate-900">
+              Taxas de Conversão Entre Estágios
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {funnelData.conversionRates.map((rate: any, index: number) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg"
+                >
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-slate-300">{getStageName(rate.from)}</span>
+                      <span className="text-slate-300">
+                        {getStageName(rate.from)}
+                      </span>
                       <span className="text-slate-500">→</span>
-                      <span className="text-slate-300">{getStageName(rate.to)}</span>
+                      <span className="text-slate-300">
+                        {getStageName(rate.to)}
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -128,7 +159,9 @@ export default function FunnelView() {
                     ) : (
                       <TrendingDown className="w-4 h-4 text-red-500" />
                     )}
-                    <span className={`text-lg font-bold ${rate.rate >= 50 ? 'text-green-400' : 'text-red-400'}`}>
+                    <span
+                      className={`text-lg font-bold ${rate.rate >= 50 ? "text-green-400" : "text-red-400"}`}
+                    >
                       {rate.rate}%
                     </span>
                   </div>
@@ -141,14 +174,23 @@ export default function FunnelView() {
         {/* Detalhamento por Estágio */}
         <Card className="bg-white border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-slate-900">Detalhamento por Estágio</CardTitle>
+            <CardTitle className="text-slate-900">
+              Detalhamento por Estágio
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {funnelData.funnelData.map((item: any) => (
-                <div key={item.stage} className="p-4 bg-slate-800/50 rounded-lg text-center">
-                  <div className="text-sm text-slate-400 mb-2">{getStageName(item.stage)}</div>
-                  <div className="text-2xl font-bold text-slate-900">{item.count}</div>
+                <div
+                  key={item.stage}
+                  className="p-4 bg-slate-800/50 rounded-lg text-center"
+                >
+                  <div className="text-sm text-slate-400 mb-2">
+                    {getStageName(item.stage)}
+                  </div>
+                  <div className="text-2xl font-bold text-slate-900">
+                    {item.count}
+                  </div>
                   <div
                     className="mt-2 h-2 rounded-full"
                     style={{ backgroundColor: getStageColor(item.stage) }}

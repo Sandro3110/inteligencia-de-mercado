@@ -3,9 +3,9 @@
  * Item 10 do módulo de exportação inteligente
  */
 
-import { useState, useEffect, useRef } from 'react';
-import { Search, Building2, Users, Target, TrendingUp } from 'lucide-react';
-import { trpc } from '@/lib/trpc';
+import { useState, useEffect, useRef } from "react";
+import { Search, Building2, Users, Target, TrendingUp } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 interface SmartAutocompleteProps {
   value: string;
@@ -15,12 +15,16 @@ interface SmartAutocompleteProps {
 
 interface Suggestion {
   text: string;
-  type: 'mercado' | 'cliente' | 'concorrente' | 'lead';
+  type: "mercado" | "cliente" | "concorrente" | "lead";
   icon: any;
   color: string;
 }
 
-export function SmartAutocomplete({ value, onChange, projectId }: SmartAutocompleteProps) {
+export function SmartAutocomplete({
+  value,
+  onChange,
+  projectId,
+}: SmartAutocompleteProps) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -46,30 +50,30 @@ export function SmartAutocomplete({ value, onChange, projectId }: SmartAutocompl
     const results: Suggestion[] = [];
 
     // Simulação - em produção, usar tRPC query real
-    if (query.toLowerCase().includes('embalagem')) {
+    if (query.toLowerCase().includes("embalagem")) {
       results.push({
-        text: 'Embalagens Plásticas para Indústria Alimentícia',
-        type: 'mercado',
+        text: "Embalagens Plásticas para Indústria Alimentícia",
+        type: "mercado",
         icon: Target,
-        color: 'text-green-600'
+        color: "text-green-600",
       });
     }
 
-    if (query.toLowerCase().includes('cliente')) {
+    if (query.toLowerCase().includes("cliente")) {
       results.push({
-        text: 'Clientes validados no mercado de Embalagens',
-        type: 'cliente',
+        text: "Clientes validados no mercado de Embalagens",
+        type: "cliente",
         icon: Users,
-        color: 'text-blue-600'
+        color: "text-blue-600",
       });
     }
 
-    if (query.toLowerCase().includes('lead')) {
+    if (query.toLowerCase().includes("lead")) {
       results.push({
-        text: 'Leads qualificados (score > 70)',
-        type: 'lead',
+        text: "Leads qualificados (score > 70)",
+        type: "lead",
         icon: TrendingUp,
-        color: 'text-orange-600'
+        color: "text-orange-600",
       });
     }
 
@@ -81,25 +85,25 @@ export function SmartAutocomplete({ value, onChange, projectId }: SmartAutocompl
     if (!showDropdown) return;
 
     switch (e.key) {
-      case 'ArrowDown':
+      case "ArrowDown":
         e.preventDefault();
-        setSelectedIndex(prev => 
+        setSelectedIndex(prev =>
           prev < suggestions.length - 1 ? prev + 1 : 0
         );
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
-        setSelectedIndex(prev => 
+        setSelectedIndex(prev =>
           prev > 0 ? prev - 1 : suggestions.length - 1
         );
         break;
-      case 'Enter':
+      case "Enter":
         e.preventDefault();
         if (suggestions[selectedIndex]) {
           selectSuggestion(suggestions[selectedIndex]);
         }
         break;
-      case 'Escape':
+      case "Escape":
         setShowDropdown(false);
         break;
     }
@@ -120,7 +124,7 @@ export function SmartAutocomplete({ value, onChange, projectId }: SmartAutocompl
           ref={inputRef}
           type="text"
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={e => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => suggestions.length > 0 && setShowDropdown(true)}
           onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
@@ -139,7 +143,7 @@ export function SmartAutocomplete({ value, onChange, projectId }: SmartAutocompl
                 key={index}
                 onClick={() => selectSuggestion(suggestion)}
                 className={`w-full px-4 py-3 text-left flex items-start gap-3 hover:bg-slate-50 transition-colors ${
-                  index === selectedIndex ? 'bg-blue-50' : ''
+                  index === selectedIndex ? "bg-blue-50" : ""
                 }`}
               >
                 <Icon className={`w-4 h-4 mt-0.5 ${suggestion.color}`} />

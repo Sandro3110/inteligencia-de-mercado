@@ -92,7 +92,7 @@ export function addToSearchHistory(query: string) {
     let history: string[] = stored ? JSON.parse(stored) : [];
 
     // Remove duplicatas
-    history = history.filter((q) => q !== query);
+    history = history.filter(q => q !== query);
 
     // Adiciona no início
     history.unshift(query);

@@ -116,7 +116,7 @@ trpc.push.getPublicKey.useQuery();
 // Subscrever push
 trpc.push.subscribe.useMutation({
   endpoint: string,
-  keys: { p256dh: string, auth: string }
+  keys: { p256dh: string, auth: string },
 });
 
 // Remover subscrição

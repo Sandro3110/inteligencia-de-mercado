@@ -4,7 +4,13 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, Save, MapPin, Key } from "lucide-react";
 
@@ -14,12 +20,10 @@ export default function SystemSettings() {
   const [isSaving, setIsSaving] = useState(false);
 
   // Query para buscar API Key atual
-  const { data: currentSettings, isLoading } = trpc.settings.getGoogleMapsApiKey.useQuery(
-    undefined,
-    {
+  const { data: currentSettings, isLoading } =
+    trpc.settings.getGoogleMapsApiKey.useQuery(undefined, {
       enabled: isAuthenticated,
-    }
-  );
+    });
 
   // Atualizar estado quando dados chegarem
   useEffect(() => {
@@ -34,7 +38,7 @@ export default function SystemSettings() {
       toast.success("Configurações salvas com sucesso!");
       setIsSaving(false);
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao salvar: ${error.message}`);
       setIsSaving(false);
     },
@@ -65,7 +69,8 @@ export default function SystemSettings() {
           <CardHeader>
             <CardTitle>Acesso Negado</CardTitle>
             <CardDescription>
-              Você precisa estar autenticado para acessar as configurações do sistema.
+              Você precisa estar autenticado para acessar as configurações do
+              sistema.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -90,12 +95,16 @@ export default function SystemSettings() {
             <CardTitle>Google Maps API</CardTitle>
           </div>
           <CardDescription>
-            Configure a API Key do Google Maps para habilitar geocodificação e visualização de mapas
+            Configure a API Key do Google Maps para habilitar geocodificação e
+            visualização de mapas
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="googleMapsApiKey" className="flex items-center gap-2">
+            <Label
+              htmlFor="googleMapsApiKey"
+              className="flex items-center gap-2"
+            >
               <Key className="h-4 w-4" />
               API Key
             </Label>
@@ -104,7 +113,7 @@ export default function SystemSettings() {
               type="text"
               placeholder="AIzaSy..."
               value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
+              onChange={e => setApiKey(e.target.value)}
               className="font-mono"
             />
             <p className="text-sm text-muted-foreground">

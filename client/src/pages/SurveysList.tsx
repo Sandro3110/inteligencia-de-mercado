@@ -86,13 +86,15 @@ const statusConfig = {
 
 export default function SurveysList() {
   const [, navigate] = useLocation();
-  
+
   // Pegar projectId da URL se existir
   const urlParams = new URLSearchParams(window.location.search);
-  const projectIdFromUrl = urlParams.get('projectId');
-  
+  const projectIdFromUrl = urlParams.get("projectId");
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProject, setSelectedProject] = useState<string>(projectIdFromUrl || "all");
+  const [selectedProject, setSelectedProject] = useState<string>(
+    projectIdFromUrl || "all"
+  );
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [sortField, setSortField] = useState<SortField>("dataImportacao");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
@@ -100,8 +102,10 @@ export default function SurveysList() {
   const [surveyToDelete, setSurveyToDelete] = useState<number | null>(null);
 
   // Queries
-  const { data: projects, isLoading: projectsLoading } = trpc.projects.list.useQuery();
-  const { data: surveys, isLoading: surveysLoading } = trpc.pesquisas.list.useQuery();
+  const { data: projects, isLoading: projectsLoading } =
+    trpc.projects.list.useQuery();
+  const { data: surveys, isLoading: surveysLoading } =
+    trpc.pesquisas.list.useQuery();
 
   // Mutations
   const utils = trpc.useUtils();
@@ -112,7 +116,7 @@ export default function SurveysList() {
       setDeleteDialogOpen(false);
       setSurveyToDelete(null);
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao deletar pesquisa: ${error.message}`);
     },
   });
@@ -121,7 +125,7 @@ export default function SurveysList() {
   const filteredSurveys = useMemo(() => {
     if (!surveys) return [];
 
-    let filtered = surveys.filter((survey) => {
+    let filtered = surveys.filter(survey => {
       const matchesSearch =
         searchTerm === "" ||
         survey.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -158,7 +162,14 @@ export default function SurveysList() {
     });
 
     return filtered;
-  }, [surveys, searchTerm, selectedProject, selectedStatus, sortField, sortOrder]);
+  }, [
+    surveys,
+    searchTerm,
+    selectedProject,
+    selectedStatus,
+    sortField,
+    sortOrder,
+  ]);
 
   const handleDelete = (id: number) => {
     setSurveyToDelete(id);
@@ -180,7 +191,7 @@ export default function SurveysList() {
   };
 
   const getProjectName = (projectId: number) => {
-    const project = projects?.find((p) => p.id === projectId);
+    const project = projects?.find(p => p.id === projectId);
     return project?.nome || `Projeto #${projectId}`;
   };
 
@@ -216,19 +227,22 @@ export default function SurveysList() {
                 <Input
                   placeholder="Buscar pesquisas..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   className="pl-9"
                 />
               </div>
 
               {/* Filtro por Projeto */}
-              <Select value={selectedProject} onValueChange={setSelectedProject}>
+              <Select
+                value={selectedProject}
+                onValueChange={setSelectedProject}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Todos os projetos" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos os projetos</SelectItem>
-                  {projects?.map((project) => (
+                  {projects?.map(project => (
                     <SelectItem key={project.id} value={project.id.toString()}>
                       {project.nome}
                     </SelectItem>
@@ -254,8 +268,11 @@ export default function SurveysList() {
               {/* Ordenação */}
               <Select
                 value={`${sortField}-${sortOrder}`}
-                onValueChange={(value) => {
-                  const [field, order] = value.split("-") as [SortField, SortOrder];
+                onValueChange={value => {
+                  const [field, order] = value.split("-") as [
+                    SortField,
+                    SortOrder,
+                  ];
                   setSortField(field);
                   setSortOrder(order);
                 }}
@@ -266,8 +283,12 @@ export default function SurveysList() {
                 <SelectContent>
                   <SelectItem value="nome-asc">Nome (A-Z)</SelectItem>
                   <SelectItem value="nome-desc">Nome (Z-A)</SelectItem>
-                  <SelectItem value="dataImportacao-desc">Mais recentes</SelectItem>
-                  <SelectItem value="dataImportacao-asc">Mais antigas</SelectItem>
+                  <SelectItem value="dataImportacao-desc">
+                    Mais recentes
+                  </SelectItem>
+                  <SelectItem value="dataImportacao-asc">
+                    Mais antigas
+                  </SelectItem>
                   <SelectItem value="status-asc">Status (A-Z)</SelectItem>
                   <SelectItem value="status-desc">Status (Z-A)</SelectItem>
                 </SelectContent>
@@ -291,7 +312,7 @@ export default function SurveysList() {
         {/* Lista de Pesquisas */}
         {surveysLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+            {[1, 2, 3, 4, 5, 6].map(i => (
               <Card key={i}>
                 <CardHeader>
                   <Skeleton className="h-6 w-3/4" />
@@ -307,48 +328,69 @@ export default function SurveysList() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Nenhuma pesquisa encontrada</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                Nenhuma pesquisa encontrada
+              </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                {searchTerm || selectedProject !== "all" || selectedStatus !== "all"
+                {searchTerm ||
+                selectedProject !== "all" ||
+                selectedStatus !== "all"
                   ? "Tente ajustar os filtros de busca"
                   : "Comece criando sua primeira pesquisa"}
               </p>
-              {!searchTerm && selectedProject === "all" && selectedStatus === "all" && (
-                <Button onClick={() => navigate("/nova-pesquisa")}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Criar Primeira Pesquisa
-                </Button>
-              )}
+              {!searchTerm &&
+                selectedProject === "all" &&
+                selectedStatus === "all" && (
+                  <Button onClick={() => navigate("/nova-pesquisa")}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Criar Primeira Pesquisa
+                  </Button>
+                )}
             </CardContent>
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredSurveys.map((survey) => {
-              const StatusIcon = statusConfig[survey.status as keyof typeof statusConfig].icon;
-              const statusColor = statusConfig[survey.status as keyof typeof statusConfig].color;
+            {filteredSurveys.map(survey => {
+              const StatusIcon =
+                statusConfig[survey.status as keyof typeof statusConfig].icon;
+              const statusColor =
+                statusConfig[survey.status as keyof typeof statusConfig].color;
 
               return (
-                <Card key={survey.id} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={survey.id}
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
-                        <CardTitle className="truncate">{survey.nome}</CardTitle>
+                        <CardTitle className="truncate">
+                          {survey.nome}
+                        </CardTitle>
                         <CardDescription className="mt-1">
                           {getProjectName(survey.projectId)}
                         </CardDescription>
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleView(survey.id)}>
+                          <DropdownMenuItem
+                            onClick={() => handleView(survey.id)}
+                          >
                             <Eye className="mr-2 h-4 w-4" />
                             Visualizar
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDuplicate(survey.id)}>
+                          <DropdownMenuItem
+                            onClick={() => handleDuplicate(survey.id)}
+                          >
                             <Copy className="mr-2 h-4 w-4" />
                             Duplicar
                           </DropdownMenuItem>
@@ -375,7 +417,11 @@ export default function SurveysList() {
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className={statusColor}>
                         <StatusIcon className="mr-1 h-3 w-3" />
-                        {statusConfig[survey.status as keyof typeof statusConfig].label}
+                        {
+                          statusConfig[
+                            survey.status as keyof typeof statusConfig
+                          ].label
+                        }
                       </Badge>
                     </div>
 
@@ -384,7 +430,8 @@ export default function SurveysList() {
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-muted-foreground" />
                         <span className="text-muted-foreground">
-                          {survey.clientesEnriquecidos}/{survey.totalClientes} clientes
+                          {survey.clientesEnriquecidos}/{survey.totalClientes}{" "}
+                          clientes
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -418,8 +465,8 @@ export default function SurveysList() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja deletar esta pesquisa? Esta ação não pode ser desfeita e
-              todos os dados relacionados serão perdidos.
+              Tem certeza que deseja deletar esta pesquisa? Esta ação não pode
+              ser desfeita e todos os dados relacionados serão perdidos.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -1,10 +1,39 @@
 import { useState } from "react";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, FunnelChart, Funnel, LabelList } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  FunnelChart,
+  Funnel,
+  LabelList,
+} from "recharts";
 import { Target, Award, TrendingUp, CheckCircle2 } from "lucide-react";
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSidebarState } from "@/hooks/useSidebarState";
@@ -15,14 +44,15 @@ import { useSidebarState } from "@/hooks/useSidebarState";
  */
 export default function ResearchOverview() {
   const { selectedProjectId } = useSelectedProject();
-  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | undefined>();
+  const [selectedPesquisaId, setSelectedPesquisaId] = useState<
+    number | undefined
+  >();
   const { sidebarClass } = useSidebarState();
 
   // Buscar pesquisas do projeto
-  const { data: pesquisas } = trpc.pesquisas.list.useQuery(
-    undefined,
-    { enabled: !!selectedProjectId }
-  );
+  const { data: pesquisas } = trpc.pesquisas.list.useQuery(undefined, {
+    enabled: !!selectedProjectId,
+  });
 
   // Buscar métricas consolidadas
   const { data: metrics, isLoading } = trpc.analytics.researchOverview.useQuery(
@@ -38,7 +68,9 @@ export default function ResearchOverview() {
 
   if (!selectedProjectId) {
     return (
-      <div className={`min-h-screen bg-background p-8 ${sidebarClass} transition-all duration-300`}>
+      <div
+        className={`min-h-screen bg-background p-8 ${sidebarClass} transition-all duration-300`}
+      >
         <div className="text-center text-muted-foreground">
           Selecione um projeto para visualizar o Research Overview
         </div>
@@ -48,10 +80,14 @@ export default function ResearchOverview() {
 
   if (isLoading) {
     return (
-      <div className={`min-h-screen bg-background p-8 space-y-6 ${sidebarClass} transition-all duration-300`}>
+      <div
+        className={`min-h-screen bg-background p-8 space-y-6 ${sidebarClass} transition-all duration-300`}
+      >
         <Skeleton className="h-12 w-full" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32" />)}
+          {[1, 2, 3, 4].map(i => (
+            <Skeleton key={i} className="h-32" />
+          ))}
         </div>
         <Skeleton className="h-96 w-full" />
       </div>
@@ -74,8 +110,16 @@ export default function ResearchOverview() {
   // Dados do funil de qualificação
   const funnelData = [
     { name: "Leads Gerados", value: kpis?.totalLeads || 0, fill: "#3b82f6" },
-    { name: "Leads Validados", value: (kpis as any)?.totalValidados || 0, fill: "#8b5cf6" },
-    { name: "Leads Aprovados", value: (kpis as any)?.totalAprovados || 0, fill: "#10b981" },
+    {
+      name: "Leads Validados",
+      value: (kpis as any)?.totalValidados || 0,
+      fill: "#8b5cf6",
+    },
+    {
+      name: "Leads Aprovados",
+      value: (kpis as any)?.totalAprovados || 0,
+      fill: "#10b981",
+    },
   ];
 
   // Dados de distribuição de qualidade
@@ -86,33 +130,45 @@ export default function ResearchOverview() {
   ];
 
   // Dados de evolução temporal
-  const evolutionData = timeline?.map(t => ({
-    data: new Date(t.data).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
-    leads: t.leadsGerados,
-    qualidade: (t.qualidadeMedia || 0) / 100,
-  })) || [];
+  const evolutionData =
+    timeline?.map(t => ({
+      data: new Date(t.data).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+      }),
+      leads: t.leadsGerados,
+      qualidade: (t.qualidadeMedia || 0) / 100,
+    })) || [];
 
   // Top 10 mercados
   const topMercados = metrics?.topMercados || [];
 
   return (
-    <div className={`min-h-screen bg-background ${sidebarClass} transition-all duration-300`}>
+    <div
+      className={`min-h-screen bg-background ${sidebarClass} transition-all duration-300`}
+    >
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-8 py-4">
         <DynamicBreadcrumbs />
         <div className="flex items-center justify-between mt-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Research Overview</h1>
+            <h1 className="text-2xl font-bold text-slate-900">
+              Research Overview
+            </h1>
             <p className="text-sm text-slate-600 mt-1">
               Visão geral do processo de geração e qualificação de leads
             </p>
           </div>
-          
+
           {/* Filtro de Pesquisa */}
           <div className="w-64">
             <Select
               value={selectedPesquisaId?.toString() || "all"}
-              onValueChange={(value) => setSelectedPesquisaId(value === "all" ? undefined : parseInt(value))}
+              onValueChange={value =>
+                setSelectedPesquisaId(
+                  value === "all" ? undefined : parseInt(value)
+                )
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Todas as pesquisas" />
@@ -142,7 +198,9 @@ export default function ResearchOverview() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-slate-900">{kpis.totalMercados}</div>
+              <div className="text-3xl font-bold text-slate-900">
+                {kpis.totalMercados}
+              </div>
             </CardContent>
           </Card>
 
@@ -154,7 +212,9 @@ export default function ResearchOverview() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-slate-900">{kpis.totalLeads}</div>
+              <div className="text-3xl font-bold text-slate-900">
+                {kpis.totalLeads}
+              </div>
             </CardContent>
           </Card>
 
@@ -166,7 +226,9 @@ export default function ResearchOverview() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-slate-900">{kpis.qualidadeMedia}/100</div>
+              <div className="text-3xl font-bold text-slate-900">
+                {kpis.qualidadeMedia}/100
+              </div>
             </CardContent>
           </Card>
 
@@ -178,7 +240,9 @@ export default function ResearchOverview() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-slate-900">{kpis.taxaAprovacao.toFixed(1)}%</div>
+              <div className="text-3xl font-bold text-slate-900">
+                {kpis.taxaAprovacao.toFixed(1)}%
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -188,8 +252,12 @@ export default function ResearchOverview() {
           {/* Funil de Qualificação */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-slate-900">Funil de Qualificação</CardTitle>
-              <CardDescription>Progressão de leads no processo de validação</CardDescription>
+              <CardTitle className="text-lg font-semibold text-slate-900">
+                Funil de Qualificação
+              </CardTitle>
+              <CardDescription>
+                Progressão de leads no processo de validação
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -211,8 +279,12 @@ export default function ResearchOverview() {
           {/* Distribuição de Qualidade */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-slate-900">Distribuição de Qualidade</CardTitle>
-              <CardDescription>Classificação dos leads por score de qualidade</CardDescription>
+              <CardTitle className="text-lg font-semibold text-slate-900">
+                Distribuição de Qualidade
+              </CardTitle>
+              <CardDescription>
+                Classificação dos leads por score de qualidade
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -222,7 +294,9 @@ export default function ResearchOverview() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) =>
+                      `${name}: ${(percent * 100).toFixed(0)}%`
+                    }
                     outerRadius={100}
                     dataKey="value"
                   >
@@ -240,8 +314,12 @@ export default function ResearchOverview() {
         {/* Evolução Temporal */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-900">Evolução Temporal (Últimos 30 Dias)</CardTitle>
-            <CardDescription>Geração de leads e qualidade média ao longo do tempo</CardDescription>
+            <CardTitle className="text-lg font-semibold text-slate-900">
+              Evolução Temporal (Últimos 30 Dias)
+            </CardTitle>
+            <CardDescription>
+              Geração de leads e qualidade média ao longo do tempo
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -276,8 +354,12 @@ export default function ResearchOverview() {
         {/* Top 10 Mercados */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-900">Top 10 Mercados por Volume</CardTitle>
-            <CardDescription>Mercados com maior geração de leads</CardDescription>
+            <CardTitle className="text-lg font-semibold text-slate-900">
+              Top 10 Mercados por Volume
+            </CardTitle>
+            <CardDescription>
+              Mercados com maior geração de leads
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={400}>
@@ -287,8 +369,16 @@ export default function ResearchOverview() {
                 <YAxis dataKey="mercadoNome" type="category" width={200} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="totalLeads" fill="#3b82f6" name="Total de Leads" />
-                <Bar dataKey="qualidadeMedia" fill="#10b981" name="Qualidade Média" />
+                <Bar
+                  dataKey="totalLeads"
+                  fill="#3b82f6"
+                  name="Total de Leads"
+                />
+                <Bar
+                  dataKey="qualidadeMedia"
+                  fill="#10b981"
+                  name="Qualidade Média"
+                />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

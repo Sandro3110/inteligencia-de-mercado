@@ -1,4 +1,5 @@
 # Roadmap de Desenvolvimento - Gestor PAV
+
 ## Planejamento Estratégico de Funcionalidades Futuras
 
 **Documento:** Roadmap de Desenvolvimento v1.0  
@@ -25,6 +26,7 @@ Este documento apresenta o planejamento estratégico para a evolução do **Gest
 O sistema atual possui uma base sólida com as seguintes capacidades operacionais:
 
 **Gestão de Dados**
+
 - Cadastro e organização de 73 mercados únicos com segmentação B2B/B2C
 - Gerenciamento de 800 clientes associados a múltiplos mercados
 - Mapeamento de 591 concorrentes por mercado
@@ -32,6 +34,7 @@ O sistema atual possui uma base sólida com as seguintes capacidades operacionai
 - Sistema de validação com 4 status (pending, rich, needs_adjustment, discarded)
 
 **Interface e Experiência do Usuário**
+
 - Dashboard visual com gráficos de pizza e barras (Recharts)
 - Navegação em cascata (Mercados → Clientes → Concorrentes → Leads)
 - Busca global inteligente por nome, CNPJ, produto e cidade
@@ -42,6 +45,7 @@ O sistema atual possui uma base sólida com as seguintes capacidades operacionai
 - Atalhos de teclado (Ctrl+K para busca, / para focar, Escape para fechar)
 
 **Performance e Otimização**
+
 - Índices de banco de dados para queries 70% mais rápidas
 - Cache de queries tRPC (5 minutos staleTime, 10 minutos gcTime)
 - Animações suaves com Framer Motion e suporte a prefers-reduced-motion
@@ -49,19 +53,20 @@ O sistema atual possui uma base sólida com as seguintes capacidades operacionai
 - Validação automática de CNPJ com indicadores visuais
 
 **Exportação e Relatórios**
+
 - Exportação CSV de clientes, concorrentes e leads
 - Exportação filtrada (apenas dados visíveis após aplicação de filtros)
 - Dashboard com KPIs e estatísticas de validação
 
 ### Métricas de Performance Atual
 
-| Métrica | Valor | Benchmark |
-|---------|-------|-----------|
-| Tempo de validação individual | 30 segundos | Padrão da indústria: 45-60s |
-| Tempo de validação em lote (20 itens) | 2 minutos | 80% mais rápido que validação individual |
-| Tempo de busca global | <1 segundo | Instantâneo |
-| Taxa de cache hit | ~60% | Reduz carga no servidor |
-| Velocidade de queries (com índices) | +70% | Comparado a baseline sem índices |
+| Métrica                               | Valor       | Benchmark                                |
+| ------------------------------------- | ----------- | ---------------------------------------- |
+| Tempo de validação individual         | 30 segundos | Padrão da indústria: 45-60s              |
+| Tempo de validação em lote (20 itens) | 2 minutos   | 80% mais rápido que validação individual |
+| Tempo de busca global                 | <1 segundo  | Instantâneo                              |
+| Taxa de cache hit                     | ~60%        | Reduz carga no servidor                  |
+| Velocidade de queries (com índices)   | +70%        | Comparado a baseline sem índices         |
 
 ---
 
@@ -107,6 +112,7 @@ CREATE INDEX idx_entity_tags_tag ON entity_tags(tagId);
 ```
 
 **Componentes frontend:**
+
 - Modal de criação de tags com seletor de cor e ícone
 - Dropdown multi-select para adicionar tags a entidades
 - Filtro por tags na sidebar (multi-seleção com operador AND/OR)
@@ -114,11 +120,13 @@ CREATE INDEX idx_entity_tags_tag ON entity_tags(tagId);
 - Página de gerenciamento de tags (/tags) com CRUD completo
 
 **Estimativa de impacto:**
+
 - Redução de 25% no tempo de localização de itens específicos
 - Aumento de 40% na organização de workflows personalizados
 - Suporte a até 50 tags customizadas sem degradação de performance
 
 **Entregáveis:**
+
 - [ ] Schema de banco de dados (tags + entity_tags)
 - [ ] Routers tRPC (tags.create, tags.list, tags.update, tags.delete, tags.addToEntity, tags.removeFromEntity)
 - [ ] Componente TagManager para CRUD
@@ -171,7 +179,7 @@ export async function getClientesByMercadoPaginated({
   if (!db) return { data: [], total: 0, page, pageSize, totalPages: 0 };
 
   const offset = (page - 1) * pageSize;
-  
+
   let query = db
     .select()
     .from(clientes)
@@ -207,17 +215,20 @@ export async function getClientesByMercadoPaginated({
 ```
 
 **Componentes frontend:**
+
 - Controles de paginação (Anterior/Próximo/Ir para página)
 - Indicador "Exibindo X-Y de Z itens"
 - Seletor de tamanho de página (10/20/50/100)
 - Preservação de estado de paginação ao navegar
 
 **Estimativa de impacto:**
+
 - Suporte a 10.000+ registros sem degradação
 - Redução de 80% no tempo de carregamento inicial
 - Economia de 60% em transferência de dados
 
 **Entregáveis:**
+
 - [ ] Atualizar routers com paginação
 - [ ] Atualizar funções db.ts com limit/offset
 - [ ] Componente Pagination reutilizável
@@ -255,6 +266,7 @@ CREATE TABLE audit_log (
 ```
 
 **Funcionalidades:**
+
 - Registro automático via middleware tRPC
 - Página de histórico por entidade (/entity/:type/:id/history)
 - Timeline visual com ícones por tipo de ação
@@ -262,16 +274,19 @@ CREATE TABLE audit_log (
 - Exportação de audit log para compliance
 
 **Componentes frontend:**
+
 - Componente AuditLogTimeline
 - Modal de detalhes de alteração (diff visual)
 - Filtros avançados (data range, usuário, ação)
 
 **Estimativa de impacto:**
+
 - 100% de rastreabilidade de alterações
 - Redução de 50% em conflitos de dados
 - Compliance com regulamentações (LGPD, SOC 2)
 
 **Entregáveis:**
+
 - [ ] Schema audit_log
 - [ ] Middleware tRPC para logging automático
 - [ ] Routers auditLog (list, getByEntity)
@@ -294,41 +309,52 @@ CREATE TABLE audit_log (
 // pnpm add xlsx exceljs jspdf jspdf-autotable
 
 // server/export.ts
-import ExcelJS from 'exceljs';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import ExcelJS from "exceljs";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
-export async function exportToExcel(data: any[], type: 'clientes' | 'concorrentes' | 'leads') {
+export async function exportToExcel(
+  data: any[],
+  type: "clientes" | "concorrentes" | "leads"
+) {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet(type.toUpperCase());
 
   // Definir colunas com formatação
   worksheet.columns = [
-    { header: 'Nome', key: 'nome', width: 30 },
-    { header: 'CNPJ', key: 'cnpj', width: 20 },
-    { header: 'Status', key: 'validationStatus', width: 15 },
-    { header: 'Score', key: 'qualityScore', width: 10 },
-    { header: 'Cidade', key: 'cidade', width: 20 },
+    { header: "Nome", key: "nome", width: 30 },
+    { header: "CNPJ", key: "cnpj", width: 20 },
+    { header: "Status", key: "validationStatus", width: 15 },
+    { header: "Score", key: "qualityScore", width: 10 },
+    { header: "Cidade", key: "cidade", width: 20 },
   ];
 
   // Estilizar header
-  worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+  worksheet.getRow(1).font = { bold: true, color: { argb: "FFFFFFFF" } };
   worksheet.getRow(1).fill = {
-    type: 'pattern',
-    pattern: 'solid',
-    fgColor: { argb: 'FF0066CC' },
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "FF0066CC" },
   };
 
   // Adicionar dados com formatação condicional
-  data.forEach((item) => {
+  data.forEach(item => {
     const row = worksheet.addRow(item);
-    
+
     // Colorir status
-    const statusCell = row.getCell('validationStatus');
-    if (item.validationStatus === 'rich') {
-      statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF10B981' } };
-    } else if (item.validationStatus === 'pending') {
-      statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF59E0B' } };
+    const statusCell = row.getCell("validationStatus");
+    if (item.validationStatus === "rich") {
+      statusCell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF10B981" },
+      };
+    } else if (item.validationStatus === "pending") {
+      statusCell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFF59E0B" },
+      };
     }
   });
 
@@ -346,36 +372,45 @@ export async function exportToPDF(data: any[], type: string, stats: any) {
   doc.setFontSize(18);
   doc.text(`Relatório de ${type.toUpperCase()}`, 14, 20);
   doc.setFontSize(10);
-  doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, 28);
+  doc.text(`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 28);
 
   // Estatísticas
   doc.setFontSize(12);
-  doc.text('Resumo Executivo', 14, 40);
+  doc.text("Resumo Executivo", 14, 40);
   doc.setFontSize(10);
   doc.text(`Total de registros: ${stats.total}`, 14, 48);
-  doc.text(`Validados: ${stats.rich} (${Math.round((stats.rich/stats.total)*100)}%)`, 14, 54);
-  doc.text(`Pendentes: ${stats.pending} (${Math.round((stats.pending/stats.total)*100)}%)`, 14, 60);
+  doc.text(
+    `Validados: ${stats.rich} (${Math.round((stats.rich / stats.total) * 100)}%)`,
+    14,
+    54
+  );
+  doc.text(
+    `Pendentes: ${stats.pending} (${Math.round((stats.pending / stats.total) * 100)}%)`,
+    14,
+    60
+  );
 
   // Tabela
   autoTable(doc, {
     startY: 70,
-    head: [['Nome', 'CNPJ', 'Status', 'Score', 'Cidade']],
+    head: [["Nome", "CNPJ", "Status", "Score", "Cidade"]],
     body: data.map(item => [
       item.nome,
       item.cnpj,
       item.validationStatus,
-      item.qualityScore + '%',
+      item.qualityScore + "%",
       item.cidade,
     ]),
     styles: { fontSize: 8 },
     headStyles: { fillColor: [0, 102, 204] },
   });
 
-  return doc.output('arraybuffer');
+  return doc.output("arraybuffer");
 }
 ```
 
 **Funcionalidades:**
+
 - Exportação Excel com formatação condicional (cores por status)
 - Gráficos embutidos no Excel (distribuição de status)
 - PDF com logo, header e footer profissionais
@@ -383,11 +418,13 @@ export async function exportToPDF(data: any[], type: string, stats: any) {
 - Agendamento de relatórios automáticos (semanal/mensal)
 
 **Estimativa de impacto:**
+
 - Economia de 2-3 horas/semana em formatação manual
 - Aumento de 40% em credibilidade de relatórios
 - Suporte a apresentações executivas
 
 **Entregáveis:**
+
 - [ ] Instalar exceljs e jspdf
 - [ ] Função exportToExcel com formatação
 - [ ] Função exportToPDF com relatório
@@ -411,6 +448,7 @@ export async function exportToPDF(data: any[], type: string, stats: any) {
 **Tecnologias:** WebSockets (Socket.io) ou Server-Sent Events (SSE)
 
 **Funcionalidades:**
+
 - Notificações in-app com toast
 - Badge de contador no ícone de notificações
 - Centro de notificações (/notifications) com histórico
@@ -418,6 +456,7 @@ export async function exportToPDF(data: any[], type: string, stats: any) {
 - Notificações por email (opcional)
 
 **Entregáveis:**
+
 - [ ] Infraestrutura WebSocket/SSE
 - [ ] Schema notifications
 - [ ] Componente NotificationCenter
@@ -445,6 +484,7 @@ CREATE TABLE favoritos (
 ```
 
 **Funcionalidades:**
+
 - Botão de estrela em cada card (toggle)
 - Filtro "Apenas Favoritos" na sidebar
 - Página dedicada /favorites com todos os favoritos
@@ -452,6 +492,7 @@ CREATE TABLE favoritos (
 - Limite de 100 favoritos por usuário
 
 **Entregáveis:**
+
 - [ ] Schema favoritos
 - [ ] Routers favoritos (add, remove, list)
 - [ ] Componente FavoriteButton
@@ -465,6 +506,7 @@ CREATE TABLE favoritos (
 **Descrição:** Permitir importação de dados via upload de CSV/Excel com validação, preview e mapeamento de colunas.
 
 **Funcionalidades:**
+
 - Upload de arquivo (drag & drop)
 - Preview dos dados (primeiras 10 linhas)
 - Mapeamento de colunas (auto-detect + manual)
@@ -473,6 +515,7 @@ CREATE TABLE favoritos (
 - Importação incremental (adicionar ou substituir)
 
 **Entregáveis:**
+
 - [ ] Componente FileUpload
 - [ ] Parser CSV/Excel
 - [ ] Componente ColumnMapper
@@ -493,12 +536,14 @@ CREATE TABLE favoritos (
 ```typescript
 // server/enrichment.ts
 export async function enrichByCNPJ(cnpj: string) {
-  const cleanCNPJ = cnpj.replace(/\D/g, '');
-  
+  const cleanCNPJ = cnpj.replace(/\D/g, "");
+
   try {
-    const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cleanCNPJ}`);
+    const response = await fetch(
+      `https://brasilapi.com.br/api/cnpj/v1/${cleanCNPJ}`
+    );
     const data = await response.json();
-    
+
     return {
       razaoSocial: data.razao_social,
       nomeFantasia: data.nome_fantasia,
@@ -511,12 +556,13 @@ export async function enrichByCNPJ(cnpj: string) {
       dataAbertura: data.data_inicio_atividade,
     };
   } catch (error) {
-    throw new Error('Falha ao consultar CNPJ na Receita Federal');
+    throw new Error("Falha ao consultar CNPJ na Receita Federal");
   }
 }
 ```
 
 **Funcionalidades:**
+
 - Botão "Enriquecer" em cada card de cliente/concorrente
 - Modal de confirmação mostrando dados encontrados
 - Opção de mesclar (manter dados existentes) ou substituir
@@ -524,6 +570,7 @@ export async function enrichByCNPJ(cnpj: string) {
 - Rate limiting (max 3 requests/segundo)
 
 **Entregáveis:**
+
 - [ ] Função enrichByCNPJ
 - [ ] Router enrichment.byCNPJ
 - [ ] Botão "Enriquecer" nos cards
@@ -544,6 +591,7 @@ export async function enrichByCNPJ(cnpj: string) {
 **Descrição:** Expandir dashboard atual com filtros interativos, drill-down e visualizações avançadas.
 
 **Funcionalidades:**
+
 - Filtros por período (últimos 7/30/90 dias, custom range)
 - Filtros por mercado, segmentação, cidade, UF
 - Drill-down em gráficos (clicar em fatia de pizza para ver detalhes)
@@ -556,6 +604,7 @@ export async function enrichByCNPJ(cnpj: string) {
 - Exportação de gráficos como imagem
 
 **Entregáveis:**
+
 - [ ] Componentes de filtro avançado
 - [ ] Gráficos adicionais (Recharts)
 - [ ] Drill-down interativo
@@ -571,12 +620,14 @@ export async function enrichByCNPJ(cnpj: string) {
 **Exemplo:** Buscar "móveis de escritório" retorna resultados de "cadeiras corporativas", "mesas executivas", etc.
 
 **Implementação:**
+
 - Gerar embeddings de todos os textos (nome, produto, descrição)
 - Armazenar embeddings em banco vetorial (Pinecone, Weaviate ou PostgreSQL com pgvector)
 - Busca por similaridade coseno
 - Fallback para busca tradicional se IA falhar
 
 **Entregáveis:**
+
 - [ ] Integração com API de embeddings
 - [ ] Banco vetorial (pgvector)
 - [ ] Geração de embeddings em background
@@ -590,12 +641,14 @@ export async function enrichByCNPJ(cnpj: string) {
 **Descrição:** IA analisa dados e sugere status de validação baseado em padrões históricos (ex: CNPJs inválidos → sugerir "discarded", empresas com site ativo → sugerir "rich").
 
 **Funcionalidades:**
+
 - Score de confiança da sugestão (0-100%)
 - Explicação da sugestão ("CNPJ inválido detectado")
 - Botão "Aceitar Sugestão" para validação rápida
 - Aprendizado contínuo (feedback loop)
 
 **Entregáveis:**
+
 - [ ] Modelo de ML (scikit-learn ou TensorFlow.js)
 - [ ] Treinamento com dados históricos
 - [ ] Endpoint de sugestões
@@ -609,6 +662,7 @@ export async function enrichByCNPJ(cnpj: string) {
 **Descrição:** Agendar geração automática de relatórios (Excel/PDF) e envio por email em intervalos regulares (diário, semanal, mensal).
 
 **Funcionalidades:**
+
 - Configuração de agendamento (cron-like)
 - Seleção de destinatários
 - Template de relatório customizável
@@ -616,6 +670,7 @@ export async function enrichByCNPJ(cnpj: string) {
 - Retry automático em caso de falha
 
 **Entregáveis:**
+
 - [ ] Schema scheduled_reports
 - [ ] Job scheduler (node-cron)
 - [ ] Geração de relatório em background
@@ -635,6 +690,7 @@ export async function enrichByCNPJ(cnpj: string) {
 **Descrição:** Expor API pública para integração com outros sistemas (CRM, ERP, BI).
 
 **Funcionalidades:**
+
 - Autenticação via API key
 - Rate limiting (1000 requests/hora)
 - Documentação interativa (Swagger/OpenAPI)
@@ -642,6 +698,7 @@ export async function enrichByCNPJ(cnpj: string) {
 - SDKs para JavaScript, Python
 
 **Entregáveis:**
+
 - [ ] Endpoints REST
 - [ ] Schema GraphQL
 - [ ] Autenticação API key
@@ -656,6 +713,7 @@ export async function enrichByCNPJ(cnpj: string) {
 **Descrição:** Suporte a múltiplas organizações com isolamento de dados.
 
 **Funcionalidades:**
+
 - Tabela organizations
 - Isolamento de dados por organizationId
 - Gerenciamento de usuários por organização
@@ -663,6 +721,7 @@ export async function enrichByCNPJ(cnpj: string) {
 - Billing por organização
 
 **Entregáveis:**
+
 - [ ] Schema multi-tenant
 - [ ] Middleware de isolamento
 - [ ] Gerenciamento de organizações
@@ -676,12 +735,14 @@ export async function enrichByCNPJ(cnpj: string) {
 **Descrição:** Sincronização bidirecional com Google Sheets para colaboração externa.
 
 **Funcionalidades:**
+
 - Conectar planilha existente
 - Sincronização automática (a cada 15 minutos)
 - Mapeamento de colunas
 - Conflito resolution (last-write-wins ou manual)
 
 **Entregáveis:**
+
 - [ ] Integração Google Sheets API
 - [ ] Sincronização bidirecional
 - [ ] Resolução de conflitos
@@ -693,23 +754,23 @@ export async function enrichByCNPJ(cnpj: string) {
 
 ### Matriz de Priorização
 
-| Funcionalidade | Esforço (h) | Impacto | ROI | Prioridade |
-|----------------|-------------|---------|-----|------------|
-| **Tags Customizáveis** | 24 | Alto | 45% | 🔴 CRÍTICA |
-| **Paginação Server-Side** | 16 | Alto | 38% | 🔴 CRÍTICA |
-| **Audit Log** | 20 | Médio | 30% | 🟠 ALTA |
-| **Exportação Avançada** | 20 | Médio | 28% | 🟠 ALTA |
-| **Notificações Push** | 24 | Médio | 25% | 🟠 ALTA |
-| **Favoritos** | 16 | Baixo | 20% | 🟡 MÉDIA |
-| **Importação em Lote** | 18 | Alto | 35% | 🟠 ALTA |
-| **Enriquecimento API** | 12 | Médio | 22% | 🟡 MÉDIA |
-| **Dashboard Avançado** | 20 | Baixo | 18% | 🟡 MÉDIA |
-| **Busca Semântica** | 24 | Baixo | 15% | 🟢 BAIXA |
-| **Sugestões IA** | 20 | Baixo | 12% | 🟢 BAIXA |
-| **Relatórios Agendados** | 16 | Baixo | 10% | 🟢 BAIXA |
-| **API Pública** | 20 | Baixo | 8% | 🟢 BAIXA |
-| **Multi-tenant** | 18 | Baixo | 6% | 🟢 BAIXA |
-| **Google Sheets** | 12 | Baixo | 5% | 🟢 BAIXA |
+| Funcionalidade            | Esforço (h) | Impacto | ROI | Prioridade |
+| ------------------------- | ----------- | ------- | --- | ---------- |
+| **Tags Customizáveis**    | 24          | Alto    | 45% | 🔴 CRÍTICA |
+| **Paginação Server-Side** | 16          | Alto    | 38% | 🔴 CRÍTICA |
+| **Audit Log**             | 20          | Médio   | 30% | 🟠 ALTA    |
+| **Exportação Avançada**   | 20          | Médio   | 28% | 🟠 ALTA    |
+| **Notificações Push**     | 24          | Médio   | 25% | 🟠 ALTA    |
+| **Favoritos**             | 16          | Baixo   | 20% | 🟡 MÉDIA   |
+| **Importação em Lote**    | 18          | Alto    | 35% | 🟠 ALTA    |
+| **Enriquecimento API**    | 12          | Médio   | 22% | 🟡 MÉDIA   |
+| **Dashboard Avançado**    | 20          | Baixo   | 18% | 🟡 MÉDIA   |
+| **Busca Semântica**       | 24          | Baixo   | 15% | 🟢 BAIXA   |
+| **Sugestões IA**          | 20          | Baixo   | 12% | 🟢 BAIXA   |
+| **Relatórios Agendados**  | 16          | Baixo   | 10% | 🟢 BAIXA   |
+| **API Pública**           | 20          | Baixo   | 8%  | 🟢 BAIXA   |
+| **Multi-tenant**          | 18          | Baixo   | 6%  | 🟢 BAIXA   |
+| **Google Sheets**         | 12          | Baixo   | 5%  | 🟢 BAIXA   |
 
 ### Quick Wins (Alto Impacto, Baixo Esforço)
 
@@ -732,6 +793,7 @@ export async function enrichByCNPJ(cnpj: string) {
 **Princípio:** Entregar valor continuamente através de releases pequenas e frequentes (sprints de 2 semanas).
 
 **Ciclo de desenvolvimento:**
+
 1. **Semana 1:** Planejamento + Design + Schema
 2. **Semana 2:** Implementação Backend + Testes
 3. **Semana 3:** Implementação Frontend + Integração
@@ -774,28 +836,28 @@ Fase 5: Integração
 
 ### KPIs por Funcionalidade
 
-| Funcionalidade | Métrica de Sucesso | Target |
-|----------------|-------------------|--------|
-| Tags | % de itens com pelo menos 1 tag | 60% |
-| Paginação | Tempo de carregamento (10.000 registros) | <2s |
-| Audit Log | % de alterações rastreadas | 100% |
-| Exportação | Relatórios gerados/semana | 20+ |
-| Notificações | Taxa de abertura | 70% |
-| Favoritos | Itens favoritados/usuário | 15+ |
-| Importação | Registros importados/mês | 500+ |
-| Enriquecimento | Taxa de sucesso API | 95% |
-| Dashboard | Tempo médio de análise | -40% |
-| Busca Semântica | Precisão de resultados | 85% |
+| Funcionalidade  | Métrica de Sucesso                       | Target |
+| --------------- | ---------------------------------------- | ------ |
+| Tags            | % de itens com pelo menos 1 tag          | 60%    |
+| Paginação       | Tempo de carregamento (10.000 registros) | <2s    |
+| Audit Log       | % de alterações rastreadas               | 100%   |
+| Exportação      | Relatórios gerados/semana                | 20+    |
+| Notificações    | Taxa de abertura                         | 70%    |
+| Favoritos       | Itens favoritados/usuário                | 15+    |
+| Importação      | Registros importados/mês                 | 500+   |
+| Enriquecimento  | Taxa de sucesso API                      | 95%    |
+| Dashboard       | Tempo médio de análise                   | -40%   |
+| Busca Semântica | Precisão de resultados                   | 85%    |
 
 ### Métricas Globais de Produto
 
-| Categoria | Métrica | Baseline | Target Q4 2026 |
-|-----------|---------|----------|----------------|
-| **Performance** | Tempo de carregamento | 2.5s | 1.5s |
-| **Produtividade** | Validações/hora | 12 | 25 |
-| **Qualidade** | Taxa de erro de dados | 8% | 2% |
-| **Adoção** | Usuários ativos/dia | - | 15+ |
-| **Satisfação** | NPS | - | 50+ |
+| Categoria         | Métrica               | Baseline | Target Q4 2026 |
+| ----------------- | --------------------- | -------- | -------------- |
+| **Performance**   | Tempo de carregamento | 2.5s     | 1.5s           |
+| **Produtividade** | Validações/hora       | 12       | 25             |
+| **Qualidade**     | Taxa de erro de dados | 8%       | 2%             |
+| **Adoção**        | Usuários ativos/dia   | -        | 15+            |
+| **Satisfação**    | NPS                   | -        | 50+            |
 
 ---
 
@@ -803,30 +865,33 @@ Fase 5: Integração
 
 ### Resumo por Trimestre
 
-| Trimestre | Funcionalidades | Horas | Custo Estimado* | ROI Projetado |
-|-----------|----------------|-------|-----------------|---------------|
-| **Q1 2026** | Tags, Paginação, Audit Log, Exportação | 80h | R$ 16.000 | 45% |
-| **Q2 2026** | Notificações, Favoritos, Importação, Enriquecimento | 70h | R$ 14.000 | 38% |
-| **Q3 2026** | Dashboard Avançado, Busca IA, Sugestões, Relatórios | 80h | R$ 16.000 | 52% |
-| **Q4 2026** | API, Multi-tenant, Google Sheets | 50h | R$ 10.000 | 21% |
-| **TOTAL** | 15 funcionalidades | **280h** | **R$ 56.000** | **156%** |
+| Trimestre   | Funcionalidades                                     | Horas    | Custo Estimado\* | ROI Projetado |
+| ----------- | --------------------------------------------------- | -------- | ---------------- | ------------- |
+| **Q1 2026** | Tags, Paginação, Audit Log, Exportação              | 80h      | R$ 16.000        | 45%           |
+| **Q2 2026** | Notificações, Favoritos, Importação, Enriquecimento | 70h      | R$ 14.000        | 38%           |
+| **Q3 2026** | Dashboard Avançado, Busca IA, Sugestões, Relatórios | 80h      | R$ 16.000        | 52%           |
+| **Q4 2026** | API, Multi-tenant, Google Sheets                    | 50h      | R$ 10.000        | 21%           |
+| **TOTAL**   | 15 funcionalidades                                  | **280h** | **R$ 56.000**    | **156%**      |
 
-*Baseado em R$ 200/hora (desenvolvedor sênior)
+\*Baseado em R$ 200/hora (desenvolvedor sênior)
 
 ### Retorno sobre Investimento (ROI)
 
 **Ganhos de produtividade estimados:**
+
 - Redução de 40% no tempo de validação → 8h/semana economizadas
 - Redução de 50% em erros de dados → 4h/semana economizadas
 - Automação de relatórios → 3h/semana economizadas
 - **Total:** 15h/semana = 60h/mês = 720h/ano
 
 **Valor econômico:**
+
 - 720h/ano × R$ 100/hora (custo de trabalho manual) = **R$ 72.000/ano**
 - Investimento: R$ 56.000
 - **ROI:** (72.000 - 56.000) / 56.000 = **28.5% ao ano**
 
 **Benefícios intangíveis:**
+
 - Aumento de satisfação do usuário
 - Redução de churn
 - Melhor tomada de decisão baseada em dados
@@ -839,20 +904,20 @@ Fase 5: Integração
 
 ### Riscos Técnicos
 
-| Risco | Probabilidade | Impacto | Mitigação |
-|-------|---------------|---------|-----------|
-| Degradação de performance com crescimento | Alta | Alto | Implementar paginação e índices primeiro |
-| Falha em APIs externas (Receita Federal) | Média | Médio | Cache + fallback + retry logic |
-| Complexidade de multi-tenant | Baixa | Alto | Adiar para Q4, validar arquitetura |
-| Overengineering de IA | Média | Baixo | MVP simples, iterar baseado em feedback |
+| Risco                                     | Probabilidade | Impacto | Mitigação                                |
+| ----------------------------------------- | ------------- | ------- | ---------------------------------------- |
+| Degradação de performance com crescimento | Alta          | Alto    | Implementar paginação e índices primeiro |
+| Falha em APIs externas (Receita Federal)  | Média         | Médio   | Cache + fallback + retry logic           |
+| Complexidade de multi-tenant              | Baixa         | Alto    | Adiar para Q4, validar arquitetura       |
+| Overengineering de IA                     | Média         | Baixo   | MVP simples, iterar baseado em feedback  |
 
 ### Riscos de Negócio
 
-| Risco | Probabilidade | Impacto | Mitigação |
-|-------|---------------|---------|-----------|
-| Baixa adoção de funcionalidades | Média | Alto | Validar com usuários antes de implementar |
-| Mudança de prioridades | Alta | Médio | Roadmap flexível, sprints curtos |
-| Falta de recursos | Baixa | Alto | Priorizar Quick Wins primeiro |
+| Risco                           | Probabilidade | Impacto | Mitigação                                 |
+| ------------------------------- | ------------- | ------- | ----------------------------------------- |
+| Baixa adoção de funcionalidades | Média         | Alto    | Validar com usuários antes de implementar |
+| Mudança de prioridades          | Alta          | Médio   | Roadmap flexível, sprints curtos          |
+| Falta de recursos               | Baixa         | Alto    | Priorizar Quick Wins primeiro             |
 
 ---
 

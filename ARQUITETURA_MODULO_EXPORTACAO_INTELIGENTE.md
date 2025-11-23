@@ -1,4 +1,5 @@
 # Arquitetura do Módulo de Exportação e Inteligência de Dados
+
 ## Sistema PAV - Proposta Técnica Completa
 
 **Versão:** 1.0  
@@ -71,12 +72,14 @@ A interface utiliza um **wizard progressivo** que simplifica a complexidade atra
 O usuário inicia descrevendo sua necessidade em **linguagem natural livre**:
 
 **Exemplos de Contextos:**
+
 - "Quero exportar todos os leads de alta qualidade no setor de embalagens em São Paulo"
 - "Preciso de um relatório de concorrentes de médio porte no agronegócio do Sul"
 - "Exportar clientes B2B validados com faturamento acima de R$ 10M no Sudeste"
 - "Listar mercados emergentes com crescimento acima de 20% no último trimestre"
 
 **Funcionalidades:**
+
 - Campo de texto livre com autocomplete inteligente
 - Sugestões contextuais baseadas em histórico
 - Validação em tempo real da viabilidade do contexto
@@ -84,6 +87,7 @@ O usuário inicia descrevendo sua necessidade em **linguagem natural livre**:
 
 **Assistência por IA:**
 O sistema analisa o texto e **destaca entidades identificadas** com cores:
+
 - 🔵 Azul: Entidades (leads, clientes, concorrentes, mercados)
 - 🟢 Verde: Filtros geográficos (São Paulo, Sul, Sudeste)
 - 🟡 Amarelo: Filtros de qualidade (alta qualidade, validados)
@@ -95,6 +99,7 @@ O sistema analisa o texto e **destaca entidades identificadas** com cores:
 Com base no contexto interpretado, o sistema apresenta **filtros estruturados** organizados em 6 categorias:
 
 **A) Escopo de Dados**
+
 ```
 ┌─────────────────────────────────────────┐
 │ ☐ Projetos (múltipla escolha)          │
@@ -110,6 +115,7 @@ Com base no contexto interpretado, o sistema apresenta **filtros estruturados** 
 ```
 
 **B) Tipo de Entidade**
+
 ```
 ┌─────────────────────────────────────────┐
 │ ○ Mercados (667 registros)              │
@@ -121,6 +127,7 @@ Com base no contexto interpretado, o sistema apresenta **filtros estruturados** 
 ```
 
 **C) Filtros Geográficos**
+
 ```
 ┌─────────────────────────────────────────┐
 │ Estados (múltipla escolha)              │
@@ -140,6 +147,7 @@ Com base no contexto interpretado, o sistema apresenta **filtros estruturados** 
 ```
 
 **D) Filtros de Qualidade**
+
 ```
 ┌─────────────────────────────────────────┐
 │ Quality Score                           │
@@ -157,6 +165,7 @@ Com base no contexto interpretado, o sistema apresenta **filtros estruturados** 
 ```
 
 **E) Filtros de Porte/Segmentação**
+
 ```
 ┌─────────────────────────────────────────┐
 │ Porte da Empresa                        │
@@ -174,6 +183,7 @@ Com base no contexto interpretado, o sistema apresenta **filtros estruturados** 
 ```
 
 **F) Filtros Temporais**
+
 ```
 ┌─────────────────────────────────────────┐
 │ Período de Criação                      │
@@ -188,6 +198,7 @@ Com base no contexto interpretado, o sistema apresenta **filtros estruturados** 
 ```
 
 **Funcionalidades Avançadas:**
+
 - **Operadores Lógicos:** Alternar entre AND/OR para cada categoria
 - **Filtros Salvos:** Salvar combinação de filtros com nome personalizado
 - **Templates:** Carregar templates pré-definidos (ex: "Leads Prioritários", "Análise Competitiva Regional")
@@ -199,6 +210,7 @@ Com base no contexto interpretado, o sistema apresenta **filtros estruturados** 
 O usuário escolhe **quais campos exportar** e se deseja **incluir dados relacionados**:
 
 **A) Campos da Entidade Principal**
+
 ```
 ┌─────────────────────────────────────────┐
 │ CLIENTE (entidade principal)            │
@@ -236,6 +248,7 @@ O usuário escolhe **quais campos exportar** e se deseja **incluir dados relacio
 ```
 
 **B) Dados Relacionados (Joins Automáticos)**
+
 ```
 ┌─────────────────────────────────────────┐
 │ INCLUIR DADOS RELACIONADOS?             │
@@ -270,11 +283,13 @@ O usuário escolhe **quais campos exportar** e se deseja **incluir dados relacio
 ```
 
 **Modos de Relacionamento:**
+
 - **Coluna Única:** Dados relacionados em uma célula (ex: "Mercado1; Mercado2; Mercado3")
 - **Linhas Separadas:** Uma linha por relacionamento (cliente repetido em cada linha)
 - **Arquivo Separado:** Gera arquivo adicional com relacionamentos (ex: clientes.csv + concorrentes.csv)
 
 **Funcionalidades:**
+
 - **Preview de Estrutura:** Mostra exemplo de como ficará a tabela final
 - **Estimativa de Tamanho:** Calcula tamanho aproximado do arquivo (MB)
 - **Validação de Limites:** Alerta se arquivo ultrapassar 100MB
@@ -284,6 +299,7 @@ O usuário escolhe **quais campos exportar** e se deseja **incluir dados relacio
 O usuário escolhe entre **3 tipos de saída** e **múltiplos formatos**:
 
 **A) Tipo de Saída**
+
 ```
 ┌─────────────────────────────────────────┐
 │ ESCOLHA O TIPO DE SAÍDA                 │
@@ -312,6 +328,7 @@ O usuário escolhe entre **3 tipos de saída** e **múltiplos formatos**:
 **B) Formatos Disponíveis (por tipo)**
 
 **LISTA SIMPLES:**
+
 ```
 ┌─────────────────────────────────────────┐
 │ ○ CSV (dados brutos)                    │
@@ -334,6 +351,7 @@ O usuário escolhe entre **3 tipos de saída** e **múltiplos formatos**:
 ```
 
 **LISTA COMPLETA:**
+
 ```
 ┌─────────────────────────────────────────┐
 │ ● Excel Avançado (.xlsx)                │
@@ -352,6 +370,7 @@ O usuário escolhe entre **3 tipos de saída** e **múltiplos formatos**:
 ```
 
 **RELATÓRIO CONTEXTUALIZADO:**
+
 ```
 ┌─────────────────────────────────────────┐
 │ ● PDF Executivo                         │
@@ -529,46 +548,49 @@ O modelo identifica **entidades-chave** no texto livre:
 
 ```typescript
 interface ExtractedEntities {
-  entityType: 'mercados' | 'clientes' | 'concorrentes' | 'leads' | 'produtos';
+  entityType: "mercados" | "clientes" | "concorrentes" | "leads" | "produtos";
   geography: {
-    states?: string[];      // ["SP", "MG"]
-    cities?: string[];      // ["São Paulo", "Campinas"]
-    regions?: string[];     // ["Sudeste", "Sul"]
+    states?: string[]; // ["SP", "MG"]
+    cities?: string[]; // ["São Paulo", "Campinas"]
+    regions?: string[]; // ["Sudeste", "Sul"]
   };
   quality: {
-    minScore?: number;      // 80
-    status?: string[];      // ["validados"]
-    completeness?: number;  // 70
+    minScore?: number; // 80
+    status?: string[]; // ["validados"]
+    completeness?: number; // 70
   };
   size: {
-    porte?: string[];       // ["média", "grande"]
-    revenue?: {             // Faturamento
+    porte?: string[]; // ["média", "grande"]
+    revenue?: {
+      // Faturamento
       min?: number;
       max?: number;
     };
   };
   segmentation: {
-    type?: string[];        // ["B2B", "B2C"]
-    cnae?: string[];        // ["1013-9"]
+    type?: string[]; // ["B2B", "B2C"]
+    cnae?: string[]; // ["1013-9"]
   };
   temporal: {
     createdAfter?: Date;
     createdBefore?: Date;
     updatedWithin?: number; // dias
   };
-  keywords: string[];       // ["embalagens", "alta qualidade"]
+  keywords: string[]; // ["embalagens", "alta qualidade"]
 }
 ```
 
 **Exemplo de Interpretação:**
 
 Entrada:
+
 ```
-"Quero exportar todos os leads de alta qualidade no setor de 
+"Quero exportar todos os leads de alta qualidade no setor de
 embalagens em São Paulo com faturamento acima de R$ 10M"
 ```
 
 Saída:
+
 ```json
 {
   "entityType": "leads",
@@ -594,18 +616,18 @@ O sistema mapeia entidades extraídas para **filtros SQL**:
 
 ```typescript
 interface QueryFilters {
-  table: string;                    // "leads"
-  where: WhereClause[];             // Condições SQL
-  joins: JoinClause[];              // Joins necessários
-  orderBy?: OrderByClause[];        // Ordenação
-  limit?: number;                   // Limite de registros
+  table: string; // "leads"
+  where: WhereClause[]; // Condições SQL
+  joins: JoinClause[]; // Joins necessários
+  orderBy?: OrderByClause[]; // Ordenação
+  limit?: number; // Limite de registros
 }
 
 interface WhereClause {
-  field: string;                    // "quality_score"
-  operator: '=' | '>' | '<' | 'IN' | 'LIKE';
-  value: any;                       // 80
-  logicalOperator?: 'AND' | 'OR';   // "AND"
+  field: string; // "quality_score"
+  operator: "=" | ">" | "<" | "IN" | "LIKE";
+  value: any; // 80
+  logicalOperator?: "AND" | "OR"; // "AND"
 }
 ```
 
@@ -616,14 +638,15 @@ O sistema valida a interpretação e sugere **refinamentos**:
 ```typescript
 interface InterpretationResult {
   filters: QueryFilters;
-  confidence: number;               // 0-100
-  estimatedRecords: number;         // 234
-  suggestions: string[];            // Sugestões de refinamento
-  warnings: string[];               // Alertas
+  confidence: number; // 0-100
+  estimatedRecords: number; // 234
+  suggestions: string[]; // Sugestões de refinamento
+  warnings: string[]; // Alertas
 }
 ```
 
 Exemplo:
+
 ```json
 {
   "confidence": 85,
@@ -686,10 +709,10 @@ Para otimizar performance, o sistema mantém um **cache de interpretações**:
 
 ```typescript
 interface CachedInterpretation {
-  inputHash: string;                // Hash MD5 do texto
+  inputHash: string; // Hash MD5 do texto
   interpretation: ExtractedEntities;
   timestamp: Date;
-  hitCount: number;                 // Quantas vezes foi reutilizado
+  hitCount: number; // Quantas vezes foi reutilizado
 }
 ```
 
@@ -735,12 +758,12 @@ class DynamicQueryBuilder {
 
     // Adiciona campos de relacionamentos se necessário
     this.relationships.forEach(rel => {
-      if (rel.mode === 'single_column') {
+      if (rel.mode === "single_column") {
         fields.push(`GROUP_CONCAT(${rel.table}.${rel.field}) AS ${rel.alias}`);
       }
     });
 
-    return `SELECT ${fields.join(', ')}`;
+    return `SELECT ${fields.join(", ")}`;
   }
 
   /**
@@ -750,26 +773,26 @@ class DynamicQueryBuilder {
     const joins: string[] = [];
 
     this.relationships.forEach(rel => {
-      const joinType = rel.required ? 'INNER JOIN' : 'LEFT JOIN';
+      const joinType = rel.required ? "INNER JOIN" : "LEFT JOIN";
       joins.push(
         `${joinType} ${rel.table} ON ${this.baseTable}.${rel.foreignKey} = ${rel.table}.${rel.primaryKey}`
       );
     });
 
-    return joins.join(' ');
+    return joins.join(" ");
   }
 
   /**
    * Constrói cláusula WHERE com todos os filtros
    */
   private buildWhere(): string {
-    if (this.filters.where.length === 0) return '';
+    if (this.filters.where.length === 0) return "";
 
     const conditions = this.filters.where.map(clause => {
       return this.buildCondition(clause);
     });
 
-    return `WHERE ${conditions.join(' ')}`;
+    return `WHERE ${conditions.join(" ")}`;
   }
 
   /**
@@ -779,15 +802,15 @@ class DynamicQueryBuilder {
     const field = this.sanitizeField(clause.field);
     const value = this.sanitizeValue(clause.value);
     const operator = clause.operator;
-    const logical = clause.logicalOperator || 'AND';
+    const logical = clause.logicalOperator || "AND";
 
-    let condition = '';
+    let condition = "";
 
     switch (operator) {
-      case 'IN':
+      case "IN":
         condition = `${field} IN (${value})`;
         break;
-      case 'LIKE':
+      case "LIKE":
         condition = `${field} LIKE '%${value}%'`;
         break;
       default:
@@ -802,7 +825,7 @@ class DynamicQueryBuilder {
    */
   private sanitizeField(field: string): string {
     // Remove caracteres perigosos
-    const sanitized = field.replace(/[^a-zA-Z0-9_\.]/g, '');
+    const sanitized = field.replace(/[^a-zA-Z0-9_\.]/g, "");
     return sanitized;
   }
 
@@ -810,12 +833,12 @@ class DynamicQueryBuilder {
    * Sanitiza valores para prevenir SQL injection
    */
   private sanitizeValue(value: any): string {
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       // Escapa aspas simples
       return `'${value.replace(/'/g, "''")}'`;
     }
     if (Array.isArray(value)) {
-      return value.map(v => this.sanitizeValue(v)).join(', ');
+      return value.map(v => this.sanitizeValue(v)).join(", ");
     }
     return String(value);
   }
@@ -853,8 +876,8 @@ Queries idênticas são cacheadas por **5 minutos**:
 
 ```typescript
 interface QueryCache {
-  queryHash: string;              // Hash MD5 da query
-  results: any[];                 // Resultados
+  queryHash: string; // Hash MD5 da query
+  results: any[]; // Resultados
   timestamp: Date;
   expiresAt: Date;
   hitCount: number;
@@ -883,7 +906,7 @@ class QueryCacheManager {
       results,
       timestamp: new Date(),
       expiresAt: new Date(Date.now() + this.TTL),
-      hitCount: 0
+      hitCount: 0,
     });
   }
 }
@@ -895,8 +918,8 @@ Para queries com muitos resultados, o sistema usa **cursor-based pagination**:
 
 ```typescript
 interface PaginationConfig {
-  pageSize: number;               // 1000 registros por página
-  cursor?: string;                // Cursor da última página
+  pageSize: number; // 1000 registros por página
+  cursor?: string; // Cursor da última página
 }
 
 async function executePaginatedQuery(
@@ -915,7 +938,7 @@ async function executePaginatedQuery(
   return {
     data: results,
     nextCursor: results.length === limit ? String(offset + limit) : null,
-    hasMore: results.length === limit
+    hasMore: results.length === limit,
   };
 }
 ```
@@ -936,7 +959,7 @@ async function loadRelationships(
   const relationshipPromises = relationships.map(rel => {
     return db.query(`
       SELECT * FROM ${rel.table}
-      WHERE ${rel.foreignKey} IN (${mainIds.join(',')})
+      WHERE ${rel.foreignKey} IN (${mainIds.join(",")})
     `);
   });
 
@@ -967,7 +990,7 @@ O sistema suporta **3 modos de relacionamento**:
 Múltiplos valores em uma única célula:
 
 ```sql
-SELECT 
+SELECT
   c.id,
   c.nome,
   GROUP_CONCAT(m.nome SEPARATOR '; ') AS mercados
@@ -978,6 +1001,7 @@ GROUP BY c.id
 ```
 
 Resultado:
+
 ```
 | ID | Nome         | Mercados                                    |
 |----|--------------|---------------------------------------------|
@@ -990,7 +1014,7 @@ Resultado:
 Uma linha por relacionamento:
 
 ```sql
-SELECT 
+SELECT
   c.id,
   c.nome,
   m.nome AS mercado
@@ -1000,6 +1024,7 @@ LEFT JOIN mercados m ON cm.mercado_id = m.id
 ```
 
 Resultado:
+
 ```
 | ID | Nome         | Mercado                  |
 |----|--------------|--------------------------|
@@ -1013,6 +1038,7 @@ Resultado:
 Dois arquivos mantendo normalização:
 
 **clientes.csv:**
+
 ```
 | ID | Nome         | Email              |
 |----|--------------|--------------------|
@@ -1021,6 +1047,7 @@ Dois arquivos mantendo normalização:
 ```
 
 **clientes_mercados.csv:**
+
 ```
 | Cliente ID | Mercado                  |
 |------------|--------------------------|
@@ -1047,8 +1074,8 @@ O sistema calcula **estatísticas descritivas** dos dados:
 interface DataStatistics {
   totalRecords: number;
   distributions: {
-    geography: Record<string, number>;    // {"SP": 120, "MG": 80}
-    porte: Record<string, number>;        // {"média": 150, "grande": 50}
+    geography: Record<string, number>; // {"SP": 120, "MG": 80}
+    porte: Record<string, number>; // {"média": 150, "grande": 50}
     segmentation: Record<string, number>; // {"B2B": 180, "B2C": 20}
     qualityScore: {
       mean: number;
@@ -1059,10 +1086,10 @@ interface DataStatistics {
     };
   };
   trends: {
-    growthRate?: number;                  // Taxa de crescimento
-    seasonality?: string;                 // Sazonalidade identificada
+    growthRate?: number; // Taxa de crescimento
+    seasonality?: string; // Sazonalidade identificada
   };
-  outliers: any[];                        // Registros atípicos
+  outliers: any[]; // Registros atípicos
 }
 ```
 
@@ -1110,30 +1137,30 @@ JSON estruturado conforme interface InsightReport
 ```typescript
 interface Insight {
   id: string;
-  title: string;                        // "Concentração Geográfica no Sudeste"
-  description: string;                  // Descrição detalhada
-  category: 'opportunity' | 'risk' | 'trend' | 'recommendation';
-  priority: 'high' | 'medium' | 'low';
+  title: string; // "Concentração Geográfica no Sudeste"
+  description: string; // Descrição detalhada
+  category: "opportunity" | "risk" | "trend" | "recommendation";
+  priority: "high" | "medium" | "low";
   supportingData: {
-    metric: string;                     // "Distribuição geográfica"
-    value: any;                         // {"SP": 60%, "MG": 25%}
-    visualization?: string;             // Tipo de gráfico sugerido
+    metric: string; // "Distribuição geográfica"
+    value: any; // {"SP": 60%, "MG": 25%}
+    visualization?: string; // Tipo de gráfico sugerido
   }[];
-  implications: string[];               // Implicações para o negócio
-  recommendations: string[];            // Ações recomendadas
+  implications: string[]; // Implicações para o negócio
+  recommendations: string[]; // Ações recomendadas
 }
 
 interface InsightReport {
-  executiveSummary: string;             // Sumário executivo (1 parágrafo)
-  keyFindings: string[];                // 3-5 descobertas principais
-  insights: Insight[];                  // 5-7 insights detalhados
+  executiveSummary: string; // Sumário executivo (1 parágrafo)
+  keyFindings: string[]; // 3-5 descobertas principais
+  insights: Insight[]; // 5-7 insights detalhados
   recommendations: {
-    immediate: string[];                // Ações imediatas (próximos 30 dias)
-    shortTerm: string[];                // Curto prazo (próximos 90 dias)
-    longTerm: string[];                 // Longo prazo (6-12 meses)
+    immediate: string[]; // Ações imediatas (próximos 30 dias)
+    shortTerm: string[]; // Curto prazo (próximos 90 dias)
+    longTerm: string[]; // Longo prazo (6-12 meses)
   };
-  risks: string[];                      // Riscos identificados
-  opportunities: string[];              // Oportunidades identificadas
+  risks: string[]; // Riscos identificados
+  opportunities: string[]; // Oportunidades identificadas
 }
 ```
 
@@ -1146,6 +1173,7 @@ O sistema oferece **4 templates especializados**:
 Foco em **oportunidades e tendências** de mercado:
 
 **Seções Geradas:**
+
 1. **Visão Geral do Mercado**
    - Tamanho total e segmentação
    - Principais players e concentração
@@ -1176,6 +1204,7 @@ Foco em **oportunidades e tendências** de mercado:
 Foco em **perfil e comportamento** de clientes:
 
 **Seções Geradas:**
+
 1. **Perfil Demográfico**
    - Distribuição geográfica
    - Distribuição por porte
@@ -1206,6 +1235,7 @@ Foco em **perfil e comportamento** de clientes:
 Foco em **concorrência e posicionamento**:
 
 **Seções Geradas:**
+
 1. **Mapeamento Competitivo**
    - Número de concorrentes por mercado
    - Concentração geográfica
@@ -1236,6 +1266,7 @@ Foco em **concorrência e posicionamento**:
 Foco em **qualificação e priorização**:
 
 **Seções Geradas:**
+
 1. **Perfil de Leads**
    - Distribuição por quality score
    - Distribuição geográfica
@@ -1267,7 +1298,7 @@ O sistema gera **gráficos automáticos** para ilustrar insights:
 
 ```typescript
 interface ChartConfig {
-  type: 'bar' | 'pie' | 'line' | 'scatter' | 'heatmap';
+  type: "bar" | "pie" | "line" | "scatter" | "heatmap";
   title: string;
   data: any[];
   xAxis?: string;
@@ -1281,15 +1312,15 @@ class ChartGenerator {
    */
   generateBarChart(data: Record<string, number>, title: string): ChartConfig {
     return {
-      type: 'bar',
+      type: "bar",
       title,
       data: Object.entries(data).map(([key, value]) => ({
         label: key,
-        value
+        value,
       })),
-      xAxis: 'Categoria',
-      yAxis: 'Quantidade',
-      colors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444']
+      xAxis: "Categoria",
+      yAxis: "Quantidade",
+      colors: ["#3B82F6", "#10B981", "#F59E0B", "#EF4444"],
     };
   }
 
@@ -1298,16 +1329,16 @@ class ChartGenerator {
    */
   generatePieChart(data: Record<string, number>, title: string): ChartConfig {
     const total = Object.values(data).reduce((sum, val) => sum + val, 0);
-    
+
     return {
-      type: 'pie',
+      type: "pie",
       title,
       data: Object.entries(data).map(([key, value]) => ({
         label: key,
         value,
-        percentage: ((value / total) * 100).toFixed(1)
+        percentage: ((value / total) * 100).toFixed(1),
       })),
-      colors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
+      colors: ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"],
     };
   }
 
@@ -1319,15 +1350,15 @@ class ChartGenerator {
     title: string
   ): ChartConfig {
     return {
-      type: 'line',
+      type: "line",
       title,
       data: data.map(point => ({
-        x: point.date.toISOString().split('T')[0],
-        y: point.value
+        x: point.date.toISOString().split("T")[0],
+        y: point.value,
       })),
-      xAxis: 'Data',
-      yAxis: 'Valor',
-      colors: ['#3B82F6']
+      xAxis: "Data",
+      yAxis: "Valor",
+      colors: ["#3B82F6"],
     };
   }
 }
@@ -1347,25 +1378,30 @@ O sistema utiliza **templates modulares** para cada formato de saída:
 class CSVRenderer {
   render(data: any[], fields: string[]): string {
     // Cabeçalho
-    const header = fields.join(';');
-    
+    const header = fields.join(";");
+
     // Linhas de dados
     const rows = data.map(record => {
-      return fields.map(field => {
-        const value = record[field];
-        
-        // Escapa valores com ponto e vírgula ou quebras de linha
-        if (typeof value === 'string' && (value.includes(';') || value.includes('\n'))) {
-          return `"${value.replace(/"/g, '""')}"`;
-        }
-        
-        return value ?? '';
-      }).join(';');
+      return fields
+        .map(field => {
+          const value = record[field];
+
+          // Escapa valores com ponto e vírgula ou quebras de linha
+          if (
+            typeof value === "string" &&
+            (value.includes(";") || value.includes("\n"))
+          ) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+
+          return value ?? "";
+        })
+        .join(";");
     });
-    
+
     // Adiciona BOM para UTF-8
-    const BOM = '\uFEFF';
-    return BOM + [header, ...rows].join('\n');
+    const BOM = "\uFEFF";
+    return BOM + [header, ...rows].join("\n");
   }
 }
 ```
@@ -1373,78 +1409,89 @@ class CSVRenderer {
 #### Template Excel
 
 ```typescript
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 class ExcelRenderer {
   render(data: any[], fields: string[], options: ExcelOptions): Buffer {
     const workbook = XLSX.utils.book_new();
-    
+
     // Cria aba principal
     const worksheet = XLSX.utils.json_to_sheet(data, {
-      header: fields
+      header: fields,
     });
-    
+
     // Aplica formatação
     this.applyFormatting(worksheet, fields);
-    
+
     // Adiciona filtros automáticos
-    worksheet['!autofilter'] = { ref: XLSX.utils.encode_range(worksheet['!ref']!) };
-    
+    worksheet["!autofilter"] = {
+      ref: XLSX.utils.encode_range(worksheet["!ref"]!),
+    };
+
     // Congela primeira linha
-    worksheet['!freeze'] = { xSplit: 0, ySplit: 1 };
-    
+    worksheet["!freeze"] = { xSplit: 0, ySplit: 1 };
+
     // Ajusta largura das colunas
-    worksheet['!cols'] = fields.map(field => ({ wch: this.calculateColumnWidth(field) }));
-    
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Dados');
-    
+    worksheet["!cols"] = fields.map(field => ({
+      wch: this.calculateColumnWidth(field),
+    }));
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Dados");
+
     // Adiciona aba de sumário se solicitado
     if (options.includeSummary) {
       const summarySheet = this.createSummarySheet(data);
-      XLSX.utils.book_append_sheet(workbook, summarySheet, 'Sumário');
+      XLSX.utils.book_append_sheet(workbook, summarySheet, "Sumário");
     }
-    
+
     // Adiciona gráficos se solicitado
     if (options.includeCharts) {
       // Nota: XLSX não suporta gráficos nativamente, usar ExcelJS
       this.addChartsWithExcelJS(workbook, data);
     }
-    
-    return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    return XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
   }
-  
+
   private applyFormatting(worksheet: XLSX.WorkSheet, fields: string[]): void {
-    const range = XLSX.utils.decode_range(worksheet['!ref']!);
-    
+    const range = XLSX.utils.decode_range(worksheet["!ref"]!);
+
     // Formata cabeçalho (negrito, fundo azul)
     for (let col = range.s.c; col <= range.e.c; col++) {
       const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
       if (!worksheet[cellAddress]) continue;
-      
+
       worksheet[cellAddress].s = {
-        font: { bold: true, color: { rgb: 'FFFFFF' } },
-        fill: { fgColor: { rgb: '3B82F6' } },
-        alignment: { horizontal: 'center' }
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: "3B82F6" } },
+        alignment: { horizontal: "center" },
       };
     }
-    
+
     // Formata células de dados
     for (let row = range.s.r + 1; row <= range.e.r; row++) {
       for (let col = range.s.c; col <= range.e.c; col++) {
         const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
         if (!worksheet[cellAddress]) continue;
-        
+
         const field = fields[col];
-        
+
         // Formatação condicional para quality_score
-        if (field === 'quality_score') {
+        if (field === "quality_score") {
           const value = worksheet[cellAddress].v as number;
           worksheet[cellAddress].s = {
             fill: {
               fgColor: {
-                rgb: value >= 80 ? '10B981' : value >= 60 ? '3B82F6' : value >= 40 ? 'F59E0B' : 'EF4444'
-              }
-            }
+                rgb:
+                  value >= 80
+                    ? "10B981"
+                    : value >= 60
+                      ? "3B82F6"
+                      : value >= 40
+                        ? "F59E0B"
+                        : "EF4444",
+              },
+            },
           };
         }
       }
@@ -1456,72 +1503,73 @@ class ExcelRenderer {
 #### Template PDF (Lista)
 
 ```typescript
-import PDFDocument from 'pdfkit';
+import PDFDocument from "pdfkit";
 
 class PDFListRenderer {
   render(data: any[], fields: string[], options: PDFOptions): Buffer {
     const doc = new PDFDocument({
-      size: 'A4',
-      margins: { top: 50, bottom: 50, left: 50, right: 50 }
+      size: "A4",
+      margins: { top: 50, bottom: 50, left: 50, right: 50 },
     });
-    
+
     const chunks: Buffer[] = [];
-    doc.on('data', chunk => chunks.push(chunk));
-    
+    doc.on("data", chunk => chunks.push(chunk));
+
     // Cabeçalho
     this.renderHeader(doc, options.title);
-    
+
     // Tabela de dados
     this.renderTable(doc, data, fields);
-    
+
     // Rodapé
     this.renderFooter(doc);
-    
+
     doc.end();
-    
+
     return Buffer.concat(chunks);
   }
-  
-  private renderTable(doc: PDFKit.PDFDocument, data: any[], fields: string[]): void {
+
+  private renderTable(
+    doc: PDFKit.PDFDocument,
+    data: any[],
+    fields: string[]
+  ): void {
     const tableTop = 150;
     const rowHeight = 25;
     const columnWidth = (doc.page.width - 100) / fields.length;
-    
+
     // Cabeçalho da tabela
-    doc.fontSize(10).font('Helvetica-Bold');
+    doc.fontSize(10).font("Helvetica-Bold");
     fields.forEach((field, i) => {
-      doc.text(
-        this.formatFieldName(field),
-        50 + i * columnWidth,
-        tableTop,
-        { width: columnWidth, align: 'center' }
-      );
+      doc.text(this.formatFieldName(field), 50 + i * columnWidth, tableTop, {
+        width: columnWidth,
+        align: "center",
+      });
     });
-    
+
     // Linha separadora
-    doc.moveTo(50, tableTop + 15)
-       .lineTo(doc.page.width - 50, tableTop + 15)
-       .stroke();
-    
+    doc
+      .moveTo(50, tableTop + 15)
+      .lineTo(doc.page.width - 50, tableTop + 15)
+      .stroke();
+
     // Linhas de dados
-    doc.fontSize(9).font('Helvetica');
+    doc.fontSize(9).font("Helvetica");
     data.forEach((record, rowIndex) => {
       const y = tableTop + 20 + rowIndex * rowHeight;
-      
+
       // Verifica se precisa adicionar nova página
       if (y > doc.page.height - 100) {
         doc.addPage();
         return;
       }
-      
+
       fields.forEach((field, colIndex) => {
         const value = record[field];
-        doc.text(
-          String(value ?? ''),
-          50 + colIndex * columnWidth,
-          y,
-          { width: columnWidth, align: 'left' }
-        );
+        doc.text(String(value ?? ""), 50 + colIndex * columnWidth, y, {
+          width: columnWidth,
+          align: "left",
+        });
       });
     });
   }
@@ -1538,104 +1586,118 @@ class PDFReportRenderer {
     options: PDFReportOptions
   ): Buffer {
     const doc = new PDFDocument({
-      size: 'A4',
-      margins: { top: 50, bottom: 50, left: 50, right: 50 }
+      size: "A4",
+      margins: { top: 50, bottom: 50, left: 50, right: 50 },
     });
-    
+
     const chunks: Buffer[] = [];
-    doc.on('data', chunk => chunks.push(chunk));
-    
+    doc.on("data", chunk => chunks.push(chunk));
+
     // Página 1: Capa
     this.renderCover(doc, options.title, options.subtitle);
-    
+
     // Página 2: Sumário Executivo
     doc.addPage();
-    this.renderExecutiveSummary(doc, insights.executiveSummary, insights.keyFindings);
-    
+    this.renderExecutiveSummary(
+      doc,
+      insights.executiveSummary,
+      insights.keyFindings
+    );
+
     // Páginas 3-N: Insights Detalhados
     insights.insights.forEach(insight => {
       doc.addPage();
       this.renderInsight(doc, insight);
     });
-    
+
     // Página N+1: Recomendações
     doc.addPage();
     this.renderRecommendations(doc, insights.recommendations);
-    
+
     // Página N+2: Anexos (dados detalhados)
     doc.addPage();
     this.renderDataAppendix(doc, data);
-    
+
     doc.end();
-    
+
     return Buffer.concat(chunks);
   }
-  
-  private renderCover(doc: PDFKit.PDFDocument, title: string, subtitle: string): void {
+
+  private renderCover(
+    doc: PDFKit.PDFDocument,
+    title: string,
+    subtitle: string
+  ): void {
     // Logo
-    if (fs.existsSync('./assets/logo.png')) {
-      doc.image('./assets/logo.png', 50, 50, { width: 150 });
+    if (fs.existsSync("./assets/logo.png")) {
+      doc.image("./assets/logo.png", 50, 50, { width: 150 });
     }
-    
+
     // Título
-    doc.fontSize(32)
-       .font('Helvetica-Bold')
-       .text(title, 50, 250, { align: 'center' });
-    
+    doc
+      .fontSize(32)
+      .font("Helvetica-Bold")
+      .text(title, 50, 250, { align: "center" });
+
     // Subtítulo
-    doc.fontSize(18)
-       .font('Helvetica')
-       .text(subtitle, 50, 320, { align: 'center' });
-    
+    doc
+      .fontSize(18)
+      .font("Helvetica")
+      .text(subtitle, 50, 320, { align: "center" });
+
     // Data
-    doc.fontSize(12)
-       .text(
-         new Date().toLocaleDateString('pt-BR', {
-           day: '2-digit',
-           month: 'long',
-           year: 'numeric'
-         }),
-         50,
-         doc.page.height - 100,
-         { align: 'center' }
-       );
+    doc.fontSize(12).text(
+      new Date().toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      }),
+      50,
+      doc.page.height - 100,
+      { align: "center" }
+    );
   }
-  
+
   private renderInsight(doc: PDFKit.PDFDocument, insight: Insight): void {
     // Título do insight
-    doc.fontSize(20)
-       .font('Helvetica-Bold')
-       .text(insight.title, 50, 80);
-    
+    doc.fontSize(20).font("Helvetica-Bold").text(insight.title, 50, 80);
+
     // Badge de prioridade
-    const badgeColor = insight.priority === 'high' ? '#EF4444' : 
-                       insight.priority === 'medium' ? '#F59E0B' : '#10B981';
-    doc.rect(50, 115, 80, 20)
-       .fill(badgeColor);
-    doc.fontSize(10)
-       .font('Helvetica-Bold')
-       .fillColor('#FFFFFF')
-       .text(insight.priority.toUpperCase(), 50, 119, { width: 80, align: 'center' });
-    
+    const badgeColor =
+      insight.priority === "high"
+        ? "#EF4444"
+        : insight.priority === "medium"
+          ? "#F59E0B"
+          : "#10B981";
+    doc.rect(50, 115, 80, 20).fill(badgeColor);
+    doc
+      .fontSize(10)
+      .font("Helvetica-Bold")
+      .fillColor("#FFFFFF")
+      .text(insight.priority.toUpperCase(), 50, 119, {
+        width: 80,
+        align: "center",
+      });
+
     // Descrição
-    doc.fontSize(12)
-       .font('Helvetica')
-       .fillColor('#000000')
-       .text(insight.description, 50, 150, { align: 'justify' });
-    
+    doc
+      .fontSize(12)
+      .font("Helvetica")
+      .fillColor("#000000")
+      .text(insight.description, 50, 150, { align: "justify" });
+
     // Dados de suporte
     let y = 250;
     insight.supportingData.forEach(data => {
-      doc.fontSize(11)
-         .font('Helvetica-Bold')
-         .text(`${data.metric}:`, 50, y);
-      
-      doc.fontSize(10)
-         .font('Helvetica')
-         .text(JSON.stringify(data.value, null, 2), 70, y + 15);
-      
+      doc.fontSize(11).font("Helvetica-Bold").text(`${data.metric}:`, 50, y);
+
+      doc
+        .fontSize(10)
+        .font("Helvetica")
+        .text(JSON.stringify(data.value, null, 2), 70, y + 15);
+
       y += 60;
-      
+
       // Adiciona gráfico se especificado
       if (data.visualization && y < doc.page.height - 200) {
         // Gera gráfico e insere
@@ -1644,33 +1706,31 @@ class PDFReportRenderer {
         y += 250;
       }
     });
-    
+
     // Implicações
     if (insight.implications.length > 0) {
-      doc.fontSize(14)
-         .font('Helvetica-Bold')
-         .text('Implicações:', 50, y);
-      
+      doc.fontSize(14).font("Helvetica-Bold").text("Implicações:", 50, y);
+
       y += 25;
       insight.implications.forEach(implication => {
-        doc.fontSize(10)
-           .font('Helvetica')
-           .text(`• ${implication}`, 70, y, { align: 'justify' });
+        doc
+          .fontSize(10)
+          .font("Helvetica")
+          .text(`• ${implication}`, 70, y, { align: "justify" });
         y += 30;
       });
     }
-    
+
     // Recomendações
     if (insight.recommendations.length > 0) {
-      doc.fontSize(14)
-         .font('Helvetica-Bold')
-         .text('Recomendações:', 50, y);
-      
+      doc.fontSize(14).font("Helvetica-Bold").text("Recomendações:", 50, y);
+
       y += 25;
       insight.recommendations.forEach(recommendation => {
-        doc.fontSize(10)
-           .font('Helvetica')
-           .text(`✓ ${recommendation}`, 70, y, { align: 'justify' });
+        doc
+          .fontSize(10)
+          .font("Helvetica")
+          .text(`✓ ${recommendation}`, 70, y, { align: "justify" });
         y += 30;
       });
     }
@@ -1683,31 +1743,33 @@ class PDFReportRenderer {
 O sistema utiliza **Chart.js** via node-canvas para gerar gráficos:
 
 ```typescript
-import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
+import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 
 class ChartRenderer {
   private chartJSNodeCanvas: ChartJSNodeCanvas;
-  
+
   constructor() {
     this.chartJSNodeCanvas = new ChartJSNodeCanvas({
       width: 800,
       height: 600,
-      backgroundColour: 'white'
+      backgroundColour: "white",
     });
   }
-  
+
   async renderBarChart(config: ChartConfig): Promise<Buffer> {
     const configuration = {
-      type: 'bar' as const,
+      type: "bar" as const,
       data: {
         labels: config.data.map(d => d.label),
-        datasets: [{
-          label: config.title,
-          data: config.data.map(d => d.value),
-          backgroundColor: config.colors || ['#3B82F6'],
-          borderColor: config.colors || ['#2563EB'],
-          borderWidth: 1
-        }]
+        datasets: [
+          {
+            label: config.title,
+            data: config.data.map(d => d.value),
+            backgroundColor: config.colors || ["#3B82F6"],
+            borderColor: config.colors || ["#2563EB"],
+            borderWidth: 1,
+          },
+        ],
       },
       options: {
         responsive: true,
@@ -1715,44 +1777,50 @@ class ChartRenderer {
           title: {
             display: true,
             text: config.title,
-            font: { size: 18 }
+            font: { size: 18 },
           },
           legend: {
-            display: false
-          }
+            display: false,
+          },
         },
         scales: {
           y: {
             beginAtZero: true,
             title: {
               display: true,
-              text: config.yAxis || 'Valor'
-            }
+              text: config.yAxis || "Valor",
+            },
           },
           x: {
             title: {
               display: true,
-              text: config.xAxis || 'Categoria'
-            }
-          }
-        }
-      }
+              text: config.xAxis || "Categoria",
+            },
+          },
+        },
+      },
     };
-    
+
     return await this.chartJSNodeCanvas.renderToBuffer(configuration);
   }
-  
+
   async renderPieChart(config: ChartConfig): Promise<Buffer> {
     const configuration = {
-      type: 'pie' as const,
+      type: "pie" as const,
       data: {
         labels: config.data.map(d => `${d.label} (${d.percentage}%)`),
-        datasets: [{
-          data: config.data.map(d => d.value),
-          backgroundColor: config.colors || [
-            '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'
-          ]
-        }]
+        datasets: [
+          {
+            data: config.data.map(d => d.value),
+            backgroundColor: config.colors || [
+              "#3B82F6",
+              "#10B981",
+              "#F59E0B",
+              "#EF4444",
+              "#8B5CF6",
+            ],
+          },
+        ],
       },
       options: {
         responsive: true,
@@ -1760,15 +1828,15 @@ class ChartRenderer {
           title: {
             display: true,
             text: config.title,
-            font: { size: 18 }
+            font: { size: 18 },
           },
           legend: {
-            position: 'right' as const
-          }
-        }
-      }
+            position: "right" as const,
+          },
+        },
+      },
     };
-    
+
     return await this.chartJSNodeCanvas.renderToBuffer(configuration);
   }
 }
@@ -1788,70 +1856,78 @@ export const exportRouter = router({
    * Interpreta contexto em linguagem natural
    */
   interpretContext: protectedProcedure
-    .input(z.object({
-      context: z.string(),
-      projectId: z.string().optional()
-    }))
+    .input(
+      z.object({
+        context: z.string(),
+        projectId: z.string().optional(),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
       const interpretation = await interpretationService.interpret(
         input.context,
         input.projectId
       );
-      
+
       return interpretation;
     }),
-  
+
   /**
    * Valida filtros e estima volume de dados
    */
   validateFilters: protectedProcedure
-    .input(z.object({
-      filters: QueryFiltersSchema
-    }))
+    .input(
+      z.object({
+        filters: QueryFiltersSchema,
+      })
+    )
     .query(async ({ input }) => {
       const validation = await queryBuilder.validate(input.filters);
-      
+
       return {
         isValid: validation.isValid,
         estimatedRecords: validation.estimatedRecords,
         estimatedSize: validation.estimatedSize,
-        warnings: validation.warnings
+        warnings: validation.warnings,
       };
     }),
-  
+
   /**
    * Executa query e retorna dados
    */
   executeQuery: protectedProcedure
-    .input(z.object({
-      filters: QueryFiltersSchema,
-      fields: z.array(z.string()),
-      relationships: z.array(RelationshipConfigSchema).optional()
-    }))
+    .input(
+      z.object({
+        filters: QueryFiltersSchema,
+        fields: z.array(z.string()),
+        relationships: z.array(RelationshipConfigSchema).optional(),
+      })
+    )
     .query(async ({ input }) => {
       const query = queryBuilder.build(
         input.filters,
         input.fields,
         input.relationships
       );
-      
+
       const results = await db.execute(query);
-      
+
       return {
         data: results,
-        count: results.length
+        count: results.length,
       };
     }),
-  
+
   /**
    * Gera insights com IA
    */
   generateInsights: protectedProcedure
-    .input(z.object({
-      data: z.array(z.any()),
-      templateType: z.enum(['market', 'client', 'competitive', 'lead']),
-      depth: z.enum(['quick', 'standard', 'deep'])
-    }))
+    .input(
+      z.object({
+        data: z.array(z.any()),
+        templateType: z.enum(["market", "client", "competitive", "lead"]),
+        depth: z.enum(["quick", "standard", "deep"]),
+      })
+    )
     .mutation(async ({ input }) => {
       const statistics = analysisService.calculateStatistics(input.data);
       const insights = await analysisService.generateInsights(
@@ -1859,56 +1935,59 @@ export const exportRouter = router({
         input.templateType,
         input.depth
       );
-      
+
       return insights;
     }),
-  
+
   /**
    * Renderiza formato final
    */
   renderOutput: protectedProcedure
-    .input(z.object({
-      data: z.array(z.any()),
-      fields: z.array(z.string()),
-      format: z.enum(['csv', 'excel', 'pdf', 'json']),
-      outputType: z.enum(['simple', 'complete', 'report']),
-      insights: InsightReportSchema.optional(),
-      options: z.any().optional()
-    }))
+    .input(
+      z.object({
+        data: z.array(z.any()),
+        fields: z.array(z.string()),
+        format: z.enum(["csv", "excel", "pdf", "json"]),
+        outputType: z.enum(["simple", "complete", "report"]),
+        insights: InsightReportSchema.optional(),
+        options: z.any().optional(),
+      })
+    )
     .mutation(async ({ input }) => {
       let renderer;
-      
+
       switch (input.format) {
-        case 'csv':
+        case "csv":
           renderer = new CSVRenderer();
           break;
-        case 'excel':
+        case "excel":
           renderer = new ExcelRenderer();
           break;
-        case 'pdf':
-          renderer = input.outputType === 'report' 
-            ? new PDFReportRenderer() 
-            : new PDFListRenderer();
+        case "pdf":
+          renderer =
+            input.outputType === "report"
+              ? new PDFReportRenderer()
+              : new PDFListRenderer();
           break;
-        case 'json':
+        case "json":
           renderer = new JSONRenderer();
           break;
       }
-      
+
       const buffer = await renderer.render(
         input.data,
         input.fields,
         input.insights,
         input.options
       );
-      
+
       // Salva em S3
       const { url } = await storagePut(
         `exports/${Date.now()}-export.${input.format}`,
         buffer,
         `application/${input.format}`
       );
-      
+
       // Registra no histórico
       await db.exportHistory.create({
         userId: ctx.user.id,
@@ -1917,30 +1996,32 @@ export const exportRouter = router({
         outputType: input.outputType,
         recordCount: input.data.length,
         fileUrl: url,
-        fileSize: buffer.length
+        fileSize: buffer.length,
       });
-      
+
       return { url };
     }),
-  
+
   /**
    * Lista histórico de exportações
    */
   listHistory: protectedProcedure
-    .input(z.object({
-      limit: z.number().default(20),
-      offset: z.number().default(0)
-    }))
+    .input(
+      z.object({
+        limit: z.number().default(20),
+        offset: z.number().default(0),
+      })
+    )
     .query(async ({ input, ctx }) => {
       const history = await db.exportHistory.findMany({
         where: { userId: ctx.user.id },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: input.limit,
-        skip: input.offset
+        skip: input.offset,
       });
-      
+
       return history;
-    })
+    }),
 });
 ```
 
@@ -1951,41 +2032,50 @@ Adicionar tabelas para suportar o módulo:
 ```typescript
 // drizzle/schema.ts
 
-export const exportHistory = mysqlTable('export_history', {
-  id: varchar('id', { length: 64 }).primaryKey(),
-  userId: varchar('userId', { length: 64 }).notNull(),
-  context: text('context'),                    // Contexto original
-  filters: json('filters'),                    // Filtros aplicados
-  format: mysqlEnum('format', ['csv', 'excel', 'pdf', 'json']).notNull(),
-  outputType: mysqlEnum('outputType', ['simple', 'complete', 'report']).notNull(),
-  recordCount: int('recordCount').notNull(),
-  fileUrl: text('fileUrl').notNull(),
-  fileSize: int('fileSize').notNull(),         // Bytes
-  createdAt: timestamp('createdAt').defaultNow()
+export const exportHistory = mysqlTable("export_history", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  context: text("context"), // Contexto original
+  filters: json("filters"), // Filtros aplicados
+  format: mysqlEnum("format", ["csv", "excel", "pdf", "json"]).notNull(),
+  outputType: mysqlEnum("outputType", [
+    "simple",
+    "complete",
+    "report",
+  ]).notNull(),
+  recordCount: int("recordCount").notNull(),
+  fileUrl: text("fileUrl").notNull(),
+  fileSize: int("fileSize").notNull(), // Bytes
+  createdAt: timestamp("createdAt").defaultNow(),
 });
 
-export const savedFilters = mysqlTable('saved_filters', {
-  id: varchar('id', { length: 64 }).primaryKey(),
-  userId: varchar('userId', { length: 64 }).notNull(),
-  name: varchar('name', { length: 255 }).notNull(),
-  description: text('description'),
-  filters: json('filters').notNull(),
-  isPublic: boolean('isPublic').default(false),
-  shareToken: varchar('shareToken', { length: 64 }),
-  usageCount: int('usageCount').default(0),
-  createdAt: timestamp('createdAt').defaultNow(),
-  updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow()
+export const savedFilters = mysqlTable("saved_filters", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  filters: json("filters").notNull(),
+  isPublic: boolean("isPublic").default(false),
+  shareToken: varchar("shareToken", { length: 64 }),
+  usageCount: int("usageCount").default(0),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
 });
 
-export const exportTemplates = mysqlTable('export_templates', {
-  id: varchar('id', { length: 64 }).primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
-  description: text('description'),
-  templateType: mysqlEnum('templateType', ['market', 'client', 'competitive', 'lead']).notNull(),
-  config: json('config').notNull(),            // Configuração do template
-  isSystem: boolean('isSystem').default(false), // Template do sistema ou customizado
-  userId: varchar('userId', { length: 64 }),   // Null se for template do sistema
-  createdAt: timestamp('createdAt').defaultNow()
+export const exportTemplates = mysqlTable("export_templates", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  templateType: mysqlEnum("templateType", [
+    "market",
+    "client",
+    "competitive",
+    "lead",
+  ]).notNull(),
+  config: json("config").notNull(), // Configuração do template
+  isSystem: boolean("isSystem").default(false), // Template do sistema ou customizado
+  userId: varchar("userId", { length: 64 }), // Null se for template do sistema
+  createdAt: timestamp("createdAt").defaultNow(),
 });
 ```
 
@@ -1995,44 +2085,47 @@ export const exportTemplates = mysqlTable('export_templates', {
 
 ### 8.1 Performance Esperada
 
-| Operação | Volume | Tempo Estimado | Observações |
-|----------|--------|----------------|-------------|
-| Interpretação de Contexto | 1 contexto | ~2s | Chamada à API Gemini |
-| Validação de Filtros | 1 query | ~0.5s | Cache local |
-| Execução de Query | 1.000 registros | ~3s | Com 2 joins |
-| Execução de Query | 10.000 registros | ~15s | Com 2 joins |
-| Geração de Insights | 1.000 registros | ~30s | Análise padrão |
-| Geração de Insights | 1.000 registros | ~90s | Análise profunda |
-| Renderização CSV | 10.000 registros | ~5s | Sem relacionamentos |
-| Renderização Excel | 10.000 registros | ~15s | Com formatação |
-| Renderização PDF Lista | 1.000 registros | ~20s | Com tabelas |
-| Renderização PDF Relatório | 1.000 registros | ~60s | Com insights e gráficos |
+| Operação                   | Volume           | Tempo Estimado | Observações             |
+| -------------------------- | ---------------- | -------------- | ----------------------- |
+| Interpretação de Contexto  | 1 contexto       | ~2s            | Chamada à API Gemini    |
+| Validação de Filtros       | 1 query          | ~0.5s          | Cache local             |
+| Execução de Query          | 1.000 registros  | ~3s            | Com 2 joins             |
+| Execução de Query          | 10.000 registros | ~15s           | Com 2 joins             |
+| Geração de Insights        | 1.000 registros  | ~30s           | Análise padrão          |
+| Geração de Insights        | 1.000 registros  | ~90s           | Análise profunda        |
+| Renderização CSV           | 10.000 registros | ~5s            | Sem relacionamentos     |
+| Renderização Excel         | 10.000 registros | ~15s           | Com formatação          |
+| Renderização PDF Lista     | 1.000 registros  | ~20s           | Com tabelas             |
+| Renderização PDF Relatório | 1.000 registros  | ~60s           | Com insights e gráficos |
 
 ### 8.2 Limites Recomendados
 
-| Recurso | Limite | Justificativa |
-|---------|--------|---------------|
-| Registros por Exportação | 50.000 | Performance de renderização |
-| Tamanho de Arquivo | 100 MB | Limite de download no navegador |
-| Relacionamentos Simultâneos | 5 | Complexidade de joins |
-| Insights por Relatório | 7 | Legibilidade |
-| Gráficos por Relatório | 10 | Tamanho do PDF |
-| Histórico de Exportações | 100 | Por usuário |
-| Filtros Salvos | 50 | Por usuário |
+| Recurso                     | Limite | Justificativa                   |
+| --------------------------- | ------ | ------------------------------- |
+| Registros por Exportação    | 50.000 | Performance de renderização     |
+| Tamanho de Arquivo          | 100 MB | Limite de download no navegador |
+| Relacionamentos Simultâneos | 5      | Complexidade de joins           |
+| Insights por Relatório      | 7      | Legibilidade                    |
+| Gráficos por Relatório      | 10     | Tamanho do PDF                  |
+| Histórico de Exportações    | 100    | Por usuário                     |
+| Filtros Salvos              | 50     | Por usuário                     |
 
 ### 8.3 Custos Estimados
 
 **Custos de IA (Gemini):**
+
 - Interpretação de Contexto: ~500 tokens = $0.001
 - Geração de Insights (Padrão): ~3.000 tokens = $0.006
 - Geração de Insights (Profunda): ~8.000 tokens = $0.016
 
 **Custos de Armazenamento (S3):**
+
 - Arquivo CSV (10k registros): ~2 MB = $0.00005/mês
 - Arquivo Excel (10k registros): ~5 MB = $0.00012/mês
 - Arquivo PDF Relatório: ~10 MB = $0.00024/mês
 
 **Custo Total Estimado por Exportação:**
+
 - Lista Simples: ~$0.001
 - Lista Completa: ~$0.002
 - Relatório Contextualizado: ~$0.020
@@ -2044,18 +2137,21 @@ export const exportTemplates = mysqlTable('export_templates', {
 ### Fase 1: MVP (2 semanas)
 
 **Semana 1:**
+
 - [ ] Implementar wizard de 4 etapas (frontend)
 - [ ] Implementar interpretação de contexto com IA
 - [ ] Implementar Query Builder básico
 - [ ] Implementar exportação CSV e Excel simples
 
 **Semana 2:**
+
 - [ ] Implementar sistema de relacionamentos
 - [ ] Implementar renderização PDF lista
 - [ ] Implementar histórico de exportações
 - [ ] Testes de integração
 
 **Entregáveis:**
+
 - Exportação de listas simples e completas
 - Suporte a CSV, Excel e PDF tabular
 - Interpretação de contextos básicos
@@ -2064,18 +2160,21 @@ export const exportTemplates = mysqlTable('export_templates', {
 ### Fase 2: Relatórios Contextualizados (2 semanas)
 
 **Semana 3:**
+
 - [ ] Implementar motor de análise estatística
 - [ ] Implementar geração de insights com IA
 - [ ] Implementar 4 templates de relatório
 - [ ] Implementar geração de gráficos
 
 **Semana 4:**
+
 - [ ] Implementar renderização PDF relatório
 - [ ] Implementar sistema de templates customizáveis
 - [ ] Otimizações de performance
 - [ ] Testes completos
 
 **Entregáveis:**
+
 - Relatórios contextualizados com IA
 - 4 templates especializados
 - Gráficos automáticos
@@ -2084,6 +2183,7 @@ export const exportTemplates = mysqlTable('export_templates', {
 ### Fase 3: Funcionalidades Avançadas (1 semana)
 
 **Semana 5:**
+
 - [ ] Implementar filtros salvos e compartilháveis
 - [ ] Implementar templates customizáveis
 - [ ] Implementar agendamento de exportações recorrentes
@@ -2091,6 +2191,7 @@ export const exportTemplates = mysqlTable('export_templates', {
 - [ ] Documentação completa
 
 **Entregáveis:**
+
 - Filtros salvos e compartilháveis
 - Templates customizáveis
 - Agendamento de exportações

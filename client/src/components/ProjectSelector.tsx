@@ -1,16 +1,21 @@
-import { useSelectedProject } from '@/hooks/useSelectedProject';
+import { useSelectedProject } from "@/hooks/useSelectedProject";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Briefcase, Loader2 } from 'lucide-react';
+} from "@/components/ui/select";
+import { Briefcase, Loader2 } from "lucide-react";
 
 export function ProjectSelector() {
-  const { selectedProjectId, selectedProject, projects, selectProject, isLoading } =
-    useSelectedProject();
+  const {
+    selectedProjectId,
+    selectedProject,
+    projects,
+    selectProject,
+    isLoading,
+  } = useSelectedProject();
 
   if (isLoading) {
     return (
@@ -35,18 +40,18 @@ export function ProjectSelector() {
       <Briefcase className="h-4 w-4 text-muted-foreground" />
       <Select
         value={selectedProjectId?.toString()}
-        onValueChange={(value) => selectProject(parseInt(value, 10))}
+        onValueChange={value => selectProject(parseInt(value, 10))}
       >
         <SelectTrigger className="w-[200px] h-9">
           <SelectValue placeholder="Selecione um projeto" />
         </SelectTrigger>
         <SelectContent>
-          {projects.map((project) => (
+          {projects.map(project => (
             <SelectItem key={project.id} value={project.id.toString()}>
               <div className="flex items-center gap-2">
                 <div
                   className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: project.cor || '#3b82f6' }}
+                  style={{ backgroundColor: project.cor || "#3b82f6" }}
                 />
                 <span>{project.nome}</span>
               </div>

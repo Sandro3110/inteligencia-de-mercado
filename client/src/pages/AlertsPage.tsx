@@ -8,7 +8,13 @@ import { useState, useEffect } from "react";
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { ProjectSelector } from "@/components/ProjectSelector";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,18 +22,18 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { 
-  Bell, 
-  AlertTriangle, 
-  CheckCircle2, 
-  Clock, 
-  Zap, 
+import {
+  Bell,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  Zap,
   Loader2,
   TrendingUp,
   Target,
   Settings,
   History,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { intelligentAlertsSchema } from "@shared/formSchemas";
@@ -42,13 +48,14 @@ interface IntelligentAlertConfigState {
 
 export default function AlertsPage() {
   const { selectedProjectId } = useSelectedProject();
-  
-  const [intelligentConfig, setIntelligentConfig] = useState<IntelligentAlertConfigState>({
-    circuitBreakerThreshold: 10,
-    errorRateThreshold: 10,
-    processingTimeThreshold: 60,
-    notifyOnCompletion: true,
-  });
+
+  const [intelligentConfig, setIntelligentConfig] =
+    useState<IntelligentAlertConfigState>({
+      circuitBreakerThreshold: 10,
+      errorRateThreshold: 10,
+      processingTimeThreshold: 60,
+      notifyOnCompletion: true,
+    });
 
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -56,12 +63,13 @@ export default function AlertsPage() {
   const pageSize = 20;
 
   // ============= QUERIES =============
-  
+
   // Alertas Inteligentes - Configuração
-  const { data: loadedIntelligentConfig, isLoading: isLoadingIntelligent } = trpc.intelligentAlerts.getConfig.useQuery(
-    { projectId: selectedProjectId! },
-    { enabled: !!selectedProjectId }
-  );
+  const { data: loadedIntelligentConfig, isLoading: isLoadingIntelligent } =
+    trpc.intelligentAlerts.getConfig.useQuery(
+      { projectId: selectedProjectId! },
+      { enabled: !!selectedProjectId }
+    );
 
   // Alertas Inteligentes - Estatísticas
   const { data: intelligentStats } = trpc.intelligentAlerts.getStats.useQuery(
@@ -70,34 +78,38 @@ export default function AlertsPage() {
   );
 
   // Histórico de Alertas
-  const { data: history, isLoading: isLoadingHistory } = trpc.alert.history.useQuery(
-    {
-      projectId: selectedProjectId!,
-      limit: pageSize,
-      offset: historyPage * pageSize,
-    },
-    { enabled: !!selectedProjectId }
-  );
+  const { data: history, isLoading: isLoadingHistory } =
+    trpc.alert.history.useQuery(
+      {
+        projectId: selectedProjectId!,
+        limit: pageSize,
+        offset: historyPage * pageSize,
+      },
+      { enabled: !!selectedProjectId }
+    );
 
   // ============= MUTATIONS =============
-  
-  const saveIntelligentMutation = trpc.intelligentAlerts.saveConfig.useMutation();
+
+  const saveIntelligentMutation =
+    trpc.intelligentAlerts.saveConfig.useMutation();
 
   // ============= EFFECTS =============
-  
+
   useEffect(() => {
     if (loadedIntelligentConfig) {
       setIntelligentConfig({
-        circuitBreakerThreshold: loadedIntelligentConfig.circuitBreakerThreshold,
+        circuitBreakerThreshold:
+          loadedIntelligentConfig.circuitBreakerThreshold,
         errorRateThreshold: loadedIntelligentConfig.errorRateThreshold,
-        processingTimeThreshold: loadedIntelligentConfig.processingTimeThreshold,
+        processingTimeThreshold:
+          loadedIntelligentConfig.processingTimeThreshold,
         notifyOnCompletion: loadedIntelligentConfig.notifyOnCompletion === 1,
       });
     }
   }, [loadedIntelligentConfig]);
 
   // ============= HANDLERS =============
-  
+
   const handleSaveIntelligent = async () => {
     if (!selectedProjectId) {
       toast.error("Selecione um projeto primeiro");
@@ -106,23 +118,23 @@ export default function AlertsPage() {
 
     try {
       intelligentAlertsSchema.parse({
-        type: 'circuit_breaker',
+        type: "circuit_breaker",
         threshold: intelligentConfig.circuitBreakerThreshold,
-        enabled: true
+        enabled: true,
       });
       intelligentAlertsSchema.parse({
-        type: 'error_rate',
+        type: "error_rate",
         threshold: intelligentConfig.errorRateThreshold,
-        enabled: true
+        enabled: true,
       });
       intelligentAlertsSchema.parse({
-        type: 'processing_time',
+        type: "processing_time",
         threshold: intelligentConfig.processingTimeThreshold,
-        enabled: true
+        enabled: true,
       });
     } catch (error: any) {
       const firstError = error.errors?.[0];
-      toast.error(firstError?.message || 'Configurações inválidas');
+      toast.error(firstError?.message || "Configurações inválidas");
       return;
     }
 
@@ -140,7 +152,9 @@ export default function AlertsPage() {
       });
 
       setLastSaved(new Date());
-      toast.success("Configurações de alertas inteligentes salvas com sucesso!");
+      toast.success(
+        "Configurações de alertas inteligentes salvas com sucesso!"
+      );
     } catch (error: any) {
       toast.error(`Erro ao salvar: ${error.message}`);
     } finally {
@@ -159,7 +173,7 @@ export default function AlertsPage() {
   };
 
   // ============= HELPER FUNCTIONS =============
-  
+
   const getAlertIcon = (type: string) => {
     switch (type) {
       case "error_rate":
@@ -200,7 +214,7 @@ export default function AlertsPage() {
   };
 
   // ============= RENDER =============
-  
+
   if (!selectedProjectId) {
     return (
       <div className="min-h-screen ml-60 bg-background p-6">
@@ -212,7 +226,9 @@ export default function AlertsPage() {
           <Card>
             <CardContent className="py-12 text-center">
               <Bell className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Selecione um Projeto</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                Selecione um Projeto
+              </h3>
               <p className="text-muted-foreground">
                 Escolha um projeto acima para configurar e visualizar alertas
               </p>
@@ -235,7 +251,8 @@ export default function AlertsPage() {
               Central de Alertas
             </h1>
             <p className="text-muted-foreground mt-1">
-              Configure alertas, visualize histórico e gerencie notificações inteligentes
+              Configure alertas, visualize histórico e gerencie notificações
+              inteligentes
             </p>
           </div>
           <ProjectSelector />
@@ -280,7 +297,9 @@ export default function AlertsPage() {
                 <CardContent className="p-8 text-center">
                   <div className="flex flex-col items-center gap-4">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    <p className="text-muted-foreground">Carregando histórico...</p>
+                    <p className="text-muted-foreground">
+                      Carregando histórico...
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -288,14 +307,16 @@ export default function AlertsPage() {
               <Card>
                 <CardContent className="p-8 text-center">
                   <Bell className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">Nenhum alerta foi disparado ainda</p>
+                  <p className="text-muted-foreground">
+                    Nenhum alerta foi disparado ainda
+                  </p>
                 </CardContent>
               </Card>
             ) : (
               <div className="space-y-4">
-                {history.map((item) => {
+                {history.map(item => {
                   const condition = JSON.parse(item.condition);
-                  
+
                   return (
                     <Card
                       key={item.id}
@@ -305,8 +326,8 @@ export default function AlertsPage() {
                           item.alertType === "error_rate"
                             ? "#ef4444"
                             : item.alertType === "high_quality_lead"
-                            ? "#10b981"
-                            : "#3b82f6",
+                              ? "#10b981"
+                              : "#3b82f6",
                       }}
                     >
                       <CardHeader>
@@ -318,13 +339,16 @@ export default function AlertsPage() {
                                 {getAlertTypeName(item.alertType)}
                               </CardTitle>
                               <CardDescription className="text-xs">
-                                {new Date(item.triggeredAt).toLocaleString("pt-BR", {
-                                  day: "2-digit",
-                                  month: "long",
-                                  year: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
+                                {new Date(item.triggeredAt).toLocaleString(
+                                  "pt-BR",
+                                  {
+                                    day: "2-digit",
+                                    month: "long",
+                                    year: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  }
+                                )}
                               </CardDescription>
                             </div>
                           </div>
@@ -347,7 +371,8 @@ export default function AlertsPage() {
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <span>Condição:</span>
                             <code className="px-2 py-1 rounded bg-muted text-primary">
-                              valor {condition.operator || ">="} {condition.value}
+                              valor {condition.operator || ">="}{" "}
+                              {condition.value}
                             </code>
                           </div>
                         </div>
@@ -360,14 +385,14 @@ export default function AlertsPage() {
                   <div className="flex justify-center gap-2 pt-4">
                     <Button
                       variant="outline"
-                      onClick={() => setHistoryPage((p) => Math.max(0, p - 1))}
+                      onClick={() => setHistoryPage(p => Math.max(0, p - 1))}
                       disabled={historyPage === 0}
                     >
                       Anterior
                     </Button>
                     <Button
                       variant="outline"
-                      onClick={() => setHistoryPage((p) => p + 1)}
+                      onClick={() => setHistoryPage(p => p + 1)}
                       disabled={history.length < pageSize}
                     >
                       Próxima
@@ -459,7 +484,8 @@ export default function AlertsPage() {
                   <Badge variant="default">Crítico</Badge>
                 </div>
                 <CardDescription>
-                  Alerta quando o circuit breaker é ativado por falhas consecutivas
+                  Alerta quando o circuit breaker é ativado por falhas
+                  consecutivas
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -473,17 +499,25 @@ export default function AlertsPage() {
                     min={1}
                     max={50}
                     value={intelligentConfig.circuitBreakerThreshold}
-                    onChange={(e) => setIntelligentConfig(prev => ({ 
-                      ...prev, 
-                      circuitBreakerThreshold: parseInt(e.target.value) || 10 
-                    }))}
+                    onChange={e =>
+                      setIntelligentConfig(prev => ({
+                        ...prev,
+                        circuitBreakerThreshold: parseInt(e.target.value) || 10,
+                      }))
+                    }
                   />
                   <p className="text-xs text-muted-foreground">
-                    Alerta será disparado após {intelligentConfig.circuitBreakerThreshold} falhas consecutivas
+                    Alerta será disparado após{" "}
+                    {intelligentConfig.circuitBreakerThreshold} falhas
+                    consecutivas
                   </p>
                 </div>
 
-                <Button variant="outline" size="sm" onClick={() => handleTestAlert("circuit-breaker")}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleTestAlert("circuit-breaker")}
+                >
                   Testar Alerta
                 </Button>
               </CardContent>
@@ -514,17 +548,24 @@ export default function AlertsPage() {
                     min={1}
                     max={100}
                     value={intelligentConfig.errorRateThreshold}
-                    onChange={(e) => setIntelligentConfig(prev => ({ 
-                      ...prev, 
-                      errorRateThreshold: parseInt(e.target.value) || 10 
-                    }))}
+                    onChange={e =>
+                      setIntelligentConfig(prev => ({
+                        ...prev,
+                        errorRateThreshold: parseInt(e.target.value) || 10,
+                      }))
+                    }
                   />
                   <p className="text-xs text-muted-foreground">
-                    Alerta será disparado quando taxa de erro ultrapassar {intelligentConfig.errorRateThreshold}%
+                    Alerta será disparado quando taxa de erro ultrapassar{" "}
+                    {intelligentConfig.errorRateThreshold}%
                   </p>
                 </div>
 
-                <Button variant="outline" size="sm" onClick={() => handleTestAlert("error-rate")}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleTestAlert("error-rate")}
+                >
                   Testar Alerta
                 </Button>
               </CardContent>
@@ -541,7 +582,8 @@ export default function AlertsPage() {
                   <Badge variant="outline">Informativo</Badge>
                 </div>
                 <CardDescription>
-                  Alerta quando o tempo médio de processamento excede o threshold
+                  Alerta quando o tempo médio de processamento excede o
+                  threshold
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -555,17 +597,24 @@ export default function AlertsPage() {
                     min={10}
                     max={300}
                     value={intelligentConfig.processingTimeThreshold}
-                    onChange={(e) => setIntelligentConfig(prev => ({ 
-                      ...prev, 
-                      processingTimeThreshold: parseInt(e.target.value) || 60 
-                    }))}
+                    onChange={e =>
+                      setIntelligentConfig(prev => ({
+                        ...prev,
+                        processingTimeThreshold: parseInt(e.target.value) || 60,
+                      }))
+                    }
                   />
                   <p className="text-xs text-muted-foreground">
-                    Alerta será disparado quando tempo médio ultrapassar {intelligentConfig.processingTimeThreshold}s
+                    Alerta será disparado quando tempo médio ultrapassar{" "}
+                    {intelligentConfig.processingTimeThreshold}s
                   </p>
                 </div>
 
-                <Button variant="outline" size="sm" onClick={() => handleTestAlert("processing-time")}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleTestAlert("processing-time")}
+                >
                   Testar Alerta
                 </Button>
               </CardContent>
@@ -582,7 +631,8 @@ export default function AlertsPage() {
                   <Badge variant="default">Ativo</Badge>
                 </div>
                 <CardDescription>
-                  Notificação quando o enriquecimento é concluído com estatísticas
+                  Notificação quando o enriquecimento é concluído com
+                  estatísticas
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -592,20 +642,27 @@ export default function AlertsPage() {
                       Notificar ao Concluir
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Enviar alerta com estatísticas quando enriquecimento terminar
+                      Enviar alerta com estatísticas quando enriquecimento
+                      terminar
                     </p>
                   </div>
                   <Switch
                     id="notify-completion"
                     checked={intelligentConfig.notifyOnCompletion}
-                    onCheckedChange={(checked) => setIntelligentConfig(prev => ({ 
-                      ...prev, 
-                      notifyOnCompletion: checked 
-                    }))}
+                    onCheckedChange={checked =>
+                      setIntelligentConfig(prev => ({
+                        ...prev,
+                        notifyOnCompletion: checked,
+                      }))
+                    }
                   />
                 </div>
 
-                <Button variant="outline" size="sm" onClick={() => handleTestAlert("completion")}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleTestAlert("completion")}
+                >
                   Testar Alerta
                 </Button>
               </CardContent>

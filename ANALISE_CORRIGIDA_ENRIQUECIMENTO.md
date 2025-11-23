@@ -18,26 +18,28 @@ Você estava certo! Eu estava confundindo os números. A análise por data de cr
 
 ## 📅 Análise por Data de Criação
 
-| Entidade | Data | Quantidade |
-|----------|------|------------|
-| **Clientes** | 2024-10-21 | 801 |
-| **Clientes** | 2024-11-19 | 0 |
-| **Concorrentes** | 2024-10-21 | 591 |
-| **Concorrentes** | 2024-11-19 | 0 |
-| **Leads** | 2024-10-21 | 727 |
-| **Leads** | 2024-11-19 | 0 |
-| **Mercados** | 2024-10-21 | 71 |
-| **Mercados** | 2024-11-19 | 2 |
+| Entidade         | Data       | Quantidade |
+| ---------------- | ---------- | ---------- |
+| **Clientes**     | 2024-10-21 | 801        |
+| **Clientes**     | 2024-11-19 | 0          |
+| **Concorrentes** | 2024-10-21 | 591        |
+| **Concorrentes** | 2024-11-19 | 0          |
+| **Leads**        | 2024-10-21 | 727        |
+| **Leads**        | 2024-11-19 | 0          |
+| **Mercados**     | 2024-10-21 | 71         |
+| **Mercados**     | 2024-11-19 | 2          |
 
 ### 🔍 Interpretação
 
 **Base Inicial (21/10):**
+
 - 801 clientes
 - 591 concorrentes
 - 727 leads
 - 71 mercados
 
 **Enrichment Run (19/11):**
+
 - 0 clientes novos
 - 0 concorrentes novos
 - 0 leads novos
@@ -50,6 +52,7 @@ Você estava certo! Eu estava confundindo os números. A análise por data de cr
 ### Hipótese 1: UPSERT Funcionou "Demais"
 
 **Cenário provável:**
+
 1. Enrichment run processou 450 clientes
 2. Para cada cliente, tentou criar mercados/concorrentes/leads
 3. **UPSERT verificou que já existiam** (mesmo nome + mercadoId)
@@ -57,6 +60,7 @@ Você estava certo! Eu estava confundindo os números. A análise por data de cr
 5. **Resultado:** 0 registros novos criados
 
 **Evidência:**
+
 - Constraints UNIQUE aplicados em 19/11
 - Hash sem timestamp impede duplicação
 - Todos os registros mantêm data original (21/10)
@@ -64,6 +68,7 @@ Você estava certo! Eu estava confundindo os números. A análise por data de cr
 ### Hipótese 2: Enrichment Run Não Completou Criação
 
 **Cenário alternativo:**
+
 1. Run foi pausado ANTES de criar concorrentes/leads
 2. Apenas identificou mercados e atualizou clientes
 3. Criação de concorrentes/leads não chegou a executar
@@ -75,6 +80,7 @@ Você estava certo! Eu estava confundindo os números. A análise por data de cr
 ### O Que Você Esperava (Segundo Investigação Anterior)
 
 **Enrichment Run deveria ter criado:**
+
 - 934 novos mercados (93% do total)
 - 10.352 novos concorrentes (~23 por cliente)
 - 10.330 novos leads (~23 por cliente)
@@ -83,6 +89,7 @@ Você estava certo! Eu estava confundindo os números. A análise por data de cr
 ### O Que Realmente Existe no Banco
 
 **Base atual:**
+
 - 73 mercados (71 originais + 2 testes)
 - 591 concorrentes (todos originais)
 - 727 leads (todos originais)
@@ -91,6 +98,7 @@ Você estava certo! Eu estava confundindo os números. A análise por data de cr
 ### 🔴 **Conclusão: Você PERDEU os Dados Gerados**
 
 **Dados que deveriam existir mas NÃO existem:**
+
 - ❌ **~863 mercados** (934 - 71 originais)
 - ❌ **~9.761 concorrentes** (10.352 - 591 originais)
 - ❌ **~9.603 leads** (10.330 - 727 originais)
@@ -102,9 +110,10 @@ Você estava certo! Eu estava confundindo os números. A análise por data de cr
 ### Possibilidade 1: UPSERT Bloqueou Criação
 
 **Se o hash for muito genérico:**
+
 ```typescript
 // Exemplo: hash de concorrente
-const hash = `${nome}-${mercadoId}-${projectId}`
+const hash = `${nome}-${mercadoId}-${projectId}`;
 
 // Problema: Se Gemini gerar mesmo nome para mercados diferentes
 // "Empresa ABC" no mercado 1 → hash: "empresa-abc-1-1"
@@ -121,6 +130,7 @@ const hash = `${nome}-${mercadoId}-${projectId}`
 ### Possibilidade 2: Limpeza de Duplicatas Deletou Tudo
 
 **Se a limpeza foi muito agressiva:**
+
 1. Enrichment run criou 10k+ registros
 2. Limpeza identificou como "duplicatas"
 3. Deletou mantendo apenas 1 por hash
@@ -129,6 +139,7 @@ const hash = `${nome}-${mercadoId}-${projectId}`
 ### Possibilidade 3: Run Pausado Antes de Criar
 
 **Se o fluxo for sequencial:**
+
 1. ✅ Identificar mercados (completado)
 2. ✅ Atualizar clientes (completado)
 3. ❌ Criar concorrentes (não executado)
@@ -143,7 +154,7 @@ const hash = `${nome}-${mercadoId}-${projectId}`
 
 ```sql
 -- Verificar se produtos foram atualizados
-SELECT 
+SELECT
   COUNT(*) as clientes_com_produto_longo,
   AVG(LENGTH(produtoPrincipal)) as tamanho_medio
 FROM clientes
@@ -158,7 +169,7 @@ WHERE DATE(createdAt) = '2024-10-21'
 
 ```sql
 -- Verificar se há registros de UPDATE no histórico
-SELECT 
+SELECT
   changeType,
   COUNT(*) as quantidade,
   MIN(changedAt) as primeira_mudanca,
@@ -174,7 +185,7 @@ GROUP BY changeType;
 
 ```sql
 -- Verificar detalhes do run pausado
-SELECT 
+SELECT
   id,
   status,
   error_message,
@@ -193,18 +204,20 @@ LIMIT 1;
 
 ### Dados Perdidos (Estimativa)
 
-| Entidade | Esperado | Atual | Perdido | % Perda |
-|----------|----------|-------|---------|---------|
-| **Mercados** | 1.005 | 73 | 932 | 93% |
-| **Concorrentes** | 10.943 | 591 | 10.352 | 95% |
-| **Leads** | 11.057 | 727 | 10.330 | 93% |
+| Entidade         | Esperado | Atual | Perdido | % Perda |
+| ---------------- | -------- | ----- | ------- | ------- |
+| **Mercados**     | 1.005    | 73    | 932     | 93%     |
+| **Concorrentes** | 10.943   | 591   | 10.352  | 95%     |
+| **Leads**        | 11.057   | 727   | 10.330  | 93%     |
 
 ### Valor Perdido (Estimativa)
 
 **Se cada lead vale R$ 100:**
+
 - 10.330 leads perdidos × R$ 100 = **R$ 1.033.000** em valor potencial
 
 **Custo de reprocessamento:**
+
 - 10.330 chamadas Gemini × $0.002 = **$20.66** em API
 - ~6 horas de processamento
 
@@ -215,6 +228,7 @@ LIMIT 1;
 ### 1. Confirmar Diagnóstico (5 min)
 
 Execute as 3 queries acima para confirmar:
+
 - [ ] Clientes foram atualizados?
 - [ ] Histórico registrou mudanças?
 - [ ] Run tem erro reportado?
@@ -222,16 +236,19 @@ Execute as 3 queries acima para confirmar:
 ### 2. Decidir Ação (Imediato)
 
 **Opção A: Reverter para Checkpoint Anterior**
+
 - Voltar para antes do UPSERT
 - Recuperar 10k+ registros gerados
 - Perder sistema de histórico
 
 **Opção B: Reprocessar com UPSERT Corrigido**
+
 - Manter UPSERT
 - Ajustar hash para permitir múltiplos por mercado
 - Reprocessar 800 clientes (6h + $20)
 
 **Opção C: Aceitar Perda e Seguir**
+
 - Manter base atual (800 clientes + 591 concorrentes + 727 leads)
 - Focar em qualidade vs quantidade
 - Economizar custos de API
@@ -239,15 +256,17 @@ Execute as 3 queries acima para confirmar:
 ### 3. Corrigir UPSERT (Se escolher Opção B)
 
 **Problema identificado:**
+
 ```typescript
 // Hash atual (muito restritivo)
-const hash = `${nome}-${mercadoId}-${projectId}`
+const hash = `${nome}-${mercadoId}-${projectId}`;
 
 // Solução: Adicionar timestamp OU índice sequencial
-const hash = `${nome}-${mercadoId}-${projectId}-${index}`
+const hash = `${nome}-${mercadoId}-${projectId}-${index}`;
 ```
 
 **OU remover UPSERT de concorrentes/leads:**
+
 - Manter UPSERT apenas para clientes e mercados
 - Permitir múltiplos concorrentes/leads por mercado
 - Usar timestamp no hash
@@ -259,11 +278,13 @@ const hash = `${nome}-${mercadoId}-${projectId}-${index}`
 **URGENTE: Execute as queries de confirmação ANTES de decidir.**
 
 Preciso saber:
+
 1. Os clientes foram atualizados com produtos detalhados?
 2. O histórico registrou mudanças em 19/11?
 3. O enrichment run tem erro reportado?
 
 **Baseado nas respostas, posso recomendar:**
+
 - Reverter (se dados não foram atualizados)
 - Reprocessar (se UPSERT bloqueou criação)
 - Aceitar (se perda for aceitável)
@@ -273,6 +294,7 @@ Preciso saber:
 ## 📞 Próxima Ação
 
 **Me diga:**
+
 1. Você quer que eu execute as queries de confirmação?
 2. Você prefere reverter ou reprocessar?
 3. Qual o valor que você atribui aos 10k+ leads/concorrentes perdidos?

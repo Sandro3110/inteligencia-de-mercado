@@ -111,11 +111,9 @@ export async function isEmpresaUnica(
  * Filtra lista de empresas removendo duplicatas
  * Verifica tanto contra o banco quanto dentro da própria lista
  */
-export async function filtrarEmpresasUnicas<T extends { nome: string; cnpj?: string }>(
-  empresas: T[],
-  projectId?: number,
-  empresasExcluir?: string[]
-): Promise<T[]> {
+export async function filtrarEmpresasUnicas<
+  T extends { nome: string; cnpj?: string },
+>(empresas: T[], projectId?: number, empresasExcluir?: string[]): Promise<T[]> {
   const empresasUnicas: T[] = [];
   const nomesVistos = new Set<string>();
 
@@ -123,8 +121,13 @@ export async function filtrarEmpresasUnicas<T extends { nome: string; cnpj?: str
     const nomeNormalizado = normalizarNomeEmpresa(empresa.nome);
 
     // Verificar se está na lista de exclusão
-    if (empresasExcluir && empresasExcluir.some(e => normalizarNomeEmpresa(e) === nomeNormalizado)) {
-      console.log(`[Deduplicação] Empresa na lista de exclusão: ${empresa.nome}`);
+    if (
+      empresasExcluir &&
+      empresasExcluir.some(e => normalizarNomeEmpresa(e) === nomeNormalizado)
+    ) {
+      console.log(
+        `[Deduplicação] Empresa na lista de exclusão: ${empresa.nome}`
+      );
       continue;
     }
 
@@ -135,7 +138,11 @@ export async function filtrarEmpresasUnicas<T extends { nome: string; cnpj?: str
     }
 
     // Verificar se existe no banco
-    const { isUnica } = await isEmpresaUnica(empresa.nome, empresa.cnpj, projectId);
+    const { isUnica } = await isEmpresaUnica(
+      empresa.nome,
+      empresa.cnpj,
+      projectId
+    );
 
     if (isUnica) {
       empresasUnicas.push(empresa);
@@ -152,7 +159,9 @@ export async function filtrarEmpresasUnicas<T extends { nome: string; cnpj?: str
  * Obtém lista de nomes de empresas já existentes no banco
  * Útil para passar ao Gemini para evitar gerar duplicatas
  */
-export async function getEmpresasExistentes(projectId?: number): Promise<string[]> {
+export async function getEmpresasExistentes(
+  projectId?: number
+): Promise<string[]> {
   const db = await getDb();
   if (!db) {
     return [];
@@ -166,7 +175,7 @@ export async function getEmpresasExistentes(projectId?: number): Promise<string[
     .from(clientes)
     .where(projectId ? eq(clientes.projectId, projectId) : undefined);
 
-  empresas.push(...clientesResult.map((c) => c.nome).filter(Boolean));
+  empresas.push(...clientesResult.map(c => c.nome).filter(Boolean));
 
   // Buscar concorrentes
   const concorrentesResult = await db
@@ -174,7 +183,7 @@ export async function getEmpresasExistentes(projectId?: number): Promise<string[
     .from(concorrentes)
     .where(projectId ? eq(concorrentes.projectId, projectId) : undefined);
 
-  empresas.push(...concorrentesResult.map((c) => c.nome).filter(Boolean));
+  empresas.push(...concorrentesResult.map(c => c.nome).filter(Boolean));
 
   // Buscar leads
   const leadsResult = await db
@@ -182,7 +191,7 @@ export async function getEmpresasExistentes(projectId?: number): Promise<string[
     .from(leads)
     .where(projectId ? eq(leads.projectId, projectId) : undefined);
 
-  empresas.push(...leadsResult.map((l) => l.nome).filter(Boolean));
+  empresas.push(...leadsResult.map(l => l.nome).filter(Boolean));
 
   return Array.from(new Set(empresas)); // Remove duplicatas
 }

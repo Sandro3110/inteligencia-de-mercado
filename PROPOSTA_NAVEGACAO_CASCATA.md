@@ -67,12 +67,14 @@ O header conterá os controles globais que afetam toda a visualização:
 Esta é a área principal onde a hierarquia é exibida. A visualização funciona da seguinte forma:
 
 **Estado inicial** (nenhum mercado selecionado):
+
 - Grid de cards compactos (3-4 colunas) mostrando os 73 mercados
 - Cada card exibe: nome do mercado, segmentação (pill badge), contadores de status (pendente/validado/descartado) para cada tipo (clientes/concorrentes/leads)
 - Hover effect: elevação sutil do card
 - Click: expande o mercado e mostra os níveis subordinados
 
 **Estado expandido** (mercado selecionado):
+
 - O card do mercado selecionado se destaca visualmente (borda colorida, leve aumento de tamanho)
 - Abaixo do mercado, aparecem **3 seções em colunas** lado a lado:
   - **Coluna 1: Clientes** (lista compacta com nome, status, botão validar)
@@ -83,6 +85,7 @@ Esta é a área principal onde a hierarquia é exibida. A visualização funcion
 - Botão "Fechar" ou click fora para colapsar
 
 **Navegação fluida**:
+
 - Ao clicar em outro mercado, o anterior colapsa automaticamente (accordion behavior)
 - Animação suave de expansão/colapso (300ms ease-in-out)
 - Indicador visual de qual mercado está expandido
@@ -115,30 +118,36 @@ Mantém a funcionalidade atual de validação individual, mas com melhorias:
 A implementação será baseada em componentes reutilizáveis e modulares:
 
 **CascadeView** (componente principal):
+
 - Gerencia estado global da navegação (mercado expandido, filtros ativos)
 - Renderiza header, lista de mercados e painel lateral
 - Controla animações de expansão/colapso
 
 **MercadoCard** (card compacto de mercado):
+
 - Props: mercado (dados), isExpanded (boolean), onToggle (callback)
 - Exibe nome, segmentação, contadores de status
 - Renderiza MercadoDetails quando expandido
 
 **MercadoDetails** (conteúdo expandido):
+
 - Renderiza 3 colunas: ClientesList, ConcorrentesList, LeadsList
 - Gerencia seleção de itens para fila de trabalho
 
 **ItemRow** (linha de cliente/concorrente/lead):
+
 - Props: item (dados), type (cliente|concorrente|lead), onSelect (callback)
 - Exibe nome, status badge, checkbox, botão validar
 - Hover effect: destaque sutil
 
 **FilaTrabalho** (painel lateral):
+
 - Gerencia lista de itens selecionados
 - Renderiza ações em lote
 - Persiste estado no localStorage
 
 **ThemeToggle** (botão de tema):
+
 - Ícone animado (sol ↔ lua)
 - Alterna entre light/dark
 - Persiste preferência no localStorage
@@ -150,14 +159,16 @@ O estado da aplicação será gerenciado com React hooks:
 ```typescript
 // Estado global da navegação
 const [expandedMercadoId, setExpandedMercadoId] = useState<number | null>(null);
-const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'rich' | 'discarded'>('all');
+const [statusFilter, setStatusFilter] = useState<
+  "all" | "pending" | "rich" | "discarded"
+>("all");
 const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
 const [filaOpen, setFilaOpen] = useState(false);
 
 // Tipos
 interface SelectedItem {
   id: number;
-  type: 'cliente' | 'concorrente' | 'lead';
+  type: "cliente" | "concorrente" | "lead";
   mercadoId: number;
   name: string;
   status: string;
@@ -173,9 +184,9 @@ As queries existentes serão otimizadas para suportar filtros:
 trpc.mercados.listWithStats.useQuery({ statusFilter });
 
 // Itens de um mercado específico (clientes, concorrentes, leads)
-trpc.mercados.getDetails.useQuery({ 
-  mercadoId, 
-  statusFilter 
+trpc.mercados.getDetails.useQuery({
+  mercadoId,
+  statusFilter,
 });
 
 // Validação em lote
@@ -375,24 +386,28 @@ As queries tRPC serão configuradas com cache agressivo para dados que mudam rar
 A implementação será dividida em 4 fases incrementais:
 
 ### Fase 1: Estrutura Base (2-3 horas)
+
 - Criar componente CascadeView
 - Implementar lista de mercados com cards compactos
 - Adicionar botão de tema light/dark no header
 - Implementar expansão/colapso de mercados (sem conteúdo ainda)
 
 ### Fase 2: Conteúdo Expandido (3-4 horas)
+
 - Criar componente MercadoDetails com 3 colunas
 - Implementar ItemRow para clientes/concorrentes/leads
 - Adicionar badges de status e contadores
 - Integrar queries tRPC para carregar dados
 
 ### Fase 3: Filtros e Fila (2-3 horas)
+
 - Implementar filtro global de status no header
 - Criar componente FilaTrabalho (painel lateral)
 - Adicionar checkboxes e seleção de itens
 - Implementar persistência no localStorage
 
 ### Fase 4: Validação e Polimento (2-3 horas)
+
 - Adaptar modal de validação para suportar lote
 - Adicionar animações suaves de expansão/colapso
 - Implementar scroll automático ao expandir
@@ -418,4 +433,3 @@ Estou pronto para iniciar a implementação assim que você aprovar a proposta o
 **Documentação preparada por**: Manus AI  
 **Projeto**: Gestor de Pesquisa de Mercado PAV  
 **Versão do sistema**: 4e584f8e (Redesign MciGlobal)
-

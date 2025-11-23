@@ -25,7 +25,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 
 export function UnifiedFilterPanel() {
-  const { filters, updateFilters, clearFilters, hasActiveFilters } = useFilters();
+  const { filters, updateFilters, clearFilters, hasActiveFilters } =
+    useFilters();
   const [isOpen, setIsOpen] = useState(false);
 
   // Buscar opções de filtros do backend
@@ -40,21 +41,21 @@ export function UnifiedFilterPanel() {
 
   const toggleEstado = (estado: string) => {
     const newEstados = filters.estados.includes(estado)
-      ? filters.estados.filter((e) => e !== estado)
+      ? filters.estados.filter(e => e !== estado)
       : [...filters.estados, estado];
     updateFilters({ estados: newEstados });
   };
 
   const toggleTag = (tag: string) => {
     const newTags = filters.tags.includes(tag)
-      ? filters.tags.filter((t) => t !== tag)
+      ? filters.tags.filter(t => t !== tag)
       : [...filters.tags, tag];
     updateFilters({ tags: newTags });
   };
 
   const toggleStatus = (status: string) => {
     const newStatus = filters.statusValidacao.includes(status)
-      ? filters.statusValidacao.filter((s) => s !== status)
+      ? filters.statusValidacao.filter(s => s !== status)
       : [...filters.statusValidacao, status];
     updateFilters({ statusValidacao: newStatus });
   };
@@ -67,7 +68,7 @@ export function UnifiedFilterPanel() {
         <Input
           placeholder="Buscar em todos os dados..."
           value={filters.searchTerm}
-          onChange={(e) => updateFilters({ searchTerm: e.target.value })}
+          onChange={e => updateFilters({ searchTerm: e.target.value })}
           className="pl-9"
         />
       </div>
@@ -98,14 +99,17 @@ export function UnifiedFilterPanel() {
           <SheetHeader>
             <SheetTitle>Filtros Avançados</SheetTitle>
             <SheetDescription>
-              Configure filtros que serão aplicados em todas as visualizações (Lista, Mapa, Kanban)
+              Configure filtros que serão aplicados em todas as visualizações
+              (Lista, Mapa, Kanban)
             </SheetDescription>
           </SheetHeader>
 
           <div className="space-y-6 mt-6">
             {/* Filtro de Qualidade */}
             <div className="space-y-3">
-              <Label>Qualidade ({filters.qualidadeMin} - {filters.qualidadeMax})</Label>
+              <Label>
+                Qualidade ({filters.qualidadeMin} - {filters.qualidadeMax})
+              </Label>
               <Slider
                 min={0}
                 max={100}
@@ -125,7 +129,7 @@ export function UnifiedFilterPanel() {
               <Label>Tipo de Entidade</Label>
               <Select
                 value={filters.tipoEntidade}
-                onValueChange={(value) => updateFilters({ tipoEntidade: value })}
+                onValueChange={value => updateFilters({ tipoEntidade: value })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -143,7 +147,7 @@ export function UnifiedFilterPanel() {
             <div className="space-y-3">
               <Label>Status de Validação</Label>
               <div className="space-y-2">
-                {["pendente", "validado", "descartado"].map((status) => (
+                {["pendente", "validado", "descartado"].map(status => (
                   <div key={status} className="flex items-center space-x-2">
                     <Checkbox
                       id={`status-${status}`}
@@ -169,7 +173,9 @@ export function UnifiedFilterPanel() {
                   {filterOptions.estados.map((estado: string) => (
                     <Badge
                       key={estado}
-                      variant={filters.estados.includes(estado) ? "default" : "outline"}
+                      variant={
+                        filters.estados.includes(estado) ? "default" : "outline"
+                      }
                       className="cursor-pointer"
                       onClick={() => toggleEstado(estado)}
                     >
@@ -191,12 +197,16 @@ export function UnifiedFilterPanel() {
                   {filterOptions.tags.map((tag: string) => (
                     <Badge
                       key={tag}
-                      variant={filters.tags.includes(tag) ? "default" : "outline"}
+                      variant={
+                        filters.tags.includes(tag) ? "default" : "outline"
+                      }
                       className="cursor-pointer"
                       onClick={() => toggleTag(tag)}
                     >
                       {tag}
-                      {filters.tags.includes(tag) && <X className="ml-1 h-3 w-3" />}
+                      {filters.tags.includes(tag) && (
+                        <X className="ml-1 h-3 w-3" />
+                      )}
                     </Badge>
                   ))}
                 </div>

@@ -30,7 +30,7 @@ export function MultiSelectFilter({
 
   const toggleValue = (value: string) => {
     if (selectedValues.includes(value)) {
-      onValuesChange(selectedValues.filter((v) => v !== value));
+      onValuesChange(selectedValues.filter(v => v !== value));
     } else {
       onValuesChange([...selectedValues, value]);
     }
@@ -42,8 +42,8 @@ export function MultiSelectFilter({
   };
 
   const selectedLabels = options
-    .filter((opt) => selectedValues.includes(opt.value))
-    .map((opt) => opt.label);
+    .filter(opt => selectedValues.includes(opt.value))
+    .map(opt => opt.label);
 
   return (
     <div className="space-y-2">
@@ -90,7 +90,7 @@ export function MultiSelectFilter({
                   Nenhuma opção disponível
                 </p>
               ) : (
-                options.map((option) => {
+                options.map(option => {
                   const isSelected = selectedValues.includes(option.value);
                   return (
                     <div

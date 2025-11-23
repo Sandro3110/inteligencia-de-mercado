@@ -3,7 +3,13 @@ import { useState } from "react";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { useEnrichmentConfig } from "@/hooks/useEnrichmentConfig";
 import { ProjectSelector } from "@/components/ProjectSelector";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -14,7 +20,15 @@ import { Settings, Key, CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 export default function EnrichmentSettings() {
   const { selectedProjectId } = useSelectedProject();
-  const { config, isLoading, saveConfig, isSaving, testKeys, isTesting, testResults } = useEnrichmentConfig(selectedProjectId || undefined);
+  const {
+    config,
+    isLoading,
+    saveConfig,
+    isSaving,
+    testKeys,
+    isTesting,
+    testResults,
+  } = useEnrichmentConfig(selectedProjectId || undefined);
 
   // Form state
   const [openaiApiKey, setOpenaiApiKey] = useState("");
@@ -70,28 +84,31 @@ export default function EnrichmentSettings() {
       return;
     }
 
-    saveConfig({
-      projectId: selectedProjectId,
-      openaiApiKey,
-      serpapiKey: serpapiKey || undefined,
-      receitawsKey: receitawsKey || undefined,
-      produtosPorMercado,
-      concorrentesPorMercado,
-      leadsPorMercado,
-      batchSize,
-      checkpointInterval,
-      enableDeduplication: enableDeduplication ? 1 : 0,
-      enableQualityScore: enableQualityScore ? 1 : 0,
-      enableAutoRetry: enableAutoRetry ? 1 : 0,
-      maxRetries,
-    }, {
-      onSuccess: () => {
-        toast.success("Configurações salvas com sucesso!");
+    saveConfig(
+      {
+        projectId: selectedProjectId,
+        openaiApiKey,
+        serpapiKey: serpapiKey || undefined,
+        receitawsKey: receitawsKey || undefined,
+        produtosPorMercado,
+        concorrentesPorMercado,
+        leadsPorMercado,
+        batchSize,
+        checkpointInterval,
+        enableDeduplication: enableDeduplication ? 1 : 0,
+        enableQualityScore: enableQualityScore ? 1 : 0,
+        enableAutoRetry: enableAutoRetry ? 1 : 0,
+        maxRetries,
       },
-      onError: (error: any) => {
-        toast.error(`Erro ao salvar: ${error.message}`);
-      },
-    });
+      {
+        onSuccess: () => {
+          toast.success("Configurações salvas com sucesso!");
+        },
+        onError: (error: any) => {
+          toast.error(`Erro ao salvar: ${error.message}`);
+        },
+      }
+    );
   };
 
   if (!selectedProjectId) {
@@ -99,12 +116,16 @@ export default function EnrichmentSettings() {
       <div className="min-h-screen ml-60 bg-background p-6">
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
-            <Breadcrumbs items={[{ label: "Configurações de Enriquecimento" }]} />
+            <Breadcrumbs
+              items={[{ label: "Configurações de Enriquecimento" }]}
+            />
             <ProjectSelector />
           </div>
           <Card>
             <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">Selecione um projeto para configurar o enriquecimento</p>
+              <p className="text-muted-foreground">
+                Selecione um projeto para configurar o enriquecimento
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -118,7 +139,9 @@ export default function EnrichmentSettings() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <Breadcrumbs items={[{ label: "Configurações de Enriquecimento" }]} />
+            <Breadcrumbs
+              items={[{ label: "Configurações de Enriquecimento" }]}
+            />
             <h1 className="text-3xl font-bold text-foreground mt-2">
               <Settings className="inline-block w-8 h-8 mr-2" />
               Configurações de Enriquecimento
@@ -134,7 +157,9 @@ export default function EnrichmentSettings() {
           <Card>
             <CardContent className="py-12 text-center">
               <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-              <p className="text-muted-foreground">Carregando configurações...</p>
+              <p className="text-muted-foreground">
+                Carregando configurações...
+              </p>
             </CardContent>
           </Card>
         ) : (
@@ -147,7 +172,8 @@ export default function EnrichmentSettings() {
                   API Keys
                 </CardTitle>
                 <CardDescription>
-                  Configure suas chaves de API para os serviços de enriquecimento
+                  Configure suas chaves de API para os serviços de
+                  enriquecimento
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -161,10 +187,11 @@ export default function EnrichmentSettings() {
                     type="password"
                     placeholder="sk-..."
                     value={openaiApiKey}
-                    onChange={(e) => setOpenaiApiKey(e.target.value)}
+                    onChange={e => setOpenaiApiKey(e.target.value)}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Obrigatória. Usada para gerar dados de mercado, produtos, concorrentes e leads.
+                    Obrigatória. Usada para gerar dados de mercado, produtos,
+                    concorrentes e leads.
                   </p>
                 </div>
 
@@ -176,7 +203,7 @@ export default function EnrichmentSettings() {
                     type="password"
                     placeholder="..."
                     value={serpapiKey}
-                    onChange={(e) => setSerpapiKey(e.target.value)}
+                    onChange={e => setSerpapiKey(e.target.value)}
                   />
                   <p className="text-xs text-muted-foreground">
                     Opcional. Usada para buscar informações adicionais na web.
@@ -185,13 +212,15 @@ export default function EnrichmentSettings() {
 
                 {/* ReceitaWS Key */}
                 <div className="space-y-2">
-                  <Label htmlFor="receitaws-key">ReceitaWS API Key (Opcional)</Label>
+                  <Label htmlFor="receitaws-key">
+                    ReceitaWS API Key (Opcional)
+                  </Label>
                   <Input
                     id="receitaws-key"
                     type="password"
                     placeholder="..."
                     value={receitawsKey}
-                    onChange={(e) => setReceitawsKey(e.target.value)}
+                    onChange={e => setReceitawsKey(e.target.value)}
                   />
                   <p className="text-xs text-muted-foreground">
                     Opcional. Usada para validar e enriquecer dados de CNPJ.
@@ -200,16 +229,19 @@ export default function EnrichmentSettings() {
 
                 {/* Google Maps API Key */}
                 <div className="space-y-2">
-                  <Label htmlFor="googlemaps-key">Google Maps API Key (Opcional)</Label>
+                  <Label htmlFor="googlemaps-key">
+                    Google Maps API Key (Opcional)
+                  </Label>
                   <Input
                     id="googlemaps-key"
                     type="password"
                     placeholder="AIza..."
                     value={googleMapsApiKey}
-                    onChange={(e) => setGoogleMapsApiKey(e.target.value)}
+                    onChange={e => setGoogleMapsApiKey(e.target.value)}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Opcional. Usada para geocodificar endereços (adicionar coordenadas lat/lng) quando a IA não conseguir.
+                    Opcional. Usada para geocodificar endereços (adicionar
+                    coordenadas lat/lng) quando a IA não conseguir.
                   </p>
                 </div>
 
@@ -274,7 +306,9 @@ export default function EnrichmentSettings() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label>Produtos por Mercado</Label>
-                    <span className="text-sm font-medium">{produtosPorMercado}</span>
+                    <span className="text-sm font-medium">
+                      {produtosPorMercado}
+                    </span>
                   </div>
                   <Slider
                     value={[produtosPorMercado]}
@@ -289,11 +323,15 @@ export default function EnrichmentSettings() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label>Concorrentes por Mercado</Label>
-                    <span className="text-sm font-medium">{concorrentesPorMercado}</span>
+                    <span className="text-sm font-medium">
+                      {concorrentesPorMercado}
+                    </span>
                   </div>
                   <Slider
                     value={[concorrentesPorMercado]}
-                    onValueChange={([value]) => setConcorrentesPorMercado(value)}
+                    onValueChange={([value]) =>
+                      setConcorrentesPorMercado(value)
+                    }
                     min={1}
                     max={20}
                     step={1}
@@ -304,7 +342,9 @@ export default function EnrichmentSettings() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label>Leads por Mercado</Label>
-                    <span className="text-sm font-medium">{leadsPorMercado}</span>
+                    <span className="text-sm font-medium">
+                      {leadsPorMercado}
+                    </span>
                   </div>
                   <Slider
                     value={[leadsPorMercado]}
@@ -335,7 +375,7 @@ export default function EnrichmentSettings() {
                     min={1}
                     max={100}
                     value={batchSize}
-                    onChange={(e) => setBatchSize(parseInt(e.target.value))}
+                    onChange={e => setBatchSize(parseInt(e.target.value))}
                   />
                   <p className="text-xs text-muted-foreground">
                     Quantos clientes processar por vez (recomendado: 50)
@@ -344,14 +384,18 @@ export default function EnrichmentSettings() {
 
                 {/* Checkpoint Interval */}
                 <div className="space-y-2">
-                  <Label htmlFor="checkpoint-interval">Intervalo de Checkpoint</Label>
+                  <Label htmlFor="checkpoint-interval">
+                    Intervalo de Checkpoint
+                  </Label>
                   <Input
                     id="checkpoint-interval"
                     type="number"
                     min={10}
                     max={500}
                     value={checkpointInterval}
-                    onChange={(e) => setCheckpointInterval(parseInt(e.target.value))}
+                    onChange={e =>
+                      setCheckpointInterval(parseInt(e.target.value))
+                    }
                   />
                   <p className="text-xs text-muted-foreground">
                     Salvar progresso a cada X clientes (recomendado: 100)
@@ -364,7 +408,8 @@ export default function EnrichmentSettings() {
                     <div>
                       <Label>Deduplicação de Mercados</Label>
                       <p className="text-xs text-muted-foreground">
-                        Reusar mercados já existentes ao invés de criar duplicados
+                        Reusar mercados já existentes ao invés de criar
+                        duplicados
                       </p>
                     </div>
                     <Switch
@@ -408,7 +453,7 @@ export default function EnrichmentSettings() {
                         min={1}
                         max={5}
                         value={maxRetries}
-                        onChange={(e) => setMaxRetries(parseInt(e.target.value))}
+                        onChange={e => setMaxRetries(parseInt(e.target.value))}
                       />
                     </div>
                   )}

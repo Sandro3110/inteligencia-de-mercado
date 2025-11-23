@@ -11,14 +11,14 @@ O projeto **Ground** apresentou retorno extremamente baixo no processo de enriqu
 
 ### Métricas do Projeto
 
-| Métrica | Quantidade | Status |
-|---------|-----------|--------|
-| **Clientes** | 1 (Veolia) | ✅ OK |
-| **Mercados Identificados** | 1 | ⚠️ Muito Baixo |
-| **Concorrentes** | 0 | ❌ Crítico |
-| **Leads** | 0 | ❌ Crítico |
-| **Produtos** | 0 | ❌ Crítico |
-| **Pesquisas Criadas** | 0 | ❌ Crítico |
+| Métrica                    | Quantidade | Status         |
+| -------------------------- | ---------- | -------------- |
+| **Clientes**               | 1 (Veolia) | ✅ OK          |
+| **Mercados Identificados** | 1          | ⚠️ Muito Baixo |
+| **Concorrentes**           | 0          | ❌ Crítico     |
+| **Leads**                  | 0          | ❌ Crítico     |
+| **Produtos**               | 0          | ❌ Crítico     |
+| **Pesquisas Criadas**      | 0          | ❌ Crítico     |
 
 **Taxa de Retorno:** 0% (esperado: 500-1000% considerando múltiplos mercados, concorrentes e leads por cliente)
 
@@ -31,6 +31,7 @@ O projeto **Ground** apresentou retorno extremamente baixo no processo de enriqu
 A Veolia é uma empresa multinacional francesa líder global em gestão de recursos ambientais, com forte presença no Brasil desde 1996.
 
 **Informações Reais da Veolia Brasil:**
+
 - **CNPJ:** 01.600.200/0001-48
 - **Razão Social:** Veolia Serviços Ambientais Brasil LTDA
 - **Sede:** São Paulo, SP
@@ -38,16 +39,15 @@ A Veolia é uma empresa multinacional francesa líder global em gestão de recur
 - **Porte:** Grande Empresa
 
 **Áreas de Atuação:**
+
 1. **Gestão de Água**
    - Tratamento de água industrial
    - Sistemas de reuso de água
    - Tecnologias avançadas de purificação
-   
 2. **Gestão de Resíduos**
    - Aterros sanitários (ex: Pedreira - 5.500 ton/dia)
    - Coleta e transporte de resíduos
    - Reciclagem e economia circular
-   
 3. **Tratamento de Efluentes**
    - Estações de tratamento (ETE)
    - Efluentes industriais
@@ -60,6 +60,7 @@ A Veolia é uma empresa multinacional francesa líder global em gestão de recur
 **Segmentação:** B2B (Business-to-Business)
 
 **Clientes Típicos:**
+
 - Indústrias (química, papel e celulose, alimentos)
 - Municípios e governos
 - Grandes empresas (Coca-Cola FEMSA, Suzano, Solvay)
@@ -75,6 +76,7 @@ A Veolia é uma empresa multinacional francesa líder global em gestão de recur
 O sistema identificou que **não há nenhuma pesquisa (survey) criada** para o projeto Ground. Isso indica que o cliente foi cadastrado de forma avulsa, sem passar pelo fluxo completo de enriquecimento.
 
 **Impactos:**
+
 - ❌ Sem pesquisa, não há parâmetros de enriquecimento definidos
 - ❌ Sem parâmetros, o sistema não sabe quantos concorrentes/leads buscar
 - ❌ Sem contexto estruturado, a IA não consegue gerar insights relevantes
@@ -84,6 +86,7 @@ O sistema identificou que **não há nenhuma pesquisa (survey) criada** para o p
 Embora a Veolia seja uma empresa conhecida, os dados cadastrados no sistema estavam incompletos:
 
 **Dados Faltantes Críticos:**
+
 - ✗ CNPJ não cadastrado
 - ✗ Produto principal não especificado
 - ✗ Segmentação B2B/B2C não definida
@@ -92,6 +95,7 @@ Embora a Veolia seja uma empresa conhecida, os dados cadastrados no sistema esta
 - ✗ Site oficial não cadastrado
 
 **Impacto:** Sem esses dados, o sistema de enriquecimento não consegue:
+
 1. Validar a empresa via APIs (ReceitaWS, Serasa)
 2. Identificar mercados específicos baseados em CNAE
 3. Buscar concorrentes regionais (sem cidade/UF)
@@ -100,11 +104,13 @@ Embora a Veolia seja uma empresa conhecida, os dados cadastrados no sistema esta
 #### **Causa Terciária: Mercado Identificado Sem Desdobramento**
 
 O sistema identificou **1 mercado**, mas não gerou:
+
 - Concorrentes para esse mercado
 - Leads potenciais nesse mercado
 - Produtos relacionados
 
 **Hipóteses:**
+
 1. Job de enriquecimento foi interrompido prematuramente
 2. Erro na etapa de geração de concorrentes/leads
 3. Timeout ou limite de API atingido
@@ -139,22 +145,18 @@ Com dados completos, o sistema deveria identificar:
    - Segmentação: B2B
    - Categoria: Serviços Ambientais
    - Tamanho: R$ 15 bilhões/ano (Brasil)
-   
 2. **Tratamento de Água e Efluentes Industriais**
    - Segmentação: B2B
    - Categoria: Saneamento Industrial
    - Tamanho: R$ 8 bilhões/ano
-   
 3. **Economia Circular e Reciclagem**
    - Segmentação: B2B
    - Categoria: Sustentabilidade
    - Tamanho: R$ 5 bilhões/ano
-   
 4. **Saneamento Básico Municipal**
    - Segmentação: B2G (Business-to-Government)
    - Categoria: Concessões Públicas
    - Tamanho: R$ 50 bilhões/ano
-   
 5. **Energia de Resíduos (Waste-to-Energy)**
    - Segmentação: B2B
    - Categoria: Energia Renovável
@@ -165,26 +167,23 @@ Com dados completos, o sistema deveria identificar:
 #### Mercado 1: Gestão de Resíduos Industriais
 
 **Concorrentes Diretos:**
+
 1. **Estre Ambiental** (CNPJ: 51.928.174/0001-50)
    - Porte: Grande
    - Localização: São Paulo, SP
    - Diferencial: Maior aterro sanitário da América Latina
-   
 2. **Orizon (ex-Solví)** (CNPJ: 08.926.302/0001-05)
    - Porte: Grande
    - Localização: Rio de Janeiro, RJ
    - Diferencial: Líder em coleta urbana
-   
 3. **Cavo** (CNPJ: 02.565.577/0001-51)
    - Porte: Média
    - Localização: Curitiba, PR
    - Diferencial: Foco em resíduos perigosos
-   
 4. **Essencis** (CNPJ: 04.295.213/0001-00)
    - Porte: Grande
    - Localização: São Paulo, SP
    - Diferencial: Soluções integradas
-   
 5. **Corpus Saneamento** (CNPJ: 07.639.639/0001-97)
    - Porte: Média
    - Localização: Minas Gerais
@@ -193,6 +192,7 @@ Com dados completos, o sistema deveria identificar:
 #### Mercado 2: Tratamento de Água Industrial
 
 **Concorrentes:**
+
 1. **Xylem Brasil**
 2. **Degremont (Suez)**
 3. **Kurita do Brasil**
@@ -209,28 +209,24 @@ Com dados completos, o sistema deveria identificar:
    - CNPJ: 07.526.557/0001-00
    - Cidade: São Paulo, SP
    - Potencial: Alto (múltiplas unidades)
-   
 2. **Suzano Papel e Celulose**
    - CNPJ: 16.404.287/0001-55
    - Cidade: Salvador, BA
    - Potencial: Alto (já cliente parcial)
-   
 3. **Braskem** - Petroquímica
    - CNPJ: 42.150.391/0001-70
    - Cidade: Camaçari, BA
    - Potencial: Médio-Alto
-   
 4. **Gerdau** - Siderurgia
    - CNPJ: 33.611.500/0001-19
    - Cidade: Porto Alegre, RS
    - Potencial: Alto
-   
 5. **JBS** - Alimentos
    - CNPJ: 02.916.265/0001-60
    - Cidade: São Paulo, SP
    - Potencial: Alto
 
-*[...mais 15 leads]*
+_[...mais 15 leads]_
 
 ### 4.5. Produtos Esperados (3-5 por cliente)
 
@@ -240,12 +236,10 @@ Para a Veolia, o sistema deveria sugerir:
    - Mercado: Tratamento de Água
    - Descrição: ETE compacta para indústrias químicas
    - Preço Estimado: R$ 500k - R$ 5M
-   
 2. **Gestão Integrada de Resíduos Classe I e II**
    - Mercado: Gestão de Resíduos
    - Descrição: Coleta, transporte e destinação final
    - Preço Estimado: R$ 50k - R$ 200k/mês
-   
 3. **Sistema de Reuso de Água Industrial**
    - Mercado: Economia Circular
    - Descrição: Tecnologia de reuso até 90%
@@ -255,13 +249,13 @@ Para a Veolia, o sistema deveria sugerir:
 
 ## 5. Comparação: Resultado Real vs. Esperado
 
-| Métrica | Real | Esperado | Gap | Taxa de Sucesso |
-|---------|------|----------|-----|-----------------|
-| Mercados | 1 | 5 | -4 | 20% |
-| Concorrentes | 0 | 25 (5/mercado) | -25 | 0% |
-| Leads | 0 | 50 (10/mercado) | -50 | 0% |
-| Produtos | 0 | 3 | -3 | 0% |
-| **Total de Insights** | **1** | **83** | **-82** | **1.2%** |
+| Métrica               | Real  | Esperado        | Gap     | Taxa de Sucesso |
+| --------------------- | ----- | --------------- | ------- | --------------- |
+| Mercados              | 1     | 5               | -4      | 20%             |
+| Concorrentes          | 0     | 25 (5/mercado)  | -25     | 0%              |
+| Leads                 | 0     | 50 (10/mercado) | -50     | 0%              |
+| Produtos              | 0     | 3               | -3      | 0%              |
+| **Total de Insights** | **1** | **83**          | **-82** | **1.2%**        |
 
 **Conclusão:** O projeto teve apenas **1,2% do retorno esperado**.
 
@@ -317,6 +311,7 @@ Para a Veolia, o sistema deveria sugerir:
 ### 6.3. Boas Práticas para Futuros Projetos
 
 1. **Checklist de Qualidade Pré-Enriquecimento**
+
    ```
    ✓ CNPJ válido e cadastrado
    ✓ Nome completo da empresa
@@ -344,6 +339,7 @@ Para a Veolia, o sistema deveria sugerir:
 ## 7. Próximos Passos
 
 ### Passo 1: Correção do Projeto Ground (1-2 horas)
+
 1. Acessar cadastro da Veolia
 2. Completar todos os campos obrigatórios
 3. Criar pesquisa "Ground - Veolia Enriquecida"
@@ -351,11 +347,13 @@ Para a Veolia, o sistema deveria sugerir:
 5. Validar resultados
 
 ### Passo 2: Análise Comparativa (30 min)
+
 1. Comparar resultados antes/depois
 2. Documentar melhorias
 3. Calcular nova taxa de retorno
 
 ### Passo 3: Implementação de Melhorias (1 semana)
+
 1. Desenvolver validação de entrada
 2. Integrar APIs de enriquecimento automático
 3. Criar dashboard de qualidade
@@ -374,6 +372,7 @@ O projeto Ground teve **retorno extremamente baixo (1,2%)** devido a:
 Com a implementação das recomendações acima, especialmente a **completude de dados** e **criação de pesquisa estruturada**, esperamos atingir um retorno de **80-100% do esperado** (65-83 insights totais).
 
 **Estimativa de Melhoria:**
+
 - De: 1 insight → Para: 65-83 insights
 - Aumento: **6.500% - 8.300%**
 

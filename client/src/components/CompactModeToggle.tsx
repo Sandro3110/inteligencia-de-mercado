@@ -28,7 +28,9 @@ export function CompactModeToggle() {
       </TooltipTrigger>
       <TooltipContent>
         <p>{isCompact ? "Modo Normal" : "Modo Compacto"}</p>
-        <p className="text-xs text-muted-foreground">Ajusta densidade da interface</p>
+        <p className="text-xs text-muted-foreground">
+          Ajusta densidade da interface
+        </p>
       </TooltipContent>
     </Tooltip>
   );

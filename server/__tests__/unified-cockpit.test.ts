@@ -1,17 +1,17 @@
-import { describe, it, expect, beforeAll } from 'vitest';
-import { appRouter } from '../routers';
-import type { Context } from '../_core/context';
+import { describe, it, expect, beforeAll } from "vitest";
+import { appRouter } from "../routers";
+import type { Context } from "../_core/context";
 
 /**
  * Testes para validar a consolidação do Cockpit Unificado
- * 
+ *
  * Fase 64: Consolidação de Funcionalidades
  * - Verifica que todas as queries necessárias para o UnifiedCockpit funcionam
  * - Valida que os dados são retornados corretamente para cada aba
  * - Testa filtros e estatísticas
  */
 
-describe('Unified Cockpit - Consolidação de Funcionalidades', () => {
+describe("Unified Cockpit - Consolidação de Funcionalidades", () => {
   let caller: ReturnType<typeof appRouter.createCaller>;
   let testProjectId: number;
   let testPesquisaId: number;
@@ -20,10 +20,10 @@ describe('Unified Cockpit - Consolidação de Funcionalidades', () => {
     // Mock de contexto de usuário autenticado
     const mockContext: Context = {
       user: {
-        id: 'test-user-id',
-        name: 'Test User',
-        email: 'test@example.com',
-        role: 'admin',
+        id: "test-user-id",
+        name: "Test User",
+        email: "test@example.com",
+        role: "admin",
       },
       req: {} as any,
       res: {} as any,
@@ -35,19 +35,21 @@ describe('Unified Cockpit - Consolidação de Funcionalidades', () => {
     const projects = await caller.projects.list();
     if (projects.length > 0) {
       testProjectId = projects[0].id;
-      
+
       // Buscar pesquisa de teste
-      const pesquisas = await caller.pesquisas.list({ projectId: testProjectId });
+      const pesquisas = await caller.pesquisas.list({
+        projectId: testProjectId,
+      });
       if (pesquisas.length > 0) {
         testPesquisaId = pesquisas[0].id;
       }
     }
   });
 
-  describe('Aba Lista - Queries de Dados', () => {
-    it('deve buscar lista de mercados', async () => {
+  describe("Aba Lista - Queries de Dados", () => {
+    it("deve buscar lista de mercados", async () => {
       if (!testProjectId) {
-        console.log('⚠️ Nenhum projeto de teste encontrado, pulando teste');
+        console.log("⚠️ Nenhum projeto de teste encontrado, pulando teste");
         return;
       }
 
@@ -60,9 +62,9 @@ describe('Unified Cockpit - Consolidação de Funcionalidades', () => {
       expect(Array.isArray(mercados)).toBe(true);
     });
 
-    it('deve buscar lista de clientes', async () => {
+    it("deve buscar lista de clientes", async () => {
       if (!testProjectId) {
-        console.log('⚠️ Nenhum projeto de teste encontrado, pulando teste');
+        console.log("⚠️ Nenhum projeto de teste encontrado, pulando teste");
         return;
       }
 
@@ -75,9 +77,9 @@ describe('Unified Cockpit - Consolidação de Funcionalidades', () => {
       expect(Array.isArray(clientes)).toBe(true);
     });
 
-    it('deve buscar lista de concorrentes', async () => {
+    it("deve buscar lista de concorrentes", async () => {
       if (!testProjectId) {
-        console.log('⚠️ Nenhum projeto de teste encontrado, pulando teste');
+        console.log("⚠️ Nenhum projeto de teste encontrado, pulando teste");
         return;
       }
 
@@ -90,9 +92,9 @@ describe('Unified Cockpit - Consolidação de Funcionalidades', () => {
       expect(Array.isArray(concorrentes)).toBe(true);
     });
 
-    it('deve buscar lista de leads', async () => {
+    it("deve buscar lista de leads", async () => {
       if (!testProjectId) {
-        console.log('⚠️ Nenhum projeto de teste encontrado, pulando teste');
+        console.log("⚠️ Nenhum projeto de teste encontrado, pulando teste");
         return;
       }
 
@@ -106,26 +108,26 @@ describe('Unified Cockpit - Consolidação de Funcionalidades', () => {
     });
   });
 
-  describe('Aba Mapa - Queries Geográficas', () => {
-    it('deve buscar entidades para o mapa unificado', async () => {
+  describe("Aba Mapa - Queries Geográficas", () => {
+    it("deve buscar entidades para o mapa unificado", async () => {
       if (!testProjectId) {
-        console.log('⚠️ Nenhum projeto de teste encontrado, pulando teste');
+        console.log("⚠️ Nenhum projeto de teste encontrado, pulando teste");
         return;
       }
 
       const entities = await caller.unifiedMap.getAllEntities({
         projectId: testProjectId,
         pesquisaId: testPesquisaId,
-        entityTypes: ['mercado', 'cliente', 'concorrente', 'lead'],
+        entityTypes: ["mercado", "cliente", "concorrente", "lead"],
       });
 
       expect(entities).toBeDefined();
       expect(Array.isArray(entities)).toBe(true);
     });
 
-    it('deve buscar estatísticas do mapa', async () => {
+    it("deve buscar estatísticas do mapa", async () => {
       if (!testProjectId) {
-        console.log('⚠️ Nenhum projeto de teste encontrado, pulando teste');
+        console.log("⚠️ Nenhum projeto de teste encontrado, pulando teste");
         return;
       }
 
@@ -135,15 +137,15 @@ describe('Unified Cockpit - Consolidação de Funcionalidades', () => {
       });
 
       expect(stats).toBeDefined();
-      expect(stats).toHaveProperty('total');
-      expect(stats).toHaveProperty('byType');
+      expect(stats).toHaveProperty("total");
+      expect(stats).toHaveProperty("byType");
     });
   });
 
-  describe('Aba Kanban - Leads por Estágio', () => {
-    it('deve buscar leads para visualização Kanban', async () => {
+  describe("Aba Kanban - Leads por Estágio", () => {
+    it("deve buscar leads para visualização Kanban", async () => {
       if (!testProjectId) {
-        console.log('⚠️ Nenhum projeto de teste encontrado, pulando teste');
+        console.log("⚠️ Nenhum projeto de teste encontrado, pulando teste");
         return;
       }
 
@@ -158,15 +160,15 @@ describe('Unified Cockpit - Consolidação de Funcionalidades', () => {
       // Verificar que leads têm campo stage
       if (leads.length > 0) {
         const lead = leads[0];
-        expect(lead).toHaveProperty('stage');
+        expect(lead).toHaveProperty("stage");
       }
     });
   });
 
-  describe('Estatísticas do Header', () => {
-    it('deve buscar estatísticas do dashboard', async () => {
+  describe("Estatísticas do Header", () => {
+    it("deve buscar estatísticas do dashboard", async () => {
       if (!testProjectId) {
-        console.log('⚠️ Nenhum projeto de teste encontrado, pulando teste');
+        console.log("⚠️ Nenhum projeto de teste encontrado, pulando teste");
         return;
       }
 
@@ -175,41 +177,41 @@ describe('Unified Cockpit - Consolidação de Funcionalidades', () => {
       });
 
       expect(stats).toBeDefined();
-      expect(stats).toHaveProperty('totals');
-      expect(stats.totals).toHaveProperty('mercados');
-      expect(stats.totals).toHaveProperty('clientes');
-      expect(stats.totals).toHaveProperty('concorrentes');
-      expect(stats.totals).toHaveProperty('leads');
+      expect(stats).toHaveProperty("totals");
+      expect(stats.totals).toHaveProperty("mercados");
+      expect(stats.totals).toHaveProperty("clientes");
+      expect(stats.totals).toHaveProperty("concorrentes");
+      expect(stats.totals).toHaveProperty("leads");
     });
   });
 
-  describe('Filtros e Pesquisa', () => {
-    it('deve filtrar mercados por pesquisa', async () => {
+  describe("Filtros e Pesquisa", () => {
+    it("deve filtrar mercados por pesquisa", async () => {
       if (!testProjectId) {
-        console.log('⚠️ Nenhum projeto de teste encontrado, pulando teste');
+        console.log("⚠️ Nenhum projeto de teste encontrado, pulando teste");
         return;
       }
 
       const mercados = await caller.mercados.list({
         projectId: testProjectId,
         pesquisaId: testPesquisaId,
-        search: 'test',
+        search: "test",
       });
 
       expect(mercados).toBeDefined();
       expect(Array.isArray(mercados)).toBe(true);
     });
 
-    it('deve filtrar clientes por status de validação', async () => {
+    it("deve filtrar clientes por status de validação", async () => {
       if (!testProjectId) {
-        console.log('⚠️ Nenhum projeto de teste encontrado, pulando teste');
+        console.log("⚠️ Nenhum projeto de teste encontrado, pulando teste");
         return;
       }
 
       const clientes = await caller.clientes.list({
         projectId: testProjectId,
         pesquisaId: testPesquisaId,
-        validationStatus: 'pending',
+        validationStatus: "pending",
       });
 
       expect(clientes).toBeDefined();
@@ -217,17 +219,17 @@ describe('Unified Cockpit - Consolidação de Funcionalidades', () => {
     });
   });
 
-  describe('Integração de Projetos e Pesquisas', () => {
-    it('deve listar projetos disponíveis', async () => {
+  describe("Integração de Projetos e Pesquisas", () => {
+    it("deve listar projetos disponíveis", async () => {
       const projects = await caller.projects.list();
 
       expect(projects).toBeDefined();
       expect(Array.isArray(projects)).toBe(true);
     });
 
-    it('deve listar pesquisas de um projeto', async () => {
+    it("deve listar pesquisas de um projeto", async () => {
       if (!testProjectId) {
-        console.log('⚠️ Nenhum projeto de teste encontrado, pulando teste');
+        console.log("⚠️ Nenhum projeto de teste encontrado, pulando teste");
         return;
       }
 
@@ -241,31 +243,31 @@ describe('Unified Cockpit - Consolidação de Funcionalidades', () => {
   });
 });
 
-describe('Redirects e Rotas Antigas', () => {
-  it('deve validar que rotas antigas foram removidas/redirecionadas', () => {
+describe("Redirects e Rotas Antigas", () => {
+  it("deve validar que rotas antigas foram removidas/redirecionadas", () => {
     // Este teste é mais conceitual - valida que a estrutura está correta
     // As rotas antigas (/mercados, /geo-cockpit) agora redirecionam para /?view=lista ou /?view=mapa
-    
-    const oldRoutes = ['/mercados', '/geo-cockpit', '/cascade'];
-    const newRoutes = ['/?view=lista', '/?view=mapa'];
+
+    const oldRoutes = ["/mercados", "/geo-cockpit", "/cascade"];
+    const newRoutes = ["/?view=lista", "/?view=mapa"];
 
     expect(oldRoutes.length).toBeGreaterThan(0);
     expect(newRoutes.length).toBeGreaterThan(0);
-    
+
     // Validação conceitual: rotas antigas devem redirecionar para novas rotas
     expect(true).toBe(true);
   });
 });
 
-describe('Performance e Cache', () => {
-  it('deve carregar dados rapidamente (< 2s)', async () => {
+describe("Performance e Cache", () => {
+  it("deve carregar dados rapidamente (< 2s)", async () => {
     // Buscar projeto de teste
     const mockContext: Context = {
       user: {
-        id: 'test-user-id',
-        name: 'Test User',
-        email: 'test@example.com',
-        role: 'admin',
+        id: "test-user-id",
+        name: "Test User",
+        email: "test@example.com",
+        role: "admin",
       },
       req: {} as any,
       res: {} as any,
@@ -273,14 +275,14 @@ describe('Performance e Cache', () => {
     const caller = appRouter.createCaller(mockContext);
     const projects = await caller.projects.list();
     const testProjectId = projects.length > 0 ? projects[0].id : null;
-    
+
     if (!testProjectId) {
-      console.log('⚠️ Nenhum projeto de teste encontrado, pulando teste');
+      console.log("⚠️ Nenhum projeto de teste encontrado, pulando teste");
       return;
     }
 
     const startTime = Date.now();
-    
+
     await Promise.all([
       caller.mercados.list({ projectId: testProjectId }),
       caller.clientes.list({ projectId: testProjectId }),

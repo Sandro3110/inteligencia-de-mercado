@@ -7,7 +7,11 @@ export function useEnrichmentConfig(projectId: number | undefined) {
   const utils = trpc.useUtils();
 
   // Buscar configuração
-  const { data: config, isLoading, error } = trpc.enrichmentConfig.get.useQuery(
+  const {
+    data: config,
+    isLoading,
+    error,
+  } = trpc.enrichmentConfig.get.useQuery(
     { projectId: projectId! },
     { enabled: !!projectId }
   );

@@ -4,23 +4,27 @@ import { useOnboarding } from "@/contexts/OnboardingContext";
 const steps: Step[] = [
   {
     target: "body",
-    content: "Bem-vindo ao Gestor PAV! Vamos fazer um tour rápido pelas funcionalidades principais.",
+    content:
+      "Bem-vindo ao Gestor PAV! Vamos fazer um tour rápido pelas funcionalidades principais.",
     placement: "center",
     disableBeacon: true,
   },
   {
     target: '[href="/"]',
-    content: "Esta é a página inicial com visão em cascata de mercados, clientes, concorrentes e leads.",
+    content:
+      "Esta é a página inicial com visão em cascata de mercados, clientes, concorrentes e leads.",
     placement: "bottom",
   },
   {
     target: '[href="/dashboard"]',
-    content: "No Dashboard você encontra estatísticas e métricas gerais do seu projeto.",
+    content:
+      "No Dashboard você encontra estatísticas e métricas gerais do seu projeto.",
     placement: "bottom",
   },
   {
     target: '[href="/analytics"]',
-    content: "Analytics oferece gráficos interativos e análises avançadas dos seus dados.",
+    content:
+      "Analytics oferece gráficos interativos e análises avançadas dos seus dados.",
     placement: "bottom",
   },
   {
@@ -30,23 +34,27 @@ const steps: Step[] = [
   },
   {
     target: ".compact-mode-toggle",
-    content: "Use este botão para alternar entre modo normal e compacto, ajustando a densidade da interface.",
+    content:
+      "Use este botão para alternar entre modo normal e compacto, ajustando a densidade da interface.",
     placement: "bottom",
     spotlightClicks: true,
   },
   {
     target: "body",
-    content: "Pressione Ctrl+K a qualquer momento para abrir a busca global e encontrar rapidamente mercados, clientes, concorrentes e leads.",
+    content:
+      "Pressione Ctrl+K a qualquer momento para abrir a busca global e encontrar rapidamente mercados, clientes, concorrentes e leads.",
     placement: "center",
   },
   {
     target: "body",
-    content: "Use Ctrl+/ ou ? para ver todos os atalhos de teclado disponíveis. Isso vai acelerar muito seu trabalho!",
+    content:
+      "Use Ctrl+/ ou ? para ver todos os atalhos de teclado disponíveis. Isso vai acelerar muito seu trabalho!",
     placement: "center",
   },
   {
     target: '[data-tour="filter-tags"]',
-    content: "Filtre seus dados por tags personalizadas para organizar melhor suas informações.",
+    content:
+      "Filtre seus dados por tags personalizadas para organizar melhor suas informações.",
     placement: "bottom",
   },
   {
@@ -56,13 +64,15 @@ const steps: Step[] = [
   },
   {
     target: "body",
-    content: "Pronto! Agora você conhece as principais funcionalidades. Explore e aproveite o Gestor PAV!",
+    content:
+      "Pronto! Agora você conhece as principais funcionalidades. Explore e aproveite o Gestor PAV!",
     placement: "center",
   },
 ];
 
 export function OnboardingTour() {
-  const { isOnboarding, stopOnboarding, markOnboardingComplete } = useOnboarding();
+  const { isOnboarding, stopOnboarding, markOnboardingComplete } =
+    useOnboarding();
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, type } = data;

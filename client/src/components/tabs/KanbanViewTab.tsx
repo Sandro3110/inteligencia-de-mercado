@@ -16,23 +16,26 @@ interface KanbanViewTabProps {
  * Aba de visualização Kanban
  * Mostra leads organizados por estágio (novo, em contato, negociação, fechado, perdido)
  */
-export default function KanbanViewTab({ filters, onFiltersChange }: KanbanViewTabProps) {
+export default function KanbanViewTab({
+  filters,
+  onFiltersChange,
+}: KanbanViewTabProps) {
   const { selectedProjectId } = useSelectedProject();
   const { selectedPesquisaId } = useSelectedPesquisa(selectedProjectId);
-  
+
   const { data: leads, isLoading } = trpc.leads.list.useQuery(
-    { 
-      projectId: selectedProjectId!, 
-      pesquisaId: selectedPesquisaId || undefined 
+    {
+      projectId: selectedProjectId!,
+      pesquisaId: selectedPesquisaId || undefined,
     },
     { enabled: !!selectedProjectId }
   );
-  
+
   if (isLoading) {
     return (
       <div className="h-full p-6">
         <div className="grid grid-cols-5 gap-4">
-          {[1, 2, 3, 4, 5].map((i) => (
+          {[1, 2, 3, 4, 5].map(i => (
             <Card key={i}>
               <CardHeader>
                 <Skeleton className="h-6 w-32" />
@@ -46,7 +49,7 @@ export default function KanbanViewTab({ filters, onFiltersChange }: KanbanViewTa
       </div>
     );
   }
-  
+
   if (!leads || leads.length === 0) {
     return (
       <div className="h-full flex items-center justify-center p-6">
@@ -59,7 +62,7 @@ export default function KanbanViewTab({ filters, onFiltersChange }: KanbanViewTa
       </div>
     );
   }
-  
+
   // Agrupar leads por estágio
   const stages = [
     { id: "novo", label: "Novo", color: "bg-blue-500" },
@@ -68,16 +71,19 @@ export default function KanbanViewTab({ filters, onFiltersChange }: KanbanViewTa
     { id: "fechado", label: "Fechado", color: "bg-green-500" },
     { id: "perdido", label: "Perdido", color: "bg-red-500" },
   ];
-  
-  const leadsByStage = stages.reduce((acc, stage) => {
-    acc[stage.id] = leads.filter((lead) => (lead.stage || "novo") === stage.id);
-    return acc;
-  }, {} as Record<string, typeof leads>);
-  
+
+  const leadsByStage = stages.reduce(
+    (acc, stage) => {
+      acc[stage.id] = leads.filter(lead => (lead.stage || "novo") === stage.id);
+      return acc;
+    },
+    {} as Record<string, typeof leads>
+  );
+
   return (
     <div className="h-full overflow-auto p-6">
       <div className="grid grid-cols-5 gap-4">
-        {stages.map((stage) => (
+        {stages.map(stage => (
           <Card key={stage.id}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -89,18 +95,26 @@ export default function KanbanViewTab({ filters, onFiltersChange }: KanbanViewTa
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {leadsByStage[stage.id]?.map((lead) => (
-                <Card key={lead.id} className="p-3 hover:shadow-md transition-shadow cursor-pointer">
+              {leadsByStage[stage.id]?.map(lead => (
+                <Card
+                  key={lead.id}
+                  className="p-3 hover:shadow-md transition-shadow cursor-pointer"
+                >
                   <div className="font-medium text-sm">{lead.nome}</div>
                   {lead.cnpj && (
-                    <div className="text-xs text-muted-foreground">{lead.cnpj}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {lead.cnpj}
+                    </div>
                   )}
                   {lead.tipo && (
-                    <div className="text-xs text-muted-foreground mt-1">{lead.tipo}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {lead.tipo}
+                    </div>
                   )}
                 </Card>
               ))}
-              {(!leadsByStage[stage.id] || leadsByStage[stage.id].length === 0) && (
+              {(!leadsByStage[stage.id] ||
+                leadsByStage[stage.id].length === 0) && (
                 <div className="text-sm text-muted-foreground text-center py-4">
                   Nenhum lead
                 </div>

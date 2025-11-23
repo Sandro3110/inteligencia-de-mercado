@@ -7,12 +7,12 @@
 
 ## 📋 PROJETO
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | 120001 |
-| **Nome** | Teste Jeep API Corrigida |
+| Campo         | Valor                                                      |
+| ------------- | ---------------------------------------------------------- |
+| **ID**        | 120001                                                     |
+| **Nome**      | Teste Jeep API Corrigida                                   |
 | **Descrição** | Projeto criado automaticamente via fluxo de enriquecimento |
-| **Status** | ✅ Ativo |
+| **Status**    | ✅ Ativo                                                   |
 
 ---
 
@@ -20,13 +20,13 @@
 
 ### Jeep do Brasil
 
-| Campo | Valor |
-|-------|-------|
-| **CNPJ** | 04601397000165 |
-| **Site** | N/A |
-| **Produto** | N/A |
-| **Porte** | N/A |
-| **Score de Qualidade** | 50/100 ⚠️ |
+| Campo                  | Valor          |
+| ---------------------- | -------------- |
+| **CNPJ**               | 04601397000165 |
+| **Site**               | N/A            |
+| **Produto**            | N/A            |
+| **Porte**              | N/A            |
+| **Score de Qualidade** | 50/100 ⚠️      |
 
 **Observação:** Dados básicos do cliente foram preservados do input. Enriquecimento adicional via ReceitaWS pendente.
 
@@ -36,11 +36,11 @@
 
 ### 1. Automotivo
 
-| Campo | Valor |
-|-------|-------|
-| **Categoria** | Manufatura e Venda de Veículos |
-| **Segmentação** | B2C (Business-to-Consumer) |
-| **Método** | Identificado via LLM (Gemini) a partir do produto "Veículos automotores" |
+| Campo           | Valor                                                                    |
+| --------------- | ------------------------------------------------------------------------ |
+| **Categoria**   | Manufatura e Venda de Veículos                                           |
+| **Segmentação** | B2C (Business-to-Consumer)                                               |
+| **Método**      | Identificado via LLM (Gemini) a partir do produto "Veículos automotores" |
 
 ---
 
@@ -50,53 +50,53 @@ Dados obtidos via **SerpAPI** + análise **Gemini**
 
 ### 1. Stellantis (Fiat, Jeep, Peugeot, Citroën)
 
-| Campo | Valor |
-|-------|-------|
-| **Produto** | Veículos de passeio, SUVs e comerciais leves |
-| **CNPJ** | N/A |
-| **Site** | N/A |
-| **Score** | 15/100 |
-| **Classificação** | ⚠️ Ruim |
+| Campo             | Valor                                        |
+| ----------------- | -------------------------------------------- |
+| **Produto**       | Veículos de passeio, SUVs e comerciais leves |
+| **CNPJ**          | N/A                                          |
+| **Site**          | N/A                                          |
+| **Score**         | 15/100                                       |
+| **Classificação** | ⚠️ Ruim                                      |
 
 ### 2. Volkswagen do Brasil
 
-| Campo | Valor |
-|-------|-------|
-| **Produto** | Veículos de passeio, SUVs e picapes |
-| **CNPJ** | N/A |
-| **Site** | N/A |
-| **Score** | 15/100 |
-| **Classificação** | ⚠️ Ruim |
+| Campo             | Valor                               |
+| ----------------- | ----------------------------------- |
+| **Produto**       | Veículos de passeio, SUVs e picapes |
+| **CNPJ**          | N/A                                 |
+| **Site**          | N/A                                 |
+| **Score**         | 15/100                              |
+| **Classificação** | ⚠️ Ruim                             |
 
 ### 3. General Motors (Chevrolet)
 
-| Campo | Valor |
-|-------|-------|
-| **Produto** | Veículos de passeio, SUVs e picapes |
-| **CNPJ** | N/A |
-| **Site** | N/A |
-| **Score** | 15/100 |
-| **Classificação** | ⚠️ Ruim |
+| Campo             | Valor                               |
+| ----------------- | ----------------------------------- |
+| **Produto**       | Veículos de passeio, SUVs e picapes |
+| **CNPJ**          | N/A                                 |
+| **Site**          | N/A                                 |
+| **Score**         | 15/100                              |
+| **Classificação** | ⚠️ Ruim                             |
 
 ### 4. Hyundai Motor Brasil
 
-| Campo | Valor |
-|-------|-------|
-| **Produto** | Veículos de passeio e SUVs |
-| **CNPJ** | N/A |
-| **Site** | N/A |
-| **Score** | 15/100 |
-| **Classificação** | ⚠️ Ruim |
+| Campo             | Valor                      |
+| ----------------- | -------------------------- |
+| **Produto**       | Veículos de passeio e SUVs |
+| **CNPJ**          | N/A                        |
+| **Site**          | N/A                        |
+| **Score**         | 15/100                     |
+| **Classificação** | ⚠️ Ruim                    |
 
 ### 5. Toyota do Brasil
 
-| Campo | Valor |
-|-------|-------|
-| **Produto** | Veículos de passeio, SUVs e picapes (incluindo híbridos) |
-| **CNPJ** | N/A |
-| **Site** | N/A |
-| **Score** | 15/100 |
-| **Classificação** | ⚠️ Ruim |
+| Campo             | Valor                                                    |
+| ----------------- | -------------------------------------------------------- |
+| **Produto**       | Veículos de passeio, SUVs e picapes (incluindo híbridos) |
+| **CNPJ**          | N/A                                                      |
+| **Site**          | N/A                                                      |
+| **Score**         | 15/100                                                   |
+| **Classificação** | ⚠️ Ruim                                                  |
 
 ---
 
@@ -106,85 +106,85 @@ Dados obtidos via **SerpAPI** + análise **Gemini**
 
 ### 1. Bosch Brasil
 
-| Campo | Valor |
-|-------|-------|
-| **Tipo** | B2B (Fornecedor) |
-| **Setor** | Automotivo |
-| **Região** | Sudeste (São Paulo/Campinas) |
-| **CNPJ** | N/A |
-| **Email** | N/A |
-| **Telefone** | N/A |
-| **Site** | N/A |
-| **Score** | 0/100 |
-| **Classificação** | ⚠️ Ruim |
+| Campo             | Valor                        |
+| ----------------- | ---------------------------- |
+| **Tipo**          | B2B (Fornecedor)             |
+| **Setor**         | Automotivo                   |
+| **Região**        | Sudeste (São Paulo/Campinas) |
+| **CNPJ**          | N/A                          |
+| **Email**         | N/A                          |
+| **Telefone**      | N/A                          |
+| **Site**          | N/A                          |
+| **Score**         | 0/100                        |
+| **Classificação** | ⚠️ Ruim                      |
 
 ### 2. ZF do Brasil
 
-| Campo | Valor |
-|-------|-------|
-| **Tipo** | B2B (Fornecedor) |
-| **Setor** | Automotivo |
-| **Região** | Sudeste (Sorocaba/Limeira) |
-| **CNPJ** | N/A |
-| **Email** | N/A |
-| **Telefone** | N/A |
-| **Site** | N/A |
-| **Score** | 0/100 |
-| **Classificação** | ⚠️ Ruim |
+| Campo             | Valor                      |
+| ----------------- | -------------------------- |
+| **Tipo**          | B2B (Fornecedor)           |
+| **Setor**         | Automotivo                 |
+| **Região**        | Sudeste (Sorocaba/Limeira) |
+| **CNPJ**          | N/A                        |
+| **Email**         | N/A                        |
+| **Telefone**      | N/A                        |
+| **Site**          | N/A                        |
+| **Score**         | 0/100                      |
+| **Classificação** | ⚠️ Ruim                    |
 
 ### 3. Magneti Marelli Cofap
 
-| Campo | Valor |
-|-------|-------|
-| **Tipo** | B2B (Fornecedor) |
-| **Setor** | Automotivo |
-| **Região** | Sudeste (Minas Gerais/São Paulo) |
-| **CNPJ** | N/A |
-| **Email** | N/A |
-| **Telefone** | N/A |
-| **Site** | N/A |
-| **Score** | 0/100 |
-| **Classificação** | ⚠️ Ruim |
+| Campo             | Valor                            |
+| ----------------- | -------------------------------- |
+| **Tipo**          | B2B (Fornecedor)                 |
+| **Setor**         | Automotivo                       |
+| **Região**        | Sudeste (Minas Gerais/São Paulo) |
+| **CNPJ**          | N/A                              |
+| **Email**         | N/A                              |
+| **Telefone**      | N/A                              |
+| **Site**          | N/A                              |
+| **Score**         | 0/100                            |
+| **Classificação** | ⚠️ Ruim                          |
 
 ### 4. Volkswagen do Brasil
 
-| Campo | Valor |
-|-------|-------|
-| **Tipo** | B2B (Fornecedor) |
-| **Setor** | Automotivo |
-| **Região** | Sudeste (São Bernardo do Campo) |
-| **CNPJ** | N/A |
-| **Email** | N/A |
-| **Telefone** | N/A |
-| **Site** | N/A |
-| **Score** | 0/100 |
-| **Classificação** | ⚠️ Ruim |
+| Campo             | Valor                           |
+| ----------------- | ------------------------------- |
+| **Tipo**          | B2B (Fornecedor)                |
+| **Setor**         | Automotivo                      |
+| **Região**        | Sudeste (São Bernardo do Campo) |
+| **CNPJ**          | N/A                             |
+| **Email**         | N/A                             |
+| **Telefone**      | N/A                             |
+| **Site**          | N/A                             |
+| **Score**         | 0/100                           |
+| **Classificação** | ⚠️ Ruim                         |
 
 ### 5. Randon Implementos e Participações
 
-| Campo | Valor |
-|-------|-------|
-| **Tipo** | B2B (Fornecedor) |
-| **Setor** | Automotivo |
-| **Região** | Sul (Caxias do Sul) |
-| **CNPJ** | N/A |
-| **Email** | N/A |
-| **Telefone** | N/A |
-| **Site** | N/A |
-| **Score** | 0/100 |
-| **Classificação** | ⚠️ Ruim |
+| Campo             | Valor               |
+| ----------------- | ------------------- |
+| **Tipo**          | B2B (Fornecedor)    |
+| **Setor**         | Automotivo          |
+| **Região**        | Sul (Caxias do Sul) |
+| **CNPJ**          | N/A                 |
+| **Email**         | N/A                 |
+| **Telefone**      | N/A                 |
+| **Site**          | N/A                 |
+| **Score**         | 0/100               |
+| **Classificação** | ⚠️ Ruim             |
 
 ---
 
 ## 📊 RESUMO ESTATÍSTICO
 
-| Métrica | Valor |
-|---------|-------|
-| **Total de Clientes** | 1 |
-| **Total de Mercados** | 1 |
-| **Total de Concorrentes** | 5 |
-| **Total de Leads** | 5 |
-| **Score Médio Geral** | 13/100 ⚠️ |
+| Métrica                   | Valor     |
+| ------------------------- | --------- |
+| **Total de Clientes**     | 1         |
+| **Total de Mercados**     | 1         |
+| **Total de Concorrentes** | 5         |
+| **Total de Leads**        | 5         |
+| **Score Médio Geral**     | 13/100 ⚠️ |
 
 ---
 
@@ -228,6 +228,7 @@ GET https://receitaws.com.br/v1/cnpj/{cnpj}
 ```
 
 **Benefícios:**
+
 - Razão social completa
 - Endereço completo
 - Porte da empresa
@@ -237,6 +238,7 @@ GET https://receitaws.com.br/v1/cnpj/{cnpj}
 ### 2. Extrair Dados Estruturados do SerpAPI
 
 Melhorar parser de resultados para capturar:
+
 - Sites oficiais dos resultados de busca
 - Snippets com telefones/emails
 - Links para redes sociais
@@ -244,6 +246,7 @@ Melhorar parser de resultados para capturar:
 ### 3. Implementar Validação Manual
 
 Criar interface para revisar e corrigir dados antes de salvar no banco, permitindo:
+
 - Aprovar/rejeitar resultados
 - Editar campos manualmente
 - Adicionar informações faltantes
@@ -280,6 +283,7 @@ Criar interface para revisar e corrigir dados antes de salvar no banco, permitin
 ## 📝 CONCLUSÃO
 
 O sistema está **funcionando corretamente** em termos de:
+
 - Isolamento de dados por projeto
 - Busca real via SerpAPI
 - Análise inteligente via Gemini

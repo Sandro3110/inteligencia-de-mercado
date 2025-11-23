@@ -14,10 +14,10 @@ interface ChartSkeletonProps {
  * Skeleton loader que imita a estrutura de um gráfico
  * Usado em dashboards e analytics
  */
-export function ChartSkeleton({ 
+export function ChartSkeleton({
   type = "bar",
   showHeader = true,
-  height = "h-80"
+  height = "h-80",
 }: ChartSkeletonProps) {
   return (
     <Card className="animate-pulse">
@@ -28,7 +28,9 @@ export function ChartSkeleton({
         </CardHeader>
       )}
       <CardContent className={showHeader ? "" : "pt-6"}>
-        <div className={`w-full ${height} flex items-end justify-around gap-2 px-4 pb-4`}>
+        <div
+          className={`w-full ${height} flex items-end justify-around gap-2 px-4 pb-4`}
+        >
           {type === "bar" && (
             <>
               <Skeleton className="w-full h-3/4" />

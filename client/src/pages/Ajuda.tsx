@@ -5,7 +5,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,42 +40,114 @@ export default function Ajuda() {
       category: "Navegação Rápida (Gmail-style)",
       icon: Zap,
       items: [
-        { keys: ["G", "H"], description: "Ir para Home", color: "bg-blue-100 text-blue-700" },
-        { keys: ["G", "P"], description: "Ir para Projetos", color: "bg-purple-100 text-purple-700" },
-        { keys: ["G", "M"], description: "Ir para Mercados", color: "bg-green-100 text-green-700" },
-        { keys: ["G", "A"], description: "Ir para Analytics", color: "bg-orange-100 text-orange-700" },
-        { keys: ["G", "E"], description: "Ir para Enriquecimento", color: "bg-pink-100 text-pink-700" },
-        { keys: ["G", "R"], description: "Ir para Relatórios", color: "bg-indigo-100 text-indigo-700" },
-        { keys: ["G", "N"], description: "Ir para Notificações", color: "bg-yellow-100 text-yellow-700" },
-        { keys: ["G", "S"], description: "Ir para Configurações", color: "bg-gray-100 text-gray-700" },
+        {
+          keys: ["G", "H"],
+          description: "Ir para Home",
+          color: "bg-blue-100 text-blue-700",
+        },
+        {
+          keys: ["G", "P"],
+          description: "Ir para Projetos",
+          color: "bg-purple-100 text-purple-700",
+        },
+        {
+          keys: ["G", "M"],
+          description: "Ir para Mercados",
+          color: "bg-green-100 text-green-700",
+        },
+        {
+          keys: ["G", "A"],
+          description: "Ir para Analytics",
+          color: "bg-orange-100 text-orange-700",
+        },
+        {
+          keys: ["G", "E"],
+          description: "Ir para Enriquecimento",
+          color: "bg-pink-100 text-pink-700",
+        },
+        {
+          keys: ["G", "R"],
+          description: "Ir para Relatórios",
+          color: "bg-indigo-100 text-indigo-700",
+        },
+        {
+          keys: ["G", "N"],
+          description: "Ir para Notificações",
+          color: "bg-yellow-100 text-yellow-700",
+        },
+        {
+          keys: ["G", "S"],
+          description: "Ir para Configurações",
+          color: "bg-gray-100 text-gray-700",
+        },
       ],
     },
     {
       category: "Navegação Numérica",
       icon: Keyboard,
       items: [
-        { keys: ["Ctrl", "1"], description: "Dashboard", color: "bg-blue-100 text-blue-700" },
-        { keys: ["Ctrl", "2"], description: "Mercados", color: "bg-green-100 text-green-700" },
-        { keys: ["Ctrl", "3"], description: "Analytics", color: "bg-orange-100 text-orange-700" },
-        { keys: ["Ctrl", "4"], description: "ROI", color: "bg-purple-100 text-purple-700" },
+        {
+          keys: ["Ctrl", "1"],
+          description: "Dashboard",
+          color: "bg-blue-100 text-blue-700",
+        },
+        {
+          keys: ["Ctrl", "2"],
+          description: "Mercados",
+          color: "bg-green-100 text-green-700",
+        },
+        {
+          keys: ["Ctrl", "3"],
+          description: "Analytics",
+          color: "bg-orange-100 text-orange-700",
+        },
+        {
+          keys: ["Ctrl", "4"],
+          description: "ROI",
+          color: "bg-purple-100 text-purple-700",
+        },
       ],
     },
     {
       category: "Ações",
       icon: Zap,
       items: [
-        { keys: ["Ctrl", "K"], description: "Busca global", color: "bg-blue-100 text-blue-700" },
-        { keys: ["Ctrl", "N"], description: "Novo projeto de enriquecimento", color: "bg-green-100 text-green-700" },
-        { keys: ["Ctrl", "B"], description: "Toggle sidebar", color: "bg-gray-100 text-gray-700" },
+        {
+          keys: ["Ctrl", "K"],
+          description: "Busca global",
+          color: "bg-blue-100 text-blue-700",
+        },
+        {
+          keys: ["Ctrl", "N"],
+          description: "Novo projeto de enriquecimento",
+          color: "bg-green-100 text-green-700",
+        },
+        {
+          keys: ["Ctrl", "B"],
+          description: "Toggle sidebar",
+          color: "bg-gray-100 text-gray-700",
+        },
       ],
     },
     {
       category: "Ajuda",
       icon: HelpCircle,
       items: [
-        { keys: ["Ctrl", "/"], description: "Mostrar atalhos", color: "bg-yellow-100 text-yellow-700" },
-        { keys: ["?"], description: "Mostrar atalhos", color: "bg-yellow-100 text-yellow-700" },
-        { keys: ["Esc"], description: "Fechar modal/dialog", color: "bg-red-100 text-red-700" },
+        {
+          keys: ["Ctrl", "/"],
+          description: "Mostrar atalhos",
+          color: "bg-yellow-100 text-yellow-700",
+        },
+        {
+          keys: ["?"],
+          description: "Mostrar atalhos",
+          color: "bg-yellow-100 text-yellow-700",
+        },
+        {
+          keys: ["Esc"],
+          description: "Fechar modal/dialog",
+          color: "bg-red-100 text-red-700",
+        },
       ],
     },
   ];
@@ -154,7 +232,8 @@ export default function Ajuda() {
     },
     {
       title: "Analytics e ROI",
-      description: "Análise de métricas e cálculo de retorno sobre investimento",
+      description:
+        "Análise de métricas e cálculo de retorno sobre investimento",
       duration: "10 min",
       thumbnail: "/help-analytics.png",
       url: "#",
@@ -182,37 +261,43 @@ export default function Ajuda() {
     {
       icon: Keyboard,
       title: "Use atalhos de teclado",
-      description: "Pressione ? ou Ctrl+/ a qualquer momento para ver todos os atalhos disponíveis. Atalhos estilo Gmail (G+H, G+P) aceleram muito a navegação.",
+      description:
+        "Pressione ? ou Ctrl+/ a qualquer momento para ver todos os atalhos disponíveis. Atalhos estilo Gmail (G+H, G+P) aceleram muito a navegação.",
     },
     {
       icon: Search,
       title: "Busca global poderosa",
-      description: "Pressione Ctrl+K para abrir a busca global. Você pode buscar por mercados, clientes, concorrentes, leads e até navegar diretamente para páginas.",
+      description:
+        "Pressione Ctrl+K para abrir a busca global. Você pode buscar por mercados, clientes, concorrentes, leads e até navegar diretamente para páginas.",
     },
     {
       icon: Download,
       title: "Exporte com filtros ativos",
-      description: "Ao exportar dados, todos os filtros aplicados (tags, qualidade, status) são respeitados. Use isso para criar relatórios segmentados rapidamente.",
+      description:
+        "Ao exportar dados, todos os filtros aplicados (tags, qualidade, status) são respeitados. Use isso para criar relatórios segmentados rapidamente.",
     },
     {
       icon: BarChart3,
       title: "Acompanhe tendências",
-      description: "A página de Tendências mostra a evolução da qualidade dos seus dados ao longo do tempo. Use para identificar mercados que precisam de atenção.",
+      description:
+        "A página de Tendências mostra a evolução da qualidade dos seus dados ao longo do tempo. Use para identificar mercados que precisam de atenção.",
     },
     {
       icon: MapPin,
       title: "Geocodificação automática",
-      description: "Empresas são automaticamente geocodificadas ao serem enriquecidas. Isso permite análises territoriais e visualização em mapas.",
+      description:
+        "Empresas são automaticamente geocodificadas ao serem enriquecidas. Isso permite análises territoriais e visualização em mapas.",
     },
     {
       icon: Settings,
       title: "Configure alertas personalizados",
-      description: "Crie alertas para ser notificado quando condições específicas forem atendidas, como identificação de leads de alta qualidade.",
+      description:
+        "Crie alertas para ser notificado quando condições específicas forem atendidas, como identificação de leads de alta qualidade.",
     },
   ];
 
   const filteredFaq = faq.filter(
-    (item) =>
+    item =>
       item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.answer.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -226,7 +311,9 @@ export default function Ajuda() {
             <div className="p-3 bg-blue-600 rounded-xl">
               <HelpCircle className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-slate-900">Central de Ajuda</h1>
+            <h1 className="text-4xl font-bold text-slate-900">
+              Central de Ajuda
+            </h1>
           </div>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
             Encontre respostas, aprenda com tutoriais e domine o Gestor PAV
@@ -240,11 +327,17 @@ export default function Ajuda() {
               <HelpCircle className="w-4 h-4" />
               <span className="hidden sm:inline">FAQ</span>
             </TabsTrigger>
-            <TabsTrigger value="shortcuts" className="flex items-center gap-2 py-3">
+            <TabsTrigger
+              value="shortcuts"
+              className="flex items-center gap-2 py-3"
+            >
               <Keyboard className="w-4 h-4" />
               <span className="hidden sm:inline">Atalhos</span>
             </TabsTrigger>
-            <TabsTrigger value="tutorials" className="flex items-center gap-2 py-3">
+            <TabsTrigger
+              value="tutorials"
+              className="flex items-center gap-2 py-3"
+            >
               <Video className="w-4 h-4" />
               <span className="hidden sm:inline">Tutoriais</span>
             </TabsTrigger>
@@ -272,7 +365,7 @@ export default function Ajuda() {
                   <Input
                     placeholder="Buscar nas perguntas frequentes..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     className="pl-10"
                   />
                 </div>
@@ -281,10 +374,14 @@ export default function Ajuda() {
                   {filteredFaq.map((item, index) => (
                     <AccordionItem key={index} value={`item-${index}`}>
                       <AccordionTrigger className="text-left hover:no-underline">
-                        <span className="font-medium text-slate-900">{item.question}</span>
+                        <span className="font-medium text-slate-900">
+                          {item.question}
+                        </span>
                       </AccordionTrigger>
                       <AccordionContent>
-                        <p className="text-slate-600 leading-relaxed">{item.answer}</p>
+                        <p className="text-slate-600 leading-relaxed">
+                          {item.answer}
+                        </p>
                       </AccordionContent>
                     </AccordionItem>
                   ))}
@@ -293,7 +390,9 @@ export default function Ajuda() {
                 {filteredFaq.length === 0 && (
                   <div className="text-center py-12">
                     <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                    <p className="text-slate-500">Nenhuma pergunta encontrada para "{searchQuery}"</p>
+                    <p className="text-slate-500">
+                      Nenhuma pergunta encontrada para "{searchQuery}"
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -319,7 +418,9 @@ export default function Ajuda() {
                           key={index}
                           className={`flex items-center justify-between p-4 rounded-lg border ${shortcut.color}`}
                         >
-                          <span className="font-medium">{shortcut.description}</span>
+                          <span className="font-medium">
+                            {shortcut.description}
+                          </span>
                           <div className="flex items-center gap-1">
                             {shortcut.keys.map((key, i) => (
                               <span key={i} className="flex items-center gap-1">
@@ -343,8 +444,9 @@ export default function Ajuda() {
                   <div>
                     <p className="font-medium text-blue-900 mb-1">Dica Pro</p>
                     <p className="text-sm text-blue-700">
-                      Os atalhos estilo Gmail (G+H, G+P, etc) são sequenciais: pressione G, solte, e então
-                      pressione a segunda tecla. Você tem 1 segundo para completar a sequência.
+                      Os atalhos estilo Gmail (G+H, G+P, etc) são sequenciais:
+                      pressione G, solte, e então pressione a segunda tecla.
+                      Você tem 1 segundo para completar a sequência.
                     </p>
                   </div>
                 </div>
@@ -379,12 +481,16 @@ export default function Ajuda() {
                             <Video className="w-6 h-6 text-blue-600" />
                           </div>
                         </div>
-                        <Badge className="absolute top-2 right-2">{tutorial.badge}</Badge>
+                        <Badge className="absolute top-2 right-2">
+                          {tutorial.badge}
+                        </Badge>
                       </div>
                       <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">
                         {tutorial.title}
                       </h3>
-                      <p className="text-sm text-slate-600 mb-2">{tutorial.description}</p>
+                      <p className="text-sm text-slate-600 mb-2">
+                        {tutorial.description}
+                      </p>
                       <div className="flex items-center justify-between text-xs text-slate-500">
                         <span>{tutorial.duration}</span>
                         <ExternalLink className="w-3 h-3" />
@@ -422,8 +528,12 @@ export default function Ajuda() {
                             <Icon className="w-5 h-5 text-blue-600" />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-slate-900 mb-1">{tip.title}</h3>
-                            <p className="text-sm text-slate-600">{tip.description}</p>
+                            <h3 className="font-semibold text-slate-900 mb-1">
+                              {tip.title}
+                            </h3>
+                            <p className="text-sm text-slate-600">
+                              {tip.description}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -437,16 +547,23 @@ export default function Ajuda() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-xl font-bold mb-2">Precisa de mais ajuda?</h3>
+                    <h3 className="text-xl font-bold mb-2">
+                      Precisa de mais ajuda?
+                    </h3>
                     <p className="text-blue-100 mb-4">
-                      Entre em contato com nosso suporte ou consulte a documentação completa
+                      Entre em contato com nosso suporte ou consulte a
+                      documentação completa
                     </p>
                     <div className="flex gap-3">
                       <Button variant="secondary" size="sm">
                         <ExternalLink className="w-4 h-4 mr-2" />
                         Documentação
                       </Button>
-                      <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                      >
                         Contatar Suporte
                       </Button>
                     </div>

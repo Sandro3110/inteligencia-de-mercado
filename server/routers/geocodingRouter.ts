@@ -30,7 +30,10 @@ export const geocodingRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const records = await getRecordsSemCoordenadas(input.projetoId, input.tipo);
+      const records = await getRecordsSemCoordenadas(
+        input.projetoId,
+        input.tipo
+      );
       return records;
     }),
 
@@ -60,7 +63,12 @@ export const geocodingRouter = router({
       }
 
       // Geocodificar endereço
-      const result = await geocodeAddress(input.cidade, input.uf, "Brasil", apiKey);
+      const result = await geocodeAddress(
+        input.cidade,
+        input.uf,
+        "Brasil",
+        apiKey
+      );
 
       if (!("latitude" in result)) {
         return {
@@ -72,11 +80,23 @@ export const geocodingRouter = router({
       // Atualizar coordenadas no banco
       let updated = false;
       if (input.tipo === "cliente") {
-        updated = await updateClienteCoordinates(input.id, result.latitude, result.longitude);
+        updated = await updateClienteCoordinates(
+          input.id,
+          result.latitude,
+          result.longitude
+        );
       } else if (input.tipo === "concorrente") {
-        updated = await updateConcorrenteCoordinates(input.id, result.latitude, result.longitude);
+        updated = await updateConcorrenteCoordinates(
+          input.id,
+          result.latitude,
+          result.longitude
+        );
       } else if (input.tipo === "lead") {
-        updated = await updateLeadCoordinates(input.id, result.latitude, result.longitude);
+        updated = await updateLeadCoordinates(
+          input.id,
+          result.latitude,
+          result.longitude
+        );
       }
 
       if (!updated) {
@@ -121,7 +141,10 @@ export const geocodingRouter = router({
       }
 
       // Buscar registros sem coordenadas
-      const records = await getRecordsSemCoordenadas(input.projetoId, input.tipo);
+      const records = await getRecordsSemCoordenadas(
+        input.projetoId,
+        input.tipo
+      );
 
       if (records.length === 0) {
         return {

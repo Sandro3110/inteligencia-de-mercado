@@ -34,7 +34,11 @@ import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { useUnreadNotificationsCount } from "@/hooks/useUnreadNotificationsCount";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
 interface NavItem {
@@ -50,7 +54,7 @@ interface NavSection {
   icon: any;
   items: NavItem[];
   defaultOpen?: boolean;
-  priority?: 'core' | 'high' | 'medium' | 'low';
+  priority?: "core" | "high" | "medium" | "low";
 }
 
 /**
@@ -68,16 +72,39 @@ const navSections: NavSection[] = [
   {
     title: "🎯 Core",
     icon: Zap,
-    priority: 'core',
+    priority: "core",
     defaultOpen: true,
     items: [
       { title: "Cockpit Unificado", href: "/", icon: Home, shortcut: "Ctrl+H" },
-      { title: "Nova Pesquisa", href: "/research/new", icon: Plus, badge: "Criar" },
+      {
+        title: "Nova Pesquisa",
+        href: "/research/new",
+        icon: Plus,
+        badge: "Criar",
+      },
       { title: "Pesquisas", href: "/pesquisas", icon: FileStack },
-      { title: "Enriquecer Dados", href: "/enrichment", icon: Sparkles, shortcut: "Ctrl+E" },
-      { title: "Acompanhar Progresso", href: "/enrichment-progress", icon: Activity },
-      { title: "Ver Resultados", href: "/resultados-enriquecimento", icon: CheckCircle },
-      { title: "Exportar Dados", href: "/export", icon: Download, shortcut: "Ctrl+X" },
+      {
+        title: "Enriquecer Dados",
+        href: "/enrichment",
+        icon: Sparkles,
+        shortcut: "Ctrl+E",
+      },
+      {
+        title: "Acompanhar Progresso",
+        href: "/enrichment-progress",
+        icon: Activity,
+      },
+      {
+        title: "Ver Resultados",
+        href: "/resultados-enriquecimento",
+        icon: CheckCircle,
+      },
+      {
+        title: "Exportar Dados",
+        href: "/export",
+        icon: Download,
+        shortcut: "Ctrl+X",
+      },
       { title: "Gerenciar Projetos", href: "/projetos", icon: FolderOpen },
     ],
   },
@@ -88,12 +115,22 @@ const navSections: NavSection[] = [
   {
     title: "📊 Análise",
     icon: BarChart3,
-    priority: 'high',
+    priority: "high",
     defaultOpen: false,
     items: [
-      { title: "Analytics Unificado", href: "/analytics", icon: BarChart3, shortcut: "Ctrl+A" },
+      {
+        title: "Analytics Unificado",
+        href: "/analytics",
+        icon: BarChart3,
+        shortcut: "Ctrl+A",
+      },
       { title: "Tendências", href: "/tendencias", icon: TrendingUp },
-      { title: "Performance e Conversão", href: "/performance", icon: DollarSign, shortcut: "Ctrl+R" },
+      {
+        title: "Performance e Conversão",
+        href: "/performance",
+        icon: DollarSign,
+        shortcut: "Ctrl+R",
+      },
     ],
   },
 
@@ -103,11 +140,19 @@ const navSections: NavSection[] = [
   {
     title: "⚙️ Configurações",
     icon: Settings,
-    priority: 'medium',
+    priority: "medium",
     defaultOpen: false,
     items: [
-      { title: "Configurações do Sistema", href: "/configuracoes/sistema", icon: Settings },
-      { title: "Parâmetros Enriquecimento", href: "/enrichment-settings", icon: Settings },
+      {
+        title: "Configurações do Sistema",
+        href: "/configuracoes/sistema",
+        icon: Settings,
+      },
+      {
+        title: "Parâmetros Enriquecimento",
+        href: "/enrichment-settings",
+        icon: Settings,
+      },
       { title: "Configurar Alertas", href: "/alertas", icon: Bell },
       { title: "Relatórios e Automação", href: "/relatorios", icon: FileText },
       { title: "Configurar IA (LLM)", href: "/admin/llm", icon: Zap },
@@ -120,33 +165,45 @@ const navSections: NavSection[] = [
   {
     title: "📁 Sistema",
     icon: FileStack,
-    priority: 'low',
+    priority: "low",
     defaultOpen: false,
     items: [
       { title: "Central de Notificações", href: "/notificacoes", icon: Bell },
-      { title: "Configurações de Notificações", href: "/notificacoes/config", icon: Settings },
+      {
+        title: "Configurações de Notificações",
+        href: "/notificacoes/config",
+        icon: Settings,
+      },
       { title: "Geocodificação", href: "/geocodificacao", icon: MapPin },
       { title: "Gerenciar Geocodificação", href: "/geo-admin", icon: Settings },
       { title: "Monitoramento", href: "/monitoring", icon: Activity },
-      { title: "Central de Ajuda", href: "/ajuda", icon: HelpCircle, shortcut: "?" },
+      {
+        title: "Central de Ajuda",
+        href: "/ajuda",
+        icon: HelpCircle,
+        shortcut: "?",
+      },
     ],
   },
 ];
 
-const STORAGE_KEY = 'sidebar-collapsed';
+const STORAGE_KEY = "sidebar-collapsed";
 
 export function AppSidebar() {
   const [location, setLocation] = useLocation();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const [collapsed, setCollapsed] = useState(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored === 'true';
+    return stored === "true";
   });
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
-    navSections.reduce((acc, section) => {
-      acc[section.title] = section.defaultOpen ?? false;
-      return acc;
-    }, {} as Record<string, boolean>)
+    navSections.reduce(
+      (acc, section) => {
+        acc[section.title] = section.defaultOpen ?? false;
+        return acc;
+      },
+      {} as Record<string, boolean>
+    )
   );
 
   const { selectedProjectId } = useSelectedProject();
@@ -158,8 +215,9 @@ export function AppSidebar() {
   // Listener para evento de toggle sidebar
   useEffect(() => {
     const handleToggle = () => toggleSidebar();
-    window.addEventListener('toggle-sidebar' as any, handleToggle);
-    return () => window.removeEventListener('toggle-sidebar' as any, handleToggle);
+    window.addEventListener("toggle-sidebar" as any, handleToggle);
+    return () =>
+      window.removeEventListener("toggle-sidebar" as any, handleToggle);
   }, []);
 
   const toggleSidebar = () => {
@@ -167,14 +225,16 @@ export function AppSidebar() {
       const newValue = !prev;
       localStorage.setItem(STORAGE_KEY, String(newValue));
       // Disparar evento para outras páginas ajustarem margem
-      window.dispatchEvent(new CustomEvent('sidebar-toggle', { detail: { collapsed: newValue } }));
+      window.dispatchEvent(
+        new CustomEvent("sidebar-toggle", { detail: { collapsed: newValue } })
+      );
       return newValue;
     });
   };
 
   const toggleSection = (title: string) => {
     if (!collapsed) {
-      setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
+      setOpenSections(prev => ({ ...prev, [title]: !prev[title] }));
     }
   };
 
@@ -187,16 +247,21 @@ export function AppSidebar() {
   // Cores por prioridade
   const getPriorityColor = (priority?: string) => {
     switch (priority) {
-      case 'core': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'high': return 'text-green-600 bg-green-50 border-green-200';
-      case 'medium': return 'text-purple-600 bg-purple-50 border-purple-200';
-      case 'low': return 'text-gray-600 bg-gray-50 border-gray-200';
-      default: return 'text-gray-600';
+      case "core":
+        return "text-blue-600 bg-blue-50 border-blue-200";
+      case "high":
+        return "text-green-600 bg-green-50 border-green-200";
+      case "medium":
+        return "text-purple-600 bg-purple-50 border-purple-200";
+      case "low":
+        return "text-gray-600 bg-gray-50 border-gray-200";
+      default:
+        return "text-gray-600";
     }
   };
 
   return (
-    <aside 
+    <aside
       className={cn(
         "fixed left-0 top-0 h-screen bg-white border-r border-slate-200 overflow-y-auto z-50 transition-all duration-300",
         collapsed ? "w-16" : "w-64"
@@ -209,8 +274,12 @@ export function AppSidebar() {
             <span className="flex items-center gap-2 cursor-pointer">
               <BarChart3 className="w-6 h-6 text-blue-600" />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-slate-900">Gestor PAV</span>
-                <span className="text-xs text-slate-500">Inteligência de Mercado</span>
+                <span className="text-sm font-semibold text-slate-900">
+                  Gestor PAV
+                </span>
+                <span className="text-xs text-slate-500">
+                  Inteligência de Mercado
+                </span>
               </div>
             </span>
           </Link>
@@ -228,11 +297,15 @@ export function AppSidebar() {
               onClick={toggleSidebar}
               className={cn("h-8 w-8", collapsed && "mx-auto")}
             >
-              {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+              {collapsed ? (
+                <ChevronRight className="w-4 h-4" />
+              ) : (
+                <ChevronLeft className="w-4 h-4" />
+              )}
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">
-            {collapsed ? 'Expandir menu' : 'Recolher menu'}
+            {collapsed ? "Expandir menu" : "Recolher menu"}
           </TooltipContent>
         </Tooltip>
       </div>
@@ -240,7 +313,9 @@ export function AppSidebar() {
       {/* Project Selector */}
       {!collapsed && selectedProjectId && stats && (
         <div className="p-3 border-b border-slate-200 bg-slate-50">
-          <div className="text-xs font-semibold text-slate-600 mb-1">Projeto Ativo</div>
+          <div className="text-xs font-semibold text-slate-600 mb-1">
+            Projeto Ativo
+          </div>
           <div className="text-sm font-medium text-slate-900">
             Projeto #{selectedProjectId}
           </div>
@@ -254,7 +329,7 @@ export function AppSidebar() {
 
       {/* Navigation */}
       <nav className="p-2">
-        {navSections.map((section) => {
+        {navSections.map(section => {
           const isOpen = openSections[section.title];
           const SectionIcon = section.icon;
 
@@ -266,14 +341,23 @@ export function AppSidebar() {
                 className={cn(
                   "w-full flex items-center justify-between px-3 py-2 rounded-md transition-colors",
                   collapsed ? "justify-center" : "",
-                  section.priority === 'core' ? "hover:bg-blue-50" : "hover:bg-slate-100"
+                  section.priority === "core"
+                    ? "hover:bg-blue-50"
+                    : "hover:bg-slate-100"
                 )}
               >
                 {collapsed ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="flex items-center">
-                        <SectionIcon className={cn("w-5 h-5", section.priority === 'core' ? 'text-blue-600' : 'text-slate-600')} />
+                        <SectionIcon
+                          className={cn(
+                            "w-5 h-5",
+                            section.priority === "core"
+                              ? "text-blue-600"
+                              : "text-slate-600"
+                          )}
+                        />
                       </div>
                     </TooltipTrigger>
                     <TooltipContent side="right">
@@ -283,11 +367,22 @@ export function AppSidebar() {
                 ) : (
                   <>
                     <div className="flex items-center gap-2">
-                      <SectionIcon className={cn("w-4 h-4", section.priority === 'core' ? 'text-blue-600' : 'text-slate-600')} />
-                      <span className={cn(
-                        "text-sm font-semibold",
-                        section.priority === 'core' ? 'text-blue-700' : 'text-slate-700'
-                      )}>
+                      <SectionIcon
+                        className={cn(
+                          "w-4 h-4",
+                          section.priority === "core"
+                            ? "text-blue-600"
+                            : "text-slate-600"
+                        )}
+                      />
+                      <span
+                        className={cn(
+                          "text-sm font-semibold",
+                          section.priority === "core"
+                            ? "text-blue-700"
+                            : "text-slate-700"
+                        )}
+                      >
                         {section.title}
                       </span>
                     </div>
@@ -302,8 +397,13 @@ export function AppSidebar() {
 
               {/* Section Items */}
               {(isOpen || collapsed) && (
-                <div className={cn("mt-1", collapsed ? "space-y-1" : "ml-2 space-y-0.5")}>
-                  {section.items.map((item) => {
+                <div
+                  className={cn(
+                    "mt-1",
+                    collapsed ? "space-y-1" : "ml-2 space-y-0.5"
+                  )}
+                >
+                  {section.items.map(item => {
                     const ItemIcon = item.icon;
                     const active = isActive(item.href);
 
@@ -322,14 +422,15 @@ export function AppSidebar() {
                               >
                                 <ItemIcon className="w-5 h-5" />
                                 {/* Badge de notificações não lidas (collapsed) */}
-                                {item.href === "/notificacoes" && unreadCount > 0 && (
-                                  <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                    <span className="relative inline-flex items-center justify-center rounded-full h-4 w-4 bg-red-500 text-white text-[10px] font-bold">
-                                      {unreadCount > 9 ? '9' : unreadCount}
+                                {item.href === "/notificacoes" &&
+                                  unreadCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                      <span className="relative inline-flex items-center justify-center rounded-full h-4 w-4 bg-red-500 text-white text-[10px] font-bold">
+                                        {unreadCount > 9 ? "9" : unreadCount}
+                                      </span>
                                     </span>
-                                  </span>
-                                )}
+                                  )}
                               </a>
                             </TooltipTrigger>
                             <TooltipContent side="right">
@@ -357,11 +458,12 @@ export function AppSidebar() {
                               <span className="text-sm">{item.title}</span>
                             </div>
                             {/* Badge de notificações não lidas */}
-                            {item.href === "/notificacoes" && unreadCount > 0 ? (
+                            {item.href === "/notificacoes" &&
+                            unreadCount > 0 ? (
                               <span className="relative flex h-5 w-5">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                 <span className="relative inline-flex items-center justify-center rounded-full h-5 w-5 bg-red-500 text-white text-xs font-bold">
-                                  {unreadCount > 9 ? '9+' : unreadCount}
+                                  {unreadCount > 9 ? "9+" : unreadCount}
                                 </span>
                               </span>
                             ) : item.badge ? (
@@ -385,8 +487,6 @@ export function AppSidebar() {
           );
         })}
       </nav>
-
-
     </aside>
   );
 }

@@ -2,11 +2,39 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { TrendingUp, MapPin, PieChart as PieChartIcon, RefreshCw } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  TrendingUp,
+  MapPin,
+  PieChart as PieChartIcon,
+  RefreshCw,
+} from "lucide-react";
 import { CardSkeleton, ChartSkeleton } from "@/components/skeletons";
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+const COLORS = [
+  "#3b82f6",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#ec4899",
+  "#06b6d4",
+  "#84cc16",
+];
 
 interface InteractiveTabProps {
   projectId: number;
@@ -14,25 +42,35 @@ interface InteractiveTabProps {
 
 export function InteractiveTab({ projectId }: InteractiveTabProps) {
   const [months, setMonths] = useState(6);
-  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(null);
-
-  // Buscar pesquisas do projeto selecionado
-  const { data: pesquisas } = trpc.pesquisas.list.useQuery(
-    undefined,
-    { enabled: !!projectId }
+  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(
+    null
   );
 
-  const { data: evolutionData, refetch: refetchEvolution, isLoading: isLoadingEvolution } = trpc.analytics.evolution.useQuery(
+  // Buscar pesquisas do projeto selecionado
+  const { data: pesquisas } = trpc.pesquisas.list.useQuery(undefined, {
+    enabled: !!projectId,
+  });
+
+  const {
+    data: evolutionData,
+    refetch: refetchEvolution,
+    isLoading: isLoadingEvolution,
+  } = trpc.analytics.evolution.useQuery(
     { projectId, pesquisaId: selectedPesquisaId ?? undefined, months },
     { enabled: !!projectId }
   );
 
-  const { data: geographicData, refetch: refetchGeographic } = trpc.analytics.geographic.useQuery(
-    { projectId, pesquisaId: selectedPesquisaId ?? undefined },
-    { enabled: !!projectId }
-  );
+  const { data: geographicData, refetch: refetchGeographic } =
+    trpc.analytics.geographic.useQuery(
+      { projectId, pesquisaId: selectedPesquisaId ?? undefined },
+      { enabled: !!projectId }
+    );
 
-  const { data: segmentationData, refetch: refetchSegmentation, isLoading: isLoadingSegmentation } = trpc.analytics.segmentation.useQuery(
+  const {
+    data: segmentationData,
+    refetch: refetchSegmentation,
+    isLoading: isLoadingSegmentation,
+  } = trpc.analytics.segmentation.useQuery(
     { projectId, pesquisaId: selectedPesquisaId ?? undefined },
     { enabled: !!projectId }
   );
@@ -66,7 +104,11 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
       <div className="flex items-center justify-end gap-4">
         <select
           value={selectedPesquisaId || ""}
-          onChange={(e) => setSelectedPesquisaId(e.target.value ? Number(e.target.value) : null)}
+          onChange={e =>
+            setSelectedPesquisaId(
+              e.target.value ? Number(e.target.value) : null
+            )
+          }
           className="px-3 py-2 border border-slate-300 rounded-md text-slate-700 bg-white"
         >
           <option value="">Todas as Pesquisas</option>
@@ -78,7 +120,7 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
         </select>
         <select
           value={months}
-          onChange={(e) => setMonths(Number(e.target.value))}
+          onChange={e => setMonths(Number(e.target.value))}
           className="px-3 py-2 border border-slate-300 rounded-md text-slate-700 bg-white"
         >
           <option value={3}>Últimos 3 meses</option>
@@ -98,7 +140,9 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
             <TrendingUp className="w-5 h-5 text-blue-600" />
             <CardTitle className="text-slate-900">Evolução Temporal</CardTitle>
           </div>
-          <p className="text-sm text-slate-600 mt-1">Mercados, clientes e leads criados por mês</p>
+          <p className="text-sm text-slate-600 mt-1">
+            Mercados, clientes e leads criados por mês
+          </p>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -107,13 +151,35 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
               <XAxis dataKey="month" stroke="#64748b" />
               <YAxis stroke="#64748b" />
               <Tooltip
-                contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "0.5rem" }}
+                contentStyle={{
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "0.5rem",
+                }}
                 labelStyle={{ color: "#0f172a" }}
               />
               <Legend />
-              <Line type="monotone" dataKey="mercados" stroke="#3b82f6" strokeWidth={2} name="Mercados" />
-              <Line type="monotone" dataKey="clientes" stroke="#10b981" strokeWidth={2} name="Clientes" />
-              <Line type="monotone" dataKey="leads" stroke="#f59e0b" strokeWidth={2} name="Leads" />
+              <Line
+                type="monotone"
+                dataKey="mercados"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                name="Mercados"
+              />
+              <Line
+                type="monotone"
+                dataKey="clientes"
+                stroke="#10b981"
+                strokeWidth={2}
+                name="Clientes"
+              />
+              <Line
+                type="monotone"
+                dataKey="leads"
+                stroke="#f59e0b"
+                strokeWidth={2}
+                name="Leads"
+              />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -125,18 +191,31 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
           <CardHeader>
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-green-600" />
-              <CardTitle className="text-slate-900">Distribuição Geográfica</CardTitle>
+              <CardTitle className="text-slate-900">
+                Distribuição Geográfica
+              </CardTitle>
             </div>
-            <p className="text-sm text-slate-600 mt-1">Top 10 estados com mais registros</p>
+            <p className="text-sm text-slate-600 mt-1">
+              Top 10 estados com mais registros
+            </p>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={geographicData || []} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis type="number" stroke="#64748b" />
-                <YAxis dataKey="uf" type="category" stroke="#64748b" width={50} />
+                <YAxis
+                  dataKey="uf"
+                  type="category"
+                  stroke="#64748b"
+                  width={50}
+                />
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "0.5rem" }}
+                  contentStyle={{
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "0.5rem",
+                  }}
                   labelStyle={{ color: "#0f172a" }}
                 />
                 <Bar dataKey="count" fill="#10b981" name="Registros" />
@@ -150,9 +229,13 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
           <CardHeader>
             <div className="flex items-center gap-2">
               <PieChartIcon className="w-5 h-5 text-purple-600" />
-              <CardTitle className="text-slate-900">Segmentação de Mercado</CardTitle>
+              <CardTitle className="text-slate-900">
+                Segmentação de Mercado
+              </CardTitle>
             </div>
-            <p className="text-sm text-slate-600 mt-1">Distribuição B2B, B2C e Ambos</p>
+            <p className="text-sm text-slate-600 mt-1">
+              Distribuição B2B, B2C e Ambos
+            </p>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -162,18 +245,27 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ segmentacao, percent }) => `${segmentacao} (${(percent * 100).toFixed(0)}%)`}
+                  label={({ segmentacao, percent }) =>
+                    `${segmentacao} (${(percent * 100).toFixed(0)}%)`
+                  }
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="count"
                   nameKey="segmentacao"
                 >
                   {(segmentationData || []).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "0.5rem" }}
+                  contentStyle={{
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "0.5rem",
+                  }}
                 />
                 <Legend />
               </PieChart>
@@ -188,8 +280,12 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-700 font-medium">Total de Meses</p>
-                <p className="text-2xl font-bold text-blue-900">{evolutionData?.length || 0}</p>
+                <p className="text-sm text-blue-700 font-medium">
+                  Total de Meses
+                </p>
+                <p className="text-2xl font-bold text-blue-900">
+                  {evolutionData?.length || 0}
+                </p>
               </div>
               <TrendingUp className="w-8 h-8 text-blue-600 opacity-50" />
             </div>
@@ -200,8 +296,12 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-green-700 font-medium">Estados Ativos</p>
-                <p className="text-2xl font-bold text-green-900">{geographicData?.length || 0}</p>
+                <p className="text-sm text-green-700 font-medium">
+                  Estados Ativos
+                </p>
+                <p className="text-2xl font-bold text-green-900">
+                  {geographicData?.length || 0}
+                </p>
               </div>
               <MapPin className="w-8 h-8 text-green-600 opacity-50" />
             </div>
@@ -213,7 +313,9 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-purple-700 font-medium">Segmentos</p>
-                <p className="text-2xl font-bold text-purple-900">{segmentationData?.length || 0}</p>
+                <p className="text-2xl font-bold text-purple-900">
+                  {segmentationData?.length || 0}
+                </p>
               </div>
               <PieChartIcon className="w-8 h-8 text-purple-600 opacity-50" />
             </div>

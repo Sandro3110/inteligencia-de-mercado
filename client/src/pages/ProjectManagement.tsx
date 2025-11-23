@@ -1,23 +1,23 @@
 /**
  * Gestão de Projetos Unificada
  * Fusão de: ProjectManagement + ProjectActivityDashboard + AtividadePage
- * 
+ *
  * Abas disponíveis:
  * - Projetos: Gerenciamento completo de projetos
  * - Atividades: Dashboard de atividade e inatividade
  * - Logs: Registro de atividades do sistema
  */
 
-import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Folder, Activity, FileText } from 'lucide-react';
-import DashboardLayout from '@/components/DashboardLayout';
-import { ProjectsTab } from '@/components/projects/ProjectsTab';
-import { ActivityTab } from '@/components/projects/ActivityTab';
-import { LogsTab } from '@/components/projects/LogsTab';
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Folder, Activity, FileText } from "lucide-react";
+import DashboardLayout from "@/components/DashboardLayout";
+import { ProjectsTab } from "@/components/projects/ProjectsTab";
+import { ActivityTab } from "@/components/projects/ActivityTab";
+import { LogsTab } from "@/components/projects/LogsTab";
 
 export default function ProjectManagement() {
-  const [activeTab, setActiveTab] = useState('projects');
+  const [activeTab, setActiveTab] = useState("projects");
 
   return (
     <DashboardLayout>
@@ -26,12 +26,17 @@ export default function ProjectManagement() {
         <div>
           <h1 className="text-3xl font-bold">Gestão de Projetos</h1>
           <p className="text-muted-foreground mt-1">
-            Gerencie seus projetos, monitore atividades e visualize logs do sistema
+            Gerencie seus projetos, monitore atividades e visualize logs do
+            sistema
           </p>
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
             <TabsTrigger value="projects" className="gap-2">
               <Folder className="w-4 h-4" />

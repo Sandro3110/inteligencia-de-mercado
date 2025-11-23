@@ -17,7 +17,7 @@ interface BreadcrumbsProps {
 /**
  * Componente de Breadcrumbs para navegação contextual
  * Suporta links (href) ou callbacks (onClick)
- * 
+ *
  * Uso:
  * ```tsx
  * <Breadcrumbs items={[

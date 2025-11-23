@@ -11,7 +11,10 @@ interface ListViewTabProps {
  * Atualmente renderiza o CascadeView completo
  * TODO: Extrair apenas o conteúdo necessário sem header/sidebar
  */
-export default function ListViewTab({ filters, onFiltersChange }: ListViewTabProps) {
+export default function ListViewTab({
+  filters,
+  onFiltersChange,
+}: ListViewTabProps) {
   return (
     <div className="h-full w-full overflow-hidden">
       <CascadeView />

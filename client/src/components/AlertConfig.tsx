@@ -1,16 +1,36 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Bell, Plus, Trash2, Edit2, AlertCircle, TrendingUp, Target } from "lucide-react";
+import {
+  Bell,
+  Plus,
+  Trash2,
+  Edit2,
+  AlertCircle,
+  TrendingUp,
+  Target,
+} from "lucide-react";
 
-type AlertType = 'error_rate' | 'high_quality_lead' | 'market_threshold';
+type AlertType = "error_rate" | "high_quality_lead" | "market_threshold";
 
 interface AlertTypeInfo {
   label: string;
@@ -23,7 +43,8 @@ interface AlertTypeInfo {
 const ALERT_TYPES: Record<AlertType, AlertTypeInfo> = {
   error_rate: {
     label: "Taxa de Erro",
-    description: "Alerta quando a taxa de erro no enriquecimento ultrapassar o limite",
+    description:
+      "Alerta quando a taxa de erro no enriquecimento ultrapassar o limite",
     icon: <AlertCircle className="w-5 h-5 text-red-500" />,
     thresholdLabel: "Taxa de erro máxima",
     thresholdUnit: "%",
@@ -54,8 +75,8 @@ export function AlertConfig() {
     threshold: number;
     enabled: boolean;
   }>({
-    name: '',
-    type: 'error_rate',
+    name: "",
+    type: "error_rate",
     threshold: 10,
     enabled: true,
   });
@@ -74,7 +95,7 @@ export function AlertConfig() {
       setIsCreating(false);
       resetForm();
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao criar alerta: ${error.message}`);
     },
   });
@@ -86,7 +107,7 @@ export function AlertConfig() {
       setEditingId(null);
       resetForm();
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao atualizar alerta: ${error.message}`);
     },
   });
@@ -96,15 +117,15 @@ export function AlertConfig() {
       toast.success("Alerta deletado com sucesso!");
       refetch();
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao deletar alerta: ${error.message}`);
     },
   });
 
   const resetForm = () => {
     setFormData({
-      name: '',
-      type: 'error_rate',
+      name: "",
+      type: "error_rate",
       threshold: 10,
       enabled: true,
     });
@@ -112,7 +133,7 @@ export function AlertConfig() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedProjectId) {
       toast.error("Nenhum projeto selecionado");
       return;
@@ -191,9 +212,7 @@ export function AlertConfig() {
             <CardTitle className="text-slate-900">
               {editingId ? "Editar Alerta" : "Criar Novo Alerta"}
             </CardTitle>
-            <CardDescription>
-              Configure os parâmetros do alerta
-            </CardDescription>
+            <CardDescription>Configure os parâmetros do alerta</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -204,7 +223,9 @@ export function AlertConfig() {
                   id="name"
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={e =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   placeholder="Ex: Alerta de Taxa de Erro Alta"
                   required
                 />
@@ -215,7 +236,9 @@ export function AlertConfig() {
                 <Label htmlFor="type">Tipo de Alerta</Label>
                 <Select
                   value={formData.type}
-                  onValueChange={(value) => setFormData({ ...formData, type: value as AlertType })}
+                  onValueChange={value =>
+                    setFormData({ ...formData, type: value as AlertType })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -231,22 +254,33 @@ export function AlertConfig() {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-sm text-slate-400">{selectedTypeInfo.description}</p>
+                <p className="text-sm text-slate-400">
+                  {selectedTypeInfo.description}
+                </p>
               </div>
 
               {/* Threshold */}
               <div className="space-y-2">
-                <Label htmlFor="threshold">{selectedTypeInfo.thresholdLabel}</Label>
+                <Label htmlFor="threshold">
+                  {selectedTypeInfo.thresholdLabel}
+                </Label>
                 <div className="flex items-center gap-2">
                   <Input
                     id="threshold"
                     type="number"
                     value={formData.threshold}
-                    onChange={(e) => setFormData({ ...formData, threshold: Number(e.target.value) })}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        threshold: Number(e.target.value),
+                      })
+                    }
                     min={0}
                     required
                   />
-                  <span className="text-sm text-slate-400">{selectedTypeInfo.thresholdUnit}</span>
+                  <span className="text-sm text-slate-400">
+                    {selectedTypeInfo.thresholdUnit}
+                  </span>
                 </div>
               </div>
 
@@ -261,13 +295,20 @@ export function AlertConfig() {
                 <Switch
                   id="enabled"
                   checked={formData.enabled}
-                  onCheckedChange={(checked) => setFormData({ ...formData, enabled: checked })}
+                  onCheckedChange={checked =>
+                    setFormData({ ...formData, enabled: checked })
+                  }
                 />
               </div>
 
               {/* Botões */}
               <div className="flex gap-2 pt-4">
-                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                <Button
+                  type="submit"
+                  disabled={
+                    createMutation.isPending || updateMutation.isPending
+                  }
+                >
                   {editingId ? "Atualizar" : "Criar"} Alerta
                 </Button>
                 <Button type="button" variant="outline" onClick={handleCancel}>
@@ -282,27 +323,36 @@ export function AlertConfig() {
       {/* Lista de Alertas */}
       <div className="space-y-3">
         {alerts && alerts.length > 0 ? (
-          alerts.map((alert) => {
+          alerts.map(alert => {
             const typeInfo = ALERT_TYPES[alert.alertType as AlertType];
             const condition = JSON.parse(alert.condition);
             return (
-              <Card key={alert.id} className="bg-white border-slate-200 shadow-sm">
+              <Card
+                key={alert.id}
+                className="bg-white border-slate-200 shadow-sm"
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       {typeInfo.icon}
                       <div>
-                        <h3 className="font-medium text-slate-900">{alert.name}</h3>
+                        <h3 className="font-medium text-slate-900">
+                          {alert.name}
+                        </h3>
                         <p className="text-sm text-slate-400">
-                          {typeInfo.label} - Limite: {condition.value} {typeInfo.thresholdUnit}
+                          {typeInfo.label} - Limite: {condition.value}{" "}
+                          {typeInfo.thresholdUnit}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Switch
                         checked={!!alert.enabled}
-                        onCheckedChange={(checked) =>
-                          updateMutation.mutate({ id: alert.id, enabled: checked })
+                        onCheckedChange={checked =>
+                          updateMutation.mutate({
+                            id: alert.id,
+                            enabled: checked,
+                          })
                         }
                       />
                       <Button

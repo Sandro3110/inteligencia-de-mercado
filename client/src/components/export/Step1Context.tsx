@@ -1,6 +1,12 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ExportState } from "@/pages/ExportWizard";
 import { Lightbulb, Sparkles } from "lucide-react";
 import { trpc } from "@/lib/trpc";
@@ -19,7 +25,7 @@ export default function Step1Context({ state, setState }: Step1ContextProps) {
     "Exportar todos os clientes validados do projeto Embalagens",
     "Buscar concorrentes de médio porte na região Sul com score acima de 80",
     "Listar mercados recentes (últimos 30 dias) em MG e SP",
-    "Produtos de clientes B2B com faturamento acima de 5 milhões"
+    "Produtos de clientes B2B com faturamento acima de 5 milhões",
   ];
 
   return (
@@ -29,7 +35,8 @@ export default function Step1Context({ state, setState }: Step1ContextProps) {
           O que você deseja exportar?
         </h2>
         <p className="text-slate-600">
-          Descreva em linguagem natural o que você precisa. Nossa IA vai interpretar e criar os filtros automaticamente.
+          Descreva em linguagem natural o que você precisa. Nossa IA vai
+          interpretar e criar os filtros automaticamente.
         </p>
       </div>
 
@@ -38,14 +45,16 @@ export default function Step1Context({ state, setState }: Step1ContextProps) {
         <Label htmlFor="project">Projeto (opcional)</Label>
         <Select
           value={state.projectId}
-          onValueChange={(value) => setState(prev => ({ ...prev, projectId: value }))}
+          onValueChange={value =>
+            setState(prev => ({ ...prev, projectId: value }))
+          }
         >
           <SelectTrigger>
             <SelectValue placeholder="Todos os projetos" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todos os projetos</SelectItem>
-            {projects?.map((project) => (
+            {projects?.map(project => (
               <SelectItem key={project.id} value={String(project.id)}>
                 {project.nome}
               </SelectItem>
@@ -59,7 +68,9 @@ export default function Step1Context({ state, setState }: Step1ContextProps) {
         <Label htmlFor="entityType">Tipo de Dados</Label>
         <Select
           value={state.entityType}
-          onValueChange={(value: any) => setState(prev => ({ ...prev, entityType: value }))}
+          onValueChange={(value: any) =>
+            setState(prev => ({ ...prev, entityType: value }))
+          }
         >
           <SelectTrigger>
             <SelectValue />
@@ -86,39 +97,66 @@ export default function Step1Context({ state, setState }: Step1ContextProps) {
           id="context"
           placeholder="Ex: Quero leads de alta qualidade no setor de embalagens em São Paulo..."
           value={state.context}
-          onChange={(e) => setState(prev => ({ ...prev, context: e.target.value }))}
+          onChange={e =>
+            setState(prev => ({ ...prev, context: e.target.value }))
+          }
           rows={4}
           className="resize-none"
         />
         <p className="text-xs text-slate-500">
-          Nossa IA vai extrair automaticamente: geografia, qualidade, porte, segmentação e período.
+          Nossa IA vai extrair automaticamente: geografia, qualidade, porte,
+          segmentação e período.
         </p>
-        
+
         {/* Highlight de entidades detectadas */}
         {state.context && state.context.length > 20 && (
           <div className="mt-3 p-3 bg-white border border-slate-200 rounded-lg">
-            <p className="text-xs font-semibold text-slate-700 mb-2">Entidades detectadas:</p>
+            <p className="text-xs font-semibold text-slate-700 mb-2">
+              Entidades detectadas:
+            </p>
             <div className="flex flex-wrap gap-2">
-              {state.context.match(/\b(SP|MG|RJ|RS|PR|SC|BA|CE|PE|DF)\b/gi)?.map((match, i) => (
-                <span key={`geo-${i}`} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                  🟢 {match}
-                </span>
-              ))}
-              {state.context.match(/\b(alta qualidade|validado|pendente|score|qualidade)\b/gi)?.map((match, i) => (
-                <span key={`qual-${i}`} className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                  🟡 {match}
-                </span>
-              ))}
-              {state.context.match(/\b(médio porte|grande|pequena|micro)\b/gi)?.map((match, i) => (
-                <span key={`size-${i}`} className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
-                  🟣 {match}
-                </span>
-              ))}
-              {state.context.match(/\b(recente|dias|mês|trimestre|ano)\b/gi)?.map((match, i) => (
-                <span key={`time-${i}`} className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
-                  🟠 {match}
-                </span>
-              ))}
+              {state.context
+                .match(/\b(SP|MG|RJ|RS|PR|SC|BA|CE|PE|DF)\b/gi)
+                ?.map((match, i) => (
+                  <span
+                    key={`geo-${i}`}
+                    className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
+                  >
+                    🟢 {match}
+                  </span>
+                ))}
+              {state.context
+                .match(
+                  /\b(alta qualidade|validado|pendente|score|qualidade)\b/gi
+                )
+                ?.map((match, i) => (
+                  <span
+                    key={`qual-${i}`}
+                    className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full"
+                  >
+                    🟡 {match}
+                  </span>
+                ))}
+              {state.context
+                .match(/\b(médio porte|grande|pequena|micro)\b/gi)
+                ?.map((match, i) => (
+                  <span
+                    key={`size-${i}`}
+                    className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full"
+                  >
+                    🟣 {match}
+                  </span>
+                ))}
+              {state.context
+                .match(/\b(recente|dias|mês|trimestre|ano)\b/gi)
+                ?.map((match, i) => (
+                  <span
+                    key={`time-${i}`}
+                    className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full"
+                  >
+                    🟠 {match}
+                  </span>
+                ))}
             </div>
           </div>
         )}
@@ -129,7 +167,9 @@ export default function Step1Context({ state, setState }: Step1ContextProps) {
         <div className="flex items-start gap-2 mb-3">
           <Lightbulb className="h-5 w-5 text-blue-600 mt-0.5" />
           <div>
-            <h3 className="font-semibold text-blue-900 mb-1">Exemplos de contextos</h3>
+            <h3 className="font-semibold text-blue-900 mb-1">
+              Exemplos de contextos
+            </h3>
             <p className="text-sm text-blue-700 mb-2">
               Clique em um exemplo para usar como base:
             </p>
@@ -152,11 +192,24 @@ export default function Step1Context({ state, setState }: Step1ContextProps) {
       <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
         <h4 className="font-semibold text-slate-900 mb-2">Como funciona?</h4>
         <ul className="text-sm text-slate-600 space-y-1">
-          <li>• <strong>Geografia:</strong> Estados (SP, MG), cidades, regiões (Sudeste, Sul)</li>
-          <li>• <strong>Qualidade:</strong> "Alta qualidade" = score ≥ 80, "validados", "pendentes"</li>
-          <li>• <strong>Porte:</strong> Micro, pequena, média, grande empresa</li>
-          <li>• <strong>Temporal:</strong> "Recente" = últimos 30 dias, "este mês", "último trimestre"</li>
-          <li>• <strong>Segmentação:</strong> B2B, B2C, CNAE específico</li>
+          <li>
+            • <strong>Geografia:</strong> Estados (SP, MG), cidades, regiões
+            (Sudeste, Sul)
+          </li>
+          <li>
+            • <strong>Qualidade:</strong> "Alta qualidade" = score ≥ 80,
+            "validados", "pendentes"
+          </li>
+          <li>
+            • <strong>Porte:</strong> Micro, pequena, média, grande empresa
+          </li>
+          <li>
+            • <strong>Temporal:</strong> "Recente" = últimos 30 dias, "este
+            mês", "último trimestre"
+          </li>
+          <li>
+            • <strong>Segmentação:</strong> B2B, B2C, CNAE específico
+          </li>
         </ul>
       </div>
     </div>

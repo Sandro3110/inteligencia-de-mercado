@@ -6,7 +6,7 @@ export default function ReportsPage() {
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Breadcrumbs */}
         <DynamicBreadcrumbs />
-        
+
         {/* Componente de Geração de Relatórios */}
         <ReportGenerator />
       </div>

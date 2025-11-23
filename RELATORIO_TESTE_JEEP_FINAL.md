@@ -11,6 +11,7 @@
 ✅ **TESTE APROVADO** - API funcionando corretamente com todas as regras implementadas
 
 **Validações Aprovadas:** 7/7 (100%)
+
 - ✅ Projeto criado isoladamente
 - ✅ Nome do projeto correto
 - ✅ Cliente processado e enriquecido
@@ -41,15 +42,15 @@
 
 ## 📊 ESTATÍSTICAS FINAIS
 
-| Métrica | Valor |
-|---------|-------|
-| **Projeto ID** | 180004 |
-| **Projeto Nome** | Teste Jeep API Corrigida |
-| **Clientes Processados** | 1 |
-| **Mercados Identificados** | 1 |
-| **Concorrentes Encontrados** | 10 |
-| **Leads Gerados** | 8 |
-| **Score Médio de Qualidade** | 50/100 |
+| Métrica                      | Valor                    |
+| ---------------------------- | ------------------------ |
+| **Projeto ID**               | 180004                   |
+| **Projeto Nome**             | Teste Jeep API Corrigida |
+| **Clientes Processados**     | 1                        |
+| **Mercados Identificados**   | 1                        |
+| **Concorrentes Encontrados** | 10                       |
+| **Leads Gerados**            | 8                        |
+| **Score Médio de Qualidade** | 50/100                   |
 
 ---
 
@@ -57,14 +58,14 @@
 
 ### Jeep do Brasil
 
-| Campo | Valor |
-|-------|-------|
-| **Nome** | Jeep do Brasil |
-| **CNPJ** | 04.601.397/0001-65 |
-| **Site** | N/A |
-| **Produto** | N/A |
-| **Porte** | N/A |
-| **Score de Qualidade** | 50/100 |
+| Campo                  | Valor              |
+| ---------------------- | ------------------ |
+| **Nome**               | Jeep do Brasil     |
+| **CNPJ**               | 04.601.397/0001-65 |
+| **Site**               | N/A                |
+| **Produto**            | N/A                |
+| **Porte**              | N/A                |
+| **Score de Qualidade** | 50/100             |
 
 **Fonte de Enriquecimento:** ReceitaWS (Cache HIT - 0 dias)
 
@@ -76,11 +77,11 @@
 
 ### 1. Automotivo
 
-| Campo | Valor |
-|-------|-------|
-| **Nome** | Automotivo |
-| **Categoria** | Manufatura de Bens de Consumo Duráveis e Transporte |
-| **Segmentação** | B2C |
+| Campo           | Valor                                               |
+| --------------- | --------------------------------------------------- |
+| **Nome**        | Automotivo                                          |
+| **Categoria**   | Manufatura de Bens de Consumo Duráveis e Transporte |
+| **Segmentação** | B2C                                                 |
 
 **Método de Identificação:** Análise do produto "Veículos automotores" fornecido no input
 
@@ -91,6 +92,7 @@
 ### Top 5 Concorrentes
 
 #### 1. As 25 maiores montadoras e empresas de peças do Brasil
+
 - **CNPJ:** N/A
 - **Site:** https://valor.globo.com/empresas/noticia/2024/11/18/as-maiores-montadoras-e-empresas-de-pecas-do-brasil.ghtml
 - **Produto:** Quais são as maiores empresas do setor automotivo no Brasil? As maiores empresas do setor automotivo no Brasil incluem a Stellantis, Volkswagen, General Motors e ...
@@ -98,6 +100,7 @@
 - **Fonte:** SerpAPI (Google Search)
 
 #### 2. 23 Maiores Empresas de Industria Automotiva no Brasil
+
 - **CNPJ:** N/A
 - **Site:** https://www.econodata.com.br/maiores-empresas/todo-brasil/busca-industria-automotiva
 - **Produto:** Ranking das maiores empresas de Industria Automotiva no Brasil. Veja a lista completa de empresas de Industria Automotiva do Brasil.
@@ -105,6 +108,7 @@
 - **Fonte:** SerpAPI (Google Search)
 
 #### 3. Conheça as principais fabricantes de carros no Brasil
+
 - **CNPJ:** N/A
 - **Site:** https://centercarjf.com.br/blog/detalhe/12575/conheca-as-principais-fabricantes-de-carros-no-brasil/
 - **Produto:** Quais são as principais fabricantes de carros no Brasil? As principais fabricantes de carros no Brasil incluem Volkswagen, Fiat, General Motors, Toyota e ...
@@ -112,6 +116,7 @@
 - **Fonte:** SerpAPI (Google Search)
 
 #### 4. Fábricas de automóveis no Brasil: onde estão e quanto...
+
 - **CNPJ:** N/A
 - **Site:** https://motor1.uol.com.br/news/242153/fabricas-automoveis-brasil/
 - **Produto:** Quais são as principais fábricas de automóveis no Brasil? As principais fábricas incluem Volkswagen, Fiat, General Motors, Toyota, Hyundai e outras.
@@ -119,6 +124,7 @@
 - **Fonte:** SerpAPI (Google Search)
 
 #### 5. 20 marcas de carro mais vendidas no Brasil em 2024
+
 - **CNPJ:** N/A
 - **Site:** https://www.minutoseguros.com.br/blog/as-marcas-de-carro-mais-vendidas-no-brasil/
 - **Produto:** Quais são as marcas de carro mais vendidas no Brasil? As marcas mais vendidas incluem Fiat, Volkswagen, Chevrolet, Hyundai e Toyota.
@@ -140,6 +146,7 @@
 ### Top 5 Leads
 
 #### 1. Os 15 melhores distribuidores de peças automotivas do...
+
 - **CNPJ:** N/A
 - **Email:** N/A
 - **Telefone:** N/A
@@ -151,6 +158,7 @@
 - **Fonte:** SerpAPI (Google Search)
 
 #### 2. Sama
+
 - **CNPJ:** N/A
 - **Email:** N/A
 - **Telefone:** N/A
@@ -162,6 +170,7 @@
 - **Fonte:** SerpAPI (Google Search)
 
 #### 3. Lista Fabricantes
+
 - **CNPJ:** N/A
 - **Email:** N/A
 - **Telefone:** N/A
@@ -173,6 +182,7 @@
 - **Fonte:** SerpAPI (Google Search)
 
 #### 4. Quais são as maiores distribuidoras de autopeças no Brasil?
+
 - **CNPJ:** N/A
 - **Email:** N/A
 - **Telefone:** N/A
@@ -184,6 +194,7 @@
 - **Fonte:** SerpAPI (Google Search)
 
 #### 5. SK Automotive
+
 - **CNPJ:** N/A
 - **Email:** N/A
 - **Telefone:** N/A
@@ -209,11 +220,13 @@
 **Regra:** Cada demanda cria um novo projeto isolado, sem misturar com a base consolidada.
 
 **Implementação:**
+
 - Projeto criado com ID único: **180004**
 - Nome: "Teste Jeep API Corrigida"
 - Todos os dados (cliente, mercado, concorrentes, leads) vinculados ao `projectId = 180004`
 
 **Validação:**
+
 ```sql
 SELECT COUNT(*) FROM clientes WHERE projectId = 180004;  -- Resultado: 1
 SELECT COUNT(*) FROM mercados_unicos WHERE projectId = 180004;  -- Resultado: 1
@@ -230,12 +243,14 @@ SELECT COUNT(*) FROM leads WHERE projectId = 180004;  -- Resultado: 8
 **Regra:** Empresas brasileiras com CNPJ devem ser enriquecidas automaticamente via ReceitaWS.
 
 **Implementação:**
+
 - CNPJ fornecido: **04.601.397/0001-65** (Jeep do Brasil)
 - Consulta ReceitaWS executada com sucesso
 - Cache HIT (dados já consultados anteriormente)
 - TTL do cache: 30 dias
 
 **Dados Retornados:**
+
 - Razão Social: Jeep do Brasil
 - CNPJ: 04.601.397/0001-65
 - Status: Ativo
@@ -249,12 +264,14 @@ SELECT COUNT(*) FROM leads WHERE projectId = 180004;  -- Resultado: 8
 **Regra:** Sistema deve buscar 20 concorrentes por cliente usando apenas SerpAPI (sem LLM).
 
 **Implementação:**
+
 - Query SerpAPI: `"principais empresas Automotivo Brasil"`
 - Resultados encontrados: **10 concorrentes**
 - Fonte: Google Search via SerpAPI
 - Sem uso de LLM (Gemini/Manus IA)
 
 **Observação:** SerpAPI retornou apenas 10 resultados para esta query específica. Para obter 20 concorrentes, seria necessário:
+
 1. Executar múltiplas queries com variações de palavras-chave
 2. Aumentar o parâmetro `num` da SerpAPI (atualmente em 10)
 
@@ -267,12 +284,14 @@ SELECT COUNT(*) FROM leads WHERE projectId = 180004;  -- Resultado: 8
 **Regra:** Sistema deve buscar 20 leads por cliente usando apenas SerpAPI (sem LLM).
 
 **Implementação:**
+
 - Query SerpAPI: `"fornecedores Automotivo Brasil empresas"`
 - Resultados encontrados: **8 leads**
 - Fonte: Google Search via SerpAPI
 - Sem uso de LLM (Gemini/Manus IA)
 
 **Deduplicação Aplicada:**
+
 - 2 duplicatas removidas de 10 candidatos
 - Algoritmo: Similaridade de nomes (Levenshtein distance)
 
@@ -287,15 +306,18 @@ SELECT COUNT(*) FROM leads WHERE projectId = 180004;  -- Resultado: 8
 **Regra:** Mesma empresa não pode aparecer em múltiplos níveis (cliente/concorrente/lead).
 
 **Implementação:**
+
 - Algoritmo de deduplicação por CNPJ exato
 - Algoritmo de similaridade de nomes (Levenshtein distance)
 - Threshold de similaridade: 85%
 
 **Duplicatas Removidas:**
+
 1. "As 25 maiores montadoras e empresas de peças do Brasil" (duplicata entre concorrente e lead)
 2. "Sky Automotive" ≈ "SK Automotive" (similaridade de nomes)
 
 **Validação:**
+
 ```
 [Dedup] Nome similar encontrado: "As 25 maiores montadoras e empresas de peças do Brasil" ≈ "As 25 maiores montadoras e empresas de peças do Brasil"
 [Dedup] Excluindo duplicata: As 25 maiores montadoras e empresas de peças do Brasil
@@ -313,16 +335,19 @@ SELECT COUNT(*) FROM leads WHERE projectId = 180004;  -- Resultado: 8
 **Regra:** Dados enriquecidos devem ser cacheados por 30 dias para reduzir chamadas à API.
 
 **Implementação:**
+
 - Tabela: `enrichment_cache`
 - TTL: 30 dias (2.592.000 segundos)
 - Chave de cache: CNPJ + fonte (input/receitaws/serpapi)
 
 **Resultado:**
+
 ```
 [Cache] HIT para CNPJ 04601397000165 (fonte: input, idade: 0 dias)
 ```
 
 **Benefício:**
+
 - Redução de tempo de busca: **2s → 0.1s** (95% mais rápido)
 - Economia de chamadas à API ReceitaWS
 
@@ -335,6 +360,7 @@ SELECT COUNT(*) FROM leads WHERE projectId = 180004;  -- Resultado: 8
 **Regra:** Todos os dados coletados devem ser gravados no banco de dados.
 
 **Implementação:**
+
 - **Projeto:** 1 registro inserido na tabela `projects`
 - **Cliente:** 1 registro inserido na tabela `clientes`
 - **Mercado:** 1 registro inserido na tabela `mercados_unicos`
@@ -342,6 +368,7 @@ SELECT COUNT(*) FROM leads WHERE projectId = 180004;  -- Resultado: 8
 - **Leads:** 8 registros inseridos na tabela `leads`
 
 **Validação SQL:**
+
 ```sql
 -- Verificar projeto criado
 SELECT * FROM projects WHERE id = 180004;
@@ -369,28 +396,28 @@ SELECT COUNT(*) FROM leads WHERE projectId = 180004;  -- 8
 
 O score de qualidade (0-100) é calculado com base na presença dos seguintes campos:
 
-| Campo | Peso |
-|-------|------|
-| CNPJ | 20 pontos |
-| Email | 15 pontos |
-| Telefone | 10 pontos |
-| Site | 15 pontos |
-| LinkedIn | 10 pontos |
-| Instagram | 5 pontos |
-| Produto | 15 pontos |
-| Cidade | 3 pontos |
-| UF | 2 pontos |
-| CNAE | 3 pontos |
-| Porte | 2 pontos |
+| Campo     | Peso      |
+| --------- | --------- |
+| CNPJ      | 20 pontos |
+| Email     | 15 pontos |
+| Telefone  | 10 pontos |
+| Site      | 15 pontos |
+| LinkedIn  | 10 pontos |
+| Instagram | 5 pontos  |
+| Produto   | 15 pontos |
+| Cidade    | 3 pontos  |
+| UF        | 2 pontos  |
+| CNAE      | 3 pontos  |
+| Porte     | 2 pontos  |
 
 ### Classificação
 
-| Faixa | Classificação | Cor |
-|-------|---------------|-----|
-| 80-100% | Excelente | 🟢 Verde |
-| 60-79% | Bom | 🔵 Azul |
-| 40-59% | Regular | 🟡 Amarelo |
-| 0-39% | Ruim | 🔴 Vermelho |
+| Faixa   | Classificação | Cor         |
+| ------- | ------------- | ----------- |
+| 80-100% | Excelente     | 🟢 Verde    |
+| 60-79%  | Bom           | 🔵 Azul     |
+| 40-59%  | Regular       | 🟡 Amarelo  |
+| 0-39%   | Ruim          | 🔴 Vermelho |
 
 ### Resultados
 
@@ -399,6 +426,7 @@ O score de qualidade (0-100) é calculado com base na presença dos seguintes ca
 - **Leads:** 15/100 (Ruim) - Apenas site preenchido
 
 **Observação:** Scores baixos são esperados porque:
+
 1. ReceitaWS retorna dados limitados (apenas CNPJ, razão social, status)
 2. SerpAPI retorna apenas nome, site e snippet (descrição)
 3. Não há extração de CNPJs dos snippets (melhoria futura)
@@ -409,24 +437,24 @@ O score de qualidade (0-100) é calculado com base na presença dos seguintes ca
 
 ### Tempo de Execução
 
-| Etapa | Tempo Estimado |
-|-------|----------------|
-| 1. Criar projeto | ~0.5s |
-| 2. Identificar mercados | ~1s |
+| Etapa                              | Tempo Estimado    |
+| ---------------------------------- | ----------------- |
+| 1. Criar projeto                   | ~0.5s             |
+| 2. Identificar mercados            | ~1s               |
 | 3. Enriquecer clientes (ReceitaWS) | ~0.1s (cache HIT) |
-| 4. Buscar concorrentes (SerpAPI) | ~2s |
-| 5. Buscar leads (SerpAPI) | ~2s |
-| 6. Calcular métricas | ~0.5s |
-| 7. Finalizar | ~0.5s |
-| **TOTAL** | **~6.6 segundos** |
+| 4. Buscar concorrentes (SerpAPI)   | ~2s               |
+| 5. Buscar leads (SerpAPI)          | ~2s               |
+| 6. Calcular métricas               | ~0.5s             |
+| 7. Finalizar                       | ~0.5s             |
+| **TOTAL**                          | **~6.6 segundos** |
 
 ### Chamadas de API
 
-| API | Chamadas | Custo |
-|-----|----------|-------|
-| ReceitaWS | 0 (cache HIT) | R$ 0,00 |
-| SerpAPI | 2 (concorrentes + leads) | ~$0.02 USD |
-| LLM (Gemini/Manus) | 0 | R$ 0,00 |
+| API                | Chamadas                 | Custo      |
+| ------------------ | ------------------------ | ---------- |
+| ReceitaWS          | 0 (cache HIT)            | R$ 0,00    |
+| SerpAPI            | 2 (concorrentes + leads) | ~$0.02 USD |
+| LLM (Gemini/Manus) | 0                        | R$ 0,00    |
 
 **Economia:** 100% de créditos Manus IA economizados (sem uso de LLM)
 
@@ -512,6 +540,7 @@ O score de qualidade (0-100) é calculado com base na presença dos seguintes ca
 O teste com **Jeep do Brasil** foi **100% aprovado** em todas as validações críticas:
 
 ✅ **Funcionalidades Implementadas:**
+
 - Criação de projeto isolado
 - Enriquecimento via ReceitaWS
 - Busca de concorrentes via SerpAPI
@@ -521,17 +550,20 @@ O teste com **Jeep do Brasil** foi **100% aprovado** em todas as validações cr
 - Gravação no banco de dados
 
 ✅ **Regras de Negócio Aplicadas:**
+
 - Isolamento de dados por projeto
 - Exclusão de duplicatas (CNPJ + similaridade de nomes)
 - Sem uso de LLM (economia de créditos Manus IA)
 - Cache automático para reduzir chamadas à API
 
 ⚠️ **Limitações Identificadas:**
+
 - Quantidade de resultados abaixo da meta (10 concorrentes, 8 leads vs. 20 esperados)
 - Score de qualidade baixo (falta de CNPJs, emails, telefones)
 - Necessidade de múltiplas queries SerpAPI para atingir meta de 20 resultados
 
 🎯 **Próximos Passos Recomendados:**
+
 1. Implementar múltiplas queries SerpAPI (Prioridade ALTA)
 2. Extrair CNPJs via regex dos snippets (Prioridade ALTA)
 3. Integrar Hunter.io para emails (Prioridade MÉDIA)
@@ -544,14 +576,16 @@ O teste com **Jeep do Brasil** foi **100% aprovado** em todas as validações cr
 **Ambiente:** Produção  
 **Banco de Dados:** MySQL (TiDB)  
 **APIs Utilizadas:**
+
 - ReceitaWS (pública, gratuita)
 - SerpAPI (chave: d326d4b0b97ec15e828b0b1437db474612b72cb6969efe25ddad1b766cb8af67)
 
 **Projeto ID:** 180004  
 **Data de Criação:** 18/11/2025 16:51:26 GMT-5  
-**Status:** Ativo  
+**Status:** Ativo
 
 **Arquivos Relacionados:**
+
 - `/home/ubuntu/gestor-pav/server/enrichmentFlow.ts` - Fluxo principal
 - `/home/ubuntu/gestor-pav/server/_core/receitaws.ts` - Integração ReceitaWS
 - `/home/ubuntu/gestor-pav/server/_core/serpApi.ts` - Integração SerpAPI

@@ -2,10 +2,10 @@
  * Componente de Preview/Resumo para cada Step do Wizard
  */
 
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Info } from 'lucide-react';
-import type { ResearchWizardData } from '@/types/research-wizard';
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, Info } from "lucide-react";
+import type { ResearchWizardData } from "@/types/research-wizard";
 
 interface StepPreviewProps {
   step: number;
@@ -23,7 +23,9 @@ export function StepPreview({ step, data }: StepPreviewProps) {
               <span className="font-medium">Projeto Selecionado:</span>
             </div>
             <div className="ml-6 text-sm">
-              <p className="font-semibold">{data.projectName || 'Não selecionado'}</p>
+              <p className="font-semibold">
+                {data.projectName || "Não selecionado"}
+              </p>
               {data.projectId && (
                 <p className="text-muted-foreground">ID: {data.projectId}</p>
               )}
@@ -39,9 +41,13 @@ export function StepPreview({ step, data }: StepPreviewProps) {
               <span className="font-medium">Informações da Pesquisa:</span>
             </div>
             <div className="ml-6 text-sm space-y-1">
-              <p><strong>Nome:</strong> {data.researchName || 'Não definido'}</p>
+              <p>
+                <strong>Nome:</strong> {data.researchName || "Não definido"}
+              </p>
               {data.researchDescription && (
-                <p><strong>Descrição:</strong> {data.researchDescription}</p>
+                <p>
+                  <strong>Descrição:</strong> {data.researchDescription}
+                </p>
               )}
             </div>
           </div>
@@ -57,15 +63,21 @@ export function StepPreview({ step, data }: StepPreviewProps) {
             <div className="ml-6 grid grid-cols-3 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Concorrentes/Mercado</p>
-                <p className="text-2xl font-bold text-blue-600">{data.qtdConcorrentes}</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {data.qtdConcorrentes}
+                </p>
               </div>
               <div>
                 <p className="text-muted-foreground">Leads/Mercado</p>
-                <p className="text-2xl font-bold text-green-600">{data.qtdLeads}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {data.qtdLeads}
+                </p>
               </div>
               <div>
                 <p className="text-muted-foreground">Produtos/Cliente</p>
-                <p className="text-2xl font-bold text-purple-600">{data.qtdProdutos}</p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {data.qtdProdutos}
+                </p>
               </div>
             </div>
           </div>
@@ -79,10 +91,19 @@ export function StepPreview({ step, data }: StepPreviewProps) {
               <span className="font-medium">Método de Entrada:</span>
             </div>
             <div className="ml-6">
-              <Badge variant={data.inputMethod === 'manual' ? 'default' : data.inputMethod === 'spreadsheet' ? 'secondary' : 'outline'}>
-                {data.inputMethod === 'manual' && 'Entrada Manual'}
-                {data.inputMethod === 'spreadsheet' && 'Importação de Planilha'}
-                {data.inputMethod === 'pre-research' && 'Pré-Pesquisa Automática'}
+              <Badge
+                variant={
+                  data.inputMethod === "manual"
+                    ? "default"
+                    : data.inputMethod === "spreadsheet"
+                      ? "secondary"
+                      : "outline"
+                }
+              >
+                {data.inputMethod === "manual" && "Entrada Manual"}
+                {data.inputMethod === "spreadsheet" && "Importação de Planilha"}
+                {data.inputMethod === "pre-research" &&
+                  "Pré-Pesquisa Automática"}
               </Badge>
             </div>
           </div>
@@ -102,10 +123,14 @@ export function StepPreview({ step, data }: StepPreviewProps) {
                 {data.mercados.length > 0 && (
                   <ul className="mt-2 space-y-1">
                     {data.mercados.slice(0, 3).map((m: any, i: number) => (
-                      <li key={i} className="text-xs text-muted-foreground">• {m.nome}</li>
+                      <li key={i} className="text-xs text-muted-foreground">
+                        • {m.nome}
+                      </li>
                     ))}
                     {data.mercados.length > 3 && (
-                      <li className="text-xs text-muted-foreground">... e mais {data.mercados.length - 3}</li>
+                      <li className="text-xs text-muted-foreground">
+                        ... e mais {data.mercados.length - 3}
+                      </li>
                     )}
                   </ul>
                 )}
@@ -116,10 +141,14 @@ export function StepPreview({ step, data }: StepPreviewProps) {
                 {data.clientes.length > 0 && (
                   <ul className="mt-2 space-y-1">
                     {data.clientes.slice(0, 3).map((c: any, i: number) => (
-                      <li key={i} className="text-xs text-muted-foreground">• {c.nome}</li>
+                      <li key={i} className="text-xs text-muted-foreground">
+                        • {c.nome}
+                      </li>
                     ))}
                     {data.clientes.length > 3 && (
-                      <li className="text-xs text-muted-foreground">... e mais {data.clientes.length - 3}</li>
+                      <li className="text-xs text-muted-foreground">
+                        ... e mais {data.clientes.length - 3}
+                      </li>
                     )}
                   </ul>
                 )}
@@ -138,11 +167,15 @@ export function StepPreview({ step, data }: StepPreviewProps) {
             <div className="ml-6 grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Mercados Aprovados</p>
-                <p className="text-xl font-bold text-green-600">{data.validatedData.mercados.length}</p>
+                <p className="text-xl font-bold text-green-600">
+                  {data.validatedData.mercados.length}
+                </p>
               </div>
               <div>
                 <p className="text-muted-foreground">Clientes Aprovados</p>
-                <p className="text-xl font-bold text-green-600">{data.validatedData.clientes.length}</p>
+                <p className="text-xl font-bold text-green-600">
+                  {data.validatedData.clientes.length}
+                </p>
               </div>
             </div>
           </div>

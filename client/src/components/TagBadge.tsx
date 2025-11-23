@@ -8,10 +8,15 @@ interface TagBadgeProps {
   size?: "sm" | "md";
 }
 
-export function TagBadge({ name, color, onRemove, size = "md" }: TagBadgeProps) {
+export function TagBadge({
+  name,
+  color,
+  onRemove,
+  size = "md",
+}: TagBadgeProps) {
   const textSize = size === "sm" ? "text-[10px]" : "text-[11px]";
   const padding = size === "sm" ? "px-1.5 py-0.5" : "px-2 py-0.5";
-  
+
   return (
     <Badge
       className={`${textSize} ${padding} font-medium inline-flex items-center gap-1`}
@@ -24,7 +29,7 @@ export function TagBadge({ name, color, onRemove, size = "md" }: TagBadgeProps) 
       {name}
       {onRemove && (
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             onRemove();
           }}

@@ -7,6 +7,7 @@ O Fluxo de Enriquecimento é um processo automatizado que transforma uma lista s
 ## 🎯 Objetivo
 
 Permitir que o usuário:
+
 1. Insira uma lista de clientes (nome, CNPJ, site, produto)
 2. Dispare um processo automatizado que:
    - Identifica mercados/setores automaticamente
@@ -18,13 +19,16 @@ Permitir que o usuário:
 ## 🔄 Etapas do Fluxo
 
 ### 1. Criação do Projeto
+
 **Entrada:** Nome do projeto  
 **Processo:** Cria um novo registro na tabela `projects`  
 **Saída:** `projectId` para associar todos os dados
 
 ### 2. Identificação de Mercados
+
 **Entrada:** Lista de produtos dos clientes  
-**Processo:**  
+**Processo:**
+
 - Extrai produtos únicos da lista
 - Para cada produto, usa LLM (GPT-4) para identificar:
   - Nome do mercado/setor
@@ -34,6 +38,7 @@ Permitir que o usuário:
 
 **API Utilizada:** Manus Forge LLM API  
 **Prompt Example:**
+
 ```
 Produto: Embalagens plásticas para alimentos
 
@@ -46,8 +51,10 @@ Retorne JSON com:
 ```
 
 ### 3. Enriquecimento de Clientes
+
 **Entrada:** Lista de clientes com dados parciais  
-**Processo:**  
+**Processo:**
+
 - Para cada cliente:
   1. Identifica o mercado correspondente (via LLM)
   2. Se tiver CNPJ, busca dados via ReceitaWS/Data API:
@@ -60,10 +67,12 @@ Retorne JSON com:
   5. Associa cliente ao mercado (`clientes_mercados`)
 
 **APIs Utilizadas:**
+
 - Manus Forge LLM API (identificação de mercado)
 - Manus Forge Data API (enriquecimento de CNPJ)
 
 **Cálculo de Qualidade:**
+
 ```typescript
 // Pesos dos campos (total = 100 pontos)
 - nome: 10 pontos
@@ -79,14 +88,17 @@ Retorne JSON com:
 ```
 
 **Classificação:**
+
 - 80-100: Excelente
 - 60-79: Bom
 - 40-59: Regular
 - 0-39: Ruim
 
 ### 4. Busca de Concorrentes
+
 **Entrada:** Lista de mercados identificados  
-**Processo:**  
+**Processo:**
+
 - Para cada mercado:
   1. Usa LLM para gerar lista de concorrentes potenciais
   2. Para cada concorrente:
@@ -97,6 +109,7 @@ Retorne JSON com:
 **API Utilizada:** Manus Forge LLM API + Data API
 
 **Prompt Example:**
+
 ```
 Mercado: Indústria de Embalagens Plásticas
 Segmentação: B2B
@@ -115,8 +128,10 @@ Retorne JSON com:
 ```
 
 ### 5. Busca de Leads
+
 **Entrada:** Lista de mercados identificados  
-**Processo:**  
+**Processo:**
+
 - Para cada mercado:
   1. Identifica segmentação (B2B/B2C)
   2. Usa LLM para gerar lista de leads qualificados
@@ -129,13 +144,16 @@ Retorne JSON com:
 **API Utilizada:** Manus Forge LLM API + Data API
 
 **Critérios de Qualificação:**
+
 - B2B: Empresas com perfil de comprador corporativo
 - B2C: Empresas com perfil de consumidor final
 - Porte compatível com o mercado
 - Região de atuação relevante
 
 ### 6. Cálculo de Estatísticas
-**Processo:**  
+
+**Processo:**
+
 - Conta total de registros criados:
   - Mercados
   - Clientes
@@ -145,7 +163,9 @@ Retorne JSON com:
 - Gera resumo do processamento
 
 ### 7. Finalização
-**Saída:**  
+
+**Saída:**
+
 ```json
 {
   "status": "completed",
@@ -164,19 +184,23 @@ Retorne JSON com:
 ## 🖥️ Interface Web
 
 ### Acesso
+
 URL: `/enrichment`
 
 ### Campos de Input
 
 **1. Nome do Projeto**
+
 - Campo obrigatório
 - Máximo 255 caracteres
 - Exemplo: "Embalagens 2024"
 
 **2. Lista de Clientes**
+
 - Formato: `Nome|CNPJ|Site|Produto` (um por linha)
 - CNPJ, Site e Produto são opcionais
 - Exemplo:
+
 ```
 Empresa ABC|12.345.678/0001-90|www.empresaabc.com.br|Embalagens plásticas
 Indústria XYZ|98.765.432/0001-10|www.industriaxyz.com|Caixas de papelão
@@ -184,13 +208,16 @@ Fábrica 123||www.fabrica123.com|Embalagens metálicas
 ```
 
 ### Botão de Ação
+
 - **Texto:** "Iniciar Processamento"
 - **Ação:** Dispara o fluxo completo
 - **Estado:** Desabilitado durante processamento
 - **Feedback:** Spinner + "Processando..."
 
 ### Resultado
+
 Após conclusão, exibe:
+
 - ✅ Status de sucesso/erro
 - ✅ Estatísticas do processamento
 - ✅ Botão "Ver Projeto Criado" (redireciona para o projeto)
@@ -203,6 +230,7 @@ Após conclusão, exibe:
 **Função Principal:** `executeEnrichmentFlow(input, onProgress)`
 
 **Parâmetros:**
+
 ```typescript
 type EnrichmentInput = {
   clientes: Array<{
@@ -216,6 +244,7 @@ type EnrichmentInput = {
 ```
 
 **Callback de Progresso:**
+
 ```typescript
 type ProgressCallback = (progress: {
   status: 'processing' | 'completed' | 'error';
@@ -234,12 +263,13 @@ type ProgressCallback = (progress: {
 **Output:** `EnrichmentProgress`
 
 **Exemplo de Uso:**
+
 ```typescript
 const result = await trpc.enrichment.execute.mutateAsync({
   projectName: "Meu Projeto",
   clientes: [
-    { nome: "Empresa A", cnpj: "12345678000190", produto: "Embalagens" }
-  ]
+    { nome: "Empresa A", cnpj: "12345678000190", produto: "Embalagens" },
+  ],
 });
 ```
 
@@ -247,6 +277,7 @@ const result = await trpc.enrichment.execute.mutateAsync({
 
 **Arquivo:** `client/src/pages/EnrichmentFlow.tsx`  
 **Componentes Utilizados:**
+
 - `Card` - Container principal
 - `Input` - Campo de nome do projeto
 - `textarea` - Lista de clientes
@@ -305,26 +336,31 @@ const result = await trpc.enrichment.execute.mutateAsync({
 ## 🚀 Melhorias Futuras
 
 ### 1. Upload de Planilha
+
 - Permitir upload de arquivo Excel/CSV
 - Mapear colunas automaticamente
 - Validar dados antes do processamento
 
 ### 2. Progresso em Tempo Real
+
 - Implementar WebSockets ou Server-Sent Events
 - Exibir barra de progresso detalhada
 - Mostrar cada etapa sendo executada
 
 ### 3. Configuração Avançada
+
 - Permitir escolher quais etapas executar
 - Configurar quantidade de concorrentes/leads
 - Definir critérios de qualificação personalizados
 
 ### 4. Validação Pré-Processamento
+
 - Validar CNPJs antes de iniciar
 - Verificar duplicatas
 - Sugerir correções automáticas
 
 ### 5. Relatório Detalhado
+
 - Gerar PDF com resumo do processamento
 - Incluir gráficos de distribuição
 - Listar problemas encontrados
@@ -332,12 +368,14 @@ const result = await trpc.enrichment.execute.mutateAsync({
 ## 📝 Notas de Implementação
 
 ### Limitações Atuais
+
 1. **Busca de Concorrentes e Leads:** Implementação simplificada (retorna arrays vazios)
 2. **Progresso em Tempo Real:** Não implementado (apenas resultado final)
 3. **Validação de CNPJ:** Básica (apenas formato)
 4. **Tratamento de Erros:** Genérico (pode ser melhorado)
 
 ### Próximos Passos
+
 1. Implementar busca real de concorrentes via LLM
 2. Implementar busca real de leads via Data API
 3. Adicionar validação robusta de dados

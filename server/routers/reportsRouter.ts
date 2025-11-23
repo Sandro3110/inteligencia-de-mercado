@@ -15,7 +15,9 @@ export const reportsRouter = router({
         projectId: z.number(),
         name: z.string().min(1, "Nome é obrigatório"),
         frequency: z.enum(["weekly", "monthly"]),
-        recipients: z.array(z.string().email()).min(1, "Pelo menos um destinatário é obrigatório"),
+        recipients: z
+          .array(z.string().email())
+          .min(1, "Pelo menos um destinatário é obrigatório"),
         config: z.object({
           format: z.enum(["pdf", "excel", "csv"]).optional(),
           filters: z.any().optional(),
@@ -26,7 +28,7 @@ export const reportsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const { createReportSchedule } = await import("../db");
-      
+
       const schedule = await createReportSchedule({
         userId: ctx.user.id,
         projectId: input.projectId,
@@ -52,11 +54,11 @@ export const reportsRouter = router({
     )
     .query(async ({ ctx, input }) => {
       const { getReportSchedules } = await import("../db");
-      
+
       const schedules = await getReportSchedules(ctx.user.id, input.projectId);
-      
+
       // Parse recipients JSON
-      return schedules.map((schedule) => ({
+      return schedules.map(schedule => ({
         ...schedule,
         recipients: JSON.parse(schedule.recipients as string),
       }));
@@ -69,9 +71,9 @@ export const reportsRouter = router({
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       const { getReportScheduleById } = await import("../db");
-      
+
       const schedule = await getReportScheduleById(input.id);
-      
+
       if (!schedule) {
         throw new Error("Agendamento não encontrado");
       }
@@ -103,8 +105,10 @@ export const reportsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { getReportScheduleById, updateReportSchedule } = await import("../db");
-      
+      const { getReportScheduleById, updateReportSchedule } = await import(
+        "../db"
+      );
+
       // Verificar se o usuário é o dono
       const existing = await getReportScheduleById(input.id);
       if (!existing || existing.userId !== ctx.user.id) {
@@ -112,13 +116,15 @@ export const reportsRouter = router({
       }
 
       const updateData: any = {};
-      
+
       if (input.name !== undefined) updateData.name = input.name;
       if (input.frequency !== undefined) updateData.frequency = input.frequency;
-      if (input.recipients !== undefined) updateData.recipients = JSON.stringify(input.recipients);
+      if (input.recipients !== undefined)
+        updateData.recipients = JSON.stringify(input.recipients);
       if (input.config !== undefined) updateData.config = input.config;
       if (input.nextRunAt !== undefined) updateData.nextRunAt = input.nextRunAt;
-      if (input.enabled !== undefined) updateData.enabled = input.enabled ? 1 : 0;
+      if (input.enabled !== undefined)
+        updateData.enabled = input.enabled ? 1 : 0;
 
       await updateReportSchedule(input.id, updateData);
 
@@ -131,8 +137,10 @@ export const reportsRouter = router({
   deleteSchedule: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      const { getReportScheduleById, deleteReportSchedule } = await import("../db");
-      
+      const { getReportScheduleById, deleteReportSchedule } = await import(
+        "../db"
+      );
+
       // Verificar se o usuário é o dono
       const existing = await getReportScheduleById(input.id);
       if (!existing || existing.userId !== ctx.user.id) {

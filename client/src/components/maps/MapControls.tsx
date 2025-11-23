@@ -6,7 +6,13 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Layers, Map as MapIcon, Flame } from "lucide-react";
@@ -97,7 +103,9 @@ export default function MapControls({ config, onChange }: MapControlsProps) {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs">Raio de Agrupamento</Label>
-                  <span className="text-xs text-muted-foreground">{config.clusterRadius}px</span>
+                  <span className="text-xs text-muted-foreground">
+                    {config.clusterRadius}px
+                  </span>
                 </div>
                 <Slider
                   value={[config.clusterRadius]}
@@ -126,8 +134,8 @@ export default function MapControls({ config, onChange }: MapControlsProps) {
 
         <div className="pt-2 border-t text-xs text-muted-foreground">
           <p>
-            <strong>Dica:</strong> Use o modo híbrido para ver densidade e pontos específicos
-            simultaneamente.
+            <strong>Dica:</strong> Use o modo híbrido para ver densidade e
+            pontos específicos simultaneamente.
           </p>
         </div>
       </CardContent>

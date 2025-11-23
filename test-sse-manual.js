@@ -1,6 +1,6 @@
 /**
  * Script de Teste Manual para Sistema de Notificações SSE
- * 
+ *
  * Como usar:
  * 1. Faça login no sistema: https://3000-izrmelqgbgh8w93e231so-6564cc02.manus.computer
  * 2. Abra o DevTools (F12)
@@ -19,7 +19,7 @@ async function testSSENotifications() {
     });
     const authData = await authResponse.json();
     const user = authData.result?.data?.json;
-    
+
     if (user) {
       console.log("✅ Usuário autenticado:", user.name, `(${user.id})`);
     } else {
@@ -37,11 +37,16 @@ async function testSSENotifications() {
     const noAuthResponse = await fetch("/api/notifications/stream", {
       credentials: "omit", // Não enviar cookies
     });
-    
+
     if (noAuthResponse.status === 401) {
-      console.log("✅ Endpoint rejeitou corretamente requisição sem auth (401)");
+      console.log(
+        "✅ Endpoint rejeitou corretamente requisição sem auth (401)"
+      );
     } else {
-      console.warn("⚠️ Endpoint deveria retornar 401, retornou:", noAuthResponse.status);
+      console.warn(
+        "⚠️ Endpoint deveria retornar 401, retornou:",
+        noAuthResponse.status
+      );
     }
   } catch (error) {
     console.error("❌ Erro ao testar sem auth:", error);
@@ -57,7 +62,7 @@ async function testSSENotifications() {
     console.log("✅ Conexão SSE estabelecida!");
   };
 
-  eventSource.onerror = (error) => {
+  eventSource.onerror = error => {
     console.error("❌ Erro na conexão SSE:", error);
     eventSource.close();
   };
@@ -67,7 +72,7 @@ async function testSSENotifications() {
     console.log(`💓 Heartbeat recebido (${heartbeatCount})`);
   });
 
-  eventSource.addEventListener("notification", (event) => {
+  eventSource.addEventListener("notification", event => {
     notificationCount++;
     const notification = JSON.parse(event.data);
     console.log(`🔔 Notificação ${notificationCount} recebida:`, notification);
@@ -92,7 +97,7 @@ async function testSSENotifications() {
 
       const createData = await createResponse.json();
       const notification = createData.result?.data?.json;
-      
+
       if (notification) {
         console.log("✅ Notificação criada:", notification.id);
         console.log("⏳ Aguardando recebimento via SSE...");
@@ -113,7 +118,7 @@ async function testSSENotifications() {
       });
       const unreadData = await unreadResponse.json();
       const unread = unreadData.result?.data?.json || [];
-      
+
       console.log(`✅ Total de notificações não lidas: ${unread.length}`);
       if (unread.length > 0) {
         console.log("Primeiras 3:", unread.slice(0, 3));
@@ -128,7 +133,7 @@ async function testSSENotifications() {
     console.log("\n📊 Estatísticas após 10 segundos:");
     console.log(`- Heartbeats recebidos: ${heartbeatCount}`);
     console.log(`- Notificações recebidas: ${notificationCount}`);
-    
+
     if (heartbeatCount > 0) {
       console.log("✅ Sistema de heartbeat funcionando!");
     } else {
@@ -136,9 +141,11 @@ async function testSSENotifications() {
     }
 
     console.log("\n🏁 Testes concluídos!");
-    console.log("💡 Dica: Deixe o console aberto para continuar monitorando eventos SSE");
+    console.log(
+      "💡 Dica: Deixe o console aberto para continuar monitorando eventos SSE"
+    );
     console.log("💡 Para fechar a conexão: eventSource.close()");
-    
+
     // Expor eventSource globalmente para controle manual
     window.testEventSource = eventSource;
   }, 10000);
@@ -151,7 +158,7 @@ async function quickAuthTest() {
   const response = await fetch("/api/trpc/auth.me", { credentials: "include" });
   const data = await response.json();
   const user = data.result?.data?.json;
-  
+
   if (user) {
     console.log("✅ Autenticado como:", user.name);
     return true;

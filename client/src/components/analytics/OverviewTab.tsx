@@ -5,20 +5,32 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { exportToCSV } from "@/lib/export";
 import { toast } from "sonner";
-import { 
-  Building2, 
-  Users, 
-  Target, 
+import {
+  Building2,
+  Users,
+  Target,
   TrendingUp,
   CheckCircle2,
   AlertCircle,
   XCircle,
-  Clock
+  Clock,
 } from "lucide-react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from "recharts";
 import { CardSkeleton, ChartSkeleton } from "@/components/skeletons";
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
 
 interface OverviewTabProps {
   projectId: number;
@@ -29,17 +41,17 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
     { projectId },
     { enabled: !!projectId }
   );
-  
+
   const { data: allClientes } = trpc.clientes.list.useQuery(
     { projectId },
     { enabled: !!projectId }
   );
-  
+
   const { data: allConcorrentes } = trpc.concorrentes.list.useQuery(
     { projectId },
     { enabled: !!projectId }
   );
-  
+
   const { data: allLeads } = trpc.leads.list.useQuery(
     { projectId },
     { enabled: !!projectId }
@@ -47,29 +59,29 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
 
   const handleExportClientes = () => {
     if (!allClientes || allClientes.length === 0) {
-      toast.error('Nenhum cliente para exportar');
+      toast.error("Nenhum cliente para exportar");
       return;
     }
-    exportToCSV(allClientes, 'clientes-pav.csv');
-    toast.success('Clientes exportados com sucesso!');
+    exportToCSV(allClientes, "clientes-pav.csv");
+    toast.success("Clientes exportados com sucesso!");
   };
 
   const handleExportConcorrentes = () => {
     if (!allConcorrentes || allConcorrentes.length === 0) {
-      toast.error('Nenhum concorrente para exportar');
+      toast.error("Nenhum concorrente para exportar");
       return;
     }
-    exportToCSV(allConcorrentes, 'concorrentes-pav.csv');
-    toast.success('Concorrentes exportados com sucesso!');
+    exportToCSV(allConcorrentes, "concorrentes-pav.csv");
+    toast.success("Concorrentes exportados com sucesso!");
   };
 
   const handleExportLeads = () => {
     if (!allLeads || allLeads.length === 0) {
-      toast.error('Nenhum lead para exportar');
+      toast.error("Nenhum lead para exportar");
       return;
     }
-    exportToCSV(allLeads, 'leads-pav.csv');
-    toast.success('Leads exportados com sucesso!');
+    exportToCSV(allLeads, "leads-pav.csv");
+    toast.success("Leads exportados com sucesso!");
   };
 
   if (isLoading) {
@@ -99,34 +111,47 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
     return item?.count || 0;
   };
 
-  const clientesPending = getStatusCount(stats.validation.clientes, 'pending');
-  const clientesRich = getStatusCount(stats.validation.clientes, 'rich');
-  const clientesNeedsAdjustment = getStatusCount(stats.validation.clientes, 'needs_adjustment');
-  const clientesDiscarded = getStatusCount(stats.validation.clientes, 'discarded');
+  const clientesPending = getStatusCount(stats.validation.clientes, "pending");
+  const clientesRich = getStatusCount(stats.validation.clientes, "rich");
+  const clientesNeedsAdjustment = getStatusCount(
+    stats.validation.clientes,
+    "needs_adjustment"
+  );
+  const clientesDiscarded = getStatusCount(
+    stats.validation.clientes,
+    "discarded"
+  );
 
-  const concorrentesPending = getStatusCount(stats.validation.concorrentes, 'pending');
-  const concorrentesRich = getStatusCount(stats.validation.concorrentes, 'rich');
+  const concorrentesPending = getStatusCount(
+    stats.validation.concorrentes,
+    "pending"
+  );
+  const concorrentesRich = getStatusCount(
+    stats.validation.concorrentes,
+    "rich"
+  );
 
-  const leadsPending = getStatusCount(stats.validation.leads, 'pending');
-  const leadsRich = getStatusCount(stats.validation.leads, 'rich');
+  const leadsPending = getStatusCount(stats.validation.leads, "pending");
+  const leadsRich = getStatusCount(stats.validation.leads, "rich");
 
   const totalValidated = clientesRich + concorrentesRich + leadsRich;
   const totalPending = clientesPending + concorrentesPending + leadsPending;
-  const totalRecords = stats.totals.clientes + stats.totals.concorrentes + stats.totals.leads;
+  const totalRecords =
+    stats.totals.clientes + stats.totals.concorrentes + stats.totals.leads;
   const validationProgress = Math.round((totalValidated / totalRecords) * 100);
 
   const validationData = [
-    { name: 'Validados', value: totalValidated, color: COLORS[1] },
-    { name: 'Pendentes', value: totalPending, color: COLORS[2] },
-    { name: 'Ajuste', value: clientesNeedsAdjustment, color: COLORS[2] },
-    { name: 'Descartados', value: clientesDiscarded, color: COLORS[3] },
+    { name: "Validados", value: totalValidated, color: COLORS[1] },
+    { name: "Pendentes", value: totalPending, color: COLORS[2] },
+    { name: "Ajuste", value: clientesNeedsAdjustment, color: COLORS[2] },
+    { name: "Descartados", value: clientesDiscarded, color: COLORS[3] },
   ];
 
   const entityData = [
-    { name: 'Mercados', value: stats.totals.mercados },
-    { name: 'Clientes', value: stats.totals.clientes },
-    { name: 'Concorrentes', value: stats.totals.concorrentes },
-    { name: 'Leads', value: stats.totals.leads },
+    { name: "Mercados", value: stats.totals.mercados },
+    { name: "Clientes", value: stats.totals.clientes },
+    { name: "Concorrentes", value: stats.totals.concorrentes },
+    { name: "Leads", value: stats.totals.leads },
   ];
 
   return (
@@ -141,7 +166,9 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
             <Building2 className="h-5 w-5 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{stats.totals.mercados}</div>
+            <div className="text-2xl font-bold text-slate-900">
+              {stats.totals.mercados}
+            </div>
             <Link href="/mercados">
               <a className="text-xs text-blue-600 hover:underline mt-1 inline-block">
                 Ver mercados →
@@ -158,8 +185,10 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
             <Users className="h-5 w-5 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{stats.totals.clientes}</div>
-            <button 
+            <div className="text-2xl font-bold text-slate-900">
+              {stats.totals.clientes}
+            </div>
+            <button
               onClick={handleExportClientes}
               className="text-xs text-green-600 hover:underline mt-1"
             >
@@ -176,8 +205,10 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
             <Target className="h-5 w-5 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{stats.totals.concorrentes}</div>
-            <button 
+            <div className="text-2xl font-bold text-slate-900">
+              {stats.totals.concorrentes}
+            </div>
+            <button
               onClick={handleExportConcorrentes}
               className="text-xs text-purple-600 hover:underline mt-1"
             >
@@ -194,8 +225,10 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
             <TrendingUp className="h-5 w-5 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{stats.totals.leads}</div>
-            <button 
+            <div className="text-2xl font-bold text-slate-900">
+              {stats.totals.leads}
+            </div>
+            <button
               onClick={handleExportLeads}
               className="text-xs text-orange-600 hover:underline mt-1"
             >
@@ -216,30 +249,40 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
           <div className="flex items-center gap-4 mb-4">
             <div className="flex-1">
               <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-green-500 transition-all duration-500"
                   style={{ width: `${validationProgress}%` }}
                 />
               </div>
             </div>
-            <span className="text-2xl font-bold text-slate-900">{validationProgress}%</span>
+            <span className="text-2xl font-bold text-slate-900">
+              {validationProgress}%
+            </span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span className="text-slate-600">Validados: <strong>{totalValidated}</strong></span>
+              <span className="text-slate-600">
+                Validados: <strong>{totalValidated}</strong>
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-yellow-600" />
-              <span className="text-slate-600">Pendentes: <strong>{totalPending}</strong></span>
+              <span className="text-slate-600">
+                Pendentes: <strong>{totalPending}</strong>
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-orange-600" />
-              <span className="text-slate-600">Ajuste: <strong>{clientesNeedsAdjustment}</strong></span>
+              <span className="text-slate-600">
+                Ajuste: <strong>{clientesNeedsAdjustment}</strong>
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <XCircle className="h-4 w-4 text-red-600" />
-              <span className="text-slate-600">Descartados: <strong>{clientesDiscarded}</strong></span>
+              <span className="text-slate-600">
+                Descartados: <strong>{clientesDiscarded}</strong>
+              </span>
             </div>
           </div>
         </CardContent>
@@ -261,7 +304,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={(entry) => `${entry.name}: ${entry.value}`}
+                  label={entry => `${entry.name}: ${entry.value}`}
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"

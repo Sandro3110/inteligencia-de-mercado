@@ -6,7 +6,7 @@ import { normalizarNomeEmpresa } from "./server/empresasUnicas";
 
 async function testUniqueness() {
   console.log("🧪 TESTE DE UNICIDADE - 20 Concorrentes + 20 Leads");
-  console.log("=" .repeat(70));
+  console.log("=".repeat(70));
 
   const mercadoNome = "Embalagens Plásticas B2B";
   const projectId = 1; // Projeto Embalagens
@@ -23,7 +23,7 @@ async function testUniqueness() {
   console.log(`\n✅ ${concorrentes.length} concorrentes gerados\n`);
 
   // Verificar duplicatas internas
-  const nomesConcorrentes = concorrentes.map((c) =>
+  const nomesConcorrentes = concorrentes.map(c =>
     normalizarNomeEmpresa(c.nome)
   );
   const uniquesConcorrentes = new Set(nomesConcorrentes);
@@ -41,14 +41,16 @@ async function testUniqueness() {
   concorrentes.forEach((c, index) => {
     console.log(`[${index + 1}] ${c.nome}`);
     console.log(`    CNPJ: ${c.cnpj} | Porte: ${c.porte}`);
-    console.log(`    Score: ${c.qualidadeScore}/100 (${c.qualidadeClassificacao})`);
+    console.log(
+      `    Score: ${c.qualidadeScore}/100 (${c.qualidadeClassificacao})`
+    );
   });
 
   // 2. GERAR 20 LEADS ÚNICOS
   console.log("\n" + "=".repeat(70));
   console.log("\n📋 ETAPA 2: Gerando 20 leads únicos...\n");
 
-  const nomesConcorrentesParaExcluir = concorrentes.map((c) => c.nome);
+  const nomesConcorrentesParaExcluir = concorrentes.map(c => c.nome);
 
   const leads = await generateLeadsUnicos(
     mercadoNome,
@@ -61,7 +63,7 @@ async function testUniqueness() {
   console.log(`\n✅ ${leads.length} leads gerados\n`);
 
   // Verificar duplicatas internas
-  const nomesLeads = leads.map((l) => normalizarNomeEmpresa(l.nome));
+  const nomesLeads = leads.map(l => normalizarNomeEmpresa(l.nome));
   const uniquesLeads = new Set(nomesLeads);
 
   if (nomesLeads.length !== uniquesLeads.size) {
@@ -76,18 +78,21 @@ async function testUniqueness() {
 
   leads.forEach((l, index) => {
     console.log(`[${index + 1}] ${l.nome}`);
-    console.log(`    CNPJ: ${l.cnpj} | Porte: ${l.porte} | Região: ${l.regiao}`);
-    console.log(`    Score: ${l.qualidadeScore}/100 (${l.qualidadeClassificacao})`);
+    console.log(
+      `    CNPJ: ${l.cnpj} | Porte: ${l.porte} | Região: ${l.regiao}`
+    );
+    console.log(
+      `    Score: ${l.qualidadeScore}/100 (${l.qualidadeClassificacao})`
+    );
   });
 
   // 3. VERIFICAR DUPLICATAS ENTRE CONCORRENTES E LEADS
   console.log("\n" + "=".repeat(70));
-  console.log("\n📋 ETAPA 3: Verificando duplicatas entre concorrentes e leads...\n");
+  console.log(
+    "\n📋 ETAPA 3: Verificando duplicatas entre concorrentes e leads...\n"
+  );
 
-  const todasEmpresas = [
-    ...nomesConcorrentes,
-    ...nomesLeads,
-  ];
+  const todasEmpresas = [...nomesConcorrentes, ...nomesLeads];
   const uniquesTotal = new Set(todasEmpresas);
 
   const duplicatasEntreGrupos = todasEmpresas.length - uniquesTotal.size;
@@ -99,7 +104,7 @@ async function testUniqueness() {
 
     // Encontrar quais são as duplicatas
     const contagem = new Map<string, number>();
-    todasEmpresas.forEach((nome) => {
+    todasEmpresas.forEach(nome => {
       contagem.set(nome, (contagem.get(nome) || 0) + 1);
     });
 
@@ -107,9 +112,9 @@ async function testUniqueness() {
     contagem.forEach((count, nome) => {
       if (count > 1) {
         const original = [
-          ...concorrentes.map((c) => c.nome),
-          ...leads.map((l) => l.nome),
-        ].find((n) => normalizarNomeEmpresa(n) === nome);
+          ...concorrentes.map(c => c.nome),
+          ...leads.map(l => l.nome),
+        ].find(n => normalizarNomeEmpresa(n) === nome);
         console.log(`  - ${original} (aparece ${count}x)`);
       }
     });
@@ -133,7 +138,9 @@ async function testUniqueness() {
     leads.length === 20 &&
     duplicatasEntreGrupos === 0
   ) {
-    console.log("\n✅ TESTE PASSOU! Regra de unicidade funcionando corretamente.");
+    console.log(
+      "\n✅ TESTE PASSOU! Regra de unicidade funcionando corretamente."
+    );
   } else {
     console.log("\n❌ TESTE FALHOU! Verificar implementação.");
   }

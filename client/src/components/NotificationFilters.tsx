@@ -99,7 +99,7 @@ export function NotificationFilters({
               <Input
                 placeholder="Buscar por título ou mensagem..."
                 value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
+                onChange={e => setSearchText(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -126,15 +126,18 @@ export function NotificationFilters({
                 <Label htmlFor="type-filter">Tipo</Label>
                 <Select
                   value={filters.type || "all"}
-                  onValueChange={(value) =>
-                    onFiltersChange({ ...filters, type: value === "all" ? undefined : value })
+                  onValueChange={value =>
+                    onFiltersChange({
+                      ...filters,
+                      type: value === "all" ? undefined : value,
+                    })
                   }
                 >
                   <SelectTrigger id="type-filter">
                     <SelectValue placeholder="Selecione o tipo" />
                   </SelectTrigger>
                   <SelectContent>
-                    {NOTIFICATION_TYPES.map((type) => (
+                    {NOTIFICATION_TYPES.map(type => (
                       <SelectItem key={type.value} value={type.value}>
                         {type.label}
                       </SelectItem>
@@ -148,15 +151,18 @@ export function NotificationFilters({
                 <Label htmlFor="period-filter">Período</Label>
                 <Select
                   value={filters.period || "all"}
-                  onValueChange={(value) =>
-                    onFiltersChange({ ...filters, period: value === "all" ? undefined : value })
+                  onValueChange={value =>
+                    onFiltersChange({
+                      ...filters,
+                      period: value === "all" ? undefined : value,
+                    })
                   }
                 >
                   <SelectTrigger id="period-filter">
                     <SelectValue placeholder="Selecione o período" />
                   </SelectTrigger>
                   <SelectContent>
-                    {PERIODS.map((period) => (
+                    {PERIODS.map(period => (
                       <SelectItem key={period.value} value={period.value}>
                         {period.label}
                       </SelectItem>
@@ -170,7 +176,7 @@ export function NotificationFilters({
                 <Label htmlFor="status-filter">Status</Label>
                 <Select
                   value={filters.status || "all"}
-                  onValueChange={(value) =>
+                  onValueChange={value =>
                     onFiltersChange({
                       ...filters,
                       status: value as "all" | "read" | "unread",
@@ -181,7 +187,7 @@ export function NotificationFilters({
                     <SelectValue placeholder="Selecione o status" />
                   </SelectTrigger>
                   <SelectContent>
-                    {STATUS_OPTIONS.map((status) => (
+                    {STATUS_OPTIONS.map(status => (
                       <SelectItem key={status.value} value={status.value}>
                         {status.label}
                       </SelectItem>
@@ -196,10 +202,11 @@ export function NotificationFilters({
                   <Label htmlFor="project-filter">Projeto</Label>
                   <Select
                     value={filters.projectId?.toString() || "all"}
-                    onValueChange={(value) =>
+                    onValueChange={value =>
                       onFiltersChange({
                         ...filters,
-                        projectId: value === "all" ? undefined : parseInt(value),
+                        projectId:
+                          value === "all" ? undefined : parseInt(value),
                       })
                     }
                   >
@@ -208,8 +215,11 @@ export function NotificationFilters({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todos os Projetos</SelectItem>
-                      {projects.map((project) => (
-                        <SelectItem key={project.id} value={project.id.toString()}>
+                      {projects.map(project => (
+                        <SelectItem
+                          key={project.id}
+                          value={project.id.toString()}
+                        >
                           {project.nome}
                         </SelectItem>
                       ))}
@@ -226,17 +236,20 @@ export function NotificationFilters({
               <span className="font-medium">Filtros ativos:</span>
               {filters.type && filters.type !== "all" && (
                 <span className="px-2 py-1 bg-primary/10 rounded">
-                  {NOTIFICATION_TYPES.find((t) => t.value === filters.type)?.label}
+                  {
+                    NOTIFICATION_TYPES.find(t => t.value === filters.type)
+                      ?.label
+                  }
                 </span>
               )}
               {filters.period && filters.period !== "all" && (
                 <span className="px-2 py-1 bg-primary/10 rounded">
-                  {PERIODS.find((p) => p.value === filters.period)?.label}
+                  {PERIODS.find(p => p.value === filters.period)?.label}
                 </span>
               )}
               {filters.status && filters.status !== "all" && (
                 <span className="px-2 py-1 bg-primary/10 rounded">
-                  {STATUS_OPTIONS.find((s) => s.value === filters.status)?.label}
+                  {STATUS_OPTIONS.find(s => s.value === filters.status)?.label}
                 </span>
               )}
               {filters.projectId && (

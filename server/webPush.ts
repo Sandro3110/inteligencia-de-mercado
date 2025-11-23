@@ -1,15 +1,15 @@
-import crypto from 'crypto';
-import https from 'https';
-import { URL } from 'url';
-import { getDb } from './db';
-import { pushSubscriptions } from '../drizzle/schema';
-import { eq } from 'drizzle-orm';
+import crypto from "crypto";
+import https from "https";
+import { URL } from "url";
+import { getDb } from "./db";
+import { pushSubscriptions } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 // VAPID keys devem ser configuradas no .env
 // Execute: node server/generateVapidKeys.mjs para gerar
-const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || '';
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
-const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:admin@example.com';
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || "";
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || "";
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || "mailto:admin@example.com";
 
 interface PushSubscriptionData {
   endpoint: string;
@@ -36,7 +36,7 @@ export async function savePushSubscription(
   userAgent?: string
 ) {
   const db = await getDb();
-  if (!db) throw new Error('Database not available');
+  if (!db) throw new Error("Database not available");
 
   // Verificar se já existe subscrição para este endpoint
   const existing = await db
@@ -92,7 +92,9 @@ export async function removePushSubscription(endpoint: string) {
   const db = await getDb();
   if (!db) return false;
 
-  await db.delete(pushSubscriptions).where(eq(pushSubscriptions.endpoint, endpoint));
+  await db
+    .delete(pushSubscriptions)
+    .where(eq(pushSubscriptions.endpoint, endpoint));
   return true;
 }
 
@@ -101,8 +103,8 @@ export async function removePushSubscription(endpoint: string) {
  */
 function generateVapidAuthHeader(audience: string): string {
   const header = {
-    typ: 'JWT',
-    alg: 'ES256',
+    typ: "JWT",
+    alg: "ES256",
   };
 
   const jwtPayload = {
@@ -111,22 +113,26 @@ function generateVapidAuthHeader(audience: string): string {
     sub: VAPID_SUBJECT,
   };
 
-  const encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64url');
-  const encodedPayload = Buffer.from(JSON.stringify(jwtPayload)).toString('base64url');
+  const encodedHeader = Buffer.from(JSON.stringify(header)).toString(
+    "base64url"
+  );
+  const encodedPayload = Buffer.from(JSON.stringify(jwtPayload)).toString(
+    "base64url"
+  );
 
   const unsignedToken = `${encodedHeader}.${encodedPayload}`;
 
   // Assinar com chave privada VAPID
-  const privateKeyBuffer = Buffer.from(VAPID_PRIVATE_KEY, 'base64url');
-  const sign = crypto.createSign('SHA256');
+  const privateKeyBuffer = Buffer.from(VAPID_PRIVATE_KEY, "base64url");
+  const sign = crypto.createSign("SHA256");
   sign.update(unsignedToken);
   const signature = sign.sign({
     key: privateKeyBuffer,
-    format: 'der',
-    type: 'pkcs8',
+    format: "der",
+    type: "pkcs8",
   });
 
-  const encodedSignature = signature.toString('base64url');
+  const encodedSignature = signature.toString("base64url");
 
   return `${unsignedToken}.${encodedSignature}`;
 }
@@ -139,7 +145,7 @@ export async function sendPushNotification(
   payload: PushNotificationPayload
 ): Promise<boolean> {
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    console.error('[WebPush] VAPID keys not configured');
+    console.error("[WebPush] VAPID keys not configured");
     return false;
   }
 
@@ -155,10 +161,10 @@ export async function sendPushNotification(
 
     // Headers VAPID
     const headers = {
-      'Content-Type': 'application/octet-stream',
-      'Content-Encoding': 'aes128gcm',
-      'Authorization': `vapid t=${vapidToken}, k=${VAPID_PUBLIC_KEY}`,
-      'TTL': '86400', // 24 horas
+      "Content-Type": "application/octet-stream",
+      "Content-Encoding": "aes128gcm",
+      Authorization: `vapid t=${vapidToken}, k=${VAPID_PUBLIC_KEY}`,
+      TTL: "86400", // 24 horas
     };
 
     // Enviar requisição HTTP POST
@@ -166,26 +172,29 @@ export async function sendPushNotification(
       const req = https.request(
         subscription.endpoint,
         {
-          method: 'POST',
+          method: "POST",
           headers,
         },
-        (res) => {
+        res => {
           if (res.statusCode === 201) {
             resolve(true);
           } else if (res.statusCode === 410 || res.statusCode === 404) {
             // Subscrição expirada ou inválida
-            console.warn('[WebPush] Subscription expired or invalid:', subscription.endpoint);
+            console.warn(
+              "[WebPush] Subscription expired or invalid:",
+              subscription.endpoint
+            );
             removePushSubscription(subscription.endpoint);
             resolve(false);
           } else {
-            console.error('[WebPush] Push failed with status:', res.statusCode);
+            console.error("[WebPush] Push failed with status:", res.statusCode);
             resolve(false);
           }
         }
       );
 
-      req.on('error', (error) => {
-        console.error('[WebPush] Request error:', error);
+      req.on("error", error => {
+        console.error("[WebPush] Request error:", error);
         reject(error);
       });
 
@@ -193,7 +202,7 @@ export async function sendPushNotification(
       req.end();
     });
   } catch (error) {
-    console.error('[WebPush] Error sending push:', error);
+    console.error("[WebPush] Error sending push:", error);
     return false;
   }
 }
@@ -201,11 +210,14 @@ export async function sendPushNotification(
 /**
  * Envia notificação push para todos os dispositivos de um usuário
  */
-export async function sendPushToUser(userId: string, payload: PushNotificationPayload) {
+export async function sendPushToUser(
+  userId: string,
+  payload: PushNotificationPayload
+) {
   const subscriptions = await getUserPushSubscriptions(userId);
 
   const results = await Promise.allSettled(
-    subscriptions.map((sub) =>
+    subscriptions.map(sub =>
       sendPushNotification(
         {
           endpoint: sub.endpoint,
@@ -219,7 +231,9 @@ export async function sendPushToUser(userId: string, payload: PushNotificationPa
     )
   );
 
-  const successful = results.filter((r) => r.status === 'fulfilled' && r.value).length;
+  const successful = results.filter(
+    r => r.status === "fulfilled" && r.value
+  ).length;
 
   return {
     total: subscriptions.length,

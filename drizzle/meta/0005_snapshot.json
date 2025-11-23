@@ -176,9 +176,7 @@
       "compositePrimaryKeys": {
         "clientes_id": {
           "name": "clientes_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -222,9 +220,7 @@
       "compositePrimaryKeys": {
         "clientes_mercados_id": {
           "name": "clientes_mercados_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -360,9 +356,7 @@
       "compositePrimaryKeys": {
         "concorrentes_id": {
           "name": "concorrentes_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -414,12 +408,8 @@
           "name": "entity_tags_tagId_tags_id_fk",
           "tableFrom": "entity_tags",
           "tableTo": "tags",
-          "columnsFrom": [
-            "tagId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tagId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -427,9 +417,7 @@
       "compositePrimaryKeys": {
         "entity_tags_id": {
           "name": "entity_tags_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -602,9 +590,7 @@
       "compositePrimaryKeys": {
         "leads_id": {
           "name": "leads_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -705,9 +691,7 @@
       "compositePrimaryKeys": {
         "mercados_unicos_id": {
           "name": "mercados_unicos_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -775,9 +759,7 @@
       "compositePrimaryKeys": {
         "projects_id": {
           "name": "projects_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -829,12 +811,8 @@
           "name": "saved_filters_userId_users_id_fk",
           "tableFrom": "saved_filters",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -842,9 +820,7 @@
       "compositePrimaryKeys": {
         "saved_filters_id": {
           "name": "saved_filters_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -889,9 +865,7 @@
       "compositePrimaryKeys": {
         "tags_id": {
           "name": "tags_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -958,9 +932,7 @@
       "compositePrimaryKeys": {
         "users_id": {
           "name": "users_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},

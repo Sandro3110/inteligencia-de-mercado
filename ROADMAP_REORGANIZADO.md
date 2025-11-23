@@ -3,6 +3,7 @@
 ## 📊 Status Atual do Projeto
 
 **Funcionalidades Implementadas:**
+
 - ✅ Sistema completo de navegação em cascata (Mercados → Clientes → Concorrentes → Leads)
 - ✅ Sistema de validação com status (Pendente, Validado, Ajuste, Descartado)
 - ✅ Busca global avançada com seletor multi-campo (8 campos configuráveis)
@@ -22,11 +23,13 @@
 ## 🎯 Fases Prioritárias (Próximos Passos)
 
 ### **Fase 34: Exportação Inteligente** 📤 (4h)
+
 **Prioridade:** ALTA | **Impacto:** ALTO
 
 Modificar sistema de exportação para respeitar filtros ativos.
 
 **Tarefas:**
+
 - [ ] Atualizar função exportToCSV para aceitar dados filtrados
 - [ ] Passar dados visíveis (após busca + tags + filtros avançados + status) para exportação
 - [ ] Adicionar nome do arquivo com timestamp e filtros aplicados
@@ -39,11 +42,13 @@ Modificar sistema de exportação para respeitar filtros ativos.
 ---
 
 ### **Fase 35: Paginação Server-Side** 📄 (8h)
+
 **Prioridade:** ALTA | **Impacto:** ALTO
 
 Implementar paginação real no backend para melhorar performance com grandes volumes.
 
 **Tarefas:**
+
 - [ ] Atualizar routers tRPC com parâmetros `page` e `pageSize`
 - [ ] Atualizar funções db.ts com `LIMIT` e `OFFSET`
 - [ ] Retornar `{ data, total, page, pageSize, totalPages }` nas queries
@@ -59,11 +64,13 @@ Implementar paginação real no backend para melhorar performance com grandes vo
 ---
 
 ### **Fase 36: Filtros Salvos** 💾 (12h)
+
 **Prioridade:** MÉDIA | **Impacto:** ALTO
 
 Permitir salvar combinações de filtros para reutilizar rapidamente.
 
 **Tarefas:**
+
 - [ ] Criar tabela `saved_filters` no schema (id, name, user_id, filters_json, created_at)
 - [ ] Adicionar routers tRPC (savedFilters.list, create, delete, apply)
 - [ ] Adicionar funções no db.ts
@@ -81,11 +88,13 @@ Permitir salvar combinações de filtros para reutilizar rapidamente.
 ---
 
 ### **Fase 37: Audit Log (Histórico de Alterações)** 📜 (18h)
+
 **Prioridade:** MÉDIA | **Impacto:** MÉDIO
 
 Rastrear quem modificou cada registro e quando (essencial para compliance).
 
 **Tarefas:**
+
 - [ ] Criar tabela `audit_logs` no schema (id, entity_type, entity_id, action, user_id, old_data, new_data, timestamp)
 - [ ] Criar middleware de auditoria para interceptar mutations
 - [ ] Registrar INSERT/UPDATE/DELETE automaticamente
@@ -102,11 +111,13 @@ Rastrear quem modificou cada registro e quando (essencial para compliance).
 ---
 
 ### **Fase 38: Dashboard de Métricas Avançado** 📊 (16h)
+
 **Prioridade:** MÉDIA | **Impacto:** MÉDIO
 
 Expandir dashboard com gráficos de distribuição e análises.
 
 **Tarefas:**
+
 - [ ] Instalar biblioteca de gráficos avançados (recharts já instalado)
 - [ ] Criar gráfico de distribuição por segmentação (B2B vs B2C vs Ambos)
 - [ ] Criar gráfico de distribuição geográfica (mapa de calor por UF)
@@ -124,11 +135,13 @@ Expandir dashboard com gráficos de distribuição e análises.
 ---
 
 ### **Fase 39: Modo Kanban para Leads** 🎯 (20h)
+
 **Prioridade:** BAIXA | **Impacto:** ALTO
 
 Visualização em quadros para gerenciar pipeline de leads.
 
 **Tarefas:**
+
 - [ ] Criar tabela `lead_stages` no schema (id, name, order, color)
 - [ ] Adicionar coluna `stage_id` na tabela `leads`
 - [ ] Criar routers para stages (list, create, update, delete, reorder)
@@ -150,11 +163,13 @@ Visualização em quadros para gerenciar pipeline de leads.
 ---
 
 ### **Fase 40: Histórico de Buscas** 🔍 (6h)
+
 **Prioridade:** BAIXA | **Impacto:** BAIXO
 
 Salvar últimas buscas para repetir rapidamente.
 
 **Tarefas:**
+
 - [ ] Criar estado `searchHistory` no CascadeView
 - [ ] Persistir histórico no localStorage (últimas 10 buscas)
 - [ ] Criar dropdown de sugestões ao focar no campo de busca
@@ -169,11 +184,13 @@ Salvar últimas buscas para repetir rapidamente.
 ---
 
 ### **Fase 41: Busca com Operadores Lógicos** 🔬 (10h)
+
 **Prioridade:** BAIXA | **Impacto:** MÉDIO
 
 Adicionar suporte a operadores AND/OR entre termos.
 
 **Tarefas:**
+
 - [ ] Criar parser de query (detectar AND, OR, NOT)
 - [ ] Implementar lógica de busca booleana
 - [ ] Adicionar suporte a aspas para busca exata ("termo exato")
@@ -187,11 +204,13 @@ Adicionar suporte a operadores AND/OR entre termos.
 ---
 
 ### **Fase 42: Integração com Email** 📧 (14h)
+
 **Prioridade:** BAIXA | **Impacto:** MÉDIO
 
 Enviar relatórios por email automaticamente.
 
 **Tarefas:**
+
 - [ ] Integrar serviço de email (SendGrid/Resend)
 - [ ] Criar template de email HTML para relatórios
 - [ ] Criar rota `reports.sendByEmail(filters, recipientEmail)`
@@ -207,11 +226,13 @@ Enviar relatórios por email automaticamente.
 ---
 
 ### **Fase 43: Visualização em Mapa** 🗺️ (24h)
+
 **Prioridade:** BAIXA | **Impacto:** MÉDIO
 
 Mostrar clientes/concorrentes geograficamente.
 
 **Tarefas:**
+
 - [ ] Instalar biblioteca de mapas (Leaflet/Mapbox)
 - [ ] Criar componente `MapView.tsx`
 - [ ] Geocodificar endereços (API Google Maps/OpenStreetMap)
@@ -228,11 +249,13 @@ Mostrar clientes/concorrentes geograficamente.
 ---
 
 ### **Fase 44: Alertas Automáticos** 🔔 (12h)
+
 **Prioridade:** BAIXA | **Impacto:** BAIXO
 
 Notificar quando novos leads/clientes são adicionados.
 
 **Tarefas:**
+
 - [ ] Criar tabela `notification_rules` no schema
 - [ ] Implementar sistema de triggers no backend
 - [ ] Criar rota `notifications.list` e `notifications.markAsRead`
@@ -248,11 +271,13 @@ Notificar quando novos leads/clientes são adicionados.
 ---
 
 ### **Fase 45: Exportação Avançada (Excel + PDF)** 📊 (12h)
+
 **Prioridade:** MÉDIA | **Impacto:** MÉDIO
 
 Expandir exportação para múltiplos formatos com formatação.
 
 **Tarefas:**
+
 - [ ] Instalar biblioteca xlsx
 - [ ] Criar função `exportToExcel` com formatação (cores, bordas, larguras)
 - [ ] Criar função `exportToPDF` com relatório formatado (logo, cabeçalho, rodapé)
@@ -267,11 +292,13 @@ Expandir exportação para múltiplos formatos com formatação.
 ---
 
 ### **Fase 46: Temas Customizados** 🎨 (8h)
+
 **Prioridade:** BAIXA | **Impacto:** BAIXO
 
 Permitir usuário escolher cores do sistema.
 
 **Tarefas:**
+
 - [ ] Criar tabela `user_preferences` no schema
 - [ ] Adicionar campo `theme_colors` (JSON)
 - [ ] Criar componente `ThemeCustomizer.tsx`
@@ -287,11 +314,13 @@ Permitir usuário escolher cores do sistema.
 ---
 
 ### **Fase 47: Tarefas e Follow-ups** ✅ (18h)
+
 **Prioridade:** MÉDIA | **Impacto:** MÉDIO
 
 Sistema de lembretes para acompanhamento de leads/clientes.
 
 **Tarefas:**
+
 - [ ] Criar tabela `tasks` no schema (id, entity_type, entity_id, title, description, due_date, status, user_id)
 - [ ] Adicionar routers tRPC (tasks.list, create, update, delete, complete)
 - [ ] Criar componente `TaskManager.tsx`
@@ -308,11 +337,13 @@ Sistema de lembretes para acompanhamento de leads/clientes.
 ---
 
 ### **Fase 48: Comparação de Mercados** ⚖️ (10h)
+
 **Prioridade:** BAIXA | **Impacto:** BAIXO
 
 Visualização lado a lado de 2+ mercados.
 
 **Tarefas:**
+
 - [ ] Criar componente `CompareMarkets.tsx`
 - [ ] Implementar seleção múltipla de mercados (checkboxes)
 - [ ] Criar tabela comparativa (lado a lado)
@@ -327,11 +358,13 @@ Visualização lado a lado de 2+ mercados.
 ---
 
 ### **Fase 49: Validação de Email** ✉️ (4h)
+
 **Prioridade:** BAIXA | **Impacto:** BAIXO
 
 Validar emails e destacar inválidos.
 
 **Tarefas:**
+
 - [ ] Criar função `isValidEmail()` com regex
 - [ ] Adicionar validação visual nos cards (ícone de alerta)
 - [ ] Adicionar tooltip explicativo para emails inválidos
@@ -344,11 +377,13 @@ Validar emails e destacar inválidos.
 ---
 
 ### **Fase 50: Modo Compacto + Zoom** 🔍 (6h)
+
 **Prioridade:** BAIXA | **Impacto:** BAIXO
 
 Controles de densidade visual.
 
 **Tarefas:**
+
 - [ ] Criar contexto `CompactModeContext`
 - [ ] Criar contexto `ZoomContext`
 - [ ] Adicionar botão toggle "Modo Compacto" no header
@@ -365,50 +400,55 @@ Controles de densidade visual.
 
 ## 📈 Estimativa Total de Tempo
 
-| Fase | Horas | Prioridade |
-|------|-------|------------|
-| 34. Exportação Inteligente | 4h | ALTA |
-| 35. Paginação Server-Side | 8h | ALTA |
-| 36. Filtros Salvos | 12h | MÉDIA |
-| 37. Audit Log | 18h | MÉDIA |
-| 38. Dashboard Avançado | 16h | MÉDIA |
-| 39. Modo Kanban | 20h | BAIXA |
-| 40. Histórico de Buscas | 6h | BAIXA |
-| 41. Busca com Operadores | 10h | BAIXA |
-| 42. Integração Email | 14h | BAIXA |
-| 43. Visualização Mapa | 24h | BAIXA |
-| 44. Alertas Automáticos | 12h | BAIXA |
-| 45. Exportação Avançada | 12h | MÉDIA |
-| 46. Temas Customizados | 8h | BAIXA |
-| 47. Tarefas e Follow-ups | 18h | MÉDIA |
-| 48. Comparação de Mercados | 10h | BAIXA |
-| 49. Validação de Email | 4h | BAIXA |
-| 50. Modo Compacto + Zoom | 6h | BAIXA |
-| **TOTAL** | **202h** | - |
+| Fase                       | Horas    | Prioridade |
+| -------------------------- | -------- | ---------- |
+| 34. Exportação Inteligente | 4h       | ALTA       |
+| 35. Paginação Server-Side  | 8h       | ALTA       |
+| 36. Filtros Salvos         | 12h      | MÉDIA      |
+| 37. Audit Log              | 18h      | MÉDIA      |
+| 38. Dashboard Avançado     | 16h      | MÉDIA      |
+| 39. Modo Kanban            | 20h      | BAIXA      |
+| 40. Histórico de Buscas    | 6h       | BAIXA      |
+| 41. Busca com Operadores   | 10h      | BAIXA      |
+| 42. Integração Email       | 14h      | BAIXA      |
+| 43. Visualização Mapa      | 24h      | BAIXA      |
+| 44. Alertas Automáticos    | 12h      | BAIXA      |
+| 45. Exportação Avançada    | 12h      | MÉDIA      |
+| 46. Temas Customizados     | 8h       | BAIXA      |
+| 47. Tarefas e Follow-ups   | 18h      | MÉDIA      |
+| 48. Comparação de Mercados | 10h      | BAIXA      |
+| 49. Validação de Email     | 4h       | BAIXA      |
+| 50. Modo Compacto + Zoom   | 6h       | BAIXA      |
+| **TOTAL**                  | **202h** | -          |
 
 ---
 
 ## 🎯 Recomendação de Sequência
 
 ### **Sprint 1 (20h) - Otimizações Essenciais**
+
 1. Exportação Inteligente (4h)
 2. Paginação Server-Side (8h)
 3. Filtros Salvos (12h) - Parcial
 
 ### **Sprint 2 (24h) - Rastreabilidade e Analytics**
+
 1. Filtros Salvos (conclusão)
 2. Audit Log (18h)
 3. Histórico de Buscas (6h)
 
 ### **Sprint 3 (28h) - Visualização e Relatórios**
+
 1. Dashboard Avançado (16h)
 2. Exportação Avançada (12h)
 
 ### **Sprint 4 (32h) - Gestão de Pipeline**
+
 1. Modo Kanban (20h)
 2. Tarefas e Follow-ups (18h) - Parcial
 
 ### **Sprint 5+ (98h) - Funcionalidades Avançadas**
+
 1. Restante conforme prioridade e necessidade do negócio
 
 ---

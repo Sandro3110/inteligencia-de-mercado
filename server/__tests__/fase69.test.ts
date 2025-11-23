@@ -5,9 +5,9 @@
  * - Geocodificação em Massa
  */
 
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { sql } from 'drizzle-orm';
-import { getDb } from '../db';
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { sql } from "drizzle-orm";
+import { getDb } from "../db";
 import {
   saveResearchDraft,
   getResearchDraft,
@@ -15,19 +15,19 @@ import {
   deleteResearchDraft,
   getRegionAnalysis,
   getTerritorialInsights,
-} from '../db';
+} from "../db";
 
-describe('Fase 69: Sistema de Drafts + Geocodificação + Análise Territorial', () => {
+describe("Fase 69: Sistema de Drafts + Geocodificação + Análise Territorial", () => {
   let testUserId: string;
   let testProjectId: number;
   let testDraftId: number;
 
   beforeAll(async () => {
-    testUserId = 'test-user-fase69';
-    
+    testUserId = "test-user-fase69";
+
     // Criar projeto de teste
     const db = await getDb();
-    if (!db) throw new Error('Database not available');
+    if (!db) throw new Error("Database not available");
 
     const projectResult = await db.execute(sql`
       INSERT INTO projects (nome, descricao)
@@ -42,12 +42,24 @@ describe('Fase 69: Sistema de Drafts + Geocodificação + Análise Territorial',
     if (!db) return;
 
     if (testProjectId) {
-      await db.execute(sql`DELETE FROM research_drafts WHERE userId = ${testUserId}`);
-      await db.execute(sql`DELETE FROM clientes WHERE projectId = ${testProjectId}`);
-      await db.execute(sql`DELETE FROM concorrentes WHERE projectId = ${testProjectId}`);
-      await db.execute(sql`DELETE FROM leads WHERE projectId = ${testProjectId}`);
-      await db.execute(sql`DELETE FROM pesquisas WHERE projectId = ${testProjectId}`);
-      await db.execute(sql`DELETE FROM mercados_unicos WHERE projectId = ${testProjectId}`);
+      await db.execute(
+        sql`DELETE FROM research_drafts WHERE userId = ${testUserId}`
+      );
+      await db.execute(
+        sql`DELETE FROM clientes WHERE projectId = ${testProjectId}`
+      );
+      await db.execute(
+        sql`DELETE FROM concorrentes WHERE projectId = ${testProjectId}`
+      );
+      await db.execute(
+        sql`DELETE FROM leads WHERE projectId = ${testProjectId}`
+      );
+      await db.execute(
+        sql`DELETE FROM pesquisas WHERE projectId = ${testProjectId}`
+      );
+      await db.execute(
+        sql`DELETE FROM mercados_unicos WHERE projectId = ${testProjectId}`
+      );
       await db.execute(sql`DELETE FROM projects WHERE id = ${testProjectId}`);
     }
   });
@@ -56,17 +68,22 @@ describe('Fase 69: Sistema de Drafts + Geocodificação + Análise Territorial',
   // TESTES DE DRAFTS
   // ========================================
 
-  describe('Sistema de Drafts', () => {
-    it('deve salvar um novo draft', async () => {
+  describe("Sistema de Drafts", () => {
+    it("deve salvar um novo draft", async () => {
       const draftData = {
         projectId: testProjectId,
-        researchName: 'Pesquisa Teste',
-        researchDescription: 'Descrição teste',
+        researchName: "Pesquisa Teste",
+        researchDescription: "Descrição teste",
         qtdConcorrentes: 5,
         qtdLeads: 10,
       };
 
-      const draft = await saveResearchDraft(testUserId, draftData, 2, testProjectId);
+      const draft = await saveResearchDraft(
+        testUserId,
+        draftData,
+        2,
+        testProjectId
+      );
 
       expect(draft).toBeTruthy();
       expect(draft?.userId).toBe(testUserId);
@@ -79,24 +96,29 @@ describe('Fase 69: Sistema de Drafts + Geocodificação + Análise Territorial',
       }
     });
 
-    it('deve atualizar draft existente', async () => {
+    it("deve atualizar draft existente", async () => {
       const updatedData = {
         projectId: testProjectId,
-        researchName: 'Pesquisa Atualizada',
-        researchDescription: 'Descrição atualizada',
+        researchName: "Pesquisa Atualizada",
+        researchDescription: "Descrição atualizada",
         qtdConcorrentes: 8,
         qtdLeads: 15,
       };
 
-      const draft = await saveResearchDraft(testUserId, updatedData, 3, testProjectId);
+      const draft = await saveResearchDraft(
+        testUserId,
+        updatedData,
+        3,
+        testProjectId
+      );
 
       expect(draft).toBeTruthy();
       expect(draft?.id).toBe(testDraftId); // Mesmo ID
       expect(draft?.currentStep).toBe(3);
-      expect(draft?.draftData.researchName).toBe('Pesquisa Atualizada');
+      expect(draft?.draftData.researchName).toBe("Pesquisa Atualizada");
     });
 
-    it('deve recuperar draft por usuário e projeto', async () => {
+    it("deve recuperar draft por usuário e projeto", async () => {
       const draft = await getResearchDraft(testUserId, testProjectId);
 
       expect(draft).toBeTruthy();
@@ -105,7 +127,7 @@ describe('Fase 69: Sistema de Drafts + Geocodificação + Análise Territorial',
       expect(draft?.projectId).toBe(testProjectId);
     });
 
-    it('deve listar todos os drafts do usuário', async () => {
+    it("deve listar todos os drafts do usuário", async () => {
       const drafts = await getUserDrafts(testUserId);
 
       expect(drafts).toBeTruthy();
@@ -114,7 +136,7 @@ describe('Fase 69: Sistema de Drafts + Geocodificação + Análise Territorial',
       expect(drafts[0].userId).toBe(testUserId);
     });
 
-    it('deve deletar draft', async () => {
+    it("deve deletar draft", async () => {
       const deleted = await deleteResearchDraft(testDraftId);
 
       expect(deleted).toBe(true);
@@ -128,8 +150,8 @@ describe('Fase 69: Sistema de Drafts + Geocodificação + Análise Territorial',
   // TESTES DE ANÁLISE TERRITORIAL
   // ========================================
 
-  describe('Análise Territorial', () => {
-    it('deve retornar estrutura válida para análise por UF', async () => {
+  describe("Análise Territorial", () => {
+    it("deve retornar estrutura válida para análise por UF", async () => {
       const analysis = await getRegionAnalysis(testProjectId);
 
       expect(analysis).toBeTruthy();
@@ -137,7 +159,7 @@ describe('Fase 69: Sistema de Drafts + Geocodificação + Análise Territorial',
       expect(Array.isArray(analysis.byUF)).toBe(true);
     });
 
-    it('deve retornar estrutura válida para análise por cidade', async () => {
+    it("deve retornar estrutura válida para análise por cidade", async () => {
       const analysis = await getRegionAnalysis(testProjectId);
 
       expect(analysis).toBeTruthy();
@@ -145,14 +167,14 @@ describe('Fase 69: Sistema de Drafts + Geocodificação + Análise Territorial',
       expect(Array.isArray(analysis.byCidade)).toBe(true);
     });
 
-    it('deve retornar insights territoriais com estrutura válida', async () => {
+    it("deve retornar insights territoriais com estrutura válida", async () => {
       const insights = await getTerritorialInsights(testProjectId);
 
       // Pode retornar null se não houver dados geocodificados
       if (insights) {
-        expect(typeof insights.totalRegistros).toBe('number');
-        expect(typeof insights.totalEstados).toBe('number');
-        expect(typeof insights.totalCidades).toBe('number');
+        expect(typeof insights.totalRegistros).toBe("number");
+        expect(typeof insights.totalEstados).toBe("number");
+        expect(typeof insights.totalCidades).toBe("number");
       } else {
         expect(insights).toBeNull();
       }
@@ -163,23 +185,28 @@ describe('Fase 69: Sistema de Drafts + Geocodificação + Análise Territorial',
   // TESTES DE INTEGRAÇÃO
   // ========================================
 
-  describe('Integração Completa', () => {
-    it('deve criar draft, salvar e recuperar dados completos', async () => {
+  describe("Integração Completa", () => {
+    it("deve criar draft, salvar e recuperar dados completos", async () => {
       const draftData = {
         projectId: testProjectId,
-        researchName: 'Integração Teste',
+        researchName: "Integração Teste",
         mercados: [
-          { nome: 'Mercado A', descricao: 'Teste A' },
-          { nome: 'Mercado B', descricao: 'Teste B' },
+          { nome: "Mercado A", descricao: "Teste A" },
+          { nome: "Mercado B", descricao: "Teste B" },
         ],
         clientes: [
-          { nome: 'Cliente 1', cidade: 'São Paulo', uf: 'SP' },
-          { nome: 'Cliente 2', cidade: 'Rio de Janeiro', uf: 'RJ' },
+          { nome: "Cliente 1", cidade: "São Paulo", uf: "SP" },
+          { nome: "Cliente 2", cidade: "Rio de Janeiro", uf: "RJ" },
         ],
       };
 
       // Salvar draft
-      const saved = await saveResearchDraft(testUserId, draftData, 5, testProjectId);
+      const saved = await saveResearchDraft(
+        testUserId,
+        draftData,
+        5,
+        testProjectId
+      );
       expect(saved).toBeTruthy();
 
       // Recuperar draft

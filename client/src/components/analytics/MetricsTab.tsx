@@ -19,7 +19,14 @@ import {
 } from "recharts";
 import { useState } from "react";
 
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
+const COLORS = [
+  "#3b82f6",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#ec4899",
+];
 
 interface MetricsTabProps {
   projectId: number;
@@ -27,12 +34,17 @@ interface MetricsTabProps {
 
 export function MetricsTab({ projectId }: MetricsTabProps) {
   const [days, setDays] = useState(30);
-  
-  const { data: distribuicaoGeo, refetch: refetchGeo } = trpc.dashboard.distribuicaoGeografica.useQuery();
-  const { data: distribuicaoSeg, refetch: refetchSeg } = trpc.dashboard.distribuicaoSegmentacao.useQuery();
-  const { data: timeline, refetch: refetchTimeline } = trpc.dashboard.timelineValidacoes.useQuery({ days });
-  const { data: funil, refetch: refetchFunil } = trpc.dashboard.funilConversao.useQuery();
-  const { data: top10, refetch: refetchTop10 } = trpc.dashboard.top10Mercados.useQuery();
+
+  const { data: distribuicaoGeo, refetch: refetchGeo } =
+    trpc.dashboard.distribuicaoGeografica.useQuery();
+  const { data: distribuicaoSeg, refetch: refetchSeg } =
+    trpc.dashboard.distribuicaoSegmentacao.useQuery();
+  const { data: timeline, refetch: refetchTimeline } =
+    trpc.dashboard.timelineValidacoes.useQuery({ days });
+  const { data: funil, refetch: refetchFunil } =
+    trpc.dashboard.funilConversao.useQuery();
+  const { data: top10, refetch: refetchTop10 } =
+    trpc.dashboard.top10Mercados.useQuery();
 
   const handleRefreshAll = () => {
     refetchGeo();
@@ -56,8 +68,12 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
       {/* Header com controles */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">Métricas Detalhadas</h2>
-          <p className="text-sm text-muted-foreground">Análise e visualização de dados</p>
+          <h2 className="text-xl font-semibold text-slate-900">
+            Métricas Detalhadas
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Análise e visualização de dados
+          </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex gap-2">
@@ -99,11 +115,13 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Total de Leads</p>
-              <p className="text-2xl font-bold text-slate-900">{funil?.leads || 0}</p>
+              <p className="text-2xl font-bold text-slate-900">
+                {funil?.leads || 0}
+              </p>
             </div>
           </div>
         </Card>
-        
+
         <Card className="p-6 bg-white border-slate-200 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-green-500/10 rounded-lg">
@@ -111,21 +129,29 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Total de Clientes</p>
-              <p className="text-2xl font-bold text-slate-900">{funil?.clientes || 0}</p>
+              <p className="text-2xl font-bold text-slate-900">
+                {funil?.clientes || 0}
+              </p>
             </div>
           </div>
         </Card>
-        
+
         <Card className="p-6 bg-white border-slate-200 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-amber-500/10 rounded-lg">
               <CheckCircle2 className="w-6 h-6 text-amber-500" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Clientes Validados</p>
-              <p className="text-2xl font-bold text-slate-900">{funil?.validados || 0}</p>
+              <p className="text-sm text-muted-foreground">
+                Clientes Validados
+              </p>
+              <p className="text-2xl font-bold text-slate-900">
+                {funil?.validados || 0}
+              </p>
               <p className="text-xs text-muted-foreground">
-                {funil?.clientes ? `${((funil.validados / funil.clientes) * 100).toFixed(1)}% do total` : ""}
+                {funil?.clientes
+                  ? `${((funil.validados / funil.clientes) * 100).toFixed(1)}% do total`
+                  : ""}
               </p>
             </div>
           </div>
@@ -136,14 +162,20 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Distribuição Geográfica */}
         <Card className="p-6 bg-white border-slate-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">Distribuição Geográfica (Top 10 UFs)</h3>
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">
+            Distribuição Geográfica (Top 10 UFs)
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={distribuicaoGeo?.slice(0, 10)}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="uf" stroke="#64748b" />
               <YAxis stroke="#64748b" />
               <Tooltip
-                contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "0.5rem" }}
+                contentStyle={{
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "0.5rem",
+                }}
                 labelStyle={{ color: "#0f172a" }}
               />
               <Bar dataKey="count" fill="#3b82f6" name="Clientes" />
@@ -153,7 +185,9 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
 
         {/* Distribuição por Segmentação */}
         <Card className="p-6 bg-white border-slate-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">Distribuição por Segmentação</h3>
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">
+            Distribuição por Segmentação
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -163,14 +197,21 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
-                label={(entry) => `${entry.segmentacao}: ${entry.count}`}
+                label={entry => `${entry.segmentacao}: ${entry.count}`}
               >
                 {distribuicaoSeg?.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "0.5rem" }}
+                contentStyle={{
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "0.5rem",
+                }}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -178,32 +219,50 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
 
         {/* Timeline de Validações */}
         <Card className="p-6 bg-white border-slate-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">Timeline de Validações ({days} dias)</h3>
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">
+            Timeline de Validações ({days} dias)
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={timeline}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="date" stroke="#64748b" />
               <YAxis stroke="#64748b" />
               <Tooltip
-                contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "0.5rem" }}
+                contentStyle={{
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "0.5rem",
+                }}
                 labelStyle={{ color: "#0f172a" }}
               />
               <Legend />
-              <Line type="monotone" dataKey="count" stroke="#10b981" name="Validações" strokeWidth={2} />
+              <Line
+                type="monotone"
+                dataKey="count"
+                stroke="#10b981"
+                name="Validações"
+                strokeWidth={2}
+              />
             </LineChart>
           </ResponsiveContainer>
         </Card>
 
         {/* Funil de Conversão */}
         <Card className="p-6 bg-white border-slate-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">Funil de Conversão</h3>
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">
+            Funil de Conversão
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={funilData} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis type="number" stroke="#64748b" />
               <YAxis dataKey="name" type="category" stroke="#64748b" />
               <Tooltip
-                contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "0.5rem" }}
+                contentStyle={{
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "0.5rem",
+                }}
                 labelStyle={{ color: "#0f172a" }}
               />
               <Bar dataKey="value" name="Quantidade">
@@ -217,17 +276,32 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
 
         {/* Top 10 Mercados */}
         <Card className="p-6 bg-white border-slate-200 shadow-sm lg:col-span-2">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">Top 10 Mercados por Volume de Clientes</h3>
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">
+            Top 10 Mercados por Volume de Clientes
+          </h3>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={top10} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis type="number" stroke="#64748b" />
-              <YAxis dataKey="nome" type="category" stroke="#64748b" width={300} />
+              <YAxis
+                dataKey="nome"
+                type="category"
+                stroke="#64748b"
+                width={300}
+              />
               <Tooltip
-                contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "0.5rem" }}
+                contentStyle={{
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "0.5rem",
+                }}
                 labelStyle={{ color: "#0f172a" }}
               />
-              <Bar dataKey="quantidadeClientes" fill="#8b5cf6" name="Clientes" />
+              <Bar
+                dataKey="quantidadeClientes"
+                fill="#8b5cf6"
+                name="Clientes"
+              />
             </BarChart>
           </ResponsiveContainer>
         </Card>

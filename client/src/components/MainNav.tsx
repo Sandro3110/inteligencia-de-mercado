@@ -3,9 +3,16 @@ import { CompactModeToggle } from "./CompactModeToggle";
 import { useOnboarding } from "@/contexts/OnboardingContext";
 import { HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { 
-  Home, BarChart3, Database, TrendingUp, 
-  Settings, Clock, FileText, Bell, Activity 
+import {
+  Home,
+  BarChart3,
+  Database,
+  TrendingUp,
+  Settings,
+  Clock,
+  FileText,
+  Bell,
+  Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,79 +28,79 @@ const navItems: NavItem[] = [
     title: "Início",
     href: "/",
     icon: Home,
-    description: "Visão geral e seleção de mercados"
+    description: "Visão geral e seleção de mercados",
   },
   {
     title: "Mercados",
     href: "/mercados",
     icon: Database,
-    description: "Explorar mercados identificados"
+    description: "Explorar mercados identificados",
   },
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: BarChart3,
-    description: "Estatísticas e métricas gerais"
+    description: "Estatísticas e métricas gerais",
   },
   {
     title: "Analytics",
     href: "/analytics",
     icon: TrendingUp,
-    description: "Análises avançadas e insights"
+    description: "Análises avançadas e insights",
   },
   {
     title: "Enriquecimento",
     href: "/enrichment",
     icon: Settings,
-    description: "Configurar e executar enriquecimento"
+    description: "Configurar e executar enriquecimento",
   },
   {
     title: "Configurações",
     href: "/enrichment-settings",
     icon: Settings,
-    description: "API keys e critérios de enriquecimento"
+    description: "API keys e critérios de enriquecimento",
   },
   {
     title: "Monitoramento",
     href: "/enrichment-progress",
     icon: Clock,
-    description: "Acompanhar progresso em tempo real"
+    description: "Acompanhar progresso em tempo real",
   },
   {
     title: "Alertas",
     href: "/alertas",
     icon: Bell,
-    description: "Configurar alertas personalizados"
+    description: "Configurar alertas personalizados",
   },
   {
     title: "Relatórios",
     href: "/relatorios",
     icon: FileText,
-    description: "Gerar relatórios executivos em PDF"
+    description: "Gerar relatórios executivos em PDF",
   },
   {
     title: "ROI",
     href: "/roi",
     icon: TrendingUp,
-    description: "Dashboard de ROI e conversões"
+    description: "Dashboard de ROI e conversões",
   },
   {
     title: "Funil",
     href: "/funil",
     icon: BarChart3,
-    description: "Visualizar funil de vendas"
+    description: "Visualizar funil de vendas",
   },
   {
     title: "Agendamento",
     href: "/agendamento",
     icon: Clock,
-    description: "Agendar enriquecimentos recorrentes"
+    description: "Agendar enriquecimentos recorrentes",
   },
   {
     title: "Atividade",
     href: "/atividade",
     icon: Activity,
-    description: "Timeline de atividades do sistema"
+    description: "Timeline de atividades do sistema",
   },
 ];
 
@@ -108,21 +115,22 @@ export default function MainNav() {
           <FileText className="h-6 w-6 text-primary" />
           <span className="text-xl font-bold">Inteligência de Mercado</span>
         </div>
-        
+
         <div className="flex flex-1 items-center space-x-1">
-          {navItems.map((item) => {
+          {navItems.map(item => {
             const Icon = item.icon;
-            const isActive = location === item.href || 
+            const isActive =
+              location === item.href ||
               (item.href !== "/" && location.startsWith(item.href));
-            
+
             return (
               <Link key={item.href} href={item.href}>
                 <span
                   className={cn(
                     "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer",
                     "hover:bg-accent hover:text-accent-foreground",
-                    isActive 
-                      ? "bg-accent text-accent-foreground" 
+                    isActive
+                      ? "bg-accent text-accent-foreground"
                       : "text-muted-foreground"
                   )}
                   title={item.description}

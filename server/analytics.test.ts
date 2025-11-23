@@ -11,7 +11,7 @@ describe("Dashboard Analytics", () => {
   it("should get distribuicao geografica", async () => {
     const result = await getDistribuicaoGeografica();
     expect(Array.isArray(result)).toBe(true);
-    
+
     if (result.length > 0) {
       const first = result[0];
       expect(first).toHaveProperty("uf");
@@ -24,7 +24,7 @@ describe("Dashboard Analytics", () => {
   it("should get distribuicao segmentacao", async () => {
     const result = await getDistribuicaoSegmentacao();
     expect(Array.isArray(result)).toBe(true);
-    
+
     if (result.length > 0) {
       const first = result[0];
       expect(first).toHaveProperty("segmentacao");
@@ -37,7 +37,7 @@ describe("Dashboard Analytics", () => {
   it("should get timeline validacoes with default 30 days", async () => {
     const result = await getTimelineValidacoes();
     expect(Array.isArray(result)).toBe(true);
-    
+
     if (result.length > 0) {
       const first = result[0];
       expect(first).toHaveProperty("date");
@@ -67,17 +67,19 @@ describe("Dashboard Analytics", () => {
     const result = await getTop10Mercados();
     expect(Array.isArray(result)).toBe(true);
     expect(result.length).toBeLessThanOrEqual(10);
-    
+
     if (result.length > 0) {
       const first = result[0];
       expect(first).toHaveProperty("nome");
       expect(first).toHaveProperty("quantidadeClientes");
       expect(typeof first.nome).toBe("string");
       expect(typeof first.quantidadeClientes).toBe("number");
-      
+
       // Verificar ordenação decrescente
       if (result.length > 1) {
-        expect(result[0].quantidadeClientes).toBeGreaterThanOrEqual(result[1].quantidadeClientes);
+        expect(result[0].quantidadeClientes).toBeGreaterThanOrEqual(
+          result[1].quantidadeClientes
+        );
       }
     }
   });

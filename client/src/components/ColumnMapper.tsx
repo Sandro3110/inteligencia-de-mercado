@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -45,11 +51,11 @@ export function ColumnMapper({
   useEffect(() => {
     const autoMapping: Record<string, string> = {};
 
-    targetFields.forEach((field) => {
+    targetFields.forEach(field => {
       const normalizedFieldName = field.label.toLowerCase().trim();
 
       // Procurar coluna com nome similar
-      const matchingColumn = sourceColumns.find((col) => {
+      const matchingColumn = sourceColumns.find(col => {
         const normalizedColName = col.toLowerCase().trim();
         return (
           normalizedColName === normalizedFieldName ||
@@ -66,8 +72,11 @@ export function ColumnMapper({
     setMapping(autoMapping);
   }, [sourceColumns, targetFields]);
 
-  const handleMappingChange = (targetFieldKey: string, sourceColumn: string) => {
-    setMapping((prev) => ({
+  const handleMappingChange = (
+    targetFieldKey: string,
+    sourceColumn: string
+  ) => {
+    setMapping(prev => ({
       ...prev,
       [targetFieldKey]: sourceColumn,
     }));
@@ -77,23 +86,21 @@ export function ColumnMapper({
     const newErrors: string[] = [];
 
     // Verificar campos obrigatórios
-    targetFields.forEach((field) => {
+    targetFields.forEach(field => {
       if (field.required && !mapping[field.key]) {
         newErrors.push(`Campo obrigatório não mapeado: ${field.label}`);
       }
     });
 
     // Verificar duplicatas
-    const usedColumns = Object.values(mapping).filter((col) => col);
+    const usedColumns = Object.values(mapping).filter(col => col);
     const duplicates = usedColumns.filter(
       (col, index) => usedColumns.indexOf(col) !== index
     );
 
     if (duplicates.length > 0) {
       const uniqueDuplicates = Array.from(new Set(duplicates));
-      newErrors.push(
-        `Colunas duplicadas: ${uniqueDuplicates.join(", ")}`
-      );
+      newErrors.push(`Colunas duplicadas: ${uniqueDuplicates.join(", ")}`);
     }
 
     setErrors(newErrors);
@@ -107,11 +114,11 @@ export function ColumnMapper({
   };
 
   const getMappingStatus = () => {
-    const requiredFields = targetFields.filter((f) => f.required);
-    const mappedRequired = requiredFields.filter((f) => mapping[f.key]);
+    const requiredFields = targetFields.filter(f => f.required);
+    const mappedRequired = requiredFields.filter(f => mapping[f.key]);
     return {
       total: targetFields.length,
-      mapped: Object.keys(mapping).filter((k) => mapping[k]).length,
+      mapped: Object.keys(mapping).filter(k => mapping[k]).length,
       requiredMapped: mappedRequired.length,
       requiredTotal: requiredFields.length,
     };
@@ -142,7 +149,7 @@ export function ColumnMapper({
 
       {/* Mapping Grid */}
       <div className="grid gap-4">
-        {targetFields.map((field) => (
+        {targetFields.map(field => (
           <Card key={field.key}>
             <CardContent className="pt-6">
               <div className="grid gap-4 md:grid-cols-[1fr,auto,1fr]">
@@ -172,14 +179,16 @@ export function ColumnMapper({
                 <div className="space-y-2">
                   <Select
                     value={mapping[field.key] || ""}
-                    onValueChange={(value) => handleMappingChange(field.key, value)}
+                    onValueChange={value =>
+                      handleMappingChange(field.key, value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione uma coluna" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">Não mapear</SelectItem>
-                      {sourceColumns.map((col) => (
+                      {sourceColumns.map(col => (
                         <SelectItem key={col} value={col}>
                           {col}
                         </SelectItem>
@@ -192,7 +201,9 @@ export function ColumnMapper({
                     <div className="text-xs text-muted-foreground space-y-1">
                       <p className="font-medium">Exemplos:</p>
                       {previewData.slice(0, 3).map((row, idx) => {
-                        const colIndex = sourceColumns.indexOf(mapping[field.key]);
+                        const colIndex = sourceColumns.indexOf(
+                          mapping[field.key]
+                        );
                         return (
                           <p key={idx} className="truncate">
                             • {row[colIndex] || "(vazio)"}
@@ -234,11 +245,7 @@ export function ColumnMapper({
 
       {/* Confirm Button */}
       <div className="flex justify-end">
-        <Button
-          onClick={handleConfirm}
-          disabled={!isComplete}
-          size="lg"
-        >
+        <Button onClick={handleConfirm} disabled={!isComplete} size="lg">
           <CheckCircle2 className="mr-2 h-4 w-4" />
           Confirmar Mapeamento
         </Button>

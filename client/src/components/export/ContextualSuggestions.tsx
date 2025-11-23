@@ -3,9 +3,9 @@
  * Item 11 do módulo de exportação inteligente
  */
 
-import { Lightbulb, TrendingUp, Users, Target, Award } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Card } from '../ui/card';
+import { Lightbulb, TrendingUp, Users, Target, Award } from "lucide-react";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
 
 interface ContextualSuggestionsProps {
   projectId?: number;
@@ -18,59 +18,67 @@ interface Suggestion {
   context: string;
   icon: any;
   color: string;
-  priority: 'high' | 'medium' | 'low';
+  priority: "high" | "medium" | "low";
 }
 
-export function ContextualSuggestions({ projectId, onSelectSuggestion }: ContextualSuggestionsProps) {
+export function ContextualSuggestions({
+  projectId,
+  onSelectSuggestion,
+}: ContextualSuggestionsProps) {
   // Sugestões baseadas em análise de dados
   const suggestions: Suggestion[] = [
     {
-      title: 'Top 10 Mercados por Volume',
-      description: 'Mercados com maior número de clientes e leads',
-      context: 'Exportar os 10 mercados com mais clientes, incluindo estatísticas de leads e concorrentes',
+      title: "Top 10 Mercados por Volume",
+      description: "Mercados com maior número de clientes e leads",
+      context:
+        "Exportar os 10 mercados com mais clientes, incluindo estatísticas de leads e concorrentes",
       icon: TrendingUp,
-      color: 'text-green-600',
-      priority: 'high'
+      color: "text-green-600",
+      priority: "high",
     },
     {
-      title: 'Clientes Validados Recentes',
-      description: 'Clientes aprovados nos últimos 30 dias',
-      context: 'Clientes com status validado criados nos últimos 30 dias, com produtos e mercados',
+      title: "Clientes Validados Recentes",
+      description: "Clientes aprovados nos últimos 30 dias",
+      context:
+        "Clientes com status validado criados nos últimos 30 dias, com produtos e mercados",
       icon: Users,
-      color: 'text-blue-600',
-      priority: 'high'
+      color: "text-blue-600",
+      priority: "high",
     },
     {
-      title: 'Leads de Alta Qualidade',
-      description: 'Leads com score acima de 80',
-      context: 'Leads com qualityScore maior que 80, incluindo dados de contato e mercado',
+      title: "Leads de Alta Qualidade",
+      description: "Leads com score acima de 80",
+      context:
+        "Leads com qualityScore maior que 80, incluindo dados de contato e mercado",
       icon: Award,
-      color: 'text-orange-600',
-      priority: 'high'
+      color: "text-orange-600",
+      priority: "high",
     },
     {
-      title: 'Mercados B2B em Crescimento',
-      description: 'Mercados B2B com tendência de crescimento',
-      context: 'Mercados com segmentação B2B e crescimento positivo, com análise competitiva',
+      title: "Mercados B2B em Crescimento",
+      description: "Mercados B2B com tendência de crescimento",
+      context:
+        "Mercados com segmentação B2B e crescimento positivo, com análise competitiva",
       icon: Target,
-      color: 'text-purple-600',
-      priority: 'medium'
+      color: "text-purple-600",
+      priority: "medium",
     },
     {
-      title: 'Concorrentes por Região',
-      description: 'Análise de concorrentes agrupados por UF',
-      context: 'Concorrentes agrupados por estado, com contagem e principais produtos',
+      title: "Concorrentes por Região",
+      description: "Análise de concorrentes agrupados por UF",
+      context:
+        "Concorrentes agrupados por estado, com contagem e principais produtos",
       icon: Users,
-      color: 'text-red-600',
-      priority: 'medium'
-    }
+      color: "text-red-600",
+      priority: "medium",
+    },
   ];
 
   const getPriorityBadge = (priority: string) => {
     const colors = {
-      high: 'bg-green-100 text-green-800 border-green-200',
-      medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      low: 'bg-slate-100 text-slate-800 border-slate-200'
+      high: "bg-green-100 text-green-800 border-green-200",
+      medium: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      low: "bg-slate-100 text-slate-800 border-slate-200",
     };
     return colors[priority as keyof typeof colors];
   };
@@ -104,8 +112,14 @@ export function ContextualSuggestions({ projectId, onSelectSuggestion }: Context
                     <h4 className="text-sm font-semibold text-slate-900">
                       {suggestion.title}
                     </h4>
-                    <span className={`text-xs px-2 py-0.5 rounded-full border ${getPriorityBadge(suggestion.priority)}`}>
-                      {suggestion.priority === 'high' ? 'Alta' : suggestion.priority === 'medium' ? 'Média' : 'Baixa'}
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full border ${getPriorityBadge(suggestion.priority)}`}
+                    >
+                      {suggestion.priority === "high"
+                        ? "Alta"
+                        : suggestion.priority === "medium"
+                          ? "Média"
+                          : "Baixa"}
                     </span>
                   </div>
                   <p className="text-xs text-slate-600 mb-2">
@@ -115,7 +129,7 @@ export function ContextualSuggestions({ projectId, onSelectSuggestion }: Context
                     variant="ghost"
                     size="sm"
                     className="text-xs h-7 px-2"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       onSelectSuggestion(suggestion.context);
                     }}
@@ -131,7 +145,8 @@ export function ContextualSuggestions({ projectId, onSelectSuggestion }: Context
 
       {/* Nota informativa */}
       <p className="text-xs text-slate-500 italic">
-        💡 As sugestões são atualizadas dinamicamente baseadas nos dados do seu projeto
+        💡 As sugestões são atualizadas dinamicamente baseadas nos dados do seu
+        projeto
       </p>
     </div>
   );

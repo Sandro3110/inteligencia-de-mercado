@@ -1,6 +1,6 @@
 /**
  * Controle de Execução do Enriquecimento
- * 
+ *
  * Gerencia estado de pausa/retomada do processamento
  */
 
@@ -27,35 +27,45 @@ export function shouldPause(): boolean {
 /**
  * Pausa o enriquecimento
  */
-export async function pauseEnrichment(projectId: number, runId: number): Promise<void> {
+export async function pauseEnrichment(
+  projectId: number,
+  runId: number
+): Promise<void> {
   state.isPaused = true;
   state.projectId = projectId;
   state.runId = runId;
-  
+
   // Atualizar status no banco
-  const { updateEnrichmentRun } = await import('./db');
+  const { updateEnrichmentRun } = await import("./db");
   await updateEnrichmentRun(runId, {
-    status: 'paused',
+    status: "paused",
   });
-  
-  console.log(`[Control] Enriquecimento pausado - Projeto ${projectId}, Run ${runId}`);
+
+  console.log(
+    `[Control] Enriquecimento pausado - Projeto ${projectId}, Run ${runId}`
+  );
 }
 
 /**
  * Retoma o enriquecimento
  */
-export async function resumeEnrichment(projectId: number, runId: number): Promise<void> {
+export async function resumeEnrichment(
+  projectId: number,
+  runId: number
+): Promise<void> {
   state.isPaused = false;
   state.projectId = projectId;
   state.runId = runId;
-  
+
   // Atualizar status no banco
-  const { updateEnrichmentRun } = await import('./db');
+  const { updateEnrichmentRun } = await import("./db");
   await updateEnrichmentRun(runId, {
-    status: 'running',
+    status: "running",
   });
-  
-  console.log(`[Control] Enriquecimento retomado - Projeto ${projectId}, Run ${runId}`);
+
+  console.log(
+    `[Control] Enriquecimento retomado - Projeto ${projectId}, Run ${runId}`
+  );
 }
 
 /**

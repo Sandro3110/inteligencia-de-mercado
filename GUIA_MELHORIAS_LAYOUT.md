@@ -52,6 +52,7 @@ Os cards permaneciam com cores escuras mesmo no tema light, causando baixo contr
 Criamos **estilos específicos por tema** no `index.css`:
 
 #### Tema Dark (MciGlobal)
+
 ```css
 .dark .glass-card {
   background: radial-gradient(...), linear-gradient(...);
@@ -60,19 +61,24 @@ Criamos **estilos específicos por tema** no `index.css`:
 ```
 
 #### Tema Light (Novo)
+
 ```css
 .glass-card {
-  background: linear-gradient(to bottom right, 
-    rgba(255, 255, 255, 0.98), 
-    rgba(249, 250, 251, 0.96));
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.98),
+    rgba(249, 250, 251, 0.96)
+  );
   border: 1px solid rgba(226, 232, 240, 0.8);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .glass-card:hover {
-  background: linear-gradient(to bottom right, 
-    rgba(239, 246, 255, 0.98), 
-    rgba(224, 242, 254, 0.96));
+  background: linear-gradient(
+    to bottom right,
+    rgba(239, 246, 255, 0.98),
+    rgba(224, 242, 254, 0.96)
+  );
   border-color: rgba(147, 197, 253, 0.8);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
@@ -92,6 +98,7 @@ Criamos **estilos específicos por tema** no `index.css`:
 ### Estrutura Anterior
 
 Layout **vertical** em cascata:
+
 - Mercado expandido
   - Clientes (lista vertical)
   - Concorrentes (lista vertical)
@@ -214,31 +221,31 @@ Cada mercado selecionado mostra 3 mini-KPIs com **barras de progresso**:
 
 ### Tema Dark (MciGlobal)
 
-| Elemento | Cor | Código |
-|:---------|:----|:-------|
-| Background | Slate-950 | `#020617` |
-| Foreground | Gray-200 | `#e5e7eb` |
-| Primary | Sky-400 | `#38bdf8` |
-| Card | Slate-900 | `#0f172a` |
-| Border | Gray-800 | `#1f2937` |
-| Success | Green-500 | `#22c55e` |
-| Warning | Yellow-500 | `#eab308` |
-| Error | Red-500 | `#ef4444` |
-| Info | Blue-500 | `#3b82f6` |
+| Elemento   | Cor        | Código    |
+| :--------- | :--------- | :-------- |
+| Background | Slate-950  | `#020617` |
+| Foreground | Gray-200   | `#e5e7eb` |
+| Primary    | Sky-400    | `#38bdf8` |
+| Card       | Slate-900  | `#0f172a` |
+| Border     | Gray-800   | `#1f2937` |
+| Success    | Green-500  | `#22c55e` |
+| Warning    | Yellow-500 | `#eab308` |
+| Error      | Red-500    | `#ef4444` |
+| Info       | Blue-500   | `#3b82f6` |
 
 ### Tema Light (Novo)
 
-| Elemento | Cor | Código |
-|:---------|:----|:-------|
-| Background | White | `#ffffff` |
-| Foreground | Gray-900 | `#111827` |
-| Primary | Blue-600 | `#2563eb` |
-| Card | White | `#ffffff` |
-| Border | Gray-200 | `#e5e7eb` |
-| Success | Green-600 | `#16a34a` |
-| Warning | Yellow-600 | `#ca8a04` |
-| Error | Red-600 | `#dc2626` |
-| Info | Blue-600 | `#2563eb` |
+| Elemento   | Cor        | Código    |
+| :--------- | :--------- | :-------- |
+| Background | White      | `#ffffff` |
+| Foreground | Gray-900   | `#111827` |
+| Primary    | Blue-600   | `#2563eb` |
+| Card       | White      | `#ffffff` |
+| Border     | Gray-200   | `#e5e7eb` |
+| Success    | Green-600  | `#16a34a` |
+| Warning    | Yellow-600 | `#ca8a04` |
+| Error      | Red-600    | `#dc2626` |
+| Info       | Blue-600   | `#2563eb` |
 
 ---
 
@@ -312,4 +319,3 @@ Cada mercado selecionado mostra 3 mini-KPIs com **barras de progresso**:
 **Última atualização**: 18 de novembro de 2025  
 **Versão**: 2.0.0  
 **Autor**: Manus AI
-

@@ -9,5 +9,5 @@ export {
   Step4ChooseMethod,
   Step5InsertData,
   Step6ValidateData,
-  Step7Summary
-} from './AllSteps';
+  Step7Summary,
+} from "./AllSteps";

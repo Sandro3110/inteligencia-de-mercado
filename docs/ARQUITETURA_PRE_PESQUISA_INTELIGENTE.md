@@ -250,6 +250,7 @@ Este é o fluxo básico já testado com sucesso. Serve como baseline para os dem
 Usuário fornece **nome da empresa OU site**.
 
 **Exemplos:**
+
 - `"Cooperativa de Insumos de Holambra"`
 - `"https://www.cih.com.br"`
 
@@ -282,11 +283,13 @@ Completude < 50% (menos de 5 campos preenchidos de 10).
 O sistema executa até **3 tentativas progressivas**, cada uma com prompt mais específico:
 
 **Tentativa 1 (Baseline):**
+
 ```
 Prompt genérico solicitando todos os 10 campos.
 ```
 
 **SE completude < 50% → Tentativa 2 (Refinada):**
+
 ```
 Prompt focado nos campos faltantes:
 "Na primeira tentativa, encontramos apenas [campos preenchidos].
@@ -299,6 +302,7 @@ Pesquise em fontes oficiais como Receita Federal, site da empresa, etc."
 ```
 
 **SE completude < 50% → Tentativa 3 (Ultra-Refinada):**
+
 ```
 Prompt com estratégias alternativas:
 "Ainda faltam [campos faltantes].
@@ -310,6 +314,7 @@ Tente estratégias alternativas:
 ```
 
 **SE completude < 50% após 3 tentativas:**
+
 ```
 Sistema aceita resultado parcial e exibe aviso ao usuário:
 "⚠️ Não foi possível encontrar todos os dados.
@@ -322,89 +327,100 @@ Você pode editar manualmente os campos faltantes."
 **Input:** `"Empresa XYZ Ltda"` (empresa pequena, poucos dados públicos)
 
 **Tentativa 1:**
+
 ```json
 {
   "nome": "Empresa XYZ Ltda",
   "produto": "Serviços de consultoria",
   "cidade": "São Paulo",
-  "uf": "SP",
+  "uf": "SP"
   // Demais campos: null
 }
 ```
+
 **Completude:** 4/10 (40%) → **Retry ativado**
 
 **Tentativa 2 (Prompt refinado focando em CNPJ, site, contato):**
+
 ```json
 {
   "nome": "Empresa XYZ Ltda",
-  "cnpj": "12.345.678/0001-90",  // ✅ Encontrado
-  "site": "https://www.empresaxyz.com.br",  // ✅ Encontrado
+  "cnpj": "12.345.678/0001-90", // ✅ Encontrado
+  "site": "https://www.empresaxyz.com.br", // ✅ Encontrado
   "produto": "Serviços de consultoria",
   "cidade": "São Paulo",
   "uf": "SP",
-  "telefone": "(11) 1234-5678",  // ✅ Encontrado
+  "telefone": "(11) 1234-5678" // ✅ Encontrado
   // Demais campos: null
 }
 ```
+
 **Completude:** 7/10 (70%) → **Sucesso! Prosseguir**
 
 ### Implementação Técnica
 
 ```typescript
-async function prePesquisaComRetry(query: string, maxTentativas: number = 3): Promise<EmpresaInfo> {
+async function prePesquisaComRetry(
+  query: string,
+  maxTentativas: number = 3
+): Promise<EmpresaInfo> {
   let resultado: EmpresaInfo | null = null;
   let tentativa = 0;
-  
+
   while (tentativa < maxTentativas) {
     tentativa++;
-    
+
     // Construir prompt baseado na tentativa
     const prompt = construirPrompt(query, tentativa, resultado);
-    
+
     // Executar pesquisa
     resultado = await executarPesquisa(prompt);
-    
+
     // Calcular completude
     const completude = calcularCompletude(resultado);
-    
+
     console.log(`Tentativa ${tentativa}: ${completude}% de completude`);
-    
+
     // Se completude >= 50%, sucesso
     if (completude >= 50) {
       return resultado;
     }
-    
+
     // Se última tentativa, retornar resultado parcial
     if (tentativa === maxTentativas) {
       console.warn(`Completude final: ${completude}% (abaixo do ideal)`);
       return resultado;
     }
-    
+
     // Aguardar 2 segundos antes do próximo retry
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
-  
+
   return resultado!;
 }
 
-function construirPrompt(query: string, tentativa: number, resultadoAnterior: EmpresaInfo | null): string {
+function construirPrompt(
+  query: string,
+  tentativa: number,
+  resultadoAnterior: EmpresaInfo | null
+): string {
   if (tentativa === 1) {
     // Prompt baseline
     return promptBaseline(query);
   }
-  
+
   if (tentativa === 2) {
     // Prompt refinado focando em campos faltantes
     const camposFaltantes = identificarCamposFaltantes(resultadoAnterior);
     return promptRefinado(query, camposFaltantes);
   }
-  
+
   if (tentativa === 3) {
     // Prompt ultra-refinado com estratégias alternativas
     const camposFaltantes = identificarCamposFaltantes(resultadoAnterior);
     return promptUltraRefinado(query, camposFaltantes);
   }
-  
+
   return promptBaseline(query);
 }
 ```
@@ -424,20 +440,23 @@ Texto livre em linguagem natural descrevendo uma ou mais empresas.
 **Exemplos:**
 
 **Exemplo 1 (Múltiplas entidades explícitas):**
+
 ```
-"Pesquisei cooperativas agrícolas de café em Minas Gerais e 
+"Pesquisei cooperativas agrícolas de café em Minas Gerais e
 distribuidoras de insumos em São Paulo"
 ```
 
 **Exemplo 2 (Lista informal):**
+
 ```
-"Quero pesquisar a Cooperativa de Holambra, a Carga Pesada 
+"Quero pesquisar a Cooperativa de Holambra, a Carga Pesada
 Distribuidora e a Braskem"
 ```
 
 **Exemplo 3 (Descrição contextual):**
+
 ```
-"Empresas do setor de embalagens plásticas para alimentos na 
+"Empresas do setor de embalagens plásticas para alimentos na
 região Sul, especialmente no Paraná e Santa Catarina"
 ```
 
@@ -446,13 +465,14 @@ região Sul, especialmente no Paraná e Santa Catarina"
 A IA analisa o texto e identifica **entidades distintas** (empresas ou grupos de empresas).
 
 **Prompt de Separação:**
+
 ```
-Você é um assistente de análise de texto especializado em identificar 
+Você é um assistente de análise de texto especializado em identificar
 empresas e contextos de pesquisa.
 
 INPUT: "[texto do usuário]"
 
-Sua tarefa é identificar e separar todas as entidades (empresas ou 
+Sua tarefa é identificar e separar todas as entidades (empresas ou
 grupos de empresas) mencionadas no texto.
 
 Para cada entidade identificada, retorne:
@@ -470,6 +490,7 @@ Retorne um array JSON com todas as entidades identificadas.
 ```
 
 **Output esperado para Exemplo 1:**
+
 ```json
 [
   {
@@ -486,6 +507,7 @@ Retorne um array JSON com todas as entidades identificadas.
 ```
 
 **Output esperado para Exemplo 2:**
+
 ```json
 [
   {
@@ -511,10 +533,12 @@ Retorne um array JSON com todas as entidades identificadas.
 Para cada entidade identificada:
 
 **SE tipo === "especifica":**
+
 - Executar pré-pesquisa direta (Fluxo 1)
 - Aplicar retry se necessário (Fluxo 2)
 
 **SE tipo === "contexto":**
+
 - Executar refinamento de contexto (Fluxo 4)
 - Após refinamento, executar pré-pesquisa
 
@@ -585,6 +609,7 @@ Transformar inputs genéricos em pesquisas específicas através de um diálogo 
 Usuário fornece **contexto genérico** sem especificar empresa concreta.
 
 **Exemplos de inputs genéricos:**
+
 - `"cooperativas agrícolas"`
 - `"distribuidoras de insumos"`
 - `"empresas de embalagens plásticas"`
@@ -606,6 +631,7 @@ PRÉ-PESQUISA REFINADA
 ### Exemplo Prático: "Cooperativas Agrícolas"
 
 **Input do Usuário:**
+
 ```
 "cooperativas agrícolas"
 ```
@@ -617,6 +643,7 @@ PRÉ-PESQUISA REFINADA
 **NÍVEL 1: Especificação de Setor**
 
 **IA gera pergunta contextual:**
+
 ```
 🤖 Para refinar a pesquisa, preciso de mais detalhes.
 
@@ -636,6 +663,7 @@ Você pode selecionar uma opção ou digitar livremente.
 ```
 
 **Usuário responde:**
+
 ```
 "Café"
 ```
@@ -647,6 +675,7 @@ Você pode selecionar uma opção ou digitar livremente.
 **NÍVEL 2: Especificação Geográfica (Estado)**
 
 **IA gera pergunta contextual:**
+
 ```
 🤖 Cooperativas agrícolas de café em qual estado?
 
@@ -663,6 +692,7 @@ Você pode selecionar uma opção ou digitar livremente.
 ```
 
 **Usuário responde:**
+
 ```
 "Minas Gerais"
 ```
@@ -674,6 +704,7 @@ Você pode selecionar uma opção ou digitar livremente.
 **NÍVEL 3: Especificação Geográfica (Cidade/Região)**
 
 **IA gera pergunta contextual:**
+
 ```
 🤖 Cooperativas agrícolas de café em Minas Gerais.
 
@@ -691,6 +722,7 @@ Você pode selecionar uma opção ou digitar livremente.
 ```
 
 **Usuário responde:**
+
 ```
 "Sul de Minas"
 ```
@@ -700,6 +732,7 @@ Você pode selecionar uma opção ou digitar livremente.
 ---
 
 **CONTEXTO REFINADO FINAL:**
+
 ```
 Cooperativas agrícolas de café em Minas Gerais, região Sul de Minas
 ```
@@ -707,12 +740,14 @@ Cooperativas agrícolas de café em Minas Gerais, região Sul de Minas
 **Sistema executa pré-pesquisa com contexto refinado:**
 
 A IA agora busca especificamente cooperativas que atendam todos os critérios:
+
 - Tipo: Cooperativa agrícola
 - Setor: Café
 - Estado: Minas Gerais
 - Região: Sul de Minas
 
 **Resultados esperados (exemplos):**
+
 1. Coopercitrus - Sul de Minas
 2. Cooxupé - Cooperativa Regional de Cafeicultores em Guaxupé
 3. Minasul - Cooperativa dos Cafeicultores da Zona de Varginha
@@ -722,6 +757,7 @@ A IA agora busca especificamente cooperativas que atendam todos os critérios:
 As perguntas de cada nível são **geradas dinamicamente pela IA** baseadas no contexto acumulado.
 
 **Prompt de Geração de Pergunta (Nível 1):**
+
 ```
 Você é um assistente de refinamento de pesquisa de mercado.
 
@@ -743,6 +779,7 @@ Retorne JSON:
 ```
 
 **Prompt de Geração de Pergunta (Nível 2):**
+
 ```
 Você é um assistente de refinamento de pesquisa de mercado.
 
@@ -766,6 +803,7 @@ Retorne JSON:
 ```
 
 **Prompt de Geração de Pergunta (Nível 3):**
+
 ```
 Você é um assistente de refinamento de pesquisa de mercado.
 
@@ -894,15 +932,18 @@ Ao editar campo, validação ocorre instantaneamente:
 **5. Ações Disponíveis**
 
 **✓ Confirmar e Adicionar:**
+
 - Valida todos os campos
 - Se válido: Adiciona à lista de clientes aprovados
 - Se inválido: Exibe erros e impede confirmação
 
 **✗ Descartar:**
+
 - Remove resultado da lista
 - Não grava no banco
 
 **🔄 Pesquisar Novamente:**
+
 - Executa nova pré-pesquisa com mesmo input
 - Útil se primeira pesquisa retornou dados incorretos
 
@@ -962,6 +1003,7 @@ Ao clicar em "Gravar Todos no Banco":
 **Problema:** IA pode retornar dados malformados ou maliciosos.
 
 **Mitigação:**
+
 - Schema validation com Zod em todos os outputs
 - Sanitização de strings (remover scripts, SQL injection)
 - Validação de URLs (whitelist de protocolos: http/https)
@@ -972,6 +1014,7 @@ Ao clicar em "Gravar Todos no Banco":
 **Problema:** Usuário pode abusar do sistema fazendo milhares de requests.
 
 **Mitigação:**
+
 - Rate limiting: Máximo 10 pré-pesquisas por minuto por usuário
 - Máximo 100 pré-pesquisas por dia por usuário
 - Cooldown de 2 segundos entre requests
@@ -981,6 +1024,7 @@ Ao clicar em "Gravar Todos no Banco":
 **Problema:** Múltiplos retries e refinamentos aumentam custo.
 
 **Mitigação:**
+
 - Limite de 3 retries por pesquisa
 - Cache de resultados (TTL 24h)
 - Usar modelo mais barato (gpt-4o-mini) para perguntas de refinamento
@@ -991,6 +1035,7 @@ Ao clicar em "Gravar Todos no Banco":
 **Problema:** Dados sensíveis podem ser enviados para OpenAI.
 
 **Mitigação:**
+
 - Não enviar dados já existentes no banco para IA
 - Apenas enviar queries de pesquisa (nomes de empresas públicas)
 - Logs de API não devem conter dados sensíveis
@@ -1000,6 +1045,7 @@ Ao clicar em "Gravar Todos no Banco":
 **Problema:** Dados incorretos da IA podem ser gravados automaticamente.
 
 **Mitigação:**
+
 - **Interface de revisão obrigatória** (já implementada)
 - Nenhum dado gravado sem confirmação explícita
 - Validação final antes de gravar no banco
@@ -1008,12 +1054,12 @@ Ao clicar em "Gravar Todos no Banco":
 
 ## 📊 Resumo de Viabilidade
 
-| Melhoria | Viabilidade | Segurança | Complexidade | Recomendação |
-|----------|-------------|-----------|--------------|--------------|
-| **Retry Inteligente** | ✅ Alta | ✅ Segura | 🟡 Média | ✅ Implementar |
-| **Multi-Cliente** | ✅ Alta | ⚠️ Validação Obrigatória | 🟡 Média | ✅ Implementar com revisão |
-| **Aprovação Obrigatória** | ✅ Alta | ✅ Essencial | 🟢 Baixa | ✅ Obrigatória |
-| **Refinamento 3 Níveis** | ✅ Alta | ✅ Segura | 🔴 Alta | ✅ Implementar com UX cuidadosa |
+| Melhoria                  | Viabilidade | Segurança                | Complexidade | Recomendação                    |
+| ------------------------- | ----------- | ------------------------ | ------------ | ------------------------------- |
+| **Retry Inteligente**     | ✅ Alta     | ✅ Segura                | 🟡 Média     | ✅ Implementar                  |
+| **Multi-Cliente**         | ✅ Alta     | ⚠️ Validação Obrigatória | 🟡 Média     | ✅ Implementar com revisão      |
+| **Aprovação Obrigatória** | ✅ Alta     | ✅ Essencial             | 🟢 Baixa     | ✅ Obrigatória                  |
+| **Refinamento 3 Níveis**  | ✅ Alta     | ✅ Segura                | 🔴 Alta      | ✅ Implementar com UX cuidadosa |
 
 ---
 

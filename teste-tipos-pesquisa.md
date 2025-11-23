@@ -3,6 +3,7 @@
 ## Data: 22/11/2025
 
 ## Objetivo
+
 Testar a criação de todos os tipos de pesquisa disponíveis no sistema Gestor PAV, validando cada método de entrada de dados.
 
 ---
@@ -12,6 +13,7 @@ Testar a criação de todos os tipos de pesquisa disponíveis no sistema Gestor 
 Conforme análise do código em `client/src/components/research-wizard/AllSteps.tsx` (linhas 571-593), o sistema oferece **3 métodos de entrada de dados**:
 
 ### 1. Entrada Manual
+
 - **ID**: `manual`
 - **Ícone**: Plus
 - **Título**: Entrada Manual
@@ -19,13 +21,15 @@ Conforme análise do código em `client/src/components/research-wizard/AllSteps.
 - **Recomendação**: Ideal para 1-10 registros
 
 ### 2. Upload de Planilha
+
 - **ID**: `spreadsheet`
-- **Ícone**: FileSpreadsheet  
+- **Ícone**: FileSpreadsheet
 - **Título**: Upload de Planilha
 - **Descrição**: Importe dados em massa via CSV ou Excel
 - **Recomendação**: Ideal para 10+ registros
 
 ### 3. Pré-Pesquisa com IA
+
 - **ID**: `pre-research`
 - **Ícone**: Sparkles
 - **Título**: Pré-Pesquisa com IA
@@ -41,17 +45,20 @@ Conforme análise do código em `client/src/components/research-wizard/AllSteps.
 **Status**: PASSOU
 
 **Passos**:
+
 1. Navegado para `/research/new`
 2. Wizard carregou corretamente
 3. Step 1 exibido: "Selecione o Projeto"
 4. 32 projetos disponíveis listados
 
 **Evidências**:
+
 - Screenshot: `/home/ubuntu/screenshots/3000-iqwev51yaceh4xr_2025-11-21_23-45-56_2698.webp`
 - Projeto "Embalagens" selecionado com sucesso
 - Resumo do Passo 1 exibindo projeto selecionado
 
 **Observações**:
+
 - Interface funcionando corretamente
 - Dropdown de projetos abrindo normalmente
 - Botões "Adormecer Projeto" e "Deletar (se vazio)" visíveis
@@ -63,6 +70,7 @@ Conforme análise do código em `client/src/components/research-wizard/AllSteps.
 **Status**: PASSOU
 
 **Passos Realizados**:
+
 1. Step 1 → Step 2: Selecionado projeto "Embalagens"
 2. Step 2 → Step 3: Preenchido nome "Teste de Tipos de Pesquisa - Novembro 2025" e descrição
 3. Step 3 → Step 4: Mantidos parâmetros padrão (5 concorrentes, 10 leads, 3 produtos)
@@ -71,8 +79,9 @@ Conforme análise do código em `client/src/components/research-wizard/AllSteps.
 **Observação**: Cliques via interface não funcionaram, foi necessário usar JavaScript para forçar navegação
 
 **Evidências**:
+
 - Screenshot Step 2: 29% completo
-- Screenshot Step 3: 43% completo  
+- Screenshot Step 3: 43% completo
 - Screenshot Step 4: 57% completo
 
 ### Teste 3: Visualização dos 3 Tipos de Pesquisa ✅
@@ -102,10 +111,10 @@ Conforme análise do código em `client/src/components/research-wizard/AllSteps.
 
 ## Status Geral dos Testes
 
-| Tipo de Pesquisa | Status | Observações |
-|------------------|--------|-------------|
-| Entrada Manual | ✅ TESTADO | Funcionando 100% - Adicionados 2 mercados |
-| Upload de Planilha | ✅ TESTADO | Interface visualizada - Drag-and-drop funcional |
+| Tipo de Pesquisa    | Status     | Observações                                     |
+| ------------------- | ---------- | ----------------------------------------------- |
+| Entrada Manual      | ✅ TESTADO | Funcionando 100% - Adicionados 2 mercados       |
+| Upload de Planilha  | ✅ TESTADO | Interface visualizada - Drag-and-drop funcional |
 | Pré-Pesquisa com IA | ✅ TESTADO | Interface visualizada - Campo de texto + botões |
 
 ---
@@ -125,12 +134,14 @@ Conforme análise do código em `client/src/components/research-wizard/AllSteps.
 ### Teste 4: Método Entrada Manual ✅
 
 **Interface**:
+
 - Campo de texto: "Nome do mercado..."
 - Botão "Adicionar"
 - Lista de mercados adicionados com botão de deletar
 - Contador em tempo real no resumo
 
 **Teste Realizado**:
+
 - Adicionado mercado "Embalagens Plásticas" ✅
 - Adicionado mercado "Embalagens de Papel" ✅
 - Resumo atualizou para 2 mercados ✅
@@ -142,12 +153,14 @@ Conforme análise do código em `client/src/components/research-wizard/AllSteps.
 ### Teste 5: Método Upload de Planilha ✅
 
 **Interface**:
+
 - Área de drag-and-drop: "Arraste um arquivo aqui ou clique para selecionar"
 - Botão "Selecionar Arquivo"
 - Instruções de formato: "A planilha deve conter as colunas: nome (obrigatório), segmentacao"
 - Suporte para CSV e Excel
 
 **Observação Importante**:
+
 - O wizard mantém os dados entre trocas de método
 - Os 2 mercados adicionados manualmente ainda aparecem no resumo
 
@@ -158,6 +171,7 @@ Conforme análise do código em `client/src/components/research-wizard/AllSteps.
 ### Teste 6: Método Pré-Pesquisa com IA ✅
 
 **Interface**:
+
 - Campo de texto grande (textarea) para descrição em linguagem natural
 - Placeholder: "Ex: 'Empresas de tecnologia no setor de saúde' ou 'Mercados B2B de software'"
 - Botão "Buscar Mercados"
@@ -176,7 +190,7 @@ Conforme análise do código em `client/src/components/research-wizard/AllSteps.
 O sistema **Gestor PAV** implementa com sucesso **3 tipos de pesquisa** distintos, cada um otimizado para diferentes cenários de uso:
 
 1. **Entrada Manual** - Para pesquisas pequenas (1-10 registros)
-2. **Upload de Planilha** - Para importação em massa (10+ registros)  
+2. **Upload de Planilha** - Para importação em massa (10+ registros)
 3. **Pré-Pesquisa com IA** - Para pesquisas exploratórias com linguagem natural
 
 ### Pontos Fortes Identificados
@@ -190,6 +204,7 @@ O sistema **Gestor PAV** implementa com sucesso **3 tipos de pesquisa** distinto
 ### Problemas Encontrados
 
 ⚠️ **Navegação via Interface**: Cliques diretos nos botões "Próximo" não funcionaram consistentemente
+
 - **Solução Temporária**: Forçar cliques via JavaScript funcionou
 - **Recomendação**: Investigar event handlers dos botões
 

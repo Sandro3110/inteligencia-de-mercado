@@ -11,7 +11,7 @@ Sistema de enriquecimento sequencial em 5 etapas usando **apenas Gemini LLM**, p
 ## 🔄 Fluxo Sequencial
 
 ```
-CLIENTES (801) 
+CLIENTES (801)
     ↓ Etapa 1: Enriquecimento
 CLIENTES ENRIQUECIDOS (801)
     ↓ Etapa 2: Identificação
@@ -31,9 +31,11 @@ LEADS ÚNICOS (~2.403)
 ## 📊 ETAPA 1: Enriquecimento de Clientes
 
 ### Objetivo
+
 Preencher campos vazios da tabela `clientes` (26 campos) usando dados existentes.
 
 ### Input
+
 ```json
 {
   "id": 1,
@@ -44,6 +46,7 @@ Preencher campos vazios da tabela `clientes` (26 campos) usando dados existentes
 ```
 
 ### Prompt Gemini
+
 ```
 Você é um especialista em inteligência de mercado B2B brasileiro.
 
@@ -78,6 +81,7 @@ REGRAS:
 ```
 
 ### Output Esperado
+
 ```json
 {
   "siteOficial": "https://empresaxyz.com.br",
@@ -97,6 +101,7 @@ REGRAS:
 ```
 
 ### Regras de Atualização
+
 - ✅ Atualizar apenas campos NULL/vazios
 - ✅ Manter dados existentes intactos
 - ✅ Validar formato de email, telefone, URLs
@@ -107,9 +112,11 @@ REGRAS:
 ## 📊 ETAPA 2: Identificação de Mercados
 
 ### Objetivo
+
 Identificar todos os mercados em que o cliente atua e criar registros únicos na tabela `mercados_unicos`.
 
 ### Input
+
 ```json
 {
   "clienteId": 1,
@@ -123,6 +130,7 @@ Identificar todos os mercados em que o cliente atua e criar registros únicos na
 ```
 
 ### Prompt Gemini
+
 ```
 Você é um especialista em segmentação de mercado B2B brasileiro.
 
@@ -154,6 +162,7 @@ REGRAS:
 ```
 
 ### Output Esperado
+
 ```json
 [
   {
@@ -178,6 +187,7 @@ REGRAS:
 ```
 
 ### Regras de Unicidade
+
 - ✅ Hash: `nome-projectId` (normalizado, lowercase, sem caracteres especiais)
 - ✅ Verificar se mercado já existe antes de inserir
 - ✅ Se existir, reusar ID do mercado existente
@@ -189,22 +199,25 @@ REGRAS:
 ## 📊 ETAPA 3: Criação de Produtos
 
 ### Objetivo
+
 Mapear produtos específicos que o cliente oferece para cada mercado.
 
 ### Input
+
 ```json
 {
   "clienteId": 1,
   "clienteNome": "Empresa XYZ Ltda",
   "produtoPrincipal": "Embalagens plásticas",
   "mercados": [
-    {"id": 10, "nome": "Embalagens Plásticas para Alimentos"},
-    {"id": 11, "nome": "Embalagens para Cosméticos"}
+    { "id": 10, "nome": "Embalagens Plásticas para Alimentos" },
+    { "id": 11, "nome": "Embalagens para Cosméticos" }
   ]
 }
 ```
 
 ### Prompt Gemini
+
 ```
 Você é um especialista em catálogo de produtos B2B.
 
@@ -234,6 +247,7 @@ REGRAS:
 ```
 
 ### Output Esperado
+
 ```json
 [
   {
@@ -264,6 +278,7 @@ REGRAS:
 ```
 
 ### Regras de Unicidade
+
 - ✅ Chave única: `clienteId + mercadoId + nome` (normalizado)
 - ✅ Verificar se produto já existe antes de inserir
 - ✅ Um cliente pode ter múltiplos produtos no mesmo mercado
@@ -274,9 +289,11 @@ REGRAS:
 ## 📊 ETAPA 4: Busca de Concorrentes
 
 ### Objetivo
+
 Identificar 5 empresas concorrentes que atuam com os mesmos produtos e mercados.
 
 ### Input
+
 ```json
 {
   "clienteId": 1,
@@ -293,6 +310,7 @@ Identificar 5 empresas concorrentes que atuam com os mesmos produtos e mercados.
 ```
 
 ### Prompt Gemini
+
 ```
 Você é um especialista em mapeamento competitivo B2B brasileiro.
 
@@ -327,6 +345,7 @@ REGRAS CRÍTICAS:
 ```
 
 ### Output Esperado
+
 ```json
 [
   {
@@ -359,6 +378,7 @@ REGRAS CRÍTICAS:
 ```
 
 ### Regras de Unicidade e Validação
+
 - ✅ Hash: `nome-cnpj` (normalizado)
 - ✅ Verificar se concorrente já existe antes de inserir
 - ✅ **CRÍTICO**: Concorrente NÃO pode estar na tabela `clientes`
@@ -366,8 +386,9 @@ REGRAS CRÍTICAS:
 - ✅ Um concorrente pode atuar em múltiplos mercados (registros separados por mercado)
 
 ### Validação Cruzada (Backend)
+
 ```sql
-SELECT COUNT(*) FROM clientes 
+SELECT COUNT(*) FROM clientes
 WHERE LOWER(TRIM(nome)) = LOWER(TRIM(?))
    OR (cnpj IS NOT NULL AND cnpj = ?);
 -- Se COUNT > 0, DESCARTAR o concorrente
@@ -378,9 +399,11 @@ WHERE LOWER(TRIM(nome)) = LOWER(TRIM(?))
 ## 📊 ETAPA 5: Busca de Leads (Busca Semântica)
 
 ### Objetivo
+
 Identificar 5 empresas que são **potenciais compradores** dos produtos (B2B, B2C ou B2B2C).
 
 ### Input
+
 ```json
 {
   "clienteId": 1,
@@ -397,6 +420,7 @@ Identificar 5 empresas que são **potenciais compradores** dos produtos (B2B, B2
 ```
 
 ### Prompt Gemini
+
 ```
 Você é um especialista em prospecção de leads B2B/B2C brasileiro.
 
@@ -440,6 +464,7 @@ REGRAS CRÍTICAS:
 ```
 
 ### Output Esperado
+
 ```json
 [
   {
@@ -478,6 +503,7 @@ REGRAS CRÍTICAS:
 ```
 
 ### Regras de Unicidade e Validação
+
 - ✅ Hash: `nome-cnpj` (normalizado)
 - ✅ Verificar se lead já existe antes de inserir
 - ✅ **CRÍTICO**: Lead NÃO pode estar em `clientes` ou `concorrentes`
@@ -485,6 +511,7 @@ REGRAS CRÍTICAS:
 - ✅ Um lead pode atuar em múltiplos mercados (registros separados por mercado)
 
 ### Validação Cruzada (Backend)
+
 ```sql
 SELECT COUNT(*) FROM (
   SELECT nome, cnpj FROM clientes
@@ -501,6 +528,7 @@ WHERE LOWER(TRIM(nome)) = LOWER(TRIM(?))
 ## 🎯 Sistema de Controle e Checkpoint
 
 ### Tabela de Controle: `enrichment_runs`
+
 ```sql
 CREATE TABLE enrichment_runs (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -519,6 +547,7 @@ CREATE TABLE enrichment_runs (
 ```
 
 ### Controle de Execução
+
 ```json
 {
   "enrichmentRunId": 1,
@@ -534,6 +563,7 @@ CREATE TABLE enrichment_runs (
 ```
 
 ### Checkpoint Entre Etapas
+
 - ✅ Salvar progresso após cada cliente processado
 - ✅ Permitir pausar/retomar em qualquer etapa
 - ✅ Rollback automático em caso de erro crítico
@@ -546,6 +576,7 @@ CREATE TABLE enrichment_runs (
 ### Score de Qualidade (0-100)
 
 **Clientes**:
+
 ```javascript
 const weights = {
   cnpj: 15,
@@ -559,11 +590,12 @@ const weights = {
   cnae: 10,
   porte: 10,
   faturamentoDeclarado: 10,
-  numeroEstabelecimentos: 5
+  numeroEstabelecimentos: 5,
 };
 ```
 
 **Concorrentes**:
+
 ```javascript
 const weights = {
   cnpj: 20,
@@ -574,11 +606,12 @@ const weights = {
   porte: 10,
   faturamentoDeclarado: 15,
   numeroEstabelecimentos: 5,
-  faturamentoEstimado: 10
+  faturamentoEstimado: 10,
 };
 ```
 
 **Leads**:
+
 ```javascript
 const weights = {
   cnpj: 15,
@@ -591,11 +624,12 @@ const weights = {
   porte: 10,
   faturamentoDeclarado: 10,
   numeroEstabelecimentos: 5,
-  setor: 5
+  setor: 5,
 };
 ```
 
 ### Classificação
+
 - **90-100**: Excelente (dados completos e validados)
 - **70-89**: Bom (maioria dos campos preenchidos)
 - **50-69**: Regular (campos essenciais preenchidos)
@@ -606,6 +640,7 @@ const weights = {
 ## 🚀 Resumo de Execução
 
 ### Estimativas Finais
+
 - **Clientes enriquecidos**: 801
 - **Mercados únicos**: ~1.401
 - **Produtos**: ~6.006
@@ -614,6 +649,7 @@ const weights = {
 - **TOTAL**: ~12.213 registros
 
 ### Tempo Estimado
+
 - **Etapa 1**: ~2,7h (801 clientes × 12s)
 - **Etapa 2**: ~2,2h (801 clientes × 10s)
 - **Etapa 3**: ~3,3h (2.002 mercados × 6s)
@@ -622,6 +658,7 @@ const weights = {
 - **TOTAL**: ~11,8 horas
 
 ### Custo Estimado
+
 - **Input**: 2,8M tokens
 - **Output**: 3,8M tokens
 - **Total**: 6,6M tokens
@@ -632,6 +669,7 @@ const weights = {
 ## ✅ Checklist de Implementação
 
 ### Backend
+
 - [ ] Criar funções de enriquecimento em `server/enrichment.ts`
 - [ ] Criar routers tRPC para enriquecimento
 - [ ] Implementar sistema de controle e checkpoint
@@ -640,6 +678,7 @@ const weights = {
 - [ ] Criar logs detalhados de execução
 
 ### Testes
+
 - [ ] Teste 1: Enriquecer 1 cliente completo (todas as 5 etapas)
 - [ ] Teste 2: Enriquecer 10 clientes (validar unicidade e performance)
 - [ ] Teste 3: Enriquecer 50 clientes (validar checkpoint e retomada)

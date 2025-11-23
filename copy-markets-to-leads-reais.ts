@@ -8,16 +8,18 @@ const SOURCE_PROJECT_ID = 1; // Embalagens
 const TARGET_PROJECT_ID = 270005; // Leads Reais
 
 async function copyMarketsToLeadsReais() {
-  console.log("🚀 Copiando mercados do projeto Embalagens para Leads Reais...\n");
+  console.log(
+    "🚀 Copiando mercados do projeto Embalagens para Leads Reais...\n"
+  );
 
   // 1. Copiar mercados
   console.log(`📋 Buscando mercados do projeto ${SOURCE_PROJECT_ID}...`);
-  
+
   const sourceMercados = await db
     .select()
     .from(mercadosUnicos)
     .where(eq(mercadosUnicos.projectId, SOURCE_PROJECT_ID));
-  
+
   console.log(`   ✅ ${sourceMercados.length} mercados encontrados\n`);
 
   const mercadoMap = new Map<number, number>(); // sourceId -> targetId
@@ -35,19 +37,19 @@ async function copyMarketsToLeadsReais() {
 
     const newMercadoId = Number(result.insertId);
     mercadoMap.set(mercado.id, newMercadoId);
-    console.log(`   ✅ "${mercado.nome}" (ID: ${mercado.id} → ${newMercadoId})`);
+    console.log(
+      `   ✅ "${mercado.nome}" (ID: ${mercado.id} → ${newMercadoId})`
+    );
   }
 
   console.log(`\n✅ ${mercadoMap.size} mercados copiados!\n`);
 
   // 2. Copiar associações clientes-mercados
   console.log(`📋 Copiando associações clientes-mercados...`);
-  
+
   // Buscar todas as associações (tabela não tem projectId)
-  const sourceAssociations = await db
-    .select()
-    .from(clientesMercados);
-  
+  const sourceAssociations = await db.select().from(clientesMercados);
+
   console.log(`   ${sourceAssociations.length} associações encontradas\n`);
 
   // Criar mapa de clientes por CNPJ
@@ -104,7 +106,9 @@ async function copyMarketsToLeadsReais() {
   }
 
   console.log(`\n✅ ${copiedCount} associações copiadas!`);
-  console.log(`   ⚠️  ${skippedCount} associações ignoradas (duplicatas ou clientes não encontrados)\n`);
+  console.log(
+    `   ⚠️  ${skippedCount} associações ignoradas (duplicatas ou clientes não encontrados)\n`
+  );
 
   console.log(`\n${"=".repeat(60)}`);
   console.log("🎉 CÓPIA COMPLETA!");
@@ -126,7 +130,7 @@ copyMarketsToLeadsReais()
     console.log("\n✅ Processo concluído com sucesso!");
     process.exit(0);
   })
-  .catch((error) => {
+  .catch(error => {
     console.error("\n❌ Erro fatal:", error);
     process.exit(1);
   });

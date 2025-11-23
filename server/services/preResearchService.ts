@@ -1,16 +1,16 @@
 /**
  * Serviço de Pré-Pesquisa Inteligente
  * Fase 40.1 - Integração ao Wizard
- * 
+ *
  * Centraliza toda a lógica de pré-pesquisa com IA para reutilização
  */
 
-import { invokeLLM } from '../_core/llm';
-import { invokeLLMWithConfig } from './llmWithConfig';
+import { invokeLLM } from "../_core/llm";
+import { invokeLLMWithConfig } from "./llmWithConfig";
 
 export interface PreResearchInput {
   prompt: string;
-  tipo: 'mercado' | 'cliente';
+  tipo: "mercado" | "cliente";
   quantidade?: number;
   contextoAdicional?: string;
   projectId?: number; // FASE 41.2: Para buscar credenciais configuradas
@@ -46,7 +46,9 @@ export interface PreResearchResult {
 /**
  * Executa pré-pesquisa com IA baseada em prompt em linguagem natural
  */
-export async function executePreResearch(input: PreResearchInput): Promise<PreResearchResult> {
+export async function executePreResearch(
+  input: PreResearchInput
+): Promise<PreResearchResult> {
   const startTime = Date.now();
 
   try {
@@ -54,28 +56,28 @@ export async function executePreResearch(input: PreResearchInput): Promise<PreRe
     const userPrompt = buildUserPrompt(input);
 
     // FASE 41.2: Usar credenciais configuráveis se projectId fornecido
-    const llmFunction = input.projectId 
+    const llmFunction = input.projectId
       ? (params: any) => invokeLLMWithConfig(input.projectId!, params)
       : invokeLLM;
-    
+
     const response = await llmFunction({
       messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
       ],
       response_format: {
-        type: 'json_schema',
+        type: "json_schema",
         json_schema: {
-          name: 'pre_research_result',
+          name: "pre_research_result",
           strict: true,
-          schema: buildResponseSchema(input.tipo)
-        }
-      }
+          schema: buildResponseSchema(input.tipo),
+        },
+      },
     });
 
     const content = response.choices[0]?.message?.content;
-    if (!content || typeof content !== 'string') {
-      throw new Error('Resposta vazia ou inválida da IA');
+    if (!content || typeof content !== "string") {
+      throw new Error("Resposta vazia ou inválida da IA");
     }
 
     const parsed = JSON.parse(content);
@@ -88,20 +90,19 @@ export async function executePreResearch(input: PreResearchInput): Promise<PreRe
       metadata: {
         totalEncontradas: parsed.entidades?.length || 0,
         tempoProcessamento: processingTime,
-        modeloUtilizado: response.model
-      }
+        modeloUtilizado: response.model,
+      },
     };
-
   } catch (error) {
-    console.error('[PreResearch] Erro:', error);
+    console.error("[PreResearch] Erro:", error);
     return {
       success: false,
       entidades: [],
       metadata: {
         totalEncontradas: 0,
         tempoProcessamento: Date.now() - startTime,
-        modeloUtilizado: 'unknown'
-      }
+        modeloUtilizado: "unknown",
+      },
     };
   }
 }
@@ -109,8 +110,8 @@ export async function executePreResearch(input: PreResearchInput): Promise<PreRe
 /**
  * Constrói o prompt do sistema baseado no tipo
  */
-function buildSystemPrompt(tipo: 'mercado' | 'cliente'): string {
-  if (tipo === 'mercado') {
+function buildSystemPrompt(tipo: "mercado" | "cliente"): string {
+  if (tipo === "mercado") {
     return `Você é um assistente especializado em identificar mercados e segmentos de negócio.
 
 Sua tarefa é analisar o prompt do usuário e retornar uma lista de mercados relevantes.
@@ -167,86 +168,95 @@ function buildUserPrompt(input: PreResearchInput): string {
 /**
  * Constrói o schema de resposta JSON
  */
-function buildResponseSchema(tipo: 'mercado' | 'cliente'): any {
-  if (tipo === 'mercado') {
+function buildResponseSchema(tipo: "mercado" | "cliente"): any {
+  if (tipo === "mercado") {
     return {
-      type: 'object',
+      type: "object",
       properties: {
         entidades: {
-          type: 'array',
+          type: "array",
           items: {
-            type: 'object',
+            type: "object",
             properties: {
-              nome: { type: 'string' },
-              descricao: { type: 'string' },
-              categoria: { type: 'string' },
-              segmentacao: { type: 'string', enum: ['B2B', 'B2C', 'B2B2C', 'B2G'] }
+              nome: { type: "string" },
+              descricao: { type: "string" },
+              categoria: { type: "string" },
+              segmentacao: {
+                type: "string",
+                enum: ["B2B", "B2C", "B2B2C", "B2G"],
+              },
             },
-            required: ['nome', 'descricao', 'segmentacao'],
-            additionalProperties: false
-          }
+            required: ["nome", "descricao", "segmentacao"],
+            additionalProperties: false,
+          },
         },
         perguntas_refinamento: {
-          type: 'array',
+          type: "array",
           items: {
-            type: 'object',
+            type: "object",
             properties: {
-              pergunta: { type: 'string' },
+              pergunta: { type: "string" },
               opcoes: {
-                type: 'array',
-                items: { type: 'string' }
-              }
+                type: "array",
+                items: { type: "string" },
+              },
             },
-            required: ['pergunta', 'opcoes'],
-            additionalProperties: false
-          }
-        }
+            required: ["pergunta", "opcoes"],
+            additionalProperties: false,
+          },
+        },
       },
-      required: ['entidades'],
-      additionalProperties: false
+      required: ["entidades"],
+      additionalProperties: false,
     };
   } else {
     return {
-      type: 'object',
+      type: "object",
       properties: {
         entidades: {
-          type: 'array',
+          type: "array",
           items: {
-            type: 'object',
+            type: "object",
             properties: {
-              nome: { type: 'string' },
-              razaoSocial: { type: 'string' },
-              cnpj: { type: 'string' },
-              site: { type: 'string' },
-              email: { type: 'string' },
-              telefone: { type: 'string' },
-              cidade: { type: 'string' },
-              uf: { type: 'string' },
-              porte: { type: 'string', enum: ['MEI', 'ME', 'EPP', 'Médio', 'Grande'] },
-              segmentacao: { type: 'string', enum: ['B2B', 'B2C', 'B2B2C', 'B2G'] }
+              nome: { type: "string" },
+              razaoSocial: { type: "string" },
+              cnpj: { type: "string" },
+              site: { type: "string" },
+              email: { type: "string" },
+              telefone: { type: "string" },
+              cidade: { type: "string" },
+              uf: { type: "string" },
+              porte: {
+                type: "string",
+                enum: ["MEI", "ME", "EPP", "Médio", "Grande"],
+              },
+              segmentacao: {
+                type: "string",
+                enum: ["B2B", "B2C", "B2B2C", "B2G"],
+              },
             },
-            required: ['nome'],
-            additionalProperties: false
-          }
+            required: ["nome"],
+            additionalProperties: false,
+          },
         },
         perguntas_refinamento: {
-          type: 'array',
+          type: "array",
           items: {
-            type: 'object',
+            type: "object",
             properties: {
-              pergunta: { type: 'string' },
+              pergunta: { type: "string" },
               opcoes: {
-                type: 'array',
-                items: { type: 'string' }
-              }
+                type: "array",
+                items: { type: "string" },
+              },
             },
-            required: ['pergunta', 'opcoes'],
-            additionalProperties: false
-          }
-        }
+            required: ["pergunta", "opcoes"],
+            additionalProperties: false,
+          },
+        },
       },
-      required: ['entidades'],
-      additionalProperties: false
+      required: ["entidades"],
+      additionalProperties: false,
     };
   }
 }
@@ -256,7 +266,7 @@ function buildResponseSchema(tipo: 'mercado' | 'cliente'): any {
  */
 export async function retryWithImprovement(
   entidade: any,
-  tipo: 'mercado' | 'cliente',
+  tipo: "mercado" | "cliente",
   maxRetries: number = 2
 ): Promise<any> {
   let currentData = { ...entidade };
@@ -264,7 +274,7 @@ export async function retryWithImprovement(
 
   while (retryCount < maxRetries) {
     const camposFaltantes = identifyMissingFields(currentData, tipo);
-    
+
     if (camposFaltantes.length === 0) {
       break; // Dados completos
     }
@@ -272,7 +282,11 @@ export async function retryWithImprovement(
     retryCount++;
 
     try {
-      const improvedData = await requestMissingFields(currentData, camposFaltantes, tipo);
+      const improvedData = await requestMissingFields(
+        currentData,
+        camposFaltantes,
+        tipo
+      );
       currentData = { ...currentData, ...improvedData };
     } catch (error) {
       console.error(`[Retry ${retryCount}] Erro:`, error);
@@ -286,22 +300,25 @@ export async function retryWithImprovement(
 /**
  * Identifica campos faltantes
  */
-function identifyMissingFields(data: any, tipo: 'mercado' | 'cliente'): string[] {
+function identifyMissingFields(
+  data: any,
+  tipo: "mercado" | "cliente"
+): string[] {
   const missing: string[] = [];
 
-  if (tipo === 'mercado') {
-    if (!data.descricao) missing.push('descricao');
-    if (!data.categoria) missing.push('categoria');
-    if (!data.segmentacao) missing.push('segmentacao');
+  if (tipo === "mercado") {
+    if (!data.descricao) missing.push("descricao");
+    if (!data.categoria) missing.push("categoria");
+    if (!data.segmentacao) missing.push("segmentacao");
   } else {
-    if (!data.razaoSocial) missing.push('razaoSocial');
-    if (!data.cnpj) missing.push('cnpj');
-    if (!data.site) missing.push('site');
-    if (!data.email) missing.push('email');
-    if (!data.telefone) missing.push('telefone');
-    if (!data.cidade) missing.push('cidade');
-    if (!data.uf) missing.push('uf');
-    if (!data.porte) missing.push('porte');
+    if (!data.razaoSocial) missing.push("razaoSocial");
+    if (!data.cnpj) missing.push("cnpj");
+    if (!data.site) missing.push("site");
+    if (!data.email) missing.push("email");
+    if (!data.telefone) missing.push("telefone");
+    if (!data.cidade) missing.push("cidade");
+    if (!data.uf) missing.push("uf");
+    if (!data.porte) missing.push("porte");
   }
 
   return missing;
@@ -313,11 +330,11 @@ function identifyMissingFields(data: any, tipo: 'mercado' | 'cliente'): string[]
 async function requestMissingFields(
   data: any,
   camposFaltantes: string[],
-  tipo: 'mercado' | 'cliente'
+  tipo: "mercado" | "cliente"
 ): Promise<any> {
-  const prompt = `Complete os seguintes campos faltantes para ${tipo === 'mercado' ? 'o mercado' : 'a empresa'} "${data.nome}":
+  const prompt = `Complete os seguintes campos faltantes para ${tipo === "mercado" ? "o mercado" : "a empresa"} "${data.nome}":
 
-Campos faltantes: ${camposFaltantes.join(', ')}
+Campos faltantes: ${camposFaltantes.join(", ")}
 
 Dados atuais: ${JSON.stringify(data, null, 2)}
 
@@ -326,13 +343,17 @@ Retorne APENAS os campos faltantes em formato JSON.`;
   // Usar invokeLLM padrão para retry (sem projectId disponível aqui)
   const response = await invokeLLM({
     messages: [
-      { role: 'system', content: 'Você é um assistente que completa informações faltantes sobre empresas e mercados.' },
-      { role: 'user', content: prompt }
-    ]
+      {
+        role: "system",
+        content:
+          "Você é um assistente que completa informações faltantes sobre empresas e mercados.",
+      },
+      { role: "user", content: prompt },
+    ],
   });
 
   const content = response.choices[0]?.message?.content;
-  if (!content || typeof content !== 'string') {
+  if (!content || typeof content !== "string") {
     return {};
   }
 

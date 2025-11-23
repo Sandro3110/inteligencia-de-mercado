@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -11,20 +17,20 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { 
-  Bell, 
-  BellOff, 
-  Mail, 
-  Smartphone, 
-  Monitor, 
-  RotateCcw, 
+import {
+  Bell,
+  BellOff,
+  Mail,
+  Smartphone,
+  Monitor,
+  RotateCcw,
   Save,
   CheckCircle2,
   XCircle,
   Send,
   Settings,
   TestTube,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 
@@ -37,7 +43,16 @@ interface NotificationChannel {
 interface NotificationPreference {
   id: number;
   userId: string;
-  type: 'lead_quality' | 'lead_closed' | 'new_competitor' | 'market_threshold' | 'data_incomplete' | 'enrichment' | 'validation' | 'export' | 'all';
+  type:
+    | "lead_quality"
+    | "lead_closed"
+    | "new_competitor"
+    | "market_threshold"
+    | "data_incomplete"
+    | "enrichment"
+    | "validation"
+    | "export"
+    | "all";
   enabled: number;
   channels: NotificationChannel | null;
   createdAt: string | null;
@@ -45,14 +60,46 @@ interface NotificationPreference {
 }
 
 const NOTIFICATION_TYPES = [
-  { value: 'lead_quality', label: 'Qualidade de Lead', description: 'Notificações sobre leads de alta qualidade identificados' },
-  { value: 'lead_closed', label: 'Lead Fechado', description: 'Quando um lead é marcado como fechado/convertido' },
-  { value: 'new_competitor', label: 'Novo Concorrente', description: 'Quando um novo concorrente é identificado no mercado' },
-  { value: 'market_threshold', label: 'Limite de Mercado', description: 'Alertas quando mercados atingem limites configurados' },
-  { value: 'data_incomplete', label: 'Dados Incompletos', description: 'Quando dados importantes estão faltando' },
-  { value: 'enrichment', label: 'Enriquecimento', description: 'Status e conclusão de processos de enriquecimento' },
-  { value: 'validation', label: 'Validação', description: 'Solicitações e status de validação de dados' },
-  { value: 'export', label: 'Exportação', description: 'Conclusão de exportações e relatórios' },
+  {
+    value: "lead_quality",
+    label: "Qualidade de Lead",
+    description: "Notificações sobre leads de alta qualidade identificados",
+  },
+  {
+    value: "lead_closed",
+    label: "Lead Fechado",
+    description: "Quando um lead é marcado como fechado/convertido",
+  },
+  {
+    value: "new_competitor",
+    label: "Novo Concorrente",
+    description: "Quando um novo concorrente é identificado no mercado",
+  },
+  {
+    value: "market_threshold",
+    label: "Limite de Mercado",
+    description: "Alertas quando mercados atingem limites configurados",
+  },
+  {
+    value: "data_incomplete",
+    label: "Dados Incompletos",
+    description: "Quando dados importantes estão faltando",
+  },
+  {
+    value: "enrichment",
+    label: "Enriquecimento",
+    description: "Status e conclusão de processos de enriquecimento",
+  },
+  {
+    value: "validation",
+    label: "Validação",
+    description: "Solicitações e status de validação de dados",
+  },
+  {
+    value: "export",
+    label: "Exportação",
+    description: "Conclusão de exportações e relatórios",
+  },
 ];
 
 export default function NotificationConfig() {
@@ -61,20 +108,30 @@ export default function NotificationConfig() {
 
   // Estados para aba Preferências
   const [hasChanges, setHasChanges] = useState(false);
-  const [localPreferences, setLocalPreferences] = useState<Record<string, { enabled: boolean; channels: NotificationChannel }>>({});
+  const [localPreferences, setLocalPreferences] = useState<
+    Record<string, { enabled: boolean; channels: NotificationChannel }>
+  >({});
 
   // Estados para aba Web Push
   const [isSupported, setIsSupported] = useState(false);
-  const [permission, setPermission] = useState<NotificationPermission>("default");
+  const [permission, setPermission] =
+    useState<NotificationPermission>("default");
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
+  const [registration, setRegistration] =
+    useState<ServiceWorkerRegistration | null>(null);
 
   // Estados para aba Teste
-  const [testTitle, setTestTitle] = useState('🧪 Notificação de Teste');
-  const [testMessage, setTestMessage] = useState('Sistema de notificações em tempo real funcionando perfeitamente!');
+  const [testTitle, setTestTitle] = useState("🧪 Notificação de Teste");
+  const [testMessage, setTestMessage] = useState(
+    "Sistema de notificações em tempo real funcionando perfeitamente!"
+  );
 
   // Queries
-  const { data: preferences, isLoading, refetch } = trpc.notifications.getPreferences.useQuery();
+  const {
+    data: preferences,
+    isLoading,
+    refetch,
+  } = trpc.notifications.getPreferences.useQuery();
   const { data: vapidKey } = trpc.push.getPublicKey.useQuery();
 
   // Mutations - Preferências
@@ -110,14 +167,15 @@ export default function NotificationConfig() {
 
   // Mutations - Teste
   const sendTestMutation = trpc.notifications.sendTestNotification.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       toast.success(data.message, {
-        description: 'A notificação deve aparecer no badge e no toast em instantes!',
+        description:
+          "A notificação deve aparecer no badge e no toast em instantes!",
         duration: 5000,
       });
     },
-    onError: (error) => {
-      toast.error('Erro ao enviar notificação', {
+    onError: error => {
+      toast.error("Erro ao enviar notificação", {
         description: error.message,
       });
     },
@@ -126,7 +184,10 @@ export default function NotificationConfig() {
   // Inicializar preferências locais quando os dados chegarem
   useEffect(() => {
     if (preferences) {
-      const prefs: Record<string, { enabled: boolean; channels: NotificationChannel }> = {};
+      const prefs: Record<
+        string,
+        { enabled: boolean; channels: NotificationChannel }
+      > = {};
       preferences.forEach((pref: NotificationPreference) => {
         prefs[pref.type] = {
           enabled: pref.enabled === 1,
@@ -139,7 +200,7 @@ export default function NotificationConfig() {
 
   // Verificar suporte e permissão para Web Push
   useEffect(() => {
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
+    if ("serviceWorker" in navigator && "PushManager" in window) {
       setIsSupported(true);
       setPermission(Notification.permission);
     }
@@ -150,26 +211,28 @@ export default function NotificationConfig() {
     if (!isSupported) return;
 
     navigator.serviceWorker
-      .register('/sw.js')
-      .then((reg) => {
-        console.log('[Push] Service Worker registrado:', reg);
+      .register("/sw.js")
+      .then(reg => {
+        console.log("[Push] Service Worker registrado:", reg);
         setRegistration(reg);
 
         return reg.pushManager.getSubscription();
       })
-      .then((sub) => {
+      .then(sub => {
         if (sub) {
           setIsSubscribed(true);
         }
       })
-      .catch((error) => {
-        console.error('[Push] Erro ao registrar Service Worker:', error);
-        toast.error('Erro ao registrar Service Worker');
+      .catch(error => {
+        console.error("[Push] Erro ao registrar Service Worker:", error);
+        toast.error("Erro ao registrar Service Worker");
       });
   }, [isSupported]);
 
   const getPreference = (type: string) => {
-    return localPreferences[type] || { enabled: true, channels: { inApp: true } };
+    return (
+      localPreferences[type] || { enabled: true, channels: { inApp: true } }
+    );
   };
 
   const handleToggleEnabled = (type: string, enabled: boolean) => {
@@ -180,7 +243,11 @@ export default function NotificationConfig() {
     setHasChanges(true);
   };
 
-  const handleToggleChannel = (type: string, channel: keyof NotificationChannel, value: boolean) => {
+  const handleToggleChannel = (
+    type: string,
+    channel: keyof NotificationChannel,
+    value: boolean
+  ) => {
     setLocalPreferences(prev => ({
       ...prev,
       [type]: {
@@ -202,7 +269,7 @@ export default function NotificationConfig() {
       );
 
       await Promise.all(updates);
-      
+
       toast.success("Preferências salvas com sucesso!");
       setHasChanges(false);
       refetch();
@@ -229,20 +296,22 @@ export default function NotificationConfig() {
       const perm = await Notification.requestPermission();
       setPermission(perm);
 
-      if (perm === 'granted') {
-        toast.success('Permissão concedida!');
-      } else if (perm === 'denied') {
-        toast.error('Permissão negada. Habilite nas configurações do navegador.');
+      if (perm === "granted") {
+        toast.success("Permissão concedida!");
+      } else if (perm === "denied") {
+        toast.error(
+          "Permissão negada. Habilite nas configurações do navegador."
+        );
       }
     } catch (error) {
-      console.error('[Push] Erro ao solicitar permissão:', error);
-      toast.error('Erro ao solicitar permissão');
+      console.error("[Push] Erro ao solicitar permissão:", error);
+      toast.error("Erro ao solicitar permissão");
     }
   };
 
   const subscribeToPush = async () => {
     if (!registration || !vapidKey) {
-      toast.error('Service Worker ou chave VAPID não disponível');
+      toast.error("Service Worker ou chave VAPID não disponível");
       return;
     }
 
@@ -257,13 +326,13 @@ export default function NotificationConfig() {
       await subscribe.mutateAsync({
         endpoint: subscription.endpoint,
         keys: {
-          p256dh: subscriptionJSON.keys?.p256dh || '',
-          auth: subscriptionJSON.keys?.auth || '',
+          p256dh: subscriptionJSON.keys?.p256dh || "",
+          auth: subscriptionJSON.keys?.auth || "",
         },
       });
     } catch (error) {
-      console.error('[Push] Erro ao subscrever:', error);
-      toast.error('Erro ao subscrever push notifications');
+      console.error("[Push] Erro ao subscrever:", error);
+      toast.error("Erro ao subscrever push notifications");
     }
   };
 
@@ -277,8 +346,8 @@ export default function NotificationConfig() {
         await unsubscribe.mutateAsync({ endpoint: subscription.endpoint });
       }
     } catch (error) {
-      console.error('[Push] Erro ao desinscrever:', error);
-      toast.error('Erro ao remover subscrição');
+      console.error("[Push] Erro ao desinscrever:", error);
+      toast.error("Erro ao remover subscrição");
     }
   };
 
@@ -291,8 +360,10 @@ export default function NotificationConfig() {
   };
 
   function urlBase64ToUint8Array(base64String: string) {
-    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding)
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
     const rawData = window.atob(base64);
     const outputArray = new Uint8Array(rawData.length);
     for (let i = 0; i < rawData.length; ++i) {
@@ -306,7 +377,9 @@ export default function NotificationConfig() {
       <DashboardLayout>
         <div className="container mx-auto py-8">
           <Alert>
-            <AlertDescription>Faça login para configurar notificações.</AlertDescription>
+            <AlertDescription>
+              Faça login para configurar notificações.
+            </AlertDescription>
           </Alert>
         </div>
       </DashboardLayout>
@@ -358,7 +431,9 @@ export default function NotificationConfig() {
           <TabsContent value="preferencias" className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold">Preferências de Notificações</h2>
+                <h2 className="text-2xl font-bold">
+                  Preferências de Notificações
+                </h2>
                 <p className="text-muted-foreground mt-1">
                   Configure como e quando você deseja receber notificações
                 </p>
@@ -373,7 +448,7 @@ export default function NotificationConfig() {
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Restaurar Padrões
                 </Button>
-                
+
                 <Button
                   onClick={handleSave}
                   disabled={!hasChanges || updatePreference.isPending}
@@ -388,24 +463,27 @@ export default function NotificationConfig() {
               <CardHeader>
                 <CardTitle>Tipos de Notificação</CardTitle>
                 <CardDescription>
-                  Escolha quais notificações você deseja receber e por quais canais
+                  Escolha quais notificações você deseja receber e por quais
+                  canais
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {NOTIFICATION_TYPES.map((notifType, index) => {
                   const pref = getPreference(notifType.value);
-                  
+
                   return (
                     <div key={notifType.value}>
                       {index > 0 && <Separator className="my-4" />}
-                      
+
                       <div className="space-y-4">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-3">
                               <Switch
                                 checked={pref.enabled}
-                                onCheckedChange={(checked) => handleToggleEnabled(notifType.value, checked)}
+                                onCheckedChange={checked =>
+                                  handleToggleEnabled(notifType.value, checked)
+                                }
                               />
                               <div>
                                 <Label className="text-base font-semibold cursor-pointer">
@@ -424,21 +502,35 @@ export default function NotificationConfig() {
                             <p className="text-sm font-medium mb-3">
                               Canais de Notificação:
                             </p>
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                               <div className="flex items-center gap-3 p-3 bg-background rounded-md border">
                                 <Switch
                                   checked={pref.channels.inApp ?? true}
-                                  onCheckedChange={(checked) => handleToggleChannel(notifType.value, 'inApp', checked)}
+                                  onCheckedChange={checked =>
+                                    handleToggleChannel(
+                                      notifType.value,
+                                      "inApp",
+                                      checked
+                                    )
+                                  }
                                 />
                                 <Monitor className="w-4 h-4 text-blue-600" />
-                                <Label className="cursor-pointer">No Sistema</Label>
+                                <Label className="cursor-pointer">
+                                  No Sistema
+                                </Label>
                               </div>
 
                               <div className="flex items-center gap-3 p-3 bg-background rounded-md border">
                                 <Switch
                                   checked={pref.channels.email ?? false}
-                                  onCheckedChange={(checked) => handleToggleChannel(notifType.value, 'email', checked)}
+                                  onCheckedChange={checked =>
+                                    handleToggleChannel(
+                                      notifType.value,
+                                      "email",
+                                      checked
+                                    )
+                                  }
                                 />
                                 <Mail className="w-4 h-4 text-green-600" />
                                 <Label className="cursor-pointer">E-mail</Label>
@@ -447,7 +539,13 @@ export default function NotificationConfig() {
                               <div className="flex items-center gap-3 p-3 bg-background rounded-md border">
                                 <Switch
                                   checked={pref.channels.push ?? false}
-                                  onCheckedChange={(checked) => handleToggleChannel(notifType.value, 'push', checked)}
+                                  onCheckedChange={checked =>
+                                    handleToggleChannel(
+                                      notifType.value,
+                                      "push",
+                                      checked
+                                    )
+                                  }
                                 />
                                 <Smartphone className="w-4 h-4 text-purple-600" />
                                 <Label className="cursor-pointer">Push</Label>
@@ -471,23 +569,32 @@ export default function NotificationConfig() {
                   <Monitor className="w-5 h-5 text-blue-600 mt-0.5" />
                   <div>
                     <p className="font-medium text-foreground">No Sistema</p>
-                    <p>Notificações aparecem dentro da plataforma, no ícone de sino do menu</p>
+                    <p>
+                      Notificações aparecem dentro da plataforma, no ícone de
+                      sino do menu
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <Mail className="w-5 h-5 text-green-600 mt-0.5" />
                   <div>
                     <p className="font-medium text-foreground">E-mail</p>
-                    <p>Notificações enviadas para o e-mail cadastrado na sua conta</p>
+                    <p>
+                      Notificações enviadas para o e-mail cadastrado na sua
+                      conta
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <Smartphone className="w-5 h-5 text-purple-600 mt-0.5" />
                   <div>
                     <p className="font-medium text-foreground">Push</p>
-                    <p>Notificações push no navegador (requer permissão do navegador)</p>
+                    <p>
+                      Notificações push no navegador (requer permissão do
+                      navegador)
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -499,18 +606,23 @@ export default function NotificationConfig() {
             <div>
               <h2 className="text-2xl font-bold">Configurações de Web Push</h2>
               <p className="text-muted-foreground mt-1">
-                Configure notificações push para receber alertas mesmo quando o app estiver fechado
+                Configure notificações push para receber alertas mesmo quando o
+                app estiver fechado
               </p>
             </div>
 
             <Card>
               <CardHeader>
                 <CardTitle>Status do Navegador</CardTitle>
-                <CardDescription>Verificação de compatibilidade</CardDescription>
+                <CardDescription>
+                  Verificação de compatibilidade
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Suporte a Push Notifications</span>
+                  <span className="font-medium">
+                    Suporte a Push Notifications
+                  </span>
                   {isSupported ? (
                     <Badge variant="default" className="gap-1">
                       <CheckCircle2 className="h-3 w-3" />
@@ -528,18 +640,18 @@ export default function NotificationConfig() {
                   <span className="font-medium">Permissão de Notificações</span>
                   <Badge
                     variant={
-                      permission === 'granted'
-                        ? 'default'
-                        : permission === 'denied'
-                        ? 'destructive'
-                        : 'secondary'
+                      permission === "granted"
+                        ? "default"
+                        : permission === "denied"
+                          ? "destructive"
+                          : "secondary"
                     }
                   >
-                    {permission === 'granted'
-                      ? 'Concedida'
-                      : permission === 'denied'
-                      ? 'Negada'
-                      : 'Não Solicitada'}
+                    {permission === "granted"
+                      ? "Concedida"
+                      : permission === "denied"
+                        ? "Negada"
+                        : "Não Solicitada"}
                   </Badge>
                 </div>
 
@@ -563,40 +675,50 @@ export default function NotificationConfig() {
             <Card>
               <CardHeader>
                 <CardTitle>Gerenciar Subscrição</CardTitle>
-                <CardDescription>Ative ou desative notificações push</CardDescription>
+                <CardDescription>
+                  Ative ou desative notificações push
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {!isSupported && (
                   <Alert>
                     <AlertDescription>
-                      Seu navegador não suporta Web Push Notifications. Use Chrome, Firefox, Edge ou Safari.
+                      Seu navegador não suporta Web Push Notifications. Use
+                      Chrome, Firefox, Edge ou Safari.
                     </AlertDescription>
                   </Alert>
                 )}
 
-                {isSupported && permission === 'default' && (
+                {isSupported && permission === "default" && (
                   <Button onClick={requestPermission} className="w-full">
                     <Bell className="h-4 w-4 mr-2" />
                     Solicitar Permissão
                   </Button>
                 )}
 
-                {isSupported && permission === 'denied' && (
+                {isSupported && permission === "denied" && (
                   <Alert>
                     <AlertDescription>
-                      Permissão negada. Habilite notificações nas configurações do navegador para este site.
+                      Permissão negada. Habilite notificações nas configurações
+                      do navegador para este site.
                     </AlertDescription>
                   </Alert>
                 )}
 
-                {isSupported && permission === 'granted' && !isSubscribed && (
-                  <Button onClick={subscribeToPush} disabled={subscribe.isPending} className="w-full">
+                {isSupported && permission === "granted" && !isSubscribed && (
+                  <Button
+                    onClick={subscribeToPush}
+                    disabled={subscribe.isPending}
+                    className="w-full"
+                  >
                     <Bell className="h-4 w-4 mr-2" />
-                    {subscribe.isPending ? 'Inscrevendo...' : 'Ativar Notificações Push'}
+                    {subscribe.isPending
+                      ? "Inscrevendo..."
+                      : "Ativar Notificações Push"}
                   </Button>
                 )}
 
-                {isSupported && permission === 'granted' && isSubscribed && (
+                {isSupported && permission === "granted" && isSubscribed && (
                   <>
                     <Button
                       onClick={unsubscribeFromPush}
@@ -605,7 +727,9 @@ export default function NotificationConfig() {
                       className="w-full"
                     >
                       <BellOff className="h-4 w-4 mr-2" />
-                      {unsubscribe.isPending ? 'Removendo...' : 'Desativar Notificações Push'}
+                      {unsubscribe.isPending
+                        ? "Removendo..."
+                        : "Desativar Notificações Push"}
                     </Button>
 
                     <Button
@@ -615,7 +739,9 @@ export default function NotificationConfig() {
                       className="w-full"
                     >
                       <Send className="h-4 w-4 mr-2" />
-                      {testPush.isPending ? 'Enviando...' : 'Enviar Notificação de Teste'}
+                      {testPush.isPending
+                        ? "Enviando..."
+                        : "Enviar Notificação de Teste"}
                     </Button>
                   </>
                 )}
@@ -628,16 +754,20 @@ export default function NotificationConfig() {
               </CardHeader>
               <CardContent className="space-y-2 text-sm text-muted-foreground">
                 <p>
-                  • <strong>Web Push API</strong> permite que o servidor envie notificações mesmo quando o app está fechado
+                  • <strong>Web Push API</strong> permite que o servidor envie
+                  notificações mesmo quando o app está fechado
                 </p>
                 <p>
-                  • <strong>Service Worker</strong> roda em segundo plano e recebe as notificações
+                  • <strong>Service Worker</strong> roda em segundo plano e
+                  recebe as notificações
                 </p>
                 <p>
-                  • <strong>VAPID</strong> (Voluntary Application Server Identification) autentica o servidor
+                  • <strong>VAPID</strong> (Voluntary Application Server
+                  Identification) autentica o servidor
                 </p>
                 <p>
-                  • As notificações aparecem no sistema operacional, não apenas no navegador
+                  • As notificações aparecem no sistema operacional, não apenas
+                  no navegador
                 </p>
               </CardContent>
             </Card>
@@ -651,22 +781,29 @@ export default function NotificationConfig() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold">Teste de Notificações</h2>
-                <p className="text-muted-foreground">Valide o sistema de notificações em tempo real</p>
+                <p className="text-muted-foreground">
+                  Valide o sistema de notificações em tempo real
+                </p>
               </div>
             </div>
 
             <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
               <CardHeader>
-                <CardTitle className="text-blue-900 dark:text-blue-100">Como funciona?</CardTitle>
+                <CardTitle className="text-blue-900 dark:text-blue-100">
+                  Como funciona?
+                </CardTitle>
                 <CardDescription className="text-blue-700 dark:text-blue-300">
-                  Este teste valida o fluxo completo de notificações em tempo real
+                  Este teste valida o fluxo completo de notificações em tempo
+                  real
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-blue-600 mt-0.5" />
                   <div>
-                    <p className="font-medium text-blue-900 dark:text-blue-100">1. Criação no Backend</p>
+                    <p className="font-medium text-blue-900 dark:text-blue-100">
+                      1. Criação no Backend
+                    </p>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
                       A notificação é salva no banco de dados via tRPC
                     </p>
@@ -675,7 +812,9 @@ export default function NotificationConfig() {
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-blue-600 mt-0.5" />
                   <div>
-                    <p className="font-medium text-blue-900 dark:text-blue-100">2. Transmissão SSE</p>
+                    <p className="font-medium text-blue-900 dark:text-blue-100">
+                      2. Transmissão SSE
+                    </p>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
                       O servidor envia via Server-Sent Events para o frontend
                     </p>
@@ -684,7 +823,9 @@ export default function NotificationConfig() {
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-blue-600 mt-0.5" />
                   <div>
-                    <p className="font-medium text-blue-900 dark:text-blue-100">3. Toast Interativo</p>
+                    <p className="font-medium text-blue-900 dark:text-blue-100">
+                      3. Toast Interativo
+                    </p>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
                       Um toast aparece na tela com a mensagem
                     </p>
@@ -693,9 +834,12 @@ export default function NotificationConfig() {
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-blue-600 mt-0.5" />
                   <div>
-                    <p className="font-medium text-blue-900 dark:text-blue-100">4. Atualização do Badge</p>
+                    <p className="font-medium text-blue-900 dark:text-blue-100">
+                      4. Atualização do Badge
+                    </p>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      O contador de notificações no header é atualizado automaticamente
+                      O contador de notificações no header é atualizado
+                      automaticamente
                     </p>
                   </div>
                 </div>
@@ -715,7 +859,7 @@ export default function NotificationConfig() {
                   <Input
                     id="title"
                     value={testTitle}
-                    onChange={(e) => setTestTitle(e.target.value)}
+                    onChange={e => setTestTitle(e.target.value)}
                     placeholder="Digite o título da notificação"
                   />
                 </div>
@@ -725,7 +869,7 @@ export default function NotificationConfig() {
                   <Input
                     id="message"
                     value={testMessage}
-                    onChange={(e) => setTestMessage(e.target.value)}
+                    onChange={e => setTestMessage(e.target.value)}
                     placeholder="Digite a mensagem da notificação"
                   />
                 </div>
@@ -759,7 +903,8 @@ export default function NotificationConfig() {
                     Notificação Enviada!
                   </CardTitle>
                   <CardDescription className="text-green-700 dark:text-green-300">
-                    Verifique o badge de notificações no header e aguarde o toast aparecer
+                    Verifique o badge de notificações no header e aguarde o
+                    toast aparecer
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

@@ -48,7 +48,7 @@ export default function KanbanBoard({ mercadoId, leads }: KanbanBoardProps) {
       utils.leads.byStage.invalidate({ mercadoId });
       toast.success("Lead movido com sucesso!");
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Erro ao mover lead: ${error.message}`);
     },
   });
@@ -85,10 +85,10 @@ export default function KanbanBoard({ mercadoId, leads }: KanbanBoardProps) {
   };
 
   const getLeadsByStage = (stage: string) => {
-    return leads.filter((lead) => (lead.stage || "novo") === stage);
+    return leads.filter(lead => (lead.stage || "novo") === stage);
   };
 
-  const activeLead = leads.find((lead) => lead.id === activeId);
+  const activeLead = leads.find(lead => lead.id === activeId);
 
   return (
     <DndContext
@@ -97,7 +97,7 @@ export default function KanbanBoard({ mercadoId, leads }: KanbanBoardProps) {
       onDragEnd={handleDragEnd}
     >
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {STAGES.map((stage) => {
+        {STAGES.map(stage => {
           const stageLeads = getLeadsByStage(stage.id);
           return (
             <KanbanColumn
@@ -127,7 +127,13 @@ type KanbanColumnProps = {
   isLoading: boolean;
 };
 
-function KanbanColumn({ id, label, color, leads, isLoading }: KanbanColumnProps) {
+function KanbanColumn({
+  id,
+  label,
+  color,
+  leads,
+  isLoading,
+}: KanbanColumnProps) {
   const { setNodeRef } = useDroppable({ id });
 
   return (
@@ -152,7 +158,7 @@ function KanbanColumn({ id, label, color, leads, isLoading }: KanbanColumnProps)
       )}
 
       <div className="flex flex-col gap-2">
-        {leads.map((lead) => (
+        {leads.map(lead => (
           <KanbanCard key={lead.id} lead={lead} />
         ))}
       </div>

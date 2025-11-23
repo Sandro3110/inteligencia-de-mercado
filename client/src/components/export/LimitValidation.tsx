@@ -3,8 +3,8 @@
  * Item 8 do módulo de exportação inteligente
  */
 
-import { AlertTriangle, Filter, Layers, Split } from 'lucide-react';
-import { Button } from '../ui/button';
+import { AlertTriangle, Filter, Layers, Split } from "lucide-react";
+import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,8 +12,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../ui/dialog';
-import { Badge } from '../ui/badge';
+} from "../ui/dialog";
+import { Badge } from "../ui/badge";
 
 interface LimitValidationProps {
   open: boolean;
@@ -34,7 +34,7 @@ export function LimitValidation({
   onReduceFields,
   onAddFilters,
   onSplitBatches,
-  onProceedAnyway
+  onProceedAnyway,
 }: LimitValidationProps) {
   const isVeryLarge = estimatedSize > 100;
   const isLarge = estimatedSize > 50;
@@ -49,10 +49,13 @@ export function LimitValidation({
             </div>
             <div>
               <DialogTitle>
-                {isVeryLarge ? 'Arquivo Muito Grande Detectado' : 'Arquivo Grande Detectado'}
+                {isVeryLarge
+                  ? "Arquivo Muito Grande Detectado"
+                  : "Arquivo Grande Detectado"}
               </DialogTitle>
               <DialogDescription>
-                A exportação pode demorar vários minutos e consumir recursos significativos
+                A exportação pode demorar vários minutos e consumir recursos
+                significativos
               </DialogDescription>
             </div>
           </div>
@@ -70,11 +73,11 @@ export function LimitValidation({
             <div>
               <p className="text-xs text-slate-600 mb-1">Total de Registros</p>
               <p className="text-2xl font-bold text-slate-900">
-                {recordCount.toLocaleString('pt-BR')}
+                {recordCount.toLocaleString("pt-BR")}
               </p>
             </div>
           </div>
-          
+
           {isVeryLarge && (
             <div className="mt-3 pt-3 border-t border-slate-200">
               <Badge variant="destructive" className="text-xs">
@@ -131,8 +134,8 @@ export function LimitValidation({
                   Adicionar Filtros
                 </h5>
                 <p className="text-xs text-slate-600">
-                  Voltar ao passo 2 e adicionar filtros para reduzir o número de registros.
-                  Recomendado para exportações focadas.
+                  Voltar ao passo 2 e adicionar filtros para reduzir o número de
+                  registros. Recomendado para exportações focadas.
                 </p>
               </div>
             </div>
@@ -155,8 +158,8 @@ export function LimitValidation({
                   Dividir em Lotes
                 </h5>
                 <p className="text-xs text-slate-600">
-                  Gerar múltiplos arquivos menores automaticamente.
-                  Ideal para exportações muito grandes.
+                  Gerar múltiplos arquivos menores automaticamente. Ideal para
+                  exportações muito grandes.
                 </p>
               </div>
             </div>
@@ -169,13 +172,13 @@ export function LimitValidation({
             Cancelar
           </Button>
           <Button
-            variant={isVeryLarge ? 'destructive' : 'default'}
+            variant={isVeryLarge ? "destructive" : "default"}
             onClick={() => {
               onProceedAnyway();
               onClose();
             }}
           >
-            {isVeryLarge ? 'Prosseguir Mesmo Assim' : 'Continuar'}
+            {isVeryLarge ? "Prosseguir Mesmo Assim" : "Continuar"}
           </Button>
         </DialogFooter>
 
@@ -183,8 +186,9 @@ export function LimitValidation({
         {isVeryLarge && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3">
             <p className="text-xs text-red-800">
-              <strong>⚠️ Atenção:</strong> Exportações acima de 100 MB podem falhar ou demorar mais de 5 minutos.
-              Recomendamos fortemente usar uma das opções de otimização acima.
+              <strong>⚠️ Atenção:</strong> Exportações acima de 100 MB podem
+              falhar ou demorar mais de 5 minutos. Recomendamos fortemente usar
+              uma das opções de otimização acima.
             </p>
           </div>
         )}

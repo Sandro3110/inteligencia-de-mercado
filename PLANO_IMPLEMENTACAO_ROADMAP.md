@@ -13,6 +13,7 @@
 Este documento apresenta um **plano completo e detalhado** para implementar todas as funcionalidades propostas no roadmap do Gestor PAV. O plano está organizado em **8 fases principais** distribuídas ao longo de **4 trimestres**, totalizando **280 horas** de desenvolvimento. O ROI projetado é de **156% ao ano** através de ganhos de produtividade e redução de tempo de validação.
 
 **Status Atual do Sistema:**
+
 - ✅ 73 mercados, 800 clientes, 591 concorrentes, 727 leads
 - ✅ Dashboard com gráficos visuais (Recharts)
 - ✅ Validação em lote com checkboxes
@@ -32,12 +33,12 @@ Este documento apresenta um **plano completo e detalhado** para implementar toda
 
 ### Distribuição por Trimestre
 
-| Trimestre | Fases | Horas | Funcionalidades Principais |
-|-----------|-------|-------|----------------------------|
-| **Q1 2026** | Fase 1-2 | 80h | Tags, Paginação, Audit Log, Exportação Avançada |
-| **Q2 2026** | Fase 3-4 | 70h | Notificações, Favoritos, Importação, Enriquecimento |
-| **Q3 2026** | Fase 5-6 | 80h | Dashboard Avançado, Busca IA, Sugestões |
-| **Q4 2026** | Fase 7-8 | 50h | API Pública, Multi-tenant, Integrações |
+| Trimestre   | Fases    | Horas | Funcionalidades Principais                          |
+| ----------- | -------- | ----- | --------------------------------------------------- |
+| **Q1 2026** | Fase 1-2 | 80h   | Tags, Paginação, Audit Log, Exportação Avançada     |
+| **Q2 2026** | Fase 3-4 | 70h   | Notificações, Favoritos, Importação, Enriquecimento |
+| **Q3 2026** | Fase 5-6 | 80h   | Dashboard Avançado, Busca IA, Sugestões             |
+| **Q4 2026** | Fase 7-8 | 50h   | API Pública, Multi-tenant, Integrações              |
 
 ### Matriz de Priorização (Valor vs. Esforço)
 
@@ -74,6 +75,7 @@ Baixo Valor, Alto Esforço (Roadmap Futuro)
 **Objetivo:** Permitir organização flexível de mercados/clientes com tags personalizadas.
 
 **Escopo:**
+
 - Criar tabela `tags` e `entity_tags` (junction table)
 - CRUD completo de tags (criar, editar, deletar)
 - Aplicar tags em mercados, clientes, concorrentes e leads
@@ -105,13 +107,13 @@ tags: router({
   list: publicProcedure.query(async () => {
     return await db.getTags();
   }),
-  
+
   create: protectedProcedure
     .input(z.object({ name: z.string(), color: z.string().optional() }))
     .mutation(async ({ input }) => {
       return await db.createTag(input);
     }),
-    
+
   addToEntity: protectedProcedure
     .input(z.object({
       tagId: z.number(),
@@ -121,7 +123,7 @@ tags: router({
     .mutation(async ({ input }) => {
       return await db.addTagToEntity(input);
     }),
-    
+
   removeFromEntity: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
@@ -131,12 +133,14 @@ tags: router({
 ```
 
 **UI Components:**
+
 - `TagManager.tsx` - Modal para gerenciar tags
 - `TagPicker.tsx` - Dropdown para selecionar tags
 - `TagBadge.tsx` - Badge colorido para exibir tags
 - `TagFilter.tsx` - Filtro multi-tag com checkboxes
 
 **Métricas de Sucesso:**
+
 - Tempo de organização reduzido em 60%
 - 80% dos usuários criam pelo menos 3 tags
 - Filtro por tags usado em 40% das sessões
@@ -148,6 +152,7 @@ tags: router({
 **Objetivo:** Otimizar performance com datasets grandes (>1000 registros).
 
 **Escopo:**
+
 - Implementar `page` e `pageSize` nos routers
 - Adicionar `LIMIT` e `OFFSET` nas queries SQL
 - Criar componente `Pagination` reutilizável
@@ -167,16 +172,16 @@ export async function getClientesByMercadoPaginated(
   if (!db) return { data: [], total: 0, page, pageSize, totalPages: 0 };
 
   const offset = (page - 1) * pageSize;
-  
+
   // Get total count
   const countResult = await db
     .select({ count: sql<number>`count(*)` })
     .from(clientesMercados)
     .where(eq(clientesMercados.mercadoId, mercadoId));
-  
+
   const total = countResult[0]?.count || 0;
   const totalPages = Math.ceil(total / pageSize);
-  
+
   // Get paginated data
   const data = await db
     .select()
@@ -185,7 +190,7 @@ export async function getClientesByMercadoPaginated(
     .where(eq(clientesMercados.mercadoId, mercadoId))
     .limit(pageSize)
     .offset(offset);
-  
+
   return {
     data: data.map(row => row.clientes),
     total,
@@ -217,10 +222,10 @@ clientes: router({
 
 ```typescript
 // components/Pagination.tsx
-export function Pagination({ 
-  currentPage, 
-  totalPages, 
-  onPageChange 
+export function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange
 }: PaginationProps) {
   return (
     <div className="flex items-center justify-between px-4 py-3">
@@ -251,6 +256,7 @@ export function Pagination({
 ```
 
 **Métricas de Sucesso:**
+
 - Tempo de carregamento reduzido em 70% para listas grandes
 - Uso de memória reduzido em 80%
 - Navegação entre páginas < 200ms
@@ -262,6 +268,7 @@ export function Pagination({
 **Objetivo:** Rastreabilidade completa de todas as mudanças no sistema.
 
 **Escopo:**
+
 - Criar tabela `audit_logs`
 - Registrar todas as operações CRUD
 - Capturar before/after state (JSON)
@@ -277,12 +284,22 @@ export const auditLogs = mysqlTable("audit_logs", {
   id: int("id").primaryKey().autoincrement(),
   userId: varchar("userId", { length: 64 }).notNull(),
   userName: text("userName"),
-  action: mysqlEnum("action", ["create", "update", "delete", "validate"]).notNull(),
-  entityType: mysqlEnum("entityType", ["mercado", "cliente", "concorrente", "lead"]).notNull(),
+  action: mysqlEnum("action", [
+    "create",
+    "update",
+    "delete",
+    "validate",
+  ]).notNull(),
+  entityType: mysqlEnum("entityType", [
+    "mercado",
+    "cliente",
+    "concorrente",
+    "lead",
+  ]).notNull(),
   entityId: int("entityId").notNull(),
   beforeState: json("beforeState"), // Estado anterior (JSON)
-  afterState: json("afterState"),   // Estado posterior (JSON)
-  changes: json("changes"),          // Lista de campos alterados
+  afterState: json("afterState"), // Estado posterior (JSON)
+  changes: json("changes"), // Lista de campos alterados
   ipAddress: varchar("ipAddress", { length: 45 }),
   userAgent: text("userAgent"),
   createdAt: timestamp("createdAt").defaultNow(),
@@ -292,7 +309,7 @@ export const auditLogs = mysqlTable("audit_logs", {
 export async function createAuditLog(log: InsertAuditLog) {
   const db = await getDb();
   if (!db) return;
-  
+
   await db.insert(auditLogs).values(log);
 }
 
@@ -308,57 +325,63 @@ export async function getAuditLogs(filters: {
 }) {
   const db = await getDb();
   if (!db) return { data: [], total: 0 };
-  
+
   let query = db.select().from(auditLogs);
-  
+
   if (filters.userId) query = query.where(eq(auditLogs.userId, filters.userId));
-  if (filters.entityType) query = query.where(eq(auditLogs.entityType, filters.entityType));
-  if (filters.entityId) query = query.where(eq(auditLogs.entityId, filters.entityId));
+  if (filters.entityType)
+    query = query.where(eq(auditLogs.entityType, filters.entityType));
+  if (filters.entityId)
+    query = query.where(eq(auditLogs.entityId, filters.entityId));
   if (filters.action) query = query.where(eq(auditLogs.action, filters.action));
-  
+
   const data = await query
     .orderBy(desc(auditLogs.createdAt))
     .limit(filters.pageSize || 50)
     .offset(((filters.page || 1) - 1) * (filters.pageSize || 50));
-  
+
   return { data, total: data.length };
 }
 
 // Middleware para capturar mudanças automaticamente
-export const auditMiddleware = t.middleware(async ({ ctx, next, path, type, input }) => {
-  const result = await next();
-  
-  if (type === "mutation" && ctx.user) {
-    // Capturar before state se for update/delete
-    let beforeState = null;
-    if (input?.id) {
-      beforeState = await getEntityById(path, input.id);
+export const auditMiddleware = t.middleware(
+  async ({ ctx, next, path, type, input }) => {
+    const result = await next();
+
+    if (type === "mutation" && ctx.user) {
+      // Capturar before state se for update/delete
+      let beforeState = null;
+      if (input?.id) {
+        beforeState = await getEntityById(path, input.id);
+      }
+
+      await createAuditLog({
+        userId: ctx.user.id,
+        userName: ctx.user.name,
+        action: inferAction(path),
+        entityType: inferEntityType(path),
+        entityId: input?.id || result?.id,
+        beforeState,
+        afterState: result,
+        changes: calculateDiff(beforeState, result),
+        ipAddress: ctx.req.ip,
+        userAgent: ctx.req.headers["user-agent"],
+      });
     }
-    
-    await createAuditLog({
-      userId: ctx.user.id,
-      userName: ctx.user.name,
-      action: inferAction(path),
-      entityType: inferEntityType(path),
-      entityId: input?.id || result?.id,
-      beforeState,
-      afterState: result,
-      changes: calculateDiff(beforeState, result),
-      ipAddress: ctx.req.ip,
-      userAgent: ctx.req.headers["user-agent"],
-    });
+
+    return result;
   }
-  
-  return result;
-});
+);
 ```
 
 **UI Components:**
+
 - `AuditLogViewer.tsx` - Tabela de logs com filtros
 - `AuditLogDetail.tsx` - Modal com diff visual
 - `AuditLogExport.tsx` - Botão de exportação
 
 **Métricas de Sucesso:**
+
 - 100% das operações registradas
 - Tempo de consulta < 500ms
 - Diff visual claro e legível
@@ -372,6 +395,7 @@ export const auditMiddleware = t.middleware(async ({ ctx, next, path, type, inpu
 **Objetivo:** Exportar dados em múltiplos formatos com formatação profissional.
 
 **Escopo:**
+
 - Exportação para Excel (.xlsx) com formatação
 - Exportação para PDF com relatório formatado
 - Exportação com filtros aplicados
@@ -385,43 +409,51 @@ export const auditMiddleware = t.middleware(async ({ ctx, next, path, type, inpu
 // pnpm add xlsx jspdf jspdf-autotable
 
 // client/src/lib/export.ts
-import * as XLSX from 'xlsx';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
-export function exportToExcel(data: any[], filename: string, options?: ExportOptions) {
+export function exportToExcel(
+  data: any[],
+  filename: string,
+  options?: ExportOptions
+) {
   // Filtrar colunas se especificado
-  const filteredData = options?.columns 
+  const filteredData = options?.columns
     ? data.map(row => pick(row, options.columns))
     : data;
-  
+
   // Criar workbook
   const ws = XLSX.utils.json_to_sheet(filteredData);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Dados");
-  
+
   // Aplicar formatação
   if (options?.formatting) {
     applyExcelFormatting(ws, options.formatting);
   }
-  
+
   // Download
   XLSX.writeFile(wb, filename);
 }
 
-export function exportToPDF(data: any[], filename: string, options?: ExportOptions) {
+export function exportToPDF(
+  data: any[],
+  filename: string,
+  options?: ExportOptions
+) {
   const doc = new jsPDF();
-  
+
   // Header
   doc.setFontSize(18);
   doc.text(options?.title || "Relatório", 14, 22);
   doc.setFontSize(11);
-  doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, 30);
-  
+  doc.text(`Gerado em: ${new Date().toLocaleString("pt-BR")}`, 14, 30);
+
   // Filtrar colunas
   const columns = options?.columns || Object.keys(data[0]);
   const rows = data.map(row => columns.map(col => row[col]));
-  
+
   // Tabela
   autoTable(doc, {
     head: [columns],
@@ -430,7 +462,7 @@ export function exportToPDF(data: any[], filename: string, options?: ExportOptio
     styles: { fontSize: 8 },
     headStyles: { fillColor: [59, 130, 246] },
   });
-  
+
   // Download
   doc.save(filename);
 }
@@ -443,12 +475,12 @@ export function exportFilteredData(
     statusFilter?: string;
     tags?: number[];
   },
-  format: 'csv' | 'excel' | 'pdf',
+  format: "csv" | "excel" | "pdf",
   filename: string
 ) {
   // Aplicar filtros
   let filteredData = allData;
-  
+
   if (filters.searchQuery) {
     filteredData = filteredData.filter(item =>
       Object.values(item).some(val =>
@@ -456,26 +488,28 @@ export function exportFilteredData(
       )
     );
   }
-  
-  if (filters.statusFilter && filters.statusFilter !== 'all') {
-    filteredData = filteredData.filter(item => item.validationStatus === filters.statusFilter);
+
+  if (filters.statusFilter && filters.statusFilter !== "all") {
+    filteredData = filteredData.filter(
+      item => item.validationStatus === filters.statusFilter
+    );
   }
-  
+
   if (filters.tags && filters.tags.length > 0) {
     filteredData = filteredData.filter(item =>
       item.tags?.some((tag: any) => filters.tags!.includes(tag.id))
     );
   }
-  
+
   // Exportar no formato escolhido
   switch (format) {
-    case 'csv':
+    case "csv":
       exportToCSV(filteredData, filename);
       break;
-    case 'excel':
+    case "excel":
       exportToExcel(filteredData, filename);
       break;
-    case 'pdf':
+    case "pdf":
       exportToPDF(filteredData, filename);
       break;
   }
@@ -512,6 +546,7 @@ export function ExportMenu({ data, filters }: ExportMenuProps) {
 ```
 
 **Métricas de Sucesso:**
+
 - 90% dos usuários usam Excel ao invés de CSV
 - Tempo de exportação < 3s para 1000 registros
 - 0 erros de formatação
@@ -523,6 +558,7 @@ export function ExportMenu({ data, filters }: ExportMenuProps) {
 **Objetivo:** Permitir ajuste de densidade visual e tamanho de fonte.
 
 **Escopo:**
+
 - Toggle de modo compacto (reduz espaçamentos)
 - Controles de zoom (80%, 90%, 100%, 110%)
 - Persistência no localStorage
@@ -537,7 +573,7 @@ export function ExportMenu({ data, filters }: ExportMenuProps) {
 export function ViewControls() {
   const { isCompact, toggleCompact } = useCompactMode();
   const { zoomLevel, setZoomLevel } = useZoom();
-  
+
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -548,7 +584,7 @@ export function ViewControls() {
         <Minimize2 className="h-4 w-4 mr-2" />
         Compacto
       </Button>
-      
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm">
@@ -577,6 +613,7 @@ export function ViewControls() {
 ```
 
 **Métricas de Sucesso:**
+
 - 40% dos usuários ativam modo compacto
 - 20% dos usuários ajustam zoom
 - Preferências persistem entre sessões
@@ -588,6 +625,7 @@ export function ViewControls() {
 **Objetivo:** Marcar mercados/clientes prioritários para acesso rápido.
 
 **Escopo:**
+
 - Criar tabela `favoritos`
 - Botão de estrela em todos os cards
 - Filtro "Apenas Favoritos"
@@ -613,7 +651,7 @@ favoritos: router({
     .query(async ({ ctx, input }) => {
       return await db.getFavoritos(ctx.user.id, input.entityType);
     }),
-    
+
   toggle: protectedProcedure
     .input(z.object({
       entityType: z.enum(["mercado", "cliente", "concorrente", "lead"]),
@@ -633,14 +671,14 @@ export function FavoriteButton({ entityType, entityId }: FavoriteButtonProps) {
   const { data: favoritos } = trpc.favoritos.list.useQuery({ entityType });
   const toggleMutation = trpc.favoritos.toggle.useMutation();
   const utils = trpc.useUtils();
-  
+
   const isFavorite = favoritos?.some(f => f.entityId === entityId);
-  
+
   const handleToggle = async () => {
     await toggleMutation.mutateAsync({ entityType, entityId });
     utils.favoritos.list.invalidate();
   };
-  
+
   return (
     <Button
       variant="ghost"
@@ -659,6 +697,7 @@ export function FavoriteButton({ entityType, entityId }: FavoriteButtonProps) {
 ```
 
 **Métricas de Sucesso:**
+
 - 60% dos usuários marcam favoritos
 - Média de 10 favoritos por usuário
 - Filtro de favoritos usado em 30% das sessões
@@ -672,6 +711,7 @@ export function FavoriteButton({ entityType, entityId }: FavoriteButtonProps) {
 **Objetivo:** Notificar usuários sobre eventos importantes em tempo real.
 
 **Escopo:**
+
 - Sistema de notificações in-app
 - Notificações push via Service Worker
 - Tipos: nova importação, validação concluída, comentário
@@ -698,9 +738,9 @@ export const notifications = mysqlTable("notifications", {
 export async function createNotification(notification: InsertNotification) {
   const db = await getDb();
   if (!db) return;
-  
+
   await db.insert(notifications).values(notification);
-  
+
   // Enviar push notification se usuário tiver habilitado
   await sendPushNotification(notification.userId, {
     title: notification.title,
@@ -716,9 +756,9 @@ export async function createNotification(notification: InsertNotification) {
 export function NotificationCenter() {
   const { data: notifications } = trpc.notifications.list.useQuery();
   const markAsReadMutation = trpc.notifications.markAsRead.useMutation();
-  
+
   const unreadCount = notifications?.filter(n => !n.isRead).length || 0;
-  
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -752,6 +792,7 @@ export function NotificationCenter() {
 ```
 
 **Métricas de Sucesso:**
+
 - 70% dos usuários habilitam notificações
 - Taxa de clique em notificações > 40%
 - Tempo de resposta a eventos críticos reduzido em 50%
@@ -763,6 +804,7 @@ export function NotificationCenter() {
 **Objetivo:** Importar grandes volumes de dados via CSV/Excel.
 
 **Escopo:**
+
 - Upload de arquivos CSV/Excel
 - Mapeamento de colunas
 - Validação de dados antes de importar
@@ -789,10 +831,10 @@ import: router({
         fileUrl: input.fileUrl,
         mapping: input.mapping,
       });
-      
+
       return { jobId };
     }),
-    
+
   status: protectedProcedure
     .input(z.object({ jobId: z.string() }))
     .query(async ({ input }) => {
@@ -807,13 +849,13 @@ export async function processImportJob(job: ImportJob) {
     const { url } = await storageGet(job.fileUrl);
     const response = await fetch(url);
     const buffer = await response.arrayBuffer();
-    
+
     // Parse CSV/Excel
     const data = parseFile(buffer, job.entityType);
-    
+
     // Validar dados
     const { valid, invalid } = validateImportData(data, job.mapping);
-    
+
     // Importar dados válidos
     const imported = [];
     for (const row of valid) {
@@ -821,7 +863,7 @@ export async function processImportJob(job: ImportJob) {
       const result = await db.createEntity(job.entityType, mapped);
       imported.push(result);
     }
-    
+
     // Criar notificação
     await createNotification({
       userId: job.userId,
@@ -829,7 +871,7 @@ export async function processImportJob(job: ImportJob) {
       title: "Importação concluída",
       message: `${imported.length} registros importados com sucesso. ${invalid.length} erros.`,
     });
-    
+
     return { success: true, imported: imported.length, errors: invalid.length };
   } catch (error) {
     await createNotification({
@@ -852,36 +894,36 @@ export function ImportWizard({ entityType }: ImportWizardProps) {
   const [file, setFile] = useState<File | null>(null);
   const [mapping, setMapping] = useState<Record<string, string>>({});
   const [preview, setPreview] = useState<any[]>([]);
-  
+
   const uploadMutation = trpc.import.upload.useMutation();
-  
+
   const handleUpload = async () => {
     if (!file) return;
-    
+
     // Upload para S3
     const formData = new FormData();
     formData.append('file', file);
     const response = await fetch('/api/upload', { method: 'POST', body: formData });
     const { url } = await response.json();
-    
+
     // Iniciar importação
     const { jobId } = await uploadMutation.mutateAsync({
       entityType,
       fileUrl: url,
       mapping,
     });
-    
+
     // Monitorar progresso
     pollImportStatus(jobId);
   };
-  
+
   return (
     <Dialog>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>Importar {entityType}s</DialogTitle>
         </DialogHeader>
-        
+
         {step === 1 && <UploadStep onNext={(f) => { setFile(f); setStep(2); }} />}
         {step === 2 && <MappingStep file={file!} onNext={(m) => { setMapping(m); setStep(3); }} />}
         {step === 3 && <PreviewStep mapping={mapping} onNext={() => setStep(4)} />}
@@ -893,6 +935,7 @@ export function ImportWizard({ entityType }: ImportWizardProps) {
 ```
 
 **Métricas de Sucesso:**
+
 - Importação de 1000 registros em < 30s
 - Taxa de erro < 5%
 - 80% dos usuários completam importação com sucesso
@@ -904,6 +947,7 @@ export function ImportWizard({ entityType }: ImportWizardProps) {
 **Objetivo:** Preencher dados automaticamente consultando CNPJ na Receita Federal.
 
 **Escopo:**
+
 - Integração com API da Receita Federal
 - Botão "Enriquecer Dados" em cada card
 - Preenchimento automático de: razão social, nome fantasia, endereço, telefone, email
@@ -940,23 +984,23 @@ const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 horas
 export async function consultarCNPJ(cnpj: string): Promise<ReceitaFederalResponse | null> {
   // Limpar formatação
   const cnpjLimpo = cnpj.replace(/\D/g, '');
-  
+
   // Verificar cache
   const cached = cache.get(cnpjLimpo);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
     return cached.data;
   }
-  
+
   try {
     // API pública da Receita Federal (via BrasilAPI)
     const response = await axios.get<ReceitaFederalResponse>(
       `https://brasilapi.com.br/api/cnpj/v1/${cnpjLimpo}`,
       { timeout: 10000 }
     );
-    
+
     // Salvar no cache
     cache.set(cnpjLimpo, { data: response.data, timestamp: Date.now() });
-    
+
     return response.data;
   } catch (error) {
     console.error('[Receita Federal API] Erro ao consultar CNPJ:', error);
@@ -971,7 +1015,7 @@ enriquecimento: router({
     .mutation(async ({ input }) => {
       return await consultarCNPJ(input.cnpj);
     }),
-    
+
   enriquecerCliente: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
@@ -979,12 +1023,12 @@ enriquecimento: router({
       if (!cliente || !cliente.cnpj) {
         throw new Error("Cliente não encontrado ou CNPJ inválido");
       }
-      
+
       const dados = await consultarCNPJ(cliente.cnpj);
       if (!dados) {
         throw new Error("Não foi possível consultar o CNPJ");
       }
-      
+
       // Atualizar apenas campos vazios
       const updates: Partial<Cliente> = {};
       if (!cliente.nome && dados.razao_social) updates.nome = dados.razao_social;
@@ -996,9 +1040,9 @@ enriquecimento: router({
       if (!cliente.estado && dados.uf) updates.estado = dados.uf;
       if (!cliente.telefone && dados.telefone) updates.telefone = dados.telefone;
       if (!cliente.email && dados.email) updates.email = dados.email;
-      
+
       await db.updateCliente(input.id, updates);
-      
+
       // Registrar no audit log
       await createAuditLog({
         userId: "system",
@@ -1010,7 +1054,7 @@ enriquecimento: router({
         afterState: { ...cliente, ...updates },
         changes: Object.keys(updates),
       });
-      
+
       return { success: true, updates };
     }),
 }),
@@ -1023,7 +1067,7 @@ enriquecimento: router({
 export function EnrichButton({ entityType, entityId, cnpj }: EnrichButtonProps) {
   const enrichMutation = trpc.enriquecimento.enriquecerCliente.useMutation();
   const utils = trpc.useUtils();
-  
+
   const handleEnrich = async () => {
     try {
       const result = await enrichMutation.mutateAsync({ id: entityId });
@@ -1033,7 +1077,7 @@ export function EnrichButton({ entityType, entityId, cnpj }: EnrichButtonProps) 
       toast.error("Erro ao enriquecer dados: " + error.message);
     }
   };
-  
+
   return (
     <Button
       variant="outline"
@@ -1058,6 +1102,7 @@ export function EnrichButton({ entityType, entityId, cnpj }: EnrichButtonProps) 
 ```
 
 **Métricas de Sucesso:**
+
 - 80% dos CNPJs consultados com sucesso
 - Tempo de consulta < 2s
 - Taxa de cache hit > 60%
@@ -1072,6 +1117,7 @@ export function EnrichButton({ entityType, entityId, cnpj }: EnrichButtonProps) 
 **Objetivo:** Criar visualizações avançadas para análise de dados.
 
 **Escopo:**
+
 - Gráfico de linha: Evolução de validações ao longo do tempo
 - Gráfico de funil: Pipeline de validação
 - Heatmap: Atividade por dia da semana/hora
@@ -1097,17 +1143,17 @@ analytics: router({
     .query(async ({ input }) => {
       return await db.getValidationTimeline(input.startDate, input.endDate, input.entityType);
     }),
-    
+
   funnel: protectedProcedure.query(async () => {
     return await db.getValidationFunnel();
   }),
-  
+
   heatmap: protectedProcedure
     .input(z.object({ startDate: z.date(), endDate: z.date() }))
     .query(async ({ input }) => {
       return await db.getActivityHeatmap(input.startDate, input.endDate);
     }),
-    
+
   geographic: protectedProcedure.query(async () => {
     return await db.getGeographicDistribution();
   }),
@@ -1116,19 +1162,19 @@ analytics: router({
 // client/src/pages/AdvancedDashboard.tsx
 export default function AdvancedDashboard() {
   const [dateRange, setDateRange] = useState({ start: subDays(new Date(), 30), end: new Date() });
-  
+
   const { data: timeline } = trpc.analytics.timeline.useQuery(dateRange);
   const { data: funnel } = trpc.analytics.funnel.useQuery();
   const { data: heatmap } = trpc.analytics.heatmap.useQuery(dateRange);
   const { data: geographic } = trpc.analytics.geographic.useQuery();
-  
+
   return (
     <div className="container py-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Dashboard Avançado</h1>
         <DateRangePicker value={dateRange} onChange={setDateRange} />
       </div>
-      
+
       {/* Timeline */}
       <Card>
         <CardHeader>
@@ -1149,7 +1195,7 @@ export default function AdvancedDashboard() {
           </ResponsiveContainer>
         </CardContent>
       </Card>
-      
+
       {/* Funnel */}
       <Card>
         <CardHeader>
@@ -1159,7 +1205,7 @@ export default function AdvancedDashboard() {
           <FunnelChart data={funnel} />
         </CardContent>
       </Card>
-      
+
       {/* Heatmap */}
       <Card>
         <CardHeader>
@@ -1169,7 +1215,7 @@ export default function AdvancedDashboard() {
           <ActivityHeatmap data={heatmap} />
         </CardContent>
       </Card>
-      
+
       {/* Geographic Map */}
       <Card>
         <CardHeader>
@@ -1185,6 +1231,7 @@ export default function AdvancedDashboard() {
 ```
 
 **Métricas de Sucesso:**
+
 - Dashboard carrega em < 2s
 - 70% dos usuários acessam dashboard semanalmente
 - Insights acionáveis identificados em 80% das sessões
@@ -1198,6 +1245,7 @@ export default function AdvancedDashboard() {
 **Objetivo:** Busca inteligente que entende intenção e contexto.
 
 **Escopo:**
+
 - Embeddings de texto com OpenAI
 - Busca por similaridade semântica
 - Sugestões de busca inteligentes
@@ -1211,7 +1259,7 @@ export default function AdvancedDashboard() {
 // pnpm add openai
 
 // server/_core/aiSearch.ts
-import OpenAI from 'openai';
+import OpenAI from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -1221,7 +1269,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     model: "text-embedding-3-small",
     input: text,
   });
-  
+
   return response.data[0].embedding;
 }
 
@@ -1241,7 +1289,7 @@ export async function semanticSearch(
 ): Promise<any[]> {
   // Gerar embedding da query
   const queryEmbedding = await generateEmbedding(query);
-  
+
   // Calcular similaridade com cada entidade
   const results = entities.map(entity => {
     // Concatenar campos relevantes
@@ -1251,31 +1299,34 @@ export async function semanticSearch(
       entity.produto,
       entity.descricao,
       entity.cidade,
-    ].filter(Boolean).join(' ');
-    
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     // Usar embedding pré-calculado ou gerar novo
     const embedding = entity.embedding || generateEmbedding(text);
-    
+
     return {
       ...entity,
       similarity: cosineSimilarity(queryEmbedding, embedding),
     };
   });
-  
+
   // Ordenar por similaridade e retornar top K
-  return results
-    .sort((a, b) => b.similarity - a.similarity)
-    .slice(0, topK);
+  return results.sort((a, b) => b.similarity - a.similarity).slice(0, topK);
 }
 
 // Sugestões inteligentes
-export async function generateSearchSuggestions(query: string): Promise<string[]> {
+export async function generateSearchSuggestions(
+  query: string
+): Promise<string[]> {
   const response = await openai.chat.completions.create({
     model: "gpt-4",
     messages: [
       {
         role: "system",
-        content: "Você é um assistente que sugere buscas relacionadas para um sistema de gestão de mercado B2B. Retorne 5 sugestões de busca relacionadas.",
+        content:
+          "Você é um assistente que sugere buscas relacionadas para um sistema de gestão de mercado B2B. Retorne 5 sugestões de busca relacionadas.",
       },
       {
         role: "user",
@@ -1285,12 +1336,13 @@ export async function generateSearchSuggestions(query: string): Promise<string[]
     temperature: 0.7,
     max_tokens: 200,
   });
-  
-  const suggestions = response.choices[0].message.content
-    ?.split('\n')
-    .filter(s => s.trim())
-    .slice(0, 5) || [];
-  
+
+  const suggestions =
+    response.choices[0].message.content
+      ?.split("\n")
+      .filter(s => s.trim())
+      .slice(0, 5) || [];
+
   return suggestions;
 }
 
@@ -1305,14 +1357,14 @@ export const clientes = mysqlTable("clientes", {
 export async function generateEmbeddingsJob() {
   const db = await getDb();
   if (!db) return;
-  
+
   // Buscar entidades sem embedding
   const entities = await db
     .select()
     .from(clientes)
     .where(isNull(clientes.embedding))
     .limit(100);
-  
+
   for (const entity of entities) {
     const text = [
       entity.nome,
@@ -1320,10 +1372,12 @@ export async function generateEmbeddingsJob() {
       entity.produto,
       entity.descricao,
       entity.cidade,
-    ].filter(Boolean).join(' ');
-    
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     const embedding = await generateEmbedding(text);
-    
+
     await db
       .update(clientes)
       .set({ embedding, embeddingUpdatedAt: new Date() })
@@ -1339,20 +1393,20 @@ export async function generateEmbeddingsJob() {
 export function SemanticSearch() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  
+
   const searchMutation = trpc.search.semantic.useMutation();
-  
+
   const handleSearch = async () => {
     const results = await searchMutation.mutateAsync({ query });
     // Exibir resultados
   };
-  
+
   const loadSuggestions = useDebouncedCallback(async (q: string) => {
     if (q.length < 3) return;
     const suggs = await generateSearchSuggestions(q);
     setSuggestions(suggs);
   }, 500);
-  
+
   return (
     <div className="relative">
       <Input
@@ -1363,7 +1417,7 @@ export function SemanticSearch() {
         }}
         placeholder="Buscar por conceito (ex: empresas de tecnologia)"
       />
-      
+
       {suggestions.length > 0 && (
         <div className="absolute top-full left-0 right-0 bg-card border rounded-md mt-1 shadow-lg">
           {suggestions.map((suggestion, i) => (
@@ -1383,6 +1437,7 @@ export function SemanticSearch() {
 ```
 
 **Métricas de Sucesso:**
+
 - Precisão de busca semântica > 80%
 - Tempo de resposta < 1s
 - 60% dos usuários usam busca semântica
@@ -1396,6 +1451,7 @@ export function SemanticSearch() {
 **Objetivo:** Sincronização bidirecional com Google Sheets.
 
 **Escopo:**
+
 - Exportar dados para Google Sheets
 - Importar dados de Google Sheets
 - Sincronização automática (polling ou webhooks)
@@ -1409,14 +1465,14 @@ export function SemanticSearch() {
 // pnpm add googleapis
 
 // server/_core/googleSheetsAPI.ts
-import { google } from 'googleapis';
+import { google } from "googleapis";
 
 const auth = new google.auth.GoogleAuth({
   credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS!),
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
-const sheets = google.sheets({ version: 'v4', auth });
+const sheets = google.sheets({ version: "v4", auth });
 
 export async function exportToGoogleSheets(
   spreadsheetId: string,
@@ -1426,7 +1482,7 @@ export async function exportToGoogleSheets(
   await sheets.spreadsheets.values.update({
     spreadsheetId,
     range,
-    valueInputOption: 'RAW',
+    valueInputOption: "RAW",
     requestBody: { values: data },
   });
 }
@@ -1439,7 +1495,7 @@ export async function importFromGoogleSheets(
     spreadsheetId,
     range,
   });
-  
+
   return response.data.values || [];
 }
 
@@ -1447,25 +1503,25 @@ export async function importFromGoogleSheets(
 export async function syncWithGoogleSheets(syncConfig: SyncConfig) {
   // Buscar dados do banco
   const localData = await db.getEntities(syncConfig.entityType);
-  
+
   // Buscar dados do Google Sheets
   const sheetData = await importFromGoogleSheets(
     syncConfig.spreadsheetId,
     syncConfig.range
   );
-  
+
   // Comparar e resolver conflitos
   const { toUpdate, toCreate } = compareData(localData, sheetData);
-  
+
   // Atualizar banco
   for (const item of toUpdate) {
     await db.updateEntity(syncConfig.entityType, item.id, item);
   }
-  
+
   for (const item of toCreate) {
     await db.createEntity(syncConfig.entityType, item);
   }
-  
+
   // Atualizar Google Sheets com novos dados do banco
   const updatedData = await db.getEntities(syncConfig.entityType);
   await exportToGoogleSheets(
@@ -1477,6 +1533,7 @@ export async function syncWithGoogleSheets(syncConfig: SyncConfig) {
 ```
 
 **Métricas de Sucesso:**
+
 - Sincronização completa em < 10s para 1000 registros
 - Taxa de conflitos < 5%
 - 40% dos usuários usam integração com Sheets
@@ -1488,6 +1545,7 @@ export async function syncWithGoogleSheets(syncConfig: SyncConfig) {
 **Objetivo:** Permitir integrações externas via API REST.
 
 **Escopo:**
+
 - API REST completa (CRUD)
 - Autenticação via API Key
 - Rate limiting
@@ -1498,8 +1556,8 @@ export async function syncWithGoogleSheets(syncConfig: SyncConfig) {
 
 ```typescript
 // server/api/rest.ts
-import express from 'express';
-import rateLimit from 'express-rate-limit';
+import express from "express";
+import rateLimit from "express-rate-limit";
 
 const apiRouter = express.Router();
 
@@ -1513,18 +1571,18 @@ apiRouter.use(limiter);
 
 // Middleware de autenticação
 async function authenticateAPIKey(req, res, next) {
-  const apiKey = req.headers['x-api-key'];
-  
+  const apiKey = req.headers["x-api-key"];
+
   if (!apiKey) {
-    return res.status(401).json({ error: 'API key required' });
+    return res.status(401).json({ error: "API key required" });
   }
-  
+
   const user = await db.getUserByAPIKey(apiKey);
-  
+
   if (!user) {
-    return res.status(401).json({ error: 'Invalid API key' });
+    return res.status(401).json({ error: "Invalid API key" });
   }
-  
+
   req.user = user;
   next();
 }
@@ -1532,17 +1590,17 @@ async function authenticateAPIKey(req, res, next) {
 apiRouter.use(authenticateAPIKey);
 
 // Endpoints
-apiRouter.get('/mercados', async (req, res) => {
+apiRouter.get("/mercados", async (req, res) => {
   const mercados = await db.getMercados();
   res.json(mercados);
 });
 
-apiRouter.get('/mercados/:id', async (req, res) => {
+apiRouter.get("/mercados/:id", async (req, res) => {
   const mercado = await db.getMercado(parseInt(req.params.id));
   res.json(mercado);
 });
 
-apiRouter.post('/mercados', async (req, res) => {
+apiRouter.post("/mercados", async (req, res) => {
   const mercado = await db.createMercado(req.body);
   res.status(201).json(mercado);
 });
@@ -1553,27 +1611,25 @@ export default apiRouter;
 
 // Documentação OpenAPI
 export const openApiSpec = {
-  openapi: '3.0.0',
+  openapi: "3.0.0",
   info: {
-    title: 'Gestor PAV API',
-    version: '1.0.0',
-    description: 'API para gestão de pesquisa de mercado',
+    title: "Gestor PAV API",
+    version: "1.0.0",
+    description: "API para gestão de pesquisa de mercado",
   },
-  servers: [
-    { url: 'https://api.gestor-pav.com/v1' },
-  ],
+  servers: [{ url: "https://api.gestor-pav.com/v1" }],
   paths: {
-    '/mercados': {
+    "/mercados": {
       get: {
-        summary: 'Listar mercados',
+        summary: "Listar mercados",
         responses: {
-          '200': {
-            description: 'Lista de mercados',
+          "200": {
+            description: "Lista de mercados",
             content: {
-              'application/json': {
+              "application/json": {
                 schema: {
-                  type: 'array',
-                  items: { $ref: '#/components/schemas/Mercado' },
+                  type: "array",
+                  items: { $ref: "#/components/schemas/Mercado" },
                 },
               },
             },
@@ -1586,12 +1642,12 @@ export const openApiSpec = {
   components: {
     schemas: {
       Mercado: {
-        type: 'object',
+        type: "object",
         properties: {
-          id: { type: 'integer' },
-          nome: { type: 'string' },
-          tipo: { type: 'string', enum: ['B2B', 'B2C', 'B2B2C'] },
-          quantidadeClientes: { type: 'integer' },
+          id: { type: "integer" },
+          nome: { type: "string" },
+          tipo: { type: "string", enum: ["B2B", "B2C", "B2B2C"] },
+          quantidadeClientes: { type: "integer" },
         },
       },
     },
@@ -1600,6 +1656,7 @@ export const openApiSpec = {
 ```
 
 **Métricas de Sucesso:**
+
 - API disponível 99.9% do tempo
 - Tempo de resposta < 200ms (p95)
 - 20% dos usuários usam API
@@ -1613,6 +1670,7 @@ export const openApiSpec = {
 **Objetivo:** Suportar múltiplas organizações no mesmo sistema.
 
 **Escopo:**
+
 - Isolamento de dados por tenant
 - Gerenciamento de usuários por tenant
 - Planos e billing por tenant
@@ -1635,7 +1693,9 @@ export const tenants = mysqlTable("tenants", {
 
 export const tenantUsers = mysqlTable("tenant_users", {
   id: int("id").primaryKey().autoincrement(),
-  tenantId: int("tenantId").notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  tenantId: int("tenantId")
+    .notNull()
+    .references(() => tenants.id, { onDelete: "cascade" }),
   userId: varchar("userId", { length: 64 }).notNull(),
   role: mysqlEnum("role", ["owner", "admin", "member"]).default("member"),
   createdAt: timestamp("createdAt").defaultNow(),
@@ -1644,22 +1704,27 @@ export const tenantUsers = mysqlTable("tenant_users", {
 // Adicionar tenantId em todas as tabelas
 export const mercados = mysqlTable("mercados", {
   // ... campos existentes
-  tenantId: int("tenantId").notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  tenantId: int("tenantId")
+    .notNull()
+    .references(() => tenants.id, { onDelete: "cascade" }),
 });
 
 // Middleware para injetar tenantId
 export const tenantMiddleware = t.middleware(async ({ ctx, next }) => {
   if (!ctx.user) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' });
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }
-  
+
   // Buscar tenant do usuário
   const tenantUser = await db.getTenantUser(ctx.user.id);
-  
+
   if (!tenantUser) {
-    throw new TRPCError({ code: 'FORBIDDEN', message: 'User not associated with any tenant' });
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "User not associated with any tenant",
+    });
   }
-  
+
   return next({
     ctx: {
       ...ctx,
@@ -1675,7 +1740,7 @@ export const tenantProcedure = publicProcedure.use(tenantMiddleware);
 export async function getMercados(tenantId: number) {
   const db = await getDb();
   if (!db) return [];
-  
+
   return await db
     .select()
     .from(mercados)
@@ -1684,6 +1749,7 @@ export async function getMercados(tenantId: number) {
 ```
 
 **Métricas de Sucesso:**
+
 - Isolamento de dados 100% efetivo
 - Tempo de provisionamento de novo tenant < 1min
 - Suporte a 100+ tenants simultâneos
@@ -1697,6 +1763,7 @@ export async function getMercados(tenantId: number) {
 **Objetivo:** Otimizar performance para escala.
 
 **Escopo:**
+
 - Paginação virtual (react-virtual) para listas grandes
 - Lazy loading de imagens
 - Code splitting e lazy loading de rotas
@@ -1715,14 +1782,14 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 
 export function VirtualList({ items, renderItem }: VirtualListProps) {
   const parentRef = useRef<HTMLDivElement>(null);
-  
+
   const virtualizer = useVirtualizer({
     count: items.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 80, // Altura estimada de cada item
     overscan: 5, // Renderizar 5 itens extras acima/abaixo
   });
-  
+
   return (
     <div ref={parentRef} className="h-full overflow-auto">
       <div
@@ -1793,6 +1860,7 @@ self.addEventListener('fetch', (event) => {
 ```
 
 **Métricas de Sucesso:**
+
 - Lighthouse Score > 90
 - First Contentful Paint < 1.5s
 - Time to Interactive < 3s
@@ -1802,38 +1870,42 @@ self.addEventListener('fetch', (event) => {
 
 ## Resumo de Estimativas
 
-| Fase | Funcionalidades | Horas | Trimestre |
-|------|----------------|-------|-----------|
-| **Fase 1** | Tags, Paginação, Audit Log | 40h | Q1 2026 |
-| **Fase 2** | Exportação, UX, Favoritos | 40h | Q1 2026 |
-| **Fase 3** | Notificações, Importação, Enriquecimento | 35h | Q2 2026 |
-| **Fase 4** | Dashboard Avançado | 25h | Q3 2026 |
-| **Fase 5** | Busca Semântica IA | 30h | Q3 2026 |
-| **Fase 6** | Google Sheets, API Pública | 30h | Q4 2026 |
-| **Fase 7** | Multi-tenant | 30h | Q4 2026 |
-| **Fase 8** | Otimizações Finais | 20h | Q4 2026 |
-| **TOTAL** | **15 funcionalidades** | **280h** | **4 trimestres** |
+| Fase       | Funcionalidades                          | Horas    | Trimestre        |
+| ---------- | ---------------------------------------- | -------- | ---------------- |
+| **Fase 1** | Tags, Paginação, Audit Log               | 40h      | Q1 2026          |
+| **Fase 2** | Exportação, UX, Favoritos                | 40h      | Q1 2026          |
+| **Fase 3** | Notificações, Importação, Enriquecimento | 35h      | Q2 2026          |
+| **Fase 4** | Dashboard Avançado                       | 25h      | Q3 2026          |
+| **Fase 5** | Busca Semântica IA                       | 30h      | Q3 2026          |
+| **Fase 6** | Google Sheets, API Pública               | 30h      | Q4 2026          |
+| **Fase 7** | Multi-tenant                             | 30h      | Q4 2026          |
+| **Fase 8** | Otimizações Finais                       | 20h      | Q4 2026          |
+| **TOTAL**  | **15 funcionalidades**                   | **280h** | **4 trimestres** |
 
 ---
 
 ## Priorização Recomendada
 
 ### Implementar IMEDIATAMENTE (Semanas 1-4)
+
 1. ✅ Paginação Server-Side (8h) - Crítico para performance
 2. ✅ Exportação Avançada (12h) - Alto valor, baixo esforço
 3. ✅ Sistema de Favoritos (12h) - Melhora produtividade
 
 ### Implementar EM SEGUIDA (Semanas 5-12)
+
 4. Tags Customizáveis (20h) - Organização flexível
 5. Audit Log (18h) - Rastreabilidade
 6. Enriquecimento API (20h) - Automação
 
 ### Implementar DEPOIS (Mês 3-6)
+
 7. Notificações Push (15h)
 8. Importação em Lote (15h)
 9. Dashboard Avançado (25h)
 
 ### Roadmap Futuro (Mês 6+)
+
 10. Busca Semântica IA (30h)
 11. Google Sheets (15h)
 12. API Pública (15h)
@@ -1844,26 +1916,26 @@ self.addEventListener('fetch', (event) => {
 
 ## Métricas de Sucesso Globais
 
-| Métrica | Baseline Atual | Meta Q2 2026 | Meta Q4 2026 |
-|---------|----------------|--------------|--------------|
-| **Tempo de validação por item** | 30s | 15s (-50%) | 10s (-67%) |
-| **Taxa de adoção de funcionalidades** | 60% | 75% | 85% |
-| **Satisfação do usuário (NPS)** | N/A | 40 | 60 |
-| **Tempo de carregamento (p95)** | 2s | 1.5s | 1s |
-| **Taxa de erro** | 5% | 2% | 1% |
-| **Uptime** | 99% | 99.5% | 99.9% |
+| Métrica                               | Baseline Atual | Meta Q2 2026 | Meta Q4 2026 |
+| ------------------------------------- | -------------- | ------------ | ------------ |
+| **Tempo de validação por item**       | 30s            | 15s (-50%)   | 10s (-67%)   |
+| **Taxa de adoção de funcionalidades** | 60%            | 75%          | 85%          |
+| **Satisfação do usuário (NPS)**       | N/A            | 40           | 60           |
+| **Tempo de carregamento (p95)**       | 2s             | 1.5s         | 1s           |
+| **Taxa de erro**                      | 5%             | 2%           | 1%           |
+| **Uptime**                            | 99%            | 99.5%        | 99.9%        |
 
 ---
 
 ## Riscos e Mitigações
 
-| Risco | Probabilidade | Impacto | Mitigação |
-|-------|---------------|---------|-----------|
-| **Integração API Receita Federal instável** | Alta | Médio | Implementar cache agressivo + fallback manual |
-| **Performance com datasets grandes** | Média | Alto | Paginação server-side + índices otimizados |
-| **Complexidade de multi-tenant** | Média | Alto | Implementar em fases, começar com single-tenant |
-| **Custo de APIs (OpenAI)** | Baixa | Médio | Cache de embeddings + rate limiting |
-| **Adoção de funcionalidades avançadas** | Média | Médio | Onboarding guiado + tooltips contextuais |
+| Risco                                       | Probabilidade | Impacto | Mitigação                                       |
+| ------------------------------------------- | ------------- | ------- | ----------------------------------------------- |
+| **Integração API Receita Federal instável** | Alta          | Médio   | Implementar cache agressivo + fallback manual   |
+| **Performance com datasets grandes**        | Média         | Alto    | Paginação server-side + índices otimizados      |
+| **Complexidade de multi-tenant**            | Média         | Alto    | Implementar em fases, começar com single-tenant |
+| **Custo de APIs (OpenAI)**                  | Baixa         | Médio   | Cache de embeddings + rate limiting             |
+| **Adoção de funcionalidades avançadas**     | Média         | Médio   | Onboarding guiado + tooltips contextuais        |
 
 ---
 
@@ -1872,6 +1944,7 @@ self.addEventListener('fetch', (event) => {
 Este plano de implementação fornece um **roadmap claro e executável** para transformar o Gestor PAV em uma plataforma completa e escalável de gestão de pesquisa de mercado. Com **280 horas** de desenvolvimento distribuídas em **4 trimestres**, o sistema evoluirá de uma ferramenta de validação básica para uma **plataforma enterprise** com IA, automação e integrações avançadas.
 
 **Próximos Passos Imediatos:**
+
 1. Revisar e aprovar roadmap com stakeholders
 2. Priorizar Fase 1 (Tags + Paginação + Audit Log)
 3. Alocar recursos de desenvolvimento

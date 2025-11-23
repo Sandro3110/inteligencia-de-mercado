@@ -31,7 +31,9 @@ const ReportsAutomation = lazy(() => import("./pages/ReportsAutomation"));
 const PerformanceCenter = lazy(() => import("./pages/PerformanceCenter"));
 const EnrichmentSettings = lazy(() => import("./pages/EnrichmentSettings"));
 
-const ResultadosEnriquecimento = lazy(() => import("./pages/ResultadosEnriquecimento"));
+const ResultadosEnriquecimento = lazy(
+  () => import("./pages/ResultadosEnriquecimento")
+);
 
 const ExportWizard = lazy(() => import("./pages/ExportWizard"));
 // TemplateAdmin fundido em ExportWizard
@@ -50,7 +52,6 @@ const GeoAdmin = lazy(() => import("./pages/GeoAdmin"));
 const GeoCockpit = lazy(() => import("./pages/GeoCockpit"));
 // GeoCockpitTest, GeoCockpitAdvanced, TerritorialAnalysis, TerritorialHeatmap fundidos em GeoCockpit
 
-
 const SystemSettings = lazy(() => import("./pages/SystemSettings"));
 const Ajuda = lazy(() => import("./pages/Ajuda"));
 
@@ -67,12 +68,27 @@ function Router() {
     <Switch>
       {/* Cockpit Unificado - Página Principal */}
       <Route path={"/"} component={UnifiedCockpit} />
-      
+
       {/* Redirects das rotas antigas para o cockpit unificado */}
-      <Route path="/cascade">{() => { window.location.href = '/?view=lista'; return null; }}</Route>
-      <Route path="/geo-cockpit">{() => { window.location.href = '/?view=mapa'; return null; }}</Route>
-      <Route path="/mercados">{() => { window.location.href = '/?view=lista'; return null; }}</Route>
-      
+      <Route path="/cascade">
+        {() => {
+          window.location.href = "/?view=lista";
+          return null;
+        }}
+      </Route>
+      <Route path="/geo-cockpit">
+        {() => {
+          window.location.href = "/?view=mapa";
+          return null;
+        }}
+      </Route>
+      <Route path="/mercados">
+        {() => {
+          window.location.href = "/?view=lista";
+          return null;
+        }}
+      </Route>
+
       {/* Páginas secundárias mantidas */}
       <Route path="/mercado/:id" component={MercadoDetalhes} />
       <Route path="/enrichment" component={EnrichmentFlow} />
@@ -81,20 +97,48 @@ function Router() {
       <Route path="/enrichment-progress" component={EnrichmentProgress} />
       <Route path="/alertas" component={AlertsPage} />
       {/* /alertas/historico fundido em /alertas */}
-      
+
       {/* Relatórios e Automação - Fusão de 3 páginas */}
       <Route path="/relatorios" component={ReportsAutomation} />
-      <Route path="/agendamentos-relatorios">{() => { window.location.href = '/relatorios'; return null; }}</Route>
-      <Route path="/agendamento">{() => { window.location.href = '/relatorios'; return null; }}</Route>
-      
+      <Route path="/agendamentos-relatorios">
+        {() => {
+          window.location.href = "/relatorios";
+          return null;
+        }}
+      </Route>
+      <Route path="/agendamento">
+        {() => {
+          window.location.href = "/relatorios";
+          return null;
+        }}
+      </Route>
+
       {/* Performance e Conversão - Fusão de 3 páginas */}
       <Route path="/performance" component={PerformanceCenter} />
-      <Route path="/roi">{() => { window.location.href = '/performance'; return null; }}</Route>
-      <Route path="/funil">{() => { window.location.href = '/performance'; return null; }}</Route>
-      <Route path="/research-overview">{() => { window.location.href = '/performance'; return null; }}</Route>
-      
+      <Route path="/roi">
+        {() => {
+          window.location.href = "/performance";
+          return null;
+        }}
+      </Route>
+      <Route path="/funil">
+        {() => {
+          window.location.href = "/performance";
+          return null;
+        }}
+      </Route>
+      <Route path="/research-overview">
+        {() => {
+          window.location.href = "/performance";
+          return null;
+        }}
+      </Route>
+
       <Route path="/enrichment-settings" component={EnrichmentSettings} />
-      <Route path="/resultados-enriquecimento" component={ResultadosEnriquecimento} />
+      <Route
+        path="/resultados-enriquecimento"
+        component={ResultadosEnriquecimento}
+      />
 
       <Route path="/export" component={ExportWizard} />
       {/* /export/templates fundido em /export/wizard */}
@@ -103,12 +147,22 @@ function Router() {
       <Route path="/monitoring" component={MonitoringDashboard} />
       {/* /intelligent-alerts fundido em /alertas */}
       <Route path="/tendencias" component={TendenciasDashboard} />
-      
+
       {/* Gestão de Projetos - Fusão de 3 páginas */}
       <Route path="/projetos" component={ProjectManagement} />
       <Route path="/pesquisas" component={SurveysList} />
-      <Route path="/projetos/atividade">{() => { window.location.href = '/projetos'; return null; }}</Route>
-      <Route path="/atividade">{() => { window.location.href = '/projetos'; return null; }}</Route>
+      <Route path="/projetos/atividade">
+        {() => {
+          window.location.href = "/projetos";
+          return null;
+        }}
+      </Route>
+      <Route path="/atividade">
+        {() => {
+          window.location.href = "/projetos";
+          return null;
+        }}
+      </Route>
       <Route path="/notificacoes" component={Notificacoes} />
       <Route path="/notificacoes/config" component={NotificationConfig} />
       {/* /export/historico fundido em /export/wizard */}
@@ -135,25 +189,23 @@ function Router() {
 function App() {
   // Conectar ao stream de notificações em tempo real
   useRealtimeNotifications();
-  
+
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-      >
+      <ThemeProvider defaultTheme="light">
         <CompactModeProvider>
           <OnboardingProvider>
             <DashboardCustomizationProvider>
               <FilterProvider>
-              <TooltipProvider>
-                <Toaster />
-                <GlobalShortcuts />
-                <OnboardingTour />
-                <AppSidebar />
-                <Suspense fallback={<PageLoader />}>
-                  <Router />
-                </Suspense>
-              </TooltipProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <GlobalShortcuts />
+                  <OnboardingTour />
+                  <AppSidebar />
+                  <Suspense fallback={<PageLoader />}>
+                    <Router />
+                  </Suspense>
+                </TooltipProvider>
               </FilterProvider>
             </DashboardCustomizationProvider>
           </OnboardingProvider>

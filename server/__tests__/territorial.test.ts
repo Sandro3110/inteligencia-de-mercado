@@ -25,7 +25,9 @@ describe("Análise Territorial - Testes Completos", () => {
     if (!db) throw new Error("Database not available");
 
     // Buscar primeiro projeto existente
-    const projectsResult: any = await db.execute(`SELECT id FROM projects LIMIT 1`);
+    const projectsResult: any = await db.execute(
+      `SELECT id FROM projects LIMIT 1`
+    );
     const projects = projectsResult[0] || projectsResult;
     if (projects && projects.length > 0) {
       projectId = projects[0].id;
@@ -35,7 +37,9 @@ describe("Análise Territorial - Testes Completos", () => {
 
     // Buscar primeira pesquisa existente (opcional)
     if (projectId) {
-      const pesquisasResult: any = await db.execute(`SELECT id FROM pesquisas LIMIT 1`);
+      const pesquisasResult: any = await db.execute(
+        `SELECT id FROM pesquisas LIMIT 1`
+      );
       const pesquisas = pesquisasResult[0] || pesquisasResult;
       if (pesquisas && pesquisas.length > 0) {
         pesquisaId = pesquisas[0].id;
@@ -213,24 +217,24 @@ describe("Análise Territorial - Testes Completos", () => {
   describe("Integração Completa", () => {
     it("deve validar performance com grandes volumes", async () => {
       const caller = createCaller();
-      
+
       const startTime = Date.now();
       await caller.territorial.getDensity({
         projectId,
       });
       const endTime = Date.now();
-      
+
       const executionTime = endTime - startTime;
       expect(executionTime).toBeLessThan(5000); // Menos de 5 segundos
     });
 
     it("deve retornar estruturas de dados corretas", async () => {
       const caller = createCaller();
-      
+
       const density = await caller.territorial.getDensity({
         projectId,
       });
-      
+
       const stats = await caller.territorial.getDensityStats({
         projectId,
       });

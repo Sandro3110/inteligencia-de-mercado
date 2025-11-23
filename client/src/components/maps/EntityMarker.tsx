@@ -8,7 +8,12 @@ import L, { DivIcon } from "leaflet";
 import { Building, Users, Package, Target, Sparkles } from "lucide-react";
 import { renderToString } from "react-dom/server";
 
-export type EntityType = "mercado" | "cliente" | "produto" | "concorrente" | "lead";
+export type EntityType =
+  | "mercado"
+  | "cliente"
+  | "produto"
+  | "concorrente"
+  | "lead";
 
 export interface EntityMarkerProps {
   position: [number, number];

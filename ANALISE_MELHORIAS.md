@@ -1,4 +1,5 @@
 # Análise Profunda e Sugestões de Melhorias em Escala
+
 ## Gestor PAV - Sistema de Pesquisa de Mercado
 
 **Data da Análise:** 18 de Novembro de 2025  
@@ -12,12 +13,14 @@
 ### 1.1 Estrutura de Dados
 
 **Pontos Fortes:**
+
 - ✅ Schema bem normalizado com tabelas de junção (clientes_mercados)
 - ✅ Enum de validação consistente em todas as entidades
 - ✅ Campos de auditoria (createdAt, validatedBy, validatedAt)
 - ✅ Hash fields para deduplicação
 
 **Gargalos Identificados:**
+
 - ⚠️ **Falta de índices** - Nenhum índice definido além das PKs
 - ⚠️ **Queries N+1** - Busca de clientes/concorrentes/leads por mercado sem JOIN
 - ⚠️ **Falta de paginação** - Todas as queries retornam datasets completos
@@ -27,12 +30,14 @@
 ### 1.2 Fluxo de Navegação
 
 **Pontos Fortes:**
+
 - ✅ Interface em cascata intuitiva (Mercados → Clientes → Concorrentes → Leads)
 - ✅ Busca global funcional
 - ✅ Filtros por status de validação
 - ✅ Validação em lote implementada
 
 **Fricções Identificadas:**
+
 - ⚠️ **Sem breadcrumbs** - Difícil saber onde está no fluxo
 - ⚠️ **Sem histórico de navegação** - Não há "voltar ao mercado anterior"
 - ⚠️ **Sem favoritos/bookmarks** - Impossível marcar mercados importantes
@@ -42,11 +47,13 @@
 ### 1.3 Extração e Tratamento de Dados
 
 **Pontos Fortes:**
+
 - ✅ Exportação CSV filtrada implementada
 - ✅ Busca global em múltiplos campos
 - ✅ Validação em lote funcional
 
 **Limitações Críticas:**
+
 - ❌ **Sem importação de dados** - Não há como adicionar novos registros via UI
 - ❌ **Sem enriquecimento automático** - CNPJ não busca dados da Receita Federal
 - ❌ **Sem deduplicação visual** - CNPJs duplicados não são detectados
@@ -66,6 +73,7 @@
 **Problema:** Queries lentas em datasets grandes (800+ clientes)
 
 **Solução:**
+
 ```sql
 -- Adicionar índices estratégicos
 CREATE INDEX idx_clientes_mercado ON clientes_mercados(mercadoId, clienteId);
@@ -80,6 +88,7 @@ CREATE FULLTEXT INDEX idx_clientes_search ON clientes(nome, empresa, produtoPrin
 ```
 
 **Impacto Esperado:**
+
 - ⚡ Redução de 70-90% no tempo de queries
 - ⚡ Busca global 10x mais rápida
 - ⚡ Filtros por status instantâneos
@@ -89,21 +98,24 @@ CREATE FULLTEXT INDEX idx_clientes_search ON clientes(nome, empresa, produtoPrin
 **Problema:** Carregar 800 clientes de uma vez trava a interface
 
 **Solução:**
+
 ```typescript
 // Backend: Adicionar paginação aos routers
 clientes: router({
   byMercado: publicProcedure
-    .input(z.object({
-      mercadoId: z.number(),
-      page: z.number().default(1),
-      pageSize: z.number().default(50),
-      validationStatus: z.string().optional(),
-    }))
+    .input(
+      z.object({
+        mercadoId: z.number(),
+        page: z.number().default(1),
+        pageSize: z.number().default(50),
+        validationStatus: z.string().optional(),
+      })
+    )
     .query(async ({ input }) => {
       const offset = (input.page - 1) * input.pageSize;
       const { clientes, total } = await getClientesByMercadoPaginated(
-        input.mercadoId, 
-        input.pageSize, 
+        input.mercadoId,
+        input.pageSize,
         offset,
         input.validationStatus
       );
@@ -115,10 +127,11 @@ clientes: router({
         totalPages: Math.ceil(total / input.pageSize),
       };
     }),
-})
+});
 ```
 
 **Impacto Esperado:**
+
 - ⚡ Carregamento inicial 90% mais rápido
 - ⚡ Memória do navegador reduzida em 80%
 - ⚡ Scroll infinito ou paginação tradicional
@@ -128,6 +141,7 @@ clientes: router({
 **Problema:** Mesmas queries executadas repetidamente
 
 **Solução:**
+
 ```typescript
 // Frontend: Configurar staleTime no tRPC
 export const trpc = createTRPCReact<AppRouter>({
@@ -140,21 +154,22 @@ export const trpc = createTRPCReact<AppRouter>({
 });
 
 // Backend: Cache em memória para stats
-const statsCache = new Map<string, { data: any, timestamp: number }>();
+const statsCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 60000; // 1 minuto
 
 export async function getDashboardStats() {
-  const cached = statsCache.get('stats');
+  const cached = statsCache.get("stats");
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
     return cached.data;
   }
   const data = await computeStats();
-  statsCache.set('stats', { data, timestamp: Date.now() });
+  statsCache.set("stats", { data, timestamp: Date.now() });
   return data;
 }
 ```
 
 **Impacto Esperado:**
+
 - ⚡ Redução de 60% nas queries ao banco
 - ⚡ Navegação entre páginas instantânea
 - ⚡ Menor carga no servidor
@@ -168,6 +183,7 @@ export async function getDashboardStats() {
 **Problema:** Usuário perde contexto ao navegar profundamente
 
 **Solução:**
+
 ```typescript
 // Componente Breadcrumbs
 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -190,6 +206,7 @@ export async function getDashboardStats() {
 ```
 
 **Funcionalidades:**
+
 - 🎯 Breadcrumbs clicáveis em todas as páginas
 - 🎯 Histórico de navegação (últimos 10 mercados visitados)
 - 🎯 Atalho "Alt + ←" para voltar ao mercado anterior
@@ -199,6 +216,7 @@ export async function getDashboardStats() {
 **Problema:** Impossível organizar mercados prioritários
 
 **Solução:**
+
 ```sql
 -- Nova tabela de favoritos
 CREATE TABLE favoritos (
@@ -214,6 +232,7 @@ CREATE TABLE favoritos (
 ```
 
 **Funcionalidades:**
+
 - ⭐ Marcar mercados como favoritos
 - 🏷️ Adicionar tags personalizadas ("Alta Prioridade", "Q1 2025", etc)
 - 📝 Notas privadas por mercado
@@ -224,25 +243,27 @@ CREATE TABLE favoritos (
 **Problema:** Navegação lenta via mouse
 
 **Solução:**
+
 ```typescript
 // Hook useKeyboardShortcuts
 const shortcuts = {
-  'ArrowUp': () => selectPreviousItem(),
-  'ArrowDown': () => selectNextItem(),
-  'ArrowLeft': () => handlePrevPage(),
-  'ArrowRight': () => handleNextPage(),
-  'Enter': () => openDetailPopup(),
-  'Space': () => toggleItemSelection(),
-  'Escape': () => closePopup(),
-  'f': () => toggleFavorite(),
-  'e': () => startEdit(),
-  'v': () => openValidationModal(),
-  '/': () => focusSearch(),
-  '1-4': () => switchToPage(number),
+  ArrowUp: () => selectPreviousItem(),
+  ArrowDown: () => selectNextItem(),
+  ArrowLeft: () => handlePrevPage(),
+  ArrowRight: () => handleNextPage(),
+  Enter: () => openDetailPopup(),
+  Space: () => toggleItemSelection(),
+  Escape: () => closePopup(),
+  f: () => toggleFavorite(),
+  e: () => startEdit(),
+  v: () => openValidationModal(),
+  "/": () => focusSearch(),
+  "1-4": () => switchToPage(number),
 };
 ```
 
 **Funcionalidades:**
+
 - ⌨️ Navegação completa via teclado
 - ⌨️ Seleção múltipla com Shift + ↑↓
 - ⌨️ Atalho "?" mostra painel de ajuda
@@ -253,6 +274,7 @@ const shortcuts = {
 **Problema:** Impossível comparar 2 clientes lado a lado
 
 **Solução:**
+
 ```typescript
 // Estado de comparação
 const [compareMode, setCompareMode] = useState(false);
@@ -271,6 +293,7 @@ const [compareItems, setCompareItems] = useState<Cliente[]>([]);
 ```
 
 **Funcionalidades:**
+
 - 🔄 Comparar até 4 itens lado a lado
 - 🔄 Destacar diferenças automaticamente
 - 🔄 Exportar comparação como PDF
@@ -284,21 +307,24 @@ const [compareItems, setCompareItems] = useState<Cliente[]>([]);
 **Problema:** Dados incompletos e desatualizados
 
 **Solução:**
+
 ```typescript
 // API de enriquecimento
 async function enrichCliente(cnpj: string) {
   // 1. Buscar dados da Receita Federal
   const receitaData = await fetchReceitaFederal(cnpj);
-  
+
   // 2. Buscar dados do LinkedIn
   const linkedinData = await searchLinkedIn(receitaData.razaoSocial);
-  
+
   // 3. Buscar site oficial via Google
-  const siteData = await searchGoogle(`${receitaData.razaoSocial} site oficial`);
-  
+  const siteData = await searchGoogle(
+    `${receitaData.razaoSocial} site oficial`
+  );
+
   // 4. Extrair contatos do site
   const contacts = await extractContacts(siteData.url);
-  
+
   return {
     nome: receitaData.razaoSocial,
     cnpj: receitaData.cnpj,
@@ -313,6 +339,7 @@ async function enrichCliente(cnpj: string) {
 ```
 
 **Funcionalidades:**
+
 - 🤖 Botão "Enriquecer Dados" em cada cliente
 - 🤖 Enriquecimento em lote (100 clientes de uma vez)
 - 🤖 Agendamento de enriquecimento noturno
@@ -323,33 +350,35 @@ async function enrichCliente(cnpj: string) {
 **Problema:** CNPJs duplicados passam despercebidos
 
 **Solução:**
+
 ```typescript
 // Algoritmo de similaridade
 function detectDuplicates(clientes: Cliente[]) {
-  const duplicates: Array<{ original: Cliente, duplicates: Cliente[] }> = [];
-  
+  const duplicates: Array<{ original: Cliente; duplicates: Cliente[] }> = [];
+
   for (let i = 0; i < clientes.length; i++) {
     const similar = clientes.filter((c, j) => {
       if (i === j) return false;
-      
+
       // Critérios de duplicação
       const sameCNPJ = c.cnpj === clientes[i].cnpj && c.cnpj !== null;
       const similarName = levenshtein(c.nome, clientes[i].nome) < 3;
       const sameEmail = c.email === clientes[i].email && c.email !== null;
-      
+
       return sameCNPJ || (similarName && sameEmail);
     });
-    
+
     if (similar.length > 0) {
       duplicates.push({ original: clientes[i], duplicates: similar });
     }
   }
-  
+
   return duplicates;
 }
 ```
 
 **Funcionalidades:**
+
 - 🔍 Painel "Duplicatas Detectadas" no dashboard
 - 🔍 Sugestão de merge com preview
 - 🔍 Merge automático com histórico de auditoria
@@ -360,6 +389,7 @@ function detectDuplicates(clientes: Cliente[]) {
 **Problema:** Validação manual lenta e subjetiva
 
 **Solução:**
+
 ```typescript
 // Validação assistida por IA
 async function suggestValidation(cliente: Cliente) {
@@ -379,31 +409,35 @@ async function suggestValidation(cliente: Cliente) {
     
     Retorne JSON: { status: string, confidence: number, reasoning: string }
   `;
-  
+
   const result = await invokeLLM({
-    messages: [{ role: 'user', content: prompt }],
+    messages: [{ role: "user", content: prompt }],
     response_format: {
-      type: 'json_schema',
+      type: "json_schema",
       json_schema: {
-        name: 'validation_suggestion',
+        name: "validation_suggestion",
         schema: {
-          type: 'object',
+          type: "object",
           properties: {
-            status: { type: 'string', enum: ['rich', 'needs_adjustment', 'discarded'] },
-            confidence: { type: 'number', minimum: 0, maximum: 1 },
-            reasoning: { type: 'string' },
+            status: {
+              type: "string",
+              enum: ["rich", "needs_adjustment", "discarded"],
+            },
+            confidence: { type: "number", minimum: 0, maximum: 1 },
+            reasoning: { type: "string" },
           },
-          required: ['status', 'confidence', 'reasoning'],
+          required: ["status", "confidence", "reasoning"],
         },
       },
     },
   });
-  
+
   return JSON.parse(result.choices[0].message.content);
 }
 ```
 
 **Funcionalidades:**
+
 - 🧠 Sugestão automática de validação com % de confiança
 - 🧠 Explicação do raciocínio da IA
 - 🧠 Validação em lote assistida (IA sugere, humano confirma)
@@ -414,6 +448,7 @@ async function suggestValidation(cliente: Cliente) {
 **Problema:** Score de qualidade existe mas não é calculado
 
 **Solução:**
+
 ```typescript
 // Cálculo de score de qualidade
 function calculateQualityScore(entity: Cliente | Concorrente | Lead): number {
@@ -429,25 +464,26 @@ function calculateQualityScore(entity: Cliente | Concorrente | Lead): number {
     uf: 5,
     cnae: 5,
   };
-  
+
   Object.entries(weights).forEach(([field, weight]) => {
-    if (entity[field] && entity[field] !== '') {
+    if (entity[field] && entity[field] !== "") {
       score += weight;
     }
   });
-  
+
   return score;
 }
 
 function classifyQuality(score: number): string {
-  if (score >= 80) return 'Excelente';
-  if (score >= 60) return 'Bom';
-  if (score >= 40) return 'Regular';
-  return 'Ruim';
+  if (score >= 80) return "Excelente";
+  if (score >= 60) return "Bom";
+  if (score >= 40) return "Regular";
+  return "Ruim";
 }
 ```
 
 **Funcionalidades:**
+
 - 📊 Score visual (0-100) em cada card
 - 📊 Classificação por cores (Verde/Amarelo/Vermelho)
 - 📊 Filtro "Apenas Alta Qualidade" (score > 80)
@@ -462,6 +498,7 @@ function classifyQuality(score: number): string {
 **Problema:** Sem visão consolidada dos dados
 
 **Solução:**
+
 ```typescript
 // Componente Dashboard
 <div className="grid grid-cols-3 gap-6">
@@ -469,12 +506,12 @@ function classifyQuality(score: number): string {
   <StatCard title="Taxa de Validação" value="68%" trend="+12%" />
   <StatCard title="Clientes Ricos" value="544" trend="+89" />
   <StatCard title="Qualidade Média" value="72/100" trend="+5" />
-  
+
   {/* Gráficos */}
   <Chart type="bar" data={validacoesPorMes} title="Validações por Mês" />
   <Chart type="pie" data={distribuicaoPorStatus} title="Distribuição por Status" />
   <Chart type="line" data={qualidadeAoLongo Tempo} title="Evolução da Qualidade" />
-  
+
   {/* Top Lists */}
   <TopList title="Mercados Mais Ricos" items={topMercados} />
   <TopList title="Validadores Mais Ativos" items={topValidadores} />
@@ -482,6 +519,7 @@ function classifyQuality(score: number): string {
 ```
 
 **Funcionalidades:**
+
 - 📈 Dashboard interativo com filtros de período
 - 📈 Exportação de gráficos como imagem/PDF
 - 📈 Alertas automáticos (ex: "Taxa de validação caiu 20%")
@@ -492,6 +530,7 @@ function classifyQuality(score: number): string {
 **Problema:** Exportação limitada a CSV simples
 
 **Solução:**
+
 ```typescript
 // Template de relatório
 interface ReportTemplate {
@@ -504,28 +543,29 @@ interface ReportTemplate {
   fields: string[];
   groupBy?: string;
   sortBy?: string;
-  format: 'excel' | 'pdf' | 'csv' | 'json';
+  format: "excel" | "pdf" | "csv" | "json";
 }
 
 // Gerador de relatórios
 async function generateReport(template: ReportTemplate) {
   const data = await fetchDataWithFilters(template.filters);
   const processed = processData(data, template);
-  
+
   switch (template.format) {
-    case 'excel':
+    case "excel":
       return generateExcel(processed);
-    case 'pdf':
+    case "pdf":
       return generatePDF(processed);
-    case 'csv':
+    case "csv":
       return generateCSV(processed);
-    case 'json':
+    case "json":
       return JSON.stringify(processed);
   }
 }
 ```
 
 **Funcionalidades:**
+
 - 📄 Templates salvos de relatórios
 - 📄 Agendamento de relatórios (semanal/mensal)
 - 📄 Envio automático por email
@@ -536,39 +576,44 @@ async function generateReport(template: ReportTemplate) {
 **Problema:** Apenas CSV, sem formatação
 
 **Solução:**
+
 ```typescript
 // Exportação Excel com formatação
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 function exportToExcel(data: any[], filename: string) {
   const wb = XLSX.utils.book_new();
-  
+
   // Sheet 1: Dados
   const ws = XLSX.utils.json_to_sheet(data);
-  
+
   // Formatação
-  ws['!cols'] = [
+  ws["!cols"] = [
     { wch: 30 }, // Nome
     { wch: 20 }, // CNPJ
     { wch: 40 }, // Produto
     { wch: 15 }, // Status
   ];
-  
+
   // Cores
-  ws['A1'].s = { fill: { fgColor: { rgb: '4472C4' } }, font: { bold: true, color: { rgb: 'FFFFFF' } } };
-  
-  XLSX.utils.book_append_sheet(wb, ws, 'Dados');
-  
+  ws["A1"].s = {
+    fill: { fgColor: { rgb: "4472C4" } },
+    font: { bold: true, color: { rgb: "FFFFFF" } },
+  };
+
+  XLSX.utils.book_append_sheet(wb, ws, "Dados");
+
   // Sheet 2: Estatísticas
   const stats = calculateStats(data);
   const wsStats = XLSX.utils.json_to_sheet([stats]);
-  XLSX.utils.book_append_sheet(wb, wsStats, 'Estatísticas');
-  
+  XLSX.utils.book_append_sheet(wb, wsStats, "Estatísticas");
+
   XLSX.writeFile(wb, filename);
 }
 ```
 
 **Funcionalidades:**
+
 - 📊 Excel com múltiplas abas (Dados, Estatísticas, Gráficos)
 - 📊 PDF com layout profissional
 - 📊 JSON estruturado para APIs
@@ -583,6 +628,7 @@ function exportToExcel(data: any[], filename: string) {
 **Problema:** Sem comunicação entre validadores
 
 **Solução:**
+
 ```sql
 CREATE TABLE comentarios (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -597,6 +643,7 @@ CREATE TABLE comentarios (
 ```
 
 **Funcionalidades:**
+
 - 💬 Comentários em qualquer entidade
 - 💬 Respostas e threads
 - 💬 Menções (@usuario)
@@ -607,6 +654,7 @@ CREATE TABLE comentarios (
 **Problema:** Sem auditoria de mudanças
 
 **Solução:**
+
 ```sql
 CREATE TABLE audit_log (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -624,6 +672,7 @@ CREATE TABLE audit_log (
 ```
 
 **Funcionalidades:**
+
 - 📜 Histórico completo de alterações
 - 📜 Quem alterou, quando e o quê
 - 📜 Diff visual (antes/depois)
@@ -634,6 +683,7 @@ CREATE TABLE audit_log (
 **Problema:** Sem controle de quem valida o quê
 
 **Solução:**
+
 ```sql
 CREATE TABLE assignments (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -648,6 +698,7 @@ CREATE TABLE assignments (
 ```
 
 **Funcionalidades:**
+
 - 👥 Atribuir mercados a validadores
 - 👥 Prazos e lembretes
 - 👥 Dashboard "Minhas Tarefas"
@@ -658,6 +709,7 @@ CREATE TABLE assignments (
 ## 🚀 3. ROADMAP DE IMPLEMENTAÇÃO
 
 ### Fase 1: Performance (Semana 1-2)
+
 **Prioridade:** CRÍTICA  
 **Esforço:** Médio  
 **Impacto:** Alto
@@ -672,6 +724,7 @@ CREATE TABLE assignments (
 ---
 
 ### Fase 2: Navegação (Semana 3-4)
+
 **Prioridade:** Alta  
 **Esforço:** Médio  
 **Impacto:** Alto
@@ -686,6 +739,7 @@ CREATE TABLE assignments (
 ---
 
 ### Fase 3: Qualidade de Dados (Semana 5-6)
+
 **Prioridade:** Alta  
 **Esforço:** Alto  
 **Impacto:** Muito Alto
@@ -700,6 +754,7 @@ CREATE TABLE assignments (
 ---
 
 ### Fase 4: Inteligência (Semana 7-8)
+
 **Prioridade:** Média  
 **Esforço:** Alto  
 **Impacto:** Transformacional
@@ -714,6 +769,7 @@ CREATE TABLE assignments (
 ---
 
 ### Fase 5: Analytics (Semana 9-10)
+
 **Prioridade:** Média  
 **Esforço:** Médio  
 **Impacto:** Alto
@@ -728,6 +784,7 @@ CREATE TABLE assignments (
 ---
 
 ### Fase 6: Colaboração (Semana 11-12)
+
 **Prioridade:** Baixa  
 **Esforço:** Alto  
 **Impacto:** Médio
@@ -744,6 +801,7 @@ CREATE TABLE assignments (
 ## 📈 4. MÉTRICAS DE SUCESSO
 
 ### Antes das Melhorias
+
 - ⏱️ Tempo médio de validação: **15 min/mercado**
 - 📊 Taxa de validação: **68%**
 - 🎯 Qualidade média dos dados: **45/100**
@@ -751,6 +809,7 @@ CREATE TABLE assignments (
 - 👥 Produtividade: **20 mercados/dia/pessoa**
 
 ### Após Implementação Completa (Meta)
+
 - ⏱️ Tempo médio de validação: **5 min/mercado** (-67%)
 - 📊 Taxa de validação: **90%** (+22pp)
 - 🎯 Qualidade média dos dados: **85/100** (+40pts)
@@ -762,11 +821,13 @@ CREATE TABLE assignments (
 ## 💰 5. ANÁLISE DE CUSTO-BENEFÍCIO
 
 ### Investimento Estimado
+
 - **Desenvolvimento:** 12 semanas × 40h = 480 horas
 - **Infraestrutura:** APIs externas (Receita Federal, LinkedIn) = R$ 500/mês
 - **Custo total:** ~R$ 50.000 (desenvolvimento) + R$ 6.000/ano (infra)
 
 ### Retorno Esperado
+
 - **Economia de tempo:** 10 min/mercado × 73 mercados × 4 validações/mês = 48h/mês
 - **Valor do tempo:** 48h × R$ 100/h = R$ 4.800/mês = R$ 57.600/ano
 - **ROI:** 57.600 / 56.000 = **103% ao ano**
@@ -779,37 +840,45 @@ CREATE TABLE assignments (
 ### Melhorias que podem ser feitas HOJE (< 2 horas cada):
 
 1. **Adicionar índices no banco**
+
    ```sql
    CREATE INDEX idx_clientes_mercado ON clientes_mercados(mercadoId);
    CREATE INDEX idx_concorrentes_mercado ON concorrentes(mercadoId);
    CREATE INDEX idx_leads_mercado ON leads(mercadoId);
    ```
+
    **Impacto:** +70% velocidade nas queries
 
 2. **Configurar cache no tRPC**
+
    ```typescript
-   staleTime: 5 * 60 * 1000
+   staleTime: 5 * 60 * 1000;
    ```
+
    **Impacto:** +60% velocidade de navegação
 
 3. **Adicionar validação de CNPJ**
+
    ```typescript
    function isValidCNPJ(cnpj: string): boolean {
      // Algoritmo de validação
    }
    ```
+
    **Impacto:** Redução de 20% em dados inválidos
 
 4. **Mostrar score de qualidade**
+
    ```typescript
    const score = calculateQualityScore(cliente);
    ```
+
    **Impacto:** Priorização visual imediata
 
 5. **Exportação Excel básica**
    ```typescript
-   import * as XLSX from 'xlsx';
-   XLSX.writeFile(wb, 'export.xlsx');
+   import * as XLSX from "xlsx";
+   XLSX.writeFile(wb, "export.xlsx");
    ```
    **Impacto:** Relatórios profissionais
 
@@ -831,9 +900,9 @@ O sistema Gestor PAV possui uma **base sólida** mas sofre de **gargalos de perf
 ---
 
 **Próximos Passos:**
+
 1. Validar prioridades com stakeholders
 2. Implementar Quick Wins (< 1 semana)
 3. Iniciar Fase 1 (Performance)
 4. Medir métricas antes/depois
 5. Iterar baseado em feedback
-

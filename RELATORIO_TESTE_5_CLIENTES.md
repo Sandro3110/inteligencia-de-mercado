@@ -13,17 +13,17 @@ Teste realizado com 5 clientes da base "Embalagens 2025" para validar o sistema 
 
 ### Métricas Gerais
 
-| Métrica | Valor |
-|---------|-------|
-| **Clientes processados** | 5 |
+| Métrica                  | Valor   |
+| ------------------------ | ------- |
+| **Clientes processados** | 5       |
 | **Clientes com sucesso** | 4 (80%) |
-| **Clientes com erro** | 1 (20%) |
-| **Tempo total** | 96.31s |
-| **Tempo médio/cliente** | 24.08s |
-| **Mercados criados** | 4 |
-| **Produtos criados** | 10 |
-| **Concorrentes criados** | 30 |
-| **Leads criados** | 20 |
+| **Clientes com erro**    | 1 (20%) |
+| **Tempo total**          | 96.31s  |
+| **Tempo médio/cliente**  | 24.08s  |
+| **Mercados criados**     | 4       |
+| **Produtos criados**     | 10      |
+| **Concorrentes criados** | 30      |
+| **Leads criados**        | 20      |
 
 ---
 
@@ -35,6 +35,7 @@ Teste realizado com 5 clientes da base "Embalagens 2025" para validar o sistema 
 **Tempo:** 21.32s
 
 **Dados gerados:**
+
 - **Mercado:** Embalagens para Indústria Alimentícia
 - **Produtos:** 1
 - **Concorrentes:** 5
@@ -60,6 +61,7 @@ Teste realizado com 5 clientes da base "Embalagens 2025" para validar o sistema 
 **Tempo:** 25.07s
 
 **Dados gerados:**
+
 - **Mercado:** Materiais de Construção e Acabamento
 - **Produtos:** 3
 - **Concorrentes:** 10
@@ -73,6 +75,7 @@ Teste realizado com 5 clientes da base "Embalagens 2025" para validar o sistema 
 **Tempo:** 30.91s
 
 **Dados gerados:**
+
 - **Mercado:** Varejo Alimentício
 - **Produtos:** 3
 - **Concorrentes:** 10
@@ -86,6 +89,7 @@ Teste realizado com 5 clientes da base "Embalagens 2025" para validar o sistema 
 **Tempo:** 17.03s
 
 **Dados gerados:**
+
 - **Mercado:** Embalagens Plásticas para Indústria Alimentícia
 - **Produtos:** 3
 - **Concorrentes:** 5
@@ -95,14 +99,15 @@ Teste realizado com 5 clientes da base "Embalagens 2025" para validar o sistema 
 
 ## 🗂️ Análise dos Mercados Criados
 
-| ID | Nome do Mercado | Categoria | Segmentação | Clientes |
-|----|----------------|-----------|-------------|----------|
-| 1 | Embalagens para Indústria Alimentícia | Embalagens | B2B | 1 |
-| 2 | Materiais de Construção e Acabamento | Construção | B2B/B2C | 1 |
-| 3 | Varejo Alimentício | Varejo | B2C | 1 |
-| 4 | Embalagens Plásticas para Indústria Alimentícia | Embalagens | B2B | 1 |
+| ID  | Nome do Mercado                                 | Categoria  | Segmentação | Clientes |
+| --- | ----------------------------------------------- | ---------- | ----------- | -------- |
+| 1   | Embalagens para Indústria Alimentícia           | Embalagens | B2B         | 1        |
+| 2   | Materiais de Construção e Acabamento            | Construção | B2B/B2C     | 1        |
+| 3   | Varejo Alimentício                              | Varejo     | B2C         | 1        |
+| 4   | Embalagens Plásticas para Indústria Alimentícia | Embalagens | B2B         | 1        |
 
 **Observações:**
+
 - 4 mercados únicos criados
 - 50% relacionados a embalagens
 - Segmentação B2B predominante (75%)
@@ -112,18 +117,22 @@ Teste realizado com 5 clientes da base "Embalagens 2025" para validar o sistema 
 ## ✅ Correções Validadas
 
 ### 1. ✅ Campo `produto` em Concorrentes
+
 **Status:** Funcionando  
 **Validação:** Todos os 30 concorrentes possuem campo `produto` preenchido
 
 ### 2. ✅ Quality Score Melhorado
+
 **Status:** Funcionando  
 **Validação:** Todos possuem `qualidadeScore` e `qualidadeClassificacao`
 
 ### 3. ✅ Campo `ativo` em Produtos
+
 **Status:** Funcionando  
 **Validação:** Todos os 10 produtos estão ativos (ativo = 1)
 
 ### 4. ✅ Campo `pesquisaId` em Todas as Tabelas
+
 **Status:** Funcionando  
 **Validação:** Todos os dados linkados à pesquisa ID 1
 
@@ -133,21 +142,22 @@ Teste realizado com 5 clientes da base "Embalagens 2025" para validar o sistema 
 
 ### Tempo de Processamento
 
-| Métrica | Valor |
-|---------|-------|
+| Métrica                 | Valor  |
+| ----------------------- | ------ |
 | **Tempo médio/cliente** | 24.08s |
-| **Tempo mínimo** | 17.03s |
-| **Tempo máximo** | 30.91s |
+| **Tempo mínimo**        | 17.03s |
+| **Tempo máximo**        | 30.91s |
 
 ### Projeção para 806 Clientes
 
-| Cenário | Tempo Estimado |
-|---------|----------------|
-| **Melhor caso** | 3.8 horas |
-| **Caso médio** | 5.4 horas |
-| **Pior caso** | 6.9 horas |
+| Cenário         | Tempo Estimado |
+| --------------- | -------------- |
+| **Melhor caso** | 3.8 horas      |
+| **Caso médio**  | 5.4 horas      |
+| **Pior caso**   | 6.9 horas      |
 
 **Com 80% de taxa de sucesso:**
+
 - Clientes enriquecidos: ~645
 - Clientes com erro: ~161
 - Tempo total estimado: **5-7 horas**
@@ -182,16 +192,19 @@ Teste realizado com 5 clientes da base "Embalagens 2025" para validar o sistema 
 ## 📊 Próximos Passos
 
 ### Curto Prazo
+
 1. Implementar retry para erros "No mercados"
 2. Adicionar validação de resposta
 3. Testar cliente com erro novamente
 
 ### Médio Prazo
+
 1. Dashboard de monitoramento
 2. Sistema pausar/retomar
 3. Logs detalhados
 
 ### Longo Prazo
+
 1. Enriquecimento dos 806 clientes
 2. Validação de qualidade
 3. Relatório final

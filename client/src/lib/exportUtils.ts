@@ -21,12 +21,12 @@ export function exportToExcel(data: ExportData) {
 
   // Adicionar metadados se fornecidos
   const sheetData: any[][] = [];
-  
+
   if (title) {
     sheetData.push([title]);
     sheetData.push([]);
   }
-  
+
   if (metadata) {
     Object.entries(metadata).forEach(([key, value]) => {
       sheetData.push([key, value]);

@@ -9,7 +9,8 @@ const emptyStateConfig = {
   mercados: {
     icon: Building2,
     title: "Nenhum mercado encontrado",
-    description: "Comece adicionando seu primeiro mercado para iniciar a pesquisa.",
+    description:
+      "Comece adicionando seu primeiro mercado para iniciar a pesquisa.",
   },
   clientes: {
     icon: Users,
@@ -46,10 +47,9 @@ export function EmptyState({ type, searchTerm }: EmptyStateProps) {
         {config.title}
       </h3>
       <p className="text-sm text-muted-foreground max-w-sm">
-        {searchTerm 
+        {searchTerm
           ? `Nenhum resultado para "${searchTerm}". ${config.description}`
-          : config.description
-        }
+          : config.description}
       </p>
     </div>
   );

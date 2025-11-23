@@ -14,7 +14,7 @@ A API de enriquecimento estava **misturando dados de múltiplos projetos**, reto
 
 ```
 INPUT: Jeep do Brasil
-OUTPUT: 
+OUTPUT:
 - 73 mercados (de TODOS os projetos)
 - 800 clientes (de TODOS os projetos)
 - 591 concorrentes (de TODOS os projetos)
@@ -78,7 +78,7 @@ data: {
 
 ```typescript
 export type EnrichmentProgress = {
-  status: 'processing' | 'completed' | 'error';
+  status: "processing" | "completed" | "error";
   message: string;
   currentStep: number;
   totalSteps: number;
@@ -109,6 +109,7 @@ export type EnrichmentProgress = {
 ### 3. Remoção do Campo `stage` Obsoleto
 
 **Arquivos Afetados:**
+
 - `server/db.ts` (função `createLead`)
 - `server/enrichmentFlow.ts`
 - `server/enrichment.ts`
@@ -121,7 +122,7 @@ export type EnrichmentProgress = {
 // ANTES
 await createLead({
   ...data,
-  stage: 'novo', // ❌ Erro: coluna não existe
+  stage: "novo", // ❌ Erro: coluna não existe
 });
 
 // DEPOIS
@@ -138,6 +139,7 @@ await createLead({
 ### Teste Executado
 
 **Input:**
+
 ```json
 {
   "projectName": "Teste Jeep API Corrigida",
@@ -187,28 +189,28 @@ await createLead({
 
 ### Validações Aprovadas (7/7) ✅
 
-| # | Validação | Status |
-|---|-----------|--------|
-| 1 | Projeto criado | ✅ Aprovado |
-| 2 | Nome do projeto correto | ✅ Aprovado |
-| 3 | Cliente processado | ✅ Aprovado |
-| 4 | Mercado identificado | ✅ Aprovado |
-| 5 | Concorrentes encontrados | ✅ Aprovado |
-| 6 | Leads gerados | ✅ Aprovado |
-| 7 | **Dados isolados (não misturados)** | ✅ Aprovado |
+| #   | Validação                           | Status      |
+| --- | ----------------------------------- | ----------- |
+| 1   | Projeto criado                      | ✅ Aprovado |
+| 2   | Nome do projeto correto             | ✅ Aprovado |
+| 3   | Cliente processado                  | ✅ Aprovado |
+| 4   | Mercado identificado                | ✅ Aprovado |
+| 5   | Concorrentes encontrados            | ✅ Aprovado |
+| 6   | Leads gerados                       | ✅ Aprovado |
+| 7   | **Dados isolados (não misturados)** | ✅ Aprovado |
 
 ---
 
 ## 📊 Comparação Antes vs Depois
 
-| Métrica | Antes (Incorreto) | Depois (Correto) |
-|---------|-------------------|------------------|
-| **Projeto ID** | 1 (Embalagens) | 60005 (Teste Jeep) |
-| **Clientes** | 800 (todos) | 1 (Jeep) |
-| **Mercados** | 73 (todos) | 1 (Automotivo) |
-| **Concorrentes** | 591 (todos) | 3 (específicos) |
-| **Leads** | 727 (todos) | 3 (específicos) |
-| **Isolamento** | ❌ Misturado | ✅ Isolado |
+| Métrica          | Antes (Incorreto) | Depois (Correto)   |
+| ---------------- | ----------------- | ------------------ |
+| **Projeto ID**   | 1 (Embalagens)    | 60005 (Teste Jeep) |
+| **Clientes**     | 800 (todos)       | 1 (Jeep)           |
+| **Mercados**     | 73 (todos)        | 1 (Automotivo)     |
+| **Concorrentes** | 591 (todos)       | 3 (específicos)    |
+| **Leads**        | 727 (todos)       | 3 (específicos)    |
+| **Isolamento**   | ❌ Misturado      | ✅ Isolado         |
 
 ---
 
@@ -243,6 +245,7 @@ Leads: Score 0/100 (sem CNPJ, email, telefone)
 ```
 
 **Soluções:**
+
 - Integrar ReceitaWS (API pública brasileira) para dados de CNPJ
 - Implementar Google Places API para sites/telefones
 - Adicionar Hunter.io para emails corporativos

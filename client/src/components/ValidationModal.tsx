@@ -54,33 +54,51 @@ export function ValidationModal({
             <RadioGroup value={status} onValueChange={setStatus}>
               <div className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
                 <RadioGroupItem value="rich" id="rich" />
-                <Label htmlFor="rich" className="flex items-center gap-2 cursor-pointer flex-1">
+                <Label
+                  htmlFor="rich"
+                  className="flex items-center gap-2 cursor-pointer flex-1"
+                >
                   <CheckCircle2 className="h-4 w-4 text-green-600" />
                   <div>
                     <p className="font-medium">Rico</p>
-                    <p className="text-xs text-muted-foreground">Dados completos e validados</p>
+                    <p className="text-xs text-muted-foreground">
+                      Dados completos e validados
+                    </p>
                   </div>
                 </Label>
               </div>
 
               <div className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
-                <RadioGroupItem value="needs_adjustment" id="needs_adjustment" />
-                <Label htmlFor="needs_adjustment" className="flex items-center gap-2 cursor-pointer flex-1">
+                <RadioGroupItem
+                  value="needs_adjustment"
+                  id="needs_adjustment"
+                />
+                <Label
+                  htmlFor="needs_adjustment"
+                  className="flex items-center gap-2 cursor-pointer flex-1"
+                >
                   <AlertCircle className="h-4 w-4 text-yellow-600" />
                   <div>
                     <p className="font-medium">Precisa Ajuste</p>
-                    <p className="text-xs text-muted-foreground">Requer correções ou complementos</p>
+                    <p className="text-xs text-muted-foreground">
+                      Requer correções ou complementos
+                    </p>
                   </div>
                 </Label>
               </div>
 
               <div className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
                 <RadioGroupItem value="discarded" id="discarded" />
-                <Label htmlFor="discarded" className="flex items-center gap-2 cursor-pointer flex-1">
+                <Label
+                  htmlFor="discarded"
+                  className="flex items-center gap-2 cursor-pointer flex-1"
+                >
                   <XCircle className="h-4 w-4 text-red-600" />
                   <div>
                     <p className="font-medium">Descartado</p>
-                    <p className="text-xs text-muted-foreground">Dados incorretos ou irrelevantes</p>
+                    <p className="text-xs text-muted-foreground">
+                      Dados incorretos ou irrelevantes
+                    </p>
                   </div>
                 </Label>
               </div>
@@ -93,7 +111,7 @@ export function ValidationModal({
               id="notes"
               placeholder="Adicione observações sobre este item..."
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={e => setNotes(e.target.value)}
               rows={4}
             />
           </div>
@@ -103,12 +121,9 @@ export function ValidationModal({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button onClick={handleSubmit}>
-            Salvar Validação
-          </Button>
+          <Button onClick={handleSubmit}>Salvar Validação</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
-

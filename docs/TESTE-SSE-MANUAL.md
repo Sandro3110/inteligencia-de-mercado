@@ -32,10 +32,11 @@ cat /home/ubuntu/gestor-pav/test-sse-manual.js
 ```
 
 Ou acesse diretamente via URL:
+
 ```javascript
 // No console do browser
-const script = document.createElement('script');
-script.src = '/test-sse-manual.js';
+const script = document.createElement("script");
+script.src = "/test-sse-manual.js";
 document.head.appendChild(script);
 ```
 
@@ -43,10 +44,10 @@ document.head.appendChild(script);
 
 ```javascript
 // Teste rápido de autenticação
-await quickAuthTest()
+await quickAuthTest();
 
 // Executar suite completa de testes
-await testSSENotifications()
+await testSSENotifications();
 ```
 
 ### Resultados Esperados
@@ -105,7 +106,7 @@ pnpm vitest run server/__tests__/notification-monitor.test.ts
 ### Resultados Esperados (com login)
 
 ```
-✓ server/__tests__/sse-auth.test.ts (8 tests) 
+✓ server/__tests__/sse-auth.test.ts (8 tests)
   ✓ Endpoint /api/enrichment/progress/:jobId
     ✓ deve rejeitar requisições sem autenticação
     ✓ deve aceitar requisições autenticadas
@@ -158,6 +159,7 @@ curl -i https://3000-izrmelqgbgh8w93e231so-6564cc02.manus.computer/api/notificat
 ```
 
 **Resultado esperado**:
+
 ```
 HTTP/1.1 200 OK
 Content-Type: text/event-stream
@@ -185,6 +187,7 @@ No filtro, selecione "EventStream" ou digite "notifications/stream"
 ### Passo 3: Observar Eventos
 
 Você verá:
+
 - **Status**: 200 OK
 - **Type**: eventsource
 - **Size**: (pending) - conexão mantida aberta
@@ -195,6 +198,7 @@ Você verá:
 Clique na requisição → Aba "EventStream"
 
 Você verá todos os eventos recebidos:
+
 ```
 :heartbeat
 :heartbeat
@@ -209,6 +213,7 @@ data: {"id":"notif-123","title":"Nova notificação"}
 **Causa**: Não está logado ou sessão expirou
 
 **Solução**:
+
 1. Faça logout
 2. Faça login novamente
 3. Tente novamente
@@ -218,6 +223,7 @@ data: {"id":"notif-123","title":"Nova notificação"}
 **Causa**: Servidor não está rodando
 
 **Solução**:
+
 ```bash
 cd /home/ubuntu/gestor-pav
 pnpm dev
@@ -228,6 +234,7 @@ pnpm dev
 **Causa**: Conexão pode estar sendo bloqueada por proxy/firewall
 
 **Solução**:
+
 1. Verifique console do servidor para erros
 2. Teste em aba anônima
 3. Limpe cookies e tente novamente
@@ -260,6 +267,7 @@ Após executar os testes, verifique:
 **Objetivo**: < 1 segundo entre criação e recebimento
 
 **Como medir**:
+
 ```javascript
 const start = Date.now();
 await fetch("/api/trpc/notifications.create", { ... });

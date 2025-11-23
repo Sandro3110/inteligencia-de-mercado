@@ -7,24 +7,27 @@ export class CSVRenderer {
   /**
    * Renderiza dados em formato CSV e faz upload para S3
    */
-  async render(data: any[], selectedFields: string[]): Promise<{ url: string; size: number }> {
+  async render(
+    data: any[],
+    selectedFields: string[]
+  ): Promise<{ url: string; size: number }> {
     if (data.length === 0) {
-      throw new Error('Nenhum dado para exportar');
+      throw new Error("Nenhum dado para exportar");
     }
 
     // Gera CSV
     const csv = this.generateCSV(data, selectedFields);
 
     // Converte para buffer
-    const buffer = Buffer.from(csv, 'utf-8');
+    const buffer = Buffer.from(csv, "utf-8");
 
     // Faz upload para S3
     const filename = `export_${Date.now()}.csv`;
-    const { url } = await storagePut(`exports/${filename}`, buffer, 'text/csv');
+    const { url } = await storagePut(`exports/${filename}`, buffer, "text/csv");
 
     return {
       url,
-      size: buffer.length
+      size: buffer.length,
     };
   }
 
@@ -35,7 +38,7 @@ export class CSVRenderer {
     const lines: string[] = [];
 
     // Header
-    lines.push(selectedFields.map(field => this.escapeCSV(field)).join(','));
+    lines.push(selectedFields.map(field => this.escapeCSV(field)).join(","));
 
     // Data rows
     data.forEach(record => {
@@ -43,10 +46,10 @@ export class CSVRenderer {
         const value = record[field];
         return this.escapeCSV(this.formatValue(value));
       });
-      lines.push(values.join(','));
+      lines.push(values.join(","));
     });
 
-    return lines.join('\n');
+    return lines.join("\n");
   }
 
   /**
@@ -58,7 +61,7 @@ export class CSVRenderer {
     const str = String(value);
 
     // Se contém vírgula, quebra de linha ou aspas, envolve em aspas
-    if (str.includes(',') || str.includes('\n') || str.includes('"')) {
+    if (str.includes(",") || str.includes("\n") || str.includes('"')) {
       return `"${str.replace(/"/g, '""')}"`;
     }
 
@@ -69,9 +72,9 @@ export class CSVRenderer {
    * Formata valor para exibição
    */
   private formatValue(value: any): string {
-    if (value === null || value === undefined) return '';
+    if (value === null || value === undefined) return "";
     if (value instanceof Date) return value.toISOString();
-    if (typeof value === 'object') return JSON.stringify(value);
+    if (typeof value === "object") return JSON.stringify(value);
     return String(value);
   }
 }

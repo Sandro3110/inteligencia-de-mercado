@@ -1,10 +1,23 @@
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Upload, FileSpreadsheet, FileText, X, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  Upload,
+  FileSpreadsheet,
+  FileText,
+  X,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface ParsedData {
@@ -34,14 +47,18 @@ export function FileUploadParser({
   const [parseError, setParseError] = useState<string | null>(null);
 
   const parseCSV = (text: string): ParsedData => {
-    const lines = text.split("\n").filter((line) => line.trim());
+    const lines = text.split("\n").filter(line => line.trim());
     if (lines.length === 0) {
       throw new Error("Arquivo CSV vazio");
     }
 
-    const headers = lines[0].split(/[,;|\t]/).map((h) => h.trim().replace(/^"|"$/g, ""));
-    const rows = lines.slice(1).map((line) => {
-      return line.split(/[,;|\t]/).map((cell) => cell.trim().replace(/^"|"$/g, ""));
+    const headers = lines[0]
+      .split(/[,;|\t]/)
+      .map(h => h.trim().replace(/^"|"$/g, ""));
+    const rows = lines.slice(1).map(line => {
+      return line
+        .split(/[,;|\t]/)
+        .map(cell => cell.trim().replace(/^"|"$/g, ""));
     });
 
     return { headers, rows, fileName: uploadedFile?.name || "unknown" };
@@ -51,13 +68,15 @@ export function FileUploadParser({
     // Para Excel, vamos usar uma abordagem simplificada
     // Em produção, você pode usar bibliotecas como xlsx ou exceljs
     const text = await file.text();
-    
+
     // Tentar detectar se é um CSV disfarçado de Excel
     if (text.includes(",") || text.includes(";")) {
       return parseCSV(text);
     }
 
-    throw new Error("Formato Excel não suportado diretamente. Por favor, salve como CSV.");
+    throw new Error(
+      "Formato Excel não suportado diretamente. Por favor, salve como CSV."
+    );
   };
 
   const processFile = async (file: File) => {
@@ -74,7 +93,9 @@ export function FileUploadParser({
       // Validar formato
       const extension = file.name.toLowerCase().match(/\.[^.]+$/)?.[0];
       if (!extension || !acceptedFormats.includes(extension)) {
-        throw new Error(`Formato não suportado. Aceitos: ${acceptedFormats.join(", ")}`);
+        throw new Error(
+          `Formato não suportado. Aceitos: ${acceptedFormats.join(", ")}`
+        );
       }
 
       let parsedData: ParsedData;
@@ -99,7 +120,9 @@ export function FileUploadParser({
 
       setUploadedFile(file);
       onDataParsed(parsedData);
-      toast.success(`Arquivo processado com sucesso! ${parsedData.rows.length} linhas encontradas.`);
+      toast.success(
+        `Arquivo processado com sucesso! ${parsedData.rows.length} linhas encontradas.`
+      );
     } catch (error: any) {
       const errorMsg = error.message || "Erro ao processar arquivo";
       setParseError(errorMsg);
@@ -174,7 +197,9 @@ export function FileUploadParser({
                   <Button
                     variant="outline"
                     disabled={isProcessing}
-                    onClick={() => document.getElementById("file-upload")?.click()}
+                    onClick={() =>
+                      document.getElementById("file-upload")?.click()
+                    }
                   >
                     {isProcessing ? "Processando..." : "Selecionar Arquivo"}
                   </Button>

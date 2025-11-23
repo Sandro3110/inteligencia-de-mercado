@@ -12,7 +12,7 @@ interface Step3FieldsProps {
 
 export default function Step3Fields({ state, setState }: Step3FieldsProps) {
   const { data: fieldsData } = trpc.export.getAvailableFields.useQuery({
-    entityType: state.entityType
+    entityType: state.entityType,
   });
 
   const fields = fieldsData?.fields || [];
@@ -23,29 +23,29 @@ export default function Step3Fields({ state, setState }: Step3FieldsProps) {
       ...prev,
       selectedFields: current.includes(field)
         ? current.filter(f => f !== field)
-        : [...current, field]
+        : [...current, field],
     }));
   };
 
   const selectAll = () => {
     setState(prev => ({
       ...prev,
-      selectedFields: fields
+      selectedFields: fields,
     }));
   };
 
   const deselectAll = () => {
     setState(prev => ({
       ...prev,
-      selectedFields: []
+      selectedFields: [],
     }));
   };
 
   const selectEssential = () => {
-    const essential = ['id', 'nome', 'uf', 'cidade', 'quality_score', 'status'];
+    const essential = ["id", "nome", "uf", "cidade", "quality_score", "status"];
     setState(prev => ({
       ...prev,
-      selectedFields: fields.filter(f => essential.includes(f))
+      selectedFields: fields.filter(f => essential.includes(f)),
     }));
   };
 
@@ -76,9 +76,7 @@ export default function Step3Fields({ state, setState }: Step3FieldsProps) {
       {/* Selecionados */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-center justify-between mb-2">
-          <h4 className="font-semibold text-blue-900">
-            Campos Selecionados
-          </h4>
+          <h4 className="font-semibold text-blue-900">Campos Selecionados</h4>
           <Badge variant="secondary">
             {state.selectedFields.length} de {fields.length}
           </Badge>
@@ -124,17 +122,23 @@ export default function Step3Fields({ state, setState }: Step3FieldsProps) {
           <Checkbox
             id="includeRelationships"
             checked={state.includeRelationships}
-            onCheckedChange={(checked) => setState(prev => ({
-              ...prev,
-              includeRelationships: !!checked
-            }))}
+            onCheckedChange={checked =>
+              setState(prev => ({
+                ...prev,
+                includeRelationships: !!checked,
+              }))
+            }
           />
-          <label htmlFor="includeRelationships" className="text-sm font-medium cursor-pointer">
+          <label
+            htmlFor="includeRelationships"
+            className="text-sm font-medium cursor-pointer"
+          >
             Incluir dados relacionados
           </label>
         </div>
         <p className="text-xs text-slate-500 ml-6">
-          Exemplo: Para clientes, incluir seus mercados, produtos, concorrentes e leads.
+          Exemplo: Para clientes, incluir seus mercados, produtos, concorrentes
+          e leads.
         </p>
       </div>
 

@@ -6,8 +6,11 @@ import path from "path";
 import { defineConfig } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
-
-const plugins = [react(), tailwindcss(), /* jsxLocPlugin(), */ vitePluginManusRuntime()];
+const plugins = [
+  react(),
+  tailwindcss(),
+  /* jsxLocPlugin(), */ vitePluginManusRuntime(),
+];
 
 export default defineConfig({
   plugins,
@@ -28,24 +31,28 @@ export default defineConfig({
       output: {
         manualChunks: {
           // Vendor chunks (bibliotecas grandes)
-          'react-vendor': ['react', 'react-dom', 'react/jsx-runtime'],
-          'trpc-vendor': ['@trpc/client', '@trpc/react-query', '@tanstack/react-query'],
-          'ui-vendor': [
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-select',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-tooltip',
-            '@radix-ui/react-popover',
-            '@radix-ui/react-accordion',
-            '@radix-ui/react-alert-dialog',
+          "react-vendor": ["react", "react-dom", "react/jsx-runtime"],
+          "trpc-vendor": [
+            "@trpc/client",
+            "@trpc/react-query",
+            "@tanstack/react-query",
+          ],
+          "ui-vendor": [
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-select",
+            "@radix-ui/react-tabs",
+            "@radix-ui/react-tooltip",
+            "@radix-ui/react-popover",
+            "@radix-ui/react-accordion",
+            "@radix-ui/react-alert-dialog",
           ],
           // Charts e visualização
-          'charts': ['recharts', 'chart.js'],
+          charts: ["recharts", "chart.js"],
           // Excel e PDF
-          'export': ['xlsx', 'jspdf', 'jspdf-autotable'],
+          export: ["xlsx", "jspdf", "jspdf-autotable"],
           // Utilitários
-          'utils': ['date-fns', 'clsx', 'tailwind-merge', 'zod'],
+          utils: ["date-fns", "clsx", "tailwind-merge", "zod"],
         },
       },
     },

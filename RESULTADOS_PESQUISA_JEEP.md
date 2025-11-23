@@ -13,19 +13,20 @@ Sistema de enriquecimento processou com sucesso os dados da Jeep do Brasil, iden
 
 ### Estatísticas Gerais
 
-| Métrica | Quantidade |
-|---------|------------|
-| **Projeto ID** | 60007 |
-| **Mercados Identificados** | 1 |
-| **Concorrentes Encontrados** | 3 |
-| **Leads Gerados** | 3 |
-| **Status do Cache** | ✅ Ativo (HIT na 2ª execução) |
+| Métrica                      | Quantidade                    |
+| ---------------------------- | ----------------------------- |
+| **Projeto ID**               | 60007                         |
+| **Mercados Identificados**   | 1                             |
+| **Concorrentes Encontrados** | 3                             |
+| **Leads Gerados**            | 3                             |
+| **Status do Cache**          | ✅ Ativo (HIT na 2ª execução) |
 
 ---
 
 ## 🎯 Mercado Identificado
 
 ### Automotivo
+
 - **Categoria:** Manufatura e Varejo de Veículos
 - **Segmentação:** B2C (Business-to-Consumer)
 - **Tamanho Estimado:** Grande
@@ -39,18 +40,21 @@ Sistema de enriquecimento processou com sucesso os dados da Jeep do Brasil, iden
 ## 🏢 Concorrentes Principais (Top 3)
 
 ### 1. Stellantis (Fiat, Jeep, Peugeot, Citroën)
+
 - **Produto:** Veículos de múltiplas marcas
 - **Porte:** Grande
 - **Score de Qualidade:** 15/100
 - **Observação:** Grupo que inclui a própria Jeep no Brasil
 
 ### 2. Volkswagen
+
 - **Produto:** Veículos automotores
 - **Porte:** Grande
 - **Score de Qualidade:** 15/100
 - **Observação:** Líder de mercado em volume no Brasil
 
 ### 3. General Motors (Chevrolet)
+
 - **Produto:** Veículos automotores
 - **Porte:** Grande
 - **Score de Qualidade:** 15/100
@@ -61,6 +65,7 @@ Sistema de enriquecimento processou com sucesso os dados da Jeep do Brasil, iden
 ## 📈 Leads Qualificados (Top 3)
 
 ### 1. Volkswagen do Brasil
+
 - **Tipo:** Outbound
 - **Porte:** Grande
 - **Região:** Sudeste
@@ -69,6 +74,7 @@ Sistema de enriquecimento processou com sucesso os dados da Jeep do Brasil, iden
 - **Potencial:** Alto - Fornecedor de componentes e tecnologia
 
 ### 2. Bosch América Latina
+
 - **Tipo:** Outbound
 - **Porte:** Grande
 - **Região:** Sudeste
@@ -77,6 +83,7 @@ Sistema de enriquecimento processou com sucesso os dados da Jeep do Brasil, iden
 - **Potencial:** Alto - Fornecedor de sistemas eletrônicos e freios
 
 ### 3. Pirelli Pneus
+
 - **Tipo:** Outbound
 - **Porte:** Grande
 - **Região:** Sudeste
@@ -90,10 +97,10 @@ Sistema de enriquecimento processou com sucesso os dados da Jeep do Brasil, iden
 
 ### Performance do Cache
 
-| Execução | Status | Tempo de Busca | Dados Recuperados |
-|----------|--------|----------------|-------------------|
-| **1ª Execução** | MISS | ~2s | Nenhum (criado cache) |
-| **2ª Execução** | HIT | ~0.1s | Todos (do cache) |
+| Execução        | Status | Tempo de Busca | Dados Recuperados     |
+| --------------- | ------ | -------------- | --------------------- |
+| **1ª Execução** | MISS   | ~2s            | Nenhum (criado cache) |
+| **2ª Execução** | HIT    | ~0.1s          | Todos (do cache)      |
 
 ### Logs do Sistema
 
@@ -117,16 +124,16 @@ Sistema de enriquecimento processou com sucesso os dados da Jeep do Brasil, iden
 
 ## 📋 Validações do Sistema
 
-| # | Validação | Status | Observação |
-|---|-----------|--------|------------|
-| 1 | Projeto criado | ✅ Aprovado | ID: 60007 |
-| 2 | Nome do projeto correto | ✅ Aprovado | "Teste Jeep API Corrigida" |
-| 3 | Cliente processado | ⚠️ Parcial | Dados básicos salvos |
-| 4 | Mercado identificado | ✅ Aprovado | Automotivo B2C |
-| 5 | Concorrentes encontrados | ✅ Aprovado | 3 concorrentes |
-| 6 | Leads gerados | ✅ Aprovado | 3 leads B2B |
-| 7 | Dados isolados | ✅ Aprovado | Sem mistura com outros projetos |
-| 8 | Cache funcionando | ✅ Aprovado | HIT na 2ª execução |
+| #   | Validação                | Status      | Observação                      |
+| --- | ------------------------ | ----------- | ------------------------------- |
+| 1   | Projeto criado           | ✅ Aprovado | ID: 60007                       |
+| 2   | Nome do projeto correto  | ✅ Aprovado | "Teste Jeep API Corrigida"      |
+| 3   | Cliente processado       | ⚠️ Parcial  | Dados básicos salvos            |
+| 4   | Mercado identificado     | ✅ Aprovado | Automotivo B2C                  |
+| 5   | Concorrentes encontrados | ✅ Aprovado | 3 concorrentes                  |
+| 6   | Leads gerados            | ✅ Aprovado | 3 leads B2B                     |
+| 7   | Dados isolados           | ✅ Aprovado | Sem mistura com outros projetos |
+| 8   | Cache funcionando        | ✅ Aprovado | HIT na 2ª execução              |
 
 ---
 
@@ -136,11 +143,11 @@ Sistema de enriquecimento processou com sucesso os dados da Jeep do Brasil, iden
 
 **Problema:** Todos os scores estão abaixo de 20/100 devido à falta de dados enriquecidos.
 
-| Entidade | Score Atual | Score Esperado | Dados Faltantes |
-|----------|-------------|----------------|-----------------|
-| Cliente | 0/100 | 80-95/100 | Email, telefone, endereço completo |
-| Concorrentes | 15/100 | 70-85/100 | CNPJ, site, contatos |
-| Leads | 0/100 | 60-80/100 | CNPJ, email, telefone |
+| Entidade     | Score Atual | Score Esperado | Dados Faltantes                    |
+| ------------ | ----------- | -------------- | ---------------------------------- |
+| Cliente      | 0/100       | 80-95/100      | Email, telefone, endereço completo |
+| Concorrentes | 15/100      | 70-85/100      | CNPJ, site, contatos               |
+| Leads        | 0/100       | 60-80/100      | CNPJ, email, telefone              |
 
 **Causa Raiz:** Data API retorna 404 (não configurada) e não há integração com APIs públicas brasileiras.
 
@@ -212,6 +219,7 @@ Sistema de enriquecimento processou com sucesso os dados da Jeep do Brasil, iden
 Os leads gerados (VW, Bosch, Pirelli) representam potenciais **fornecedores** para a Jeep, não clientes finais. Isso indica que o sistema está corretamente identificando o ecossistema B2B do setor automotivo.
 
 **Sugestão:** Para gerar leads B2C (consumidores finais), seria necessário:
+
 - Integrar com CRM de concessionárias
 - Analisar dados de test-drives e cotações
 - Segmentar por perfil demográfico (renda, idade, localização)

@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 type ZoomLevel = 80 | 90 | 100 | 110;
 
@@ -17,7 +23,7 @@ export function ZoomProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     localStorage.setItem("zoomLevel", String(zoomLevel));
-    
+
     // Aplicar zoom no root
     document.documentElement.style.fontSize = `${zoomLevel}%`;
   }, [zoomLevel]);
