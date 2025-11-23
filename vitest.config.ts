@@ -18,6 +18,7 @@ export default defineConfig({
     ],
     globals: true,
     testTimeout: 30000,
+    setupFiles: ["./test/setup.ts"],
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
