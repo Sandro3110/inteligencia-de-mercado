@@ -1,13 +1,21 @@
-'use client';
-
 /**
- * Sugestões contextuais baseadas em dados disponíveis
- * Item 11 do módulo de exportação inteligente
+ * ContextualSuggestions Component
+ * Contextual suggestions based on available data
+ * Part 11 of the intelligent export module
  */
 
+'use client';
+
+import { useCallback, useMemo } from 'react';
 import { Lightbulb, TrendingUp, Users, Target, Award, type LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+type Priority = 'high' | 'medium' | 'low';
 
 interface ContextualSuggestionsProps {
   projectId?: number;
@@ -20,8 +28,12 @@ interface Suggestion {
   context: string;
   icon: LucideIcon;
   color: string;
-  priority: 'high' | 'medium' | 'low';
+  priority: Priority;
 }
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
 
 const SUGGESTIONS: Suggestion[] = [
   {
@@ -65,79 +77,171 @@ const SUGGESTIONS: Suggestion[] = [
     color: 'text-red-600',
     priority: 'medium',
   },
-];
+] as const;
 
-const PRIORITY_COLORS = {
+const PRIORITY_COLORS: Record<Priority, string> = {
   high: 'bg-green-100 text-green-800 border-green-200',
   medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   low: 'bg-slate-100 text-slate-800 border-slate-200',
 } as const;
 
-const PRIORITY_LABELS = {
+const PRIORITY_LABELS: Record<Priority, string> = {
   high: 'Alta',
   medium: 'Média',
   low: 'Baixa',
 } as const;
 
+const ICON_SIZES = {
+  MEDIUM: 'w-5 h-5',
+} as const;
+
+const LABELS = {
+  HEADER_TITLE: 'Sugestões Baseadas em Seus Dados',
+  BUTTON_TEXT: 'Usar esta sugestão →',
+  INFO_ICON: '💡',
+  INFO_TEXT: 'As sugestões são atualizadas dinamicamente baseadas nos dados do seu projeto',
+} as const;
+
+const CLASSES = {
+  CONTAINER: 'space-y-4',
+  HEADER: 'flex items-center gap-2',
+  HEADER_ICON: 'text-yellow-500',
+  HEADER_TITLE: 'text-sm font-semibold text-slate-900',
+  GRID: 'grid grid-cols-1 md:grid-cols-2 gap-3',
+  CARD: 'p-4 hover:shadow-md transition-shadow cursor-pointer border-slate-200',
+  CARD_CONTENT: 'flex items-start gap-3',
+  ICON_CONTAINER: 'p-2 rounded-lg bg-slate-50',
+  TEXT_CONTAINER: 'flex-1 min-w-0',
+  TITLE_ROW: 'flex items-start justify-between gap-2 mb-1',
+  TITLE: 'text-sm font-semibold text-slate-900',
+  PRIORITY_BADGE: 'text-xs px-2 py-0.5 rounded-full border',
+  DESCRIPTION: 'text-xs text-slate-600 mb-2',
+  BUTTON: 'text-xs h-7 px-2',
+  INFO_TEXT: 'text-xs text-slate-500 italic',
+} as const;
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Get priority badge CSS classes
+ */
+function getPriorityClasses(priority: Priority): string {
+  return `${CLASSES.PRIORITY_BADGE} ${PRIORITY_COLORS[priority]}`;
+}
+
+/**
+ * Get priority label
+ */
+function getPriorityLabel(priority: Priority): string {
+  return PRIORITY_LABELS[priority];
+}
+
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
+
+/**
+ * Suggestion card component
+ */
+interface SuggestionCardProps {
+  suggestion: Suggestion;
+  onSelect: (context: string) => void;
+}
+
+function SuggestionCard({ suggestion, onSelect }: SuggestionCardProps) {
+  const Icon = suggestion.icon;
+
+  const handleCardClick = useCallback(() => {
+    onSelect(suggestion.context);
+  }, [onSelect, suggestion.context]);
+
+  const handleButtonClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onSelect(suggestion.context);
+    },
+    [onSelect, suggestion.context]
+  );
+
+  return (
+    <Card className={CLASSES.CARD} onClick={handleCardClick}>
+      <div className={CLASSES.CARD_CONTENT}>
+        <div className={CLASSES.ICON_CONTAINER}>
+          <Icon className={`${ICON_SIZES.MEDIUM} ${suggestion.color}`} />
+        </div>
+        <div className={CLASSES.TEXT_CONTAINER}>
+          <div className={CLASSES.TITLE_ROW}>
+            <h4 className={CLASSES.TITLE}>{suggestion.title}</h4>
+            <span className={getPriorityClasses(suggestion.priority)}>
+              {getPriorityLabel(suggestion.priority)}
+            </span>
+          </div>
+          <p className={CLASSES.DESCRIPTION}>{suggestion.description}</p>
+          <Button variant="ghost" size="sm" className={CLASSES.BUTTON} onClick={handleButtonClick}>
+            {LABELS.BUTTON_TEXT}
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+/**
+ * Display contextual suggestions based on project data
+ */
 export function ContextualSuggestions({
   projectId,
   onSelectSuggestion,
 }: ContextualSuggestionsProps) {
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
+  const handleSelectSuggestion = useCallback(
+    (context: string) => {
+      onSelectSuggestion(context);
+    },
+    [onSelectSuggestion]
+  );
+
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const suggestionsList = useMemo(() => SUGGESTIONS, []);
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
+
   return (
-    <div className="space-y-4">
+    <div className={CLASSES.CONTAINER}>
       {/* Header */}
-      <div className="flex items-center gap-2">
-        <Lightbulb className="w-5 h-5 text-yellow-500" />
-        <h3 className="text-sm font-semibold text-slate-900">
-          Sugestões Baseadas em Seus Dados
-        </h3>
+      <div className={CLASSES.HEADER}>
+        <Lightbulb className={`${ICON_SIZES.MEDIUM} ${CLASSES.HEADER_ICON}`} />
+        <h3 className={CLASSES.HEADER_TITLE}>{LABELS.HEADER_TITLE}</h3>
       </div>
 
-      {/* Grid de sugestões */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {SUGGESTIONS.map((suggestion, index) => {
-          const Icon = suggestion.icon;
-          return (
-            <Card
-              key={index}
-              className="p-4 hover:shadow-md transition-shadow cursor-pointer border-slate-200"
-              onClick={() => onSelectSuggestion(suggestion.context)}
-            >
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-slate-50">
-                  <Icon className={`w-5 h-5 ${suggestion.color}`} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <h4 className="text-sm font-semibold text-slate-900">{suggestion.title}</h4>
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full border ${PRIORITY_COLORS[suggestion.priority]}`}
-                    >
-                      {PRIORITY_LABELS[suggestion.priority]}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-600 mb-2">{suggestion.description}</p>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs h-7 px-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectSuggestion(suggestion.context);
-                    }}
-                  >
-                    Usar esta sugestão →
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          );
-        })}
+      {/* Suggestions grid */}
+      <div className={CLASSES.GRID}>
+        {suggestionsList.map((suggestion, index) => (
+          <SuggestionCard
+            key={index}
+            suggestion={suggestion}
+            onSelect={handleSelectSuggestion}
+          />
+        ))}
       </div>
 
-      {/* Nota informativa */}
-      <p className="text-xs text-slate-500 italic">
-        💡 As sugestões são atualizadas dinamicamente baseadas nos dados do seu projeto
+      {/* Info note */}
+      <p className={CLASSES.INFO_TEXT}>
+        {LABELS.INFO_ICON} {LABELS.INFO_TEXT}
       </p>
     </div>
   );
