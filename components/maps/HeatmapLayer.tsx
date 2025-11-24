@@ -1,15 +1,19 @@
-'use client';
-
 /**
- * Componente de Layer de Heatmap para Leaflet
- *
- * Usa leaflet.heat para criar visualização de densidade
+ * HeatmapLayer Component
+ * Heatmap layer for Leaflet maps
+ * Uses leaflet.heat to create density visualization
  */
 
-import { useEffect, useMemo } from 'react';
+'use client';
+
+import { useEffect, useMemo, useCallback } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.heat';
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 export interface HeatmapPoint {
   lat: number;
@@ -18,32 +22,35 @@ export interface HeatmapPoint {
 }
 
 interface HeatmapOptions {
-  /** Raio de cada ponto em pixels (padrão: 25) */
+  /** Radius of each point in pixels (default: 25) */
   radius?: number;
-  /** Quantidade de blur (padrão: 15) */
+  /** Amount of blur (default: 15) */
   blur?: number;
-  /** Zoom máximo onde o heatmap é visível (padrão: 17) */
+  /** Maximum zoom where heatmap is visible (default: 17) */
   maxZoom?: number;
-  /** Intensidade máxima (padrão: 1.0) */
+  /** Maximum intensity (default: 1.0) */
   max?: number;
-  /** Gradiente de cores personalizado */
+  /** Custom color gradient */
   gradient?: Record<number, string>;
 }
 
 interface HeatmapLayerProps {
-  /** Array de pontos [lat, lng, intensity] */
+  /** Array of points [lat, lng, intensity] */
   points: HeatmapPoint[];
-  /** Opções de configuração do heatmap */
+  /** Heatmap configuration options */
   options?: HeatmapOptions;
 }
 
+type HeatPoint = [number, number, number];
+
 // Extend Leaflet type to include heatLayer
 declare module 'leaflet' {
-  function heatLayer(
-    latlngs: [number, number, number][],
-    options?: HeatmapOptions
-  ): L.Layer;
+  function heatLayer(latlngs: HeatPoint[], options?: HeatmapOptions): L.Layer;
 }
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
 
 const DEFAULT_GRADIENT: Record<number, string> = {
   0.0: 'blue',
@@ -51,17 +58,64 @@ const DEFAULT_GRADIENT: Record<number, string> = {
   0.7: 'yellow',
   0.9: 'orange',
   1.0: 'red',
-};
-
-const DEFAULT_OPTIONS = {
-  radius: 25,
-  blur: 15,
-  maxZoom: 17,
-  max: 1.0,
 } as const;
 
+const DEFAULT_OPTIONS = {
+  RADIUS: 25,
+  BLUR: 15,
+  MAX_ZOOM: 17,
+  MAX_INTENSITY: 1.0,
+} as const;
+
+const DEFAULT_INTENSITY = 1.0;
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
 /**
- * Layer de heatmap para visualização de densidade de pontos
+ * Convert HeatmapPoint to heat point tuple
+ */
+function convertToHeatPoint(point: HeatmapPoint): HeatPoint {
+  return [point.lat, point.lng, point.intensity ?? DEFAULT_INTENSITY];
+}
+
+/**
+ * Convert array of HeatmapPoints to heat points array
+ */
+function convertToHeatPoints(points: HeatmapPoint[]): HeatPoint[] {
+  if (!points || points.length === 0) {
+    return [];
+  }
+  return points.map(convertToHeatPoint);
+}
+
+/**
+ * Get heatmap options with defaults
+ */
+function getHeatmapOptions(options: HeatmapOptions = {}): Required<HeatmapOptions> {
+  return {
+    radius: options.radius ?? DEFAULT_OPTIONS.RADIUS,
+    blur: options.blur ?? DEFAULT_OPTIONS.BLUR,
+    maxZoom: options.maxZoom ?? DEFAULT_OPTIONS.MAX_ZOOM,
+    max: options.max ?? DEFAULT_OPTIONS.MAX_INTENSITY,
+    gradient: options.gradient ?? DEFAULT_GRADIENT,
+  };
+}
+
+/**
+ * Check if points array is empty
+ */
+function isEmptyPoints(points: HeatPoint[]): boolean {
+  return points.length === 0;
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+/**
+ * Heatmap layer for density visualization on maps
  *
  * @example
  * ```tsx
@@ -79,34 +133,41 @@ const DEFAULT_OPTIONS = {
 export default function HeatmapLayer({ points, options = {} }: HeatmapLayerProps) {
   const map = useMap();
 
-  // Memoize heat points conversion
-  const heatPoints = useMemo<[number, number, number][]>(() => {
-    if (!points || points.length === 0) return [];
-    return points.map((p) => [p.lat, p.lng, p.intensity ?? 1.0]);
-  }, [points]);
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const heatPoints = useMemo(() => convertToHeatPoints(points), [points]);
+
+  const heatmapOptions = useMemo(() => getHeatmapOptions(options), [options]);
+
+  const isEmpty = useMemo(() => isEmptyPoints(heatPoints), [heatPoints]);
+
+  // ============================================================================
+  // EFFECTS
+  // ============================================================================
 
   useEffect(() => {
-    if (heatPoints.length === 0) {
+    // Skip if no points
+    if (isEmpty) {
       return;
     }
 
-    // Criar layer de heatmap
-    const heatLayer = (L as typeof L & { heatLayer: typeof L.heatLayer }).heatLayer(heatPoints, {
-      radius: options.radius ?? DEFAULT_OPTIONS.radius,
-      blur: options.blur ?? DEFAULT_OPTIONS.blur,
-      maxZoom: options.maxZoom ?? DEFAULT_OPTIONS.maxZoom,
-      max: options.max ?? DEFAULT_OPTIONS.max,
-      gradient: options.gradient ?? DEFAULT_GRADIENT,
-    });
+    // Create heatmap layer
+    const heatLayer = (L as typeof L & { heatLayer: typeof L.heatLayer }).heatLayer(
+      heatPoints,
+      heatmapOptions
+    );
 
-    // Adicionar ao mapa
+    // Add to map
     heatLayer.addTo(map);
 
-    // Cleanup: remover layer quando componente desmontar
+    // Cleanup: remove layer when component unmounts
     return () => {
       map.removeLayer(heatLayer);
     };
-  }, [map, heatPoints, options]);
+  }, [map, heatPoints, heatmapOptions, isEmpty]);
 
-  return null; // Componente não renderiza nada visualmente
+  // Component does not render anything visually
+  return null;
 }
