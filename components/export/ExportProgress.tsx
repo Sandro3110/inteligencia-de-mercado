@@ -1,15 +1,23 @@
 /**
- * Indicador de progresso de exportação
- * Server Component - não requer 'use client'
+ * ExportProgress Component
+ * Export progress indicator
+ * Server Component - does not require 'use client'
  */
 
+import { useMemo } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
-import { CheckCircle2, Loader2, Clock } from 'lucide-react';
+import { CheckCircle2, Loader2, Clock, type LucideIcon } from 'lucide-react';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+type StepStatus = 'pending' | 'running' | 'completed';
 
 interface ExportStep {
   label: string;
-  status: 'pending' | 'running' | 'completed';
+  status: StepStatus;
   duration?: number;
 }
 
@@ -21,37 +29,177 @@ interface ExportProgressProps {
   estimatedTime: number;
 }
 
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const ICON_SIZES = {
+  SMALL: 'w-4 h-4',
+  MEDIUM: 'w-5 h-5',
+} as const;
+
+const LABELS = {
+  TITLE: 'Gerando Exportação...',
+  SUBTITLE: 'Por favor aguarde enquanto processamos seus dados',
+  PROGRESS_COMPLETED: '% concluído',
+  STEP_LABEL: (current: number, total: number) => `Etapa ${current} de ${total}`,
+  ELAPSED_TIME: 'Tempo decorrido:',
+  REMAINING_TIME: 'Tempo restante: ~',
+} as const;
+
+const CLASSES = {
+  CARD: 'p-6',
+  CONTAINER: 'space-y-6',
+  HEADER: 'text-center',
+  TITLE: 'text-xl font-bold text-slate-900 mb-2',
+  SUBTITLE: 'text-slate-600',
+  PROGRESS_SECTION: 'space-y-2',
+  PROGRESS_BAR: 'h-3',
+  PROGRESS_INFO: 'flex justify-between text-sm text-slate-600',
+  STEPS_CONTAINER: 'space-y-3',
+  STEP_BASE: 'flex items-center gap-3 p-3 rounded-lg transition-colors',
+  STEP_RUNNING: 'bg-blue-50 border border-blue-200',
+  STEP_COMPLETED: 'bg-green-50',
+  STEP_PENDING: 'bg-slate-50',
+  STEP_ICON_CONTAINER: 'flex-shrink-0',
+  STEP_LABEL_CONTAINER: 'flex-1',
+  STEP_TEXT_RUNNING: 'text-blue-900',
+  STEP_TEXT_COMPLETED: 'text-green-900',
+  STEP_TEXT_PENDING: 'text-slate-500',
+  STEP_DURATION: 'text-sm text-slate-600',
+  PENDING_ICON: 'w-5 h-5 rounded-full border-2 border-slate-300',
+  TIME_INFO: 'flex items-center justify-between pt-4 border-t border-slate-200',
+  TIME_ROW: 'flex items-center gap-2 text-sm text-slate-600',
+  TIME_TEXT: 'text-sm text-slate-600',
+} as const;
+
+const STATUS_COLORS = {
+  running: {
+    icon: 'text-blue-600',
+    text: CLASSES.STEP_TEXT_RUNNING,
+    container: CLASSES.STEP_RUNNING,
+  },
+  completed: {
+    icon: 'text-green-600',
+    text: CLASSES.STEP_TEXT_COMPLETED,
+    container: CLASSES.STEP_COMPLETED,
+  },
+  pending: {
+    icon: 'text-slate-300',
+    text: CLASSES.STEP_TEXT_PENDING,
+    container: CLASSES.STEP_PENDING,
+  },
+} as const;
+
+const TIME_THRESHOLDS = {
+  SECONDS_PER_MINUTE: 60,
+} as const;
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Format time in seconds to human-readable format
+ */
 function formatTime(seconds: number): string {
-  if (seconds < 60) return `${Math.round(seconds)}s`;
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.round(seconds % 60);
+  if (seconds < TIME_THRESHOLDS.SECONDS_PER_MINUTE) {
+    return `${Math.round(seconds)}s`;
+  }
+  
+  const mins = Math.floor(seconds / TIME_THRESHOLDS.SECONDS_PER_MINUTE);
+  const secs = Math.round(seconds % TIME_THRESHOLDS.SECONDS_PER_MINUTE);
   return `${mins}m ${secs}s`;
 }
 
-function getStepClassName(status: ExportStep['status']): string {
-  const baseClass = 'flex items-center gap-3 p-3 rounded-lg transition-colors';
-  
-  switch (status) {
-    case 'running':
-      return `${baseClass} bg-blue-50 border border-blue-200`;
-    case 'completed':
-      return `${baseClass} bg-green-50`;
-    default:
-      return `${baseClass} bg-slate-50`;
-  }
+/**
+ * Get step container CSS classes based on status
+ */
+function getStepClassName(status: StepStatus): string {
+  return `${CLASSES.STEP_BASE} ${STATUS_COLORS[status].container}`;
 }
 
-function getStepTextColor(status: ExportStep['status']): string {
-  switch (status) {
-    case 'running':
-      return 'text-blue-900';
-    case 'completed':
-      return 'text-green-900';
-    default:
-      return 'text-slate-500';
-  }
+/**
+ * Get step text CSS classes based on status
+ */
+function getStepTextColor(status: StepStatus): string {
+  return STATUS_COLORS[status].text;
 }
 
+/**
+ * Calculate progress percentage
+ */
+function calculateProgress(currentStep: number, totalSteps: number): number {
+  return (currentStep / totalSteps) * 100;
+}
+
+/**
+ * Calculate remaining time
+ */
+function calculateRemainingTime(estimatedTime: number, elapsedTime: number): number {
+  return Math.max(0, estimatedTime - elapsedTime);
+}
+
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
+
+/**
+ * Step icon component
+ */
+interface StepIconProps {
+  status: StepStatus;
+}
+
+function StepIcon({ status }: StepIconProps) {
+  const iconColor = STATUS_COLORS[status].icon;
+
+  if (status === 'completed') {
+    return <CheckCircle2 className={`${ICON_SIZES.MEDIUM} ${iconColor}`} />;
+  }
+
+  if (status === 'running') {
+    return <Loader2 className={`${ICON_SIZES.MEDIUM} ${iconColor} animate-spin`} />;
+  }
+
+  return <div className={CLASSES.PENDING_ICON} />;
+}
+
+/**
+ * Step item component
+ */
+interface StepItemProps {
+  step: ExportStep;
+}
+
+function StepItem({ step }: StepItemProps) {
+  return (
+    <div className={getStepClassName(step.status)}>
+      {/* Icon */}
+      <div className={CLASSES.STEP_ICON_CONTAINER}>
+        <StepIcon status={step.status} />
+      </div>
+
+      {/* Label */}
+      <div className={CLASSES.STEP_LABEL_CONTAINER}>
+        <span className={`font-medium ${getStepTextColor(step.status)}`}>{step.label}</span>
+      </div>
+
+      {/* Duration */}
+      {step.duration && (
+        <span className={CLASSES.STEP_DURATION}>{formatTime(step.duration)}</span>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+/**
+ * Display export progress with steps and time estimates
+ */
 export default function ExportProgress({
   currentStep,
   totalSteps,
@@ -59,67 +207,74 @@ export default function ExportProgress({
   elapsedTime,
   estimatedTime,
 }: ExportProgressProps) {
-  const progress = (currentStep / totalSteps) * 100;
-  const remainingTime = Math.max(0, estimatedTime - elapsedTime);
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const progress = useMemo(
+    () => calculateProgress(currentStep, totalSteps),
+    [currentStep, totalSteps]
+  );
+
+  const remainingTime = useMemo(
+    () => calculateRemainingTime(estimatedTime, elapsedTime),
+    [estimatedTime, elapsedTime]
+  );
+
+  const progressPercentage = useMemo(() => Math.round(progress), [progress]);
+
+  const stepLabel = useMemo(
+    () => LABELS.STEP_LABEL(currentStep, totalSteps),
+    [currentStep, totalSteps]
+  );
+
+  const formattedElapsedTime = useMemo(() => formatTime(elapsedTime), [elapsedTime]);
+
+  const formattedRemainingTime = useMemo(() => formatTime(remainingTime), [remainingTime]);
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   return (
-    <Card className="p-6">
-      <div className="space-y-6">
+    <Card className={CLASSES.CARD}>
+      <div className={CLASSES.CONTAINER}>
         {/* Header */}
-        <div className="text-center">
-          <h3 className="text-xl font-bold text-slate-900 mb-2">Gerando Exportação...</h3>
-          <p className="text-slate-600">Por favor aguarde enquanto processamos seus dados</p>
+        <div className={CLASSES.HEADER}>
+          <h3 className={CLASSES.TITLE}>{LABELS.TITLE}</h3>
+          <p className={CLASSES.SUBTITLE}>{LABELS.SUBTITLE}</p>
         </div>
 
         {/* Progress Bar */}
-        <div className="space-y-2">
-          <Progress value={progress} className="h-3" />
-          <div className="flex justify-between text-sm text-slate-600">
-            <span>{Math.round(progress)}% concluído</span>
+        <div className={CLASSES.PROGRESS_SECTION}>
+          <Progress value={progress} className={CLASSES.PROGRESS_BAR} />
+          <div className={CLASSES.PROGRESS_INFO}>
             <span>
-              Etapa {currentStep} de {totalSteps}
+              {progressPercentage}
+              {LABELS.PROGRESS_COMPLETED}
             </span>
+            <span>{stepLabel}</span>
           </div>
         </div>
 
         {/* Steps */}
-        <div className="space-y-3">
+        <div className={CLASSES.STEPS_CONTAINER}>
           {steps.map((step, index) => (
-            <div key={index} className={getStepClassName(step.status)}>
-              {/* Icon */}
-              <div className="flex-shrink-0">
-                {step.status === 'completed' ? (
-                  <CheckCircle2 className="w-5 h-5 text-green-600" />
-                ) : step.status === 'running' ? (
-                  <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
-                ) : (
-                  <div className="w-5 h-5 rounded-full border-2 border-slate-300" />
-                )}
-              </div>
-
-              {/* Label */}
-              <div className="flex-1">
-                <span className={`font-medium ${getStepTextColor(step.status)}`}>
-                  {step.label}
-                </span>
-              </div>
-
-              {/* Duration */}
-              {step.duration && (
-                <span className="text-sm text-slate-600">{formatTime(step.duration)}</span>
-              )}
-            </div>
+            <StepItem key={index} step={step} />
           ))}
         </div>
 
         {/* Time Info */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <Clock className="w-4 h-4" />
-            <span>Tempo decorrido: {formatTime(elapsedTime)}</span>
+        <div className={CLASSES.TIME_INFO}>
+          <div className={CLASSES.TIME_ROW}>
+            <Clock className={ICON_SIZES.SMALL} />
+            <span>
+              {LABELS.ELAPSED_TIME} {formattedElapsedTime}
+            </span>
           </div>
-          <div className="text-sm text-slate-600">
-            Tempo restante: ~{formatTime(remainingTime)}
+          <div className={CLASSES.TIME_TEXT}>
+            {LABELS.REMAINING_TIME}
+            {formattedRemainingTime}
           </div>
         </div>
       </div>
