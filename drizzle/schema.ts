@@ -1,29 +1,32 @@
 import {
-  mysqlTable,
-  mysqlSchema,
-  AnyMySqlColumn,
+  pgTable,
+  pgSchema,
+  AnyPgColumn,
   index,
-  int,
+  serial,
+  integer,
   varchar,
   text,
-  json,
+  jsonb,
   timestamp,
-  mysqlEnum,
+  pgEnum,
   foreignKey,
-  decimal,
-  tinyint,
-} from "drizzle-orm/mysql-core";
+  numeric,
+  smallint,
+  uniqueIndex,
+  primaryKey,
+} from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
-export const activityLog = mysqlTable(
+export const activityLog = pgTable(
   "activity_log",
   {
-    id: int().autoincrement().notNull(),
-    projectId: int().notNull(),
+    id: serial(),
+    projectId: integer().notNull(),
     activityType: varchar({ length: 50 }).notNull(),
     description: text(),
-    metadata: json(),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+    metadata: jsonb(),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
   },
   table => [
     index("idx_project").on(table.projectId),
@@ -32,138 +35,125 @@ export const activityLog = mysqlTable(
   ]
 );
 
-export const alertConfigs = mysqlTable("alert_configs", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
+export const alertConfigs = pgTable("alert_configs", {
+  id: serial(),
+  projectId: integer().notNull(),
   name: varchar({ length: 255 }).notNull(),
-  alertType: mysqlEnum([
-    "error_rate",
-    "high_quality_lead",
-    "market_threshold",
-  ]).notNull(),
+  alertType: varchar({ length: 50 }).notNull(),
   condition: text().notNull(),
-  enabled: tinyint().default(1).notNull(),
+  enabled: smallint().default(1).notNull(),
   lastTriggeredAt: timestamp({ mode: "string" }),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  updatedAt: timestamp({ mode: "string" }).defaultNow().onUpdateNow(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
+  updatedAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const alertHistory = mysqlTable("alert_history", {
-  id: int().autoincrement().notNull(),
-  alertConfigId: int().notNull(),
-  projectId: int().notNull(),
-  alertType: mysqlEnum([
-    "error_rate",
-    "high_quality_lead",
-    "market_threshold",
-  ]).notNull(),
+export const alertHistory = pgTable("alert_history", {
+  id: serial(),
+  alertConfigId: integer().notNull(),
+  projectId: integer().notNull(),
+  alertType: varchar({ length: 50 }).notNull(),
   condition: text().notNull(),
   message: text().notNull(),
   triggeredAt: timestamp({ mode: "string" })
-    .default("CURRENT_TIMESTAMP")
+    .defaultNow()
     .notNull(),
 });
 
-export const analyticsDimensoes = mysqlTable("analytics_dimensoes", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
-  pesquisaId: int(),
-  dimensaoTipo: mysqlEnum([
-    "uf",
-    "porte",
-    "segmentacao",
-    "categoria",
-  ]).notNull(),
+export const analyticsDimensoes = pgTable("analytics_dimensoes", {
+  id: serial(),
+  projectId: integer().notNull(),
+  pesquisaId: integer(),
+  dimensaoTipo: varchar({ length: 50 }).notNull(),
   dimensaoValor: varchar({ length: 100 }).notNull(),
-  totalLeads: int().default(0),
-  qualidadeMedia: int().default(0),
-  taxaConversaoSf: int().default(0),
-  custoMedioLead: int().default(0),
-  roi: int().default(0),
-  updatedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  totalLeads: integer().default(0),
+  qualidadeMedia: integer().default(0),
+  taxaConversaoSf: integer().default(0),
+  custoMedioLead: integer().default(0),
+  roi: integer().default(0),
+  updatedAt: timestamp({ mode: "string" }).defaultNow(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const analyticsMercados = mysqlTable("analytics_mercados", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
-  pesquisaId: int(),
-  mercadoId: int().notNull(),
+export const analyticsMercados = pgTable("analytics_mercados", {
+  id: serial(),
+  projectId: integer().notNull(),
+  pesquisaId: integer(),
+  mercadoId: integer().notNull(),
   periodo: timestamp({ mode: "string" }).notNull(),
-  totalClientes: int().default(0),
-  totalConcorrentes: int().default(0),
-  totalLeadsGerados: int().default(0),
-  taxaCoberturaMercado: int().default(0),
-  qualidadeMediaLeads: int().default(0),
-  leadsAltaQualidade: int().default(0),
-  leadsMediaQualidade: int().default(0),
-  leadsBaixaQualidade: int().default(0),
-  leadsEnriquecidos: int().default(0),
-  taxaSucessoEnriquecimento: int().default(0),
-  tempoMedioEnriquecimentoMin: int().default(0),
-  custoEnriquecimentoTotal: int().default(0),
-  leadsValidados: int().default(0),
-  leadsAprovados: int().default(0),
-  leadsDescartados: int().default(0),
-  taxaAprovacao: int().default(0),
-  leadsExportadosSf: int().default(0),
-  leadsConvertidosSf: int().default(0),
-  taxaConversaoSf: int().default(0),
-  horasPesquisa: int().default(0),
-  custoTotal: int().default(0),
-  roi: int().default(0),
-  updatedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  totalClientes: integer().default(0),
+  totalConcorrentes: integer().default(0),
+  totalLeadsGerados: integer().default(0),
+  taxaCoberturaMercado: integer().default(0),
+  qualidadeMediaLeads: integer().default(0),
+  leadsAltaQualidade: integer().default(0),
+  leadsMediaQualidade: integer().default(0),
+  leadsBaixaQualidade: integer().default(0),
+  leadsEnriquecidos: integer().default(0),
+  taxaSucessoEnriquecimento: integer().default(0),
+  tempoMedioEnriquecimentoMin: integer().default(0),
+  custoEnriquecimentoTotal: integer().default(0),
+  leadsValidados: integer().default(0),
+  leadsAprovados: integer().default(0),
+  leadsDescartados: integer().default(0),
+  taxaAprovacao: integer().default(0),
+  leadsExportadosSf: integer().default(0),
+  leadsConvertidosSf: integer().default(0),
+  taxaConversaoSf: integer().default(0),
+  horasPesquisa: integer().default(0),
+  custoTotal: integer().default(0),
+  roi: integer().default(0),
+  updatedAt: timestamp({ mode: "string" }).defaultNow(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const analyticsPesquisas = mysqlTable("analytics_pesquisas", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
-  pesquisaId: int().notNull(),
-  totalMercadosMapeados: int().default(0),
-  totalClientesBase: int().default(0),
-  totalLeadsGerados: int().default(0),
-  taxaConversaoClienteLead: int().default(0),
-  qualidadeMediaGeral: int().default(0),
+export const analyticsPesquisas = pgTable("analytics_pesquisas", {
+  id: serial(),
+  projectId: integer().notNull(),
+  pesquisaId: integer().notNull(),
+  totalMercadosMapeados: integer().default(0),
+  totalClientesBase: integer().default(0),
+  totalLeadsGerados: integer().default(0),
+  taxaConversaoClienteLead: integer().default(0),
+  qualidadeMediaGeral: integer().default(0),
   distribuicaoQualidade: text(),
-  taxaSucessoEnriquecimento: int().default(0),
-  tempoTotalEnriquecimentoHoras: int().default(0),
-  custoTotalEnriquecimento: int().default(0),
-  leadsExportadosSf: int().default(0),
-  leadsConvertidosSf: int().default(0),
-  taxaConversaoSf: int().default(0),
-  valorPipelineGerado: int().default(0),
-  custoTotalPesquisa: int().default(0),
-  valorGerado: int().default(0),
-  roi: int().default(0),
+  taxaSucessoEnriquecimento: integer().default(0),
+  tempoTotalEnriquecimentoHoras: integer().default(0),
+  custoTotalEnriquecimento: integer().default(0),
+  leadsExportadosSf: integer().default(0),
+  leadsConvertidosSf: integer().default(0),
+  taxaConversaoSf: integer().default(0),
+  valorPipelineGerado: integer().default(0),
+  custoTotalPesquisa: integer().default(0),
+  valorGerado: integer().default(0),
+  roi: integer().default(0),
   dataInicio: timestamp({ mode: "string" }),
   dataConclusao: timestamp({ mode: "string" }),
-  duracaoDias: int().default(0),
-  updatedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  duracaoDias: integer().default(0),
+  updatedAt: timestamp({ mode: "string" }).defaultNow(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const analyticsTimeline = mysqlTable("analytics_timeline", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
+export const analyticsTimeline = pgTable("analytics_timeline", {
+  id: serial(),
+  projectId: integer().notNull(),
   data: timestamp({ mode: "string" }).notNull(),
-  leadsGeradosDia: int().default(0),
-  leadsEnriquecidosDia: int().default(0),
-  leadsValidadosDia: int().default(0),
-  leadsExportadosSfDia: int().default(0),
-  qualidadeMediaDia: int().default(0),
-  custoDia: int().default(0),
-  leadsAcumulados: int().default(0),
-  custoAcumulado: int().default(0),
-  valorGeradoAcumulado: int().default(0),
-  updatedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  leadsGeradosDia: integer().default(0),
+  leadsEnriquecidosDia: integer().default(0),
+  leadsValidadosDia: integer().default(0),
+  leadsExportadosSfDia: integer().default(0),
+  qualidadeMediaDia: integer().default(0),
+  custoDia: integer().default(0),
+  leadsAcumulados: integer().default(0),
+  custoAcumulado: integer().default(0),
+  valorGeradoAcumulado: integer().default(0),
+  updatedAt: timestamp({ mode: "string" }).defaultNow(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const clientes = mysqlTable(
+export const clientes = pgTable(
   "clientes",
   {
-    id: int().autoincrement().notNull(),
+    id: serial(),
     clienteHash: varchar({ length: 255 }),
     nome: varchar({ length: 255 }).notNull(),
     cnpj: varchar({ length: 20 }),
@@ -178,25 +168,20 @@ export const clientes = mysqlTable(
     uf: varchar({ length: 2 }),
     cnae: varchar({ length: 20 }),
     porte: varchar({ length: 50 }),
-    qualidadeScore: int(),
+    qualidadeScore: integer(),
     qualidadeClassificacao: varchar({ length: 50 }),
-    validationStatus: mysqlEnum([
-      "pending",
-      "rich",
-      "needs_adjustment",
-      "discarded",
-    ]).default("pending"),
+    validationStatus: varchar({ length: 50 }).default("pending"),
     validationNotes: text(),
     validatedBy: varchar({ length: 64 }),
     validatedAt: timestamp({ mode: "string" }),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-    projectId: int().default(1).notNull(),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
+    projectId: integer().default(1).notNull(),
     regiao: varchar({ length: 100 }),
     faturamentoDeclarado: text(),
     numeroEstabelecimentos: text(),
-    pesquisaId: int(),
-    latitude: decimal({ precision: 10, scale: 8 }),
-    longitude: decimal({ precision: 11, scale: 8 }),
+    pesquisaId: integer(),
+    latitude: numeric({ precision: 10, scale: 8 }),
+    longitude: numeric({ precision: 11, scale: 8 }),
     geocodedAt: timestamp({ mode: "string" }),
   },
   table => [
@@ -205,65 +190,55 @@ export const clientes = mysqlTable(
   ]
 );
 
-export const clientesHistory = mysqlTable("clientes_history", {
-  id: int().autoincrement().notNull(),
-  clienteId: int().notNull(),
+export const clientesHistory = pgTable("clientes_history", {
+  id: serial(),
+  clienteId: integer().notNull(),
   field: varchar({ length: 100 }),
   oldValue: text(),
   newValue: text(),
-  changeType: mysqlEnum([
-    "created",
-    "updated",
-    "enriched",
-    "validated",
-  ]).default("updated"),
+  changeType: varchar({ length: 50 }).default("updated"),
   changedBy: varchar({ length: 64 }),
-  changedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  changedAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const clientesMercados = mysqlTable(
+export const clientesMercados = pgTable(
   "clientes_mercados",
   {
-    id: int().autoincrement().notNull(),
-    clienteId: int().notNull(),
-    mercadoId: int().notNull(),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+    id: serial(),
+    clienteId: integer().notNull(),
+    mercadoId: integer().notNull(),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
   },
   table => [index("idx_cliente_mercado").on(table.clienteId, table.mercadoId)]
 );
 
-export const concorrentes = mysqlTable(
+export const concorrentes = pgTable(
   "concorrentes",
   {
-    id: int().autoincrement().notNull(),
+    id: serial(),
     concorrenteHash: varchar({ length: 255 }),
-    mercadoId: int().notNull(),
+    mercadoId: integer().notNull(),
     nome: varchar({ length: 255 }).notNull(),
     cnpj: varchar({ length: 20 }),
     site: varchar({ length: 500 }),
     produto: text(),
     porte: varchar({ length: 50 }),
     faturamentoEstimado: text(),
-    qualidadeScore: int(),
+    qualidadeScore: integer(),
     qualidadeClassificacao: varchar({ length: 50 }),
-    validationStatus: mysqlEnum([
-      "pending",
-      "rich",
-      "needs_adjustment",
-      "discarded",
-    ]).default("pending"),
+    validationStatus: varchar({ length: 50 }).default("pending"),
     validationNotes: text(),
     validatedBy: varchar({ length: 64 }),
     validatedAt: timestamp({ mode: "string" }),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-    projectId: int().default(1).notNull(),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
+    projectId: integer().default(1).notNull(),
     cidade: varchar({ length: 100 }),
     uf: varchar({ length: 2 }),
     faturamentoDeclarado: text(),
     numeroEstabelecimentos: text(),
-    pesquisaId: int(),
-    latitude: decimal({ precision: 10, scale: 8 }),
-    longitude: decimal({ precision: 11, scale: 8 }),
+    pesquisaId: integer(),
+    latitude: numeric({ precision: 10, scale: 8 }),
+    longitude: numeric({ precision: 11, scale: 8 }),
     geocodedAt: timestamp({ mode: "string" }),
   },
   table => [
@@ -273,55 +248,50 @@ export const concorrentes = mysqlTable(
   ]
 );
 
-export const concorrentesHistory = mysqlTable("concorrentes_history", {
-  id: int().autoincrement().notNull(),
-  concorrenteId: int().notNull(),
+export const concorrentesHistory = pgTable("concorrentes_history", {
+  id: serial(),
+  concorrenteId: integer().notNull(),
   field: varchar({ length: 100 }),
   oldValue: text(),
   newValue: text(),
-  changeType: mysqlEnum([
-    "created",
-    "updated",
-    "enriched",
-    "validated",
-  ]).default("updated"),
+  changeType: varchar({ length: 50 }).default("updated"),
   changedBy: varchar({ length: 64 }),
-  changedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  changedAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const enrichmentCache = mysqlTable(
+export const enrichmentCache = pgTable(
   "enrichment_cache",
   {
     cnpj: varchar({ length: 14 }).notNull(),
     dadosJson: text().notNull(),
     fonte: varchar({ length: 50 }),
     dataAtualizacao: timestamp({ mode: "string" })
-      .default("CURRENT_TIMESTAMP")
+      .defaultNow()
       .notNull(),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
   },
   table => [index("idx_data_atualizacao").on(table.dataAtualizacao)]
 );
 
-export const enrichmentConfigs = mysqlTable(
+export const enrichmentConfigs = pgTable(
   "enrichment_configs",
   {
-    id: int().autoincrement().notNull(),
-    projectId: int().notNull(),
+    id: serial(),
+    projectId: integer().notNull(),
     openaiApiKey: text(),
     serpapiKey: text(),
     receitawsKey: text(),
-    produtosPorMercado: int().default(3).notNull(),
-    concorrentesPorMercado: int().default(5).notNull(),
-    leadsPorMercado: int().default(5).notNull(),
-    batchSize: int().default(50).notNull(),
-    checkpointInterval: int().default(100).notNull(),
-    enableDeduplication: int().default(1).notNull(),
-    enableQualityScore: int().default(1).notNull(),
-    enableAutoRetry: int().default(1).notNull(),
-    maxRetries: int().default(2).notNull(),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-    updatedAt: timestamp({ mode: "string" }).defaultNow().onUpdateNow(),
+    produtosPorMercado: integer().default(3).notNull(),
+    concorrentesPorMercado: integer().default(5).notNull(),
+    leadsPorMercado: integer().default(5).notNull(),
+    batchSize: integer().default(50).notNull(),
+    checkpointInterval: integer().default(100).notNull(),
+    enableDeduplication: integer().default(1).notNull(),
+    enableQualityScore: integer().default(1).notNull(),
+    enableAutoRetry: integer().default(1).notNull(),
+    maxRetries: integer().default(2).notNull(),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
+    updatedAt: timestamp({ mode: "string" }).defaultNow(),
     geminiApiKey: text(),
     anthropicApiKey: text(),
     googleMapsApiKey: text(),
@@ -329,58 +299,58 @@ export const enrichmentConfigs = mysqlTable(
   table => [index("projectId").on(table.projectId)]
 );
 
-export const systemSettings = mysqlTable(
+export const systemSettings = pgTable(
   "system_settings",
   {
-    id: int().autoincrement().notNull(),
+    id: serial(),
     settingKey: varchar({ length: 100 }).notNull(),
     settingValue: text(),
     description: text(),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-    updatedAt: timestamp({ mode: "string" }).defaultNow().onUpdateNow(),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
+    updatedAt: timestamp({ mode: "string" }).defaultNow(),
   },
   table => [index("idx_setting_key").on(table.settingKey)]
 );
 
-export const enrichmentJobs = mysqlTable("enrichment_jobs", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
-  status: mysqlEnum(["pending", "running", "paused", "completed", "failed"])
+export const enrichmentJobs = pgTable("enrichment_jobs", {
+  id: serial(),
+  projectId: integer().notNull(),
+  status: varchar({ length: 50 })
     .default("pending")
     .notNull(),
-  totalClientes: int().notNull(),
-  processedClientes: int().default(0).notNull(),
-  successClientes: int().default(0).notNull(),
-  failedClientes: int().default(0).notNull(),
-  currentBatch: int().default(0).notNull(),
-  totalBatches: int().notNull(),
-  batchSize: int().default(5).notNull(),
-  checkpointInterval: int().default(50).notNull(),
+  totalClientes: integer().notNull(),
+  processedClientes: integer().default(0).notNull(),
+  successClientes: integer().default(0).notNull(),
+  failedClientes: integer().default(0).notNull(),
+  currentBatch: integer().default(0).notNull(),
+  totalBatches: integer().notNull(),
+  batchSize: integer().default(5).notNull(),
+  checkpointInterval: integer().default(50).notNull(),
   startedAt: timestamp({ mode: "string" }),
   pausedAt: timestamp({ mode: "string" }),
   completedAt: timestamp({ mode: "string" }),
-  estimatedTimeRemaining: int(),
-  lastClienteId: int(),
+  estimatedTimeRemaining: integer(),
+  lastClienteId: integer(),
   errorMessage: text(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  updatedAt: timestamp({ mode: "string" }).defaultNow().onUpdateNow(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
+  updatedAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const enrichmentQueue = mysqlTable(
+export const enrichmentQueue = pgTable(
   "enrichment_queue",
   {
-    id: int().autoincrement().notNull(),
-    projectId: int()
+    id: serial(),
+    projectId: integer()
       .notNull()
       .references(() => projects.id, { onDelete: "cascade" }),
-    status: mysqlEnum(["pending", "processing", "completed", "error"]).default(
+    status: varchar({ length: 50 }).default(
       "pending"
     ),
-    priority: int().default(0),
-    clienteData: json().notNull(),
-    result: json(),
+    priority: integer().default(0),
+    clienteData: jsonb().notNull(),
+    result: jsonb(),
     errorMessage: text(),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
     startedAt: timestamp({ mode: "string" }),
     completedAt: timestamp({ mode: "string" }),
   },
@@ -391,119 +361,109 @@ export const enrichmentQueue = mysqlTable(
   ]
 );
 
-export const enrichmentRuns = mysqlTable("enrichment_runs", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
+export const enrichmentRuns = pgTable("enrichment_runs", {
+  id: serial(),
+  projectId: integer().notNull(),
   startedAt: timestamp({ mode: "string" })
-    .default("CURRENT_TIMESTAMP")
+    .defaultNow()
     .notNull(),
   completedAt: timestamp({ mode: "string" }),
-  totalClients: int().notNull(),
-  processedClients: int().default(0).notNull(),
-  status: mysqlEnum(["running", "paused", "completed", "error"])
+  totalClients: integer().notNull(),
+  processedClients: integer().default(0).notNull(),
+  status: varchar({ length: 50 })
     .default("running")
     .notNull(),
-  durationSeconds: int(),
+  durationSeconds: integer(),
   errorMessage: text(),
-  notifiedAt50: int().default(0).notNull(),
-  notifiedAt75: int().default(0).notNull(),
-  notifiedAt100: int().default(0).notNull(),
+  notifiedAt50: integer().default(0).notNull(),
+  notifiedAt75: integer().default(0).notNull(),
+  notifiedAt100: integer().default(0).notNull(),
 });
 
-export const entityTags = mysqlTable("entity_tags", {
-  id: int().autoincrement().notNull(),
-  tagId: int().notNull(),
-  entityType: mysqlEnum([
-    "mercado",
-    "cliente",
-    "concorrente",
-    "lead",
-  ]).notNull(),
-  entityId: int().notNull(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+export const entityTags = pgTable("entity_tags", {
+  id: serial(),
+  tagId: integer().notNull(),
+  entityType: varchar({ length: 50 }).notNull(),
+  entityId: integer().notNull(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const hibernationWarnings = mysqlTable("hibernation_warnings", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
+export const hibernationWarnings = pgTable("hibernation_warnings", {
+  id: serial(),
+  projectId: integer().notNull(),
   warningDate: timestamp({ mode: "string" })
-    .default("CURRENT_TIMESTAMP")
+    .defaultNow()
     .notNull(),
   scheduledHibernationDate: timestamp({ mode: "string" }).notNull(),
-  daysInactive: int().notNull(),
-  notificationSent: int().default(0).notNull(),
-  postponed: int().default(0).notNull(),
+  daysInactive: integer().notNull(),
+  notificationSent: integer().default(0).notNull(),
+  postponed: integer().default(0).notNull(),
   postponedUntil: timestamp({ mode: "string" }),
-  hibernated: int().default(0).notNull(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  hibernated: integer().default(0).notNull(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const intelligentAlertsConfigs = mysqlTable(
+export const intelligentAlertsConfigs = pgTable(
   "intelligent_alerts_configs",
   {
-    id: int().autoincrement().notNull(),
-    projectId: int().notNull(),
-    circuitBreakerThreshold: int().default(10).notNull(),
-    errorRateThreshold: int().default(10).notNull(),
-    processingTimeThreshold: int().default(60).notNull(),
-    notifyOnCompletion: int().default(1).notNull(),
-    notifyOnCircuitBreaker: int().default(1).notNull(),
-    notifyOnErrorRate: int().default(1).notNull(),
-    notifyOnProcessingTime: int().default(1).notNull(),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-    updatedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+    id: serial(),
+    projectId: integer().notNull(),
+    circuitBreakerThreshold: integer().default(10).notNull(),
+    errorRateThreshold: integer().default(10).notNull(),
+    processingTimeThreshold: integer().default(60).notNull(),
+    notifyOnCompletion: integer().default(1).notNull(),
+    notifyOnCircuitBreaker: integer().default(1).notNull(),
+    notifyOnErrorRate: integer().default(1).notNull(),
+    notifyOnProcessingTime: integer().default(1).notNull(),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
+    updatedAt: timestamp({ mode: "string" }).defaultNow(),
   },
   table => [
     index("intelligent_alerts_configs_projectId_unique").on(table.projectId),
   ]
 );
 
-export const intelligentAlertsHistory = mysqlTable(
+export const intelligentAlertsHistory = pgTable(
   "intelligent_alerts_history",
   {
-    id: int().autoincrement().notNull(),
-    projectId: int().notNull(),
-    alertType: mysqlEnum([
-      "circuit_breaker",
-      "error_rate",
-      "processing_time",
-      "completion",
-    ]).notNull(),
-    severity: mysqlEnum(["info", "warning", "critical"])
+    id: serial(),
+    projectId: integer().notNull(),
+    alertType: varchar({ length: 50 }).notNull(),
+    severity: varchar({ length: 50 })
       .default("info")
       .notNull(),
     title: varchar({ length: 255 }).notNull(),
     message: text().notNull(),
     metricValue: text(),
     threshold: text(),
-    jobId: int(),
-    clientsProcessed: int(),
-    totalClients: int(),
-    isRead: int().default(0).notNull(),
-    isDismissed: int().default(0).notNull(),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+    jobId: integer(),
+    clientsProcessed: integer(),
+    totalClients: integer(),
+    isRead: integer().default(0).notNull(),
+    isDismissed: integer().default(0).notNull(),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
     readAt: timestamp({ mode: "string" }),
     dismissedAt: timestamp({ mode: "string" }),
   }
 );
 
-export const leadConversions = mysqlTable("lead_conversions", {
-  id: int().autoincrement().notNull(),
-  leadId: int().notNull(),
-  projectId: int().notNull(),
-  dealValue: decimal({ precision: 15, scale: 2 }),
-  convertedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+export const leadConversions = pgTable("lead_conversions", {
+  id: serial(),
+  leadId: integer().notNull(),
+  projectId: integer().notNull(),
+  dealValue: numeric({ precision: 15, scale: 2 }),
+  convertedAt: timestamp({ mode: "string" }).defaultNow(),
   notes: text(),
-  status: mysqlEnum(["won", "lost"]).default("won"),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  status: varchar({ length: 50 }).default("won"),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const leads = mysqlTable(
+export const leads = pgTable(
   "leads",
   {
-    id: int().autoincrement().notNull(),
+    id: serial(),
     leadHash: varchar({ length: 255 }),
-    mercadoId: int().notNull(),
+    mercadoId: integer().notNull(),
     nome: varchar({ length: 255 }).notNull(),
     cnpj: varchar({ length: 20 }),
     site: varchar({ length: 500 }),
@@ -513,35 +473,24 @@ export const leads = mysqlTable(
     porte: varchar({ length: 50 }),
     regiao: varchar({ length: 100 }),
     setor: varchar({ length: 100 }),
-    qualidadeScore: int(),
+    qualidadeScore: integer(),
     qualidadeClassificacao: varchar({ length: 50 }),
-    leadStage: mysqlEnum([
-      "novo",
-      "em_contato",
-      "negociacao",
-      "fechado",
-      "perdido",
-    ]).default("novo"),
-    stageUpdatedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-    validationStatus: mysqlEnum([
-      "pending",
-      "rich",
-      "needs_adjustment",
-      "discarded",
-    ]).default("pending"),
+    leadStage: varchar({ length: 50 }).default("novo"),
+    stageUpdatedAt: timestamp({ mode: "string" }).defaultNow(),
+    validationStatus: varchar({ length: 50 }).default("pending"),
     validationNotes: text(),
     validatedBy: varchar({ length: 64 }),
     validatedAt: timestamp({ mode: "string" }),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-    projectId: int().default(1).notNull(),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
+    projectId: integer().default(1).notNull(),
     cidade: varchar({ length: 100 }),
     uf: varchar({ length: 2 }),
     faturamentoDeclarado: text(),
     numeroEstabelecimentos: text(),
-    pesquisaId: int(),
+    pesquisaId: integer(),
     stage: varchar({ length: 50 }).default("novo"),
-    latitude: decimal({ precision: 10, scale: 8 }),
-    longitude: decimal({ precision: 11, scale: 8 }),
+    latitude: numeric({ precision: 10, scale: 8 }),
+    longitude: numeric({ precision: 11, scale: 8 }),
     geocodedAt: timestamp({ mode: "string" }),
   },
   table => [
@@ -551,63 +500,53 @@ export const leads = mysqlTable(
   ]
 );
 
-export const leadsHistory = mysqlTable("leads_history", {
-  id: int().autoincrement().notNull(),
-  leadId: int().notNull(),
+export const leadsHistory = pgTable("leads_history", {
+  id: serial(),
+  leadId: integer().notNull(),
   field: varchar({ length: 100 }),
   oldValue: text(),
   newValue: text(),
-  changeType: mysqlEnum([
-    "created",
-    "updated",
-    "enriched",
-    "validated",
-  ]).default("updated"),
+  changeType: varchar({ length: 50 }).default("updated"),
   changedBy: varchar({ length: 64 }),
-  changedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  changedAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const llmProviderConfigs = mysqlTable("llm_provider_configs", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
-  activeProvider: mysqlEnum(["openai", "gemini", "anthropic"])
+export const llmProviderConfigs = pgTable("llm_provider_configs", {
+  id: serial(),
+  projectId: integer().notNull(),
+  activeProvider: varchar({ length: 50 })
     .default("openai")
     .notNull(),
   openaiApiKey: text(),
   openaiModel: varchar({ length: 100 }).default("gpt-4o"),
-  openaiEnabled: int().default(1).notNull(),
+  openaiEnabled: integer().default(1).notNull(),
   geminiApiKey: text(),
   geminiModel: varchar({ length: 100 }).default("gemini-2.0-flash-exp"),
-  geminiEnabled: int().default(0).notNull(),
+  geminiEnabled: integer().default(0).notNull(),
   anthropicApiKey: text(),
   anthropicModel: varchar({ length: 100 }).default(
     "claude-3-5-sonnet-20241022"
   ),
-  anthropicEnabled: int().default(0).notNull(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  updatedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  anthropicEnabled: integer().default(0).notNull(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
+  updatedAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const mercadosHistory = mysqlTable("mercados_history", {
-  id: int().autoincrement().notNull(),
-  mercadoId: int().notNull(),
+export const mercadosHistory = pgTable("mercados_history", {
+  id: serial(),
+  mercadoId: integer().notNull(),
   field: varchar({ length: 100 }),
   oldValue: text(),
   newValue: text(),
-  changeType: mysqlEnum([
-    "created",
-    "updated",
-    "enriched",
-    "validated",
-  ]).default("updated"),
+  changeType: varchar({ length: 50 }).default("updated"),
   changedBy: varchar({ length: 64 }),
-  changedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  changedAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const mercadosUnicos = mysqlTable(
+export const mercadosUnicos = pgTable(
   "mercados_unicos",
   {
-    id: int().autoincrement().notNull(),
+    id: serial(),
     mercadoHash: varchar({ length: 255 }),
     nome: varchar({ length: 255 }).notNull(),
     segmentacao: varchar({ length: 50 }),
@@ -616,10 +555,10 @@ export const mercadosUnicos = mysqlTable(
     crescimentoAnual: text(),
     tendencias: text(),
     principaisPlayers: text(),
-    quantidadeClientes: int().default(0),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-    projectId: int().default(1).notNull(),
-    pesquisaId: int(),
+    quantidadeClientes: integer().default(0),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
+    projectId: integer().default(1).notNull(),
+    pesquisaId: integer(),
   },
   table => [
     index("idx_mercados_projectId").on(table.projectId),
@@ -628,24 +567,24 @@ export const mercadosUnicos = mysqlTable(
   ]
 );
 
-export const exportHistory = mysqlTable(
+export const exportHistory = pgTable(
   "export_history",
   {
     id: varchar({ length: 64 }).primaryKey(),
     userId: varchar({ length: 64 })
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
-    projectId: int().references(() => projects.id, { onDelete: "cascade" }),
-    pesquisaId: int().references(() => pesquisas.id, { onDelete: "cascade" }),
+    projectId: integer().references(() => projects.id, { onDelete: "cascade" }),
+    pesquisaId: integer().references(() => pesquisas.id, { onDelete: "cascade" }),
     context: text(),
-    filters: json(),
-    format: mysqlEnum(["csv", "excel", "pdf"]).notNull(),
-    outputType: mysqlEnum(["list", "report"]).notNull(),
-    recordCount: int().default(0).notNull(),
+    filters: jsonb(),
+    format: varchar({ length: 50 }).notNull(),
+    outputType: varchar({ length: 50 }).notNull(),
+    recordCount: integer().default(0).notNull(),
     fileUrl: text(),
-    fileSize: int().default(0),
-    generationTime: int().default(0),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+    fileSize: integer().default(0),
+    generationTime: integer().default(0),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
   },
   table => [
     index("idx_export_user").on(table.userId),
@@ -654,26 +593,20 @@ export const exportHistory = mysqlTable(
   ]
 );
 
-export const savedFiltersExport = mysqlTable(
+export const savedFiltersExport = pgTable(
   "saved_filters_export",
   {
-    id: int().autoincrement().notNull(),
+    id: serial(),
     userId: varchar({ length: 64 })
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
-    projectId: int().references(() => projects.id, { onDelete: "cascade" }),
+    projectId: integer().references(() => projects.id, { onDelete: "cascade" }),
     name: varchar({ length: 255 }).notNull(),
     description: text(),
-    entityType: mysqlEnum([
-      "mercados",
-      "clientes",
-      "concorrentes",
-      "leads",
-      "produtos",
-    ]).notNull(),
-    filters: json().notNull(),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-    updatedAt: timestamp({ mode: "string" }).defaultNow().onUpdateNow(),
+    entityType: varchar({ length: 50 }).notNull(),
+    filters: jsonb().notNull(),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
+    updatedAt: timestamp({ mode: "string" }).defaultNow(),
   },
   table => [
     index("idx_saved_filter_user").on(table.userId),
@@ -681,69 +614,44 @@ export const savedFiltersExport = mysqlTable(
   ]
 );
 
-export const notifications = mysqlTable("notifications", {
-  id: int().autoincrement().notNull(),
+export const notifications = pgTable("notifications", {
+  id: serial(),
   userId: varchar({ length: 64 }).references(() => users.id, {
     onDelete: "cascade",
   }),
-  projectId: int().references(() => projects.id, { onDelete: "cascade" }),
-  type: mysqlEnum([
-    "lead_quality",
-    "lead_closed",
-    "new_competitor",
-    "market_threshold",
-    "data_incomplete",
-    "enrichment",
-    "validation",
-    "export",
-  ]).notNull(),
+  projectId: integer().references(() => projects.id, { onDelete: "cascade" }),
+  type: varchar({ length: 50 }).notNull(),
   title: varchar({ length: 255 }).notNull(),
   message: text().notNull(),
-  entityType: mysqlEnum(["mercado", "cliente", "concorrente", "lead"]),
-  entityId: int(),
-  isRead: int().default(0).notNull(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  entityType: varchar({ length: 50 }),
+  entityId: integer(),
+  isRead: integer().default(0).notNull(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const notificationPreferences = mysqlTable(
+export const notificationPreferences = pgTable(
   "notification_preferences",
   {
-    id: int().autoincrement().notNull(),
+    id: serial(),
     userId: varchar({ length: 64 })
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
-    type: mysqlEnum([
-      "lead_quality",
-      "lead_closed",
-      "new_competitor",
-      "market_threshold",
-      "data_incomplete",
-      "enrichment",
-      "validation",
-      "export",
-      "all",
-    ]).notNull(),
-    enabled: int().default(1).notNull(),
-    channels: json()
+    type: varchar({ length: 50 }).notNull(),
+    enabled: integer().default(1).notNull(),
+    channels: jsonb()
       .$type<{ email?: boolean; push?: boolean; inApp?: boolean }>()
       .default({ inApp: true }),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-    updatedAt: timestamp({ mode: "string" }).defaultNow().onUpdateNow(),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
+    updatedAt: timestamp({ mode: "string" }).defaultNow(),
   },
   table => [index("idx_user_type").on(table.userId, table.type)]
 );
 
-export const operationalAlerts = mysqlTable("operational_alerts", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
-  alertType: mysqlEnum([
-    "qualidade_baixa",
-    "enriquecimento_lento",
-    "backlog_validacao",
-    "custo_elevado",
-    "conversao_sf_baixa",
-  ]).notNull(),
-  severity: mysqlEnum(["low", "medium", "high", "critical"])
+export const operationalAlerts = pgTable("operational_alerts", {
+  id: serial(),
+  projectId: integer().notNull(),
+  alertType: varchar({ length: 50 }).notNull(),
+  severity: varchar({ length: 50 })
     .default("medium")
     .notNull(),
   titulo: varchar({ length: 255 }).notNull(),
@@ -751,52 +659,46 @@ export const operationalAlerts = mysqlTable("operational_alerts", {
   acaoRecomendada: text(),
   valorAtual: text(),
   valorEsperado: text(),
-  isRead: int().default(0).notNull(),
-  isDismissed: int().default(0).notNull(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  isRead: integer().default(0).notNull(),
+  isDismissed: integer().default(0).notNull(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
   readAt: timestamp({ mode: "string" }),
   dismissedAt: timestamp({ mode: "string" }),
 });
 
-export const pesquisas = mysqlTable("pesquisas", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
+export const pesquisas = pgTable("pesquisas", {
+  id: serial(),
+  projectId: integer().notNull(),
   nome: varchar({ length: 255 }).notNull(),
   descricao: text(),
-  dataImportacao: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  totalClientes: int().default(0),
-  clientesEnriquecidos: int().default(0),
-  status: mysqlEnum([
-    "importado",
-    "enriquecendo",
-    "em_andamento",
-    "concluido",
-    "erro",
-  ]).default("importado"),
-  ativo: int().default(1).notNull(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  updatedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  qtdConcorrentesPorMercado: int().default(5),
-  qtdLeadsPorMercado: int().default(10),
-  qtdProdutosPorCliente: int().default(3),
+  dataImportacao: timestamp({ mode: "string" }).defaultNow(),
+  totalClientes: integer().default(0),
+  clientesEnriquecidos: integer().default(0),
+  status: varchar({ length: 50 }).default("importado"),
+  ativo: integer().default(1).notNull(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
+  updatedAt: timestamp({ mode: "string" }).defaultNow(),
+  qtdConcorrentesPorMercado: integer().default(5),
+  qtdLeadsPorMercado: integer().default(10),
+  qtdProdutosPorCliente: integer().default(3),
 });
 
-export const produtos = mysqlTable(
+export const produtos = pgTable(
   "produtos",
   {
-    id: int().autoincrement().notNull(),
-    projectId: int().notNull(),
-    clienteId: int().notNull(),
-    mercadoId: int().notNull(),
+    id: serial(),
+    projectId: integer().notNull(),
+    clienteId: integer().notNull(),
+    mercadoId: integer().notNull(),
     nome: varchar({ length: 255 }).notNull(),
     descricao: text(),
     categoria: varchar({ length: 100 }),
     preco: text(),
     unidade: varchar({ length: 50 }),
-    ativo: int().default(1).notNull(),
-    createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-    updatedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-    pesquisaId: int(),
+    ativo: integer().default(1).notNull(),
+    createdAt: timestamp({ mode: "string" }).defaultNow(),
+    updatedAt: timestamp({ mode: "string" }).defaultNow(),
+    pesquisaId: integer(),
   },
   table => [
     index("idx_produto_unique").on(
@@ -807,126 +709,114 @@ export const produtos = mysqlTable(
   ]
 );
 
-export const projectAuditLog = mysqlTable("project_audit_log", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
+export const projectAuditLog = pgTable("project_audit_log", {
+  id: serial(),
+  projectId: integer().notNull(),
   userId: varchar({ length: 64 }),
-  action: mysqlEnum([
-    "created",
-    "updated",
-    "hibernated",
-    "reactivated",
-    "deleted",
-  ]).notNull(),
+  action: varchar({ length: 50 }).notNull(),
   changes: text(),
   metadata: text(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const projectTemplates = mysqlTable("project_templates", {
-  id: int().autoincrement().notNull(),
+export const projectTemplates = pgTable("project_templates", {
+  id: serial(),
   name: varchar({ length: 100 }).notNull(),
   description: text(),
   config: text().notNull(),
-  isDefault: int().default(0).notNull(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  updatedAt: timestamp({ mode: "string" }).defaultNow().onUpdateNow(),
+  isDefault: integer().default(0).notNull(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
+  updatedAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const projects = mysqlTable("projects", {
-  id: int().autoincrement().notNull(),
+export const projects = pgTable("projects", {
+  id: serial(),
   nome: varchar({ length: 255 }).notNull(),
   descricao: text(),
   cor: varchar({ length: 7 }).default("#3b82f6"),
-  ativo: int().default(1).notNull(),
-  status: mysqlEnum(["active", "hibernated"]).default("active").notNull(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  updatedAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  executionMode: mysqlEnum(["parallel", "sequential"]).default("sequential"),
-  maxParallelJobs: int().default(3),
-  isPaused: int().default(0),
-  lastActivityAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  ativo: integer().default(1).notNull(),
+  status: varchar({ length: 50 }).default("active").notNull(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
+  updatedAt: timestamp({ mode: "string" }).defaultNow(),
+  executionMode: varchar({ length: 50 }).default("sequential"),
+  maxParallelJobs: integer().default(3),
+  isPaused: integer().default(0),
+  lastActivityAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const recommendations = mysqlTable("recommendations", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
-  tipo: mysqlEnum([
-    "mercado",
-    "regiao",
-    "metodologia",
-    "filtro",
-    "otimizacao",
-  ]).notNull(),
-  prioridade: mysqlEnum(["baixa", "media", "alta"]).default("media").notNull(),
+export const recommendations = pgTable("recommendations", {
+  id: serial(),
+  projectId: integer().notNull(),
+  tipo: varchar({ length: 50 }).notNull(),
+  prioridade: varchar({ length: 50 }).default("media").notNull(),
   titulo: varchar({ length: 255 }).notNull(),
   descricao: text().notNull(),
   acao: text().notNull(),
-  leadsAdicionaisEstimado: int().default(0),
-  qualidadeEsperada: int().default(0),
-  custoEstimado: int().default(0),
-  roiEsperado: int().default(0),
-  isApplied: int().default(0).notNull(),
-  isDismissed: int().default(0).notNull(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  leadsAdicionaisEstimado: integer().default(0),
+  qualidadeEsperada: integer().default(0),
+  custoEstimado: integer().default(0),
+  roiEsperado: integer().default(0),
+  isApplied: integer().default(0).notNull(),
+  isDismissed: integer().default(0).notNull(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
   appliedAt: timestamp({ mode: "string" }),
   dismissedAt: timestamp({ mode: "string" }),
 });
 
-export const salesforceSyncLog = mysqlTable("salesforce_sync_log", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
-  pesquisaId: int(),
-  syncType: mysqlEnum(["manual", "automatico"]).default("manual").notNull(),
-  totalLeadsExportados: int().default(0),
-  totalLeadsSucesso: int().default(0),
-  totalLeadsErro: int().default(0),
-  status: mysqlEnum(["em_progresso", "concluido", "erro"])
+export const salesforceSyncLog = pgTable("salesforce_sync_log", {
+  id: serial(),
+  projectId: integer().notNull(),
+  pesquisaId: integer(),
+  syncType: varchar({ length: 50 }).default("manual").notNull(),
+  totalLeadsExportados: integer().default(0),
+  totalLeadsSucesso: integer().default(0),
+  totalLeadsErro: integer().default(0),
+  status: varchar({ length: 50 })
     .default("em_progresso")
     .notNull(),
   errorMessage: text(),
   leadIds: text(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
   completedAt: timestamp({ mode: "string" }),
 });
 
-export const savedFilters = mysqlTable("saved_filters", {
-  id: int().autoincrement().notNull(),
+export const savedFilters = pgTable("saved_filters", {
+  id: serial(),
   userId: varchar({ length: 64 }).notNull(),
   name: varchar({ length: 100 }).notNull(),
   filtersJson: text().notNull(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  projectId: int(),
-  isPublic: int().default(0).notNull(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
+  projectId: integer(),
+  isPublic: integer().default(0).notNull(),
   shareToken: varchar({ length: 64 }),
 });
 
-export const scheduledEnrichments = mysqlTable("scheduled_enrichments", {
-  id: int().autoincrement().notNull(),
-  projectId: int().notNull(),
+export const scheduledEnrichments = pgTable("scheduled_enrichments", {
+  id: serial(),
+  projectId: integer().notNull(),
   scheduledAt: timestamp({ mode: "string" }).notNull(),
-  recurrence: mysqlEnum(["once", "daily", "weekly"]).default("once").notNull(),
-  batchSize: int().default(50),
-  maxClients: int(),
-  timeout: int().default(3600),
-  status: mysqlEnum(["pending", "running", "completed", "cancelled", "error"])
+  recurrence: varchar({ length: 50 }).default("once").notNull(),
+  batchSize: integer().default(50),
+  maxClients: integer(),
+  timeout: integer().default(3600),
+  status: varchar({ length: 50 })
     .default("pending")
     .notNull(),
   errorMessage: text(),
   lastRunAt: timestamp({ mode: "string" }),
   nextRunAt: timestamp({ mode: "string" }),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  updatedAt: timestamp({ mode: "string" }).defaultNow().onUpdateNow(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
+  updatedAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const tags = mysqlTable("tags", {
-  id: int().autoincrement().notNull(),
+export const tags = pgTable("tags", {
+  id: serial(),
   name: varchar({ length: 50 }).notNull(),
   color: varchar({ length: 7 }).default("#3b82f6"),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
-export const users = mysqlTable("users", {
+export const users = pgTable("users", {
   id: varchar({ length: 64 }).primaryKey().notNull(),
   email: varchar({ length: 320 }).unique().notNull(),
   nome: varchar({ length: 255 }).notNull(),
@@ -934,11 +824,11 @@ export const users = mysqlTable("users", {
   cargo: varchar({ length: 100 }).notNull(),
   setor: varchar({ length: 100 }).notNull(),
   senhaHash: varchar({ length: 255 }).notNull(),
-  role: mysqlEnum(["admin", "visualizador"]).default("visualizador").notNull(),
-  ativo: tinyint().default(0).notNull(),
+  role: varchar({ length: 50 }).default("visualizador").notNull(),
+  ativo: smallint().default(0).notNull(),
   liberadoPor: varchar({ length: 64 }),
   liberadoEm: timestamp({ mode: "string" }),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
   lastSignedIn: timestamp({ mode: "string" }),
 }, table => [
   index("idx_email").on(table.email),
@@ -1089,19 +979,19 @@ export type InsertSavedFilterExport = typeof savedFiltersExport.$inferInsert;
 // Fase 60.1
 // ========================================
 
-export const researchDrafts = mysqlTable("research_drafts", {
+export const researchDrafts = pgTable("research_drafts", {
   id: int("id").primaryKey().autoincrement(),
   userId: varchar("userId", { length: 64 }).notNull(),
   projectId: int("projectId"),
   draftData: json("draftData").notNull(),
   currentStep: int("currentStep").default(1).notNull(),
-  progressStatus: mysqlEnum("progressStatus", [
+  progressStatus: pgEnum("progressStatus", [
     "started",
     "in_progress",
     "almost_done",
   ]).default("started"),
   createdAt: timestamp("createdAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
 export type ResearchDraft = typeof researchDrafts.$inferSelect;
@@ -1112,7 +1002,7 @@ export type InsertResearchDraft = typeof researchDrafts.$inferInsert;
 // Fase 66.2
 // ========================================
 
-export const pushSubscriptions = mysqlTable(
+export const pushSubscriptions = pgTable(
   "push_subscriptions",
   {
     id: int("id").primaryKey().autoincrement(),
@@ -1122,7 +1012,7 @@ export const pushSubscriptions = mysqlTable(
     auth: text("auth").notNull(),
     userAgent: text("userAgent"),
     createdAt: timestamp("createdAt").defaultNow(),
-    lastUsedAt: timestamp("lastUsedAt").defaultNow().onUpdateNow(),
+    lastUsedAt: timestamp("lastUsedAt").defaultNow(),
   },
   table => [index("idx_userId").on(table.userId)]
 );
@@ -1135,21 +1025,21 @@ export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
 // Fase 65.1
 // ========================================
 
-export const reportSchedules = mysqlTable(
+export const reportSchedules = pgTable(
   "report_schedules",
   {
     id: int("id").primaryKey().autoincrement(),
     userId: varchar("userId", { length: 64 }).notNull(),
     projectId: int("projectId").notNull(),
     name: varchar("name", { length: 255 }).notNull(),
-    frequency: mysqlEnum("frequency", ["weekly", "monthly"]).notNull(),
+    frequency: pgEnum("frequency", ["weekly", "monthly"]).notNull(),
     recipients: text("recipients").notNull(), // JSON array de emails
     config: json("config").notNull(), // Configurações do relatório (filtros, formato, etc)
     nextRunAt: timestamp("nextRunAt", { mode: "string" }).notNull(),
     lastRunAt: timestamp("lastRunAt", { mode: "string" }),
     enabled: tinyint("enabled").default(1).notNull(),
     createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+    updatedAt: timestamp("updatedAt").defaultNow(),
   },
   table => [
     index("idx_userId").on(table.userId),
@@ -1165,19 +1055,19 @@ export type InsertReportSchedule = typeof reportSchedules.$inferInsert;
 // TABELAS DE AUTENTICAÇÃO E GESTÃO DE USUÁRIOS
 // ============================================================================
 
-export const userInvites = mysqlTable(
+export const userInvites = pgTable(
   "user_invites",
   {
     id: varchar({ length: 64 }).primaryKey().notNull(),
     email: varchar({ length: 320 }).notNull(),
-    perfil: mysqlEnum(["admin", "visualizador"]).notNull(),
+    perfil: varchar({ length: 50 }).notNull(),
     token: varchar({ length: 255 }).unique().notNull(),
     criadoPor: varchar({ length: 64 }).notNull(),
-    criadoEm: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP").notNull(),
+    criadoEm: timestamp({ mode: "string" }).defaultNow().notNull(),
     expiraEm: timestamp({ mode: "string" }).notNull(),
-    usado: tinyint().default(0).notNull(),
+    usado: smallint().default(0).notNull(),
     usadoEm: timestamp({ mode: "string" }),
-    cancelado: tinyint().default(0).notNull(),
+    cancelado: smallint().default(0).notNull(),
   },
   table => [
     index("idx_token").on(table.token),
@@ -1194,15 +1084,15 @@ export const userInvites = mysqlTable(
 export type UserInvite = typeof userInvites.$inferSelect;
 export type InsertUserInvite = typeof userInvites.$inferInsert;
 
-export const passwordResets = mysqlTable(
+export const passwordResets = pgTable(
   "password_resets",
   {
     id: varchar({ length: 64 }).primaryKey().notNull(),
     userId: varchar({ length: 64 }).notNull(),
     token: varchar({ length: 255 }).unique().notNull(),
-    criadoEm: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP").notNull(),
+    criadoEm: timestamp({ mode: "string" }).defaultNow().notNull(),
     expiraEm: timestamp({ mode: "string" }).notNull(),
-    usado: tinyint().default(0).notNull(),
+    usado: smallint().default(0).notNull(),
   },
   table => [
     index("idx_token").on(table.token),
@@ -1218,15 +1108,15 @@ export const passwordResets = mysqlTable(
 export type PasswordReset = typeof passwordResets.$inferSelect;
 export type InsertPasswordReset = typeof passwordResets.$inferInsert;
 
-export const loginAttempts = mysqlTable(
+export const loginAttempts = pgTable(
   "login_attempts",
   {
-    id: int().autoincrement().primaryKey().notNull(),
+    id: serial().primaryKey().notNull(),
     email: varchar({ length: 320 }).notNull(),
-    sucesso: tinyint().notNull(),
+    sucesso: smallint().notNull(),
     ip: varchar({ length: 45 }),
     userAgent: text(),
-    tentativaEm: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP").notNull(),
+    tentativaEm: timestamp({ mode: "string" }).defaultNow().notNull(),
   },
   table => [
     index("idx_email_tentativa").on(table.email, table.tentativaEm),
@@ -1236,15 +1126,15 @@ export const loginAttempts = mysqlTable(
 export type LoginAttempt = typeof loginAttempts.$inferSelect;
 export type InsertLoginAttempt = typeof loginAttempts.$inferInsert;
 
-export const emailConfig = mysqlTable("email_config", {
-  id: int().autoincrement().primaryKey().notNull(),
-  projectId: int().notNull(),
+export const emailConfig = pgTable("email_config", {
+  id: serial().primaryKey().notNull(),
+  projectId: integer().notNull(),
   provider: varchar({ length: 50 }).default("resend").notNull(),
   apiKey: varchar({ length: 255 }).notNull(),
   fromEmail: varchar({ length: 320 }).notNull(),
   fromName: varchar({ length: 255 }).notNull(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  updatedAt: timestamp({ mode: "string" }).defaultNow().onUpdateNow(),
+  createdAt: timestamp({ mode: "string" }).defaultNow(),
+  updatedAt: timestamp({ mode: "string" }).defaultNow(),
 });
 
 export type EmailConfig = typeof emailConfig.$inferSelect;
