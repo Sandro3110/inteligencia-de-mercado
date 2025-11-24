@@ -1,11 +1,13 @@
+'use client';
+
 /**
  * Dialog para salvar configurações de exportação como template
  * Item 9 do módulo de exportação inteligente
  */
 
-import { useState } from "react";
-import { Save, Lock, Unlock } from "lucide-react";
-import { Button } from "../ui/button";
+import { useState, useCallback } from 'react';
+import { Save, Lock, Unlock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -13,32 +15,34 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
-import { Label } from "../ui/label";
-import { Switch } from "../ui/switch";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
-interface SaveConfigDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onSave: (config: SavedConfig) => void;
-  currentConfig: {
-    context?: string;
-    filters?: any;
-    fields?: string[];
-    format?: string;
-    outputType?: string;
-    depth?: string;
-    relationshipMode?: string;
-  };
+interface ExportConfig {
+  context?: string;
+  filters?: Record<string, unknown>;
+  fields?: string[];
+  format?: string;
+  outputType?: string;
+  depth?: string;
+  relationshipMode?: string;
 }
 
 interface SavedConfig {
   name: string;
   description: string;
   isPublic: boolean;
-  config: any;
+  config: ExportConfig;
+}
+
+interface SaveConfigDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onSave: (config: SavedConfig) => void | Promise<void>;
+  currentConfig: ExportConfig;
 }
 
 export function SaveConfigDialog({
@@ -47,12 +51,12 @@ export function SaveConfigDialog({
   onSave,
   currentConfig,
 }: SaveConfigDialogProps) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!name.trim()) return;
 
     setSaving(true);
@@ -65,16 +69,16 @@ export function SaveConfigDialog({
       });
 
       // Reset form
-      setName("");
-      setDescription("");
+      setName('');
+      setDescription('');
       setIsPublic(false);
       onClose();
     } catch (error) {
-      console.error("Erro ao salvar configuração:", error);
+      console.error('Erro ao salvar configuração:', error);
     } finally {
       setSaving(false);
     }
-  };
+  }, [name, description, isPublic, currentConfig, onSave, onClose]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -85,8 +89,7 @@ export function SaveConfigDialog({
             Salvar Configuração de Exportação
           </DialogTitle>
           <DialogDescription>
-            Salve esta configuração como template para reutilizar em futuras
-            exportações
+            Salve esta configuração como template para reutilizar em futuras exportações
           </DialogDescription>
         </DialogHeader>
 
@@ -100,12 +103,10 @@ export function SaveConfigDialog({
               id="name"
               placeholder="Ex: Clientes B2B São Paulo"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               maxLength={100}
             />
-            <p className="text-xs text-slate-500">
-              {name.length}/100 caracteres
-            </p>
+            <p className="text-xs text-slate-500">{name.length}/100 caracteres</p>
           </div>
 
           {/* Descrição */}
@@ -115,13 +116,11 @@ export function SaveConfigDialog({
               id="description"
               placeholder="Descreva quando usar este template..."
               value={description}
-              onChange={e => setDescription(e.target.value)}
+              onChange={(e) => setDescription(e.target.value)}
               rows={3}
               maxLength={500}
             />
-            <p className="text-xs text-slate-500">
-              {description.length}/500 caracteres
-            </p>
+            <p className="text-xs text-slate-500">{description.length}/500 caracteres</p>
           </div>
 
           {/* Visibilidade */}
@@ -134,20 +133,16 @@ export function SaveConfigDialog({
               )}
               <div>
                 <Label htmlFor="public" className="cursor-pointer">
-                  {isPublic ? "Template Público" : "Template Privado"}
+                  {isPublic ? 'Template Público' : 'Template Privado'}
                 </Label>
                 <p className="text-xs text-slate-600 mt-1">
                   {isPublic
-                    ? "Outros usuários do projeto poderão usar este template"
-                    : "Apenas você terá acesso a este template"}
+                    ? 'Outros usuários do projeto poderão usar este template'
+                    : 'Apenas você terá acesso a este template'}
                 </p>
               </div>
             </div>
-            <Switch
-              id="public"
-              checked={isPublic}
-              onCheckedChange={setIsPublic}
-            />
+            <Switch id="public" checked={isPublic} onCheckedChange={setIsPublic} />
           </div>
 
           {/* Preview da configuração */}
@@ -158,34 +153,26 @@ export function SaveConfigDialog({
             <div className="mt-2 space-y-2 text-xs">
               {currentConfig.context && (
                 <div>
-                  <span className="font-semibold">Contexto:</span>{" "}
-                  <span className="text-slate-600">
-                    {currentConfig.context}
-                  </span>
+                  <span className="font-semibold">Contexto:</span>{' '}
+                  <span className="text-slate-600">{currentConfig.context}</span>
                 </div>
               )}
               {currentConfig.format && (
                 <div>
-                  <span className="font-semibold">Formato:</span>{" "}
-                  <span className="text-slate-600">
-                    {currentConfig.format.toUpperCase()}
-                  </span>
+                  <span className="font-semibold">Formato:</span>{' '}
+                  <span className="text-slate-600">{currentConfig.format.toUpperCase()}</span>
                 </div>
               )}
               {currentConfig.outputType && (
                 <div>
-                  <span className="font-semibold">Tipo:</span>{" "}
-                  <span className="text-slate-600">
-                    {currentConfig.outputType}
-                  </span>
+                  <span className="font-semibold">Tipo:</span>{' '}
+                  <span className="text-slate-600">{currentConfig.outputType}</span>
                 </div>
               )}
               {currentConfig.fields && (
                 <div>
-                  <span className="font-semibold">Campos:</span>{" "}
-                  <span className="text-slate-600">
-                    {currentConfig.fields.length} selecionados
-                  </span>
+                  <span className="font-semibold">Campos:</span>{' '}
+                  <span className="text-slate-600">{currentConfig.fields.length} selecionados</span>
                 </div>
               )}
             </div>
@@ -196,13 +183,9 @@ export function SaveConfigDialog({
           <Button variant="outline" onClick={onClose} disabled={saving}>
             Cancelar
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={!name.trim() || saving}
-            className="gap-2"
-          >
+          <Button onClick={handleSave} disabled={!name.trim() || saving} className="gap-2">
             <Save className="w-4 h-4" />
-            {saving ? "Salvando..." : "Salvar Template"}
+            {saving ? 'Salvando...' : 'Salvar Template'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,11 +1,13 @@
+'use client';
+
 /**
  * Autocomplete inteligente para contexto de exportação
  * Item 10 do módulo de exportação inteligente
  */
 
-import { useState, useEffect, useRef } from "react";
-import { Search, Building2, Users, Target, TrendingUp } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, Building2, Users, Target, TrendingUp, type LucideIcon } from 'lucide-react';
+import { trpc } from '@/lib/trpc/client';
 
 interface SmartAutocompleteProps {
   value: string;
@@ -13,26 +15,82 @@ interface SmartAutocompleteProps {
   projectId?: number;
 }
 
+type SuggestionType = 'mercado' | 'cliente' | 'concorrente' | 'lead';
+
 interface Suggestion {
   text: string;
-  type: "mercado" | "cliente" | "concorrente" | "lead";
-  icon: any;
+  type: SuggestionType;
+  icon: LucideIcon;
   color: string;
 }
 
-export function SmartAutocomplete({
-  value,
-  onChange,
-  projectId,
-}: SmartAutocompleteProps) {
+const SUGGESTION_ICONS: Record<SuggestionType, LucideIcon> = {
+  mercado: Target,
+  cliente: Users,
+  concorrente: Building2,
+  lead: TrendingUp,
+};
+
+const SUGGESTION_COLORS: Record<SuggestionType, string> = {
+  mercado: 'text-green-600',
+  cliente: 'text-blue-600',
+  concorrente: 'text-red-600',
+  lead: 'text-orange-600',
+};
+
+const DEBOUNCE_MS = 300;
+const MIN_QUERY_LENGTH = 3;
+
+export function SmartAutocomplete({ value, onChange, projectId }: SmartAutocompleteProps) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const fetchSuggestions = useCallback(
+    async (query: string) => {
+      // TODO: Implementar busca real via tRPC quando o endpoint estiver pronto
+      // const { data } = await trpc.export.searchSuggestions.useQuery({ query, projectId });
+
+      // Simulação - em produção, usar tRPC query real
+      const results: Suggestion[] = [];
+
+      if (query.toLowerCase().includes('embalagem')) {
+        results.push({
+          text: 'Embalagens Plásticas para Indústria Alimentícia',
+          type: 'mercado',
+          icon: SUGGESTION_ICONS.mercado,
+          color: SUGGESTION_COLORS.mercado,
+        });
+      }
+
+      if (query.toLowerCase().includes('cliente')) {
+        results.push({
+          text: 'Clientes validados no mercado de Embalagens',
+          type: 'cliente',
+          icon: SUGGESTION_ICONS.cliente,
+          color: SUGGESTION_COLORS.cliente,
+        });
+      }
+
+      if (query.toLowerCase().includes('lead')) {
+        results.push({
+          text: 'Leads qualificados (score > 70)',
+          type: 'lead',
+          icon: SUGGESTION_ICONS.lead,
+          color: SUGGESTION_COLORS.lead,
+        });
+      }
+
+      setSuggestions(results);
+      setShowDropdown(results.length > 0);
+    },
+    [projectId]
+  );
+
   // Debounce para buscar sugestões
   useEffect(() => {
-    if (value.length < 3) {
+    if (value.length < MIN_QUERY_LENGTH) {
       setSuggestions([]);
       setShowDropdown(false);
       return;
@@ -40,80 +98,46 @@ export function SmartAutocomplete({
 
     const timer = setTimeout(() => {
       fetchSuggestions(value);
-    }, 300);
+    }, DEBOUNCE_MS);
 
     return () => clearTimeout(timer);
-  }, [value, projectId]);
+  }, [value, fetchSuggestions]);
 
-  const fetchSuggestions = async (query: string) => {
-    // Buscar entidades que correspondem ao texto
-    const results: Suggestion[] = [];
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!showDropdown) return;
 
-    // Simulação - em produção, usar tRPC query real
-    if (query.toLowerCase().includes("embalagem")) {
-      results.push({
-        text: "Embalagens Plásticas para Indústria Alimentícia",
-        type: "mercado",
-        icon: Target,
-        color: "text-green-600",
-      });
-    }
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (suggestions[selectedIndex]) {
+            selectSuggestion(suggestions[selectedIndex]);
+          }
+          break;
+        case 'Escape':
+          setShowDropdown(false);
+          break;
+      }
+    },
+    [showDropdown, suggestions, selectedIndex]
+  );
 
-    if (query.toLowerCase().includes("cliente")) {
-      results.push({
-        text: "Clientes validados no mercado de Embalagens",
-        type: "cliente",
-        icon: Users,
-        color: "text-blue-600",
-      });
-    }
-
-    if (query.toLowerCase().includes("lead")) {
-      results.push({
-        text: "Leads qualificados (score > 70)",
-        type: "lead",
-        icon: TrendingUp,
-        color: "text-orange-600",
-      });
-    }
-
-    setSuggestions(results);
-    setShowDropdown(results.length > 0);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!showDropdown) return;
-
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setSelectedIndex(prev =>
-          prev < suggestions.length - 1 ? prev + 1 : 0
-        );
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setSelectedIndex(prev =>
-          prev > 0 ? prev - 1 : suggestions.length - 1
-        );
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (suggestions[selectedIndex]) {
-          selectSuggestion(suggestions[selectedIndex]);
-        }
-        break;
-      case "Escape":
-        setShowDropdown(false);
-        break;
-    }
-  };
-
-  const selectSuggestion = (suggestion: Suggestion) => {
-    onChange(suggestion.text);
-    setShowDropdown(false);
-    setSelectedIndex(0);
-  };
+  const selectSuggestion = useCallback(
+    (suggestion: Suggestion) => {
+      onChange(suggestion.text);
+      setShowDropdown(false);
+      setSelectedIndex(0);
+    },
+    [onChange]
+  );
 
   return (
     <div className="relative">
@@ -124,7 +148,7 @@ export function SmartAutocomplete({
           ref={inputRef}
           type="text"
           value={value}
-          onChange={e => onChange(e.target.value)}
+          onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => suggestions.length > 0 && setShowDropdown(true)}
           onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
@@ -143,17 +167,13 @@ export function SmartAutocomplete({
                 key={index}
                 onClick={() => selectSuggestion(suggestion)}
                 className={`w-full px-4 py-3 text-left flex items-start gap-3 hover:bg-slate-50 transition-colors ${
-                  index === selectedIndex ? "bg-blue-50" : ""
+                  index === selectedIndex ? 'bg-blue-50' : ''
                 }`}
               >
                 <Icon className={`w-4 h-4 mt-0.5 ${suggestion.color}`} />
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-slate-900">
-                    {suggestion.text}
-                  </div>
-                  <div className="text-xs text-slate-500 capitalize">
-                    {suggestion.type}
-                  </div>
+                  <div className="text-sm font-medium text-slate-900">{suggestion.text}</div>
+                  <div className="text-xs text-slate-500 capitalize">{suggestion.type}</div>
                 </div>
               </button>
             );
