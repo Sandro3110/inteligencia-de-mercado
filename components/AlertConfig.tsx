@@ -8,13 +8,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { trpc } from '@/lib/trpc/client';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -133,8 +127,7 @@ interface Alert {
 const ALERT_TYPES: Record<AlertType, AlertTypeInfo> = {
   [ALERT_TYPE_KEYS.ERROR_RATE]: {
     label: 'Taxa de Erro',
-    description:
-      'Alerta quando a taxa de erro no enriquecimento ultrapassar o limite',
+    description: 'Alerta quando a taxa de erro no enriquecimento ultrapassar o limite',
     icon: <AlertCircle className="w-5 h-5 text-red-500" />,
     thresholdLabel: 'Taxa de erro máxima',
     thresholdUnit: '%',
@@ -244,10 +237,7 @@ export function AlertConfig() {
   // COMPUTED VALUES
   // ============================================================================
 
-  const selectedTypeInfo = useMemo(
-    () => ALERT_TYPES[formData.type],
-    [formData.type]
-  );
+  const selectedTypeInfo = useMemo(() => ALERT_TYPES[formData.type], [formData.type]);
 
   const formTitle = useMemo(
     () => (editingId ? LABELS.EDIT_TITLE : LABELS.CREATE_TITLE),
@@ -264,10 +254,7 @@ export function AlertConfig() {
     [createMutation.isPending, updateMutation.isPending]
   );
 
-  const hasAlerts = useMemo(
-    () => alerts && alerts.length > 0,
-    [alerts]
-  );
+  const hasAlerts = useMemo(() => alerts && alerts.length > 0, [alerts]);
 
   // ============================================================================
   // HANDLERS
@@ -448,16 +435,12 @@ export function AlertConfig() {
                   {Object.entries(ALERT_TYPES).map(renderAlertTypeOption)}
                 </SelectContent>
               </Select>
-              <p className="text-sm text-slate-400">
-                {selectedTypeInfo.description}
-              </p>
+              <p className="text-sm text-slate-400">{selectedTypeInfo.description}</p>
             </div>
 
             {/* Threshold */}
             <div className="space-y-2">
-              <Label htmlFor="threshold">
-                {selectedTypeInfo.thresholdLabel}
-              </Label>
+              <Label htmlFor="threshold">{selectedTypeInfo.thresholdLabel}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   id="threshold"
@@ -467,9 +450,7 @@ export function AlertConfig() {
                   min={0}
                   required
                 />
-                <span className="text-sm text-slate-400">
-                  {selectedTypeInfo.thresholdUnit}
-                </span>
+                <span className="text-sm text-slate-400">{selectedTypeInfo.thresholdUnit}</span>
               </div>
             </div>
 
@@ -477,9 +458,7 @@ export function AlertConfig() {
             <div className="flex items-center justify-between">
               <div>
                 <Label htmlFor="enabled">{LABELS.ALERT_ACTIVE}</Label>
-                <p className="text-sm text-slate-400">
-                  {LABELS.ALERT_ACTIVE_DESCRIPTION}
-                </p>
+                <p className="text-sm text-slate-400">{LABELS.ALERT_ACTIVE_DESCRIPTION}</p>
               </div>
               <Switch
                 id="enabled"
@@ -531,30 +510,19 @@ export function AlertConfig() {
                 <div>
                   <h3 className="font-medium text-slate-900">{alert.name}</h3>
                   <p className="text-sm text-slate-400">
-                    {typeInfo.label} - Limite: {condition.value}{' '}
-                    {typeInfo.thresholdUnit}
+                    {typeInfo.label} - Limite: {condition.value} {typeInfo.thresholdUnit}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Switch
                   checked={!!alert.enabled}
-                  onCheckedChange={(checked) =>
-                    handleToggleAlert(alert.id, checked)
-                  }
+                  onCheckedChange={(checked) => handleToggleAlert(alert.id, checked)}
                 />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEdit(alert)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => handleEdit(alert)}>
                   <Edit2 className="w-4 h-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(alert.id)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => handleDelete(alert.id)}>
                   <Trash2 className="w-4 h-4 text-red-500" />
                 </Button>
               </div>
@@ -581,7 +549,9 @@ export function AlertConfig() {
   const renderAlertsList = useCallback(
     () => (
       <div className="space-y-3">
-        {hasAlerts ? alerts!.map(renderAlertCard) : renderEmptyState()}
+        {hasAlerts
+          ? alerts!.map((alert) => renderAlertCard({ ...alert, enabled: Boolean(alert.enabled) }))
+          : renderEmptyState()}
       </div>
     ),
     [hasAlerts, alerts, renderAlertCard, renderEmptyState]
