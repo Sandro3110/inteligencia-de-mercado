@@ -25,7 +25,8 @@
       "@/server/*": ["./server/*"],
       "@/drizzle/*": ["./drizzle/*"],
       "@/shared/*": ["./shared/*"],
-      "@shared/*": ["./shared/*"]
+      "@shared/*": ["./shared/*"],
+      "@/_core/*": ["./_core/*"]
     }
   },
   "include": [
