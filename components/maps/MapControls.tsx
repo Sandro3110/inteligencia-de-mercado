@@ -1,11 +1,12 @@
-'use client';
-
 /**
- * Controles do Mapa Unificado
- * Seletor de modo de visualização, zoom e clustering
+ * MapControls Component
+ * Unified map controls
+ * View mode selector, zoom and clustering controls
  */
 
-import { useCallback } from 'react';
+'use client';
+
+import { useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import {
@@ -17,7 +18,11 @@ import {
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
-import { Layers, Map as MapIcon, Flame } from 'lucide-react';
+import { Layers, Map as MapIcon, Flame, type LucideIcon } from 'lucide-react';
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 export type ViewMode = 'markers' | 'heatmap' | 'hybrid';
 
@@ -33,13 +38,156 @@ export interface MapControlsProps {
   onChange: (config: MapControlsConfig) => void;
 }
 
+interface ViewModeOption {
+  value: ViewMode;
+  label: string;
+  icon: LucideIcon;
+}
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
 const SLIDER_CONFIG = {
-  min: 20,
-  max: 100,
-  step: 10,
+  MIN: 20,
+  MAX: 100,
+  STEP: 10,
 } as const;
 
+const ICON_SIZES = {
+  SMALL: 'w-4 h-4',
+} as const;
+
+const LABELS = {
+  TITLE: 'Controles de Visualização',
+  VIEW_MODE: 'Modo de Visualização',
+  CLUSTERING: 'Agrupar Pontos Próximos',
+  CLUSTER_RADIUS: 'Raio de Agrupamento',
+  AUTO_ZOOM: 'Auto-ajustar Zoom',
+  RADIUS_UNIT: 'px',
+  TIP_LABEL: 'Dica:',
+  TIP_TEXT: 'Use o modo híbrido para ver densidade e pontos específicos simultaneamente.',
+} as const;
+
+const VIEW_MODE_OPTIONS: ViewModeOption[] = [
+  {
+    value: 'markers',
+    label: 'Pontos Individuais',
+    icon: MapIcon,
+  },
+  {
+    value: 'heatmap',
+    label: 'Mapa de Calor',
+    icon: Flame,
+  },
+  {
+    value: 'hybrid',
+    label: 'Híbrido (Calor + Pontos)',
+    icon: Layers,
+  },
+] as const;
+
+const IDS = {
+  CLUSTERING: 'clustering',
+  AUTO_ZOOM: 'autoZoom',
+} as const;
+
+const CLASSES = {
+  CARD: 'w-full',
+  HEADER: 'pb-3',
+  TITLE: 'text-sm font-medium flex items-center gap-2',
+  CONTENT: 'space-y-4',
+  SECTION: 'space-y-2',
+  ROW: 'flex items-center justify-between',
+  LABEL: 'text-xs',
+  OPTION_CONTAINER: 'flex items-center gap-2',
+  RADIUS_VALUE: 'text-xs text-muted-foreground',
+  SLIDER: 'w-full',
+  TIP_CONTAINER: 'pt-2 border-t text-xs text-muted-foreground',
+  TIP_STRONG: 'font-bold',
+} as const;
+
+const CLUSTERING_MODES: ViewMode[] = ['markers', 'hybrid'];
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Check if clustering controls should be shown
+ */
+function shouldShowClusteringControls(viewMode: ViewMode): boolean {
+  return CLUSTERING_MODES.includes(viewMode);
+}
+
+/**
+ * Format cluster radius value
+ */
+function formatClusterRadius(radius: number): string {
+  return `${radius}${LABELS.RADIUS_UNIT}`;
+}
+
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
+
+/**
+ * View mode select option
+ */
+interface ViewModeOptionItemProps {
+  option: ViewModeOption;
+}
+
+function ViewModeOptionItem({ option }: ViewModeOptionItemProps) {
+  const Icon = option.icon;
+
+  return (
+    <div className={CLASSES.OPTION_CONTAINER}>
+      <Icon className={ICON_SIZES.SMALL} />
+      <span>{option.label}</span>
+    </div>
+  );
+}
+
+/**
+ * Cluster radius slider
+ */
+interface ClusterRadiusSliderProps {
+  radius: number;
+  onChange: (value: number[]) => void;
+}
+
+function ClusterRadiusSlider({ radius, onChange }: ClusterRadiusSliderProps) {
+  return (
+    <div className={CLASSES.SECTION}>
+      <div className={CLASSES.ROW}>
+        <Label className={CLASSES.LABEL}>{LABELS.CLUSTER_RADIUS}</Label>
+        <span className={CLASSES.RADIUS_VALUE}>{formatClusterRadius(radius)}</span>
+      </div>
+      <Slider
+        value={[radius]}
+        onValueChange={onChange}
+        min={SLIDER_CONFIG.MIN}
+        max={SLIDER_CONFIG.MAX}
+        step={SLIDER_CONFIG.STEP}
+        className={CLASSES.SLIDER}
+      />
+    </div>
+  );
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+/**
+ * Map controls for view mode, clustering and zoom
+ */
 export default function MapControls({ config, onChange }: MapControlsProps) {
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
   const handleViewModeChange = useCallback(
     (mode: string) => {
       onChange({ ...config, viewMode: mode as ViewMode });
@@ -68,96 +216,84 @@ export default function MapControls({ config, onChange }: MapControlsProps) {
     [config, onChange]
   );
 
-  const showClusteringControls = config.viewMode === 'markers' || config.viewMode === 'hybrid';
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const showClusteringControls = useMemo(
+    () => shouldShowClusteringControls(config.viewMode),
+    [config.viewMode]
+  );
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <Layers className="w-4 h-4" />
-          Controles de Visualização
+    <Card className={CLASSES.CARD}>
+      <CardHeader className={CLASSES.HEADER}>
+        <CardTitle className={CLASSES.TITLE}>
+          <Layers className={ICON_SIZES.SMALL} />
+          {LABELS.TITLE}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Modo de Visualização */}
-        <div className="space-y-2">
-          <Label className="text-xs">Modo de Visualização</Label>
+      <CardContent className={CLASSES.CONTENT}>
+        {/* View Mode */}
+        <div className={CLASSES.SECTION}>
+          <Label className={CLASSES.LABEL}>{LABELS.VIEW_MODE}</Label>
           <Select value={config.viewMode} onValueChange={handleViewModeChange}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="markers">
-                <div className="flex items-center gap-2">
-                  <MapIcon className="w-4 h-4" />
-                  <span>Pontos Individuais</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="heatmap">
-                <div className="flex items-center gap-2">
-                  <Flame className="w-4 h-4" />
-                  <span>Mapa de Calor</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="hybrid">
-                <div className="flex items-center gap-2">
-                  <Layers className="w-4 h-4" />
-                  <span>Híbrido (Calor + Pontos)</span>
-                </div>
-              </SelectItem>
+              {VIEW_MODE_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  <ViewModeOptionItem option={option} />
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
 
-        {/* Clustering (apenas para markers e hybrid) */}
+        {/* Clustering (only for markers and hybrid) */}
         {showClusteringControls && (
           <>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="clustering" className="text-xs">
-                Agrupar Pontos Próximos
+            <div className={CLASSES.ROW}>
+              <Label htmlFor={IDS.CLUSTERING} className={CLASSES.LABEL}>
+                {LABELS.CLUSTERING}
               </Label>
               <Switch
-                id="clustering"
+                id={IDS.CLUSTERING}
                 checked={config.enableClustering}
                 onCheckedChange={handleClusteringToggle}
               />
             </div>
 
             {config.enableClustering && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label className="text-xs">Raio de Agrupamento</Label>
-                  <span className="text-xs text-muted-foreground">{config.clusterRadius}px</span>
-                </div>
-                <Slider
-                  value={[config.clusterRadius]}
-                  onValueChange={handleClusterRadiusChange}
-                  min={SLIDER_CONFIG.min}
-                  max={SLIDER_CONFIG.max}
-                  step={SLIDER_CONFIG.step}
-                  className="w-full"
-                />
-              </div>
+              <ClusterRadiusSlider
+                radius={config.clusterRadius}
+                onChange={handleClusterRadiusChange}
+              />
             )}
           </>
         )}
 
-        {/* Auto-ajustar Zoom */}
-        <div className="flex items-center justify-between">
-          <Label htmlFor="autoZoom" className="text-xs">
-            Auto-ajustar Zoom
+        {/* Auto-adjust Zoom */}
+        <div className={CLASSES.ROW}>
+          <Label htmlFor={IDS.AUTO_ZOOM} className={CLASSES.LABEL}>
+            {LABELS.AUTO_ZOOM}
           </Label>
           <Switch
-            id="autoZoom"
+            id={IDS.AUTO_ZOOM}
             checked={config.autoAdjustZoom}
             onCheckedChange={handleAutoAdjustToggle}
           />
         </div>
 
-        <div className="pt-2 border-t text-xs text-muted-foreground">
+        {/* Tip */}
+        <div className={CLASSES.TIP_CONTAINER}>
           <p>
-            <strong>Dica:</strong> Use o modo híbrido para ver densidade e pontos específicos
-            simultaneamente.
+            <strong>{LABELS.TIP_LABEL}</strong> {LABELS.TIP_TEXT}
           </p>
         </div>
       </CardContent>
