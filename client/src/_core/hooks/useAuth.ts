@@ -17,6 +17,13 @@ export function useAuth(options?: UseAuthOptions) {
   const meQuery = trpc.auth.me.useQuery(undefined, {
     retry: false,
     refetchOnWindowFocus: false,
+    // Tratar erro UNAUTHORIZED como estado válido (não autenticado)
+    onError: (error) => {
+      if (error.data?.code === "UNAUTHORIZED") {
+        // Não fazer nada, é um estado válido
+        return;
+      }
+    },
   });
 
   const logoutMutation = trpc.auth.logout.useMutation({
@@ -61,10 +68,14 @@ export function useAuth(options?: UseAuthOptions) {
       );
     }
     
+    // Se há erro UNAUTHORIZED, não está loading
+    const isUnauthorizedError = meQuery.error?.data?.code === "UNAUTHORIZED";
+    const isLoading = isUnauthorizedError ? false : (meQuery.isLoading || logoutMutation.isPending);
+    
     return {
       user: meQuery.data ?? null,
-      loading: meQuery.isLoading || logoutMutation.isPending,
-      error: meQuery.error ?? logoutMutation.error ?? null,
+      loading: isLoading,
+      error: isUnauthorizedError ? null : (meQuery.error ?? logoutMutation.error ?? null),
       isAuthenticated: Boolean(meQuery.data),
       isAdmin: meQuery.data?.role === "admin",
     };
