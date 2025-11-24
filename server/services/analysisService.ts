@@ -1,5 +1,75 @@
 import { invokeLLM } from "../_core/llm";
 
+// ============================================================================
+// TYPES & INTERFACES
+// ============================================================================
+
+/**
+ * Analysis template type
+ */
+export type AnalysisTemplateType = "market" | "client" | "competitive" | "lead";
+
+/**
+ * Base entity with common fields
+ */
+interface BaseEntity {
+  quality_score?: number;
+  uf?: string;
+  cidade?: string;
+  status?: string;
+  nome?: string;
+  porte?: string;
+}
+
+/**
+ * Market entity data
+ */
+export interface MarketEntity extends BaseEntity {}
+
+/**
+ * Client entity data
+ */
+export interface ClientEntity extends BaseEntity {
+  faturamento_estimado?: number;
+  segmentacao?: string;
+}
+
+/**
+ * Competitive entity data
+ */
+export interface CompetitiveEntity extends BaseEntity {}
+
+/**
+ * Lead entity data
+ */
+export interface LeadEntity extends BaseEntity {}
+
+/**
+ * Union type for all entity types
+ */
+export type AnalysisEntity = MarketEntity | ClientEntity | CompetitiveEntity | LeadEntity;
+
+/**
+ * Analysis metrics interface
+ */
+export interface AnalysisMetrics {
+  totalRecords: number;
+  timestamp: string;
+  avgQualityScore?: number;
+  topStates?: Array<{ value: string; count: number }>;
+  topCities?: Array<{ value: string; count: number }>;
+  portDistribution?: Record<string, number>;
+  statusDistribution?: Record<string, number>;
+  avgRevenue?: number;
+  topSegments?: Array<{ value: string; count: number }>;
+  topCompetitors?: Array<{ value: string; count: number }>;
+  marketShareEstimate?: Record<string, number>;
+  highQualityCount?: number;
+  conversionPotential?: number;
+}
+
+import { invokeLLM } from "../_core/llm";
+
 /**
  * Tipo de template de análise
  */
@@ -13,7 +83,7 @@ export interface Insight {
   description: string;
   impact: "high" | "medium" | "low";
   category: "opportunity" | "risk" | "trend" | "recommendation";
-  supportingData?: Record<string, any>;
+  supportingData?: Record<string, unknown>;
 }
 
 /**
@@ -43,7 +113,7 @@ export interface AnalysisResult {
   insights: Insight[];
   swot?: SWOTAnalysis;
   recommendations: StrategicRecommendations;
-  metrics: Record<string, any>;
+  metrics: Record<string, unknown>;
   generatedAt: Date;
 }
 
@@ -55,7 +125,7 @@ export class AnalysisService {
    * Gera análise completa baseada no template
    */
   async analyze(
-    data: any[],
+    data: AnalysisEntity[],
     templateType: AnalysisTemplateType,
     context?: string
   ): Promise<AnalysisResult> {
@@ -106,10 +176,10 @@ export class AnalysisService {
    * Calcula métricas básicas dos dados
    */
   private calculateMetrics(
-    data: any[],
+    data: AnalysisEntity[],
     templateType: AnalysisTemplateType
-  ): Record<string, any> {
-    const metrics: Record<string, any> = {
+  ): Record<string, unknown> {
+    const metrics: Record<string, unknown> = {
       totalRecords: data.length,
       timestamp: new Date().toISOString(),
     };
@@ -153,8 +223,8 @@ export class AnalysisService {
    * Gera insights com IA
    */
   private async generateInsights(
-    data: any[],
-    metrics: Record<string, any>,
+    data: AnalysisEntity[],
+    metrics: Record<string, unknown>,
     templateType: AnalysisTemplateType,
     context?: string
   ): Promise<Insight[]> {
@@ -235,8 +305,8 @@ export class AnalysisService {
    * Gera análise SWOT com IA
    */
   private async generateSWOT(
-    data: any[],
-    metrics: Record<string, any>,
+    data: AnalysisEntity[],
+    metrics: Record<string, unknown>,
     templateType: AnalysisTemplateType,
     context?: string
   ): Promise<SWOTAnalysis> {
@@ -289,8 +359,8 @@ export class AnalysisService {
    * Gera recomendações estratégicas com IA
    */
   private async generateRecommendations(
-    data: any[],
-    metrics: Record<string, any>,
+    data: AnalysisEntity[],
+    metrics: Record<string, unknown>,
     insights: Insight[],
     templateType: AnalysisTemplateType,
     context?: string
@@ -349,8 +419,8 @@ export class AnalysisService {
    * Gera sumário executivo com IA
    */
   private async generateSummary(
-    data: any[],
-    metrics: Record<string, any>,
+    data: AnalysisEntity[],
+    metrics: Record<string, unknown>,
     insights: Insight[],
     templateType: AnalysisTemplateType
   ): Promise<string> {
@@ -399,8 +469,8 @@ Escreva um sumário executivo conciso, objetivo e profissional que destaque os p
   // ============================================
 
   private buildInsightsPrompt(
-    data: any[],
-    metrics: Record<string, any>,
+    data: AnalysisEntity[],
+    metrics: Record<string, unknown>,
     templateType: AnalysisTemplateType,
     context?: string
   ): string {
@@ -430,8 +500,8 @@ Retorne APENAS o JSON com o array de insights.
   }
 
   private buildSWOTPrompt(
-    data: any[],
-    metrics: Record<string, any>,
+    data: AnalysisEntity[],
+    metrics: Record<string, unknown>,
     templateType: AnalysisTemplateType,
     context?: string
   ): string {
@@ -457,8 +527,8 @@ Seja específico e baseie-se nas métricas fornecidas.
   }
 
   private buildRecommendationsPrompt(
-    data: any[],
-    metrics: Record<string, any>,
+    data: AnalysisEntity[],
+    metrics: Record<string, unknown>,
     insights: Insight[],
     templateType: AnalysisTemplateType,
     context?: string
@@ -491,7 +561,7 @@ Seja específico, prático e priorize ações com maior ROI.
   // MÉTODOS AUXILIARES
   // ============================================
 
-  private average(data: any[], field: string): number {
+  private average(data: AnalysisEntity[], field: string): number {
     const values = data
       .map(d => d[field])
       .filter(v => v !== null && v !== undefined);
@@ -500,7 +570,7 @@ Seja específico, prático e priorize ações com maior ROI.
   }
 
   private topN(
-    data: any[],
+    data: AnalysisEntity[],
     field: string,
     n: number
   ): Array<{ value: string; count: number }> {
@@ -518,7 +588,7 @@ Seja específico, prático e priorize ações com maior ROI.
       .map(([value, count]) => ({ value, count }));
   }
 
-  private distribution(data: any[], field: string): Record<string, number> {
+  private distribution(data: AnalysisEntity[], field: string): Record<string, number> {
     const dist: Record<string, number> = {};
     data.forEach(d => {
       const value = d[field] || "N/A";
@@ -542,7 +612,7 @@ Seja específico, prático e priorize ações com maior ROI.
   // ============================================
 
   private generateFallbackInsights(
-    metrics: Record<string, any>,
+    metrics: Record<string, unknown>,
     templateType: AnalysisTemplateType
   ): Insight[] {
     return [
@@ -562,7 +632,7 @@ Seja específico, prático e priorize ações com maior ROI.
   }
 
   private generateFallbackSWOT(
-    metrics: Record<string, any>,
+    metrics: Record<string, unknown>,
     templateType: AnalysisTemplateType
   ): SWOTAnalysis {
     return {
@@ -577,7 +647,7 @@ Seja específico, prático e priorize ações com maior ROI.
   }
 
   private generateFallbackRecommendations(
-    metrics: Record<string, any>,
+    metrics: Record<string, unknown>,
     templateType: AnalysisTemplateType
   ): StrategicRecommendations {
     return {
@@ -594,7 +664,7 @@ Seja específico, prático e priorize ações com maior ROI.
   }
 
   private generateFallbackSummary(
-    metrics: Record<string, any>,
+    metrics: Record<string, unknown>,
     templateType: AnalysisTemplateType
   ): string {
     return `Esta análise processou ${metrics.totalRecords} registros com qualidade média de ${(metrics.avgQualityScore || 0).toFixed(1)} pontos. Os dados foram extraídos e formatados conforme solicitado. Recomenda-se revisão manual para insights mais profundos.`;
