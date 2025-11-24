@@ -1,38 +1,128 @@
-import { useAuth } from "@/_core/hooks/useAuth";
-import { Redirect } from "wouter";
+'use client';
 
-interface ProtectedRouteProps {
+import { useMemo } from 'react';
+import { useAuth } from '@/_core/hooks/useAuth';
+import { Redirect } from 'wouter';
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const DIMENSIONS = {
+  SPINNER: 'h-12 w-12',
+} as const;
+
+const CLASSES = {
+  CONTAINER: 'flex items-center justify-center min-h-screen',
+  SPINNER: 'animate-spin rounded-full border-b-2 border-blue-600',
+  ACCESS_DENIED_CONTAINER: 'text-center',
+  ACCESS_DENIED_TITLE: 'text-2xl font-bold text-gray-900 mb-2',
+  ACCESS_DENIED_TEXT: 'text-gray-600',
+} as const;
+
+const ROUTES = {
+  LOGIN: '/login',
+} as const;
+
+const LABELS = {
+  ACCESS_DENIED_TITLE: 'Acesso Negado',
+  ACCESS_DENIED_TEXT: 'Você não tem permissão para acessar esta página.',
+} as const;
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
 }
 
-export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
+
+function LoadingSpinner() {
+  return (
+    <div className={CLASSES.CONTAINER}>
+      <div className={`${CLASSES.SPINNER} ${DIMENSIONS.SPINNER}`} />
+    </div>
+  );
+}
+
+function AccessDenied() {
+  return (
+    <div className={CLASSES.CONTAINER}>
+      <div className={CLASSES.ACCESS_DENIED_CONTAINER}>
+        <h1 className={CLASSES.ACCESS_DENIED_TITLE}>
+          {LABELS.ACCESS_DENIED_TITLE}
+        </h1>
+        <p className={CLASSES.ACCESS_DENIED_TEXT}>
+          {LABELS.ACCESS_DENIED_TEXT}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+/**
+ * ProtectedRoute
+ * 
+ * Componente que protege rotas requerendo autenticação.
+ * Opcionalmente pode requerer permissões de administrador.
+ * 
+ * @example
+ * ```tsx
+ * <ProtectedRoute>
+ *   <Dashboard />
+ * </ProtectedRoute>
+ * 
+ * <ProtectedRoute requireAdmin>
+ *   <AdminPanel />
+ * </ProtectedRoute>
+ * ```
+ */
+export function ProtectedRoute({ 
+  children, 
+  requireAdmin = false 
+}: ProtectedRouteProps) {
+  // Auth
   const { user, loading, isAuthenticated, isAdmin } = useAuth();
 
-  // Mostrar loading enquanto verifica autenticação
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const shouldShowLoading = useMemo(() => loading, [loading]);
+
+  const shouldRedirectToLogin = useMemo(
+    () => !isAuthenticated || !user,
+    [isAuthenticated, user]
+  );
+
+  const shouldShowAccessDenied = useMemo(
+    () => requireAdmin && !isAdmin,
+    [requireAdmin, isAdmin]
+  );
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
+
+  if (shouldShowLoading) {
+    return <LoadingSpinner />;
   }
 
-  // Redirecionar para login se não autenticado
-  if (!isAuthenticated || !user) {
-    return <Redirect to="/login" />;
+  if (shouldRedirectToLogin) {
+    return <Redirect to={ROUTES.LOGIN} />;
   }
 
-  // Verificar se requer admin
-  if (requireAdmin && !isAdmin) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Acesso Negado</h1>
-          <p className="text-gray-600">Você não tem permissão para acessar esta página.</p>
-        </div>
-      </div>
-    );
+  if (shouldShowAccessDenied) {
+    return <AccessDenied />;
   }
 
   return <>{children}</>;
