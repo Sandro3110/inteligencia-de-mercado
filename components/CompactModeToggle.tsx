@@ -1,16 +1,93 @@
 'use client';
 
-import { useCompactMode } from "@/contexts/CompactModeContext";
-import { Button } from "@/components/ui/button";
-import { Maximize2, Minimize2 } from "lucide-react";
+import { useCallback, useMemo } from 'react';
+import { useCompactMode } from '@/contexts/CompactModeContext';
+import { Button } from '@/components/ui/button';
+import { Maximize2, Minimize2, LucideIcon } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const ICON_SIZES = {
+  SMALL: 'h-4 w-4',
+} as const;
+
+const CLASSES = {
+  BUTTON: 'transition-all duration-200 hover:scale-110',
+  DESCRIPTION: 'text-xs text-muted-foreground',
+} as const;
+
+const LABELS = {
+  COMPACT: 'Modo Compacto',
+  NORMAL: 'Modo Normal',
+  DESCRIPTION: 'Ajusta densidade da interface',
+} as const;
+
+const ICONS: Record<'compact' | 'normal', LucideIcon> = {
+  compact: Minimize2,
+  normal: Maximize2,
+} as const;
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+interface TooltipConfig {
+  title: string;
+  description: string;
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function getTooltipConfig(isCompact: boolean): TooltipConfig {
+  return {
+    title: isCompact ? LABELS.NORMAL : LABELS.COMPACT,
+    description: LABELS.DESCRIPTION,
+  };
+}
+
+function getIcon(isCompact: boolean): LucideIcon {
+  return isCompact ? ICONS.normal : ICONS.compact;
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
 
 export function CompactModeToggle() {
+  // Context
   const { isCompact, toggleCompact } = useCompactMode();
+
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const tooltipConfig = useMemo(
+    () => getTooltipConfig(isCompact),
+    [isCompact]
+  );
+
+  const Icon = useMemo(() => getIcon(isCompact), [isCompact]);
+
+  // ============================================================================
+  // EVENT HANDLERS
+  // ============================================================================
+
+  const handleToggle = useCallback(() => {
+    toggleCompact();
+  }, [toggleCompact]);
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   return (
     <Tooltip>
@@ -18,21 +95,15 @@ export function CompactModeToggle() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={toggleCompact}
-          className="transition-all duration-200 hover:scale-110"
+          onClick={handleToggle}
+          className={CLASSES.BUTTON}
         >
-          {isCompact ? (
-            <Maximize2 className="h-4 w-4" />
-          ) : (
-            <Minimize2 className="h-4 w-4" />
-          )}
+          <Icon className={ICON_SIZES.SMALL} />
         </Button>
       </TooltipTrigger>
       <TooltipContent>
-        <p>{isCompact ? "Modo Normal" : "Modo Compacto"}</p>
-        <p className="text-xs text-muted-foreground">
-          Ajusta densidade da interface
-        </p>
+        <p>{tooltipConfig.title}</p>
+        <p className={CLASSES.DESCRIPTION}>{tooltipConfig.description}</p>
       </TooltipContent>
     </Tooltip>
   );
