@@ -18,6 +18,15 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
+// Enum declarations
+export const progressStatusEnum = pgEnum("progressStatus", [
+  "started",
+  "in_progress",
+  "almost_done",
+]);
+
+export const frequencyEnum = pgEnum("frequency", ["weekly", "monthly"]);
+
 export const activityLog = pgTable(
   "activity_log",
   {
@@ -985,11 +994,7 @@ export const researchDrafts = pgTable("research_drafts", {
   projectId: integer("projectId"),
   draftData: jsonb("draftData").notNull(),
   currentStep: integer("currentStep").default(1).notNull(),
-  progressStatus: pgEnum("progressStatus", [
-    "started",
-    "in_progress",
-    "almost_done",
-  ]).default("started"),
+  progressStatus: progressStatusEnum("progressStatus").default("started"),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
@@ -1032,7 +1037,7 @@ export const reportSchedules = pgTable(
     userId: varchar("userId", { length: 64 }).notNull(),
     projectId: integer("projectId").notNull(),
     name: varchar("name", { length: 255 }).notNull(),
-    frequency: pgEnum("frequency", ["weekly", "monthly"]).notNull(),
+    frequency: frequencyEnum("frequency").notNull(),
     recipients: text("recipients").notNull(), // JSON array de emails
     config: jsonb("config").notNull(), // Configurações do relatório (filtros, formato, etc)
     nextRunAt: timestamp("nextRunAt", { mode: "string" }).notNull(),
