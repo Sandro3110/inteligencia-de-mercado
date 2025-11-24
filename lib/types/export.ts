@@ -13,10 +13,14 @@ export interface ExportState {
 
   // Step 3: Fields
   selectedFields?: string[];
+  includeRelationships?: boolean;
 
   // Step 4: Output
-  format?: 'csv' | 'xlsx' | 'json' | 'pdf';
-  depth?: 'quick' | 'balanced' | 'deep';
+  title?: string;
+  format?: 'csv' | 'excel' | 'json' | 'pdf';
+  outputType?: 'simple' | 'complete' | 'report';
+  depth?: 'quick' | 'standard' | 'deep';
+  templateType?: 'market' | 'client' | 'competitive' | 'lead';
 }
 
 export interface ExportConfig {
