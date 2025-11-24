@@ -64,7 +64,7 @@ export async function executeEnrichmentFlow(
   jobId?: string
 ): Promise<EnrichmentProgress> {
   let runId: number | null = null;
-  let monitorInterval: NodeJS.Timeout | null = null;
+  const monitorInterval: NodeJS.Timeout | null = null;
   const startTime = Date.now();
 
   try {

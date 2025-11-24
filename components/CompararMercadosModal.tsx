@@ -294,17 +294,17 @@ export function CompararMercadosModal({
       const mercado = mercados.find((m) => m.id === id);
 
       // Note: These hooks are called unconditionally in the same order
-      // eslint-disable-next-line react-hooks/rules-of-hooks
+       
       const { data: clientesData } = trpc.clientes.byMercado.useQuery(
         { mercadoId: id },
         { enabled: isOpen && !!id }
       );
-      // eslint-disable-next-line react-hooks/rules-of-hooks
+       
       const { data: concorrentesData } = trpc.concorrentes.byMercado.useQuery(
         { mercadoId: id },
         { enabled: isOpen && !!id }
       );
-      // eslint-disable-next-line react-hooks/rules-of-hooks
+       
       const { data: leadsData } = trpc.leads.byMercado.useQuery(
         { mercadoId: id },
         { enabled: isOpen && !!id }

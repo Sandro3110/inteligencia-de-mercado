@@ -6,7 +6,7 @@ import superjson from "superjson";
 const BASE_URL = process.env.VITE_API_URL || "http://localhost:3000";
 
 describe("SSE Authentication Tests", () => {
-  let validCookie: string | null = null;
+  const validCookie: string | null = null;
   let userId: string | null = null;
 
   // Helper para fazer requisições HTTP diretas

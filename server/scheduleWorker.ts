@@ -106,7 +106,7 @@ async function executeSchedule(schedule: unknown) {
 
     // Buscar clientes do projeto para executar enriquecimento
     const { clientes: clientesTable } = await import("../drizzle/schema");
-    let clientesResult = await db
+    const clientesResult = await db
       .select()
       .from(clientesTable)
       .where(eq(clientesTable.projectId, schedule.projectId))

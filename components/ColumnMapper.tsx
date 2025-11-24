@@ -150,7 +150,7 @@ export function ColumnMapper({
   useEffect(() => {
     const autoMapping = createAutoMapping(sourceColumns, targetFields);
     setMapping(autoMapping);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [sourceColumns, targetFields]);
 
   // ============================================================================

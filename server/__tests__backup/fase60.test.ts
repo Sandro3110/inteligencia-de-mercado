@@ -283,7 +283,7 @@ describe.skip('Fase 60: Botão "Adiar Hibernação" no Dashboard', () => {
 
       // Verificar que projeto está na lista ANTES do adiamento
       let activity = await getProjectsActivity();
-      let projectBefore = activity.projectsWithActivity.find(
+      const projectBefore = activity.projectsWithActivity.find(
         p => p.id === projectId
       );
       expect(projectBefore).toBeDefined();
@@ -308,7 +308,7 @@ describe.skip('Fase 60: Botão "Adiar Hibernação" no Dashboard', () => {
 
       // Verificar que projeto NÃO tem mais aviso DEPOIS do adiamento
       activity = await getProjectsActivity();
-      let projectAfter = activity.projectsWithActivity.find(
+      const projectAfter = activity.projectsWithActivity.find(
         p => p.id === projectId
       );
       expect(projectAfter).toBeDefined();

@@ -1707,7 +1707,7 @@ export async function getPesquisas(projectId?: number) {
   if (!db) return [];
 
   try {
-    let query = db.select().from(pesquisas);
+    const query = db.select().from(pesquisas);
 
     const conditions = [eq(pesquisas.ativo, 1)];
     if (projectId) {
