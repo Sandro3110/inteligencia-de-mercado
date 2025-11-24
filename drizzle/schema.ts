@@ -980,11 +980,11 @@ export type InsertSavedFilterExport = typeof savedFiltersExport.$inferInsert;
 // ========================================
 
 export const researchDrafts = pgTable("research_drafts", {
-  id: int("id").primaryKey().autoincrement(),
+  id: serial("id").primaryKey(),
   userId: varchar("userId", { length: 64 }).notNull(),
-  projectId: int("projectId"),
+  projectId: integer("projectId"),
   draftData: json("draftData").notNull(),
-  currentStep: int("currentStep").default(1).notNull(),
+  currentStep: integer("currentStep").default(1).notNull(),
   progressStatus: pgEnum("progressStatus", [
     "started",
     "in_progress",
@@ -1005,7 +1005,7 @@ export type InsertResearchDraft = typeof researchDrafts.$inferInsert;
 export const pushSubscriptions = pgTable(
   "push_subscriptions",
   {
-    id: int("id").primaryKey().autoincrement(),
+    id: serial("id").primaryKey(),
     userId: varchar("userId", { length: 64 }).notNull(),
     endpoint: text("endpoint").notNull(),
     p256dh: text("p256dh").notNull(),
@@ -1028,16 +1028,16 @@ export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
 export const reportSchedules = pgTable(
   "report_schedules",
   {
-    id: int("id").primaryKey().autoincrement(),
+    id: serial("id").primaryKey(),
     userId: varchar("userId", { length: 64 }).notNull(),
-    projectId: int("projectId").notNull(),
+    projectId: integer("projectId").notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     frequency: pgEnum("frequency", ["weekly", "monthly"]).notNull(),
     recipients: text("recipients").notNull(), // JSON array de emails
     config: json("config").notNull(), // Configurações do relatório (filtros, formato, etc)
     nextRunAt: timestamp("nextRunAt", { mode: "string" }).notNull(),
     lastRunAt: timestamp("lastRunAt", { mode: "string" }),
-    enabled: tinyint("enabled").default(1).notNull(),
+    enabled: tinyinteger("enabled").default(1).notNull(),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
   },
