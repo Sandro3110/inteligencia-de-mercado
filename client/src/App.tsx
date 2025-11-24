@@ -13,6 +13,7 @@ import { OnboardingTour } from "./components/OnboardingTour";
 import { AppSidebar } from "./components/AppSidebar";
 import { useRealtimeNotifications } from "./hooks/useRealtimeNotifications";
 import { AuthGuard } from "./components/AuthGuard";
+import { ConditionalLayout } from "./components/ConditionalLayout";
 
 // Lazy load de páginas principais (carregamento imediato)
 import CascadeView from "./pages/CascadeView";
@@ -214,11 +215,12 @@ function App() {
                   <Toaster />
                   <GlobalShortcuts />
                   <OnboardingTour />
-                  <AppSidebar />
                   <AuthGuard>
-                    <Suspense fallback={<PageLoader />}>
-                      <Router />
-                    </Suspense>
+                    <ConditionalLayout>
+                      <Suspense fallback={<PageLoader />}>
+                        <Router />
+                      </Suspense>
+                    </ConditionalLayout>
                   </AuthGuard>
                 </TooltipProvider>
               </FilterProvider>
