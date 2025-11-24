@@ -1,10 +1,20 @@
-import { UnifiedFilters } from "@/pages/UnifiedCockpit";
-import GeoCockpit from "@/pages/GeoCockpit";
+'use client';
+
+import { UnifiedFilters } from '@/pages/UnifiedCockpit';
+import GeoCockpit from '@/pages/GeoCockpit';
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 interface MapViewTabProps {
   filters: UnifiedFilters;
   onFiltersChange: (filters: UnifiedFilters) => void;
 }
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
 
 /**
  * Aba de visualização em mapa

@@ -1,20 +1,27 @@
+'use client';
+
 /**
  * Aba de Atividades - Dashboard de Atividade de Projetos
  * Monitora atividade e inatividade dos projetos
  */
 
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useState, useCallback, useMemo } from 'react';
+import { trpc } from '@/lib/trpc/client';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Activity,
   Moon,
@@ -27,106 +34,263 @@ import {
   Trash2,
   RefreshCw,
   Loader2,
-} from "lucide-react";
-import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { PostponeHibernationDialog } from "@/components/PostponeHibernationDialog";
+  type LucideIcon,
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { PostponeHibernationDialog } from '@/components/PostponeHibernationDialog';
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const PERIOD_OPTIONS = [30, 60, 90] as const;
+const DEFAULT_PERIOD = 30;
+
+const ACTION_ICONS: Record<string, React.ReactNode> = {
+  created: <CheckCircle2 className="h-4 w-4 text-green-600" />,
+  updated: <FileEdit className="h-4 w-4 text-blue-600" />,
+  hibernated: <Moon className="h-4 w-4 text-purple-600" />,
+  reactivated: <RefreshCw className="h-4 w-4 text-green-600" />,
+  deleted: <Trash2 className="h-4 w-4 text-red-600" />,
+};
+
+const ACTION_LABELS: Record<string, string> = {
+  created: 'Criado',
+  updated: 'Atualizado',
+  hibernated: 'Hibernado',
+  reactivated: 'Reativado',
+  deleted: 'Deletado',
+};
+
+const MESSAGES = {
+  LOADING: 'Carregando atividades...',
+  NO_DATA: 'Nenhum dado de atividade disponível',
+  CONFIRM_HIBERNATE: (days: number) =>
+    `Deseja hibernar todos os projetos inativos há mais de ${days} dias?`,
+  SUCCESS_HIBERNATE: (count: number) =>
+    `${count} projeto(s) hibernado(s) com sucesso!`,
+  ERROR_HIBERNATE: (error: string) => `Erro ao hibernar projetos: ${error}`,
+  SUCCESS_POSTPONE: 'Hibernação adiada com sucesso!',
+  ERROR_POSTPONE: (error: string) => `Erro ao adiar hibernação: ${error}`,
+};
+
+const CARD_LABELS = {
+  TOTAL: 'Total de Projetos',
+  ACTIVE: 'Projetos Ativos',
+  HIBERNATED: 'Projetos Hibernados',
+  INACTIVE: 'Inativos',
+  ALL_PROJECTS: 'Todos os projetos cadastrados',
+  OF_TOTAL: '% do total',
+  NO_RECENT_ACTIVITY: 'Sem atividade recente',
+};
+
+const SECTION_TITLES = {
+  INACTIVITY_CONTROL: 'Controle de Inatividade',
+  INACTIVE_PROJECTS: 'Projetos Inativos',
+  PERIOD_LABEL: 'Período de Inatividade',
+  BATCH_ACTION: 'Ação em Lote',
+};
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+type Period = (typeof PERIOD_OPTIONS)[number];
+
+interface ProjectWithActivity {
+  id: number;
+  nome: string;
+  status: string;
+  hasWarning: boolean;
+  daysSinceActivity?: number;
+  lastActivityAt?: string;
+}
+
+interface ActivityData {
+  totalProjects: number;
+  activeProjects: number;
+  hibernatedProjects: number;
+  inactiveProjects30: number;
+  inactiveProjects60: number;
+  inactiveProjects90: number;
+  projectsWithActivity: ProjectWithActivity[];
+}
+
+interface SelectedProject {
+  id: number;
+  nome: string;
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function getActionIcon(action: string): React.ReactNode {
+  return (
+    ACTION_ICONS[action] || <Activity className="h-4 w-4 text-gray-600" />
+  );
+}
+
+function getActionLabel(action: string): string {
+  return ACTION_LABELS[action] || action;
+}
+
+function getInactiveCount(
+  activityData: ActivityData,
+  period: Period
+): number {
+  switch (period) {
+    case 30:
+      return activityData.inactiveProjects30;
+    case 60:
+      return activityData.inactiveProjects60;
+    case 90:
+      return activityData.inactiveProjects90;
+    default:
+      return 0;
+  }
+}
+
+function filterInactiveProjects(
+  projects: ProjectWithActivity[],
+  period: Period
+): ProjectWithActivity[] {
+  return projects.filter((p) => {
+    if (p.status !== 'active') return false;
+    return (
+      p.hasWarning || (p.daysSinceActivity && p.daysSinceActivity >= period)
+    );
+  });
+}
+
+function calculatePercentage(value: number, total: number): string {
+  if (total === 0) return '0';
+  return ((value / total) * 100).toFixed(0);
+}
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
 
 export function ActivityTab() {
-  const [selectedPeriod, setSelectedPeriod] = useState<30 | 60 | 90>(30);
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>(DEFAULT_PERIOD);
   const [postponeDialogOpen, setPostponeDialogOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<{
-    id: number;
-    nome: string;
-  } | null>(null);
+  const [selectedProject, setSelectedProject] =
+    useState<SelectedProject | null>(null);
+
   const utils = trpc.useUtils();
 
   const { data: activityData, isLoading } =
     trpc.projects.getActivity.useQuery();
 
   const autoHibernateMutation = trpc.projects.autoHibernate.useMutation({
-    onSuccess: data => {
-      toast.success(`${data.hibernated} projeto(s) hibernado(s) com sucesso!`);
+    onSuccess: (data) => {
+      toast.success(MESSAGES.SUCCESS_HIBERNATE(data.hibernated));
       utils.projects.getActivity.invalidate();
       utils.projects.list.invalidate();
     },
-    onError: error => {
-      toast.error(`Erro ao hibernar projetos: ${error.message}`);
+    onError: (error) => {
+      toast.error(MESSAGES.ERROR_HIBERNATE(error.message));
     },
   });
 
   const postponeMutation = trpc.projects.postponeHibernation.useMutation({
     onSuccess: () => {
-      toast.success(`Hibernação adiada com sucesso!`);
+      toast.success(MESSAGES.SUCCESS_POSTPONE);
       utils.projects.getActivity.invalidate();
       utils.projects.list.invalidate();
       setPostponeDialogOpen(false);
       setSelectedProject(null);
     },
-    onError: error => {
-      toast.error(`Erro ao adiar hibernação: ${error.message}`);
+    onError: (error) => {
+      toast.error(MESSAGES.ERROR_POSTPONE(error.message));
     },
   });
 
-  const handleAutoHibernate = () => {
-    if (
-      !confirm(
-        `Deseja hibernar todos os projetos inativos há mais de ${selectedPeriod} dias?`
-      )
-    ) {
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const inactiveCount = useMemo(() => {
+    if (!activityData) return 0;
+    return getInactiveCount(activityData, selectedPeriod);
+  }, [activityData, selectedPeriod]);
+
+  const inactiveProjects = useMemo(() => {
+    if (!activityData) return [];
+    return filterInactiveProjects(
+      activityData.projectsWithActivity,
+      selectedPeriod
+    );
+  }, [activityData, selectedPeriod]);
+
+  const activePercentage = useMemo(() => {
+    if (!activityData) return '0';
+    return calculatePercentage(
+      activityData.activeProjects,
+      activityData.totalProjects
+    );
+  }, [activityData]);
+
+  const hibernatedPercentage = useMemo(() => {
+    if (!activityData) return '0';
+    return calculatePercentage(
+      activityData.hibernatedProjects,
+      activityData.totalProjects
+    );
+  }, [activityData]);
+
+  const hasInactiveProjects = useMemo(
+    () => inactiveProjects.length > 0,
+    [inactiveProjects]
+  );
+
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
+  const handleAutoHibernate = useCallback(() => {
+    if (!confirm(MESSAGES.CONFIRM_HIBERNATE(selectedPeriod))) {
       return;
     }
     autoHibernateMutation.mutate({ days: selectedPeriod });
-  };
+  }, [selectedPeriod, autoHibernateMutation]);
 
-  const handlePostpone = (projectId: number, projectName: string) => {
-    setSelectedProject({ id: projectId, nome: projectName });
-    setPostponeDialogOpen(true);
-  };
+  const handlePostpone = useCallback(
+    (projectId: number, projectName: string) => {
+      setSelectedProject({ id: projectId, nome: projectName });
+      setPostponeDialogOpen(true);
+    },
+    []
+  );
 
-  const handleConfirmPostpone = (days: number) => {
-    if (!selectedProject) return;
-    postponeMutation.mutate({
-      projectId: selectedProject.id,
-      postponeDays: days,
-    });
-  };
+  const handleConfirmPostpone = useCallback(
+    (days: number) => {
+      if (!selectedProject) return;
+      postponeMutation.mutate({
+        projectId: selectedProject.id,
+        postponeDays: days,
+      });
+    },
+    [selectedProject, postponeMutation]
+  );
 
-  const getActionIcon = (action: string) => {
-    switch (action) {
-      case "created":
-        return <CheckCircle2 className="h-4 w-4 text-green-600" />;
-      case "updated":
-        return <FileEdit className="h-4 w-4 text-blue-600" />;
-      case "hibernated":
-        return <Moon className="h-4 w-4 text-purple-600" />;
-      case "reactivated":
-        return <RefreshCw className="h-4 w-4 text-green-600" />;
-      case "deleted":
-        return <Trash2 className="h-4 w-4 text-red-600" />;
-      default:
-        return <Activity className="h-4 w-4 text-gray-600" />;
-    }
-  };
+  const handlePeriodChange = useCallback((value: string) => {
+    setSelectedPeriod(parseInt(value) as Period);
+  }, []);
 
-  const getActionLabel = (action: string) => {
-    const labels: Record<string, string> = {
-      created: "Criado",
-      updated: "Atualizado",
-      hibernated: "Hibernado",
-      reactivated: "Reativado",
-      deleted: "Deletado",
-    };
-    return labels[action] || action;
-  };
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Carregando atividades...</p>
+          <p className="text-muted-foreground">{MESSAGES.LOADING}</p>
         </div>
       </div>
     );
@@ -136,27 +300,10 @@ export function ActivityTab() {
     return (
       <div className="text-center py-12">
         <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-        <p className="text-muted-foreground">
-          Nenhum dado de atividade disponível
-        </p>
+        <p className="text-muted-foreground">{MESSAGES.NO_DATA}</p>
       </div>
     );
   }
-
-  const inactiveCount =
-    selectedPeriod === 30
-      ? activityData.inactiveProjects30
-      : selectedPeriod === 60
-        ? activityData.inactiveProjects60
-        : activityData.inactiveProjects90;
-
-  const inactiveProjects = activityData.projectsWithActivity.filter(p => {
-    if (p.status !== "active") return false;
-    return (
-      p.hasWarning ||
-      (p.daysSinceActivity && p.daysSinceActivity >= selectedPeriod)
-    );
-  });
 
   return (
     <div className="space-y-6">
@@ -165,7 +312,7 @@ export function ActivityTab() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total de Projetos
+              {CARD_LABELS.TOTAL}
             </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -174,7 +321,7 @@ export function ActivityTab() {
               {activityData.totalProjects}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Todos os projetos cadastrados
+              {CARD_LABELS.ALL_PROJECTS}
             </p>
           </CardContent>
         </Card>
@@ -182,7 +329,7 @@ export function ActivityTab() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Projetos Ativos
+              {CARD_LABELS.ACTIVE}
             </CardTitle>
             <CheckCircle2 className="h-4 w-4 text-green-600" />
           </CardHeader>
@@ -191,11 +338,8 @@ export function ActivityTab() {
               {activityData.activeProjects}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {(
-                (activityData.activeProjects / activityData.totalProjects) *
-                100
-              ).toFixed(0)}
-              % do total
+              {activePercentage}
+              {CARD_LABELS.OF_TOTAL}
             </p>
           </CardContent>
         </Card>
@@ -203,7 +347,7 @@ export function ActivityTab() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Projetos Hibernados
+              {CARD_LABELS.HIBERNATED}
             </CardTitle>
             <Moon className="h-4 w-4 text-purple-600" />
           </CardHeader>
@@ -212,11 +356,8 @@ export function ActivityTab() {
               {activityData.hibernatedProjects}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {(
-                (activityData.hibernatedProjects / activityData.totalProjects) *
-                100
-              ).toFixed(0)}
-              % do total
+              {hibernatedPercentage}
+              {CARD_LABELS.OF_TOTAL}
             </p>
           </CardContent>
         </Card>
@@ -224,7 +365,7 @@ export function ActivityTab() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Inativos ({selectedPeriod}+ dias)
+              {CARD_LABELS.INACTIVE} ({selectedPeriod}+ dias)
             </CardTitle>
             <TrendingDown className="h-4 w-4 text-orange-600" />
           </CardHeader>
@@ -233,7 +374,7 @@ export function ActivityTab() {
               {inactiveCount}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Sem atividade recente
+              {CARD_LABELS.NO_RECENT_ACTIVITY}
             </p>
           </CardContent>
         </Card>
@@ -242,19 +383,17 @@ export function ActivityTab() {
       {/* Controles */}
       <Card>
         <CardHeader>
-          <CardTitle>Controle de Inatividade</CardTitle>
+          <CardTitle>{SECTION_TITLES.INACTIVITY_CONTROL}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="flex-1">
               <label className="text-sm font-medium mb-2 block">
-                Período de Inatividade
+                {SECTION_TITLES.PERIOD_LABEL}
               </label>
               <Select
                 value={selectedPeriod.toString()}
-                onValueChange={v =>
-                  setSelectedPeriod(parseInt(v) as 30 | 60 | 90)
-                }
+                onValueChange={handlePeriodChange}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -268,7 +407,7 @@ export function ActivityTab() {
             </div>
             <div className="flex-1">
               <label className="text-sm font-medium mb-2 block">
-                Ação em Lote
+                {SECTION_TITLES.BATCH_ACTION}
               </label>
               <Button
                 onClick={handleAutoHibernate}
@@ -290,16 +429,17 @@ export function ActivityTab() {
       </Card>
 
       {/* Lista de Projetos Inativos */}
-      {inactiveProjects.length > 0 && (
+      {hasInactiveProjects && (
         <Card>
           <CardHeader>
             <CardTitle>
-              Projetos Inativos (últimos {selectedPeriod} dias)
+              {SECTION_TITLES.INACTIVE_PROJECTS} (últimos {selectedPeriod}{' '}
+              dias)
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {inactiveProjects.map(project => (
+              {inactiveProjects.map((project) => (
                 <div
                   key={project.id}
                   className="flex items-center justify-between p-3 border rounded-lg"
@@ -321,7 +461,7 @@ export function ActivityTab() {
                       </span>
                       {project.lastActivityAt && (
                         <span>
-                          Última atividade:{" "}
+                          Última atividade:{' '}
                           {formatDistanceToNow(
                             new Date(project.lastActivityAt),
                             {
@@ -352,7 +492,7 @@ export function ActivityTab() {
       <PostponeHibernationDialog
         open={postponeDialogOpen}
         onOpenChange={setPostponeDialogOpen}
-        projectName={selectedProject?.nome || ""}
+        projectName={selectedProject?.nome || ''}
         onConfirm={handleConfirmPostpone}
         isLoading={postponeMutation.isPending}
       />

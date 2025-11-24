@@ -1,31 +1,33 @@
+'use client';
+
 /**
  * Aba de Projetos - Gestão de Projetos
  * Gerenciamento completo de projetos (criar, editar, hibernar, deletar, duplicar)
  */
 
-import { useState } from "react";
-import { useLocation } from "wouter";
-import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
+import { useState, useCallback, useMemo } from 'react';
+import { useLocation } from 'wouter';
+import { trpc } from '@/lib/trpc/client';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -33,7 +35,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,7 +45,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 import {
   FolderPlus,
   Edit,
@@ -58,118 +60,301 @@ import {
   Copy,
   History,
   FileText,
-} from "lucide-react";
-import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
+  type LucideIcon,
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
-type FilterStatus = "all" | "active" | "hibernated";
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const FILTER_STATUS_OPTIONS = ['all', 'active', 'hibernated'] as const;
+const DEFAULT_FILTER_STATUS = 'all';
+const DEFAULT_PROJECT_COLOR = '#3b82f6';
+
+const TOAST_MESSAGES = {
+  CREATE_SUCCESS: 'Projeto criado com sucesso!',
+  UPDATE_SUCCESS: 'Projeto atualizado com sucesso!',
+  DELETE_SUCCESS: 'Projeto deletado com sucesso!',
+  HIBERNATE_SUCCESS: 'Projeto adormecido com sucesso!',
+  REACTIVATE_SUCCESS: 'Projeto reativado com sucesso!',
+  DUPLICATE_SUCCESS: 'Projeto duplicado com sucesso!',
+  CREATE_ERROR: (error: string) => `Erro ao criar projeto: ${error}`,
+  UPDATE_ERROR: (error: string) => `Erro ao atualizar projeto: ${error}`,
+  DELETE_ERROR: (error: string) => `Erro ao deletar projeto: ${error}`,
+  HIBERNATE_ERROR: (error: string) => `Erro ao adormecer projeto: ${error}`,
+  REACTIVATE_ERROR: (error: string) => `Erro ao reativar projeto: ${error}`,
+  DUPLICATE_ERROR: (error: string) => `Erro ao duplicar projeto: ${error}`,
+  NAME_REQUIRED: 'Nome do projeto é obrigatório',
+  DUPLICATE_NAME_REQUIRED: 'Nome do novo projeto é obrigatório',
+};
+
+const CARD_LABELS = {
+  TOTAL: 'Total de Projetos',
+  ACTIVE: 'Projetos Ativos',
+  HIBERNATED: 'Projetos Hibernados',
+};
+
+const DIALOG_TITLES = {
+  CREATE: 'Criar Novo Projeto',
+  EDIT: 'Editar Projeto',
+  DUPLICATE: 'Duplicar Projeto',
+  HIBERNATE: 'Hibernar Projeto',
+  DELETE: 'Deletar Projeto',
+};
+
+const DIALOG_DESCRIPTIONS = {
+  CREATE: 'Preencha as informações do novo projeto',
+  EDIT: 'Atualize as informações do projeto',
+  DUPLICATE: (name: string) => `Crie uma cópia do projeto "${name}"`,
+  HIBERNATE: (name: string) =>
+    `Tem certeza que deseja hibernar o projeto "${name}"?\n\nO projeto ficará em modo somente leitura e não poderá ser editado até ser reativado.`,
+  DELETE: (name: string) =>
+    `Tem certeza que deseja deletar o projeto "${name}"?\n\nEsta ação não pode ser desfeita. Apenas projetos vazios podem ser deletados.`,
+};
+
+const FORM_LABELS = {
+  PROJECT_NAME: 'Nome do Projeto *',
+  DESCRIPTION: 'Descrição',
+  COLOR: 'Cor',
+  NEW_PROJECT_NAME: 'Nome do Novo Projeto *',
+  COPY_MARKETS: 'Copiar mercados únicos relacionados',
+};
+
+const FORM_PLACEHOLDERS = {
+  PROJECT_NAME: 'Ex: Projeto Embalagens 2025',
+  DESCRIPTION: 'Descrição opcional do projeto',
+};
+
+const BUTTON_LABELS = {
+  NEW_PROJECT: 'Novo Projeto',
+  CREATE: 'Criar Projeto',
+  SAVE: 'Salvar Alterações',
+  DUPLICATE: 'Duplicar Projeto',
+  HIBERNATE: 'Hibernar Projeto',
+  DELETE: 'Deletar Projeto',
+  CANCEL: 'Cancelar',
+  EDIT: 'Editar',
+  DUPLICATE_SHORT: 'Duplicar',
+  VIEW_RESEARCH: 'Ver Pesquisas',
+  HIBERNATE_SHORT: 'Hibernar',
+  REACTIVATE: 'Reativar',
+  HISTORY: 'Histórico',
+};
+
+const EMPTY_STATE_MESSAGES = {
+  NO_PROJECTS: 'Nenhum projeto encontrado. Crie seu primeiro projeto!',
+  NO_ACTIVE: 'Nenhum projeto ativo encontrado.',
+  NO_HIBERNATED: 'Nenhum projeto hibernado encontrado.',
+};
+
+const BADGE_LABELS = {
+  ACTIVE: 'Ativo',
+  HIBERNATED: 'Hibernado',
+};
+
+const DUPLICATE_NAME_PREFIX = 'Cópia de ';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+type FilterStatus = (typeof FILTER_STATUS_OPTIONS)[number];
+
+interface Project {
+  id: number;
+  nome: string;
+  descricao?: string;
+  cor?: string;
+  status: string;
+  lastActivityAt?: string;
+}
 
 interface ProjectsTabProps {
   onShowHistory?: (projectId: number) => void;
 }
 
+interface ProjectStats {
+  total: number;
+  active: number;
+  hibernated: number;
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function calculateStats(projects: Project[] | undefined): ProjectStats {
+  if (!projects) {
+    return { total: 0, active: 0, hibernated: 0 };
+  }
+
+  return {
+    total: projects.length,
+    active: projects.filter((p) => p.status === 'active').length,
+    hibernated: projects.filter((p) => p.status === 'hibernated').length,
+  };
+}
+
+function filterProjects(
+  projects: Project[] | undefined,
+  status: FilterStatus
+): Project[] {
+  if (!projects) return [];
+  if (status === 'all') return projects;
+  return projects.filter((p) => p.status === status);
+}
+
+function getEmptyStateMessage(status: FilterStatus): string {
+  switch (status) {
+    case 'all':
+      return EMPTY_STATE_MESSAGES.NO_PROJECTS;
+    case 'active':
+      return EMPTY_STATE_MESSAGES.NO_ACTIVE;
+    case 'hibernated':
+      return EMPTY_STATE_MESSAGES.NO_HIBERNATED;
+    default:
+      return EMPTY_STATE_MESSAGES.NO_PROJECTS;
+  }
+}
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
 export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
   const [, navigate] = useLocation();
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+  const [filterStatus, setFilterStatus] =
+    useState<FilterStatus>(DEFAULT_FILTER_STATUS);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showHibernateDialog, setShowHibernateDialog] = useState(false);
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   // Form states
-  const [projectName, setProjectName] = useState("");
-  const [projectDesc, setProjectDesc] = useState("");
-  const [projectColor, setProjectColor] = useState("#3b82f6");
-  const [duplicateName, setDuplicateName] = useState("");
+  const [projectName, setProjectName] = useState('');
+  const [projectDesc, setProjectDesc] = useState('');
+  const [projectColor, setProjectColor] = useState(DEFAULT_PROJECT_COLOR);
+  const [duplicateName, setDuplicateName] = useState('');
   const [copyMarkets, setCopyMarkets] = useState(false);
 
   const { data: projects, isLoading, refetch } = trpc.projects.list.useQuery();
 
+  // ============================================================================
+  // MUTATIONS
+  // ============================================================================
+
   const createMutation = trpc.projects.create.useMutation({
     onSuccess: () => {
-      toast.success("Projeto criado com sucesso!");
+      toast.success(TOAST_MESSAGES.CREATE_SUCCESS);
       refetch();
       setShowCreateDialog(false);
       resetForm();
     },
-    onError: error => {
-      toast.error(`Erro ao criar projeto: ${error.message}`);
+    onError: (error) => {
+      toast.error(TOAST_MESSAGES.CREATE_ERROR(error.message));
     },
   });
 
   const updateMutation = trpc.projects.update.useMutation({
     onSuccess: () => {
-      toast.success("Projeto atualizado com sucesso!");
+      toast.success(TOAST_MESSAGES.UPDATE_SUCCESS);
       refetch();
       setShowEditDialog(false);
       resetForm();
     },
-    onError: error => {
-      toast.error(`Erro ao atualizar projeto: ${error.message}`);
+    onError: (error) => {
+      toast.error(TOAST_MESSAGES.UPDATE_ERROR(error.message));
     },
   });
 
   const deleteMutation = trpc.projects.deleteEmpty.useMutation({
     onSuccess: () => {
-      toast.success("Projeto deletado com sucesso!");
+      toast.success(TOAST_MESSAGES.DELETE_SUCCESS);
       refetch();
       setShowDeleteDialog(false);
       setSelectedProject(null);
     },
-    onError: error => {
-      toast.error(`Erro ao deletar projeto: ${error.message}`);
+    onError: (error) => {
+      toast.error(TOAST_MESSAGES.DELETE_ERROR(error.message));
     },
   });
 
   const hibernateMutation = trpc.projects.hibernate.useMutation({
     onSuccess: () => {
-      toast.success("Projeto adormecido com sucesso!");
+      toast.success(TOAST_MESSAGES.HIBERNATE_SUCCESS);
       refetch();
       setShowHibernateDialog(false);
       setSelectedProject(null);
     },
-    onError: error => {
-      toast.error(`Erro ao adormecer projeto: ${error.message}`);
+    onError: (error) => {
+      toast.error(TOAST_MESSAGES.HIBERNATE_ERROR(error.message));
     },
   });
 
   const reactivateMutation = trpc.projects.reactivate.useMutation({
     onSuccess: () => {
-      toast.success("Projeto reativado com sucesso!");
+      toast.success(TOAST_MESSAGES.REACTIVATE_SUCCESS);
       refetch();
     },
-    onError: error => {
-      toast.error(`Erro ao reativar projeto: ${error.message}`);
+    onError: (error) => {
+      toast.error(TOAST_MESSAGES.REACTIVATE_ERROR(error.message));
     },
   });
 
   const duplicateMutation = trpc.projects.duplicate.useMutation({
     onSuccess: () => {
-      toast.success("Projeto duplicado com sucesso!");
+      toast.success(TOAST_MESSAGES.DUPLICATE_SUCCESS);
       refetch();
       setShowDuplicateDialog(false);
-      setDuplicateName("");
+      setDuplicateName('');
       setCopyMarkets(false);
       setSelectedProject(null);
     },
-    onError: error => {
-      toast.error(`Erro ao duplicar projeto: ${error.message}`);
+    onError: (error) => {
+      toast.error(TOAST_MESSAGES.DUPLICATE_ERROR(error.message));
     },
   });
 
-  const resetForm = () => {
-    setProjectName("");
-    setProjectDesc("");
-    setProjectColor("#3b82f6");
-    setSelectedProject(null);
-  };
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
 
-  const handleCreate = () => {
+  const stats = useMemo(() => calculateStats(projects), [projects]);
+
+  const filteredProjects = useMemo(
+    () => filterProjects(projects, filterStatus),
+    [projects, filterStatus]
+  );
+
+  const hasProjects = useMemo(
+    () => filteredProjects.length > 0,
+    [filteredProjects]
+  );
+
+  const emptyStateMessage = useMemo(
+    () => getEmptyStateMessage(filterStatus),
+    [filterStatus]
+  );
+
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
+  const resetForm = useCallback(() => {
+    setProjectName('');
+    setProjectDesc('');
+    setProjectColor(DEFAULT_PROJECT_COLOR);
+    setSelectedProject(null);
+  }, []);
+
+  const handleCreate = useCallback(() => {
     if (!projectName.trim()) {
-      toast.error("Nome do projeto é obrigatório");
+      toast.error(TOAST_MESSAGES.NAME_REQUIRED);
       return;
     }
     createMutation.mutate({
@@ -177,11 +362,11 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
       descricao: projectDesc || undefined,
       cor: projectColor,
     });
-  };
+  }, [projectName, projectDesc, projectColor, createMutation]);
 
-  const handleUpdate = () => {
+  const handleUpdate = useCallback(() => {
     if (!selectedProject || !projectName.trim()) {
-      toast.error("Nome do projeto é obrigatório");
+      toast.error(TOAST_MESSAGES.NAME_REQUIRED);
       return;
     }
     updateMutation.mutate({
@@ -190,25 +375,28 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
       descricao: projectDesc || undefined,
       cor: projectColor,
     });
-  };
+  }, [selectedProject, projectName, projectDesc, projectColor, updateMutation]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (!selectedProject) return;
     deleteMutation.mutate(selectedProject.id);
-  };
+  }, [selectedProject, deleteMutation]);
 
-  const handleHibernate = () => {
+  const handleHibernate = useCallback(() => {
     if (!selectedProject) return;
     hibernateMutation.mutate(selectedProject.id);
-  };
+  }, [selectedProject, hibernateMutation]);
 
-  const handleReactivate = (projectId: number) => {
-    reactivateMutation.mutate(projectId);
-  };
+  const handleReactivate = useCallback(
+    (projectId: number) => {
+      reactivateMutation.mutate(projectId);
+    },
+    [reactivateMutation]
+  );
 
-  const handleDuplicate = () => {
+  const handleDuplicate = useCallback(() => {
     if (!selectedProject || !duplicateName.trim()) {
-      toast.error("Nome do novo projeto é obrigatório");
+      toast.error(TOAST_MESSAGES.DUPLICATE_NAME_REQUIRED);
       return;
     }
     duplicateMutation.mutate({
@@ -216,34 +404,99 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
       newName: duplicateName,
       copyMarkets,
     });
-  };
+  }, [selectedProject, duplicateName, copyMarkets, duplicateMutation]);
 
-  const openEditDialog = (project: any) => {
+  const openEditDialog = useCallback((project: Project) => {
     setSelectedProject(project);
     setProjectName(project.nome);
-    setProjectDesc(project.descricao || "");
-    setProjectColor(project.cor || "#3b82f6");
+    setProjectDesc(project.descricao || '');
+    setProjectColor(project.cor || DEFAULT_PROJECT_COLOR);
     setShowEditDialog(true);
-  };
+  }, []);
 
-  const openDuplicateDialog = (project: any) => {
+  const openDuplicateDialog = useCallback((project: Project) => {
     setSelectedProject(project);
-    setDuplicateName(`Cópia de ${project.nome}`);
+    setDuplicateName(`${DUPLICATE_NAME_PREFIX}${project.nome}`);
     setCopyMarkets(false);
     setShowDuplicateDialog(true);
-  };
+  }, []);
 
-  const filteredProjects =
-    projects?.filter(p => {
-      if (filterStatus === "all") return true;
-      return p.status === filterStatus;
-    }) || [];
+  const openHibernateDialog = useCallback((project: Project) => {
+    setSelectedProject(project);
+    setShowHibernateDialog(true);
+  }, []);
 
-  const stats = {
-    total: projects?.length || 0,
-    active: projects?.filter(p => p.status === "active").length || 0,
-    hibernated: projects?.filter(p => p.status === "hibernated").length || 0,
-  };
+  const handleFilterChange = useCallback((value: string) => {
+    setFilterStatus(value as FilterStatus);
+  }, []);
+
+  const handleNavigateToPesquisas = useCallback(
+    (projectId: number) => {
+      navigate(`/pesquisas?projectId=${projectId}`);
+    },
+    [navigate]
+  );
+
+  const handleShowHistory = useCallback(
+    (projectId: number) => {
+      if (onShowHistory) {
+        onShowHistory(projectId);
+      }
+    },
+    [onShowHistory]
+  );
+
+  const handleOpenCreateDialog = useCallback(() => {
+    setShowCreateDialog(true);
+  }, []);
+
+  const handleCloseCreateDialog = useCallback(() => {
+    setShowCreateDialog(false);
+  }, []);
+
+  const handleCloseEditDialog = useCallback(() => {
+    setShowEditDialog(false);
+  }, []);
+
+  const handleCloseDuplicateDialog = useCallback(() => {
+    setShowDuplicateDialog(false);
+  }, []);
+
+  const handleProjectNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setProjectName(e.target.value);
+    },
+    []
+  );
+
+  const handleProjectDescChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setProjectDesc(e.target.value);
+    },
+    []
+  );
+
+  const handleProjectColorChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setProjectColor(e.target.value);
+    },
+    []
+  );
+
+  const handleDuplicateNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setDuplicateName(e.target.value);
+    },
+    []
+  );
+
+  const handleCopyMarketsChange = useCallback((checked: boolean) => {
+    setCopyMarkets(checked);
+  }, []);
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   if (isLoading) {
     return (
@@ -260,7 +513,7 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total de Projetos
+              {CARD_LABELS.TOTAL}
             </CardTitle>
             <Folder className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -272,7 +525,7 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Projetos Ativos
+              {CARD_LABELS.ACTIVE}
             </CardTitle>
             <CheckCircle2 className="h-4 w-4 text-green-600" />
           </CardHeader>
@@ -286,7 +539,7 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Projetos Hibernados
+              {CARD_LABELS.HIBERNATED}
             </CardTitle>
             <Moon className="h-4 w-4 text-purple-600" />
           </CardHeader>
@@ -302,10 +555,7 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select
-            value={filterStatus}
-            onValueChange={v => setFilterStatus(v as FilterStatus)}
-          >
+          <Select value={filterStatus} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue />
             </SelectTrigger>
@@ -319,130 +569,123 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
           </Select>
         </div>
 
-        <Button onClick={() => setShowCreateDialog(true)}>
+        <Button onClick={handleOpenCreateDialog}>
           <FolderPlus className="h-4 w-4 mr-2" />
-          Novo Projeto
+          {BUTTON_LABELS.NEW_PROJECT}
         </Button>
       </div>
 
       {/* Lista de Projetos */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredProjects.map(project => (
-          <Card key={project.id} className="relative">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: project.cor || "#3b82f6" }}
-                  />
-                  <CardTitle className="text-lg">{project.nome}</CardTitle>
-                </div>
-                {project.status === "hibernated" ? (
-                  <Badge variant="secondary" className="gap-1">
-                    <Moon className="h-3 w-3" />
-                    Hibernado
-                  </Badge>
-                ) : (
-                  <Badge variant="default" className="gap-1">
-                    <CheckCircle2 className="h-3 w-3" />
-                    Ativo
-                  </Badge>
-                )}
-              </div>
-              {project.descricao && (
-                <CardDescription className="line-clamp-2">
-                  {project.descricao}
-                </CardDescription>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {project.lastActivityAt && (
-                <p className="text-xs text-muted-foreground">
-                  Última atividade:{" "}
-                  {formatDistanceToNow(new Date(project.lastActivityAt), {
-                    addSuffix: true,
-                    locale: ptBR,
-                  })}
-                </p>
-              )}
-
-              <div className="flex flex-wrap gap-2">
-                {project.status === "active" ? (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => openEditDialog(project)}
-                    >
-                      <Edit className="h-3 w-3 mr-1" />
-                      Editar
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => openDuplicateDialog(project)}
-                    >
-                      <Copy className="h-3 w-3 mr-1" />
-                      Duplicar
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        navigate(`/pesquisas?projectId=${project.id}`)
-                      }
-                    >
-                      <FileText className="h-3 w-3 mr-1" />
-                      Ver Pesquisas
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setSelectedProject(project);
-                        setShowHibernateDialog(true);
+        {hasProjects ? (
+          filteredProjects.map((project) => (
+            <Card key={project.id} className="relative">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{
+                        backgroundColor: project.cor || DEFAULT_PROJECT_COLOR,
                       }}
-                    >
-                      <Moon className="h-3 w-3 mr-1" />
-                      Hibernar
-                    </Button>
-                    {onShowHistory && (
+                    />
+                    <CardTitle className="text-lg">{project.nome}</CardTitle>
+                  </div>
+                  {project.status === 'hibernated' ? (
+                    <Badge variant="secondary" className="gap-1">
+                      <Moon className="h-3 w-3" />
+                      {BADGE_LABELS.HIBERNATED}
+                    </Badge>
+                  ) : (
+                    <Badge variant="default" className="gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      {BADGE_LABELS.ACTIVE}
+                    </Badge>
+                  )}
+                </div>
+                {project.descricao && (
+                  <CardDescription className="line-clamp-2">
+                    {project.descricao}
+                  </CardDescription>
+                )}
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {project.lastActivityAt && (
+                  <p className="text-xs text-muted-foreground">
+                    Última atividade:{' '}
+                    {formatDistanceToNow(new Date(project.lastActivityAt), {
+                      addSuffix: true,
+                      locale: ptBR,
+                    })}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  {project.status === 'active' ? (
+                    <>
                       <Button
                         size="sm"
-                        variant="ghost"
-                        onClick={() => onShowHistory(project.id)}
+                        variant="outline"
+                        onClick={() => openEditDialog(project)}
                       >
-                        <History className="h-3 w-3 mr-1" />
-                        Histórico
+                        <Edit className="h-3 w-3 mr-1" />
+                        {BUTTON_LABELS.EDIT}
                       </Button>
-                    )}
-                  </>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={() => handleReactivate(project.id)}
-                    disabled={reactivateMutation.isPending}
-                  >
-                    <Sun className="h-3 w-3 mr-1" />
-                    Reativar
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-
-        {filteredProjects.length === 0 && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openDuplicateDialog(project)}
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        {BUTTON_LABELS.DUPLICATE_SHORT}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleNavigateToPesquisas(project.id)}
+                      >
+                        <FileText className="h-3 w-3 mr-1" />
+                        {BUTTON_LABELS.VIEW_RESEARCH}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openHibernateDialog(project)}
+                      >
+                        <Moon className="h-3 w-3 mr-1" />
+                        {BUTTON_LABELS.HIBERNATE_SHORT}
+                      </Button>
+                      {onShowHistory && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleShowHistory(project.id)}
+                        >
+                          <History className="h-3 w-3 mr-1" />
+                          {BUTTON_LABELS.HISTORY}
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => handleReactivate(project.id)}
+                      disabled={reactivateMutation.isPending}
+                    >
+                      <Sun className="h-3 w-3 mr-1" />
+                      {BUTTON_LABELS.REACTIVATE}
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
           <Card className="col-span-full">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">
-                {filterStatus === "all"
-                  ? "Nenhum projeto encontrado. Crie seu primeiro projeto!"
-                  : `Nenhum projeto ${filterStatus === "active" ? "ativo" : "hibernado"} encontrado.`}
-              </p>
+              <p className="text-muted-foreground">{emptyStateMessage}</p>
             </CardContent>
           </Card>
         )}
@@ -452,39 +695,39 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Criar Novo Projeto</DialogTitle>
+            <DialogTitle>{DIALOG_TITLES.CREATE}</DialogTitle>
             <DialogDescription>
-              Preencha as informações do novo projeto
+              {DIALOG_DESCRIPTIONS.CREATE}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="name">Nome do Projeto *</Label>
+              <Label htmlFor="name">{FORM_LABELS.PROJECT_NAME}</Label>
               <Input
                 id="name"
                 value={projectName}
-                onChange={e => setProjectName(e.target.value)}
-                placeholder="Ex: Projeto Embalagens 2025"
+                onChange={handleProjectNameChange}
+                placeholder={FORM_PLACEHOLDERS.PROJECT_NAME}
               />
             </div>
             <div>
-              <Label htmlFor="desc">Descrição</Label>
+              <Label htmlFor="desc">{FORM_LABELS.DESCRIPTION}</Label>
               <Textarea
                 id="desc"
                 value={projectDesc}
-                onChange={e => setProjectDesc(e.target.value)}
-                placeholder="Descrição opcional do projeto"
+                onChange={handleProjectDescChange}
+                placeholder={FORM_PLACEHOLDERS.DESCRIPTION}
                 rows={3}
               />
             </div>
             <div>
-              <Label htmlFor="color">Cor</Label>
+              <Label htmlFor="color">{FORM_LABELS.COLOR}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   id="color"
                   type="color"
                   value={projectColor}
-                  onChange={e => setProjectColor(e.target.value)}
+                  onChange={handleProjectColorChange}
                   className="w-20 h-10"
                 />
                 <span className="text-sm text-muted-foreground">
@@ -494,17 +737,14 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowCreateDialog(false)}
-            >
-              Cancelar
+            <Button variant="outline" onClick={handleCloseCreateDialog}>
+              {BUTTON_LABELS.CANCEL}
             </Button>
             <Button onClick={handleCreate} disabled={createMutation.isPending}>
               {createMutation.isPending && (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               )}
-              Criar Projeto
+              {BUTTON_LABELS.CREATE}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -514,37 +754,35 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Editar Projeto</DialogTitle>
-            <DialogDescription>
-              Atualize as informações do projeto
-            </DialogDescription>
+            <DialogTitle>{DIALOG_TITLES.EDIT}</DialogTitle>
+            <DialogDescription>{DIALOG_DESCRIPTIONS.EDIT}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="edit-name">Nome do Projeto *</Label>
+              <Label htmlFor="edit-name">{FORM_LABELS.PROJECT_NAME}</Label>
               <Input
                 id="edit-name"
                 value={projectName}
-                onChange={e => setProjectName(e.target.value)}
+                onChange={handleProjectNameChange}
               />
             </div>
             <div>
-              <Label htmlFor="edit-desc">Descrição</Label>
+              <Label htmlFor="edit-desc">{FORM_LABELS.DESCRIPTION}</Label>
               <Textarea
                 id="edit-desc"
                 value={projectDesc}
-                onChange={e => setProjectDesc(e.target.value)}
+                onChange={handleProjectDescChange}
                 rows={3}
               />
             </div>
             <div>
-              <Label htmlFor="edit-color">Cor</Label>
+              <Label htmlFor="edit-color">{FORM_LABELS.COLOR}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   id="edit-color"
                   type="color"
                   value={projectColor}
-                  onChange={e => setProjectColor(e.target.value)}
+                  onChange={handleProjectColorChange}
                   className="w-20 h-10"
                 />
                 <span className="text-sm text-muted-foreground">
@@ -554,14 +792,14 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
-              Cancelar
+            <Button variant="outline" onClick={handleCloseEditDialog}>
+              {BUTTON_LABELS.CANCEL}
             </Button>
             <Button onClick={handleUpdate} disabled={updateMutation.isPending}>
               {updateMutation.isPending && (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               )}
-              Salvar Alterações
+              {BUTTON_LABELS.SAVE}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -571,37 +809,37 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
       <Dialog open={showDuplicateDialog} onOpenChange={setShowDuplicateDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Duplicar Projeto</DialogTitle>
+            <DialogTitle>{DIALOG_TITLES.DUPLICATE}</DialogTitle>
             <DialogDescription>
-              Crie uma cópia do projeto "{selectedProject?.nome}"
+              {selectedProject &&
+                DIALOG_DESCRIPTIONS.DUPLICATE(selectedProject.nome)}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="dup-name">Nome do Novo Projeto *</Label>
+              <Label htmlFor="dup-name">{FORM_LABELS.NEW_PROJECT_NAME}</Label>
               <Input
                 id="dup-name"
                 value={duplicateName}
-                onChange={e => setDuplicateName(e.target.value)}
+                onChange={handleDuplicateNameChange}
               />
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="copy-markets"
                 checked={copyMarkets}
-                onCheckedChange={checked => setCopyMarkets(checked as boolean)}
+                onCheckedChange={(checked) =>
+                  handleCopyMarketsChange(checked as boolean)
+                }
               />
               <Label htmlFor="copy-markets" className="cursor-pointer">
-                Copiar mercados únicos relacionados
+                {FORM_LABELS.COPY_MARKETS}
               </Label>
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowDuplicateDialog(false)}
-            >
-              Cancelar
+            <Button variant="outline" onClick={handleCloseDuplicateDialog}>
+              {BUTTON_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleDuplicate}
@@ -610,7 +848,7 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
               {duplicateMutation.isPending && (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               )}
-              Duplicar Projeto
+              {BUTTON_LABELS.DUPLICATE}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -623,19 +861,16 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hibernar Projeto</AlertDialogTitle>
+            <AlertDialogTitle>{DIALOG_TITLES.HIBERNATE}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja hibernar o projeto "{selectedProject?.nome}
-              "?
-              <br />
-              <br />O projeto ficará em modo somente leitura e não poderá ser
-              editado até ser reativado.
+              {selectedProject &&
+                DIALOG_DESCRIPTIONS.HIBERNATE(selectedProject.nome)}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{BUTTON_LABELS.CANCEL}</AlertDialogCancel>
             <AlertDialogAction onClick={handleHibernate}>
-              Hibernar Projeto
+              {BUTTON_LABELS.HIBERNATE}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -645,23 +880,19 @@ export function ProjectsTab({ onShowHistory }: ProjectsTabProps) {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Deletar Projeto</AlertDialogTitle>
+            <AlertDialogTitle>{DIALOG_TITLES.DELETE}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja deletar o projeto "{selectedProject?.nome}
-              "?
-              <br />
-              <br />
-              Esta ação não pode ser desfeita. Apenas projetos vazios podem ser
-              deletados.
+              {selectedProject &&
+                DIALOG_DESCRIPTIONS.DELETE(selectedProject.nome)}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{BUTTON_LABELS.CANCEL}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive"
             >
-              Deletar Projeto
+              {BUTTON_LABELS.DELETE}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
