@@ -12,7 +12,7 @@ import {
 
 export interface ParsedRow {
   rowNumber: number;
-  data: unknown;
+  data: any;
   valid: boolean;
   errors?: Array<{ field: string; message: string }>;
 }
@@ -166,8 +166,8 @@ function mapColumns(
   return result;
 }
 
-function parseRow(row: unknown[], columnMap: Record<string, string>): Record<string, unknown> {
-  const parsed: unknown = {};
+function parseRow(row: any[], columnMap: Record<string, string>): any {
+  const parsed: any = {};
 
   Object.entries(columnMap).forEach(([index, fieldName]) => {
     const value = row[parseInt(index)];
@@ -192,7 +192,7 @@ export function parseCSV(
     const workbook = XLSX.read(csvContent, { type: "string" });
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    const data: unknown[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    const data: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
     if (data.length === 0) {
       return {
@@ -253,7 +253,7 @@ export function parseCSV(
       rows,
       columns: headers,
     };
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error("[SpreadsheetParser] CSV parse error:", error);
     return {
       success: false,
@@ -292,7 +292,7 @@ export function parseExcel(
     }
 
     const worksheet = workbook.Sheets[sheetName];
-    const data: unknown[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    const data: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
     if (data.length === 0) {
       return {
@@ -353,7 +353,7 @@ export function parseExcel(
       rows,
       columns: headers,
     };
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error("[SpreadsheetParser] Excel parse error:", error);
     return {
       success: false,

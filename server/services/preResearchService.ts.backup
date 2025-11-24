@@ -57,7 +57,7 @@ export async function executePreResearch(
 
     // FASE 41.2: Usar credenciais configuráveis se projectId fornecido
     const llmFunction = input.projectId
-      ? (params: unknown) => invokeLLMWithConfig(input.projectId!, params)
+      ? (params: any) => invokeLLMWithConfig(input.projectId!, params)
       : invokeLLM;
 
     const response = await llmFunction({
@@ -168,7 +168,7 @@ function buildUserPrompt(input: PreResearchInput): string {
 /**
  * Constrói o schema de resposta JSON
  */
-function buildResponseSchema(tipo: "mercado" | "cliente"): Record<string, unknown> {
+function buildResponseSchema(tipo: "mercado" | "cliente"): any {
   if (tipo === "mercado") {
     return {
       type: "object",
@@ -265,7 +265,7 @@ function buildResponseSchema(tipo: "mercado" | "cliente"): Record<string, unknow
  * Executa retry inteligente para melhorar completude dos dados
  */
 export async function retryWithImprovement(
-  entidade: Record<string, unknown>,
+  entidade: any,
   tipo: "mercado" | "cliente",
   maxRetries: number = 2
 ): Promise<any> {
@@ -301,7 +301,7 @@ export async function retryWithImprovement(
  * Identifica campos faltantes
  */
 function identifyMissingFields(
-  data: Record<string, unknown>,
+  data: any,
   tipo: "mercado" | "cliente"
 ): string[] {
   const missing: string[] = [];
@@ -328,7 +328,7 @@ function identifyMissingFields(
  * Solicita campos faltantes via IA
  */
 async function requestMissingFields(
-  data: Record<string, unknown>,
+  data: any,
   camposFaltantes: string[],
   tipo: "mercado" | "cliente"
 ): Promise<any> {
