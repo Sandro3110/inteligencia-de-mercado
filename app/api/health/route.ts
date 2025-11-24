@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { sql } from 'drizzle-orm';
 import { getDb } from '@/server/db';
 
 /**
@@ -23,9 +24,14 @@ export async function GET() {
 
   try {
     // Check database connection
-    const db = getDb();
-    await db.execute('SELECT 1');
-    health.checks.database = 'healthy';
+    const db = await getDb();
+    if (db) {
+      await db.execute(sql`SELECT 1`);
+      health.checks.database = 'healthy';
+    } else {
+      health.status = 'unhealthy';
+      health.checks.database = 'unhealthy';
+    }
   } catch (error) {
     health.status = 'unhealthy';
     health.checks.database = 'unhealthy';

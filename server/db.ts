@@ -13,7 +13,7 @@ import {
 } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { getServerlessDb } from "./lib/drizzle-serverless.js";
+import { getServerlessDb } from "./lib/drizzle-serverless";
 import {
   InsertUser,
   users,

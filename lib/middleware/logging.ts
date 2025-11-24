@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '../logger';
+import { PerformanceMetrics } from '../monitoring/metrics';
+import { checkApiPerformance } from '../monitoring/alerts';
 
 /**
  * Request Logging Middleware
@@ -30,6 +32,19 @@ export function withLogging(
       requestLogger.info('Request completed', {
         status: response.status,
         duration: `${duration}ms`,
+      });
+
+      // Record performance metrics
+      PerformanceMetrics.apiResponseTime(
+        new URL(req.url).pathname,
+        duration,
+        response.status
+      );
+
+      // Check for performance issues
+      checkApiPerformance(new URL(req.url).pathname, duration, {
+        method: req.method,
+        status: response.status,
       });
 
       // Add request ID to response headers

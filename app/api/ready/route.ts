@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { sql } from 'drizzle-orm';
 import { getDb } from '@/server/db';
 
 /**
@@ -10,8 +11,11 @@ import { getDb } from '@/server/db';
 export async function GET() {
   try {
     // Check if database is accessible
-    const db = getDb();
-    await db.execute('SELECT 1');
+    const db = await getDb();
+    if (!db) {
+      throw new Error('Database not available');
+    }
+    await db.execute(sql`SELECT 1`);
 
     return NextResponse.json(
       {

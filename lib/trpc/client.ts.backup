@@ -1,9 +1,5 @@
 'use client';
 
-// Note: TypeScript standalone (tsc --noEmit) may show parsing errors for JSX in this file,
-// but Next.js compiles it correctly. This is a known issue with 'use client' directive.
-// See: https://github.com/microsoft/TypeScript/issues/51582
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink, loggerLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
@@ -21,13 +17,16 @@ export const trpc = createTRPCReact<AppRouter>();
  */
 function getBaseUrl() {
   if (typeof window !== 'undefined') {
+    // Browser: usar URL relativa
     return '';
   }
 
   if (process.env.VERCEL_URL) {
+    // Vercel: usar URL do deployment
     return `https://${process.env.VERCEL_URL}`;
   }
 
+  // Desenvolvimento: usar localhost
   return `http://localhost:${process.env.PORT ?? 3000}`;
 }
 
@@ -40,7 +39,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 5 * 1000,
+            staleTime: 5 * 1000, // 5 segundos
             refetchOnWindowFocus: false,
           },
         },
