@@ -1,19 +1,16 @@
+'use client';
+
 /**
  * Marcador Unificado de Entidades
  * Suporta mercados, clientes, produtos, concorrentes e leads
  */
 
-import { Marker, Popup } from "react-leaflet";
-import L, { DivIcon } from "leaflet";
-import { Building, Users, Package, Target, Sparkles } from "lucide-react";
-import { renderToString } from "react-dom/server";
+import { Marker, Popup } from 'react-leaflet';
+import L, { DivIcon } from 'leaflet';
+import { Building, Users, Package, Target, Sparkles, type LucideIcon } from 'lucide-react';
+import { renderToString } from 'react-dom/server';
 
-export type EntityType =
-  | "mercado"
-  | "cliente"
-  | "produto"
-  | "concorrente"
-  | "lead";
+export type EntityType = 'mercado' | 'cliente' | 'produto' | 'concorrente' | 'lead';
 
 export interface EntityMarkerProps {
   position: [number, number];
@@ -24,15 +21,15 @@ export interface EntityMarkerProps {
   children?: React.ReactNode;
 }
 
-const ENTITY_COLORS = {
-  mercado: "#3b82f6", // blue-500
-  cliente: "#10b981", // green-500
-  produto: "#eab308", // yellow-500
-  concorrente: "#ef4444", // red-500
-  lead: "#a855f7", // purple-500
+const ENTITY_COLORS: Record<EntityType, string> = {
+  mercado: '#3b82f6', // blue-500
+  cliente: '#10b981', // green-500
+  produto: '#eab308', // yellow-500
+  concorrente: '#ef4444', // red-500
+  lead: '#a855f7', // purple-500
 };
 
-const ENTITY_ICONS = {
+const ENTITY_ICONS: Record<EntityType, LucideIcon> = {
   mercado: Building,
   cliente: Users,
   produto: Package,
@@ -40,19 +37,45 @@ const ENTITY_ICONS = {
   lead: Sparkles,
 };
 
+const QUALITY_COLORS = {
+  high: '#10b981', // green-500
+  medium: '#eab308', // yellow-500
+  low: '#ef4444', // red-500
+} as const;
+
+const SIZE_CONFIG = {
+  base: 32,
+  high: 40,
+  low: 28,
+  badge: 16,
+} as const;
+
+/**
+ * Determina a cor baseada no score de qualidade
+ */
+function getQualityColor(score: number): string {
+  if (score >= 70) return QUALITY_COLORS.high;
+  if (score >= 40) return QUALITY_COLORS.medium;
+  return QUALITY_COLORS.low;
+}
+
+/**
+ * Determina o tamanho do marcador baseado na qualidade
+ */
+function getMarkerSize(qualidadeScore?: number): number {
+  if (!qualidadeScore) return SIZE_CONFIG.base;
+  if (qualidadeScore >= 70) return SIZE_CONFIG.high;
+  if (qualidadeScore < 40) return SIZE_CONFIG.low;
+  return SIZE_CONFIG.base;
+}
+
 /**
  * Cria ícone customizado baseado no tipo de entidade
  */
 function createEntityIcon(type: EntityType, qualidadeScore?: number): DivIcon {
   const Icon = ENTITY_ICONS[type];
   const color = ENTITY_COLORS[type];
-
-  // Determinar tamanho baseado na qualidade
-  let size = 32;
-  if (qualidadeScore) {
-    if (qualidadeScore >= 70) size = 40;
-    else if (qualidadeScore < 40) size = 28;
-  }
+  const size = getMarkerSize(qualidadeScore);
 
   // Adicionar badge de qualidade se disponível
   const qualityBadge = qualidadeScore
@@ -60,11 +83,11 @@ function createEntityIcon(type: EntityType, qualidadeScore?: number): DivIcon {
         position: absolute;
         top: -4px;
         right: -4px;
-        background: ${qualidadeScore >= 70 ? "#10b981" : qualidadeScore >= 40 ? "#eab308" : "#ef4444"};
+        background: ${getQualityColor(qualidadeScore)};
         color: white;
         border-radius: 50%;
-        width: 16px;
-        height: 16px;
+        width: ${SIZE_CONFIG.badge}px;
+        height: ${SIZE_CONFIG.badge}px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -72,7 +95,7 @@ function createEntityIcon(type: EntityType, qualidadeScore?: number): DivIcon {
         font-weight: bold;
         border: 2px solid white;
       ">${qualidadeScore}</div>`
-    : "";
+    : '';
 
   const iconHtml = `
     <div style="
@@ -96,7 +119,7 @@ function createEntityIcon(type: EntityType, qualidadeScore?: number): DivIcon {
 
   return L.divIcon({
     html: iconHtml,
-    className: "custom-entity-marker",
+    className: 'custom-entity-marker',
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
     popupAnchor: [0, -size / 2],

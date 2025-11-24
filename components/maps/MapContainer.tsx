@@ -1,23 +1,26 @@
+'use client';
+
 /**
  * Componente Base de Mapa usando Leaflet
  *
  * Wrapper do react-leaflet com configurações padrão para o Brasil
  */
 
-import { ReactNode } from "react";
-import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+import { ReactNode } from 'react';
+import { MapContainer as LeafletMapContainer, TileLayer } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 // Fix para ícones do Leaflet no Vite
-import L from "leaflet";
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-let DefaultIcon = L.icon({
+// Configurar ícone padrão do Leaflet
+const DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
+  iconSize: [25, 41] as [number, number],
+  iconAnchor: [12, 41] as [number, number],
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
@@ -35,9 +38,23 @@ interface MapContainerProps {
   children?: ReactNode;
   /** Classe CSS adicional */
   className?: string;
-  /** Callback quando o mapa é clicado */
-  onClick?: (lat: number, lng: number) => void;
 }
+
+// Centro geográfico do Brasil
+const BRAZIL_CENTER: [number, number] = [-14.235, -51.925];
+
+const DEFAULT_CONFIG = {
+  zoom: 4,
+  height: '100%',
+  width: '100%',
+  maxZoom: 18,
+  borderRadius: '0.5rem',
+} as const;
+
+const TILE_LAYER = {
+  url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+} as const;
 
 /**
  * Componente de mapa base com configurações padrão para o Brasil
@@ -52,29 +69,28 @@ interface MapContainerProps {
  * ```
  */
 export default function MapContainer({
-  center = [-14.235, -51.925], // Centro do Brasil
-  zoom = 4,
-  height = "100%",
-  width = "100%",
+  center = BRAZIL_CENTER,
+  zoom = DEFAULT_CONFIG.zoom,
+  height = DEFAULT_CONFIG.height,
+  width = DEFAULT_CONFIG.width,
   children,
-  className = "",
-  onClick,
+  className = '',
 }: MapContainerProps) {
   return (
     <div style={{ height, width }} className={className}>
       <LeafletMapContainer
         center={center}
         zoom={zoom}
-        style={{ height: "100%", width: "100%", borderRadius: "0.5rem" }}
+        style={{ height: '100%', width: '100%', borderRadius: DEFAULT_CONFIG.borderRadius }}
         scrollWheelZoom={true}
         zoomControl={true}
         attributionControl={true}
       >
         {/* Tile Layer - OpenStreetMap */}
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          maxZoom={18}
+          url={TILE_LAYER.url}
+          attribution={TILE_LAYER.attribution}
+          maxZoom={DEFAULT_CONFIG.maxZoom}
         />
 
         {children}

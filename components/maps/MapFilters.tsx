@@ -1,18 +1,20 @@
+'use client';
+
 /**
  * Filtros Avançados do Mapa Unificado
  * Busca, qualidade, mercados, regiões, período
  */
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Search, Filter, X } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { useState, useCallback, useMemo } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Search, Filter, X } from 'lucide-react';
+import { trpc } from '@/lib/trpc/client';
 
 export interface MapFiltersState {
   searchText: string;
@@ -31,41 +33,42 @@ export interface MapFiltersProps {
 }
 
 const UFS_BRASIL = [
-  "AC",
-  "AL",
-  "AP",
-  "AM",
-  "BA",
-  "CE",
-  "DF",
-  "ES",
-  "GO",
-  "MA",
-  "MT",
-  "MS",
-  "MG",
-  "PA",
-  "PB",
-  "PR",
-  "PE",
-  "PI",
-  "RJ",
-  "RN",
-  "RS",
-  "RO",
-  "RR",
-  "SC",
-  "SP",
-  "SE",
-  "TO",
-];
+  'AC',
+  'AL',
+  'AP',
+  'AM',
+  'BA',
+  'CE',
+  'DF',
+  'ES',
+  'GO',
+  'MA',
+  'MT',
+  'MS',
+  'MG',
+  'PA',
+  'PB',
+  'PR',
+  'PE',
+  'PI',
+  'RJ',
+  'RN',
+  'RS',
+  'RO',
+  'RR',
+  'SC',
+  'SP',
+  'SE',
+  'TO',
+] as const;
 
-export default function MapFilters({
-  projectId,
-  pesquisaId,
-  filters,
-  onChange,
-}: MapFiltersProps) {
+const QUALITY_SLIDER_CONFIG = {
+  min: 0,
+  max: 100,
+  step: 5,
+} as const;
+
+export default function MapFilters({ projectId, pesquisaId, filters, onChange }: MapFiltersProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Buscar mercados disponíveis
@@ -74,45 +77,64 @@ export default function MapFilters({
     pesquisaId,
   });
 
-  const handleSearchChange = (text: string) => {
-    onChange({ ...filters, searchText: text });
-  };
+  const handleSearchChange = useCallback(
+    (text: string) => {
+      onChange({ ...filters, searchText: text });
+    },
+    [filters, onChange]
+  );
 
-  const handleQualityChange = (value: number[]) => {
-    onChange({ ...filters, minQuality: value[0] });
-  };
+  const handleQualityChange = useCallback(
+    (value: number[]) => {
+      onChange({ ...filters, minQuality: value[0] });
+    },
+    [filters, onChange]
+  );
 
-  const handleMercadoToggle = (mercadoId: number) => {
-    const selected = filters.selectedMercados.includes(mercadoId)
-      ? filters.selectedMercados.filter(id => id !== mercadoId)
-      : [...filters.selectedMercados, mercadoId];
-    onChange({ ...filters, selectedMercados: selected });
-  };
+  const handleMercadoToggle = useCallback(
+    (mercadoId: number) => {
+      const selected = filters.selectedMercados.includes(mercadoId)
+        ? filters.selectedMercados.filter((id) => id !== mercadoId)
+        : [...filters.selectedMercados, mercadoId];
+      onChange({ ...filters, selectedMercados: selected });
+    },
+    [filters, onChange]
+  );
 
-  const handleUFToggle = (uf: string) => {
-    const selected = filters.selectedUFs.includes(uf)
-      ? filters.selectedUFs.filter(u => u !== uf)
-      : [...filters.selectedUFs, uf];
-    onChange({ ...filters, selectedUFs: selected });
-  };
+  const handleUFToggle = useCallback(
+    (uf: string) => {
+      const selected = filters.selectedUFs.includes(uf)
+        ? filters.selectedUFs.filter((u) => u !== uf)
+        : [...filters.selectedUFs, uf];
+      onChange({ ...filters, selectedUFs: selected });
+    },
+    [filters, onChange]
+  );
 
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     onChange({
-      searchText: "",
+      searchText: '',
       minQuality: 0,
       selectedMercados: [],
       selectedUFs: [],
       dateFrom: undefined,
       dateTo: undefined,
     });
-  };
+  }, [onChange]);
 
-  const activeFiltersCount =
-    (filters.searchText ? 1 : 0) +
-    (filters.minQuality > 0 ? 1 : 0) +
-    (filters.selectedMercados.length > 0 ? 1 : 0) +
-    (filters.selectedUFs.length > 0 ? 1 : 0) +
-    (filters.dateFrom || filters.dateTo ? 1 : 0);
+  const toggleAdvanced = useCallback(() => {
+    setShowAdvanced((prev) => !prev);
+  }, []);
+
+  const activeFiltersCount = useMemo(
+    () =>
+      (filters.searchText ? 1 : 0) +
+      (filters.minQuality > 0 ? 1 : 0) +
+      (filters.selectedMercados.length > 0 ? 1 : 0) +
+      (filters.selectedUFs.length > 0 ? 1 : 0) +
+      (filters.dateFrom || filters.dateTo ? 1 : 0),
+    [filters]
+  );
 
   return (
     <Card className="w-full">
@@ -124,7 +146,7 @@ export default function MapFilters({
           </CardTitle>
           {activeFiltersCount > 0 && (
             <Badge variant="secondary" className="text-xs">
-              {activeFiltersCount} ativo{activeFiltersCount > 1 ? "s" : ""}
+              {activeFiltersCount} ativo{activeFiltersCount > 1 ? 's' : ''}
             </Badge>
           )}
         </div>
@@ -138,12 +160,12 @@ export default function MapFilters({
             <Input
               placeholder="Nome, cidade..."
               value={filters.searchText}
-              onChange={e => handleSearchChange(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-8"
             />
             {filters.searchText && (
               <button
-                onClick={() => handleSearchChange("")}
+                onClick={() => handleSearchChange('')}
                 className="absolute right-2 top-2.5 text-muted-foreground hover:text-foreground"
               >
                 <X className="h-4 w-4" />
@@ -156,28 +178,21 @@ export default function MapFilters({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-xs">Qualidade Mínima</Label>
-            <span className="text-xs text-muted-foreground">
-              {filters.minQuality}%
-            </span>
+            <span className="text-xs text-muted-foreground">{filters.minQuality}%</span>
           </div>
           <Slider
             value={[filters.minQuality]}
             onValueChange={handleQualityChange}
-            min={0}
-            max={100}
-            step={5}
+            min={QUALITY_SLIDER_CONFIG.min}
+            max={QUALITY_SLIDER_CONFIG.max}
+            step={QUALITY_SLIDER_CONFIG.step}
             className="w-full"
           />
         </div>
 
         {/* Botão para mostrar filtros avançados */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full"
-        >
-          {showAdvanced ? "Ocultar" : "Mostrar"} Filtros Avançados
+        <Button variant="outline" size="sm" onClick={toggleAdvanced} className="w-full">
+          {showAdvanced ? 'Ocultar' : 'Mostrar'} Filtros Avançados
         </Button>
 
         {/* Filtros avançados */}
@@ -188,11 +203,8 @@ export default function MapFilters({
               <div className="space-y-2">
                 <Label className="text-xs">Mercados</Label>
                 <div className="max-h-40 overflow-y-auto space-y-2 border rounded-md p-2">
-                  {mercados.map(mercado => (
-                    <div
-                      key={mercado.id}
-                      className="flex items-center space-x-2"
-                    >
+                  {mercados.map((mercado) => (
+                    <div key={mercado.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={`mercado-${mercado.id}`}
                         checked={filters.selectedMercados.includes(mercado.id)}
@@ -214,17 +226,14 @@ export default function MapFilters({
             <div className="space-y-2">
               <Label className="text-xs">Estados (UF)</Label>
               <div className="max-h-40 overflow-y-auto grid grid-cols-3 gap-2 border rounded-md p-2">
-                {UFS_BRASIL.map(uf => (
+                {UFS_BRASIL.map((uf) => (
                   <div key={uf} className="flex items-center space-x-2">
                     <Checkbox
                       id={`uf-${uf}`}
                       checked={filters.selectedUFs.includes(uf)}
                       onCheckedChange={() => handleUFToggle(uf)}
                     />
-                    <label
-                      htmlFor={`uf-${uf}`}
-                      className="text-xs cursor-pointer"
-                    >
+                    <label htmlFor={`uf-${uf}`} className="text-xs cursor-pointer">
                       {uf}
                     </label>
                   </div>
@@ -236,12 +245,7 @@ export default function MapFilters({
 
         {/* Botão limpar filtros */}
         {activeFiltersCount > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClearFilters}
-            className="w-full"
-          >
+          <Button variant="ghost" size="sm" onClick={handleClearFilters} className="w-full">
             <X className="w-4 h-4 mr-2" />
             Limpar Filtros
           </Button>

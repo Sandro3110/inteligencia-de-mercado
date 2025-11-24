@@ -1,15 +1,17 @@
+'use client';
+
 /**
  * Componente de Marcador Personalizado
  *
  * Marcadores customizados por tipo (cliente, concorrente, lead)
  */
 
-import { Marker, Popup } from "react-leaflet";
-import L, { DivIcon } from "leaflet";
-import { Building2, Users, Target } from "lucide-react";
-import { renderToString } from "react-dom/server";
+import { Marker, Popup } from 'react-leaflet';
+import L, { DivIcon } from 'leaflet';
+import { Building2, Users, Target, type LucideIcon } from 'lucide-react';
+import { renderToString } from 'react-dom/server';
 
-export type MarkerType = "cliente" | "concorrente" | "lead";
+export type MarkerType = 'cliente' | 'concorrente' | 'lead';
 
 interface CustomMarkerProps {
   /** Posição [latitude, longitude] */
@@ -24,30 +26,37 @@ interface CustomMarkerProps {
   onClick?: () => void;
 }
 
+const MARKER_ICONS: Record<MarkerType, LucideIcon> = {
+  cliente: Building2,
+  concorrente: Users,
+  lead: Target,
+};
+
+const ICON_CONFIG = {
+  size: [32, 32] as [number, number],
+  anchor: [16, 16] as [number, number],
+  popupAnchor: [0, -16] as [number, number],
+  iconSize: 18,
+} as const;
+
 /**
  * Cria ícone customizado baseado no tipo
  */
 function createCustomIcon(type: MarkerType): DivIcon {
-  const icons = {
-    cliente: Building2,
-    concorrente: Users,
-    lead: Target,
-  };
-
-  const Icon = icons[type];
+  const Icon = MARKER_ICONS[type];
 
   const iconHtml = renderToString(
     <div className={`custom-marker-icon marker-${type}`}>
-      <Icon size={18} />
+      <Icon size={ICON_CONFIG.iconSize} />
     </div>
   );
 
   return L.divIcon({
     html: iconHtml,
-    className: "custom-marker",
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
-    popupAnchor: [0, -16],
+    className: 'custom-marker',
+    iconSize: ICON_CONFIG.size,
+    iconAnchor: ICON_CONFIG.anchor,
+    popupAnchor: ICON_CONFIG.popupAnchor,
   });
 }
 
