@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   // Configurações de performance
   reactStrictMode: true,
+  swcMinify: true,
   
   // Turbopack para dev (mais rápido que Webpack)
   experimental: {
@@ -19,6 +20,12 @@ const nextConfig: NextConfig = {
   // Otimização de imagens
   images: {
     formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: 'https',
@@ -28,8 +35,17 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'maps.googleapis.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.intelmarket.com.br',
+      },
     ],
   },
+
+  // Otimização de bundle
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: true,
 
   // Configuração de headers de segurança
   async headers() {
