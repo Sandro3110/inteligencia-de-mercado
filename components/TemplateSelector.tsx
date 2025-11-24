@@ -1,104 +1,262 @@
 'use client';
 
-import { useState } from "react";
-import { trpc } from "@/lib/trpc/client";
+import { useCallback, useMemo } from 'react';
+import { trpc } from '@/lib/trpc/client';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Sparkles } from "lucide-react";
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle2, Sparkles } from 'lucide-react';
 
-interface TemplateSelectorProps {
-  onSelect: (templateId: number, config: any) => void;
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const ICON_SIZES = {
+  SMALL: 'w-3 h-3',
+  MEDIUM: 'w-5 h-5',
+} as const;
+
+const SPACING = {
+  ICON_MARGIN: 'mr-1',
+} as const;
+
+const CLASSES = {
+  CONTAINER: 'grid grid-cols-1 md:grid-cols-3 gap-4',
+  LOADING: 'text-center text-muted-foreground',
+  CARD_BASE: 'cursor-pointer transition-all hover:shadow-md',
+  CARD_SELECTED: 'border-primary border-2 bg-primary/5',
+  HEADER_CONTAINER: 'flex items-start justify-between',
+  HEADER_CONTENT: 'flex-1',
+  TITLE: 'text-base flex items-center gap-2',
+  DESCRIPTION: 'text-xs mt-1',
+  CHECK_ICON: 'text-primary flex-shrink-0',
+  CONTENT: 'space-y-2 text-xs',
+  INFO_ROW: 'flex items-center justify-between',
+  INFO_LABEL: 'text-muted-foreground',
+  INFO_VALUE: 'font-medium',
+} as const;
+
+const LABELS = {
+  LOADING: 'Carregando templates...',
+  NO_TEMPLATES: 'Nenhum template disponível',
+  DEFAULT_BADGE: 'Padrão',
+  SEGMENTATION: 'Segmentação:',
+  MIN_SCORE: 'Score mínimo:',
+  APIS: 'APIs:',
+  SOURCES: (count: number) => `${count} fontes`,
+  SCORE_FORMAT: (score: number) => `${score}/100`,
+} as const;
+
+const DEFAULT_IS_DEFAULT_VALUE = 1;
+const PLACEHOLDER_TEMPLATE_ID = 1;
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface TemplateSelectorProps {
+  onSelect: (templateId: number, config: unknown) => void;
   selectedTemplateId?: number;
 }
 
+interface TemplateConfig {
+  targetSegmentation: string;
+  minQualityScore: number;
+  dataApis?: unknown[];
+}
+
+interface Template {
+  id: number;
+  name: string;
+  description: string;
+  isDefault: number;
+  config: string;
+}
+
+interface TemplateCardProps {
+  template: Template;
+  isSelected: boolean;
+  onSelect: (templateId: number, config: unknown) => void;
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function parseTemplateConfig(configString: string): TemplateConfig {
+  try {
+    return JSON.parse(configString);
+  } catch (e) {
+    console.error('Error parsing template config:', e);
+    return {
+      targetSegmentation: '',
+      minQualityScore: 0,
+      dataApis: [],
+    };
+  }
+}
+
+function isDefaultTemplate(template: Template): boolean {
+  return template.isDefault === DEFAULT_IS_DEFAULT_VALUE;
+}
+
+function getCardClasses(isSelected: boolean): string {
+  return `${CLASSES.CARD_BASE} ${isSelected ? CLASSES.CARD_SELECTED : ''}`;
+}
+
+function getApiCount(config: TemplateConfig): number {
+  return config.dataApis?.length || 0;
+}
+
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
+
+function LoadingState() {
+  return <div className={CLASSES.LOADING}>{LABELS.LOADING}</div>;
+}
+
+function EmptyState() {
+  return <div className={CLASSES.LOADING}>{LABELS.NO_TEMPLATES}</div>;
+}
+
+function DefaultBadge() {
+  return (
+    <Badge variant="secondary" className={CLASSES.DESCRIPTION}>
+      <Sparkles className={`${ICON_SIZES.SMALL} ${SPACING.ICON_MARGIN}`} />
+      {LABELS.DEFAULT_BADGE}
+    </Badge>
+  );
+}
+
+function TemplateCard({ template, isSelected, onSelect }: TemplateCardProps) {
+  const config = useMemo(() => parseTemplateConfig(template.config), [template.config]);
+
+  const isDefault = useMemo(() => isDefaultTemplate(template), [template]);
+
+  const cardClasses = useMemo(() => getCardClasses(isSelected), [isSelected]);
+
+  const apiCount = useMemo(() => getApiCount(config), [config]);
+
+  const handleClick = useCallback(() => {
+    onSelect(template.id, config);
+  }, [template.id, config, onSelect]);
+
+  return (
+    <Card className={cardClasses} onClick={handleClick}>
+      <CardHeader>
+        <div className={CLASSES.HEADER_CONTAINER}>
+          <div className={CLASSES.HEADER_CONTENT}>
+            <CardTitle className={CLASSES.TITLE}>
+              {template.name}
+              {isDefault && <DefaultBadge />}
+            </CardTitle>
+            <CardDescription className={CLASSES.DESCRIPTION}>
+              {template.description}
+            </CardDescription>
+          </div>
+          {isSelected && (
+            <CheckCircle2 className={`${ICON_SIZES.MEDIUM} ${CLASSES.CHECK_ICON}`} />
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <div className={CLASSES.CONTENT}>
+          <div className={CLASSES.INFO_ROW}>
+            <span className={CLASSES.INFO_LABEL}>{LABELS.SEGMENTATION}</span>
+            <Badge variant="outline">{config.targetSegmentation}</Badge>
+          </div>
+
+          <div className={CLASSES.INFO_ROW}>
+            <span className={CLASSES.INFO_LABEL}>{LABELS.MIN_SCORE}</span>
+            <span className={CLASSES.INFO_VALUE}>
+              {LABELS.SCORE_FORMAT(config.minQualityScore)}
+            </span>
+          </div>
+
+          <div className={CLASSES.INFO_ROW}>
+            <span className={CLASSES.INFO_LABEL}>{LABELS.APIS}</span>
+            <span className={CLASSES.INFO_VALUE}>{LABELS.SOURCES(apiCount)}</span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+/**
+ * TemplateSelector
+ * 
+ * Componente para seleção de templates de configuração.
+ * Exibe cards com informações de cada template e permite seleção.
+ * 
+ * ⚠️ Nota: O router de templates ainda não existe, usando placeholder.
+ * 
+ * @example
+ * ```tsx
+ * <TemplateSelector
+ *   onSelect={handleTemplateSelect}
+ *   selectedTemplateId={currentTemplateId}
+ * />
+ * ```
+ */
 export function TemplateSelector({
   onSelect,
   selectedTemplateId,
 }: TemplateSelectorProps) {
-  const { data: templates, isLoading } = trpc.templates.byId.useQuery(1); // Placeholder - templates router não existe
+  // Query - Placeholder: templates router não existe
+  const { data: templates, isLoading } = trpc.templates.byId.useQuery(
+    PLACEHOLDER_TEMPLATE_ID
+  );
+
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const hasTemplates = useMemo(() => !!templates, [templates]);
+
+  const templatesList = useMemo(
+    () => (templates ? [templates] : []),
+    [templates]
+  );
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   if (isLoading) {
-    return (
-      <div className="text-center text-muted-foreground">
-        Carregando templates...
-      </div>
-    );
+    return <LoadingState />;
   }
 
-  if (!templates) {
-    return (
-      <div className="text-center text-muted-foreground">
-        Nenhum template disponível
-      </div>
-    );
+  if (!hasTemplates) {
+    return <EmptyState />;
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {templates &&
-        [templates].map((template: any) => {
-          const isSelected = selectedTemplateId === template.id;
-          const config = JSON.parse(template.config);
+    <div className={CLASSES.CONTAINER}>
+      {templatesList.map((template) => {
+        const isSelected = selectedTemplateId === template.id;
 
-          return (
-            <Card
-              key={template.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                isSelected ? "border-primary border-2 bg-primary/5" : ""
-              }`}
-              onClick={() => onSelect(template.id, config)}
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      {template.name}
-                      {template.isDefault === 1 && (
-                        <Badge variant="secondary" className="text-xs">
-                          <Sparkles className="w-3 h-3 mr-1" />
-                          Padrão
-                        </Badge>
-                      )}
-                    </CardTitle>
-                    <CardDescription className="text-xs mt-1">
-                      {template.description}
-                    </CardDescription>
-                  </div>
-                  {isSelected && (
-                    <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Segmentação:</span>
-                    <Badge variant="outline">{config.targetSegmentation}</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Score mínimo:</span>
-                    <span className="font-medium">
-                      {config.minQualityScore}/100
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">APIs:</span>
-                    <span className="font-medium">
-                      {config.dataApis?.length || 0} fontes
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+        return (
+          <TemplateCard
+            key={template.id}
+            template={template}
+            isSelected={isSelected}
+            onSelect={onSelect}
+          />
+        );
+      })}
     </div>
   );
 }
