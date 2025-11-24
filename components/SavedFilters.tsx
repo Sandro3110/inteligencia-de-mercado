@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import { Bookmark, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 

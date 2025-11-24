@@ -1,3 +1,5 @@
+'use client';
+
 import { useLocation, Link } from "wouter";
 import {
   BarChart3,
@@ -31,7 +33,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { useUnreadNotificationsCount } from "@/hooks/useUnreadNotificationsCount";
 import {

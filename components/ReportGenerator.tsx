@@ -1,5 +1,7 @@
+'use client';
+
 import { useState } from "react";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import {
   Card,

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from "react";
 import {
   DndContext,
@@ -10,7 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 

@@ -1,3 +1,5 @@
+'use client';
+
 import Joyride, { CallBackProps, STATUS, EVENTS } from "react-joyride";
 import { useTour, TourType, TOURS } from "@/hooks/useTour";
 import { useEffect } from "react";

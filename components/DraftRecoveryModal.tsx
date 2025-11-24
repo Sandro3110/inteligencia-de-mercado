@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Modal de Recuperação de Drafts - Fase 70.2
  * Permite listar, visualizar e gerenciar rascunhos salvos de pesquisas
@@ -26,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import {
   FileText,
   Trash2,

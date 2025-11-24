@@ -1,6 +1,8 @@
+'use client';
+
 import { useState } from "react";
 import { Filter, X } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { TagBadge } from "./TagBadge";

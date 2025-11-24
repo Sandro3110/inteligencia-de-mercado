@@ -1,3 +1,5 @@
+'use client';
+
 import { useCompactMode } from "@/contexts/CompactModeContext";
 import { Button } from "@/components/ui/button";
 import { Maximize2, Minimize2 } from "lucide-react";

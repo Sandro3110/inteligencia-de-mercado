@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useMemo } from "react";
 import {
   Dialog,
@@ -8,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import {
   BarChart,
   Bar,

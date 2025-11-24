@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from "react";
 import {
   X,
@@ -31,7 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import { toast } from "sonner";
 import {
   AlertDialog,

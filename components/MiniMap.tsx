@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * MiniMap - Fase 70.3
  * Componente compacto de mapa para exibir localização única

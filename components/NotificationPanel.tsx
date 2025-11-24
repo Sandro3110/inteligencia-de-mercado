@@ -1,3 +1,5 @@
+'use client';
+
 import { useWebSocket, Notification } from "@/hooks/useWebSocket";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";

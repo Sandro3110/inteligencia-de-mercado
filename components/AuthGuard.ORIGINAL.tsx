@@ -1,3 +1,5 @@
+'use client';
+
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { useEffect } from "react";

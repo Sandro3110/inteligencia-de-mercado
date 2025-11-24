@@ -1,3 +1,5 @@
+'use client';
+
 import { Link, useLocation } from "wouter";
 import { CompactModeToggle } from "./CompactModeToggle";
 import { useOnboarding } from "@/contexts/OnboardingContext";

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, useRef } from "react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,7 +15,7 @@ import {
   isValidCNPJFormat,
   isValidEmailFormat,
 } from "@shared/qualityScore";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import { DetailPopup } from "@/components/DetailPopup";
 import { DynamicBreadcrumbs } from "@/components/DynamicBreadcrumbs";
 import { TagManager } from "@/components/TagManager";

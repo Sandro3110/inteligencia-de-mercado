@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useEffect, useRef } from "react";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";

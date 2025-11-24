@@ -1,3 +1,5 @@
+'use client';
+
 import { Link, useLocation } from "wouter";
 import {
   ChevronRight,
