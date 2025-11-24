@@ -172,7 +172,7 @@ async function processClienteWithRetry(
       // Sucesso!
       recordCircuitBreakerSuccess();
       return { success: true, retries: attempt };
-    } catch (error: any) {
+    } catch (error: unknown) {
       lastError = error;
       recordCircuitBreakerFailure();
 

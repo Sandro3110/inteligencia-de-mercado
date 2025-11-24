@@ -86,7 +86,7 @@ async function checkAndExecuteSchedules() {
   }
 }
 
-async function executeSchedule(schedule: any) {
+async function executeSchedule(schedule: unknown) {
   const db = await getDb();
   if (!db) return;
 
@@ -136,7 +136,7 @@ async function executeSchedule(schedule: any) {
     // Executar enriquecimento em background
     executeEnrichmentFlow(
       {
-        clientes: clientes.map((c: any) => ({
+        clientes: clientes.map((c: unknown) => ({
           nome: c.nome,
           cnpj: c.cnpj || undefined,
           site: c.site || undefined,
@@ -144,7 +144,7 @@ async function executeSchedule(schedule: any) {
         })),
         projectName: `Agendamento #${schedule.id}`,
       },
-      async (progress: any) => {
+      async (progress: unknown) => {
         if (progress.status === "completed") {
           console.log(
             `[ScheduleWorker] Agendamento #${schedule.id} concluído com sucesso`
@@ -180,7 +180,7 @@ async function executeSchedule(schedule: any) {
     console.log(
       `[ScheduleWorker] Enriquecimento iniciado para agendamento #${schedule.id}`
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(
       `[ScheduleWorker] Erro ao executar agendamento #${schedule.id}:`,
       error
@@ -196,7 +196,7 @@ async function executeSchedule(schedule: any) {
   }
 }
 
-async function createNextSchedule(schedule: any) {
+async function createNextSchedule(schedule: unknown) {
   const db = await getDb();
   if (!db) return;
 

@@ -115,7 +115,7 @@ export async function enrichClientesBatch(
           leads: result.leadsCreated,
           duration,
         };
-      } catch (error: any) {
+      } catch (error: unknown) {
         const duration = Date.now() - startTime;
 
         return {

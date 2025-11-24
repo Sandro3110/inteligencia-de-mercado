@@ -312,7 +312,7 @@ async function processJob(jobId: number): Promise<void> {
       try {
         const result = await enrichClienteOptimized(cliente.id, job.projectId);
         return { success: result.success, clienteId: cliente.id };
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(
           `[Job ${jobId}] Erro ao processar cliente ${cliente.id}:`,
           error.message

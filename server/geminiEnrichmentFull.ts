@@ -103,7 +103,7 @@ Retorne um array JSON com ${quantidade} empresas.`;
     const result = JSON.parse(content as string);
 
     // Calcular score de qualidade para cada concorrente
-    const concorrentesComScore = result.concorrentes.map((c: any) => {
+    const concorrentesComScore = result.concorrentes.map((c: unknown) => {
       let qualidadeScore = 0;
 
       if (c.cnpj && !c.cnpj.includes("Não disponível")) qualidadeScore += 25;
@@ -252,7 +252,7 @@ Retorne um array JSON com ${quantidade} leads.`;
     const result = JSON.parse(content as string);
 
     // Calcular score de qualidade para cada lead
-    const leadsComScore = result.leads.map((l: any) => {
+    const leadsComScore = result.leads.map((l: unknown) => {
       let qualidadeScore = 0;
 
       if (l.cnpj && !l.cnpj.includes("Não disponível")) qualidadeScore += 20;

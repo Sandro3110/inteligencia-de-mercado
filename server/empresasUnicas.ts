@@ -26,7 +26,7 @@ export async function isEmpresaUnica(
 ): Promise<{
   isUnica: boolean;
   encontradaEm?: "cliente" | "concorrente" | "lead";
-  registro?: any;
+  registro?: unknown;
 }> {
   const db = await getDb();
   if (!db) {

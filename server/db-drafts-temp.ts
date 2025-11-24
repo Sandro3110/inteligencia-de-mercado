@@ -10,7 +10,7 @@ export interface ResearchDraft {
   id: number;
   userId: string;
   projectId: number | null;
-  draftData: any;
+  draftData: unknown;
   currentStep: number;
   createdAt: string;
   updatedAt: string;
@@ -18,7 +18,7 @@ export interface ResearchDraft {
 
 export async function saveResearchDraft(
   userId: string,
-  draftData: any,
+  draftData: unknown,
   currentStep: number,
   projectId?: number | null
 ): Promise<ResearchDraft | null> {

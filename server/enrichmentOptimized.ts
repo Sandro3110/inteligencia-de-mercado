@@ -125,7 +125,7 @@ export async function enrichClienteOptimized(
     // 2.5 Atualizar cliente com dados enriquecidos (incluindo coordenadas)
     if (allData.clienteEnriquecido) {
       const enriched = allData.clienteEnriquecido;
-      const updateData: any = {};
+      const updateData: unknown = {};
 
       if (enriched.siteOficial)
         updateData.siteOficial = truncate(enriched.siteOficial, 500);
@@ -264,7 +264,7 @@ export async function enrichClienteOptimized(
           .limit(1);
 
         if (!existing) {
-          const concorrenteInsert: any = {
+          const concorrenteInsert: unknown = {
             projectId,
             pesquisaId: cliente.pesquisaId || null,
             mercadoId,
@@ -330,7 +330,7 @@ export async function enrichClienteOptimized(
           .limit(1);
 
         if (!existing) {
-          const leadInsert: any = {
+          const leadInsert: unknown = {
             projectId,
             pesquisaId: cliente.pesquisaId || null,
             mercadoId,

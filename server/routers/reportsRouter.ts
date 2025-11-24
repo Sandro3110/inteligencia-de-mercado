@@ -115,7 +115,7 @@ export const reportsRouter = router({
         throw new Error("Não autorizado");
       }
 
-      const updateData: any = {};
+      const updateData: unknown = {};
 
       if (input.name !== undefined) updateData.name = input.name;
       if (input.frequency !== undefined) updateData.frequency = input.frequency;

@@ -176,7 +176,7 @@ export async function startBatchEnrichment(
 
         sucessosBloco++;
         currentJob.sucessos++;
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(
           `[BatchProcessor] ❌ Erro ao enriquecer cliente ${cliente.id}:`,
           error.message

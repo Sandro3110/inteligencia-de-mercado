@@ -33,10 +33,10 @@ export type EnrichmentProgress = {
   data?: {
     projectId?: number;
     projectName?: string;
-    clientes?: any[];
-    mercados?: any[];
-    concorrentes?: any[];
-    leads?: any[];
+    clientes?: unknown[];
+    mercados?: unknown[];
+    concorrentes?: unknown[];
+    leads?: unknown[];
     stats?: {
       mercadosCount?: number;
       clientesCount?: number;
@@ -492,7 +492,7 @@ async function enrichClientes(
 
   for (const cliente of clientes) {
     // Tentar buscar dados do cache primeiro
-    let dadosEnriquecidos: any = null;
+    let dadosEnriquecidos: unknown = null;
     if (cliente.cnpj) {
       const cnpjLimpo = cliente.cnpj.replace(/\D/g, "");
       if (cnpjLimpo.length === 14) {
@@ -554,7 +554,7 @@ async function enrichClientes(
     }
 
     // Usar dados enriquecidos se disponíveis
-    const clienteData: any = {
+    const clienteData: unknown = {
       ...cliente,
       nome: dadosEnriquecidos?.nome || cliente.nome,
       porte: dadosEnriquecidos?.porte,
@@ -641,7 +641,7 @@ async function findCompetitorsForMarkets(
   const { filterDuplicates } = await import("./_core/deduplication");
   const { filterRealCompanies } = await import("./_core/companyFilters");
   const { geocodeConcorrente } = await import("./geocodeHelper");
-  const concorrentes: any[] = [];
+  const concorrentes: unknown[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {
@@ -788,7 +788,7 @@ async function findLeadsForMarkets(
   const { filterDuplicates } = await import("./_core/deduplication");
   const { filterRealCompanies } = await import("./_core/companyFilters");
   const { geocodeLead } = await import("./geocodeHelper");
-  const leads: any[] = [];
+  const leads: unknown[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {

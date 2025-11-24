@@ -26,7 +26,7 @@ import type {
  * Constrói uma condição SQL a partir de um FilterCondition
  */
 function buildCondition(
-  table: any,
+  table: unknown,
   condition: FilterCondition
 ): SQL | undefined {
   const { field, operator, value } = condition;
@@ -86,7 +86,7 @@ function buildCondition(
 /**
  * Constrói um grupo de condições com operador lógico
  */
-function buildGroup(table: any, group: FilterGroup): SQL | undefined {
+function buildGroup(table: unknown, group: FilterGroup): SQL | undefined {
   const conditions = group.conditions
     .map(condition => buildCondition(table, condition))
     .filter((c): c is SQL => c !== undefined);
@@ -103,7 +103,7 @@ function buildGroup(table: any, group: FilterGroup): SQL | undefined {
  * Constrói query SQL completa a partir de AdvancedFilter
  */
 export function buildDynamicQuery(
-  table: any,
+  table: unknown,
   filter: AdvancedFilter
 ): SQL | undefined {
   const groups = filter.groups

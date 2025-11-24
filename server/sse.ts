@@ -39,7 +39,7 @@ function removeSSEClient(clientId: string) {
 /**
  * Envia evento SSE para um usuário específico
  */
-export function sendSSEToUser(userId: string, event: string, data: any) {
+export function sendSSEToUser(userId: string, event: string, data: unknown) {
   const userClients = clients.filter(c => c.userId === userId);
   userClients.forEach(client => {
     client.res.write(`event: ${event}\n`);
@@ -50,7 +50,7 @@ export function sendSSEToUser(userId: string, event: string, data: any) {
 /**
  * Envia evento SSE para todos os clientes
  */
-export function broadcastSSE(event: string, data: any) {
+export function broadcastSSE(event: string, data: unknown) {
   clients.forEach(client => {
     client.res.write(`event: ${event}\n`);
     client.res.write(`data: ${JSON.stringify(data)}\n\n`);

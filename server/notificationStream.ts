@@ -55,7 +55,7 @@ export function handleNotificationStream(req: Request, res: Response) {
   });
 
   // Listener para novas notificações
-  const notificationListener = (notification: any) => {
+  const notificationListener = (notification: unknown) => {
     // Enviar apenas para o usuário correto
     if (notification.userId === user.id) {
       sendEvent(res, "notification", notification);
@@ -81,7 +81,7 @@ export function handleNotificationStream(req: Request, res: Response) {
 /**
  * Enviar evento SSE formatado
  */
-function sendEvent(res: Response, event: string, data: any) {
+function sendEvent(res: Response, event: string, data: unknown) {
   res.write(`event: ${event}\n`);
   res.write(`data: ${JSON.stringify(data)}\n\n`);
 }
@@ -89,7 +89,7 @@ function sendEvent(res: Response, event: string, data: any) {
 /**
  * Broadcast de nova notificação para usuário específico
  */
-export function broadcastNotification(userId: string, notification: any) {
+export function broadcastNotification(userId: string, notification: unknown) {
   notificationEmitter.emit("new-notification", {
     ...notification,
     userId,

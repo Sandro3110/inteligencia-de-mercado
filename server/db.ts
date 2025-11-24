@@ -1258,7 +1258,7 @@ export async function updateProject(
 
     // Log de auditoria com comparação
     if (oldProject) {
-      const changes: Record<string, { before: any; after: any }> = {};
+      const changes: Record<string, { before: unknown; after: unknown }> = {};
 
       if (data.nome !== undefined && data.nome !== oldProject.nome) {
         changes.nome = { before: oldProject.nome, after: data.nome };
@@ -1311,7 +1311,7 @@ export async function deleteProject(id: number): Promise<boolean> {
  */
 export async function canDeleteProject(
   projectId: number
-): Promise<{ canDelete: boolean; reason?: string; stats?: any }> {
+): Promise<{ canDelete: boolean; reason?: string; stats?: unknown }> {
   const db = await getDb();
   if (!db) return { canDelete: false, reason: "Database not available" };
 
@@ -1553,7 +1553,7 @@ export async function logProjectChange(
   projectId: number,
   userId: string | null,
   action: "created" | "updated" | "hibernated" | "reactivated" | "deleted",
-  changes?: Record<string, { before: any; after: any }>,
+  changes?: Record<string, { before: unknown; after: unknown }>,
   metadata?: Record<string, any>
 ): Promise<void> {
   const db = await getDb();
@@ -1692,7 +1692,7 @@ export async function duplicateProject(
     }
 
     return { success: true, newProjectId };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[Database] Failed to duplicate project:", error);
     return { success: false, error: error.message };
   }
@@ -1989,7 +1989,7 @@ export async function updateMercado(
   const db = await getDb();
   if (!db) return null;
 
-  const updateData: any = {};
+  const updateData: Record<string, unknown> = {};
   if (data.nome !== undefined) updateData.nome = data.nome;
   if (data.categoria !== undefined) updateData.categoria = data.categoria;
   if (data.segmentacao !== undefined) updateData.segmentacao = data.segmentacao;
@@ -2227,7 +2227,7 @@ export async function updateCliente(
   const db = await getDb();
   if (!db) return null;
 
-  const updateData: any = {};
+  const updateData: Record<string, unknown> = {};
   Object.keys(data).forEach(key => {
     if (data[key as keyof typeof data] !== undefined) {
       updateData[key] = data[key as keyof typeof data];
@@ -2390,7 +2390,7 @@ export async function updateConcorrente(
   const db = await getDb();
   if (!db) return null;
 
-  const updateData: any = {};
+  const updateData: Record<string, unknown> = {};
   Object.keys(data).forEach(key => {
     if (data[key as keyof typeof data] !== undefined) {
       updateData[key] = data[key as keyof typeof data];
@@ -2559,7 +2559,7 @@ export async function updateLead(
   const db = await getDb();
   if (!db) return null;
 
-  const updateData: any = {};
+  const updateData: Record<string, unknown> = {};
   Object.keys(data).forEach(key => {
     if (data[key as keyof typeof data] !== undefined) {
       updateData[key] = data[key as keyof typeof data];
@@ -2638,7 +2638,7 @@ export async function updateTemplate(
   const db = await getDb();
   if (!db) return null;
 
-  const updateData: any = {};
+  const updateData: Record<string, unknown> = {};
   Object.keys(data).forEach(key => {
     if (data[key as keyof typeof data] !== undefined) {
       updateData[key] = data[key as keyof typeof data];
@@ -2675,7 +2675,7 @@ export async function deleteTemplate(id: number) {
 
 export async function searchLeadsAdvanced(
   projectId: number,
-  filter: any,
+  filter: unknown,
   page: number = 1,
   pageSize: number = 20
 ) {
@@ -3183,7 +3183,7 @@ export async function updateEnrichmentRun(
   const { enrichmentRuns } = await import("../drizzle/schema");
 
   // Convert Date to MySQL timestamp string
-  const updateData: any = { ...data };
+  const updateData: Record<string, unknown> = { ...data };
   if (data.completedAt) {
     updateData.completedAt = toPostgresTimestamp(data.completedAt);
   }
@@ -3500,7 +3500,7 @@ export async function getFunnelData(projectId: number) {
 
   // Mapear para objeto
   const stageCounts: Record<string, number> = {};
-  stageCountsResult.forEach((row: any) => {
+  stageCountsResult.forEach((row: Record<string, unknown>) => {
     stageCounts[row.stage] = row.count;
   });
 
@@ -4121,7 +4121,7 @@ export async function saveEnrichmentConfig(data: {
 
   try {
     // Criptografar API keys antes de salvar
-    const encryptedData: any = { ...data };
+    const encryptedData: Record<string, unknown> = { ...data };
 
     if (data.openaiApiKey) {
       encryptedData.openaiApiKey = encryptApiKey(data.openaiApiKey);
@@ -4337,8 +4337,8 @@ export async function getQualityTrends(projectId: number, days: number = 30) {
       // Agrupar por data e calcular qualidade média
       const dataPoints: Record<string, { total: number; count: number }> = {};
 
-      const processarEntidades = (entidades: any[]) => {
-        entidades.forEach((e: any) => {
+      const processarEntidades = (entidades: unknown[]) => {
+        entidades.forEach((e: Record<string, unknown>) => {
           const entity = e.clientes || e.concorrentes || e.leads || e;
           if (!entity.createdAt) return;
 
@@ -4993,7 +4993,7 @@ type ResearchDraft = {
   id: number;
   userId: string;
   projectId: number | null;
-  draftData: any;
+  draftData: unknown;
   currentStep: number;
   createdAt: Date;
   updatedAt: Date;
@@ -5002,7 +5002,7 @@ type ResearchDraft = {
 // Funções de gerenciamento de drafts de pesquisa (usando raw SQL temporariamente)
 export async function saveResearchDraft(
   userId: string,
-  draftData: any,
+  draftData: unknown,
   currentStep: number,
   projectId?: number | null,
   progressStatus?: "started" | "in_progress" | "almost_done"
@@ -5183,7 +5183,7 @@ export async function getUserDrafts(userId: string): Promise<ResearchDraft[]> {
     `);
 
     const rows = (results as any)[0] || [];
-    return rows.map((draft: any) => ({
+    return rows.map((draft: Record<string, unknown>) => ({
       id: draft.id,
       userId: draft.userId,
       projectId: draft.projectId,
@@ -5250,7 +5250,7 @@ export async function getFilteredDrafts(
     const results = await db.execute(query);
     const rows = (results as any)[0] || [];
 
-    let drafts = rows.map((draft: any) => ({
+    let drafts = rows.map((draft: Record<string, unknown>) => ({
       id: draft.id,
       userId: draft.userId,
       projectId: draft.projectId,
@@ -5267,7 +5267,7 @@ export async function getFilteredDrafts(
     // Filtro por texto (busca no draftData)
     if (filters?.searchText) {
       const searchLower = filters.searchText.toLowerCase();
-      drafts = drafts.filter((draft: any) => {
+      drafts = drafts.filter((draft: Record<string, unknown>) => {
         const dataStr = JSON.stringify(draft.draftData).toLowerCase();
         return dataStr.includes(searchLower);
       });
@@ -5933,7 +5933,7 @@ export async function getTerritorialDensity(
       ? [entityType]
       : ["clientes", "leads", "concorrentes"];
 
-    const densityData: any[] = [];
+    const densityData: unknown[] = [];
 
     for (const table of tables) {
       const query = pesquisaId
@@ -6111,13 +6111,13 @@ export async function getFilterOptions() {
 
     return {
       estados: ((estadosResult as any)[0] || [])
-        .map((row: any) => row.estado)
+        .map((row: Record<string, unknown>) => row.estado)
         .filter(Boolean),
       cidades: ((cidadesResult as any)[0] || [])
-        .map((row: any) => row.cidade)
+        .map((row: Record<string, unknown>) => row.cidade)
         .filter(Boolean),
       tags: ((tagsResult as any)[0] || [])
-        .map((row: any) => row.tag)
+        .map((row: Record<string, unknown>) => row.tag)
         .filter(Boolean),
     };
   } catch (error) {
