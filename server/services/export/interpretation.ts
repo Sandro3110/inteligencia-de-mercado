@@ -15,7 +15,7 @@ export interface ExportQuery {
 
 export interface InterpretedQuery {
   sql: string;
-  params: any[];
+  params: unknown[];
   fields: string[];
   entity: string;
 }
@@ -66,7 +66,7 @@ export function interpretExportQuery(query: ExportQuery): InterpretedQuery {
     fields && fields.length > 0 ? fields : defaultFields[entity] || ["*"];
 
   const whereClauses: string[] = [];
-  const params: any[] = [];
+  const params: unknown[] = [];
 
   if (projectId !== undefined) {
     whereClauses.push("projectId = ?");

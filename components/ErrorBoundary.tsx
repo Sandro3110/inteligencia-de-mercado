@@ -1,6 +1,7 @@
 'use client';
 
 import { Component, ReactNode } from 'react';
+import * as Sentry from '@sentry/nextjs';
 import { cn } from '@/lib/utils';
 import { AlertTriangle, RotateCcw } from 'lucide-react';
 
@@ -87,8 +88,19 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    // Log error para serviço de monitoramento (ex: Sentry)
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // Log error to Sentry
+    Sentry.captureException(error, {
+      contexts: {
+        react: {
+          componentStack: errorInfo.componentStack,
+        },
+      },
+    });
+
+    // Log error para console em desenvolvimento
+    if (process.env.NODE_ENV === 'development') {
+      console.error('ErrorBoundary caught an error:', error, errorInfo);
+    }
   }
 
   private renderErrorUI(): ReactNode {

@@ -35,10 +35,10 @@ export async function executeExportQuery(
     );
   });
   const query = sql.raw(finalSql);
-  const results: any = await db.execute(query);
+  const results: unknown = await db.execute(query);
 
   if (options.formatDates) {
-    return results.map((row: any) => formatDatesInRow(row));
+    return results.map((row: unknown) => formatDatesInRow(row));
   }
 
   return results;
@@ -47,7 +47,7 @@ export async function executeExportQuery(
 /**
  * Formata datas em um objeto para formato legível
  */
-function formatDatesInRow(row: any): any {
+function formatDatesInRow(row: unknown): Record<string, unknown> {
   const formatted = { ...row };
 
   Object.keys(formatted).forEach(key => {
@@ -85,7 +85,7 @@ export async function countExportRecords(
   });
 
   const query = sql.raw(countSql);
-  const result: any = await db.execute(query);
+  const result: unknown = await db.execute(query);
   return result[0]?.total || 0;
 }
 
