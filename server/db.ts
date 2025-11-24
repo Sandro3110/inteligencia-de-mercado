@@ -56,7 +56,7 @@ import {
   InsertReportSchedule,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
-import { now, toMySQLTimestamp } from "./dateUtils";
+import { now, toPostgresTimestamp } from "./dateUtils";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -1075,12 +1075,12 @@ export async function getTimelineValidacoes(days: number = 30) {
 
   const result = await db
     .select({
-      date: sql<string>`DATE(${clientes.validatedAt})`.as("date"),
+      date: sql<string>`${clientes.validatedAt}::date`.as("date"),
       count: sql<number>`count(*)`.as("count"),
     })
     .from(clientes)
     .where(
-      sql`${clientes.validatedAt} >= DATE_SUB(NOW(), INTERVAL ${days} DAY)`
+      sql`${clientes.validatedAt} >= CURRENT_TIMESTAMP - INTERVAL '1 day' * ${days}`
     )
     .groupBy(sql`date`)
     .orderBy(sql`date ASC`);
@@ -1522,7 +1522,7 @@ export async function getInactiveProjects(
 
   const cutoffDateObj = new Date();
   cutoffDateObj.setDate(cutoffDateObj.getDate() - inactiveDays);
-  const cutoffDate = toMySQLTimestamp(cutoffDateObj);
+  const cutoffDate = toPostgresTimestamp(cutoffDateObj);
 
   const result = await db
     .select()
@@ -2770,13 +2770,13 @@ export async function getQualityScoreEvolution(
 
   const result = (await db.execute(sql`
     SELECT 
-      DATE(createdAt) as date,
+      createdAt::date as date,
       AVG(qualidadeScore) as avgScore,
       COUNT(*) as count
     FROM leads
     WHERE projectId = ${projectId}
-      AND createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY)
-    GROUP BY DATE(createdAt)
+      AND createdAt >= CURRENT_TIMESTAMP - INTERVAL '1 day' * ${days}
+    GROUP BY createdAt::date
     ORDER BY date ASC
   `)) as any;
 
@@ -2792,13 +2792,13 @@ export async function getLeadsGrowthOverTime(
 
   const result = (await db.execute(sql`
     SELECT 
-      DATE(createdAt) as date,
+      createdAt::date as date,
       COUNT(*) as count,
-      SUM(COUNT(*)) OVER (ORDER BY DATE(createdAt)) as cumulative
+      SUM(COUNT(*)) OVER (ORDER BY createdAt::date) as cumulative
     FROM leads
     WHERE projectId = ${projectId}
-      AND createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY)
-    GROUP BY DATE(createdAt)
+      AND createdAt >= CURRENT_TIMESTAMP - INTERVAL '1 day' * ${days}
+    GROUP BY createdAt::date
     ORDER BY date ASC
   `)) as any;
 
@@ -3178,7 +3178,7 @@ export async function updateEnrichmentRun(
   // Convert Date to MySQL timestamp string
   const updateData: any = { ...data };
   if (data.completedAt) {
-    updateData.completedAt = toMySQLTimestamp(data.completedAt);
+    updateData.completedAt = toPostgresTimestamp(data.completedAt);
   }
 
   await db
@@ -3599,7 +3599,7 @@ export async function getEvolutionData(
         UNION ALL
         SELECT id, createdAt, 'leads' as table_name FROM leads WHERE projectId = ${projectId} ${pesquisaFilter}
       ) combined
-      WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${months} MONTH)
+      WHERE createdAt >= CURRENT_TIMESTAMP - INTERVAL '1 month' * ${months}
       GROUP BY month
       ORDER BY month ASC
     `);
@@ -4284,7 +4284,7 @@ export async function getQualityTrends(projectId: number, days: number = 30) {
   try {
     const dataLimiteDate = new Date();
     dataLimiteDate.setDate(dataLimiteDate.getDate() - days);
-    const dataLimite = toMySQLTimestamp(dataLimiteDate);
+    const dataLimite = toPostgresTimestamp(dataLimiteDate);
 
     // Buscar todos os mercados do projeto
     const mercadosResult = await db
@@ -4429,9 +4429,9 @@ export async function getProjectsActivity(): Promise<{
   const cutoff60 = new Date(nowDate.getTime() - 60 * 24 * 60 * 60 * 1000);
   const cutoff90 = new Date(nowDate.getTime() - 90 * 24 * 60 * 60 * 1000);
 
-  const cutoff30Str = toMySQLTimestamp(cutoff30);
-  const cutoff60Str = toMySQLTimestamp(cutoff60);
-  const cutoff90Str = toMySQLTimestamp(cutoff90);
+  const cutoff30Str = toPostgresTimestamp(cutoff30);
+  const cutoff60Str = toPostgresTimestamp(cutoff60);
+  const cutoff90Str = toPostgresTimestamp(cutoff90);
 
   const inactiveProjects30 = allProjects.filter(
     p =>
@@ -4656,7 +4656,7 @@ export async function sendHibernationWarning(
     const result = await db.insert(hibernationWarnings).values({
       projectId,
       warningDate: now(),
-      scheduledHibernationDate: toMySQLTimestamp(scheduledHibernationDate),
+      scheduledHibernationDate: toPostgresTimestamp(scheduledHibernationDate),
       daysInactive: daysSinceActivity,
       notificationSent: 0, // Será marcado como 1 após envio
       postponed: 0,
@@ -4736,7 +4736,7 @@ export async function postponeHibernation(
       .update(hibernationWarnings)
       .set({
         postponed: 1,
-        postponedUntil: toMySQLTimestamp(postponedUntil),
+        postponedUntil: toPostgresTimestamp(postponedUntil),
       })
       .where(eq(hibernationWarnings.id, warning.id));
 
@@ -5233,7 +5233,7 @@ export async function getFilteredDrafts(
     if (filters?.daysAgo) {
       const dateLimit = new Date();
       dateLimit.setDate(dateLimit.getDate() - filters.daysAgo);
-      const dateLimitStr = toMySQLTimestamp(dateLimit);
+      const dateLimitStr = toPostgresTimestamp(dateLimit);
       query = sql`${query} AND createdAt >= ${dateLimitStr}`;
     }
 
@@ -5894,7 +5894,7 @@ export async function updateScheduleAfterRun(
       .update(reportSchedules)
       .set({
         lastRunAt: currentTime,
-        nextRunAt: toMySQLTimestamp(nextRunDate),
+        nextRunAt: toPostgresTimestamp(nextRunDate),
       })
       .where(eq(reportSchedules.id, id));
   } catch (error) {

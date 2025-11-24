@@ -18,7 +18,7 @@ import {
 } from "../drizzle/schema";
 import { generateAllDataOptimized } from "./integrations/openaiOptimized";
 import crypto from "crypto";
-import { now, toMySQLTimestamp } from "./dateUtils";
+import { now, toPostgresTimestamp } from "./dateUtils";
 
 interface EnrichmentResult {
   clienteId: number;
@@ -227,7 +227,7 @@ export async function enrichClienteOptimized(
             preco: null,
             unidade: null,
             ativo: 1,
-            createdAt: toMySQLTimestamp(new Date()),
+            createdAt: toPostgresTimestamp(new Date()),
           })
           .onDuplicateKeyUpdate({
             set: {

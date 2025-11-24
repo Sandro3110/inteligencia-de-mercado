@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "./db";
-import { now, toMySQLTimestamp } from "./dateUtils";
+import { now, toPostgresTimestamp } from "./dateUtils";
 import {
   llmProviderConfigs,
   intelligentAlertsConfigs,
@@ -180,7 +180,7 @@ export async function getAlertsStats(
   }
 
   const since = new Date(Date.now() - hours * 60 * 60 * 1000);
-  const sinceStr = toMySQLTimestamp(since);
+  const sinceStr = toPostgresTimestamp(since);
 
   const alerts = await db
     .select()

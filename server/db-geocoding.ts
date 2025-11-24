@@ -5,7 +5,7 @@
 import { eq, and, isNull, or, inArray, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import { clientes, concorrentes, leads } from "../drizzle/schema";
-import { toMySQLTimestamp } from "./_core/dateUtils";
+import { toPostgresTimestamp } from "./_core/dateUtils";
 
 // Interface para registro sem coordenadas
 export interface RecordSemCoordenadas {
@@ -136,7 +136,7 @@ export async function updateClienteCoordinates(
       .set({
         latitude: latitude.toString(),
         longitude: longitude.toString(),
-        geocodedAt: toMySQLTimestamp(new Date()),
+        geocodedAt: toPostgresTimestamp(new Date()),
       })
       .where(eq(clientes.id, id));
 
@@ -168,7 +168,7 @@ export async function updateConcorrenteCoordinates(
       .set({
         latitude: latitude.toString(),
         longitude: longitude.toString(),
-        geocodedAt: toMySQLTimestamp(new Date()),
+        geocodedAt: toPostgresTimestamp(new Date()),
       })
       .where(eq(concorrentes.id, id));
 
@@ -200,7 +200,7 @@ export async function updateLeadCoordinates(
       .set({
         latitude: latitude.toString(),
         longitude: longitude.toString(),
-        geocodedAt: toMySQLTimestamp(new Date()),
+        geocodedAt: toPostgresTimestamp(new Date()),
       })
       .where(eq(leads.id, id));
 

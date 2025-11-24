@@ -28,13 +28,13 @@ export function registerOAuthRoutes(app: Express) {
         return;
       }
 
-      const { toMySQLTimestamp } = await import("../dateUtils");
+      const { toPostgresTimestamp } = await import("../dateUtils");
       await db.upsertUser({
         id: userInfo.openId,
         name: userInfo.name || null,
         email: userInfo.email ?? null,
         loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
-        lastSignedIn: toMySQLTimestamp(new Date()),
+        lastSignedIn: toPostgresTimestamp(new Date()),
       });
 
       const sessionToken = await sdk.createSessionToken(userInfo.openId, {

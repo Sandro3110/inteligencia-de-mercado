@@ -1,6 +1,6 @@
 import { eq, and, sql, gte, lte, desc } from "drizzle-orm";
 import { getDb } from "./db";
-import { toMySQLTimestamp, toMySQLTimestampOrNull, now } from "./dateUtils";
+import { toPostgresTimestamp, toPostgresTimestampOrNull, now } from "./dateUtils";
 import {
   analyticsMercados,
   analyticsPesquisas,
@@ -35,7 +35,7 @@ export async function aggregateMercadoMetrics(
   const db = await getDb();
   if (!db) return;
 
-  const periodoRef = toMySQLTimestamp(periodo || new Date());
+  const periodoRef = toPostgresTimestamp(periodo || new Date());
 
   // Buscar todos os mercados do projeto/pesquisa
   const whereClause = pesquisaId
@@ -247,12 +247,12 @@ export async function aggregatePesquisaMetrics(
     dataInicio: dataInicioRaw
       ? typeof dataInicioRaw === "string"
         ? dataInicioRaw
-        : toMySQLTimestamp(dataInicioRaw)
+        : toPostgresTimestamp(dataInicioRaw)
       : undefined,
     dataConclusao: dataConclusaoRaw
       ? typeof dataConclusaoRaw === "string"
         ? dataConclusaoRaw
-        : toMySQLTimestamp(dataConclusaoRaw)
+        : toPostgresTimestamp(dataConclusaoRaw)
       : undefined,
     duracaoDias,
   };
@@ -322,7 +322,7 @@ export async function aggregateTimelineMetrics(
   const db = await getDb();
   if (!db) return;
 
-  const dataRef = toMySQLTimestamp(data || new Date());
+  const dataRef = toPostgresTimestamp(data || new Date());
   const inicioDia = new Date(dataRef);
   inicioDia.setHours(0, 0, 0, 0);
   const fimDia = new Date(dataRef);

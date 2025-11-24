@@ -287,8 +287,8 @@ class SDKServer {
       }
 
       // Atualizar último acesso
-      const { toMySQLTimestamp } = await import("../dateUtils");
-      const signedInAt = toMySQLTimestamp(new Date());
+      const { toPostgresTimestamp } = await import("../dateUtils");
+      const signedInAt = toPostgresTimestamp(new Date());
       await db.updateUserLastSignIn(user.id, signedInAt);
 
       return user;

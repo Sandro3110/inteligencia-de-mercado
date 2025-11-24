@@ -1,8 +1,8 @@
 /**
- * Converte Date para string no formato MySQL timestamp
+ * Converte Date para string no formato PostgreSQL timestamp
  * Necessário porque o schema usa timestamp({ mode: 'string' })
  */
-export function toMySQLTimestamp(
+export function toPostgresTimestamp(
   date: Date | string | null | undefined
 ): string | null {
   if (!date) return null;
@@ -16,9 +16,9 @@ export function toMySQLTimestamp(
 }
 
 /**
- * Converte string MySQL timestamp para Date
+ * Converte string PostgreSQL timestamp para Date
  */
-export function fromMySQLTimestamp(
+export function fromPostgresTimestamp(
   timestamp: string | null | undefined
 ): Date | null {
   if (!timestamp) return null;
@@ -28,24 +28,24 @@ export function fromMySQLTimestamp(
 }
 
 /**
- * Retorna timestamp atual no formato MySQL
+ * Retorna timestamp atual no formato PostgreSQL
  */
-export function nowMySQLTimestamp(): string {
-  return toMySQLTimestamp(new Date())!;
+export function nowPostgresTimestamp(): string {
+  return toPostgresTimestamp(new Date())!;
 }
 
 /**
  * Converte Date para string ou retorna null (alias para compatibilidade)
  */
-export function toMySQLTimestampOrNull(
+export function toPostgresTimestampOrNull(
   date: Date | null | undefined
 ): string | null {
-  return toMySQLTimestamp(date);
+  return toPostgresTimestamp(date);
 }
 
 /**
  * Retorna timestamp atual (alias para compatibilidade)
  */
 export function now(): string {
-  return nowMySQLTimestamp();
+  return nowPostgresTimestamp();
 }

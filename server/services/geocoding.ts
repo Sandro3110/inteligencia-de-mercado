@@ -5,7 +5,7 @@
  * que não foram obtidas via OpenAI durante o enriquecimento.
  */
 
-import { toMySQLTimestamp } from "../_core/dateUtils";
+import { toPostgresTimestamp } from "../_core/dateUtils";
 
 // Interface para resultado de geocodificação
 export interface GeocodeResult {

@@ -7,7 +7,7 @@ import { getDb } from "./db";
 import { scheduledEnrichments } from "../drizzle/schema";
 import { eq, and, lte } from "drizzle-orm";
 import { executeEnrichmentFlow } from "./enrichmentFlow";
-import { toMySQLTimestamp, toMySQLTimestampOrNull, now } from "./dateUtils";
+import { toPostgresTimestamp, toPostgresTimestampOrNull, now } from "./dateUtils";
 
 let workerInterval: NodeJS.Timeout | null = null;
 let isProcessing = false;

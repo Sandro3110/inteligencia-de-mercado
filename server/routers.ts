@@ -1527,10 +1527,10 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         const { createScheduledEnrichment } = await import("./db");
-        const { toMySQLTimestamp } = await import("./dateUtils");
+        const { toPostgresTimestamp } = await import("./dateUtils");
         const id = await createScheduledEnrichment({
           projectId: input.projectId,
-          scheduledAt: toMySQLTimestamp(input.scheduledAt),
+          scheduledAt: toPostgresTimestamp(input.scheduledAt),
           recurrence: input.recurrence,
           batchSize: input.batchSize,
           maxClients: input.maxClients,
@@ -1775,10 +1775,10 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         const { createScheduledEnrichment } = await import("./db");
-        const { toMySQLTimestamp } = await import("./dateUtils");
+        const { toPostgresTimestamp } = await import("./dateUtils");
         const id = await createScheduledEnrichment({
           projectId: input.projectId,
-          scheduledAt: toMySQLTimestamp(new Date(input.scheduledAt)),
+          scheduledAt: toPostgresTimestamp(new Date(input.scheduledAt)),
           recurrence: input.recurrence,
           batchSize: input.batchSize,
           maxClients: input.maxClients,

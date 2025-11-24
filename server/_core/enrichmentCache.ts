@@ -5,7 +5,7 @@
 
 import { eq } from "drizzle-orm";
 import { enrichmentCache, type EnrichmentCache } from "../../drizzle/schema";
-import { toMySQLTimestamp, toMySQLTimestampOrNull, now } from "./dateUtils";
+import { toPostgresTimestamp, toPostgresTimestampOrNull, now } from "./dateUtils";
 
 const CACHE_TTL_DAYS = 30; // Dados expiram após 30 dias
 
