@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Componente de Preview/Resumo para cada Step do Wizard
  */

@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Todos os 7 Steps do Wizard de Pesquisa - Consolidado
  * Fase 39.3 - Wizard de Criação de Pesquisa
@@ -31,7 +33,7 @@ import {
   Sun,
 } from "lucide-react";
 import { toast } from "sonner";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import type { ResearchWizardData } from "@/types/research-wizard";
 import PreResearchInterface from "./PreResearchInterface";
 import FileUploadZone from "./FileUploadZone";

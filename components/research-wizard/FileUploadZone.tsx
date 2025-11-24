@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Componente de Upload de Planilhas com Drag & Drop
  * Fase 42.2 - Upload funcional CSV/Excel
@@ -22,7 +24,7 @@ import {
   CheckCircle2,
   X,
 } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import type { ResearchWizardData } from "@/types/research-wizard";
 import { ColumnMapper } from "@/components/ColumnMapper";
 

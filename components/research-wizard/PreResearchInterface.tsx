@@ -1,10 +1,12 @@
+'use client';
+
 /**
  * Interface de Pré-Pesquisa com IA
  * Fase 42.1 - Integração completa ao Step 5
  */
 
 import { useState } from "react";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
