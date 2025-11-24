@@ -1,18 +1,20 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Gerenciador de Jobs de Enriquecimento com Pausa/Retomar
  */
 
-import { getDb } from "./db";
-import { enrichmentJobs } from "../drizzle/schema";
-import { eq, and } from "drizzle-orm";
-import { enrichClienteOptimized } from "./enrichmentOptimized";
-import { clientes } from "../drizzle/schema";
-import { notifyOwner } from "./_core/notification";
-import { toPostgresTimestamp, toPostgresTimestampOrNull, now } from "./dateUtils";
+import { getDb } from './db';
+import { enrichmentJobs } from '../drizzle/schema';
+import { eq, and } from 'drizzle-orm';
+import { enrichClienteOptimized } from './enrichmentOptimized';
+import { clientes } from '../drizzle/schema';
+import { notifyOwner } from './_core/notification';
+import { toPostgresTimestamp, toPostgresTimestampOrNull, now } from './dateUtils';
 
 export interface JobProgress {
   jobId: number;
-  status: "pending" | "running" | "paused" | "completed" | "failed";
+  status: 'pending' | 'running' | 'paused' | 'completed' | 'failed';
   totalClientes: number;
   processedClientes: number;
   successClientes: number;
@@ -37,17 +39,14 @@ export async function createEnrichmentJob(
   } = {}
 ): Promise<number> {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error('Database not available');
 
   // Contar clientes do projeto
-  const allClientes = await db
-    .select()
-    .from(clientes)
-    .where(eq(clientes.projectId, projectId));
+  const allClientes = await db.select().from(clientes).where(eq(clientes.projectId, projectId));
   const totalClientes = allClientes.length;
 
   if (totalClientes === 0) {
-    throw new Error("Nenhum cliente encontrado para enriquecer");
+    throw new Error('Nenhum cliente encontrado para enriquecer');
   }
 
   const batchSize = options.batchSize || 5;
@@ -56,7 +55,7 @@ export async function createEnrichmentJob(
   // Criar job
   const [result] = await db.insert(enrichmentJobs).values({
     projectId,
-    status: "pending",
+    status: 'pending',
     totalClientes,
     processedClientes: 0,
     successClientes: 0,
@@ -75,24 +74,20 @@ export async function createEnrichmentJob(
  */
 export async function startEnrichmentJob(jobId: number): Promise<void> {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error('Database not available');
 
   // Buscar job
-  const [job] = await db
-    .select()
-    .from(enrichmentJobs)
-    .where(eq(enrichmentJobs.id, jobId))
-    .limit(1);
+  const [job] = await db.select().from(enrichmentJobs).where(eq(enrichmentJobs.id, jobId)).limit(1);
 
   if (!job) {
     throw new Error(`Job ${jobId} não encontrado`);
   }
 
-  if (job.status === "running") {
+  if (job.status === 'running') {
     throw new Error(`Job ${jobId} já está em execução`);
   }
 
-  if (job.status === "completed") {
+  if (job.status === 'completed') {
     throw new Error(`Job ${jobId} já foi concluído`);
   }
 
@@ -100,7 +95,7 @@ export async function startEnrichmentJob(jobId: number): Promise<void> {
   await db
     .update(enrichmentJobs)
     .set({
-      status: "running",
+      status: 'running',
       startedAt: job.startedAt || now(),
       pausedAt: null,
       updatedAt: now(),
@@ -111,12 +106,12 @@ export async function startEnrichmentJob(jobId: number): Promise<void> {
   runningJobs.set(jobId, { shouldPause: false });
 
   // Executar job em background
-  processJob(jobId).catch(async error => {
+  processJob(jobId).catch(async (error) => {
     console.error(`[Job ${jobId}] Erro fatal:`, error);
     await db
       .update(enrichmentJobs)
       .set({
-        status: "failed",
+        status: 'failed',
         errorMessage: error.message,
         completedAt: now(),
         updatedAt: now(),
@@ -140,7 +135,7 @@ export async function pauseEnrichmentJob(jobId: number): Promise<void> {
   // Sinalizar para pausar
   jobControl.shouldPause = true;
 
-  console.log(`[Job ${jobId}] Solicitação de pausa recebida`);
+  logger.debug(`[Job ${jobId}] Solicitação de pausa recebida`);
 }
 
 /**
@@ -148,7 +143,7 @@ export async function pauseEnrichmentJob(jobId: number): Promise<void> {
  */
 export async function cancelEnrichmentJob(jobId: number): Promise<void> {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error('Database not available');
 
   // Pausar se estiver rodando
   if (runningJobs.has(jobId)) {
@@ -159,8 +154,8 @@ export async function cancelEnrichmentJob(jobId: number): Promise<void> {
   await db
     .update(enrichmentJobs)
     .set({
-      status: "failed",
-      errorMessage: "Cancelado pelo usuário",
+      status: 'failed',
+      errorMessage: 'Cancelado pelo usuário',
       completedAt: now(),
       updatedAt: now(),
     })
@@ -170,17 +165,11 @@ export async function cancelEnrichmentJob(jobId: number): Promise<void> {
 /**
  * Busca status de um job
  */
-export async function getJobProgress(
-  jobId: number
-): Promise<JobProgress | null> {
+export async function getJobProgress(jobId: number): Promise<JobProgress | null> {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error('Database not available');
 
-  const [job] = await db
-    .select()
-    .from(enrichmentJobs)
-    .where(eq(enrichmentJobs.id, jobId))
-    .limit(1);
+  const [job] = await db.select().from(enrichmentJobs).where(eq(enrichmentJobs.id, jobId)).limit(1);
 
   if (!job) return null;
 
@@ -194,20 +183,16 @@ export async function getJobProgress(
     currentBatch: job.currentBatch,
     totalBatches: job.totalBatches,
     estimatedTimeRemaining: job.estimatedTimeRemaining || 0,
-    percentComplete: Math.round(
-      (job.processedClientes / job.totalClientes) * 100
-    ),
+    percentComplete: Math.round((job.processedClientes / job.totalClientes) * 100),
   };
 }
 
 /**
  * Lista todos os jobs de um projeto
  */
-export async function listProjectJobs(
-  projectId: number
-): Promise<JobProgress[]> {
+export async function listProjectJobs(projectId: number): Promise<JobProgress[]> {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error('Database not available');
 
   const jobs = await db
     .select()
@@ -215,7 +200,7 @@ export async function listProjectJobs(
     .where(eq(enrichmentJobs.projectId, projectId))
     .orderBy(enrichmentJobs.createdAt);
 
-  return jobs.map(job => ({
+  return jobs.map((job) => ({
     jobId: job.id,
     status: job.status,
     totalClientes: job.totalClientes,
@@ -225,9 +210,7 @@ export async function listProjectJobs(
     currentBatch: job.currentBatch,
     totalBatches: job.totalBatches,
     estimatedTimeRemaining: job.estimatedTimeRemaining || 0,
-    percentComplete: Math.round(
-      (job.processedClientes / job.totalClientes) * 100
-    ),
+    percentComplete: Math.round((job.processedClientes / job.totalClientes) * 100),
   }));
 }
 
@@ -236,13 +219,9 @@ export async function listProjectJobs(
  */
 async function processJob(jobId: number): Promise<void> {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error('Database not available');
 
-  const [job] = await db
-    .select()
-    .from(enrichmentJobs)
-    .where(eq(enrichmentJobs.id, jobId))
-    .limit(1);
+  const [job] = await db.select().from(enrichmentJobs).where(eq(enrichmentJobs.id, jobId)).limit(1);
 
   if (!job) {
     throw new Error(`Job ${jobId} não encontrado`);
@@ -253,22 +232,19 @@ async function processJob(jobId: number): Promise<void> {
     throw new Error(`Job ${jobId} não está registrado`);
   }
 
-  console.log(`[Job ${jobId}] Iniciando processamento`);
-  console.log(
+  logger.debug(`[Job ${jobId}] Iniciando processamento`);
+  logger.debug(
     `[Job ${jobId}] Total: ${job.totalClientes} clientes, Processados: ${job.processedClientes}`
   );
 
   // Buscar clientes do projeto
-  const allClientes = await db
-    .select()
-    .from(clientes)
-    .where(eq(clientes.projectId, job.projectId));
+  const allClientes = await db.select().from(clientes).where(eq(clientes.projectId, job.projectId));
 
   // Se está retomando, pular clientes já processados
   const startIndex = job.processedClientes;
   const clientesToProcess = allClientes.slice(startIndex);
 
-  console.log(`[Job ${jobId}] Retomando do cliente ${startIndex + 1}`);
+  logger.debug(`[Job ${jobId}] Retomando do cliente ${startIndex + 1}`);
 
   const startTime = Date.now();
 
@@ -276,12 +252,12 @@ async function processJob(jobId: number): Promise<void> {
   for (let i = 0; i < clientesToProcess.length; i += job.batchSize) {
     // Verificar se deve pausar
     if (jobControl.shouldPause) {
-      console.log(`[Job ${jobId}] Pausando...`);
+      logger.debug(`[Job ${jobId}] Pausando...`);
 
       await db
         .update(enrichmentJobs)
         .set({
-          status: "paused",
+          status: 'paused',
           pausedAt: now(),
           updatedAt: now(),
         })
@@ -297,26 +273,20 @@ async function processJob(jobId: number): Promise<void> {
       return;
     }
 
-    const batch = clientesToProcess.slice(
-      i,
-      Math.min(i + job.batchSize, clientesToProcess.length)
-    );
+    const batch = clientesToProcess.slice(i, Math.min(i + job.batchSize, clientesToProcess.length));
     const currentBatch = Math.floor((startIndex + i) / job.batchSize) + 1;
 
-    console.log(
+    logger.debug(
       `[Job ${jobId}] Processando lote ${currentBatch}/${job.totalBatches} (${batch.length} clientes)`
     );
 
     // Processar clientes em paralelo
-    const batchPromises = batch.map(async cliente => {
+    const batchPromises = batch.map(async (cliente) => {
       try {
         const result = await enrichClienteOptimized(cliente.id, job.projectId);
         return { success: result.success, clienteId: cliente.id };
       } catch (error: unknown) {
-        console.error(
-          `[Job ${jobId}] Erro ao processar cliente ${cliente.id}:`,
-          error.message
-        );
+        console.error(`[Job ${jobId}] Erro ao processar cliente ${cliente.id}:`, error.message);
         return { success: false, clienteId: cliente.id };
       }
     });
@@ -324,8 +294,8 @@ async function processJob(jobId: number): Promise<void> {
     const batchResults = await Promise.all(batchPromises);
 
     // Atualizar progresso
-    const batchSuccess = batchResults.filter(r => r.success).length;
-    const batchFailed = batchResults.filter(r => !r.success).length;
+    const batchSuccess = batchResults.filter((r) => r.success).length;
+    const batchFailed = batchResults.filter((r) => !r.success).length;
 
     const newProcessed = job.processedClientes + batchResults.length;
     const newSuccess = job.successClientes + batchSuccess;
@@ -351,18 +321,13 @@ async function processJob(jobId: number): Promise<void> {
       })
       .where(eq(enrichmentJobs.id, jobId));
 
-    console.log(
+    logger.debug(
       `[Job ${jobId}] Progresso: ${newProcessed}/${job.totalClientes} (${Math.round((newProcessed / job.totalClientes) * 100)}%)`
     );
 
     // Checkpoint automático
-    if (
-      newProcessed % job.checkpointInterval === 0 ||
-      newProcessed === job.totalClientes
-    ) {
-      console.log(
-        `[Job ${jobId}] Checkpoint automático em ${newProcessed} clientes`
-      );
+    if (newProcessed % job.checkpointInterval === 0 || newProcessed === job.totalClientes) {
+      logger.debug(`[Job ${jobId}] Checkpoint automático em ${newProcessed} clientes`);
 
       await notifyOwner({
         title: `📊 Checkpoint - Job ${jobId}`,
@@ -377,7 +342,7 @@ async function processJob(jobId: number): Promise<void> {
   await db
     .update(enrichmentJobs)
     .set({
-      status: "completed",
+      status: 'completed',
       completedAt: now(),
       estimatedTimeRemaining: 0,
       updatedAt: now(),
@@ -386,9 +351,7 @@ async function processJob(jobId: number): Promise<void> {
 
   runningJobs.delete(jobId);
 
-  console.log(
-    `[Job ${jobId}] Concluído em ${Math.round(totalDuration / 1000 / 60)} minutos`
-  );
+  logger.debug(`[Job ${jobId}] Concluído em ${Math.round(totalDuration / 1000 / 60)} minutos`);
 
   await notifyOwner({
     title: `✅ Enriquecimento Concluído - Job ${jobId}`,

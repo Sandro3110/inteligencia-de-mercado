@@ -1,4 +1,6 @@
-'use client';
+import { logger } from '@/lib/logger';
+
+('use client');
 
 import { useMemo } from 'react';
 import { useAuth } from '@/_core/hooks/useAuth';
@@ -32,15 +34,15 @@ export interface AuthGuardProps {
 // ============================================================================
 
 function isPublicRoute(location: string): boolean {
-  return PUBLIC_ROUTES.includes(location as typeof PUBLIC_ROUTES[number]);
+  return PUBLIC_ROUTES.includes(location as (typeof PUBLIC_ROUTES)[number]);
 }
 
 function logBypassInfo(location: string, isAuthenticated: boolean, user: unknown): void {
   if (BYPASS_ENABLED) {
-    console.log(LOG_MESSAGES.BYPASS_ACTIVE);
-    console.log(LOG_MESSAGES.LOCATION, location);
-    console.log(LOG_MESSAGES.IS_AUTHENTICATED, isAuthenticated);
-    console.log(LOG_MESSAGES.USER, user);
+    logger.debug(LOG_MESSAGES.BYPASS_ACTIVE);
+    logger.debug(LOG_MESSAGES.LOCATION, location);
+    logger.debug(LOG_MESSAGES.IS_AUTHENTICATED, isAuthenticated);
+    logger.debug(LOG_MESSAGES.USER, user);
   }
 }
 
@@ -50,12 +52,12 @@ function logBypassInfo(location: string, isAuthenticated: boolean, user: unknown
 
 /**
  * AuthGuard
- * 
+ *
  * ⚠️ VERSÃO DE TESTE - BYPASS DE AUTENTICAÇÃO ATIVADO
- * 
+ *
  * Esta versão permite acesso sem login para testes.
  * Em produção, este componente deve verificar autenticação e redirecionar para login.
- * 
+ *
  * @example
  * ```tsx
  * <AuthGuard>

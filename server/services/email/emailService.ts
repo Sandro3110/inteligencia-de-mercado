@@ -1,10 +1,12 @@
-import { Resend } from "resend";
+import { logger } from '@/lib/logger';
+
+import { Resend } from 'resend';
 import {
   getInviteEmailTemplate,
   getApprovalEmailTemplate,
   getRejectionEmailTemplate,
   getWelcomeEmailTemplate,
-} from "./templates";
+} from './templates';
 
 /**
  * Configuração do Resend
@@ -21,8 +23,8 @@ function getResendClient(): Resend | null {
 /**
  * Configuração padrão de email
  */
-const DEFAULT_FROM_EMAIL = process.env.EMAIL_FROM || "Intelmarket <noreply@intelmarket.app>";
-const APP_URL = process.env.APP_URL || "http://localhost:3000";
+const DEFAULT_FROM_EMAIL = process.env.EMAIL_FROM || 'Intelmarket <noreply@intelmarket.app>';
+const APP_URL = process.env.APP_URL || 'http://localhost:3000';
 
 /**
  * Interface para resultado de envio
@@ -41,16 +43,16 @@ export async function sendInviteEmail(
   recipientName: string,
   inviterName: string,
   inviteToken: string,
-  role: "admin" | "visualizador",
+  role: 'admin' | 'visualizador',
   expiresInDays: number = 7
 ): Promise<EmailResult> {
   const resend = getResendClient();
-  
+
   if (!resend) {
-    console.warn("[Email] Resend não configurado. Email não enviado.");
+    console.warn('[Email] Resend não configurado. Email não enviado.');
     return {
       success: false,
-      error: "Resend API key não configurada",
+      error: 'Resend API key não configurada',
     };
   }
 
@@ -76,17 +78,17 @@ export async function sendInviteEmail(
     }
 
     // Log do envio
-    console.log(`[Email] Convite enviado para ${recipientEmail} (${result.data?.id})`);
+    logger.debug(`[Email] Convite enviado para ${recipientEmail} (${result.data?.id})`);
 
     return {
       success: true,
       messageId: result.data?.id,
     };
   } catch (error) {
-    console.error("[Email] Erro ao enviar convite:", error);
+    console.error('[Email] Erro ao enviar convite:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Erro desconhecido",
+      error: error instanceof Error ? error.message : 'Erro desconhecido',
     };
   }
 }
@@ -100,12 +102,12 @@ export async function sendApprovalEmail(
   approverName: string
 ): Promise<EmailResult> {
   const resend = getResendClient();
-  
+
   if (!resend) {
-    console.warn("[Email] Resend não configurado. Email não enviado.");
+    console.warn('[Email] Resend não configurado. Email não enviado.');
     return {
       success: false,
-      error: "Resend API key não configurada",
+      error: 'Resend API key não configurada',
     };
   }
 
@@ -128,17 +130,17 @@ export async function sendApprovalEmail(
       throw new Error(result.error.message);
     }
 
-    console.log(`[Email] Aprovação enviada para ${recipientEmail} (${result.data?.id})`);
+    logger.debug(`[Email] Aprovação enviada para ${recipientEmail} (${result.data?.id})`);
 
     return {
       success: true,
       messageId: result.data?.id,
     };
   } catch (error) {
-    console.error("[Email] Erro ao enviar aprovação:", error);
+    console.error('[Email] Erro ao enviar aprovação:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Erro desconhecido",
+      error: error instanceof Error ? error.message : 'Erro desconhecido',
     };
   }
 }
@@ -152,12 +154,12 @@ export async function sendRejectionEmail(
   reason?: string
 ): Promise<EmailResult> {
   const resend = getResendClient();
-  
+
   if (!resend) {
-    console.warn("[Email] Resend não configurado. Email não enviado.");
+    console.warn('[Email] Resend não configurado. Email não enviado.');
     return {
       success: false,
-      error: "Resend API key não configurada",
+      error: 'Resend API key não configurada',
     };
   }
 
@@ -178,17 +180,17 @@ export async function sendRejectionEmail(
       throw new Error(result.error.message);
     }
 
-    console.log(`[Email] Rejeição enviada para ${recipientEmail} (${result.data?.id})`);
+    logger.debug(`[Email] Rejeição enviada para ${recipientEmail} (${result.data?.id})`);
 
     return {
       success: true,
       messageId: result.data?.id,
     };
   } catch (error) {
-    console.error("[Email] Erro ao enviar rejeição:", error);
+    console.error('[Email] Erro ao enviar rejeição:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Erro desconhecido",
+      error: error instanceof Error ? error.message : 'Erro desconhecido',
     };
   }
 }
@@ -201,12 +203,12 @@ export async function sendWelcomeEmail(
   userName: string
 ): Promise<EmailResult> {
   const resend = getResendClient();
-  
+
   if (!resend) {
-    console.warn("[Email] Resend não configurado. Email não enviado.");
+    console.warn('[Email] Resend não configurado. Email não enviado.');
     return {
       success: false,
-      error: "Resend API key não configurada",
+      error: 'Resend API key não configurada',
     };
   }
 
@@ -224,17 +226,17 @@ export async function sendWelcomeEmail(
       throw new Error(result.error.message);
     }
 
-    console.log(`[Email] Boas-vindas enviado para ${recipientEmail} (${result.data?.id})`);
+    logger.debug(`[Email] Boas-vindas enviado para ${recipientEmail} (${result.data?.id})`);
 
     return {
       success: true,
       messageId: result.data?.id,
     };
   } catch (error) {
-    console.error("[Email] Erro ao enviar boas-vindas:", error);
+    console.error('[Email] Erro ao enviar boas-vindas:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Erro desconhecido",
+      error: error instanceof Error ? error.message : 'Erro desconhecido',
     };
   }
 }
@@ -244,27 +246,27 @@ export async function sendWelcomeEmail(
  */
 export async function testEmailConfiguration(): Promise<EmailResult> {
   const resend = getResendClient();
-  
+
   if (!resend) {
     return {
       success: false,
-      error: "Resend API key não configurada. Configure a variável RESEND_API_KEY.",
+      error: 'Resend API key não configurada. Configure a variável RESEND_API_KEY.',
     };
   }
 
   try {
     // Tenta enviar um email de teste para o próprio remetente
     const testEmail = DEFAULT_FROM_EMAIL.match(/<(.+)>/)?.[1] || DEFAULT_FROM_EMAIL;
-    
+
     const result = await resend.emails.send({
       from: DEFAULT_FROM_EMAIL,
       to: testEmail,
-      subject: "Teste de Configuração - Intelmarket",
+      subject: 'Teste de Configuração - Intelmarket',
       html: `
         <h2>Teste de Configuração</h2>
         <p>Este é um email de teste para verificar a configuração do Resend.</p>
         <p>Se você recebeu este email, a configuração está funcionando corretamente!</p>
-        <p><strong>Data/Hora:</strong> ${new Date().toLocaleString("pt-BR")}</p>
+        <p><strong>Data/Hora:</strong> ${new Date().toLocaleString('pt-BR')}</p>
       `,
     });
 
@@ -272,17 +274,17 @@ export async function testEmailConfiguration(): Promise<EmailResult> {
       throw new Error(result.error.message);
     }
 
-    console.log(`[Email] Email de teste enviado (${result.data?.id})`);
+    logger.debug(`[Email] Email de teste enviado (${result.data?.id})`);
 
     return {
       success: true,
       messageId: result.data?.id,
     };
   } catch (error) {
-    console.error("[Email] Erro no teste de configuração:", error);
+    console.error('[Email] Erro no teste de configuração:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Erro desconhecido",
+      error: error instanceof Error ? error.message : 'Erro desconhecido',
     };
   }
 }
@@ -292,27 +294,27 @@ export async function testEmailConfiguration(): Promise<EmailResult> {
  */
 export async function logEmailSent(
   recipientEmail: string,
-  emailType: "invite" | "approval" | "rejection" | "welcome",
+  emailType: 'invite' | 'approval' | 'rejection' | 'welcome',
   success: boolean,
   messageId?: string,
   error?: string
 ): Promise<void> {
   try {
-    const { getDb } = await import("../../db");
+    const { getDb } = await import('../../db');
     const db = await getDb();
-    
+
     if (!db) {
-      console.warn("[Email] Database não disponível para log");
+      console.warn('[Email] Database não disponível para log');
       return;
     }
 
     // Criar tabela de logs se não existir (será criada via migration)
     // Por enquanto apenas log no console
-    console.log(`[Email Log] ${emailType} para ${recipientEmail} - ${success ? "✓" : "✗"}`, {
+    logger.debug(`[Email Log] ${emailType} para ${recipientEmail} - ${success ? '✓' : '✗'}`, {
       messageId,
       error,
     });
   } catch (err) {
-    console.error("[Email] Erro ao registrar log:", err);
+    console.error('[Email] Erro ao registrar log:', err);
   }
 }

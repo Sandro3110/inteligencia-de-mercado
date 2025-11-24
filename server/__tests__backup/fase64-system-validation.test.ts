@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Fase 64: Testes de Validação Completa do Sistema
  *
@@ -8,9 +10,9 @@
  * - Integridade do banco de dados
  */
 
-import { describe, it, expect, beforeAll } from "vitest";
-import { appRouter } from "../routers";
-import type { Context } from "../_core/context";
+import { describe, it, expect, beforeAll } from 'vitest';
+import { appRouter } from '../routers';
+import type { Context } from '../_core/context';
 
 // Mock de contexto para testes
 const createMockContext = (userId?: string): Context => ({
@@ -19,17 +21,17 @@ const createMockContext = (userId?: string): Context => ({
   user: userId
     ? {
         id: userId,
-        name: "Test User",
-        email: "test@example.com",
-        role: "admin" as const,
+        name: 'Test User',
+        email: 'test@example.com',
+        role: 'admin' as const,
       }
     : undefined,
 });
 
-describe("Fase 64: Validação Completa do Sistema", () => {
-  describe("1. Validação de Routers tRPC", () => {
-    it("deve ter todos os routers principais implementados", () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+describe('Fase 64: Validação Completa do Sistema', () => {
+  describe('1. Validação de Routers tRPC', () => {
+    it('deve ter todos os routers principais implementados', () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       // Verificar que os routers existem
       expect(caller.auth).toBeDefined();
@@ -57,9 +59,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("2. Validação de Queries de Projetos", () => {
-    it("deve listar projetos sem erros", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('2. Validação de Queries de Projetos', () => {
+    it('deve listar projetos sem erros', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const result = await caller.projects.list();
 
@@ -67,8 +69,8 @@ describe("Fase 64: Validação Completa do Sistema", () => {
       expect(Array.isArray(result)).toBe(true);
     });
 
-    it("deve retornar estatísticas de projeto", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+    it('deve retornar estatísticas de projeto', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       // Primeiro pegar um projeto
       const projects = await caller.projects.list();
@@ -80,14 +82,14 @@ describe("Fase 64: Validação Completa do Sistema", () => {
 
         expect(stats).toBeDefined();
         // Stats pode ter estrutura variável dependendo dos dados
-        expect(stats).toBeTypeOf("object");
+        expect(stats).toBeTypeOf('object');
       }
     });
   });
 
-  describe("3. Validação de Queries de Mercados", () => {
-    it("deve listar mercados sem erros", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('3. Validação de Queries de Mercados', () => {
+    it('deve listar mercados sem erros', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const projects = await caller.projects.list();
 
@@ -102,9 +104,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("4. Validação de Queries de Clientes", () => {
-    it("deve listar clientes sem erros", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('4. Validação de Queries de Clientes', () => {
+    it('deve listar clientes sem erros', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const projects = await caller.projects.list();
 
@@ -119,9 +121,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("5. Validação de Queries de Concorrentes", () => {
-    it("deve listar concorrentes sem erros", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('5. Validação de Queries de Concorrentes', () => {
+    it('deve listar concorrentes sem erros', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const projects = await caller.projects.list();
 
@@ -136,9 +138,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("6. Validação de Queries de Leads", () => {
-    it("deve listar leads sem erros", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('6. Validação de Queries de Leads', () => {
+    it('deve listar leads sem erros', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const projects = await caller.projects.list();
 
@@ -153,9 +155,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("7. Validação de Analytics", () => {
-    it("deve retornar dados de analytics sem erros", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('7. Validação de Analytics', () => {
+    it('deve retornar dados de analytics sem erros', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const projects = await caller.projects.list();
 
@@ -169,9 +171,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("8. Validação de Pesquisas", () => {
-    it("deve listar pesquisas sem erros", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('8. Validação de Pesquisas', () => {
+    it('deve listar pesquisas sem erros', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const projects = await caller.projects.list();
 
@@ -186,9 +188,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("9. Validação de Tags", () => {
-    it("deve listar tags sem erros", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('9. Validação de Tags', () => {
+    it('deve listar tags sem erros', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const projects = await caller.projects.list();
 
@@ -203,9 +205,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("10. Validação de Filtros Salvos", () => {
-    it("deve listar filtros salvos sem erros", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('10. Validação de Filtros Salvos', () => {
+    it('deve listar filtros salvos sem erros', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const projects = await caller.projects.list();
 
@@ -220,9 +222,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("11. Validação de Notificações", () => {
-    it("deve listar notificações sem erros", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('11. Validação de Notificações', () => {
+    it('deve listar notificações sem erros', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const notifications = await caller.notifications.list();
 
@@ -230,20 +232,20 @@ describe("Fase 64: Validação Completa do Sistema", () => {
       expect(Array.isArray(notifications)).toBe(true);
     });
 
-    it("deve contar notificações não lidas", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+    it('deve contar notificações não lidas', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const count = await caller.notifications.unreadCount();
 
       expect(count).toBeDefined();
-      expect(typeof count).toBe("number");
+      expect(typeof count).toBe('number');
       expect(count).toBeGreaterThanOrEqual(0);
     });
   });
 
-  describe("12. Validação de Histórico de Auditoria", () => {
-    it("deve listar logs de auditoria de projetos", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('12. Validação de Histórico de Auditoria', () => {
+    it('deve listar logs de auditoria de projetos', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const projects = await caller.projects.list();
 
@@ -257,15 +259,15 @@ describe("Fase 64: Validação Completa do Sistema", () => {
         expect(logs).toBeDefined();
         expect(logs.logs).toBeDefined();
         expect(Array.isArray(logs.logs)).toBe(true);
-        expect(typeof logs.total).toBe("number");
+        expect(typeof logs.total).toBe('number');
         // page e pageSize podem não estar no retorno
       }
     });
   });
 
-  describe("13. Validação de Produtos", () => {
-    it("deve listar produtos por projeto", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('13. Validação de Produtos', () => {
+    it('deve listar produtos por projeto', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const projects = await caller.projects.list();
 
@@ -280,9 +282,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("14. Validação de Alertas", () => {
-    it("deve listar configurações de alertas", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('14. Validação de Alertas', () => {
+    it('deve listar configurações de alertas', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const projects = await caller.projects.list();
 
@@ -297,9 +299,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("15. Validação de Atividades", () => {
-    it("deve retornar timeline de validações", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('15. Validação de Atividades', () => {
+    it('deve retornar timeline de validações', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       // Testar timeline de validações ao invés de activity.list
       const timeline = await caller.dashboard.timelineValidacoes({ days: 30 });
@@ -309,18 +311,18 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("16. Validação de Autenticação", () => {
-    it("deve retornar usuário autenticado", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('16. Validação de Autenticação', () => {
+    it('deve retornar usuário autenticado', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const user = await caller.auth.me();
 
       expect(user).toBeDefined();
-      expect(user?.id).toBe("test-user");
-      expect(user?.name).toBe("Test User");
+      expect(user?.id).toBe('test-user');
+      expect(user?.name).toBe('Test User');
     });
 
-    it("deve retornar undefined para usuário não autenticado", async () => {
+    it('deve retornar undefined para usuário não autenticado', async () => {
       const caller = appRouter.createCaller(createMockContext());
 
       const user = await caller.auth.me();
@@ -329,9 +331,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("17. Validação de Integridade do Sistema", () => {
-    it("deve ter configurações do sistema", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('17. Validação de Integridade do Sistema', () => {
+    it('deve ter configurações do sistema', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       const settings = await caller.settings.getGoogleMapsApiKey();
 
@@ -340,9 +342,9 @@ describe("Fase 64: Validação Completa do Sistema", () => {
     });
   });
 
-  describe("18. Resumo de Validação", () => {
-    it("deve ter sistema completamente funcional", async () => {
-      const caller = appRouter.createCaller(createMockContext("test-user"));
+  describe('18. Resumo de Validação', () => {
+    it('deve ter sistema completamente funcional', async () => {
+      const caller = appRouter.createCaller(createMockContext('test-user'));
 
       // Verificar que conseguimos fazer operações básicas
       const projects = await caller.projects.list();
@@ -354,10 +356,10 @@ describe("Fase 64: Validação Completa do Sistema", () => {
       expect(user).toBeDefined();
       expect(notifications).toBeDefined();
 
-      console.log("✅ Sistema validado com sucesso!");
-      console.log(`   - ${projects.length} projetos encontrados`);
-      console.log(`   - Usuário autenticado: ${user?.name}`);
-      console.log(`   - ${notifications.length} notificações`);
+      logger.debug('✅ Sistema validado com sucesso!');
+      logger.debug(`   - ${projects.length} projetos encontrados`);
+      logger.debug(`   - Usuário autenticado: ${user?.name}`);
+      logger.debug(`   - ${notifications.length} notificações`);
     });
   });
 });

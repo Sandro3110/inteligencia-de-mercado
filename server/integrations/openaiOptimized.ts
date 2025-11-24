@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Módulo OpenAI OTIMIZADO V2 - Prompt Estruturado de Alta Qualidade
  * - 1 chamada por cliente
@@ -30,7 +32,7 @@ interface ClienteEnriquecidoData {
 
 interface MercadoData {
   nome: string;
-  categoria: "B2B" | "B2C" | "B2G";
+  categoria: 'B2B' | 'B2C' | 'B2G';
   segmentacao: string;
   tamanhoEstimado: string;
 }
@@ -44,7 +46,7 @@ interface ProdutoData {
 interface ConcorrenteData {
   nome: string;
   descricao: string;
-  porte?: "Pequeno" | "Médio" | "Grande";
+  porte?: 'Pequeno' | 'Médio' | 'Grande';
   regiao?: string;
   cidade?: string;
   uf?: string;
@@ -55,9 +57,9 @@ interface ConcorrenteData {
 interface LeadData {
   nome: string;
   segmento: string;
-  potencial: "Alto" | "Médio" | "Baixo";
+  potencial: 'Alto' | 'Médio' | 'Baixo';
   justificativa: string;
-  porte?: "Pequeno" | "Médio" | "Grande";
+  porte?: 'Pequeno' | 'Médio' | 'Grande';
   cidade?: string;
   uf?: string;
   latitude?: number;
@@ -86,7 +88,7 @@ export async function generateAllDataOptimized(
   const MAX_RETRIES = 2;
 
   if (!apiKey) {
-    throw new Error("OPENAI_API_KEY not configured");
+    throw new Error('OPENAI_API_KEY not configured');
   }
 
   const systemPrompt = `Você é um especialista em pesquisa de mercado B2B brasileiro com 20 anos de experiência.
@@ -108,10 +110,10 @@ Sempre retorne JSON válido e estruturado conforme especificado.`;
   const userPrompt = `**EMPRESA PARA ANÁLISE:**
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 Nome: ${cliente.nome}
-${cliente.cnpj ? `🆔 CNPJ: ${cliente.cnpj}` : ""}
-🏭 Produto Principal: ${cliente.produtoPrincipal || "Não informado - PESQUISE"}
-🌐 Site: ${cliente.siteOficial || "Não informado - PESQUISE"}
-📍 Cidade: ${cliente.cidade || "Brasil - PESQUISE"}
+${cliente.cnpj ? `🆔 CNPJ: ${cliente.cnpj}` : ''}
+🏭 Produto Principal: ${cliente.produtoPrincipal || 'Não informado - PESQUISE'}
+🌐 Site: ${cliente.siteOficial || 'Não informado - PESQUISE'}
+📍 Cidade: ${cliente.cidade || 'Brasil - PESQUISE'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 **TAREFA:**
@@ -264,41 +266,39 @@ Para cada mercado, forneça:
 ✅ Priorize QUALIDADE sobre quantidade`;
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: 'gpt-4o-mini',
         messages: [
           {
-            role: "system",
+            role: 'system',
             content: systemPrompt,
           },
           {
-            role: "user",
+            role: 'user',
             content: userPrompt,
           },
         ],
         temperature: 0.3, // Mais baixa para respostas factuais e consistentes
         max_tokens: 5000, // Aumentado para acomodar descrições detalhadas
-        response_format: { type: "json_object" }, // Força resposta em JSON
+        response_format: { type: 'json_object' }, // Força resposta em JSON
       }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(
-        `OpenAI error: ${error.error?.message || response.statusText}`
-      );
+      throw new Error(`OpenAI error: ${error.error?.message || response.statusText}`);
     }
 
     const data = await response.json();
 
     if (!data.choices || data.choices.length === 0) {
-      throw new Error("OpenAI returned no choices");
+      throw new Error('OpenAI returned no choices');
     }
 
     const content = data.choices[0].message.content;
@@ -308,57 +308,57 @@ Para cada mercado, forneça:
     try {
       result = JSON.parse(content);
     } catch (parseError) {
-      console.error("[OpenAI] Failed to parse JSON:", content);
-      throw new Error("Invalid JSON response from OpenAI");
+      console.error('[OpenAI] Failed to parse JSON:', content);
+      throw new Error('Invalid JSON response from OpenAI');
     }
 
     // Validar estrutura
     if (!result.mercados || !Array.isArray(result.mercados)) {
-      console.error("[OpenAI] Invalid response structure:", result);
+      console.error('[OpenAI] Invalid response structure:', result);
       // Retry se ainda temos tentativas
       if (retryCount < MAX_RETRIES) {
-        console.log(
+        logger.debug(
           `[OpenAI] ⚠️ Invalid structure, retrying (${retryCount + 1}/${MAX_RETRIES})...`
         );
         return generateAllDataOptimized(cliente, retryCount + 1);
       }
-      throw new Error("Invalid response structure: missing mercados array");
+      throw new Error('Invalid response structure: missing mercados array');
     }
 
     // Garantir que temos pelo menos 1 mercado
     if (result.mercados.length === 0) {
       // Retry com prompt melhorado se ainda temos tentativas
       if (retryCount < MAX_RETRIES) {
-        console.log(
+        logger.debug(
           `[OpenAI] ⚠️ No mercados returned, retrying (${retryCount + 1}/${MAX_RETRIES})...`
         );
         return generateAllDataOptimized(cliente, retryCount + 1);
       }
-      throw new Error("No mercados returned by OpenAI after retries");
+      throw new Error('No mercados returned by OpenAI after retries');
     }
 
     // Limitar a 2 mercados (caso retorne mais)
     result.mercados = result.mercados.slice(0, 2);
 
     // Validar e limitar cada mercado
-    result.mercados = result.mercados.map(m => ({
+    result.mercados = result.mercados.map((m) => ({
       mercado: m.mercado,
       produtos: (m.produtos || []).slice(0, 3),
       concorrentes: (m.concorrentes || []).slice(0, 10),
       leads: (m.leads || []).slice(0, 5),
     }));
 
-    console.log(`[OpenAI] ✅ Generated HIGH-QUALITY data for ${cliente.nome}:`);
-    console.log(`  - ${result.mercados.length} mercados`);
+    logger.debug(`[OpenAI] ✅ Generated HIGH-QUALITY data for ${cliente.nome}:`);
+    logger.debug(`  - ${result.mercados.length} mercados`);
     result.mercados.forEach((m, i) => {
-      console.log(
+      logger.debug(
         `  - Mercado ${i + 1}: ${m.produtos.length}P ${m.concorrentes.length}C ${m.leads.length}L`
       );
     });
 
     return result;
   } catch (error) {
-    console.error("[OpenAI] Error generating data:", error);
+    console.error('[OpenAI] Error generating data:', error);
     throw error;
   }
 }

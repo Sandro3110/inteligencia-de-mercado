@@ -1,24 +1,26 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Schedule Worker - Verifica e executa agendamentos automaticamente
  * Roda a cada 1 minuto verificando agendamentos pendentes
  */
 
-import { getDb } from "./db";
-import { scheduledEnrichments } from "../drizzle/schema";
-import { eq, and, lte } from "drizzle-orm";
-import { executeEnrichmentFlow } from "./enrichmentFlow";
-import { toPostgresTimestamp, toPostgresTimestampOrNull, now } from "./dateUtils";
+import { getDb } from './db';
+import { scheduledEnrichments } from '../drizzle/schema';
+import { eq, and, lte } from 'drizzle-orm';
+import { executeEnrichmentFlow } from './enrichmentFlow';
+import { toPostgresTimestamp, toPostgresTimestampOrNull, now } from './dateUtils';
 
 let workerInterval: NodeJS.Timeout | null = null;
 let isProcessing = false;
 
 export async function startScheduleWorker() {
   if (workerInterval) {
-    console.log("[ScheduleWorker] Worker já está rodando");
+    logger.debug('[ScheduleWorker] Worker já está rodando');
     return;
   }
 
-  console.log("[ScheduleWorker] Iniciando worker de agendamentos...");
+  logger.debug('[ScheduleWorker] Iniciando worker de agendamentos...');
 
   // Executar imediatamente na primeira vez
   await checkAndExecuteSchedules();
@@ -28,20 +30,20 @@ export async function startScheduleWorker() {
     await checkAndExecuteSchedules();
   }, 60 * 1000); // 60 segundos
 
-  console.log("[ScheduleWorker] Worker iniciado com sucesso");
+  logger.debug('[ScheduleWorker] Worker iniciado com sucesso');
 }
 
 export function stopScheduleWorker() {
   if (workerInterval) {
     clearInterval(workerInterval);
     workerInterval = null;
-    console.log("[ScheduleWorker] Worker parado");
+    logger.debug('[ScheduleWorker] Worker parado');
   }
 }
 
 async function checkAndExecuteSchedules() {
   if (isProcessing) {
-    console.log("[ScheduleWorker] Já está processando, pulando iteração");
+    logger.debug('[ScheduleWorker] Já está processando, pulando iteração');
     return;
   }
 
@@ -50,7 +52,7 @@ async function checkAndExecuteSchedules() {
   try {
     const db = await getDb();
     if (!db) {
-      console.warn("[ScheduleWorker] Database não disponível");
+      console.warn('[ScheduleWorker] Database não disponível');
       return;
     }
 
@@ -62,7 +64,7 @@ async function checkAndExecuteSchedules() {
       .from(scheduledEnrichments)
       .where(
         and(
-          eq(scheduledEnrichments.status, "pending"),
+          eq(scheduledEnrichments.status, 'pending'),
           lte(scheduledEnrichments.scheduledAt, nowTimestamp)
         )
       )
@@ -72,7 +74,7 @@ async function checkAndExecuteSchedules() {
       return;
     }
 
-    console.log(
+    logger.debug(
       `[ScheduleWorker] Encontrados ${pendingSchedules.length} agendamentos para executar`
     );
 
@@ -80,7 +82,7 @@ async function checkAndExecuteSchedules() {
       await executeSchedule(schedule);
     }
   } catch (error) {
-    console.error("[ScheduleWorker] Erro ao verificar agendamentos:", error);
+    console.error('[ScheduleWorker] Erro ao verificar agendamentos:', error);
   } finally {
     isProcessing = false;
   }
@@ -91,7 +93,7 @@ async function executeSchedule(schedule: unknown) {
   if (!db) return;
 
   try {
-    console.log(
+    logger.debug(
       `[ScheduleWorker] Executando agendamento #${schedule.id} do projeto #${schedule.projectId}`
     );
 
@@ -99,13 +101,13 @@ async function executeSchedule(schedule: unknown) {
     await db
       .update(scheduledEnrichments)
       .set({
-        status: "running",
-        lastRunAt: new Date().toISOString().slice(0, 19).replace("T", " "),
+        status: 'running',
+        lastRunAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
       })
       .where(eq(scheduledEnrichments.id, schedule.id));
 
     // Buscar clientes do projeto para executar enriquecimento
-    const { clientes: clientesTable } = await import("../drizzle/schema");
+    const { clientes: clientesTable } = await import('../drizzle/schema');
     const clientesResult = await db
       .select()
       .from(clientesTable)
@@ -126,8 +128,8 @@ async function executeSchedule(schedule: unknown) {
       await db
         .update(scheduledEnrichments)
         .set({
-          status: "error",
-          errorMessage: "Nenhum cliente encontrado no projeto",
+          status: 'error',
+          errorMessage: 'Nenhum cliente encontrado no projeto',
         })
         .where(eq(scheduledEnrichments.id, schedule.id));
       return;
@@ -145,52 +147,42 @@ async function executeSchedule(schedule: unknown) {
         projectName: `Agendamento #${schedule.id}`,
       },
       async (progress: unknown) => {
-        if (progress.status === "completed") {
-          console.log(
-            `[ScheduleWorker] Agendamento #${schedule.id} concluído com sucesso`
-          );
+        if (progress.status === 'completed') {
+          logger.debug(`[ScheduleWorker] Agendamento #${schedule.id} concluído com sucesso`);
 
           // Atualizar status para 'completed'
           await db
             .update(scheduledEnrichments)
-            .set({ status: "completed" })
+            .set({ status: 'completed' })
             .where(eq(scheduledEnrichments.id, schedule.id));
 
           // Se for recorrente, criar próximo agendamento
-          if (schedule.recurrence !== "once") {
+          if (schedule.recurrence !== 'once') {
             await createNextSchedule(schedule);
           }
-        } else if (progress.status === "error") {
-          console.error(
-            `[ScheduleWorker] Agendamento #${schedule.id} falhou:`,
-            progress.message
-          );
+        } else if (progress.status === 'error') {
+          console.error(`[ScheduleWorker] Agendamento #${schedule.id} falhou:`, progress.message);
 
           await db
             .update(scheduledEnrichments)
             .set({
-              status: "error",
-              errorMessage: progress.error || "Erro desconhecido",
+              status: 'error',
+              errorMessage: progress.error || 'Erro desconhecido',
             })
             .where(eq(scheduledEnrichments.id, schedule.id));
         }
       }
     );
 
-    console.log(
-      `[ScheduleWorker] Enriquecimento iniciado para agendamento #${schedule.id}`
-    );
+    logger.debug(`[ScheduleWorker] Enriquecimento iniciado para agendamento #${schedule.id}`);
   } catch (error: unknown) {
-    console.error(
-      `[ScheduleWorker] Erro ao executar agendamento #${schedule.id}:`,
-      error
-    );
+    console.error(`[ScheduleWorker] Erro ao executar agendamento #${schedule.id}:`, error);
 
     await db
       .update(scheduledEnrichments)
       .set({
-        status: "error",
-        errorMessage: error.message || "Erro ao executar agendamento",
+        status: 'error',
+        errorMessage: error.message || 'Erro ao executar agendamento',
       })
       .where(eq(scheduledEnrichments.id, schedule.id));
   }
@@ -204,10 +196,10 @@ async function createNextSchedule(schedule: unknown) {
     const currentDate = new Date(schedule.scheduledAt);
     let nextDate: Date;
 
-    if (schedule.recurrence === "daily") {
+    if (schedule.recurrence === 'daily') {
       nextDate = new Date(currentDate);
       nextDate.setDate(nextDate.getDate() + 1);
-    } else if (schedule.recurrence === "weekly") {
+    } else if (schedule.recurrence === 'weekly') {
       nextDate = new Date(currentDate);
       nextDate.setDate(nextDate.getDate() + 7);
     } else {
@@ -217,22 +209,20 @@ async function createNextSchedule(schedule: unknown) {
     // Criar novo agendamento
     await db.insert(scheduledEnrichments).values({
       projectId: schedule.projectId,
-      scheduledAt: nextDate.toISOString().slice(0, 19).replace("T", " "),
+      scheduledAt: nextDate.toISOString().slice(0, 19).replace('T', ' '),
       recurrence: schedule.recurrence,
       batchSize: schedule.batchSize,
       maxClients: schedule.maxClients,
-      status: "pending",
+      status: 'pending',
     });
 
-    console.log(
-      `[ScheduleWorker] Próximo agendamento criado para ${nextDate.toISOString()}`
-    );
+    logger.debug(`[ScheduleWorker] Próximo agendamento criado para ${nextDate.toISOString()}`);
   } catch (error) {
-    console.error("[ScheduleWorker] Erro ao criar próximo agendamento:", error);
+    console.error('[ScheduleWorker] Erro ao criar próximo agendamento:', error);
   }
 }
 
 // Iniciar worker automaticamente quando o módulo for carregado
-if (process.env.NODE_ENV !== "test") {
+if (process.env.NODE_ENV !== 'test') {
   startScheduleWorker().catch(console.error);
 }

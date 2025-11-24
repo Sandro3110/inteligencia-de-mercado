@@ -1,9 +1,11 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Deduplication Module
  * Previne que a mesma empresa apareça em múltiplos níveis (cliente/concorrente/lead)
  */
 
-import { normalizeCNPJ } from "./receitaws";
+import { normalizeCNPJ } from './receitaws';
 
 /**
  * Normaliza nome de empresa para comparação
@@ -11,10 +13,10 @@ import { normalizeCNPJ } from "./receitaws";
  */
 export function normalizeCompanyName(name: string): string {
   return name
-    .normalize("NFD") // Decompõe caracteres acentuados
-    .replace(/[\u0300-\u036f]/g, "") // Remove acentos
-    .replace(/[^\w\s]/g, "") // Remove pontuação
-    .replace(/\s+/g, " ") // Normaliza espaços
+    .normalize('NFD') // Decompõe caracteres acentuados
+    .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+    .replace(/[^\w\s]/g, '') // Remove pontuação
+    .replace(/\s+/g, ' ') // Normaliza espaços
     .trim()
     .toLowerCase();
 }
@@ -61,11 +63,7 @@ export function calculateSimilarity(name1: string, name2: string): number {
  * Verifica se dois nomes são similares o suficiente para serem considerados duplicatas
  * Threshold padrão: 0.85 (85% de similaridade)
  */
-export function areNamesSimilar(
-  name1: string,
-  name2: string,
-  threshold = 0.85
-): boolean {
+export function areNamesSimilar(name1: string, name2: string, threshold = 0.85): boolean {
   const similarity = calculateSimilarity(name1, name2);
   return similarity >= threshold;
 }
@@ -86,18 +84,14 @@ export function isDuplicate(
       const cnpj2 = normalizeCNPJ(existing.cnpj);
 
       if (cnpj1 === cnpj2) {
-        console.log(
-          `[Dedup] CNPJ duplicado encontrado: ${empresa.nome} (${cnpj1})`
-        );
+        logger.debug(`[Dedup] CNPJ duplicado encontrado: ${empresa.nome} (${cnpj1})`);
         return true;
       }
     }
 
     // Verificação por nome (fallback)
     if (areNamesSimilar(empresa.nome, existing.nome, similarityThreshold)) {
-      console.log(
-        `[Dedup] Nome similar encontrado: "${empresa.nome}" ≈ "${existing.nome}"`
-      );
+      logger.debug(`[Dedup] Nome similar encontrado: "${empresa.nome}" ≈ "${existing.nome}"`);
       return true;
     }
   }
@@ -118,13 +112,13 @@ export function filterDuplicates<T extends { nome: string; cnpj?: string }>(
   for (const candidate of candidates) {
     // Verificar se é duplicata de alguma referência
     if (isDuplicate(candidate, allReferences)) {
-      console.log(`[Dedup] Excluindo duplicata: ${candidate.nome}`);
+      logger.debug(`[Dedup] Excluindo duplicata: ${candidate.nome}`);
       continue;
     }
 
     // Verificar se é duplicata dentro da própria lista filtrada
     if (isDuplicate(candidate, filtered)) {
-      console.log(`[Dedup] Excluindo duplicata interna: ${candidate.nome}`);
+      logger.debug(`[Dedup] Excluindo duplicata interna: ${candidate.nome}`);
       continue;
     }
 
@@ -133,9 +127,7 @@ export function filterDuplicates<T extends { nome: string; cnpj?: string }>(
 
   const removedCount = candidates.length - filtered.length;
   if (removedCount > 0) {
-    console.log(
-      `[Dedup] ${removedCount} duplicatas removidas de ${candidates.length} candidatos`
-    );
+    logger.debug(`[Dedup] ${removedCount} duplicatas removidas de ${candidates.length} candidatos`);
   }
 
   return filtered;

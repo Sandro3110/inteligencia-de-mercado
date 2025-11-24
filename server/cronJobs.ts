@@ -1,8 +1,10 @@
-import cron from "node-cron";
-import { eq } from "drizzle-orm";
-import { runFullAggregation } from "./analyticsAggregation";
-import { getDb } from "./db";
-import { projects } from "../drizzle/schema";
+import { logger } from '@/lib/logger';
+
+import cron from 'node-cron';
+import { eq } from 'drizzle-orm';
+import { runFullAggregation } from './analyticsAggregation';
+import { getDb } from './db';
+import { projects } from '../drizzle/schema';
 
 /**
  * Cron Jobs - Tarefas agendadas
@@ -17,72 +19,59 @@ import { projects } from "../drizzle/schema";
  */
 export function startAnalyticsAggregationJob() {
   // Executar todos os dias às 00:00 (meia-noite)
-  cron.schedule("0 0 * * *", async () => {
-    console.log("[Cron] Iniciando agregação diária de analytics...");
+  cron.schedule('0 0 * * *', async () => {
+    logger.debug('[Cron] Iniciando agregação diária de analytics...');
 
     try {
       const db = await getDb();
       if (!db) {
-        console.error("[Cron] Banco de dados não disponível");
+        console.error('[Cron] Banco de dados não disponível');
         return;
       }
 
       // Buscar todos os projetos ativos
-      const activeProjects = await db
-        .select()
-        .from(projects)
-        .where(eq(projects.ativo, 1));
+      const activeProjects = await db.select().from(projects).where(eq(projects.ativo, 1));
 
-      console.log(
-        `[Cron] Encontrados ${activeProjects.length} projetos ativos`
-      );
+      logger.debug(`[Cron] Encontrados ${activeProjects.length} projetos ativos`);
 
       // Executar agregação para cada projeto
       for (const project of activeProjects) {
-        console.log(
-          `[Cron] Agregando métricas do projeto: ${project.nome} (ID: ${project.id})`
-        );
+        logger.debug(`[Cron] Agregando métricas do projeto: ${project.nome} (ID: ${project.id})`);
 
         try {
           await runFullAggregation(project.id);
-          console.log(`[Cron] ✓ Projeto ${project.nome} agregado com sucesso`);
+          logger.debug(`[Cron] ✓ Projeto ${project.nome} agregado com sucesso`);
         } catch (error) {
-          console.error(
-            `[Cron] ✗ Erro ao agregar projeto ${project.nome}:`,
-            error
-          );
+          console.error(`[Cron] ✗ Erro ao agregar projeto ${project.nome}:`, error);
         }
       }
 
-      console.log("[Cron] Agregação diária concluída");
+      logger.debug('[Cron] Agregação diária concluída');
     } catch (error) {
-      console.error("[Cron] Erro na agregação diária:", error);
+      console.error('[Cron] Erro na agregação diária:', error);
     }
   });
 
-  console.log("[Cron] Job de agregação diária iniciado (executa às 00:00)");
+  logger.debug('[Cron] Job de agregação diária iniciado (executa às 00:00)');
 }
 
 /**
  * Execução manual de agregação (para testes)
  */
-export async function runManualAggregation(
-  projectId: number,
-  pesquisaId?: number
-) {
-  console.log(
-    `[Manual] Iniciando agregação manual para projeto ${projectId}${pesquisaId ? `, pesquisa ${pesquisaId}` : ""}`
+export async function runManualAggregation(projectId: number, pesquisaId?: number) {
+  logger.debug(
+    `[Manual] Iniciando agregação manual para projeto ${projectId}${pesquisaId ? `, pesquisa ${pesquisaId}` : ''}`
   );
 
   try {
     await runFullAggregation(projectId, pesquisaId);
-    console.log("[Manual] Agregação manual concluída com sucesso");
-    return { success: true, message: "Agregação concluída" };
+    logger.debug('[Manual] Agregação manual concluída com sucesso');
+    return { success: true, message: 'Agregação concluída' };
   } catch (error) {
-    console.error("[Manual] Erro na agregação manual:", error);
+    console.error('[Manual] Erro na agregação manual:', error);
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Erro desconhecido",
+      message: error instanceof Error ? error.message : 'Erro desconhecido',
     };
   }
 }
@@ -92,44 +81,34 @@ export async function runManualAggregation(
  * Esta função é chamada pelo endpoint /api/cron/daily
  */
 export async function runDailyCronJobs() {
-  console.log("[Cron] Executando job diário via Vercel Cron...");
+  logger.debug('[Cron] Executando job diário via Vercel Cron...');
 
   try {
     const db = await getDb();
     if (!db) {
-      throw new Error("Banco de dados não disponível");
+      throw new Error('Banco de dados não disponível');
     }
 
     // Buscar todos os projetos ativos
-    const activeProjects = await db
-      .select()
-      .from(projects)
-      .where(eq(projects.ativo, 1));
+    const activeProjects = await db.select().from(projects).where(eq(projects.ativo, 1));
 
-    console.log(
-      `[Cron] Encontrados ${activeProjects.length} projetos ativos`
-    );
+    logger.debug(`[Cron] Encontrados ${activeProjects.length} projetos ativos`);
 
     // Executar agregação para cada projeto
     for (const project of activeProjects) {
-      console.log(
-        `[Cron] Agregando métricas do projeto: ${project.nome} (ID: ${project.id})`
-      );
+      logger.debug(`[Cron] Agregando métricas do projeto: ${project.nome} (ID: ${project.id})`);
 
       try {
         await runFullAggregation(project.id);
-        console.log(`[Cron] ✓ Projeto ${project.nome} agregado com sucesso`);
+        logger.debug(`[Cron] ✓ Projeto ${project.nome} agregado com sucesso`);
       } catch (error) {
-        console.error(
-          `[Cron] ✗ Erro ao agregar projeto ${project.nome}:`,
-          error
-        );
+        console.error(`[Cron] ✗ Erro ao agregar projeto ${project.nome}:`, error);
       }
     }
 
-    console.log("[Cron] Job diário concluído");
+    logger.debug('[Cron] Job diário concluído');
   } catch (error) {
-    console.error("[Cron] Erro no job diário:", error);
+    console.error('[Cron] Erro no job diário:', error);
     throw error;
   }
 }
@@ -138,9 +117,9 @@ export async function runDailyCronJobs() {
  * Inicializar todos os cron jobs (para Railway/servidor tradicional)
  */
 export function initializeCronJobs() {
-  console.log("[Cron] Inicializando cron jobs...");
+  logger.debug('[Cron] Inicializando cron jobs...');
 
   startAnalyticsAggregationJob();
 
-  console.log("[Cron] Todos os cron jobs foram inicializados");
+  logger.debug('[Cron] Todos os cron jobs foram inicializados');
 }

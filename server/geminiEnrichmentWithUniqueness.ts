@@ -1,5 +1,7 @@
-import { invokeLLM } from "./_core/llm";
-import { filtrarEmpresasUnicas, getEmpresasExistentes } from "./empresasUnicas";
+import { logger } from '@/lib/logger';
+
+import { invokeLLM } from './_core/llm';
+import { filtrarEmpresasUnicas, getEmpresasExistentes } from './empresasUnicas';
 
 interface Concorrente {
   nome: string;
@@ -42,19 +44,15 @@ export async function generateConcorrentesUnicos(
   // Obter lista de empresas existentes para passar ao Gemini
   const empresasExistentes = await getEmpresasExistentes(projectId);
 
-  console.log(
-    `[Unicidade] Gerando ${quantidade} concorrentes únicos para: ${mercadoNome}`
-  );
-  console.log(
-    `[Unicidade] ${empresasExistentes.length} empresas já existem no banco`
-  );
+  logger.debug(`[Unicidade] Gerando ${quantidade} concorrentes únicos para: ${mercadoNome}`);
+  logger.debug(`[Unicidade] ${empresasExistentes.length} empresas já existem no banco`);
 
   while (concorrentesUnicos.length < quantidade && tentativas < maxTentativas) {
     tentativas++;
     const faltam = quantidade - concorrentesUnicos.length;
     const quantidadeGerar = Math.ceil(faltam * 1.5); // Gera 50% a mais para compensar duplicatas
 
-    console.log(
+    logger.debug(
       `[Unicidade] Tentativa ${tentativas}: Gerando ${quantidadeGerar} concorrentes (faltam ${faltam})`
     );
 
@@ -67,7 +65,7 @@ REGRAS IMPORTANTES:
 2. CNPJ válido no formato XX.XXX.XXX/XXXX-XX
 3. Site corporativo real (https://...)
 4. NÃO incluir estas empresas que já existem no banco:
-${empresasExistentes.slice(0, 50).join(", ")}
+${empresasExistentes.slice(0, 50).join(', ')}
 5. NÃO repetir nomes entre os resultados
 6. Priorizar empresas de médio e grande porte
 
@@ -85,48 +83,39 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
       const response = await invokeLLM({
         messages: [
           {
-            role: "system",
+            role: 'system',
             content:
-              "Você é um assistente que retorna APENAS JSON válido, sem markdown ou texto adicional.",
+              'Você é um assistente que retorna APENAS JSON válido, sem markdown ou texto adicional.',
           },
-          { role: "user", content: prompt },
+          { role: 'user', content: prompt },
         ],
       });
 
       const content =
-        typeof response.choices[0]?.message?.content === "string"
+        typeof response.choices[0]?.message?.content === 'string'
           ? response.choices[0].message.content
-          : "[]";
+          : '[]';
       const jsonMatch = content.match(/\[[\s\S]*\]/);
-      const concorrentesGerados: Concorrente[] = jsonMatch
-        ? JSON.parse(jsonMatch[0])
-        : [];
+      const concorrentesGerados: Concorrente[] = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
 
-      console.log(
-        `[Unicidade] Gemini gerou ${concorrentesGerados.length} concorrentes`
-      );
+      logger.debug(`[Unicidade] Gemini gerou ${concorrentesGerados.length} concorrentes`);
 
       // Calcular score de qualidade
-      const concorrentesComScore = concorrentesGerados.map(c => ({
+      const concorrentesComScore = concorrentesGerados.map((c) => ({
         ...c,
         qualidadeScore: calcularScoreConcorrente(c),
         qualidadeClassificacao: classificarScore(calcularScoreConcorrente(c)),
       }));
 
       // Filtrar duplicatas
-      const concorrentesFiltrados = await filtrarEmpresasUnicas(
-        concorrentesComScore,
-        projectId
-      );
+      const concorrentesFiltrados = await filtrarEmpresasUnicas(concorrentesComScore, projectId);
 
-      console.log(
-        `[Unicidade] Após filtrar duplicatas: ${concorrentesFiltrados.length} únicos`
-      );
+      logger.debug(`[Unicidade] Após filtrar duplicatas: ${concorrentesFiltrados.length} únicos`);
 
       concorrentesUnicos.push(...concorrentesFiltrados);
 
       // Atualizar lista de empresas existentes para próxima iteração
-      empresasExistentes.push(...concorrentesFiltrados.map(c => c.nome));
+      empresasExistentes.push(...concorrentesFiltrados.map((c) => c.nome));
     } catch (error) {
       console.error(`[Unicidade] Erro na tentativa ${tentativas}:`, error);
     }
@@ -134,7 +123,7 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
 
   // Retornar apenas a quantidade solicitada
   const resultado = concorrentesUnicos.slice(0, quantidade);
-  console.log(`[Unicidade] Retornando ${resultado.length} concorrentes únicos`);
+  logger.debug(`[Unicidade] Retornando ${resultado.length} concorrentes únicos`);
 
   return resultado;
 }
@@ -145,7 +134,7 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
  */
 export async function generateLeadsUnicos(
   mercadoNome: string,
-  tipo: "fornecedor" | "distribuidor" | "parceiro",
+  tipo: 'fornecedor' | 'distribuidor' | 'parceiro',
   quantidade: number,
   projectId?: number,
   concorrentesExistentes?: string[]
@@ -157,19 +146,15 @@ export async function generateLeadsUnicos(
   // Obter lista de empresas existentes para passar ao Gemini
   const empresasExistentes = await getEmpresasExistentes(projectId);
 
-  console.log(
-    `[Unicidade] Gerando ${quantidade} leads únicos (${tipo}) para: ${mercadoNome}`
-  );
-  console.log(
-    `[Unicidade] ${empresasExistentes.length} empresas já existem no banco`
-  );
+  logger.debug(`[Unicidade] Gerando ${quantidade} leads únicos (${tipo}) para: ${mercadoNome}`);
+  logger.debug(`[Unicidade] ${empresasExistentes.length} empresas já existem no banco`);
 
   while (leadsUnicos.length < quantidade && tentativas < maxTentativas) {
     tentativas++;
     const faltam = quantidade - leadsUnicos.length;
     const quantidadeGerar = Math.ceil(faltam * 1.5); // Gera 50% a mais
 
-    console.log(
+    logger.debug(
       `[Unicidade] Tentativa ${tentativas}: Gerando ${quantidadeGerar} leads (faltam ${faltam})`
     );
 
@@ -183,7 +168,7 @@ REGRAS IMPORTANTES:
 3. Site corporativo real (https://...)
 4. Email e telefone corporativos reais
 5. NÃO incluir estas empresas que já existem no banco:
-${empresasExistentes.slice(0, 50).join(", ")}
+${empresasExistentes.slice(0, 50).join(', ')}
 6. NÃO repetir nomes entre os resultados
 7. Priorizar empresas de médio e grande porte
 
@@ -204,25 +189,25 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
       const response = await invokeLLM({
         messages: [
           {
-            role: "system",
+            role: 'system',
             content:
-              "Você é um assistente que retorna APENAS JSON válido, sem markdown ou texto adicional.",
+              'Você é um assistente que retorna APENAS JSON válido, sem markdown ou texto adicional.',
           },
-          { role: "user", content: prompt },
+          { role: 'user', content: prompt },
         ],
       });
 
       const content =
-        typeof response.choices[0]?.message?.content === "string"
+        typeof response.choices[0]?.message?.content === 'string'
           ? response.choices[0].message.content
-          : "[]";
+          : '[]';
       const jsonMatch = content.match(/\[[\s\S]*\]/);
       const leadsGerados: Lead[] = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
 
-      console.log(`[Unicidade] Gemini gerou ${leadsGerados.length} leads`);
+      logger.debug(`[Unicidade] Gemini gerou ${leadsGerados.length} leads`);
 
       // Calcular score de qualidade
-      const leadsComScore = leadsGerados.map(l => ({
+      const leadsComScore = leadsGerados.map((l) => ({
         ...l,
         qualidadeScore: calcularScoreLead(l),
         qualidadeClassificacao: classificarScore(calcularScoreLead(l)),
@@ -235,14 +220,12 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
         concorrentesExistentes
       );
 
-      console.log(
-        `[Unicidade] Após filtrar duplicatas: ${leadsFiltrados.length} únicos`
-      );
+      logger.debug(`[Unicidade] Após filtrar duplicatas: ${leadsFiltrados.length} únicos`);
 
       leadsUnicos.push(...leadsFiltrados);
 
       // Atualizar lista de empresas existentes para próxima iteração
-      empresasExistentes.push(...leadsFiltrados.map(l => l.nome));
+      empresasExistentes.push(...leadsFiltrados.map((l) => l.nome));
     } catch (error) {
       console.error(`[Unicidade] Erro na tentativa ${tentativas}:`, error);
     }
@@ -250,7 +233,7 @@ Retorne APENAS um array JSON válido, sem texto adicional.`;
 
   // Retornar apenas a quantidade solicitada
   const resultado = leadsUnicos.slice(0, quantidade);
-  console.log(`[Unicidade] Retornando ${resultado.length} leads únicos`);
+  logger.debug(`[Unicidade] Retornando ${resultado.length} leads únicos`);
 
   return resultado;
 }
@@ -260,7 +243,7 @@ function calcularScoreConcorrente(c: Partial<Concorrente>): number {
   let score = 0;
   if (c.nome) score += 20;
   if (c.cnpj && c.cnpj.match(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/)) score += 20;
-  if (c.site && c.site.startsWith("http")) score += 20;
+  if (c.site && c.site.startsWith('http')) score += 20;
   if (c.produto && c.produto.length > 50) score += 20;
   if (c.porte) score += 10;
   if (c.faturamentoEstimado) score += 10;
@@ -271,8 +254,8 @@ function calcularScoreLead(l: Partial<Lead>): number {
   let score = 0;
   if (l.nome) score += 15;
   if (l.cnpj && l.cnpj.match(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/)) score += 15;
-  if (l.site && l.site.startsWith("http")) score += 15;
-  if (l.email && l.email.includes("@")) score += 15;
+  if (l.site && l.site.startsWith('http')) score += 15;
+  if (l.email && l.email.includes('@')) score += 15;
   if (l.telefone && l.telefone.match(/\(\d{2}\)/)) score += 10;
   if (l.tipo) score += 10;
   if (l.porte) score += 10;
@@ -282,7 +265,7 @@ function calcularScoreLead(l: Partial<Lead>): number {
 }
 
 function classificarScore(score: number): string {
-  if (score >= 90) return "Alta";
-  if (score >= 60) return "Média";
-  return "Baixa";
+  if (score >= 90) return 'Alta';
+  if (score >= 60) return 'Média';
+  return 'Baixa';
 }

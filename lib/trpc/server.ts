@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 import { initTRPC, TRPCError } from '@trpc/server';
 import { cache } from 'react';
 import superjson from 'superjson';
@@ -69,7 +71,7 @@ const loggerMiddleware = t.middleware(async ({ path, type, next }) => {
   const result = await next();
   const durationMs = Date.now() - start;
 
-  console.log(`[tRPC] ${type} ${path} - ${durationMs}ms`);
+  logger.debug(`[tRPC] ${type} ${path} - ${durationMs}ms`);
 
   return result;
 });

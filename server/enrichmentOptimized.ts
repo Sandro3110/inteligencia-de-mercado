@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Sistema de Enriquecimento OTIMIZADO
  * - 1 chamada OpenAI por cliente (vs 10-13 anterior)
@@ -6,8 +8,8 @@
  * - Tempo: 30-60s por cliente (vs 2-3min anterior)
  */
 
-import { getDb } from "./db";
-import { eq } from "drizzle-orm";
+import { getDb } from './db';
+import { eq } from 'drizzle-orm';
 import {
   clientes,
   mercadosUnicos,
@@ -15,10 +17,10 @@ import {
   concorrentes,
   leads,
   clientesMercados,
-} from "../drizzle/schema";
-import { generateAllDataOptimized } from "./integrations/openaiOptimized";
-import crypto from "crypto";
-import { now, toPostgresTimestamp } from "./dateUtils";
+} from '../drizzle/schema';
+import { generateAllDataOptimized } from './integrations/openaiOptimized';
+import crypto from 'crypto';
+import { now, toPostgresTimestamp } from './dateUtils';
 
 interface EnrichmentResult {
   clienteId: number;
@@ -34,10 +36,7 @@ interface EnrichmentResult {
 /**
  * Trunca string para tamanho máximo
  */
-function truncate(
-  str: string | undefined | null,
-  maxLength: number
-): string | null {
+function truncate(str: string | undefined | null, maxLength: number): string | null {
   if (!str) return null;
   return str.length > maxLength ? str.substring(0, maxLength) : str;
 }
@@ -70,10 +69,10 @@ function calculateQualityScore(data: {
  * Retorna classificação textual do quality score
  */
 function getQualityClassification(score: number): string {
-  if (score >= 90) return "Excelente";
-  if (score >= 75) return "Bom";
-  if (score >= 60) return "Regular";
-  return "Ruim";
+  if (score >= 90) return 'Excelente';
+  if (score >= 75) return 'Bom';
+  if (score >= 60) return 'Regular';
+  return 'Ruim';
 }
 
 /**
@@ -96,25 +95,19 @@ export async function enrichClienteOptimized(
 
   try {
     const db = await getDb();
-    if (!db) throw new Error("Database not available");
+    if (!db) throw new Error('Database not available');
 
     // 1. Buscar dados do cliente
-    const [cliente] = await db
-      .select()
-      .from(clientes)
-      .where(eq(clientes.id, clienteId))
-      .limit(1);
+    const [cliente] = await db.select().from(clientes).where(eq(clientes.id, clienteId)).limit(1);
 
     if (!cliente) {
       throw new Error(`Cliente ${clienteId} not found`);
     }
 
-    console.log(
-      `[Enrich] 🚀 Starting OPTIMIZED enrichment for: ${cliente.nome}`
-    );
+    logger.debug(`[Enrich] 🚀 Starting OPTIMIZED enrichment for: ${cliente.nome}`);
 
     // 2. **UMA ÚNICA CHAMADA** para gerar TUDO
-    console.log(`[Enrich] Generating ALL data with 1 OpenAI call...`);
+    logger.debug(`[Enrich] Generating ALL data with 1 OpenAI call...`);
     const allData = await generateAllDataOptimized({
       nome: cliente.nome,
       produtoPrincipal: cliente.produtoPrincipal || undefined,
@@ -127,21 +120,16 @@ export async function enrichClienteOptimized(
       const enriched = allData.clienteEnriquecido;
       const updateData: unknown = {};
 
-      if (enriched.siteOficial)
-        updateData.siteOficial = truncate(enriched.siteOficial, 500);
-      if (enriched.produtoPrincipal)
-        updateData.produtoPrincipal = enriched.produtoPrincipal;
+      if (enriched.siteOficial) updateData.siteOficial = truncate(enriched.siteOficial, 500);
+      if (enriched.produtoPrincipal) updateData.produtoPrincipal = enriched.produtoPrincipal;
       if (enriched.cidade) updateData.cidade = truncate(enriched.cidade, 100);
       if (enriched.uf) updateData.uf = truncate(enriched.uf, 2);
       if (enriched.regiao) updateData.regiao = truncate(enriched.regiao, 100);
       if (enriched.porte) updateData.porte = truncate(enriched.porte, 50);
       if (enriched.email) updateData.email = truncate(enriched.email, 320);
-      if (enriched.telefone)
-        updateData.telefone = truncate(enriched.telefone, 50);
-      if (enriched.linkedin)
-        updateData.linkedin = truncate(enriched.linkedin, 500);
-      if (enriched.instagram)
-        updateData.instagram = truncate(enriched.instagram, 500);
+      if (enriched.telefone) updateData.telefone = truncate(enriched.telefone, 50);
+      if (enriched.linkedin) updateData.linkedin = truncate(enriched.linkedin, 500);
+      if (enriched.instagram) updateData.instagram = truncate(enriched.instagram, 500);
 
       // Adicionar coordenadas geográficas
       if (enriched.latitude !== undefined && enriched.latitude !== null) {
@@ -155,13 +143,8 @@ export async function enrichClienteOptimized(
       }
 
       if (Object.keys(updateData).length > 0) {
-        await db
-          .update(clientes)
-          .set(updateData)
-          .where(eq(clientes.id, clienteId));
-        console.log(
-          `[Enrich] Updated cliente with enriched data (including coordinates)`
-        );
+        await db.update(clientes).set(updateData).where(eq(clientes.id, clienteId));
+        logger.debug(`[Enrich] Updated cliente with enriched data (including coordinates)`);
       }
     }
 
@@ -171,9 +154,9 @@ export async function enrichClienteOptimized(
 
       // 3.1 Criar/buscar mercado único
       const mercadoHash = crypto
-        .createHash("md5")
+        .createHash('md5')
         .update(`${mercadoData.nome}-${mercadoData.categoria}`)
-        .digest("hex");
+        .digest('hex');
 
       let mercadoId: number;
 
@@ -185,22 +168,22 @@ export async function enrichClienteOptimized(
 
       if (existingMercado) {
         mercadoId = existingMercado.id;
-        console.log(`[Enrich] Reusing mercado: ${mercadoData.nome}`);
+        logger.debug(`[Enrich] Reusing mercado: ${mercadoData.nome}`);
       } else {
         const [newMercado] = await db.insert(mercadosUnicos).values({
           projectId,
           pesquisaId: cliente.pesquisaId || null,
-          nome: truncate(mercadoData.nome, 255) || "",
-          categoria: truncate(mercadoData.categoria || "", 100),
-          segmentacao: truncate(mercadoData.segmentacao || "", 50),
-          tamanhoMercado: truncate(mercadoData.tamanhoEstimado || "", 500),
+          nome: truncate(mercadoData.nome, 255) || '',
+          categoria: truncate(mercadoData.categoria || '', 100),
+          segmentacao: truncate(mercadoData.segmentacao || '', 50),
+          tamanhoMercado: truncate(mercadoData.tamanhoEstimado || '', 500),
           mercadoHash,
           createdAt: now(),
         });
 
         mercadoId = Number(newMercado.insertId);
         result.mercadosCreated++;
-        console.log(`[Enrich] Created mercado: ${mercadoData.nome}`);
+        logger.debug(`[Enrich] Created mercado: ${mercadoData.nome}`);
       }
 
       // 3.2 Associar cliente ao mercado
@@ -221,9 +204,9 @@ export async function enrichClienteOptimized(
             pesquisaId: cliente.pesquisaId || null,
             clienteId,
             mercadoId,
-            nome: truncate(produtoData.nome, 255) || "",
-            descricao: truncate(produtoData.descricao || "", 1000),
-            categoria: truncate(produtoData.categoria || "", 100),
+            nome: truncate(produtoData.nome, 255) || '',
+            descricao: truncate(produtoData.descricao || '', 1000),
+            categoria: truncate(produtoData.categoria || '', 100),
             preco: null,
             unidade: null,
             ativo: 1,
@@ -231,8 +214,8 @@ export async function enrichClienteOptimized(
           })
           .onDuplicateKeyUpdate({
             set: {
-              descricao: truncate(produtoData.descricao || "", 1000),
-              categoria: truncate(produtoData.categoria || "", 100),
+              descricao: truncate(produtoData.descricao || '', 1000),
+              categoria: truncate(produtoData.categoria || '', 100),
               ativo: 1,
             },
           });
@@ -242,9 +225,9 @@ export async function enrichClienteOptimized(
       // 3.4 Inserir concorrentes
       for (const concorrenteData of mercadoItem.concorrentes) {
         const concorrenteHash = crypto
-          .createHash("md5")
+          .createHash('md5')
           .update(`${concorrenteData.nome}-${mercadoId}`)
-          .digest("hex");
+          .digest('hex');
 
         // ✅ BUG FIX 2: Quality score melhorado
         const qualityScore = calculateQualityScore({
@@ -268,32 +251,26 @@ export async function enrichClienteOptimized(
             projectId,
             pesquisaId: cliente.pesquisaId || null,
             mercadoId,
-            nome: truncate(concorrenteData.nome, 255) || "",
-            produto: truncate(concorrenteData.descricao || "", 1000),
-            porte: truncate(concorrenteData.porte || "", 50),
+            nome: truncate(concorrenteData.nome, 255) || '',
+            produto: truncate(concorrenteData.descricao || '', 1000),
+            porte: truncate(concorrenteData.porte || '', 50),
             cnpj: null,
             site: null,
-            cidade: truncate(concorrenteData.cidade || "", 100) || null,
-            uf: truncate(concorrenteData.uf || "", 2) || null,
+            cidade: truncate(concorrenteData.cidade || '', 100) || null,
+            uf: truncate(concorrenteData.uf || '', 2) || null,
             faturamentoEstimado: null,
             qualidadeScore: qualityScore,
             qualidadeClassificacao: getQualityClassification(qualityScore),
-            validationStatus: "pending",
+            validationStatus: 'pending',
             concorrenteHash,
             createdAt: now(),
           };
 
           // Adicionar coordenadas se disponíveis
-          if (
-            concorrenteData.latitude !== undefined &&
-            concorrenteData.latitude !== null
-          ) {
+          if (concorrenteData.latitude !== undefined && concorrenteData.latitude !== null) {
             concorrenteInsert.latitude = concorrenteData.latitude.toString();
           }
-          if (
-            concorrenteData.longitude !== undefined &&
-            concorrenteData.longitude !== null
-          ) {
+          if (concorrenteData.longitude !== undefined && concorrenteData.longitude !== null) {
             concorrenteInsert.longitude = concorrenteData.longitude.toString();
           }
           if (concorrenteData.latitude || concorrenteData.longitude) {
@@ -308,9 +285,9 @@ export async function enrichClienteOptimized(
       // 3.5 Inserir leads
       for (const leadData of mercadoItem.leads) {
         const leadHash = crypto
-          .createHash("md5")
+          .createHash('md5')
           .update(`${leadData.nome}-${mercadoId}`)
-          .digest("hex");
+          .digest('hex');
 
         // ✅ BUG FIX 2: Quality score melhorado
         const qualityScore = calculateQualityScore({
@@ -334,16 +311,16 @@ export async function enrichClienteOptimized(
             projectId,
             pesquisaId: cliente.pesquisaId || null,
             mercadoId,
-            nome: truncate(leadData.nome, 255) || "",
-            setor: truncate(leadData.segmento || "", 100),
-            tipo: truncate(leadData.potencial || "", 20),
-            porte: truncate(leadData.porte || "", 50),
-            cidade: truncate(leadData.cidade || "", 100) || null,
-            uf: truncate(leadData.uf || "", 2) || null,
+            nome: truncate(leadData.nome, 255) || '',
+            setor: truncate(leadData.segmento || '', 100),
+            tipo: truncate(leadData.potencial || '', 20),
+            porte: truncate(leadData.porte || '', 50),
+            cidade: truncate(leadData.cidade || '', 100) || null,
+            uf: truncate(leadData.uf || '', 2) || null,
             qualidadeScore: qualityScore,
             qualidadeClassificacao: getQualityClassification(qualityScore),
-            validationStatus: "pending",
-            stage: "novo",
+            validationStatus: 'pending',
+            stage: 'novo',
             leadHash,
             createdAt: now(),
           };
@@ -368,23 +345,20 @@ export async function enrichClienteOptimized(
     result.success = true;
     result.duration = Date.now() - startTime;
 
-    console.log(
+    logger.debug(
       `[Enrich] ✅ OPTIMIZED success for ${cliente.nome} in ${(result.duration / 1000).toFixed(1)}s`
     );
-    console.log(
+    logger.debug(
       `[Enrich] Created: ${result.mercadosCreated}M ${result.produtosCreated}P ${result.concorrentesCreated}C ${result.leadsCreated}L`
     );
 
     return result;
   } catch (error) {
     result.success = false;
-    result.error = error instanceof Error ? error.message : "Unknown error";
+    result.error = error instanceof Error ? error.message : 'Unknown error';
     result.duration = Date.now() - startTime;
 
-    console.error(
-      `[Enrich] ❌ OPTIMIZED failed for cliente ${clienteId}:`,
-      error
-    );
+    console.error(`[Enrich] ❌ OPTIMIZED failed for cliente ${clienteId}:`, error);
 
     return result;
   }
@@ -397,16 +371,12 @@ export async function enrichClientesParallel(
   clienteIds: number[],
   projectId: number = 1,
   concurrency: number = 5,
-  onProgress?: (
-    current: number,
-    total: number,
-    result: EnrichmentResult
-  ) => void
+  onProgress?: (current: number, total: number, result: EnrichmentResult) => void
 ): Promise<EnrichmentResult[]> {
   const results: EnrichmentResult[] = [];
   let completed = 0;
 
-  console.log(
+  logger.debug(
     `\n[Enrich] 🚀 Starting PARALLEL enrichment: ${clienteIds.length} clientes, ${concurrency} concurrent`
   );
 
@@ -414,13 +384,13 @@ export async function enrichClientesParallel(
   for (let i = 0; i < clienteIds.length; i += concurrency) {
     const batch = clienteIds.slice(i, i + concurrency);
 
-    console.log(
+    logger.debug(
       `\n[Enrich] Processing batch ${Math.floor(i / concurrency) + 1}/${Math.ceil(clienteIds.length / concurrency)}: ${batch.length} clientes`
     );
 
     // Executar batch em paralelo
     const batchResults = await Promise.all(
-      batch.map(clienteId => enrichClienteOptimized(clienteId, projectId))
+      batch.map((clienteId) => enrichClienteOptimized(clienteId, projectId))
     );
 
     // Processar resultados
@@ -435,13 +405,11 @@ export async function enrichClientesParallel(
 
     // Pequeno delay entre batches para não sobrecarregar
     if (i + concurrency < clienteIds.length) {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // 1s entre batches
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // 1s entre batches
     }
   }
 
-  console.log(
-    `\n[Enrich] ✅ PARALLEL enrichment completed: ${completed}/${clienteIds.length}`
-  );
+  logger.debug(`\n[Enrich] ✅ PARALLEL enrichment completed: ${completed}/${clienteIds.length}`);
 
   return results;
 }
@@ -453,13 +421,8 @@ export async function enrichClientesParallel(
 /**
  * @deprecated Use enrichClienteOptimized instead
  */
-export async function identifyMercados(
-  clienteId: number,
-  projectId: number = 1
-): Promise<any[]> {
-  console.warn(
-    "[DEPRECATED] identifyMercados is deprecated. Use enrichClienteOptimized instead."
-  );
+export async function identifyMercados(clienteId: number, projectId: number = 1): Promise<any[]> {
+  console.warn('[DEPRECATED] identifyMercados is deprecated. Use enrichClienteOptimized instead.');
   return [];
 }
 
@@ -471,7 +434,7 @@ export async function createProdutosCliente(
   projectId: number = 1
 ): Promise<any[]> {
   console.warn(
-    "[DEPRECATED] createProdutosCliente is deprecated. Use enrichClienteOptimized instead."
+    '[DEPRECATED] createProdutosCliente is deprecated. Use enrichClienteOptimized instead.'
   );
   return [];
 }
@@ -484,7 +447,7 @@ export async function findConcorrentesCliente(
   projectId: number = 1
 ): Promise<any[]> {
   console.warn(
-    "[DEPRECATED] findConcorrentesCliente is deprecated. Use enrichClienteOptimized instead."
+    '[DEPRECATED] findConcorrentesCliente is deprecated. Use enrichClienteOptimized instead.'
   );
   return [];
 }
@@ -492,13 +455,8 @@ export async function findConcorrentesCliente(
 /**
  * @deprecated Use enrichClienteOptimized instead
  */
-export async function findLeadsCliente(
-  clienteId: number,
-  projectId: number = 1
-): Promise<any[]> {
-  console.warn(
-    "[DEPRECATED] findLeadsCliente is deprecated. Use enrichClienteOptimized instead."
-  );
+export async function findLeadsCliente(clienteId: number, projectId: number = 1): Promise<any[]> {
+  console.warn('[DEPRECATED] findLeadsCliente is deprecated. Use enrichClienteOptimized instead.');
   return [];
 }
 
@@ -510,7 +468,7 @@ export async function enrichClienteCompleto(
   projectId: number = 1
 ): Promise<any> {
   console.warn(
-    "[DEPRECATED] enrichClienteCompleto is deprecated. Use enrichClienteOptimized instead."
+    '[DEPRECATED] enrichClienteCompleto is deprecated. Use enrichClienteOptimized instead.'
   );
   return enrichClienteOptimized(clienteId, projectId);
 }
@@ -518,12 +476,7 @@ export async function enrichClienteCompleto(
 /**
  * @deprecated Use enrichClienteOptimized instead
  */
-export async function enrichCliente(
-  clienteId: number,
-  projectId: number = 1
-): Promise<any> {
-  console.warn(
-    "[DEPRECATED] enrichCliente is deprecated. Use enrichClienteOptimized instead."
-  );
+export async function enrichCliente(clienteId: number, projectId: number = 1): Promise<any> {
+  console.warn('[DEPRECATED] enrichCliente is deprecated. Use enrichClienteOptimized instead.');
   return enrichClienteOptimized(clienteId, projectId);
 }

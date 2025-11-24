@@ -1,12 +1,14 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Sistema de enriquecimento em lote com processamento paralelo
  */
 
-import { enrichClienteOptimized } from "./enrichmentOptimized";
-import { getDb } from "./db";
-import { clientes } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
-import { notifyOwner } from "./_core/notification";
+import { enrichClienteOptimized } from './enrichmentOptimized';
+import { getDb } from './db';
+import { clientes } from '../drizzle/schema';
+import { eq } from 'drizzle-orm';
+import { notifyOwner } from './_core/notification';
 
 export interface BatchProgress {
   total: number;
@@ -53,17 +55,14 @@ export async function enrichClientesBatch(
 
   const db = await getDb();
   if (!db) {
-    throw new Error("Database not available");
+    throw new Error('Database not available');
   }
 
   // Buscar todos os clientes do projeto
-  const allClientes = await db
-    .select()
-    .from(clientes)
-    .where(eq(clientes.projectId, projectId));
+  const allClientes = await db.select().from(clientes).where(eq(clientes.projectId, projectId));
 
   if (allClientes.length === 0) {
-    throw new Error("Nenhum cliente encontrado para enriquecer");
+    throw new Error('Nenhum cliente encontrado para enriquecer');
   }
 
   const totalClientes = allClientes.length;
@@ -83,8 +82,8 @@ export async function enrichClientesBatch(
 
   const results: BatchResult[] = [];
 
-  console.log(`[Batch] Iniciando enriquecimento de ${totalClientes} clientes`);
-  console.log(
+  logger.debug(`[Batch] Iniciando enriquecimento de ${totalClientes} clientes`);
+  logger.debug(
     `[Batch] Configuração: ${batchSize} clientes em paralelo, checkpoint a cada ${checkpointInterval}`
   );
 
@@ -93,12 +92,12 @@ export async function enrichClientesBatch(
     const batch = allClientes.slice(i, Math.min(i + batchSize, totalClientes));
     progress.currentBatch = Math.floor(i / batchSize) + 1;
 
-    console.log(
+    logger.debug(
       `[Batch] Processando lote ${progress.currentBatch}/${totalBatches} (${batch.length} clientes)`
     );
 
     // Processar clientes em paralelo
-    const batchPromises = batch.map(async cliente => {
+    const batchPromises = batch.map(async (cliente) => {
       const startTime = Date.now();
 
       try {
@@ -137,8 +136,8 @@ export async function enrichClientesBatch(
 
     // Atualizar progresso
     progress.processed += batchResults.length;
-    progress.success += batchResults.filter(r => r.success).length;
-    progress.failed += batchResults.filter(r => !r.success).length;
+    progress.success += batchResults.filter((r) => r.success).length;
+    progress.failed += batchResults.filter((r) => !r.success).length;
     progress.lastUpdate = Date.now();
 
     // Calcular tempo estimado restante
@@ -152,24 +151,17 @@ export async function enrichClientesBatch(
       options.onProgress(progress);
     }
 
-    console.log(
+    logger.debug(
       `[Batch] Progresso: ${progress.processed}/${totalClientes} (${Math.round((progress.processed / totalClientes) * 100)}%)`
     );
-    console.log(
-      `[Batch] Sucesso: ${progress.success}, Falhas: ${progress.failed}`
-    );
-    console.log(
+    logger.debug(`[Batch] Sucesso: ${progress.success}, Falhas: ${progress.failed}`);
+    logger.debug(
       `[Batch] Tempo estimado restante: ${Math.round(progress.estimatedTimeRemaining / 1000 / 60)} minutos`
     );
 
     // Checkpoint automático
-    if (
-      progress.processed % checkpointInterval === 0 ||
-      progress.processed === totalClientes
-    ) {
-      console.log(
-        `[Batch] Checkpoint automático em ${progress.processed} clientes`
-      );
+    if (progress.processed % checkpointInterval === 0 || progress.processed === totalClientes) {
+      logger.debug(`[Batch] Checkpoint automático em ${progress.processed} clientes`);
 
       if (options.onCheckpoint) {
         options.onCheckpoint(progress, results);
@@ -186,15 +178,15 @@ export async function enrichClientesBatch(
   const totalDuration = Date.now() - progress.startTime;
   const avgDuration = totalDuration / totalClientes;
 
-  console.log(`[Batch] Enriquecimento concluído!`);
-  console.log(
+  logger.debug(`[Batch] Enriquecimento concluído!`);
+  logger.debug(
     `[Batch] Total: ${totalClientes} clientes em ${Math.round(totalDuration / 1000 / 60)} minutos`
   );
-  console.log(`[Batch] Média: ${Math.round(avgDuration / 1000)}s por cliente`);
-  console.log(
+  logger.debug(`[Batch] Média: ${Math.round(avgDuration / 1000)}s por cliente`);
+  logger.debug(
     `[Batch] Sucesso: ${progress.success} (${Math.round((progress.success / totalClientes) * 100)}%)`
   );
-  console.log(
+  logger.debug(
     `[Batch] Falhas: ${progress.failed} (${Math.round((progress.failed / totalClientes) * 100)}%)`
   );
 

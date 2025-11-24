@@ -1,10 +1,12 @@
+import { logger } from '@/lib/logger';
+
 // TODO: Fix this test - temporarily disabled
 // Reason: Requires API mocking or real API keys
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from 'vitest';
 
-describe.skip("Gemini API Key Validation", () => {
-  it("should validate Gemini API key with a simple request", async () => {
+describe.skip('Gemini API Key Validation', () => {
+  it('should validate Gemini API key with a simple request', async () => {
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
     expect(GEMINI_API_KEY).toBeDefined();
@@ -14,9 +16,9 @@ describe.skip("Gemini API Key Validation", () => {
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           contents: [
@@ -34,12 +36,12 @@ describe.skip("Gemini API Key Validation", () => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("[Gemini Test] Error:", response.status, errorText);
+      console.error('[Gemini Test] Error:', response.status, errorText);
       throw new Error(`Gemini API returned ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
-    console.log("[Gemini Test] Response:", JSON.stringify(data, null, 2));
+    logger.debug('[Gemini Test] Response:', JSON.stringify(data, null, 2));
 
     expect(data.candidates).toBeDefined();
     expect(data.candidates.length).toBeGreaterThan(0);

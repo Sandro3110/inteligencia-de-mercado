@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Fluxo Automatizado de Enriquecimento de Dados
  *
@@ -10,8 +12,8 @@
  * 6. Criação de novo projeto com dados processados
  */
 
-import { calculateQualityScore } from "../shared/qualityScore";
-import { jobManager } from "./_core/jobManager";
+import { calculateQualityScore } from '../shared/qualityScore';
+import { jobManager } from './_core/jobManager';
 
 export type EnrichmentInput = {
   clientes: Array<{
@@ -26,7 +28,7 @@ export type EnrichmentInput = {
 };
 
 export type EnrichmentProgress = {
-  status: "processing" | "completed" | "error";
+  status: 'processing' | 'completed' | 'error';
   message: string;
   currentStep: number;
   totalSteps: number;
@@ -81,14 +83,14 @@ export async function executeEnrichmentFlow(
 
     if (input.projectId) {
       // Reusar projeto existente
-      const { getProjectById } = await import("./db");
+      const { getProjectById } = await import('./db');
       const existingProject = await getProjectById(input.projectId);
       if (!existingProject) {
         throw new Error(`Projeto com ID ${input.projectId} não encontrado`);
       }
       project = { id: existingProject.id, nome: existingProject.nome };
       onProgress({
-        status: "processing",
+        status: 'processing',
         message: `Reusando projeto "${project.nome}" (ID: ${project.id})...`,
         currentStep: ++currentStep,
         totalSteps,
@@ -96,7 +98,7 @@ export async function executeEnrichmentFlow(
     } else {
       // Criar novo projeto
       const step1 = {
-        status: "processing" as const,
+        status: 'processing' as const,
         message: `Criando projeto "${input.projectName}"...`,
         currentStep: ++currentStep,
         totalSteps,
@@ -105,84 +107,69 @@ export async function executeEnrichmentFlow(
       if (jobId) {
         jobManager.updateJob(jobId, {
           step: currentStep,
-          currentStepName: "Criando projeto",
+          currentStepName: 'Criando projeto',
           message: step1.message,
           progress: 0,
         });
       }
 
-      const { createProject } = await import("./db");
+      const { createProject } = await import('./db');
       project = await createProject({
         nome: input.projectName!,
         descricao:
-          input.projectDescription ||
-          `Projeto criado automaticamente via fluxo de enriquecimento`,
+          input.projectDescription || `Projeto criado automaticamente via fluxo de enriquecimento`,
       });
 
       if (!project) {
-        throw new Error("Falha ao criar projeto");
+        throw new Error('Falha ao criar projeto');
       }
     }
 
     // Passo 2: Criar pesquisa dentro do projeto
     onProgress({
-      status: "processing",
-      message: "Criando pesquisa dentro do projeto...",
+      status: 'processing',
+      message: 'Criando pesquisa dentro do projeto...',
       currentStep: ++currentStep,
       totalSteps,
     });
 
-    const { createPesquisa } = await import("./db");
+    const { createPesquisa } = await import('./db');
     const pesquisaNome = input.projectName || project.nome;
     const pesquisa = await createPesquisa({
       projectId: project.id,
       nome: pesquisaNome,
       descricao: `Pesquisa criada automaticamente via fluxo de enriquecimento`,
       totalClientes: input.clientes.length,
-      status: "em_andamento",
+      status: 'em_andamento',
     });
 
     if (!pesquisa) {
-      throw new Error("Falha ao criar pesquisa");
+      throw new Error('Falha ao criar pesquisa');
     }
-    console.log(
-      `[Enrichment] Pesquisa ID ${pesquisa.id} criada para projeto ${project.id}`
-    );
+    logger.debug(`[Enrichment] Pesquisa ID ${pesquisa.id} criada para projeto ${project.id}`);
 
     // Passo 3: Identificar mercados únicos
     onProgress({
-      status: "processing",
-      message: "Identificando mercados a partir dos produtos dos clientes...",
+      status: 'processing',
+      message: 'Identificando mercados a partir dos produtos dos clientes...',
       currentStep: ++currentStep,
       totalSteps,
     });
 
     // Registrar início da execução
-    const { createEnrichmentRun } = await import("./db");
+    const { createEnrichmentRun } = await import('./db');
     runId = await createEnrichmentRun(project.id, input.clientes.length);
-    console.log(
-      `[Enrichment] Run ID ${runId} criado para projeto ${project.id}`
-    );
+    logger.debug(`[Enrichment] Run ID ${runId} criado para projeto ${project.id}`);
 
     // Iniciar monitoramento de progresso
-    const { startProgressMonitoring, stopProgressMonitoring } = await import(
-      "./enrichmentMonitor"
-    );
-    const monitorInterval = startProgressMonitoring(
-      project.id,
-      runId,
-      project.nome
-    );
+    const { startProgressMonitoring, stopProgressMonitoring } = await import('./enrichmentMonitor');
+    const monitorInterval = startProgressMonitoring(project.id, runId, project.nome);
 
-    const mercadosMap = await identifyMarkets(
-      input.clientes,
-      project.id,
-      pesquisa.id
-    );
+    const mercadosMap = await identifyMarkets(input.clientes, project.id, pesquisa.id);
 
     // Passo 4: Processar e enriquecer clientes
     onProgress({
-      status: "processing",
+      status: 'processing',
       message: `Enriquecendo dados de ${input.clientes.length} clientes...`,
       currentStep: ++currentStep,
       totalSteps,
@@ -197,8 +184,8 @@ export async function executeEnrichmentFlow(
 
     // Passo 5: Buscar concorrentes
     onProgress({
-      status: "processing",
-      message: "Identificando concorrentes por mercado...",
+      status: 'processing',
+      message: 'Identificando concorrentes por mercado...',
       currentStep: ++currentStep,
       totalSteps,
     });
@@ -207,7 +194,7 @@ export async function executeEnrichmentFlow(
       mercadosMap,
       project.id,
       pesquisa.id,
-      clientesEnriquecidos.map(c => ({
+      clientesEnriquecidos.map((c) => ({
         nome: c.nome,
         cnpj: c.cnpj || undefined,
       })) // Passar clientes para exclusão
@@ -215,8 +202,8 @@ export async function executeEnrichmentFlow(
 
     // Passo 6: Buscar leads
     onProgress({
-      status: "processing",
-      message: "Buscando leads qualificados...",
+      status: 'processing',
+      message: 'Buscando leads qualificados...',
       currentStep: ++currentStep,
       totalSteps,
     });
@@ -225,32 +212,30 @@ export async function executeEnrichmentFlow(
       mercadosMap,
       project.id,
       pesquisa.id,
-      clientesEnriquecidos.map(c => ({
+      clientesEnriquecidos.map((c) => ({
         nome: c.nome,
         cnpj: c.cnpj || undefined,
       })), // Passar clientes para exclusão
-      concorrentes.map(c => ({ nome: c.nome, cnpj: c.cnpj || undefined })) // Passar concorrentes para exclusão
+      concorrentes.map((c) => ({ nome: c.nome, cnpj: c.cnpj || undefined })) // Passar concorrentes para exclusão
     );
 
     // Passo 7: Calcular estatísticas
     onProgress({
-      status: "processing",
-      message: "Calculando métricas de qualidade...",
+      status: 'processing',
+      message: 'Calculando métricas de qualidade...',
       currentStep: ++currentStep,
       totalSteps,
     });
 
     const avgQualityScore = Math.round(
-      clientesEnriquecidos.reduce(
-        (sum, c) => sum + (c.qualidadeScore || 0),
-        0
-      ) / clientesEnriquecidos.length
+      clientesEnriquecidos.reduce((sum, c) => sum + (c.qualidadeScore || 0), 0) /
+        clientesEnriquecidos.length
     );
 
     // Passo 8: Finalizar
     onProgress({
-      status: "completed",
-      message: "Processamento concluído com sucesso!",
+      status: 'completed',
+      message: 'Processamento concluído com sucesso!',
       currentStep: ++currentStep,
       totalSteps,
       data: {
@@ -265,16 +250,16 @@ export async function executeEnrichmentFlow(
 
     // Parar monitoramento
     if (monitorInterval) {
-      const { stopProgressMonitoring } = await import("./enrichmentMonitor");
+      const { stopProgressMonitoring } = await import('./enrichmentMonitor');
       stopProgressMonitoring(monitorInterval);
     }
 
     // Registrar conclusão da execução
     if (runId) {
       const durationSeconds = Math.floor((Date.now() - startTime) / 1000);
-      const { updateEnrichmentRun } = await import("./db");
+      const { updateEnrichmentRun } = await import('./db');
       await updateEnrichmentRun(runId, {
-        status: "completed",
+        status: 'completed',
         processedClients: clientesEnriquecidos.length,
         completedAt: new Date(),
         durationSeconds,
@@ -282,22 +267,22 @@ export async function executeEnrichmentFlow(
       });
 
       // Enviar notificação de conclusão
-      const { notifyOwner } = await import("./_core/notification");
+      const { notifyOwner } = await import('./_core/notification');
       await notifyOwner({
         title: `✅ Enriquecimento Concluído - ${project.nome}`,
         content: `O enriquecimento foi concluído com sucesso!\n\n• ${clientesEnriquecidos.length} clientes processados\n• ${mercadosMap.size} mercados identificados\n• ${concorrentes.length} concorrentes encontrados\n• ${leadsEncontrados.length} leads gerados\n• Tempo total: ${Math.floor(durationSeconds / 60)} minutos`,
       });
 
       // Enviar notificação em tempo real via WebSocket
-      const { getWebSocketManager } = await import("./websocket");
+      const { getWebSocketManager } = await import('./websocket');
       const wsManager = getWebSocketManager();
       if (wsManager) {
         // TODO: Obter userId do contexto quando disponível
         // Por enquanto, broadcast para todos os usuários conectados
         wsManager.broadcast({
           id: `enrichment-${project.id}-${Date.now()}`,
-          type: "enrichment_complete",
-          title: "✅ Enriquecimento Concluído",
+          type: 'enrichment_complete',
+          title: '✅ Enriquecimento Concluído',
           message: `Projeto "${project.nome}" processado! ${clientesEnriquecidos.length} clientes, ${mercadosMap.size} mercados, ${concorrentes.length} concorrentes, ${leadsEncontrados.length} leads.`,
           timestamp: new Date(),
           data: {
@@ -310,20 +295,20 @@ export async function executeEnrichmentFlow(
         });
       }
 
-      console.log(`[Enrichment] Run ${runId} concluído com sucesso`);
+      logger.debug(`[Enrichment] Run ${runId} concluído com sucesso`);
     }
 
     // Buscar dados completos do banco para retornar
-    const db = await (await import("./db")).getDb();
-    if (!db) throw new Error("Database not available");
+    const db = await (await import('./db')).getDb();
+    if (!db) throw new Error('Database not available');
 
     const {
       clientes: clientesTable,
       mercadosUnicos,
       concorrentes: concorrentesTable,
       leads: leadsTable,
-    } = await import("../drizzle/schema");
-    const { eq } = await import("drizzle-orm");
+    } = await import('../drizzle/schema');
+    const { eq } = await import('drizzle-orm');
 
     const clientesCompletos = await db
       .select()
@@ -343,8 +328,8 @@ export async function executeEnrichmentFlow(
       .where(eq(leadsTable.projectId, project.id));
 
     return {
-      status: "completed",
-      message: "Processamento concluído!",
+      status: 'completed',
+      message: 'Processamento concluído!',
       currentStep: totalSteps,
       totalSteps,
       data: {
@@ -364,21 +349,20 @@ export async function executeEnrichmentFlow(
       },
     };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Erro desconhecido";
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
 
     // Parar monitoramento em caso de erro
     if (monitorInterval) {
-      const { stopProgressMonitoring } = await import("./enrichmentMonitor");
+      const { stopProgressMonitoring } = await import('./enrichmentMonitor');
       stopProgressMonitoring(monitorInterval);
     }
 
     // Registrar erro na execução
     if (runId) {
       const durationSeconds = Math.floor((Date.now() - startTime) / 1000);
-      const { updateEnrichmentRun } = await import("./db");
+      const { updateEnrichmentRun } = await import('./db');
       await updateEnrichmentRun(runId, {
-        status: "error",
+        status: 'error',
         completedAt: new Date(),
         durationSeconds,
         errorMessage,
@@ -387,7 +371,7 @@ export async function executeEnrichmentFlow(
     }
 
     return {
-      status: "error",
+      status: 'error',
       message: `Erro no processamento: ${errorMessage}`,
       currentStep: 0,
       totalSteps: 0,
@@ -399,17 +383,15 @@ export async function executeEnrichmentFlow(
  * Identifica mercados únicos a partir dos produtos dos clientes
  */
 async function identifyMarkets(
-  clientes: EnrichmentInput["clientes"],
+  clientes: EnrichmentInput['clientes'],
   projectId: number,
   pesquisaId: number
 ): Promise<Map<string, number>> {
-  const { invokeLLM } = await import("./_core/llm");
-  const { createMercado } = await import("./db");
+  const { invokeLLM } = await import('./_core/llm');
+  const { createMercado } = await import('./db');
 
   const mercadosMap = new Map<string, number>();
-  const produtosUnicos = Array.from(
-    new Set(clientes.map(c => c.produto).filter(Boolean))
-  );
+  const produtosUnicos = Array.from(new Set(clientes.map((c) => c.produto).filter(Boolean)));
 
   for (const produto of produtosUnicos) {
     if (!produto) continue;
@@ -418,28 +400,28 @@ async function identifyMarkets(
     const response = await invokeLLM({
       messages: [
         {
-          role: "system",
+          role: 'system',
           content:
-            "Você é um especialista em análise de mercado. Identifique o mercado/setor para o produto fornecido.",
+            'Você é um especialista em análise de mercado. Identifique o mercado/setor para o produto fornecido.',
         },
         {
-          role: "user",
+          role: 'user',
           content: `Produto: ${produto}\n\nRetorne JSON com: { "mercado": "nome do mercado", "categoria": "categoria", "segmentacao": "B2B ou B2C" }`,
         },
       ],
       response_format: {
-        type: "json_schema",
+        type: 'json_schema',
         json_schema: {
-          name: "market_identification",
+          name: 'market_identification',
           strict: true,
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
-              mercado: { type: "string" },
-              categoria: { type: "string" },
-              segmentacao: { type: "string", enum: ["B2B", "B2C", "B2B2C"] },
+              mercado: { type: 'string' },
+              categoria: { type: 'string' },
+              segmentacao: { type: 'string', enum: ['B2B', 'B2C', 'B2B2C'] },
             },
-            required: ["mercado", "categoria", "segmentacao"],
+            required: ['mercado', 'categoria', 'segmentacao'],
             additionalProperties: false,
           },
         },
@@ -447,7 +429,7 @@ async function identifyMarkets(
     });
 
     const content = response.choices[0]?.message?.content;
-    if (!content || typeof content !== "string") continue;
+    if (!content || typeof content !== 'string') continue;
 
     const data = JSON.parse(content);
 
@@ -474,19 +456,18 @@ async function identifyMarkets(
  * Enriquece dados dos clientes
  */
 async function enrichClientes(
-  clientes: EnrichmentInput["clientes"],
+  clientes: EnrichmentInput['clientes'],
   projectId: number,
   pesquisaId: number,
   mercadosMap: Map<string, number>
 ) {
-  const { createCliente, associateClienteToMercado } = await import("./db");
-  const { invokeLLM } = await import("./_core/llm");
-  const { getCachedEnrichment, setCachedEnrichment } = await import(
-    "./_core/enrichmentCache"
+  const { createCliente, associateClienteToMercado } = await import('./db');
+  const { invokeLLM } = await import('./_core/llm');
+  const { getCachedEnrichment, setCachedEnrichment } = await import('./_core/enrichmentCache');
+  const { consultarCNPJ, extractPorte, extractEndereco, extractCNAE } = await import(
+    './_core/receitaws'
   );
-  const { consultarCNPJ, extractPorte, extractEndereco, extractCNAE } =
-    await import("./_core/receitaws");
-  const { geocodeCliente } = await import("./geocodeHelper");
+  const { geocodeCliente } = await import('./geocodeHelper');
 
   const enriched = [];
 
@@ -494,7 +475,7 @@ async function enrichClientes(
     // Tentar buscar dados do cache primeiro
     let dadosEnriquecidos: unknown = null;
     if (cliente.cnpj) {
-      const cnpjLimpo = cliente.cnpj.replace(/\D/g, "");
+      const cnpjLimpo = cliente.cnpj.replace(/\D/g, '');
       if (cnpjLimpo.length === 14) {
         dadosEnriquecidos = await getCachedEnrichment(cnpjLimpo);
 
@@ -518,11 +499,7 @@ async function enrichClientes(
             };
 
             // Salvar no cache
-            await setCachedEnrichment(
-              cnpjLimpo,
-              dadosEnriquecidos,
-              "receitaws"
-            );
+            await setCachedEnrichment(cnpjLimpo, dadosEnriquecidos, 'receitaws');
           }
         }
       }
@@ -534,15 +511,15 @@ async function enrichClientes(
       const response = await invokeLLM({
         messages: [
           {
-            role: "system",
-            content: "Identifique o mercado para este produto.",
+            role: 'system',
+            content: 'Identifique o mercado para este produto.',
           },
-          { role: "user", content: `Produto: ${cliente.produto}` },
+          { role: 'user', content: `Produto: ${cliente.produto}` },
         ],
       });
 
       const content = response.choices[0]?.message?.content;
-      if (content && typeof content === "string") {
+      if (content && typeof content === 'string') {
         // Buscar mercado correspondente
         for (const [mercadoNome, id] of Array.from(mercadosMap.entries())) {
           if (content.toLowerCase().includes(mercadoNome.toLowerCase())) {
@@ -566,12 +543,12 @@ async function enrichClientes(
     const qualidadeScore = calculateQualityScore(clienteData);
     const qualidadeClassificacao =
       qualidadeScore >= 80
-        ? "Excelente"
+        ? 'Excelente'
         : qualidadeScore >= 60
-          ? "Bom"
+          ? 'Bom'
           : qualidadeScore >= 40
-            ? "Regular"
-            : "Ruim";
+            ? 'Regular'
+            : 'Ruim';
 
     // Aplicar dados do cache se disponível
     const dadosCliente = dadosEnriquecidos || cliente;
@@ -590,21 +567,17 @@ async function enrichClientes(
       produtoPrincipal: cliente.produto || null,
       qualidadeScore,
       qualidadeClassificacao,
-      validationStatus: "pending",
+      validationStatus: 'pending',
     });
 
     // Geocodificar automaticamente se tiver cidade e UF
     if (novoCliente && dadosEnriquecidos?.cidade && dadosEnriquecidos?.uf) {
-      await geocodeCliente(
-        novoCliente.id,
-        dadosEnriquecidos.cidade,
-        dadosEnriquecidos.uf
-      );
+      await geocodeCliente(novoCliente.id, dadosEnriquecidos.cidade, dadosEnriquecidos.uf);
     }
 
     // Salvar no cache se não estava em cache
     if (!dadosEnriquecidos && cliente.cnpj) {
-      const cnpjLimpo = cliente.cnpj.replace(/\D/g, "");
+      const cnpjLimpo = cliente.cnpj.replace(/\D/g, '');
       if (cnpjLimpo.length === 14) {
         await setCachedEnrichment(
           cnpjLimpo,
@@ -613,7 +586,7 @@ async function enrichClientes(
             site: cliente.site,
             produto: cliente.produto,
           },
-          "input"
+          'input'
         );
       }
     }
@@ -636,42 +609,40 @@ async function findCompetitorsForMarkets(
   pesquisaId: number,
   clientes: Array<{ nome: string; cnpj?: string }> = []
 ) {
-  const { searchCompetitors } = await import("./_core/serpApi");
-  const { createConcorrente } = await import("./db");
-  const { filterDuplicates } = await import("./_core/deduplication");
-  const { filterRealCompanies } = await import("./_core/companyFilters");
-  const { geocodeConcorrente } = await import("./geocodeHelper");
+  const { searchCompetitors } = await import('./_core/serpApi');
+  const { createConcorrente } = await import('./db');
+  const { filterDuplicates } = await import('./_core/deduplication');
+  const { filterRealCompanies } = await import('./_core/companyFilters');
+  const { geocodeConcorrente } = await import('./geocodeHelper');
   const concorrentes: unknown[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {
       // Buscar concorrentes reais via SerpAPI (20 resultados)
-      console.log(
-        `[Enrichment] Buscando concorrentes para mercado: ${mercadoNome}`
-      );
+      logger.debug(`[Enrichment] Buscando concorrentes para mercado: ${mercadoNome}`);
       const rawResults = await searchCompetitors(mercadoNome, undefined, 20);
 
       // Filtrar apenas empresas reais (remover artigos/notícias)
       const searchResults = filterRealCompanies(
         rawResults
-          .filter(r => r.site) // Garantir que tem site
-          .map(r => ({
+          .filter((r) => r.site) // Garantir que tem site
+          .map((r) => ({
             title: r.nome,
             link: r.site!,
             snippet: r.descricao,
           }))
-      ).map(filtered => ({
+      ).map((filtered) => ({
         nome: filtered.title,
         site: filtered.link,
         descricao: filtered.snippet,
       }));
 
-      console.log(
+      logger.debug(
         `[Filter] Concorrentes após filtro: ${searchResults.length}/${rawResults.length}`
       );
 
       // Extrair nomes de empresas dos resultados do SerpAPI
-      const concorrentesCandidatos = searchResults.map(result => ({
+      const concorrentesCandidatos = searchResults.map((result) => ({
         nome: result.nome,
         produto: result.descricao || mercadoNome,
         site: result.site,
@@ -688,7 +659,7 @@ async function findCompetitorsForMarkets(
         try {
           // Dados já vêm do SerpAPI (searchResults)
           const searchMatch = searchResults.find(
-            r =>
+            (r) =>
               r.nome.toLowerCase().includes(comp.nome.toLowerCase()) ||
               comp.nome.toLowerCase().includes(r.nome.toLowerCase())
           );
@@ -718,12 +689,12 @@ async function findCompetitorsForMarkets(
 
           const qualidadeClassificacao =
             qualidadeScore >= 80
-              ? "Excelente"
+              ? 'Excelente'
               : qualidadeScore >= 60
-                ? "Bom"
+                ? 'Bom'
                 : qualidadeScore >= 40
-                  ? "Regular"
-                  : "Ruim";
+                  ? 'Regular'
+                  : 'Ruim';
 
           // Criar concorrente
           const novoConcorrente = await createConcorrente({
@@ -736,14 +707,12 @@ async function findCompetitorsForMarkets(
             produto: comp.produto,
             qualidadeScore,
             qualidadeClassificacao,
-            validationStatus: "pending",
+            validationStatus: 'pending',
           });
 
           if (novoConcorrente) {
             // Enriquecer com Gemini para obter cidade/UF
-            const { enrichConcorrenteWithGemini } = await import(
-              "./geminiEnrichment"
-            );
+            const { enrichConcorrenteWithGemini } = await import('./geminiEnrichment');
             const geminiData = await enrichConcorrenteWithGemini({
               nome: comp.nome,
               site: enrichedData.site || undefined,
@@ -752,11 +721,7 @@ async function findCompetitorsForMarkets(
 
             // Geocodificar se tiver cidade e UF do Gemini
             if (geminiData?.cidade && geminiData?.uf) {
-              await geocodeConcorrente(
-                novoConcorrente.id,
-                geminiData.cidade,
-                geminiData.uf
-              );
+              await geocodeConcorrente(novoConcorrente.id, geminiData.cidade, geminiData.uf);
             }
 
             concorrentes.push(novoConcorrente);
@@ -783,43 +748,41 @@ async function findLeadsForMarkets(
   clientes: Array<{ nome: string; cnpj?: string }> = [],
   concorrentes: Array<{ nome: string; cnpj?: string }> = []
 ) {
-  const { searchLeads } = await import("./_core/serpApi");
-  const { createLead } = await import("./db");
-  const { filterDuplicates } = await import("./_core/deduplication");
-  const { filterRealCompanies } = await import("./_core/companyFilters");
-  const { geocodeLead } = await import("./geocodeHelper");
+  const { searchLeads } = await import('./_core/serpApi');
+  const { createLead } = await import('./db');
+  const { filterDuplicates } = await import('./_core/deduplication');
+  const { filterRealCompanies } = await import('./_core/companyFilters');
+  const { geocodeLead } = await import('./geocodeHelper');
   const leads: unknown[] = [];
 
   for (const [mercadoNome, mercadoId] of Array.from(mercadosMap.entries())) {
     try {
       // Buscar leads reais via SerpAPI (20 resultados)
-      console.log(`[Enrichment] Buscando leads para mercado: ${mercadoNome}`);
-      const rawResults = await searchLeads(mercadoNome, "fornecedores", 20);
+      logger.debug(`[Enrichment] Buscando leads para mercado: ${mercadoNome}`);
+      const rawResults = await searchLeads(mercadoNome, 'fornecedores', 20);
 
       // Filtrar apenas empresas reais (remover artigos/notícias)
       const searchResults = filterRealCompanies(
         rawResults
-          .filter(r => r.site) // Garantir que tem site
-          .map(r => ({
+          .filter((r) => r.site) // Garantir que tem site
+          .map((r) => ({
             title: r.nome,
             link: r.site!,
             snippet: r.descricao,
           }))
-      ).map(filtered => ({
+      ).map((filtered) => ({
         nome: filtered.title,
         site: filtered.link,
         descricao: filtered.snippet,
       }));
 
-      console.log(
-        `[Filter] Leads após filtro: ${searchResults.length}/${rawResults.length}`
-      );
+      logger.debug(`[Filter] Leads após filtro: ${searchResults.length}/${rawResults.length}`);
 
       // Extrair nomes de empresas dos resultados do SerpAPI
-      const leadsCandidatos = searchResults.map(result => ({
+      const leadsCandidatos = searchResults.map((result) => ({
         nome: result.nome,
-        tipo: "B2B",
-        regiao: "Brasil",
+        tipo: 'B2B',
+        regiao: 'Brasil',
         site: result.site,
         cnpj: undefined,
       }));
@@ -835,7 +798,7 @@ async function findLeadsForMarkets(
         try {
           // Dados já vêm do SerpAPI (searchResults)
           const searchMatch = searchResults.find(
-            r =>
+            (r) =>
               r.nome.toLowerCase().includes(lead.nome.toLowerCase()) ||
               lead.nome.toLowerCase().includes(r.nome.toLowerCase())
           );
@@ -865,12 +828,12 @@ async function findLeadsForMarkets(
 
           const qualidadeClassificacao =
             qualidadeScore >= 80
-              ? "Excelente"
+              ? 'Excelente'
               : qualidadeScore >= 60
-                ? "Bom"
+                ? 'Bom'
                 : qualidadeScore >= 40
-                  ? "Regular"
-                  : "Ruim";
+                  ? 'Regular'
+                  : 'Ruim';
 
           // Criar lead
           const novoLead = await createLead({
@@ -882,21 +845,17 @@ async function findLeadsForMarkets(
             email: null,
             telefone: null,
             site: enrichedData.site || null,
-            tipo:
-              (lead.tipo?.toLowerCase() as
-                | "inbound"
-                | "outbound"
-                | "referral") || "outbound",
-            regiao: lead.regiao || "Brasil",
+            tipo: (lead.tipo?.toLowerCase() as 'inbound' | 'outbound' | 'referral') || 'outbound',
+            regiao: lead.regiao || 'Brasil',
             setor: mercadoNome,
             qualidadeScore,
             qualidadeClassificacao,
-            validationStatus: "pending",
+            validationStatus: 'pending',
           });
 
           if (novoLead) {
             // Enriquecer com Gemini para obter cidade/UF
-            const { enrichLeadWithGemini } = await import("./geminiEnrichment");
+            const { enrichLeadWithGemini } = await import('./geminiEnrichment');
             const geminiData = await enrichLeadWithGemini({
               nome: lead.nome,
               site: enrichedData.site || undefined,
@@ -911,10 +870,10 @@ async function findLeadsForMarkets(
             leads.push(novoLead);
 
             // Registrar atividade
-            const { logActivity } = await import("./db");
+            const { logActivity } = await import('./db');
             await logActivity({
               projectId,
-              activityType: "lead_created",
+              activityType: 'lead_created',
               description: `Novo lead criado: ${lead.nome} (Score: ${qualidadeScore})`,
               metadata: JSON.stringify({
                 leadId: novoLead.id,
@@ -924,7 +883,7 @@ async function findLeadsForMarkets(
 
             // Verificar alertas de lead de alta qualidade
             if (qualidadeScore >= 80) {
-              const { checkAlerts } = await import("./enrichmentMonitor");
+              const { checkAlerts } = await import('./enrichmentMonitor');
               await checkAlerts(projectId, {
                 errorCount: 0,
                 totalProcessed: leads.length,

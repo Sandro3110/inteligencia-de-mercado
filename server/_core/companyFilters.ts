@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Filtros para garantir que apenas empresas reais (pessoas jurídicas) sejam retornadas
  * Elimina sites de notícias, jornais, blogs e artigos
@@ -8,61 +10,61 @@
  */
 const BLOCKED_DOMAINS = [
   // Portais de notícias
-  "globo.com",
-  "uol.com.br",
-  "folha.uol.com.br",
-  "estadao.com.br",
-  "g1.globo.com",
-  "valor.globo.com",
-  "exame.com",
-  "infomoney.com.br",
-  "istoedinheiro.com.br",
-  "veja.abril.com.br",
-  "cnnbrasil.com.br",
-  "r7.com",
-  "ig.com.br",
-  "terra.com.br",
-  "msn.com",
-  "yahoo.com",
+  'globo.com',
+  'uol.com.br',
+  'folha.uol.com.br',
+  'estadao.com.br',
+  'g1.globo.com',
+  'valor.globo.com',
+  'exame.com',
+  'infomoney.com.br',
+  'istoedinheiro.com.br',
+  'veja.abril.com.br',
+  'cnnbrasil.com.br',
+  'r7.com',
+  'ig.com.br',
+  'terra.com.br',
+  'msn.com',
+  'yahoo.com',
 
   // Portais automotivos (notícias)
-  "motor1.uol.com.br",
-  "autoesporte.globo.com",
-  "quatrorodas.abril.com.br",
-  "noticiasautomotivas.com.br",
-  "autoo.com.br",
-  "guiadoauto.com.br",
-  "carrosnaweb.com.br",
-  "carplace.com.br",
-  "automotivebusiness.com.br",
+  'motor1.uol.com.br',
+  'autoesporte.globo.com',
+  'quatrorodas.abril.com.br',
+  'noticiasautomotivas.com.br',
+  'autoo.com.br',
+  'guiadoauto.com.br',
+  'carrosnaweb.com.br',
+  'carplace.com.br',
+  'automotivebusiness.com.br',
 
   // Blogs e sites de conteúdo
-  "medium.com",
-  "wordpress.com",
-  "blogspot.com",
-  "wixsite.com",
-  "weebly.com",
+  'medium.com',
+  'wordpress.com',
+  'blogspot.com',
+  'wixsite.com',
+  'weebly.com',
 
   // Sites de listagens/rankings (não são empresas)
-  "econodata.com.br",
-  "empresas.com.br",
-  "listafabricantes.com.br",
-  "guiaempresas.com.br",
-  "cnpj.biz",
-  "cnpja.com",
+  'econodata.com.br',
+  'empresas.com.br',
+  'listafabricantes.com.br',
+  'guiaempresas.com.br',
+  'cnpj.biz',
+  'cnpja.com',
 
   // Outros
-  "wikipedia.org",
-  "youtube.com",
-  "facebook.com",
-  "instagram.com",
-  "linkedin.com", // Não queremos perfis do LinkedIn, queremos sites corporativos
-  "twitter.com",
-  "tiktok.com",
+  'wikipedia.org',
+  'youtube.com',
+  'facebook.com',
+  'instagram.com',
+  'linkedin.com', // Não queremos perfis do LinkedIn, queremos sites corporativos
+  'twitter.com',
+  'tiktok.com',
 
   // Sites de seguros/comparação
-  "minutoseguros.com.br",
-  "comparador.com.br",
+  'minutoseguros.com.br',
+  'comparador.com.br',
 ];
 
 /**
@@ -93,38 +95,38 @@ const ARTICLE_URL_PATTERNS = [
  * Palavras-chave que indicam que é um artigo/notícia (não empresa)
  */
 const ARTICLE_TITLE_KEYWORDS = [
-  "maiores empresas",
-  "principais empresas",
-  "top 10",
-  "top 20",
-  "top",
-  "ranking",
-  "lista de",
-  "lista",
-  "conheça as",
-  "conheça",
-  "quais são",
-  "confira",
-  "saiba quais",
-  "veja as",
-  "veja",
-  "descubra",
-  "entenda",
-  "como escolher",
-  "guia completo",
-  "guia",
-  "tudo sobre",
-  "melhores",
-  "maiores",
-  "principais",
-  "fabricantes de",
-  "distribuidores de",
-  "fornecedores de",
-  "empresas de",
-  "indústria de",
-  "setor de",
-  "mercado de",
-  "segmento de",
+  'maiores empresas',
+  'principais empresas',
+  'top 10',
+  'top 20',
+  'top',
+  'ranking',
+  'lista de',
+  'lista',
+  'conheça as',
+  'conheça',
+  'quais são',
+  'confira',
+  'saiba quais',
+  'veja as',
+  'veja',
+  'descubra',
+  'entenda',
+  'como escolher',
+  'guia completo',
+  'guia',
+  'tudo sobre',
+  'melhores',
+  'maiores',
+  'principais',
+  'fabricantes de',
+  'distribuidores de',
+  'fornecedores de',
+  'empresas de',
+  'indústria de',
+  'setor de',
+  'mercado de',
+  'segmento de',
 ];
 
 /**
@@ -140,7 +142,7 @@ export function isBlockedDomain(url: string): boolean {
 
   const urlLower = url.toLowerCase();
 
-  return BLOCKED_DOMAINS.some(domain => {
+  return BLOCKED_DOMAINS.some((domain) => {
     return urlLower.includes(domain);
   });
 }
@@ -151,7 +153,7 @@ export function isBlockedDomain(url: string): boolean {
 export function isArticleUrl(url: string): boolean {
   if (!url) return false;
 
-  return ARTICLE_URL_PATTERNS.some(pattern => {
+  return ARTICLE_URL_PATTERNS.some((pattern) => {
     return pattern.test(url);
   });
 }
@@ -165,7 +167,7 @@ export function isArticleTitle(title: string): boolean {
   const titleLower = title.toLowerCase();
 
   // 1. Verificar palavras-chave
-  const hasKeyword = ARTICLE_TITLE_KEYWORDS.some(keyword => {
+  const hasKeyword = ARTICLE_TITLE_KEYWORDS.some((keyword) => {
     return titleLower.includes(keyword);
   });
 
@@ -188,11 +190,9 @@ export function isArticleTitle(title: string): boolean {
   }
 
   // 5. Verificar nomes genéricos
-  const genericNames = ["lista", "ranking", "guia", "portal"];
+  const genericNames = ['lista', 'ranking', 'guia', 'portal'];
   if (
-    genericNames.some(
-      generic => titleLower === generic || titleLower.startsWith(generic + " ")
-    )
+    genericNames.some((generic) => titleLower === generic || titleLower.startsWith(generic + ' '))
   ) {
     return true;
   }
@@ -210,7 +210,7 @@ export function extractCNPJs(text: string): string[] {
   if (!matches) return [];
 
   // Remover formatação e retornar apenas dígitos
-  return matches.map(cnpj => cnpj.replace(/\D/g, ""));
+  return matches.map((cnpj) => cnpj.replace(/\D/g, ''));
 }
 
 /**
@@ -219,7 +219,7 @@ export function extractCNPJs(text: string): string[] {
 export function isValidCNPJFormat(cnpj: string): boolean {
   if (!cnpj) return false;
 
-  const cleaned = cnpj.replace(/\D/g, "");
+  const cleaned = cnpj.replace(/\D/g, '');
   return cleaned.length === 14;
 }
 
@@ -227,26 +227,22 @@ export function isValidCNPJFormat(cnpj: string): boolean {
  * Verifica se um resultado do SerpAPI é uma empresa real
  * Retorna true se for empresa, false se for artigo/notícia
  */
-export function isRealCompany(result: {
-  title: string;
-  link: string;
-  snippet?: string;
-}): boolean {
+export function isRealCompany(result: { title: string; link: string; snippet?: string }): boolean {
   // 1. Verificar domínio bloqueado
   if (isBlockedDomain(result.link)) {
-    console.log(`[Filter] Domínio bloqueado: ${result.link}`);
+    logger.debug(`[Filter] Domínio bloqueado: ${result.link}`);
     return false;
   }
 
   // 2. Verificar padrão de URL de artigo
   if (isArticleUrl(result.link)) {
-    console.log(`[Filter] URL de artigo detectada: ${result.link}`);
+    logger.debug(`[Filter] URL de artigo detectada: ${result.link}`);
     return false;
   }
 
   // 3. Verificar título de artigo
   if (isArticleTitle(result.title)) {
-    console.log(`[Filter] Título de artigo detectado: ${result.title}`);
+    logger.debug(`[Filter] Título de artigo detectado: ${result.title}`);
     return false;
   }
 
@@ -254,9 +250,7 @@ export function isRealCompany(result: {
   if (result.snippet) {
     const cnpjs = extractCNPJs(result.snippet);
     if (cnpjs.length > 0) {
-      console.log(
-        `[Filter] CNPJ encontrado no snippet: ${cnpjs[0]} - Aprovado como empresa`
-      );
+      logger.debug(`[Filter] CNPJ encontrado no snippet: ${cnpjs[0]} - Aprovado como empresa`);
       return true;
     }
   }
@@ -265,13 +259,13 @@ export function isRealCompany(result: {
   // Empresas reais geralmente têm domínios simples (ex: empresa.com.br)
   const domain = extractDomain(result.link);
   if (domain && isLikelyCorporateDomain(domain)) {
-    console.log(`[Filter] Domínio corporativo detectado: ${domain} - Aprovado`);
+    logger.debug(`[Filter] Domínio corporativo detectado: ${domain} - Aprovado`);
     return true;
   }
 
   // Se passou por todos os filtros mas não tem CNPJ nem domínio corporativo claro,
   // rejeitar por segurança (provavelmente é artigo)
-  console.log(
+  logger.debug(
     `[Filter] Resultado rejeitado (sem CNPJ e sem domínio corporativo claro): ${result.title}`
   );
   return false;
@@ -301,45 +295,27 @@ function isLikelyCorporateDomain(domain: string): boolean {
   const domainLower = domain.toLowerCase();
 
   // Rejeitar subdomínios de conteúdo
-  const contentSubdomains = [
-    "blog",
-    "noticias",
-    "news",
-    "artigos",
-    "portal",
-    "revista",
-  ];
-  if (contentSubdomains.some(sub => domainLower.startsWith(sub + "."))) {
+  const contentSubdomains = ['blog', 'noticias', 'news', 'artigos', 'portal', 'revista'];
+  if (contentSubdomains.some((sub) => domainLower.startsWith(sub + '.'))) {
     return false;
   }
 
   // Aceitar domínios com extensões corporativas
-  const corporateExtensions = [
-    ".com.br",
-    ".ind.br",
-    ".net.br",
-    ".com",
-    ".net",
-    ".org",
-  ];
-  const hasCorporateExtension = corporateExtensions.some(ext =>
-    domainLower.endsWith(ext)
-  );
+  const corporateExtensions = ['.com.br', '.ind.br', '.net.br', '.com', '.net', '.org'];
+  const hasCorporateExtension = corporateExtensions.some((ext) => domainLower.endsWith(ext));
 
   // Rejeitar domínios com palavras-chave de conteúdo
   const contentKeywords = [
-    "noticias",
-    "news",
-    "blog",
-    "portal",
-    "revista",
-    "jornal",
-    "guia",
-    "lista",
+    'noticias',
+    'news',
+    'blog',
+    'portal',
+    'revista',
+    'jornal',
+    'guia',
+    'lista',
   ];
-  const hasContentKeyword = contentKeywords.some(keyword =>
-    domainLower.includes(keyword)
-  );
+  const hasContentKeyword = contentKeywords.some((keyword) => domainLower.includes(keyword));
 
   return hasCorporateExtension && !hasContentKeyword;
 }
@@ -347,14 +323,14 @@ function isLikelyCorporateDomain(domain: string): boolean {
 /**
  * Filtra uma lista de resultados do SerpAPI, removendo artigos/notícias
  */
-export function filterRealCompanies<
-  T extends { title: string; link: string; snippet?: string },
->(results: T[]): T[] {
-  console.log(`[Filter] Filtrando ${results.length} resultados...`);
+export function filterRealCompanies<T extends { title: string; link: string; snippet?: string }>(
+  results: T[]
+): T[] {
+  logger.debug(`[Filter] Filtrando ${results.length} resultados...`);
 
-  const filtered = results.filter(result => isRealCompany(result));
+  const filtered = results.filter((result) => isRealCompany(result));
 
-  console.log(
+  logger.debug(
     `[Filter] ${filtered.length} empresas reais encontradas (${results.length - filtered.length} artigos removidos)`
   );
 

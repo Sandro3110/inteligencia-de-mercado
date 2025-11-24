@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Monitor de Progresso do Enriquecimento
  *
@@ -10,14 +12,14 @@ import {
   getAlertConfigs,
   updateAlertConfig,
   createAlertHistory,
-} from "./db";
-import { updateEnrichmentRun } from "./db";
-import { notifyOwner } from "./_core/notification";
-import { now } from "./dateUtils";
+} from './db';
+import { updateEnrichmentRun } from './db';
+import { notifyOwner } from './_core/notification';
+import { now } from './dateUtils';
 
 type NotificationMilestone = {
   percentage: number;
-  field: "notifiedAt50" | "notifiedAt75" | "notifiedAt100";
+  field: 'notifiedAt50' | 'notifiedAt75' | 'notifiedAt100';
   title: string;
   emoji: string;
 };
@@ -25,15 +27,15 @@ type NotificationMilestone = {
 const MILESTONES: NotificationMilestone[] = [
   {
     percentage: 50,
-    field: "notifiedAt50",
-    title: "Metade Concluída",
-    emoji: "🎯",
+    field: 'notifiedAt50',
+    title: 'Metade Concluída',
+    emoji: '🎯',
   },
   {
     percentage: 75,
-    field: "notifiedAt75",
-    title: "75% Concluído",
-    emoji: "🚀",
+    field: 'notifiedAt75',
+    title: '75% Concluído',
+    emoji: '🚀',
   },
 ];
 
@@ -58,11 +60,11 @@ export async function checkAlerts(
 
       const condition = JSON.parse(alert.condition);
       let shouldTrigger = false;
-      let message = "";
+      let message = '';
 
       // Verificar tipo de alerta
       switch (alert.alertType) {
-        case "error_rate": {
+        case 'error_rate': {
           const errorRate = (stats.errorCount / stats.totalProcessed) * 100;
           if (errorRate >= condition.value) {
             shouldTrigger = true;
@@ -71,7 +73,7 @@ export async function checkAlerts(
           break;
         }
 
-        case "high_quality_lead": {
+        case 'high_quality_lead': {
           if (stats.newLeadScore && stats.newLeadScore >= condition.value) {
             shouldTrigger = true;
             message = `Novo lead de alta qualidade identificado!\n\n• Score: ${stats.newLeadScore} (limite: ${condition.value})`;
@@ -79,11 +81,8 @@ export async function checkAlerts(
           break;
         }
 
-        case "market_threshold": {
-          if (
-            stats.mercadoLeadsCount &&
-            stats.mercadoLeadsCount >= condition.value
-          ) {
+        case 'market_threshold': {
+          if (stats.mercadoLeadsCount && stats.mercadoLeadsCount >= condition.value) {
             shouldTrigger = true;
             message = `Mercado atingiu limite de leads!\n\n• ${stats.mercadoLeadsCount} leads (limite: ${condition.value})`;
           }
@@ -113,10 +112,10 @@ export async function checkAlerts(
         });
 
         // Registrar atividade
-        const { logActivity } = await import("./db");
+        const { logActivity } = await import('./db');
         await logActivity({
           projectId,
-          activityType: "alert",
+          activityType: 'alert',
           description: `Alerta disparado: ${alert.name}`,
           metadata: JSON.stringify({
             alertId: alert.id,
@@ -124,13 +123,11 @@ export async function checkAlerts(
           }),
         });
 
-        console.log(
-          `[Alertas] Disparado: ${alert.name} - Projeto ${projectId}`
-        );
+        logger.debug(`[Alertas] Disparado: ${alert.name} - Projeto ${projectId}`);
       }
     }
   } catch (error) {
-    console.error("[Alertas] Erro ao verificar alertas:", error);
+    console.error('[Alertas] Erro ao verificar alertas:', error);
   }
 }
 
@@ -149,7 +146,7 @@ export async function checkProgressAndNotify(
       // Verificar se atingiu o marco e ainda não foi notificado
       if (progress.percentage >= milestone.percentage) {
         // Buscar run atual para verificar se já foi notificado
-        const { getActiveEnrichmentRun } = await import("./db");
+        const { getActiveEnrichmentRun } = await import('./db');
         const run = await getActiveEnrichmentRun(projectId);
 
         if (!run) continue;
@@ -168,14 +165,14 @@ export async function checkProgressAndNotify(
             [milestone.field]: 1,
           });
 
-          console.log(
+          logger.debug(
             `[Monitor] Notificação enviada: ${milestone.percentage}% - Projeto ${projectId}`
           );
         }
       }
     }
   } catch (error) {
-    console.error("[Monitor] Erro ao verificar progresso:", error);
+    console.error('[Monitor] Erro ao verificar progresso:', error);
   }
 }
 
@@ -188,9 +185,7 @@ export function startProgressMonitoring(
   runId: number,
   projectName: string
 ): NodeJS.Timeout {
-  console.log(
-    `[Monitor] Iniciando monitoramento do projeto ${projectId}, run ${runId}`
-  );
+  logger.debug(`[Monitor] Iniciando monitoramento do projeto ${projectId}, run ${runId}`);
 
   // Verificar imediatamente
   checkProgressAndNotify(projectId, runId, projectName);
@@ -208,5 +203,5 @@ export function startProgressMonitoring(
  */
 export function stopProgressMonitoring(intervalId: NodeJS.Timeout): void {
   clearInterval(intervalId);
-  console.log("[Monitor] Monitoramento parado");
+  logger.debug('[Monitor] Monitoramento parado');
 }

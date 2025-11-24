@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Sistema de Processamento em Blocos de 50 Clientes
  * - Checkpoint automático a cada bloco
@@ -5,10 +7,10 @@
  * - Continuação de onde parou
  */
 
-import { eq, and, isNull } from "drizzle-orm";
-import { getDb } from "./db";
-import { clientes, pesquisas } from "../drizzle/schema";
-import { enrichClienteOptimized } from "./enrichmentOptimized";
+import { eq, and, isNull } from 'drizzle-orm';
+import { getDb } from './db';
+import { clientes, pesquisas } from '../drizzle/schema';
+import { enrichClienteOptimized } from './enrichmentOptimized';
 
 interface BatchProcessorOptions {
   pesquisaId: number;
@@ -41,7 +43,7 @@ interface BatchResult {
 
 interface EnrichmentJob {
   pesquisaId: number;
-  status: "running" | "paused" | "completed" | "error";
+  status: 'running' | 'paused' | 'completed' | 'error';
   totalClientes: number;
   processados: number;
   sucessos: number;
@@ -58,25 +60,17 @@ let currentJob: EnrichmentJob | null = null;
 /**
  * Inicia processamento em blocos de uma pesquisa
  */
-export async function startBatchEnrichment(
-  options: BatchProcessorOptions
-): Promise<void> {
-  const {
-    pesquisaId,
-    batchSize = 50,
-    onProgress,
-    onBatchComplete,
-    onError,
-  } = options;
+export async function startBatchEnrichment(options: BatchProcessorOptions): Promise<void> {
+  const { pesquisaId, batchSize = 50, onProgress, onBatchComplete, onError } = options;
 
   const db = await getDb();
   if (!db) {
-    throw new Error("Database not available");
+    throw new Error('Database not available');
   }
 
   // Verificar se já existe job rodando
-  if (currentJob && currentJob.status === "running") {
-    throw new Error("Já existe um job de enriquecimento em execução");
+  if (currentJob && currentJob.status === 'running') {
+    throw new Error('Já existe um job de enriquecimento em execução');
   }
 
   // FASE 41.1: Buscar parâmetros da pesquisa do banco
@@ -95,11 +89,9 @@ export async function startBatchEnrichment(
   const qtdLeads = pesquisa.qtdLeadsPorMercado || 10;
   const qtdProdutos = pesquisa.qtdProdutosPorCliente || 3;
 
-  console.log(
-    `[BatchProcessor] 🚀 Iniciando enriquecimento em blocos de ${batchSize} clientes`
-  );
-  console.log(`[BatchProcessor] Pesquisa ID: ${pesquisaId}`);
-  console.log(
+  logger.debug(`[BatchProcessor] 🚀 Iniciando enriquecimento em blocos de ${batchSize} clientes`);
+  logger.debug(`[BatchProcessor] Pesquisa ID: ${pesquisaId}`);
+  logger.debug(
     `[BatchProcessor] Parâmetros: ${qtdConcorrentes} concorrentes, ${qtdLeads} leads, ${qtdProdutos} produtos`
   );
 
@@ -107,29 +99,24 @@ export async function startBatchEnrichment(
   const clientesPendentes = await db
     .select({ id: clientes.id })
     .from(clientes)
-    .where(
-      and(
-        eq(clientes.pesquisaId, pesquisaId),
-        eq(clientes.validationStatus, "pending")
-      )
-    )
+    .where(and(eq(clientes.pesquisaId, pesquisaId), eq(clientes.validationStatus, 'pending')))
     .orderBy(clientes.id);
 
   const totalClientes = clientesPendentes.length;
   const totalBlocos = Math.ceil(totalClientes / batchSize);
 
-  console.log(`[BatchProcessor] Total de clientes pendentes: ${totalClientes}`);
-  console.log(`[BatchProcessor] Total de blocos: ${totalBlocos}`);
+  logger.debug(`[BatchProcessor] Total de clientes pendentes: ${totalClientes}`);
+  logger.debug(`[BatchProcessor] Total de blocos: ${totalBlocos}`);
 
   if (totalClientes === 0) {
-    console.log("[BatchProcessor] ✅ Nenhum cliente pendente para enriquecer");
+    logger.debug('[BatchProcessor] ✅ Nenhum cliente pendente para enriquecer');
     return;
   }
 
   // Inicializar job
   currentJob = {
     pesquisaId,
-    status: "running",
+    status: 'running',
     totalClientes,
     processados: 0,
     sucessos: 0,
@@ -145,8 +132,8 @@ export async function startBatchEnrichment(
   // Processar blocos
   for (let i = 0; i < totalBlocos; i++) {
     // Verificar se job foi pausado
-    if (currentJob.status === "paused") {
-      console.log("[BatchProcessor] ⏸️ Job pausado pelo usuário");
+    if (currentJob.status === 'paused') {
+      logger.debug('[BatchProcessor] ⏸️ Job pausado pelo usuário');
       break;
     }
 
@@ -155,12 +142,12 @@ export async function startBatchEnrichment(
     const fim = Math.min(inicio + batchSize, totalClientes);
     const clientesBloco = clientesPendentes.slice(inicio, fim);
 
-    console.log(`\n${"=".repeat(80)}`);
-    console.log(`[BatchProcessor] 📦 BLOCO ${blocoNumero}/${totalBlocos}`);
-    console.log(
+    logger.debug(`\n${'='.repeat(80)}`);
+    logger.debug(`[BatchProcessor] 📦 BLOCO ${blocoNumero}/${totalBlocos}`);
+    logger.debug(
       `[BatchProcessor] Clientes: ${inicio + 1} a ${fim} (${clientesBloco.length} clientes)`
     );
-    console.log("=".repeat(80));
+    logger.debug('='.repeat(80));
 
     const batchStartTime = Date.now();
     let sucessosBloco = 0;
@@ -170,7 +157,7 @@ export async function startBatchEnrichment(
     // Processar clientes do bloco
     for (const cliente of clientesBloco) {
       try {
-        console.log(`\n[BatchProcessor] Processando cliente ${cliente.id}...`);
+        logger.debug(`\n[BatchProcessor] Processando cliente ${cliente.id}...`);
 
         await enrichClienteOptimized(cliente.id, pesquisaId);
 
@@ -208,9 +195,7 @@ export async function startBatchEnrichment(
           erros: currentJob.erros,
           blocoAtual: blocoNumero,
           totalBlocos,
-          percentual: Math.round(
-            (currentJob.processados / totalClientes) * 100
-          ),
+          percentual: Math.round((currentJob.processados / totalClientes) * 100),
           tempoDecorrido: Math.round(tempoDecorrido / 1000),
           tempoEstimado: Math.round(tempoEstimado / 1000),
         });
@@ -229,13 +214,13 @@ export async function startBatchEnrichment(
       clientesComErro: clientesComErroBloco,
     };
 
-    console.log(`\n[BatchProcessor] ✅ Bloco ${blocoNumero} concluído:`);
-    console.log(`  - Sucessos: ${sucessosBloco}`);
-    console.log(`  - Erros: ${errosBloco}`);
-    console.log(`  - Tempo: ${batchResult.tempoBloco}s`);
+    logger.debug(`\n[BatchProcessor] ✅ Bloco ${blocoNumero} concluído:`);
+    logger.debug(`  - Sucessos: ${sucessosBloco}`);
+    logger.debug(`  - Erros: ${errosBloco}`);
+    logger.debug(`  - Tempo: ${batchResult.tempoBloco}s`);
 
     if (clientesComErroBloco.length > 0) {
-      console.log(`  - Clientes com erro: ${clientesComErroBloco.join(", ")}`);
+      logger.debug(`  - Clientes com erro: ${clientesComErroBloco.join(', ')}`);
     }
 
     // Callback de bloco completo
@@ -247,40 +232,36 @@ export async function startBatchEnrichment(
     currentJob.blocoAtual = blocoNumero;
     currentJob.lastCheckpoint = new Date();
 
-    console.log(
-      `[BatchProcessor] 💾 Checkpoint automático salvo (Bloco ${blocoNumero})`
-    );
+    logger.debug(`[BatchProcessor] 💾 Checkpoint automático salvo (Bloco ${blocoNumero})`);
   }
 
   // Finalizar job
   const totalDuration = Date.now() - startTime;
 
-  if (currentJob.status === "running") {
-    currentJob.status = "completed";
+  if (currentJob.status === 'running') {
+    currentJob.status = 'completed';
   }
 
-  console.log(`\n${"=".repeat(80)}`);
-  console.log("[BatchProcessor] 🎉 PROCESSAMENTO CONCLUÍDO");
-  console.log("=".repeat(80));
-  console.log(`Total processados: ${currentJob.processados}/${totalClientes}`);
-  console.log(
+  logger.debug(`\n${'='.repeat(80)}`);
+  logger.debug('[BatchProcessor] 🎉 PROCESSAMENTO CONCLUÍDO');
+  logger.debug('='.repeat(80));
+  logger.debug(`Total processados: ${currentJob.processados}/${totalClientes}`);
+  logger.debug(
     `Sucessos: ${currentJob.sucessos} (${Math.round((currentJob.sucessos / totalClientes) * 100)}%)`
   );
-  console.log(
+  logger.debug(
     `Erros: ${currentJob.erros} (${Math.round((currentJob.erros / totalClientes) * 100)}%)`
   );
-  console.log(
+  logger.debug(
     `Tempo total: ${Math.round(totalDuration / 1000)}s (~${Math.round(totalDuration / 60000)} minutos)`
   );
-  console.log(
+  logger.debug(
     `Tempo médio por cliente: ${Math.round(totalDuration / currentJob.processados / 1000)}s`
   );
 
   if (currentJob.clientesComErro.length > 0) {
-    console.log(
-      `\n⚠️ Clientes com erro (${currentJob.clientesComErro.length}):`
-    );
-    console.log(currentJob.clientesComErro.join(", "));
+    logger.debug(`\n⚠️ Clientes com erro (${currentJob.clientesComErro.length}):`);
+    logger.debug(currentJob.clientesComErro.join(', '));
   }
 }
 
@@ -288,32 +269,28 @@ export async function startBatchEnrichment(
  * Pausa o processamento atual
  */
 export function pauseBatchEnrichment(): boolean {
-  if (!currentJob || currentJob.status !== "running") {
+  if (!currentJob || currentJob.status !== 'running') {
     return false;
   }
 
-  currentJob.status = "paused";
-  console.log("[BatchProcessor] ⏸️ Job pausado");
+  currentJob.status = 'paused';
+  logger.debug('[BatchProcessor] ⏸️ Job pausado');
   return true;
 }
 
 /**
  * Retoma o processamento pausado
  */
-export async function resumeBatchEnrichment(
-  options: BatchProcessorOptions
-): Promise<void> {
-  if (!currentJob || currentJob.status !== "paused") {
-    throw new Error("Nenhum job pausado para retomar");
+export async function resumeBatchEnrichment(options: BatchProcessorOptions): Promise<void> {
+  if (!currentJob || currentJob.status !== 'paused') {
+    throw new Error('Nenhum job pausado para retomar');
   }
 
-  console.log("[BatchProcessor] ▶️ Retomando job pausado...");
-  console.log(
-    `  - Processados: ${currentJob.processados}/${currentJob.totalClientes}`
-  );
-  console.log(`  - Último bloco: ${currentJob.blocoAtual}`);
+  logger.debug('[BatchProcessor] ▶️ Retomando job pausado...');
+  logger.debug(`  - Processados: ${currentJob.processados}/${currentJob.totalClientes}`);
+  logger.debug(`  - Último bloco: ${currentJob.blocoAtual}`);
 
-  currentJob.status = "running";
+  currentJob.status = 'running';
 
   // Continuar processamento
   await startBatchEnrichment(options);
@@ -334,7 +311,7 @@ export function cancelBatchEnrichment(): boolean {
     return false;
   }
 
-  currentJob.status = "paused";
-  console.log("[BatchProcessor] ❌ Job cancelado");
+  currentJob.status = 'paused';
+  logger.debug('[BatchProcessor] ❌ Job cancelado');
   return true;
 }

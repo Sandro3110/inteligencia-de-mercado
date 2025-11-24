@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Sistema de Processamento em Blocos OTIMIZADO
  *
@@ -8,10 +10,10 @@
  * - Métricas de performance detalhadas
  */
 
-import { eq, and } from "drizzle-orm";
-import { getDb } from "./db";
-import { clientes, pesquisas } from "../drizzle/schema";
-import { enrichClienteOptimized } from "./enrichmentOptimized";
+import { eq, and } from 'drizzle-orm';
+import { getDb } from './db';
+import { clientes, pesquisas } from '../drizzle/schema';
+import { enrichClienteOptimized } from './enrichmentOptimized';
 
 interface BatchProcessorOptions {
   pesquisaId: number;
@@ -50,7 +52,7 @@ interface BatchResult {
 
 interface EnrichmentJob {
   pesquisaId: number;
-  status: "running" | "paused" | "completed" | "error";
+  status: 'running' | 'paused' | 'completed' | 'error';
   totalClientes: number;
   processados: number;
   sucessos: number;
@@ -120,7 +122,7 @@ function recordCircuitBreakerFailure() {
  */
 function recordCircuitBreakerSuccess() {
   if (circuitBreakerFailures > 0) {
-    console.log(
+    logger.debug(
       `[CircuitBreaker] ✅ Sucesso após ${circuitBreakerFailures} falhas, resetando contador`
     );
   }
@@ -131,19 +133,13 @@ function recordCircuitBreakerSuccess() {
 /**
  * Aguarda um tempo com exponential backoff
  */
-async function exponentialBackoff(
-  attempt: number,
-  config: RetryConfig
-): Promise<void> {
-  const delay = Math.min(
-    config.baseDelay * Math.pow(2, attempt),
-    config.maxDelay
-  );
+async function exponentialBackoff(attempt: number, config: RetryConfig): Promise<void> {
+  const delay = Math.min(config.baseDelay * Math.pow(2, attempt), config.maxDelay);
 
-  console.log(
+  logger.debug(
     `[Retry] Aguardando ${delay}ms antes de tentar novamente (tentativa ${attempt + 1}/${config.maxRetries})`
   );
-  await new Promise(resolve => setTimeout(resolve, delay));
+  await new Promise((resolve) => setTimeout(resolve, delay));
 }
 
 /**
@@ -160,10 +156,8 @@ async function processClienteWithRetry(
   for (let attempt = 0; attempt <= retryConfig.maxRetries; attempt++) {
     // Verificar circuit breaker
     if (isCircuitBreakerOpen()) {
-      console.warn(
-        `[CircuitBreaker] Pulando cliente ${clienteId} - circuit breaker aberto`
-      );
-      throw new Error("Circuit breaker aberto - muitas falhas consecutivas");
+      console.warn(`[CircuitBreaker] Pulando cliente ${clienteId} - circuit breaker aberto`);
+      throw new Error('Circuit breaker aberto - muitas falhas consecutivas');
     }
 
     try {
@@ -222,7 +216,7 @@ async function processClientesBatch(
     const chunk = clientes.slice(i, Math.min(i + concurrency, clientes.length));
 
     // Processar chunk em paralelo
-    const promises = chunk.map(cliente =>
+    const promises = chunk.map((cliente) =>
       processClienteWithRetry(cliente.id, pesquisaId, retryConfig, onError)
     );
 
@@ -232,7 +226,7 @@ async function processClientesBatch(
     chunkResults.forEach((result, index) => {
       const clienteId = chunk[index].id;
 
-      if (result.status === "fulfilled") {
+      if (result.status === 'fulfilled') {
         if (result.value.success) {
           results.sucessos++;
         } else {
@@ -244,10 +238,7 @@ async function processClientesBatch(
         // Promise rejeitada (erro não tratado)
         results.erros++;
         results.clientesComErro.push(clienteId);
-        console.error(
-          `[Batch] Erro não tratado no cliente ${clienteId}:`,
-          result.reason
-        );
+        console.error(`[Batch] Erro não tratado no cliente ${clienteId}:`, result.reason);
       }
     });
   }
@@ -258,9 +249,7 @@ async function processClientesBatch(
 /**
  * Inicia processamento em blocos OTIMIZADO
  */
-export async function startBatchEnrichmentOptimized(
-  options: BatchProcessorOptions
-): Promise<void> {
+export async function startBatchEnrichmentOptimized(options: BatchProcessorOptions): Promise<void> {
   const {
     pesquisaId,
     batchSize = 50,
@@ -273,12 +262,12 @@ export async function startBatchEnrichmentOptimized(
 
   const db = await getDb();
   if (!db) {
-    throw new Error("Database not available");
+    throw new Error('Database not available');
   }
 
   // Verificar se já existe job rodando
-  if (currentJob && currentJob.status === "running") {
-    throw new Error("Já existe um job de enriquecimento em execução");
+  if (currentJob && currentJob.status === 'running') {
+    throw new Error('Já existe um job de enriquecimento em execução');
   }
 
   // Buscar parâmetros da pesquisa
@@ -294,43 +283,36 @@ export async function startBatchEnrichmentOptimized(
 
   const pesquisa = pesquisaResult[0];
 
-  console.log(`[BatchProcessor] 🚀 Iniciando enriquecimento OTIMIZADO`);
-  console.log(`[BatchProcessor] Pesquisa ID: ${pesquisaId}`);
-  console.log(`[BatchProcessor] Configuração:`);
-  console.log(`  - Tamanho do bloco: ${batchSize} clientes`);
-  console.log(`  - Concorrência: ${concurrency} clientes em paralelo`);
-  console.log(`  - Max retries: ${maxRetries}`);
-  console.log(
-    `  - Circuit breaker: ${CIRCUIT_BREAKER_THRESHOLD} falhas consecutivas`
-  );
+  logger.debug(`[BatchProcessor] 🚀 Iniciando enriquecimento OTIMIZADO`);
+  logger.debug(`[BatchProcessor] Pesquisa ID: ${pesquisaId}`);
+  logger.debug(`[BatchProcessor] Configuração:`);
+  logger.debug(`  - Tamanho do bloco: ${batchSize} clientes`);
+  logger.debug(`  - Concorrência: ${concurrency} clientes em paralelo`);
+  logger.debug(`  - Max retries: ${maxRetries}`);
+  logger.debug(`  - Circuit breaker: ${CIRCUIT_BREAKER_THRESHOLD} falhas consecutivas`);
 
   // Buscar clientes pendentes
   const clientesPendentes = await db
     .select({ id: clientes.id })
     .from(clientes)
-    .where(
-      and(
-        eq(clientes.pesquisaId, pesquisaId),
-        eq(clientes.validationStatus, "pending")
-      )
-    )
+    .where(and(eq(clientes.pesquisaId, pesquisaId), eq(clientes.validationStatus, 'pending')))
     .orderBy(clientes.id);
 
   const totalClientes = clientesPendentes.length;
   const totalBlocos = Math.ceil(totalClientes / batchSize);
 
-  console.log(`[BatchProcessor] Total de clientes pendentes: ${totalClientes}`);
-  console.log(`[BatchProcessor] Total de blocos: ${totalBlocos}`);
+  logger.debug(`[BatchProcessor] Total de clientes pendentes: ${totalClientes}`);
+  logger.debug(`[BatchProcessor] Total de blocos: ${totalBlocos}`);
 
   if (totalClientes === 0) {
-    console.log("[BatchProcessor] ✅ Nenhum cliente pendente para enriquecer");
+    logger.debug('[BatchProcessor] ✅ Nenhum cliente pendente para enriquecer');
     return;
   }
 
   // Inicializar job
   currentJob = {
     pesquisaId,
-    status: "running",
+    status: 'running',
     totalClientes,
     processados: 0,
     sucessos: 0,
@@ -353,8 +335,8 @@ export async function startBatchEnrichmentOptimized(
   // Processar blocos
   for (let i = 0; i < totalBlocos; i++) {
     // Verificar se job foi pausado
-    if (currentJob.status === "paused") {
-      console.log("[BatchProcessor] ⏸️ Job pausado pelo usuário");
+    if (currentJob.status === 'paused') {
+      logger.debug('[BatchProcessor] ⏸️ Job pausado pelo usuário');
       break;
     }
 
@@ -363,13 +345,13 @@ export async function startBatchEnrichmentOptimized(
     const fim = Math.min(inicio + batchSize, totalClientes);
     const clientesBloco = clientesPendentes.slice(inicio, fim);
 
-    console.log(`\n${"=".repeat(80)}`);
-    console.log(`[BatchProcessor] 📦 BLOCO ${blocoNumero}/${totalBlocos}`);
-    console.log(
+    logger.debug(`\n${'='.repeat(80)}`);
+    logger.debug(`[BatchProcessor] 📦 BLOCO ${blocoNumero}/${totalBlocos}`);
+    logger.debug(
       `[BatchProcessor] Clientes: ${inicio + 1} a ${fim} (${clientesBloco.length} clientes)`
     );
-    console.log(`[BatchProcessor] Processando ${concurrency} em paralelo`);
-    console.log("=".repeat(80));
+    logger.debug(`[BatchProcessor] Processando ${concurrency} em paralelo`);
+    logger.debug('='.repeat(80));
 
     const batchStartTime = Date.now();
 
@@ -384,10 +366,7 @@ export async function startBatchEnrichmentOptimized(
 
     const batchEndTime = Date.now();
     const tempoBloco = batchEndTime - batchStartTime;
-    const velocidadeBloco = (
-      clientesBloco.length /
-      (tempoBloco / 1000)
-    ).toFixed(2);
+    const velocidadeBloco = (clientesBloco.length / (tempoBloco / 1000)).toFixed(2);
 
     // Atualizar job
     currentJob.processados += clientesBloco.length;
@@ -400,15 +379,13 @@ export async function startBatchEnrichmentOptimized(
     currentJob.circuitBreakerOpen = isCircuitBreakerOpen();
 
     // Log do resultado do bloco
-    console.log(
+    logger.debug(
       `\n[BatchProcessor] ✅ Bloco ${blocoNumero} concluído em ${(tempoBloco / 1000).toFixed(1)}s`
     );
-    console.log(
+    logger.debug(
       `[BatchProcessor] Sucessos: ${batchResult.sucessos} | Erros: ${batchResult.erros} | Retries: ${batchResult.totalRetries}`
     );
-    console.log(
-      `[BatchProcessor] Velocidade: ${velocidadeBloco} clientes/segundo`
-    );
+    logger.debug(`[BatchProcessor] Velocidade: ${velocidadeBloco} clientes/segundo`);
 
     // Callback de bloco completo
     if (onBatchComplete) {
@@ -449,52 +426,37 @@ export async function startBatchEnrichmentOptimized(
 
     // Verificar circuit breaker
     if (isCircuitBreakerOpen()) {
-      console.error(
-        `[BatchProcessor] ⚠️ Pausando job - circuit breaker aberto`
-      );
-      currentJob.status = "paused";
+      console.error(`[BatchProcessor] ⚠️ Pausando job - circuit breaker aberto`);
+      currentJob.status = 'paused';
       break;
     }
   }
 
   // Finalizar job
   const totalTime = Date.now() - startTime;
-  const velocidadeGeral = (currentJob.processados / (totalTime / 1000)).toFixed(
-    2
-  );
-  const taxaSucessoGeral = (
-    (currentJob.sucessos / currentJob.processados) *
-    100
-  ).toFixed(1);
+  const velocidadeGeral = (currentJob.processados / (totalTime / 1000)).toFixed(2);
+  const taxaSucessoGeral = ((currentJob.sucessos / currentJob.processados) * 100).toFixed(1);
 
-  console.log(`\n${"=".repeat(80)}`);
-  console.log("[BatchProcessor] 🎉 PROCESSAMENTO CONCLUÍDO");
-  console.log(
-    `[BatchProcessor] Total processados: ${currentJob.processados}/${totalClientes}`
-  );
-  console.log(
-    `[BatchProcessor] Sucessos: ${currentJob.sucessos} (${taxaSucessoGeral}%)`
-  );
-  console.log(`[BatchProcessor] Erros: ${currentJob.erros}`);
-  console.log(`[BatchProcessor] Total de retries: ${currentJob.totalRetries}`);
-  console.log(
-    `[BatchProcessor] Tempo total: ${(totalTime / 1000).toFixed(1)}s`
-  );
-  console.log(
-    `[BatchProcessor] Velocidade média: ${velocidadeGeral} clientes/segundo`
-  );
-  console.log("=".repeat(80));
+  logger.debug(`\n${'='.repeat(80)}`);
+  logger.debug('[BatchProcessor] 🎉 PROCESSAMENTO CONCLUÍDO');
+  logger.debug(`[BatchProcessor] Total processados: ${currentJob.processados}/${totalClientes}`);
+  logger.debug(`[BatchProcessor] Sucessos: ${currentJob.sucessos} (${taxaSucessoGeral}%)`);
+  logger.debug(`[BatchProcessor] Erros: ${currentJob.erros}`);
+  logger.debug(`[BatchProcessor] Total de retries: ${currentJob.totalRetries}`);
+  logger.debug(`[BatchProcessor] Tempo total: ${(totalTime / 1000).toFixed(1)}s`);
+  logger.debug(`[BatchProcessor] Velocidade média: ${velocidadeGeral} clientes/segundo`);
+  logger.debug('='.repeat(80));
 
-  currentJob.status = "completed";
+  currentJob.status = 'completed';
 }
 
 /**
  * Pausa o job atual
  */
 export function pauseBatchEnrichment(): void {
-  if (currentJob && currentJob.status === "running") {
-    currentJob.status = "paused";
-    console.log("[BatchProcessor] ⏸️ Job pausado");
+  if (currentJob && currentJob.status === 'running') {
+    currentJob.status = 'paused';
+    logger.debug('[BatchProcessor] ⏸️ Job pausado');
   }
 }
 
@@ -511,5 +473,5 @@ export function getBatchEnrichmentStatus(): EnrichmentJob | null {
 export function resetCircuitBreaker(): void {
   circuitBreakerFailures = 0;
   circuitBreakerLastFailure = null;
-  console.log("[CircuitBreaker] ✅ Circuit breaker resetado manualmente");
+  logger.debug('[CircuitBreaker] ✅ Circuit breaker resetado manualmente');
 }

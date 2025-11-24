@@ -1,13 +1,15 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Drizzle ORM - Configuração para Vercel Serverless
- * 
+ *
  * Usa connection pooling otimizado para ambientes serverless.
  * Evita criar múltiplas conexões a cada invocação da função.
  */
 
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-import * as schema from "../../drizzle/schema.js";
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import * as schema from '../../drizzle/schema.js';
 
 // Cache global de conexão (persiste entre invocações)
 let cachedDb: ReturnType<typeof drizzle> | null = null;
@@ -23,9 +25,9 @@ export async function getServerlessDb() {
   }
 
   const databaseUrl = process.env.DATABASE_URL;
-  
+
   if (!databaseUrl) {
-    throw new Error("DATABASE_URL environment variable is not set");
+    throw new Error('DATABASE_URL environment variable is not set');
   }
 
   try {
@@ -36,10 +38,10 @@ export async function getServerlessDb() {
       idle_timeout: 20, // Fechar conexões ociosas após 20s
       connect_timeout: 10, // Timeout de conexão: 10s
       prepare: false, // Desabilitar prepared statements (melhor para serverless)
-      
+
       // SSL (Supabase requer)
-      ssl: process.env.NODE_ENV === "production" ? "require" : false,
-      
+      ssl: process.env.NODE_ENV === 'production' ? 'require' : false,
+
       // Transformações de tipos
       types: {
         // Converter BIGINT para number
@@ -54,12 +56,11 @@ export async function getServerlessDb() {
     cachedClient = client;
     cachedDb = db;
 
-    console.log("[Drizzle] Conexão serverless criada com sucesso");
+    logger.debug('[Drizzle] Conexão serverless criada com sucesso');
 
     return db;
-    
   } catch (error) {
-    console.error("[Drizzle] Erro ao criar conexão:", error);
+    console.error('[Drizzle] Erro ao criar conexão:', error);
     throw error;
   }
 }
@@ -72,7 +73,7 @@ export async function closeServerlessDb() {
     await cachedClient.end();
     cachedClient = null;
     cachedDb = null;
-    console.log("[Drizzle] Conexão fechada");
+    logger.debug('[Drizzle] Conexão fechada');
   }
 }
 

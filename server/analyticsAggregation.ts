@@ -1,6 +1,8 @@
-import { eq, and, sql, gte, lte, desc } from "drizzle-orm";
-import { getDb } from "./db";
-import { toPostgresTimestamp, toPostgresTimestampOrNull, now } from "./dateUtils";
+import { logger } from '@/lib/logger';
+
+import { eq, and, sql, gte, lte, desc } from 'drizzle-orm';
+import { getDb } from './db';
+import { toPostgresTimestamp, toPostgresTimestampOrNull, now } from './dateUtils';
 import {
   analyticsMercados,
   analyticsPesquisas,
@@ -11,13 +13,13 @@ import {
   concorrentes,
   mercadosUnicos,
   pesquisas,
-} from "../drizzle/schema";
+} from '../drizzle/schema';
 import type {
   InsertAnalyticsMercado,
   InsertAnalyticsPesquisa,
   InsertAnalyticsDimensao,
   InsertAnalyticsTimeline,
-} from "../drizzle/schema";
+} from '../drizzle/schema';
 
 /**
  * Motor de Agregação - Calcula métricas de analytics
@@ -39,10 +41,7 @@ export async function aggregateMercadoMetrics(
 
   // Buscar todos os mercados do projeto/pesquisa
   const whereClause = pesquisaId
-    ? and(
-        eq(mercadosUnicos.projectId, projectId),
-        eq(mercadosUnicos.pesquisaId, pesquisaId)
-      )
+    ? and(eq(mercadosUnicos.projectId, projectId), eq(mercadosUnicos.pesquisaId, pesquisaId))
     : eq(mercadosUnicos.projectId, projectId);
 
   const mercados = await db.select().from(mercadosUnicos).where(whereClause);
@@ -62,33 +61,25 @@ export async function aggregateMercadoMetrics(
 
     // Calcular métricas
     const totalLeadsGerados = leadsDoMercado.length;
-    const leadsAltaQualidade = leadsDoMercado.filter(
-      l => (l.qualidadeScore || 0) >= 80
-    ).length;
+    const leadsAltaQualidade = leadsDoMercado.filter((l) => (l.qualidadeScore || 0) >= 80).length;
     const leadsMediaQualidade = leadsDoMercado.filter(
-      l => (l.qualidadeScore || 0) >= 50 && (l.qualidadeScore || 0) < 80
+      (l) => (l.qualidadeScore || 0) >= 50 && (l.qualidadeScore || 0) < 80
     ).length;
-    const leadsBaixaQualidade = leadsDoMercado.filter(
-      l => (l.qualidadeScore || 0) < 50
-    ).length;
+    const leadsBaixaQualidade = leadsDoMercado.filter((l) => (l.qualidadeScore || 0) < 50).length;
 
     const qualidadeMedia =
       totalLeadsGerados > 0
-        ? leadsDoMercado.reduce((sum, l) => sum + (l.qualidadeScore || 0), 0) /
-          totalLeadsGerados
+        ? leadsDoMercado.reduce((sum, l) => sum + (l.qualidadeScore || 0), 0) / totalLeadsGerados
         : 0;
 
     const leadsValidados = leadsDoMercado.filter(
-      l => l.validationStatus && l.validationStatus !== "pending"
+      (l) => l.validationStatus && l.validationStatus !== 'pending'
     ).length;
-    const leadsAprovados = leadsDoMercado.filter(
-      l => l.validationStatus === "rich"
-    ).length;
+    const leadsAprovados = leadsDoMercado.filter((l) => l.validationStatus === 'rich').length;
     const leadsDescartados = leadsDoMercado.filter(
-      l => l.validationStatus === "discarded"
+      (l) => l.validationStatus === 'discarded'
     ).length;
-    const taxaAprovacao =
-      leadsValidados > 0 ? (leadsAprovados / leadsValidados) * 100 : 0;
+    const taxaAprovacao = leadsValidados > 0 ? (leadsAprovados / leadsValidados) * 100 : 0;
 
     // Buscar clientes e concorrentes do mercado
     const clientesDoMercado = await db
@@ -149,9 +140,7 @@ export async function aggregatePesquisaMetrics(
   const [pesquisa] = await db
     .select()
     .from(pesquisas)
-    .where(
-      and(eq(pesquisas.id, pesquisaId), eq(pesquisas.projectId, projectId))
-    )
+    .where(and(eq(pesquisas.id, pesquisaId), eq(pesquisas.projectId, projectId)))
     .limit(1);
 
   if (!pesquisa) return;
@@ -160,53 +149,35 @@ export async function aggregatePesquisaMetrics(
   const mercadosMapeados = await db
     .select()
     .from(mercadosUnicos)
-    .where(
-      and(
-        eq(mercadosUnicos.projectId, projectId),
-        eq(mercadosUnicos.pesquisaId, pesquisaId)
-      )
-    );
+    .where(and(eq(mercadosUnicos.projectId, projectId), eq(mercadosUnicos.pesquisaId, pesquisaId)));
 
   // Buscar clientes base
   const clientesBase = await db
     .select()
     .from(clientes)
-    .where(
-      and(
-        eq(clientes.projectId, projectId),
-        eq(clientes.pesquisaId, pesquisaId)
-      )
-    );
+    .where(and(eq(clientes.projectId, projectId), eq(clientes.pesquisaId, pesquisaId)));
 
   // Buscar leads gerados
   const leadsGerados = await db
     .select()
     .from(leads)
-    .where(
-      and(eq(leads.projectId, projectId), eq(leads.pesquisaId, pesquisaId))
-    );
+    .where(and(eq(leads.projectId, projectId), eq(leads.pesquisaId, pesquisaId)));
 
   // Calcular métricas
   const totalLeadsGerados = leadsGerados.length;
   const totalClientesBase = clientesBase.length;
-  const taxaConversao =
-    totalClientesBase > 0 ? (totalLeadsGerados / totalClientesBase) * 100 : 0;
+  const taxaConversao = totalClientesBase > 0 ? (totalLeadsGerados / totalClientesBase) * 100 : 0;
 
   const qualidadeMedia =
     totalLeadsGerados > 0
-      ? leadsGerados.reduce((sum, l) => sum + (l.qualidadeScore || 0), 0) /
-        totalLeadsGerados
+      ? leadsGerados.reduce((sum, l) => sum + (l.qualidadeScore || 0), 0) / totalLeadsGerados
       : 0;
 
-  const leadsAlta = leadsGerados.filter(
-    l => (l.qualidadeScore || 0) >= 80
-  ).length;
+  const leadsAlta = leadsGerados.filter((l) => (l.qualidadeScore || 0) >= 80).length;
   const leadsMedia = leadsGerados.filter(
-    l => (l.qualidadeScore || 0) >= 50 && (l.qualidadeScore || 0) < 80
+    (l) => (l.qualidadeScore || 0) >= 50 && (l.qualidadeScore || 0) < 80
   ).length;
-  const leadsBaixa = leadsGerados.filter(
-    l => (l.qualidadeScore || 0) < 50
-  ).length;
+  const leadsBaixa = leadsGerados.filter((l) => (l.qualidadeScore || 0) < 50).length;
 
   const distribuicaoQualidade = JSON.stringify({
     alta: leadsAlta,
@@ -216,22 +187,16 @@ export async function aggregatePesquisaMetrics(
 
   // Calcular duração
   const dataInicioRaw = pesquisa.dataImportacao || pesquisa.createdAt;
-  const dataConclusaoRaw =
-    pesquisa.status === "concluido" ? pesquisa.updatedAt : new Date();
+  const dataConclusaoRaw = pesquisa.status === 'concluido' ? pesquisa.updatedAt : new Date();
 
   const dataInicioDate =
-    typeof dataInicioRaw === "string" ? new Date(dataInicioRaw) : dataInicioRaw;
+    typeof dataInicioRaw === 'string' ? new Date(dataInicioRaw) : dataInicioRaw;
   const dataConclusaoDate =
-    typeof dataConclusaoRaw === "string"
-      ? new Date(dataConclusaoRaw)
-      : dataConclusaoRaw;
+    typeof dataConclusaoRaw === 'string' ? new Date(dataConclusaoRaw) : dataConclusaoRaw;
 
   const duracaoDias =
     dataInicioDate && dataConclusaoDate
-      ? Math.ceil(
-          (dataConclusaoDate.getTime() - dataInicioDate.getTime()) /
-            (1000 * 60 * 60 * 24)
-        )
+      ? Math.ceil((dataConclusaoDate.getTime() - dataInicioDate.getTime()) / (1000 * 60 * 60 * 24))
       : 0;
 
   // Inserir/atualizar métricas
@@ -245,12 +210,12 @@ export async function aggregatePesquisaMetrics(
     qualidadeMediaGeral: Math.round(qualidadeMedia * 100),
     distribuicaoQualidade,
     dataInicio: dataInicioRaw
-      ? typeof dataInicioRaw === "string"
+      ? typeof dataInicioRaw === 'string'
         ? dataInicioRaw
         : toPostgresTimestamp(dataInicioRaw)
       : undefined,
     dataConclusao: dataConclusaoRaw
-      ? typeof dataConclusaoRaw === "string"
+      ? typeof dataConclusaoRaw === 'string'
         ? dataConclusaoRaw
         : toPostgresTimestamp(dataConclusaoRaw)
       : undefined,
@@ -271,12 +236,12 @@ export async function aggregateDimensaoMetrics(
   if (!db) return;
 
   const dimensoes: Array<{
-    tipo: "uf" | "porte" | "segmentacao" | "categoria";
+    tipo: 'uf' | 'porte' | 'segmentacao' | 'categoria';
     campo: string;
   }> = [
-    { tipo: "uf", campo: "uf" },
-    { tipo: "porte", campo: "porte" },
-    { tipo: "segmentacao", campo: "tipo" },
+    { tipo: 'uf', campo: 'uf' },
+    { tipo: 'porte', campo: 'porte' },
+    { tipo: 'segmentacao', campo: 'tipo' },
   ];
 
   for (const { tipo, campo } of dimensoes) {
@@ -315,10 +280,7 @@ export async function aggregateDimensaoMetrics(
 /**
  * Agrega métricas diárias (timeline)
  */
-export async function aggregateTimelineMetrics(
-  projectId: number,
-  data?: Date
-): Promise<void> {
+export async function aggregateTimelineMetrics(projectId: number, data?: Date): Promise<void> {
   const db = await getDb();
   if (!db) return;
 
@@ -329,8 +291,8 @@ export async function aggregateTimelineMetrics(
   fimDia.setHours(23, 59, 59, 999);
 
   // Converter para strings ISO para comparação com timestamp do banco
-  const inicioDiaStr = inicioDia.toISOString().slice(0, 19).replace("T", " ");
-  const fimDiaStr = fimDia.toISOString().slice(0, 19).replace("T", " ");
+  const inicioDiaStr = inicioDia.toISOString().slice(0, 19).replace('T', ' ');
+  const fimDiaStr = fimDia.toISOString().slice(0, 19).replace('T', ' ');
 
   // Leads gerados no dia
   const leadsGeradosDia = await db
@@ -372,9 +334,7 @@ export async function aggregateTimelineMetrics(
   const leadsAcumulados = await db
     .select({ count: sql<number>`COUNT(*)` })
     .from(leads)
-    .where(
-      and(eq(leads.projectId, projectId), lte(leads.createdAt, fimDiaStr))
-    );
+    .where(and(eq(leads.projectId, projectId), lte(leads.createdAt, fimDiaStr)));
 
   const metricas: InsertAnalyticsTimeline = {
     projectId,
@@ -391,30 +351,27 @@ export async function aggregateTimelineMetrics(
 /**
  * Executa todas as agregações para um projeto
  */
-export async function runFullAggregation(
-  projectId: number,
-  pesquisaId?: number
-): Promise<void> {
-  console.log(
-    `[Analytics] Iniciando agregação para projeto ${projectId}${pesquisaId ? `, pesquisa ${pesquisaId}` : ""}`
+export async function runFullAggregation(projectId: number, pesquisaId?: number): Promise<void> {
+  logger.debug(
+    `[Analytics] Iniciando agregação para projeto ${projectId}${pesquisaId ? `, pesquisa ${pesquisaId}` : ''}`
   );
 
   try {
     await aggregateMercadoMetrics(projectId, pesquisaId);
-    console.log(`[Analytics] ✓ Métricas por mercado agregadas`);
+    logger.debug(`[Analytics] ✓ Métricas por mercado agregadas`);
 
     if (pesquisaId) {
       await aggregatePesquisaMetrics(projectId, pesquisaId);
-      console.log(`[Analytics] ✓ Métricas por pesquisa agregadas`);
+      logger.debug(`[Analytics] ✓ Métricas por pesquisa agregadas`);
     }
 
     await aggregateDimensaoMetrics(projectId, pesquisaId);
-    console.log(`[Analytics] ✓ Métricas por dimensão agregadas`);
+    logger.debug(`[Analytics] ✓ Métricas por dimensão agregadas`);
 
     await aggregateTimelineMetrics(projectId);
-    console.log(`[Analytics] ✓ Métricas de timeline agregadas`);
+    logger.debug(`[Analytics] ✓ Métricas de timeline agregadas`);
 
-    console.log(`[Analytics] Agregação concluída com sucesso`);
+    logger.debug(`[Analytics] Agregação concluída com sucesso`);
   } catch (error) {
     console.error(`[Analytics] Erro na agregação:`, error);
     throw error;

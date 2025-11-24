@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Módulo de Re-enriquecimento de Pesquisas
  *
@@ -7,16 +9,11 @@
  * - PARCIAL: Refaz apenas categorias específicas
  */
 
-import { eq, and } from "drizzle-orm";
-import { getDb } from "./db";
-import {
-  clientes,
-  mercadosUnicos,
-  concorrentes,
-  leads,
-} from "../drizzle/schema";
+import { eq, and } from 'drizzle-orm';
+import { getDb } from './db';
+import { clientes, mercadosUnicos, concorrentes, leads } from '../drizzle/schema';
 
-export type ReEnrichmentMode = "total" | "incremental" | "parcial";
+export type ReEnrichmentMode = 'total' | 'incremental' | 'parcial';
 
 export type ReEnrichmentOptions = {
   pesquisaId: number;
@@ -39,7 +36,7 @@ export type ReEnrichmentOptions = {
 };
 
 export type ReEnrichmentProgress = {
-  status: "processing" | "completed" | "error";
+  status: 'processing' | 'completed' | 'error';
   message: string;
   currentStep: number;
   totalSteps: number;
@@ -70,7 +67,7 @@ export async function executeReEnrichment(
     const { pesquisaId, projectId, mode, categories, novosClientes } = options;
 
     // Validar pesquisa existe
-    const { getPesquisaById } = await import("./db");
+    const { getPesquisaById } = await import('./db');
     const pesquisa = await getPesquisaById(pesquisaId);
     if (!pesquisa) {
       throw new Error(`Pesquisa ${pesquisaId} não encontrada`);
@@ -80,19 +77,17 @@ export async function executeReEnrichment(
     let currentStep = 0;
 
     // Calcular total de passos baseado no modo
-    if (mode === "total") {
+    if (mode === 'total') {
       totalSteps = 6; // Limpar tudo + refazer tudo
-    } else if (mode === "incremental") {
+    } else if (mode === 'incremental') {
       totalSteps = 4; // Apenas adicionar novos dados
-    } else if (mode === "parcial") {
-      const categoriasAtivas = Object.values(categories || {}).filter(
-        Boolean
-      ).length;
+    } else if (mode === 'parcial') {
+      const categoriasAtivas = Object.values(categories || {}).filter(Boolean).length;
       totalSteps = categoriasAtivas * 2; // Limpar + refazer cada categoria
     }
 
     onProgress({
-      status: "processing",
+      status: 'processing',
       message: `Iniciando re-enriquecimento (modo: ${mode})...`,
       currentStep: ++currentStep,
       totalSteps,
@@ -106,28 +101,27 @@ export async function executeReEnrichment(
     };
 
     // MODO TOTAL: Limpar tudo
-    if (mode === "total") {
+    if (mode === 'total') {
       onProgress({
-        status: "processing",
-        message: "Limpando dados antigos...",
+        status: 'processing',
+        message: 'Limpando dados antigos...',
         currentStep: ++currentStep,
         totalSteps,
       });
 
       deletedCounts.mercados = await deleteMercadosByPesquisa(pesquisaId);
       deletedCounts.clientes = await deleteClientesByPesquisa(pesquisaId);
-      deletedCounts.concorrentes =
-        await deleteConcorrentesByPesquisa(pesquisaId);
+      deletedCounts.concorrentes = await deleteConcorrentesByPesquisa(pesquisaId);
       deletedCounts.leads = await deleteLeadsByPesquisa(pesquisaId);
 
-      console.log(`[ReEnrichment] Dados removidos:`, deletedCounts);
+      logger.debug(`[ReEnrichment] Dados removidos:`, deletedCounts);
     }
 
     // MODO PARCIAL: Limpar apenas categorias selecionadas
-    if (mode === "parcial" && categories) {
+    if (mode === 'parcial' && categories) {
       onProgress({
-        status: "processing",
-        message: "Limpando categorias selecionadas...",
+        status: 'processing',
+        message: 'Limpando categorias selecionadas...',
         currentStep: ++currentStep,
         totalSteps,
       });
@@ -139,14 +133,13 @@ export async function executeReEnrichment(
         deletedCounts.clientes = await deleteClientesByPesquisa(pesquisaId);
       }
       if (categories.concorrentes) {
-        deletedCounts.concorrentes =
-          await deleteConcorrentesByPesquisa(pesquisaId);
+        deletedCounts.concorrentes = await deleteConcorrentesByPesquisa(pesquisaId);
       }
       if (categories.leads) {
         deletedCounts.leads = await deleteLeadsByPesquisa(pesquisaId);
       }
 
-      console.log(`[ReEnrichment] Categorias removidas:`, deletedCounts);
+      logger.debug(`[ReEnrichment] Categorias removidas:`, deletedCounts);
     }
 
     // Preparar dados para re-enriquecimento
@@ -157,15 +150,15 @@ export async function executeReEnrichment(
       produto?: string;
     }> = [];
 
-    if (mode === "incremental" && novosClientes) {
+    if (mode === 'incremental' && novosClientes) {
       // Modo incremental: apenas novos clientes
       clientesParaEnriquecer = novosClientes;
     } else {
       // Modos total/parcial: buscar clientes originais da pesquisa
       // (assumindo que temos os dados originais salvos)
       onProgress({
-        status: "processing",
-        message: "Recuperando dados originais da pesquisa...",
+        status: 'processing',
+        message: 'Recuperando dados originais da pesquisa...',
         currentStep: ++currentStep,
         totalSteps,
       });
@@ -179,7 +172,7 @@ export async function executeReEnrichment(
           .from(clientes)
           .where(eq(clientes.pesquisaId, pesquisaId));
 
-        clientesParaEnriquecer = clientesExistentes.map(c => ({
+        clientesParaEnriquecer = clientesExistentes.map((c) => ({
           nome: c.nome,
           cnpj: c.cnpj || undefined,
           site: c.siteOficial || undefined,
@@ -190,13 +183,13 @@ export async function executeReEnrichment(
 
     // Executar fluxo de enriquecimento
     onProgress({
-      status: "processing",
+      status: 'processing',
       message: `Executando enriquecimento de ${clientesParaEnriquecer.length} clientes...`,
       currentStep: ++currentStep,
       totalSteps,
     });
 
-    const { executeEnrichmentFlow } = await import("./enrichmentFlow");
+    const { executeEnrichmentFlow } = await import('./enrichmentFlow');
 
     const result = await executeEnrichmentFlow(
       {
@@ -204,10 +197,10 @@ export async function executeReEnrichment(
         projectId,
         projectName: pesquisa.nome,
       },
-      flowProgress => {
+      (flowProgress) => {
         // Repassar progresso do fluxo
         onProgress({
-          status: "processing",
+          status: 'processing',
           message: flowProgress.message,
           currentStep: currentStep + flowProgress.currentStep,
           totalSteps: totalSteps + flowProgress.totalSteps,
@@ -215,17 +208,17 @@ export async function executeReEnrichment(
       }
     );
 
-    if (result.status === "error") {
+    if (result.status === 'error') {
       throw new Error(result.message);
     }
 
     // Atualizar status da pesquisa
-    const { updatePesquisaStatus } = await import("./db");
-    await updatePesquisaStatus(pesquisaId, "concluido");
+    const { updatePesquisaStatus } = await import('./db');
+    await updatePesquisaStatus(pesquisaId, 'concluido');
 
     return {
-      status: "completed",
-      message: "Re-enriquecimento concluído com sucesso!",
+      status: 'completed',
+      message: 'Re-enriquecimento concluído com sucesso!',
       currentStep: totalSteps,
       totalSteps,
       data: {
@@ -241,12 +234,11 @@ export async function executeReEnrichment(
       },
     };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Erro desconhecido";
-    console.error("[ReEnrichment] Erro:", errorMessage);
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    console.error('[ReEnrichment] Erro:', errorMessage);
 
     return {
-      status: "error",
+      status: 'error',
       message: `Erro no re-enriquecimento: ${errorMessage}`,
       currentStep: 0,
       totalSteps: 0,
@@ -262,9 +254,7 @@ async function deleteMercadosByPesquisa(pesquisaId: number): Promise<number> {
   const db = await getDb();
   if (!db) return 0;
 
-  const result = await db
-    .delete(mercadosUnicos)
-    .where(eq(mercadosUnicos.pesquisaId, pesquisaId));
+  const result = await db.delete(mercadosUnicos).where(eq(mercadosUnicos.pesquisaId, pesquisaId));
 
   return result[0].affectedRows || 0;
 }
@@ -273,22 +263,16 @@ async function deleteClientesByPesquisa(pesquisaId: number): Promise<number> {
   const db = await getDb();
   if (!db) return 0;
 
-  const result = await db
-    .delete(clientes)
-    .where(eq(clientes.pesquisaId, pesquisaId));
+  const result = await db.delete(clientes).where(eq(clientes.pesquisaId, pesquisaId));
 
   return result[0].affectedRows || 0;
 }
 
-async function deleteConcorrentesByPesquisa(
-  pesquisaId: number
-): Promise<number> {
+async function deleteConcorrentesByPesquisa(pesquisaId: number): Promise<number> {
   const db = await getDb();
   if (!db) return 0;
 
-  const result = await db
-    .delete(concorrentes)
-    .where(eq(concorrentes.pesquisaId, pesquisaId));
+  const result = await db.delete(concorrentes).where(eq(concorrentes.pesquisaId, pesquisaId));
 
   return result[0].affectedRows || 0;
 }

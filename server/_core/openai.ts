@@ -1,18 +1,14 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Módulo OpenAI - ChatGPT-4o-mini
  * Cliente direto para API do OpenAI
  */
 
-import type {
-  Message,
-  InvokeResult,
-  ResponseFormat,
-  Tool,
-  ToolChoice,
-} from "./llm";
+import type { Message, InvokeResult, ResponseFormat, Tool, ToolChoice } from './llm';
 
-const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
-const DEFAULT_MODEL = "gpt-4o-mini";
+const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+const DEFAULT_MODEL = 'gpt-4o-mini';
 
 /**
  * Invoca ChatGPT-4o-mini via API do OpenAI
@@ -29,7 +25,7 @@ export async function invokeOpenAI(params: {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    throw new Error("OPENAI_API_KEY não configurada");
+    throw new Error('OPENAI_API_KEY não configurada');
   }
 
   const {
@@ -43,8 +39,8 @@ export async function invokeOpenAI(params: {
   } = params;
 
   // Normalizar mensagens para formato OpenAI
-  const normalizedMessages = messages.map(msg => {
-    if (typeof msg.content === "string") {
+  const normalizedMessages = messages.map((msg) => {
+    if (typeof msg.content === 'string') {
       return {
         role: msg.role,
         content: msg.content,
@@ -55,9 +51,9 @@ export async function invokeOpenAI(params: {
     return {
       role: msg.role,
       content: Array.isArray(msg.content)
-        ? msg.content.map(part => {
-            if (typeof part === "string") {
-              return { type: "text", text: part };
+        ? msg.content.map((part) => {
+            if (typeof part === 'string') {
+              return { type: 'text', text: part };
             }
             return part;
           })
@@ -88,12 +84,12 @@ export async function invokeOpenAI(params: {
   }
 
   try {
-    console.log(`[OpenAI] Chamando ${model}...`);
+    logger.debug(`[OpenAI] Chamando ${model}...`);
 
     const response = await fetch(OPENAI_API_URL, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(payload),
@@ -106,13 +102,11 @@ export async function invokeOpenAI(params: {
 
     const data = await response.json();
 
-    console.log(
-      `[OpenAI] Resposta recebida (${data.usage?.total_tokens || 0} tokens)`
-    );
+    logger.debug(`[OpenAI] Resposta recebida (${data.usage?.total_tokens || 0} tokens)`);
 
     return data as InvokeResult;
   } catch (error) {
-    console.error("[OpenAI] Erro na chamada:", error);
+    console.error('[OpenAI] Erro na chamada:', error);
     throw error;
   }
 }
@@ -123,15 +117,15 @@ export async function invokeOpenAI(params: {
 export async function testOpenAIConnection(): Promise<boolean> {
   try {
     const result = await invokeOpenAI({
-      messages: [{ role: "user", content: "Responda apenas: OK" }],
+      messages: [{ role: 'user', content: 'Responda apenas: OK' }],
       max_tokens: 10,
     });
 
     const content = result.choices[0]?.message?.content;
-    console.log("[OpenAI] Conexão OK:", content);
+    logger.debug('[OpenAI] Conexão OK:', content);
     return true;
   } catch (error) {
-    console.error("[OpenAI] Falha na conexão:", error);
+    console.error('[OpenAI] Falha na conexão:', error);
     return false;
   }
 }

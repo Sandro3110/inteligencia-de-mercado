@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Wrapper de LLM com Credenciais Configuráveis
  * Fase 41.2 - Permitir usuário trocar provedor de IA
@@ -6,18 +8,14 @@
  * Suporta múltiplos provedores: OpenAI, Gemini, Anthropic
  */
 
-import { eq } from "drizzle-orm";
-import { getDb } from "../db";
-import { enrichmentConfigs } from "../../drizzle/schema";
-import {
-  invokeLLM as coreInvokeLLM,
-  type InvokeParams,
-  type InvokeResult,
-} from "../_core/llm";
+import { eq } from 'drizzle-orm';
+import { getDb } from '../db';
+import { enrichmentConfigs } from '../../drizzle/schema';
+import { invokeLLM as coreInvokeLLM, type InvokeParams, type InvokeResult } from '../_core/llm';
 
 interface LLMConfig {
   apiKey: string;
-  provider: "openai" | "gemini" | "anthropic";
+  provider: 'openai' | 'gemini' | 'anthropic';
   model?: string;
 }
 
@@ -60,21 +58,21 @@ async function getLLMConfig(projectId: number): Promise<LLMConfig | null> {
 
     // Determinar provedor e API key (prioridade: OpenAI > Gemini > Anthropic)
     let apiKey: string | null = null;
-    let provider: "openai" | "gemini" | "anthropic" = "gemini";
+    let provider: 'openai' | 'gemini' | 'anthropic' = 'gemini';
     let model: string | undefined;
 
     if (config.openaiApiKey) {
       apiKey = config.openaiApiKey;
-      provider = "openai";
-      model = "gpt-4o";
+      provider = 'openai';
+      model = 'gpt-4o';
     } else if (config.geminiApiKey) {
       apiKey = config.geminiApiKey;
-      provider = "gemini";
-      model = "gemini-2.5-flash";
+      provider = 'gemini';
+      model = 'gemini-2.5-flash';
     } else if (config.anthropicApiKey) {
       apiKey = config.anthropicApiKey;
-      provider = "anthropic";
-      model = "claude-3-5-sonnet-20241022";
+      provider = 'anthropic';
+      model = 'claude-3-5-sonnet-20241022';
     }
 
     if (!apiKey) {
@@ -93,7 +91,7 @@ async function getLLMConfig(projectId: number): Promise<LLMConfig | null> {
 
     return llmConfig;
   } catch (error) {
-    console.error("[LLMConfig] Erro ao buscar configuração:", error);
+    console.error('[LLMConfig] Erro ao buscar configuração:', error);
     return null;
   }
 }
@@ -101,18 +99,15 @@ async function getLLMConfig(projectId: number): Promise<LLMConfig | null> {
 /**
  * Invoca OpenAI diretamente
  */
-async function invokeOpenAI(
-  apiKey: string,
-  params: InvokeParams
-): Promise<InvokeResult> {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
+async function invokeOpenAI(apiKey: string, params: InvokeParams): Promise<InvokeResult> {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: params.model || "gpt-4o",
+      model: params.model || 'gpt-4o',
       messages: params.messages,
       temperature: params.temperature || 0.7,
       max_tokens: params.max_tokens,
@@ -124,9 +119,7 @@ async function invokeOpenAI(
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(
-      `OpenAI API Error: ${error.error?.message || response.statusText}`
-    );
+    throw new Error(`OpenAI API Error: ${error.error?.message || response.statusText}`);
   }
 
   return await response.json();
@@ -135,21 +128,15 @@ async function invokeOpenAI(
 /**
  * Invoca Gemini diretamente
  */
-async function invokeGemini(
-  apiKey: string,
-  params: InvokeParams
-): Promise<InvokeResult> {
-  const model = params.model || "gemini-2.5-flash";
+async function invokeGemini(apiKey: string, params: InvokeParams): Promise<InvokeResult> {
+  const model = params.model || 'gemini-2.5-flash';
 
   // Converter formato OpenAI para Gemini
-  const contents = params.messages.map(msg => ({
-    role: msg.role === "assistant" ? "model" : "user",
+  const contents = params.messages.map((msg) => ({
+    role: msg.role === 'assistant' ? 'model' : 'user',
     parts: [
       {
-        text:
-          typeof msg.content === "string"
-            ? msg.content
-            : JSON.stringify(msg.content),
+        text: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content),
       },
     ],
   }));
@@ -157,9 +144,9 @@ async function invokeGemini(
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
     {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         contents,
@@ -173,27 +160,25 @@ async function invokeGemini(
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(
-      `Gemini API Error: ${error.error?.message || response.statusText}`
-    );
+    throw new Error(`Gemini API Error: ${error.error?.message || response.statusText}`);
   }
 
   const result = await response.json();
 
   // Converter resposta Gemini para formato OpenAI
   return {
-    id: "gemini-" + Date.now(),
-    object: "chat.completion",
+    id: 'gemini-' + Date.now(),
+    object: 'chat.completion',
     created: Date.now(),
     model,
     choices: [
       {
         index: 0,
         message: {
-          role: "assistant",
-          content: result.candidates?.[0]?.content?.parts?.[0]?.text || "",
+          role: 'assistant',
+          content: result.candidates?.[0]?.content?.parts?.[0]?.text || '',
         },
-        finish_reason: "stop",
+        finish_reason: 'stop',
       },
     ],
     usage: {
@@ -207,43 +192,35 @@ async function invokeGemini(
 /**
  * Invoca Anthropic diretamente
  */
-async function invokeAnthropic(
-  apiKey: string,
-  params: InvokeParams
-): Promise<InvokeResult> {
-  const model = params.model || "claude-3-5-sonnet-20241022";
+async function invokeAnthropic(apiKey: string, params: InvokeParams): Promise<InvokeResult> {
+  const model = params.model || 'claude-3-5-sonnet-20241022';
 
   // Separar system message das outras mensagens
-  const systemMessage = params.messages.find(m => m.role === "system");
-  const messages = params.messages.filter(m => m.role !== "system");
+  const systemMessage = params.messages.find((m) => m.role === 'system');
+  const messages = params.messages.filter((m) => m.role !== 'system');
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
       model,
       max_tokens: params.max_tokens || 4096,
       temperature: params.temperature || 0.7,
       system: systemMessage?.content,
-      messages: messages.map(msg => ({
-        role: msg.role === "assistant" ? "assistant" : "user",
-        content:
-          typeof msg.content === "string"
-            ? msg.content
-            : JSON.stringify(msg.content),
+      messages: messages.map((msg) => ({
+        role: msg.role === 'assistant' ? 'assistant' : 'user',
+        content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content),
       })),
     }),
   });
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(
-      `Anthropic API Error: ${error.error?.message || response.statusText}`
-    );
+    throw new Error(`Anthropic API Error: ${error.error?.message || response.statusText}`);
   }
 
   const result = await response.json();
@@ -251,24 +228,23 @@ async function invokeAnthropic(
   // Converter resposta Anthropic para formato OpenAI
   return {
     id: result.id,
-    object: "chat.completion",
+    object: 'chat.completion',
     created: Date.now(),
     model,
     choices: [
       {
         index: 0,
         message: {
-          role: "assistant",
-          content: result.content?.[0]?.text || "",
+          role: 'assistant',
+          content: result.content?.[0]?.text || '',
         },
-        finish_reason: result.stop_reason || "stop",
+        finish_reason: result.stop_reason || 'stop',
       },
     ],
     usage: {
       prompt_tokens: result.usage?.input_tokens || 0,
       completion_tokens: result.usage?.output_tokens || 0,
-      total_tokens:
-        (result.usage?.input_tokens || 0) + (result.usage?.output_tokens || 0),
+      total_tokens: (result.usage?.input_tokens || 0) + (result.usage?.output_tokens || 0),
     },
   };
 }
@@ -288,47 +264,43 @@ export async function invokeLLMWithConfig(
   const config = await getLLMConfig(projectId);
 
   if (config) {
-    console.log(
-      `[LLM] Usando credenciais do projeto ${projectId} (${config.provider})`
-    );
+    logger.debug(`[LLM] Usando credenciais do projeto ${projectId} (${config.provider})`);
 
     try {
       // Invocar provedor específico
       switch (config.provider) {
-        case "openai":
+        case 'openai':
           return await invokeOpenAI(config.apiKey, {
             ...params,
             model: params.model || config.model,
           });
 
-        case "gemini":
+        case 'gemini':
           return await invokeGemini(config.apiKey, {
             ...params,
             model: params.model || config.model,
           });
 
-        case "anthropic":
+        case 'anthropic':
           return await invokeAnthropic(config.apiKey, {
             ...params,
             model: params.model || config.model,
           });
 
         default:
-          console.warn(
-            `[LLM] Provedor desconhecido: ${config.provider}, usando fallback`
-          );
+          console.warn(`[LLM] Provedor desconhecido: ${config.provider}, usando fallback`);
           return coreInvokeLLM(params);
       }
     } catch (error) {
       console.error(`[LLM] Erro ao invocar ${config.provider}:`, error);
       // Fallback para sistema padrão em caso de erro
-      console.log(`[LLM] Usando fallback (sistema padrão)`);
+      logger.debug(`[LLM] Usando fallback (sistema padrão)`);
       return coreInvokeLLM(params);
     }
   }
 
   // Fallback: usar credenciais do ENV (sistema padrão)
-  console.log(`[LLM] Usando credenciais padrão do sistema (ENV)`);
+  logger.debug(`[LLM] Usando credenciais padrão do sistema (ENV)`);
   return coreInvokeLLM(params);
 }
 
@@ -358,7 +330,7 @@ export async function validateLLMConfig(projectId: number): Promise<{
   if (!config) {
     return {
       valid: false,
-      error: "Nenhuma credencial configurada para este projeto",
+      error: 'Nenhuma credencial configurada para este projeto',
     };
   }
 
@@ -366,8 +338,8 @@ export async function validateLLMConfig(projectId: number): Promise<{
     // Fazer uma chamada simples para testar
     const result = await invokeLLMWithConfig(projectId, {
       messages: [
-        { role: "system", content: "Você é um assistente útil." },
-        { role: "user", content: 'Responda apenas "OK"' },
+        { role: 'system', content: 'Você é um assistente útil.' },
+        { role: 'user', content: 'Responda apenas "OK"' },
       ],
     });
 
@@ -389,7 +361,7 @@ export async function validateLLMConfig(projectId: number): Promise<{
  */
 export async function getAvailableProviders(projectId: number): Promise<
   {
-    provider: "openai" | "gemini" | "anthropic";
+    provider: 'openai' | 'gemini' | 'anthropic';
     configured: boolean;
     model?: string;
   }[]
@@ -408,9 +380,9 @@ export async function getAvailableProviders(projectId: number): Promise<
 
     if (result.length === 0) {
       return [
-        { provider: "openai", configured: false },
-        { provider: "gemini", configured: false },
-        { provider: "anthropic", configured: false },
+        { provider: 'openai', configured: false },
+        { provider: 'gemini', configured: false },
+        { provider: 'anthropic', configured: false },
       ];
     }
 
@@ -418,23 +390,23 @@ export async function getAvailableProviders(projectId: number): Promise<
 
     return [
       {
-        provider: "openai",
+        provider: 'openai',
         configured: !!config.openaiApiKey,
-        model: "gpt-4o",
+        model: 'gpt-4o',
       },
       {
-        provider: "gemini",
+        provider: 'gemini',
         configured: !!config.geminiApiKey,
-        model: "gemini-2.5-flash",
+        model: 'gemini-2.5-flash',
       },
       {
-        provider: "anthropic",
+        provider: 'anthropic',
         configured: !!config.anthropicApiKey,
-        model: "claude-3-5-sonnet-20241022",
+        model: 'claude-3-5-sonnet-20241022',
       },
     ];
   } catch (error) {
-    console.error("[LLMConfig] Erro ao listar provedores:", error);
+    console.error('[LLMConfig] Erro ao listar provedores:', error);
     return [];
   }
 }
