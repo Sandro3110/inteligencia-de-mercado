@@ -1,0 +1,13 @@
+{
+  "name": "@shared",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    "./const": "./const.ts",
+    "./types": "./types.ts",
+    "./formSchemas": "./formSchemas.ts",
+    "./qualityScore": "./qualityScore.ts",
+    "./advancedFilters": "./advancedFilters.ts",
+    "./_core/*": "./_core/*"
+  }
+}
