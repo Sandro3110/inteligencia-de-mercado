@@ -1,5 +1,5 @@
-import * as XLSX from "xlsx";
-import { storagePut } from "../storage";
+import ExcelJS from 'exceljs';
+import { storagePut } from '../storage';
 
 /**
  * Configuração de abas do Excel
@@ -12,6 +12,7 @@ export interface ExcelSheetConfig {
 
 /**
  * Renderer para formato Excel (XLSX)
+ * Migrated from xlsx to exceljs for security
  */
 export class ExcelRenderer {
   /**
@@ -23,34 +24,34 @@ export class ExcelRenderer {
     additionalSheets?: ExcelSheetConfig[]
   ): Promise<{ url: string; size: number }> {
     if (data.length === 0) {
-      throw new Error("Nenhum dado para exportar");
+      throw new Error('Nenhum dado para exportar');
     }
 
     // Cria workbook
-    const workbook = XLSX.utils.book_new();
+    const workbook = new ExcelJS.Workbook();
 
     // Adiciona aba principal
-    this.addSheet(workbook, "Dados Principais", data, selectedFields);
+    await this.addSheet(workbook, 'Dados Principais', data, selectedFields);
 
     // Adiciona abas adicionais (se fornecidas)
     if (additionalSheets) {
-      additionalSheets.forEach(sheet => {
-        this.addSheet(workbook, sheet.name, sheet.data, sheet.fields);
-      });
+      for (const sheet of additionalSheets) {
+        await this.addSheet(workbook, sheet.name, sheet.data, sheet.fields);
+      }
     }
 
     // Adiciona aba de metadados
-    this.addMetadataSheet(workbook, data.length, selectedFields.length);
+    await this.addMetadataSheet(workbook, data.length, selectedFields.length);
 
     // Gera buffer
-    const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+    const buffer = await workbook.xlsx.writeBuffer();
 
     // Faz upload para S3
     const filename = `export_${Date.now()}.xlsx`;
     const { url } = await storagePut(
       `exports/${filename}`,
       buffer as Buffer,
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     );
 
     return {
@@ -62,61 +63,84 @@ export class ExcelRenderer {
   /**
    * Adiciona uma aba ao workbook
    */
-  private addSheet(
-    workbook: XLSX.WorkBook,
+  private async addSheet(
+    workbook: ExcelJS.Workbook,
     sheetName: string,
     data: unknown[],
     fields: string[]
-  ): void {
-    // Prepara dados para o Excel
-    const rows = data.map(record => {
+  ): Promise<void> {
+    // Cria worksheet
+    const worksheet = workbook.addWorksheet(sheetName);
+
+    // Adiciona cabeçalhos
+    worksheet.columns = fields.map((field) => ({
+      header: field,
+      key: field,
+      width: Math.max(field.length, 15),
+    }));
+
+    // Adiciona dados
+    data.forEach((record) => {
       const row: Record<string, any> = {};
-      fields.forEach(field => {
-        row[field] = this.formatValue(record[field]);
+      fields.forEach((field) => {
+        row[field] = this.formatValue((record as any)[field]);
       });
-      return row;
+      worksheet.addRow(row);
     });
 
-    // Cria worksheet
-    const worksheet = XLSX.utils.json_to_sheet(rows, { header: fields });
-
-    // Ajusta largura das colunas
-    const colWidths = fields.map(field => ({
-      wch: Math.max(field.length, 15),
-    }));
-    worksheet["!cols"] = colWidths;
-
-    // Adiciona ao workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+    // Estiliza cabeçalho
+    worksheet.getRow(1).font = { bold: true };
+    worksheet.getRow(1).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFE0E0E0' },
+    };
   }
 
   /**
    * Adiciona aba de metadados
    */
-  private addMetadataSheet(
-    workbook: XLSX.WorkBook,
+  private async addMetadataSheet(
+    workbook: ExcelJS.Workbook,
     recordCount: number,
     fieldCount: number
-  ): void {
-    const metadata = [
-      { Campo: "Data de Exportação", Valor: new Date().toISOString() },
-      { Campo: "Total de Registros", Valor: recordCount },
-      { Campo: "Total de Campos", Valor: fieldCount },
-      { Campo: "Sistema", Valor: "Gestor PAV - Inteligência de Mercado" },
+  ): Promise<void> {
+    const worksheet = workbook.addWorksheet('Metadados');
+
+    worksheet.columns = [
+      { header: 'Campo', key: 'campo', width: 25 },
+      { header: 'Valor', key: 'valor', width: 40 },
     ];
 
-    const worksheet = XLSX.utils.json_to_sheet(metadata);
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Metadados");
+    worksheet.addRow({
+      campo: 'Data de Exportação',
+      valor: new Date().toISOString(),
+    });
+    worksheet.addRow({
+      campo: 'Total de Registros',
+      valor: recordCount,
+    });
+    worksheet.addRow({
+      campo: 'Total de Campos',
+      valor: fieldCount,
+    });
+    worksheet.addRow({
+      campo: 'Sistema',
+      valor: 'Gestor PAV - Inteligência de Mercado',
+    });
+
+    // Estiliza cabeçalho
+    worksheet.getRow(1).font = { bold: true };
   }
 
   /**
    * Formata valor para Excel
    */
-  private formatValue(value: unknown): string | number {
-    if (value === null || value === undefined) return "";
+  private formatValue(value: unknown): string | number | Date {
+    if (value === null || value === undefined) return '';
     if (value instanceof Date) return value;
-    if (typeof value === "object") return JSON.stringify(value);
-    return value;
+    if (typeof value === 'object') return JSON.stringify(value);
+    return value as string | number;
   }
 }
 

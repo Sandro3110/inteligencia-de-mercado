@@ -3,12 +3,8 @@
  * Fase 39.2 - Upload de Planilha CSV/Excel
  */
 
-import * as XLSX from "xlsx";
-import {
-  validateMercado,
-  validateCliente,
-  type ValidationResult,
-} from "./validationSchemas";
+import * as XLSX from 'xlsx'; // TODO: Migrate to exceljs (complex parser)
+import { validateMercado, validateCliente, type ValidationResult } from './validationSchemas';
 
 export interface ParsedRow {
   rowNumber: number;
@@ -32,112 +28,112 @@ export interface ParseResult {
 
 const MERCADO_COLUMN_MAPPING: Record<string, string> = {
   // Variações de "nome"
-  nome: "nome",
-  name: "nome",
-  mercado: "nome",
-  market: "nome",
+  nome: 'nome',
+  name: 'nome',
+  mercado: 'nome',
+  market: 'nome',
 
   // Variações de "descrição"
-  descricao: "descricao",
-  descrição: "descricao",
-  description: "descricao",
-  desc: "descricao",
+  descricao: 'descricao',
+  descrição: 'descricao',
+  description: 'descricao',
+  desc: 'descricao',
 
   // Variações de "segmentação"
-  segmentacao: "segmentacao",
-  segmentação: "segmentacao",
-  segmentation: "segmentacao",
-  tipo: "segmentacao",
-  type: "segmentacao",
+  segmentacao: 'segmentacao',
+  segmentação: 'segmentacao',
+  segmentation: 'segmentacao',
+  tipo: 'segmentacao',
+  type: 'segmentacao',
 
   // Variações de "categoria"
-  categoria: "categoria",
-  category: "categoria",
-  cat: "categoria",
+  categoria: 'categoria',
+  category: 'categoria',
+  cat: 'categoria',
 
   // Variações de "tamanho"
-  tamanho: "tamanhoEstimado",
-  "tamanho estimado": "tamanhoEstimado",
-  size: "tamanhoEstimado",
+  tamanho: 'tamanhoEstimado',
+  'tamanho estimado': 'tamanhoEstimado',
+  size: 'tamanhoEstimado',
 
   // Variações de "tendência"
-  tendencia: "tendenciaCrescimento",
-  tendência: "tendenciaCrescimento",
-  trend: "tendenciaCrescimento",
-  crescimento: "tendenciaCrescimento",
+  tendencia: 'tendenciaCrescimento',
+  tendência: 'tendenciaCrescimento',
+  trend: 'tendenciaCrescimento',
+  crescimento: 'tendenciaCrescimento',
 };
 
 const CLIENTE_COLUMN_MAPPING: Record<string, string> = {
   // Nome
-  nome: "nome",
-  name: "nome",
-  cliente: "nome",
-  company: "nome",
-  empresa: "nome",
+  nome: 'nome',
+  name: 'nome',
+  cliente: 'nome',
+  company: 'nome',
+  empresa: 'nome',
 
   // Razão Social
-  "razao social": "razaoSocial",
-  "razão social": "razaoSocial",
-  razaosocial: "razaoSocial",
-  "legal name": "razaoSocial",
+  'razao social': 'razaoSocial',
+  'razão social': 'razaoSocial',
+  razaosocial: 'razaoSocial',
+  'legal name': 'razaoSocial',
 
   // CNPJ
-  cnpj: "cnpj",
-  "cpf/cnpj": "cnpj",
-  "tax id": "cnpj",
+  cnpj: 'cnpj',
+  'cpf/cnpj': 'cnpj',
+  'tax id': 'cnpj',
 
   // Site
-  site: "site",
-  website: "site",
-  url: "site",
-  web: "site",
+  site: 'site',
+  website: 'site',
+  url: 'site',
+  web: 'site',
 
   // Email
-  email: "email",
-  "e-mail": "email",
-  mail: "email",
+  email: 'email',
+  'e-mail': 'email',
+  mail: 'email',
 
   // Telefone
-  telefone: "telefone",
-  phone: "telefone",
-  tel: "telefone",
-  fone: "telefone",
+  telefone: 'telefone',
+  phone: 'telefone',
+  tel: 'telefone',
+  fone: 'telefone',
 
   // Endereço
-  endereco: "endereco",
-  endereço: "endereco",
-  address: "endereco",
-  rua: "endereco",
+  endereco: 'endereco',
+  endereço: 'endereco',
+  address: 'endereco',
+  rua: 'endereco',
 
   // Cidade
-  cidade: "cidade",
-  city: "cidade",
+  cidade: 'cidade',
+  city: 'cidade',
 
   // Estado
-  estado: "estado",
-  uf: "estado",
-  state: "estado",
+  estado: 'estado',
+  uf: 'estado',
+  state: 'estado',
 
   // CEP
-  cep: "cep",
-  zip: "cep",
-  "postal code": "cep",
+  cep: 'cep',
+  zip: 'cep',
+  'postal code': 'cep',
 
   // Porte
-  porte: "porte",
-  size: "porte",
-  tamanho: "porte",
+  porte: 'porte',
+  size: 'porte',
+  tamanho: 'porte',
 
   // Setor
-  setor: "setor",
-  sector: "setor",
-  industry: "setor",
-  ramo: "setor",
+  setor: 'setor',
+  sector: 'setor',
+  industry: 'setor',
+  ramo: 'setor',
 
   // Descrição
-  descricao: "descricao",
-  descrição: "descricao",
-  description: "descricao",
+  descricao: 'descricao',
+  descrição: 'descricao',
+  description: 'descricao',
 };
 
 // ============================================
@@ -148,10 +144,7 @@ function normalizeColumnName(col: string): string {
   return col.toLowerCase().trim();
 }
 
-function mapColumns(
-  headers: string[],
-  mapping: Record<string, string>
-): Record<string, string> {
+function mapColumns(headers: string[], mapping: Record<string, string>): Record<string, string> {
   const result: Record<string, string> = {};
 
   headers.forEach((header, index) => {
@@ -171,7 +164,7 @@ function parseRow(row: unknown[], columnMap: Record<string, string>): Record<str
 
   Object.entries(columnMap).forEach(([index, fieldName]) => {
     const value = row[parseInt(index)];
-    if (value !== undefined && value !== null && value !== "") {
+    if (value !== undefined && value !== null && value !== '') {
       parsed[fieldName] = String(value).trim();
     }
   });
@@ -183,13 +176,10 @@ function parseRow(row: unknown[], columnMap: Record<string, string>): Record<str
 // PARSER CSV
 // ============================================
 
-export function parseCSV(
-  csvContent: string,
-  type: "mercado" | "cliente"
-): ParseResult {
+export function parseCSV(csvContent: string, type: 'mercado' | 'cliente'): ParseResult {
   try {
     // Parse CSV usando xlsx
-    const workbook = XLSX.read(csvContent, { type: "string" });
+    const workbook = XLSX.read(csvContent, { type: 'string' });
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
     const data: unknown[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
@@ -206,9 +196,8 @@ export function parseCSV(
     }
 
     // Primeira linha = cabeçalhos
-    const headers = data[0].map(h => String(h));
-    const mapping =
-      type === "mercado" ? MERCADO_COLUMN_MAPPING : CLIENTE_COLUMN_MAPPING;
+    const headers = data[0].map((h) => String(h));
+    const mapping = type === 'mercado' ? MERCADO_COLUMN_MAPPING : CLIENTE_COLUMN_MAPPING;
     const columnMap = mapColumns(headers, mapping);
 
     // Parse e valida cada linha
@@ -221,7 +210,7 @@ export function parseCSV(
 
       // Validar
       let validation: ValidationResult<any>;
-      if (type === "mercado") {
+      if (type === 'mercado') {
         validation = validateMercado(rowData);
       } else {
         validation = validateCliente(rowData);
@@ -254,7 +243,7 @@ export function parseCSV(
       columns: headers,
     };
   } catch (error: unknown) {
-    console.error("[SpreadsheetParser] CSV parse error:", error);
+    console.error('[SpreadsheetParser] CSV parse error:', error);
     return {
       success: false,
       totalRows: 0,
@@ -272,12 +261,12 @@ export function parseCSV(
 
 export function parseExcel(
   buffer: Buffer,
-  type: "mercado" | "cliente",
+  type: 'mercado' | 'cliente',
   sheetIndex: number = 0
 ): ParseResult {
   try {
     // Parse Excel
-    const workbook = XLSX.read(buffer, { type: "buffer" });
+    const workbook = XLSX.read(buffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[sheetIndex];
 
     if (!sheetName) {
@@ -306,9 +295,8 @@ export function parseExcel(
     }
 
     // Primeira linha = cabeçalhos
-    const headers = data[0].map(h => String(h));
-    const mapping =
-      type === "mercado" ? MERCADO_COLUMN_MAPPING : CLIENTE_COLUMN_MAPPING;
+    const headers = data[0].map((h) => String(h));
+    const mapping = type === 'mercado' ? MERCADO_COLUMN_MAPPING : CLIENTE_COLUMN_MAPPING;
     const columnMap = mapColumns(headers, mapping);
 
     // Parse e valida cada linha
@@ -321,7 +309,7 @@ export function parseExcel(
 
       // Validar
       let validation: ValidationResult<any>;
-      if (type === "mercado") {
+      if (type === 'mercado') {
         validation = validateMercado(rowData);
       } else {
         validation = validateCliente(rowData);
@@ -354,7 +342,7 @@ export function parseExcel(
       columns: headers,
     };
   } catch (error: unknown) {
-    console.error("[SpreadsheetParser] Excel parse error:", error);
+    console.error('[SpreadsheetParser] Excel parse error:', error);
     return {
       success: false,
       totalRows: 0,
@@ -370,66 +358,55 @@ export function parseExcel(
 // HELPER: GERAR TEMPLATE
 // ============================================
 
-export function generateTemplate(type: "mercado" | "cliente"): Buffer {
+export function generateTemplate(type: 'mercado' | 'cliente'): Buffer {
   const headers =
-    type === "mercado"
-      ? [
-          "Nome",
-          "Descrição",
-          "Segmentação",
-          "Categoria",
-          "Tamanho Estimado",
-          "Tendência",
-        ]
+    type === 'mercado'
+      ? ['Nome', 'Descrição', 'Segmentação', 'Categoria', 'Tamanho Estimado', 'Tendência']
       : [
-          "Nome",
-          "Razão Social",
-          "CNPJ",
-          "Site",
-          "Email",
-          "Telefone",
-          "Endereço",
-          "Cidade",
-          "Estado",
-          "CEP",
-          "Porte",
-          "Setor",
-          "Descrição",
+          'Nome',
+          'Razão Social',
+          'CNPJ',
+          'Site',
+          'Email',
+          'Telefone',
+          'Endereço',
+          'Cidade',
+          'Estado',
+          'CEP',
+          'Porte',
+          'Setor',
+          'Descrição',
         ];
 
   const exampleRow =
-    type === "mercado"
+    type === 'mercado'
       ? [
-          "Embalagens Plásticas para Indústria Alimentícia",
-          "Indústrias que precisam de embalagens",
-          "B2B",
-          "Embalagens",
-          "R$ 2B/ano",
-          "Crescimento 5% a.a.",
+          'Embalagens Plásticas para Indústria Alimentícia',
+          'Indústrias que precisam de embalagens',
+          'B2B',
+          'Embalagens',
+          'R$ 2B/ano',
+          'Crescimento 5% a.a.',
         ]
       : [
-          "Empresa Exemplo Ltda",
-          "Empresa Exemplo Indústria e Comércio Ltda",
-          "12345678000190",
-          "https://exemplo.com.br",
-          "contato@exemplo.com.br",
-          "11987654321",
-          "Rua Exemplo, 123",
-          "São Paulo",
-          "SP",
-          "01234567",
-          "Médio",
-          "Indústria",
-          "Empresa de exemplo",
+          'Empresa Exemplo Ltda',
+          'Empresa Exemplo Indústria e Comércio Ltda',
+          '12345678000190',
+          'https://exemplo.com.br',
+          'contato@exemplo.com.br',
+          '11987654321',
+          'Rua Exemplo, 123',
+          'São Paulo',
+          'SP',
+          '01234567',
+          'Médio',
+          'Indústria',
+          'Empresa de exemplo',
         ];
 
   const ws = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(
-    wb,
-    ws,
-    type === "mercado" ? "Mercados" : "Clientes"
-  );
+  XLSX.utils.book_append_sheet(wb, ws, type === 'mercado' ? 'Mercados' : 'Clientes');
 
-  return XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+  return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
 }

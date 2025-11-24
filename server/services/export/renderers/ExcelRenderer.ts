@@ -1,9 +1,10 @@
 /**
  * Excel Renderer
  * Renderiza dados em formato Excel (XLSX)
+ * Migrated from xlsx to exceljs for security
  */
 
-import * as XLSX from "xlsx";
+import ExcelJS from 'exceljs';
 
 export interface ExcelOptions {
   sheetName?: string;
@@ -16,7 +17,7 @@ export class ExcelRenderer {
 
   constructor(options: ExcelOptions = {}) {
     this.options = {
-      sheetName: options.sheetName || "Dados",
+      sheetName: options.sheetName || 'Dados',
       includeHeaders: options.includeHeaders !== false,
       autoWidth: options.autoWidth !== false,
     };
@@ -25,81 +26,86 @@ export class ExcelRenderer {
   /**
    * Renderiza array de objetos em Excel
    */
-  render(data: unknown[], fields: string[]): Buffer {
+  async render(data: unknown[], fields: string[]): Promise<Buffer> {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(this.options.sheetName);
+
     if (!data || data.length === 0) {
       // Retorna workbook vazio
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet([[]]);
-      XLSX.utils.book_append_sheet(wb, ws, this.options.sheetName);
-      return Buffer.from(XLSX.write(wb, { type: "buffer", bookType: "xlsx" }));
+      return Buffer.from(await workbook.xlsx.writeBuffer());
     }
 
-    // Preparar dados
-    const rows: unknown[][] = [];
+    // Configurar colunas
+    worksheet.columns = fields.map((field) => ({
+      header: this.options.includeHeaders ? field : undefined,
+      key: field,
+      width: this.options.autoWidth ? this.calculateColumnWidth(field, data) : 15,
+    }));
 
-    // Headers
-    if (this.options.includeHeaders) {
-      rows.push(fields);
-    }
-
-    // Data rows
-    data.forEach(row => {
-      const values = fields.map(field => this.formatValue(row[field]));
-      rows.push(values);
+    // Adicionar dados
+    data.forEach((row) => {
+      const rowData: Record<string, any> = {};
+      fields.forEach((field) => {
+        rowData[field] = this.formatValue((row as any)[field]);
+      });
+      worksheet.addRow(rowData);
     });
 
-    // Criar workbook
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(rows);
-
-    // Auto-width
-    if (this.options.autoWidth) {
-      const colWidths = fields.map((field, idx) => {
-        const maxLength = Math.max(
-          field.length,
-          ...data.map(row => String(this.formatValue(row[field])).length)
-        );
-        return { wch: Math.min(maxLength + 2, 50) };
-      });
-      ws["!cols"] = colWidths;
+    // Estilizar cabeçalho se incluído
+    if (this.options.includeHeaders) {
+      worksheet.getRow(1).font = { bold: true };
+      worksheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE0E0E0' },
+      };
     }
 
-    XLSX.utils.book_append_sheet(wb, ws, this.options.sheetName);
-
     // Retornar buffer
-    return Buffer.from(XLSX.write(wb, { type: "buffer", bookType: "xlsx" }));
+    return Buffer.from(await workbook.xlsx.writeBuffer());
+  }
+
+  /**
+   * Calcula largura ideal da coluna
+   */
+  private calculateColumnWidth(field: string, data: unknown[]): number {
+    const maxLength = Math.max(
+      field.length,
+      ...data.map((row) => String(this.formatValue((row as any)[field])).length)
+    );
+    return Math.min(maxLength + 2, 50);
   }
 
   /**
    * Formata valores para Excel
    */
-  private formatValue(value: unknown): string | number {
+  private formatValue(value: unknown): string | number | Date {
     if (value === null || value === undefined) {
-      return "";
+      return '';
     }
 
     if (value instanceof Date) {
-      return value.toISOString().split("T")[0];
+      return value;
     }
 
-    if (typeof value === "object") {
+    if (typeof value === 'object') {
       return JSON.stringify(value);
     }
 
-    return value;
+    return value as string | number;
   }
 
   /**
    * Retorna o MIME type
    */
   getMimeType(): string {
-    return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   }
 
   /**
    * Retorna a extensão do arquivo
    */
   getFileExtension(): string {
-    return "xlsx";
+    return 'xlsx';
   }
 }

@@ -1,14 +1,14 @@
-import * as XLSX from "xlsx";
-import { getDb } from "./db";
-import { mercadosUnicos, leads } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import * as XLSX from 'xlsx'; // TODO: Migrate to exceljs
+import { getDb } from './db';
+import { mercadosUnicos, leads } from '../drizzle/schema';
+import { eq } from 'drizzle-orm';
 
 /**
  * Exporta mercados para Excel
  */
 export async function exportMercadosToExcel(projectId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error('Database not available');
 
   const mercados = await db
     .select()
@@ -16,19 +16,17 @@ export async function exportMercadosToExcel(projectId: number) {
     .where(eq(mercadosUnicos.projectId, projectId));
 
   // Formatar dados para Excel
-  const data = mercados.map(m => ({
+  const data = mercados.map((m) => ({
     ID: m.id,
     Nome: m.nome,
-    Segmentação: m.segmentacao || "",
-    Categoria: m.categoria || "",
-    "Tamanho do Mercado": m.tamanhoMercado || "",
-    "Crescimento Anual": m.crescimentoAnual || "",
-    Tendências: m.tendencias || "",
-    "Principais Players": m.principaisPlayers || "",
-    "Quantidade de Clientes": m.quantidadeClientes || 0,
-    "Criado em": m.createdAt
-      ? new Date(m.createdAt).toLocaleDateString("pt-BR")
-      : "",
+    Segmentação: m.segmentacao || '',
+    Categoria: m.categoria || '',
+    'Tamanho do Mercado': m.tamanhoMercado || '',
+    'Crescimento Anual': m.crescimentoAnual || '',
+    Tendências: m.tendencias || '',
+    'Principais Players': m.principaisPlayers || '',
+    'Quantidade de Clientes': m.quantidadeClientes || 0,
+    'Criado em': m.createdAt ? new Date(m.createdAt).toLocaleDateString('pt-BR') : '',
   }));
 
   // Criar workbook e worksheet
@@ -45,12 +43,12 @@ export async function exportMercadosToExcel(projectId: number) {
     { wch: 15 }, // Criado em
     { wch: 15 }, // Atualizado em
   ];
-  ws["!cols"] = colWidths;
+  ws['!cols'] = colWidths;
 
-  XLSX.utils.book_append_sheet(wb, ws, "Mercados");
+  XLSX.utils.book_append_sheet(wb, ws, 'Mercados');
 
   // Gerar buffer
-  const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+  const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
   return buffer;
 }
 
@@ -59,33 +57,28 @@ export async function exportMercadosToExcel(projectId: number) {
  */
 export async function exportLeadsToExcel(projectId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error('Database not available');
 
-  const leadsData = await db
-    .select()
-    .from(leads)
-    .where(eq(leads.projectId, projectId));
+  const leadsData = await db.select().from(leads).where(eq(leads.projectId, projectId));
 
   // Formatar dados para Excel
-  const data = leadsData.map(l => ({
+  const data = leadsData.map((l) => ({
     ID: l.id,
-    Nome: l.nome || "",
-    CNPJ: l.cnpj || "",
-    Site: l.site || "",
-    Email: l.email || "",
-    Telefone: l.telefone || "",
-    Tipo: l.tipo || "",
-    Porte: l.porte || "",
-    Região: l.regiao || "",
-    Setor: l.setor || "",
-    "Mercado ID": l.mercadoId,
-    "Score de Qualidade": l.qualidadeScore || 0,
-    Classificação: l.qualidadeClassificacao || "",
-    Estágio: l.stage || "novo",
-    "Status de Validação": l.validationStatus || "pending",
-    "Criado em": l.createdAt
-      ? new Date(l.createdAt).toLocaleDateString("pt-BR")
-      : "",
+    Nome: l.nome || '',
+    CNPJ: l.cnpj || '',
+    Site: l.site || '',
+    Email: l.email || '',
+    Telefone: l.telefone || '',
+    Tipo: l.tipo || '',
+    Porte: l.porte || '',
+    Região: l.regiao || '',
+    Setor: l.setor || '',
+    'Mercado ID': l.mercadoId,
+    'Score de Qualidade': l.qualidadeScore || 0,
+    Classificação: l.qualidadeClassificacao || '',
+    Estágio: l.stage || 'novo',
+    'Status de Validação': l.validationStatus || 'pending',
+    'Criado em': l.createdAt ? new Date(l.createdAt).toLocaleDateString('pt-BR') : '',
   }));
 
   // Criar workbook e worksheet
@@ -108,11 +101,11 @@ export async function exportLeadsToExcel(projectId: number) {
     { wch: 15 }, // Criado em
     { wch: 15 }, // Atualizado em
   ];
-  ws["!cols"] = colWidths;
+  ws['!cols'] = colWidths;
 
-  XLSX.utils.book_append_sheet(wb, ws, "Leads");
+  XLSX.utils.book_append_sheet(wb, ws, 'Leads');
 
   // Gerar buffer
-  const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+  const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
   return buffer;
 }
