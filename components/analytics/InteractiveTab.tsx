@@ -1,7 +1,16 @@
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+'use client';
+
+import { useState, useCallback, useMemo } from 'react';
+import { trpc } from '@/lib/trpc/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   LineChart,
   Line,
@@ -16,35 +25,49 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts";
-import {
-  TrendingUp,
-  MapPin,
-  PieChart as PieChartIcon,
-  RefreshCw,
-} from "lucide-react";
-import { CardSkeleton, ChartSkeleton } from "@/components/skeletons";
+} from 'recharts';
+import { TrendingUp, MapPin, PieChart as PieChartIcon, RefreshCw } from 'lucide-react';
+import { CardSkeleton, ChartSkeleton } from '@/components/skeletons';
 
 const COLORS = [
-  "#3b82f6",
-  "#10b981",
-  "#f59e0b",
-  "#ef4444",
-  "#8b5cf6",
-  "#ec4899",
-  "#06b6d4",
-  "#84cc16",
-];
+  '#3b82f6',
+  '#10b981',
+  '#f59e0b',
+  '#ef4444',
+  '#8b5cf6',
+  '#ec4899',
+  '#06b6d4',
+  '#84cc16',
+] as const;
+
+const MONTH_OPTIONS = [
+  { value: '3', label: 'Últimos 3 meses' },
+  { value: '6', label: 'Últimos 6 meses' },
+  { value: '12', label: 'Últimos 12 meses' },
+] as const;
+
+const TOOLTIP_STYLE = {
+  backgroundColor: '#ffffff',
+  border: '1px solid #e2e8f0',
+  borderRadius: '0.5rem',
+} as const;
+
+const LABEL_STYLE = {
+  color: '#0f172a',
+} as const;
 
 interface InteractiveTabProps {
   projectId: number;
 }
 
+interface Pesquisa {
+  id: number;
+  nome: string;
+}
+
 export function InteractiveTab({ projectId }: InteractiveTabProps) {
   const [months, setMonths] = useState(6);
-  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(
-    null
-  );
+  const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(null);
 
   // Buscar pesquisas do projeto selecionado
   const { data: pesquisas } = trpc.pesquisas.list.useQuery(undefined, {
@@ -60,11 +83,10 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
     { enabled: !!projectId }
   );
 
-  const { data: geographicData, refetch: refetchGeographic } =
-    trpc.analytics.geographic.useQuery(
-      { projectId, pesquisaId: selectedPesquisaId ?? undefined },
-      { enabled: !!projectId }
-    );
+  const { data: geographicData, refetch: refetchGeographic } = trpc.analytics.geographic.useQuery(
+    { projectId, pesquisaId: selectedPesquisaId ?? undefined },
+    { enabled: !!projectId }
+  );
 
   const {
     data: segmentationData,
@@ -75,13 +97,24 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
     { enabled: !!projectId }
   );
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     refetchEvolution();
     refetchGeographic();
     refetchSegmentation();
-  };
+  }, [refetchEvolution, refetchGeographic, refetchSegmentation]);
 
-  const isLoading = isLoadingEvolution || isLoadingSegmentation;
+  const handlePesquisaChange = useCallback((value: string) => {
+    setSelectedPesquisaId(value ? Number(value) : null);
+  }, []);
+
+  const handleMonthsChange = useCallback((value: string) => {
+    setMonths(Number(value));
+  }, []);
+
+  const isLoading = useMemo(
+    () => isLoadingEvolution || isLoadingSegmentation,
+    [isLoadingEvolution, isLoadingSegmentation]
+  );
 
   if (isLoading) {
     return (
@@ -102,31 +135,36 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
     <div className="space-y-6">
       {/* Controles */}
       <div className="flex items-center justify-end gap-4">
-        <select
-          value={selectedPesquisaId || ""}
-          onChange={e =>
-            setSelectedPesquisaId(
-              e.target.value ? Number(e.target.value) : null
-            )
-          }
-          className="px-3 py-2 border border-slate-300 rounded-md text-slate-700 bg-white"
+        <Select
+          value={selectedPesquisaId?.toString() || ''}
+          onValueChange={handlePesquisaChange}
         >
-          <option value="">Todas as Pesquisas</option>
-          {pesquisas?.map((p: any) => (
-            <option key={p.id} value={p.id}>
-              {p.nome}
-            </option>
-          ))}
-        </select>
-        <select
-          value={months}
-          onChange={e => setMonths(Number(e.target.value))}
-          className="px-3 py-2 border border-slate-300 rounded-md text-slate-700 bg-white"
-        >
-          <option value={3}>Últimos 3 meses</option>
-          <option value={6}>Últimos 6 meses</option>
-          <option value={12}>Últimos 12 meses</option>
-        </select>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Todas as Pesquisas" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">Todas as Pesquisas</SelectItem>
+            {(pesquisas as Pesquisa[] | undefined)?.map((p) => (
+              <SelectItem key={p.id} value={p.id.toString()}>
+                {p.nome}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={months.toString()} onValueChange={handleMonthsChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {MONTH_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         <Button onClick={handleRefresh} variant="outline" className="gap-2">
           <RefreshCw className="w-4 h-4" />
           Atualizar
@@ -150,14 +188,7 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="month" stroke="#64748b" />
               <YAxis stroke="#64748b" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "0.5rem",
-                }}
-                labelStyle={{ color: "#0f172a" }}
-              />
+              <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={LABEL_STYLE} />
               <Legend />
               <Line
                 type="monotone"
@@ -191,33 +222,17 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
           <CardHeader>
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-green-600" />
-              <CardTitle className="text-slate-900">
-                Distribuição Geográfica
-              </CardTitle>
+              <CardTitle className="text-slate-900">Distribuição Geográfica</CardTitle>
             </div>
-            <p className="text-sm text-slate-600 mt-1">
-              Top 10 estados com mais registros
-            </p>
+            <p className="text-sm text-slate-600 mt-1">Top 10 estados com mais registros</p>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={geographicData || []} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis type="number" stroke="#64748b" />
-                <YAxis
-                  dataKey="uf"
-                  type="category"
-                  stroke="#64748b"
-                  width={50}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "0.5rem",
-                  }}
-                  labelStyle={{ color: "#0f172a" }}
-                />
+                <YAxis dataKey="uf" type="category" stroke="#64748b" width={50} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={LABEL_STYLE} />
                 <Bar dataKey="count" fill="#10b981" name="Registros" />
               </BarChart>
             </ResponsiveContainer>
@@ -229,13 +244,9 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
           <CardHeader>
             <div className="flex items-center gap-2">
               <PieChartIcon className="w-5 h-5 text-purple-600" />
-              <CardTitle className="text-slate-900">
-                Segmentação de Mercado
-              </CardTitle>
+              <CardTitle className="text-slate-900">Segmentação de Mercado</CardTitle>
             </div>
-            <p className="text-sm text-slate-600 mt-1">
-              Distribuição B2B, B2C e Ambos
-            </p>
+            <p className="text-sm text-slate-600 mt-1">Distribuição B2B, B2C e Ambos</p>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -254,19 +265,10 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
                   nameKey="segmentacao"
                 >
                   {(segmentationData || []).map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "0.5rem",
-                  }}
-                />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -280,12 +282,8 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-700 font-medium">
-                  Total de Meses
-                </p>
-                <p className="text-2xl font-bold text-blue-900">
-                  {evolutionData?.length || 0}
-                </p>
+                <p className="text-sm text-blue-700 font-medium">Total de Meses</p>
+                <p className="text-2xl font-bold text-blue-900">{evolutionData?.length || 0}</p>
               </div>
               <TrendingUp className="w-8 h-8 text-blue-600 opacity-50" />
             </div>
@@ -296,12 +294,8 @@ export function InteractiveTab({ projectId }: InteractiveTabProps) {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-green-700 font-medium">
-                  Estados Ativos
-                </p>
-                <p className="text-2xl font-bold text-green-900">
-                  {geographicData?.length || 0}
-                </p>
+                <p className="text-sm text-green-700 font-medium">Estados Ativos</p>
+                <p className="text-2xl font-bold text-green-900">{geographicData?.length || 0}</p>
               </div>
               <MapPin className="w-8 h-8 text-green-600 opacity-50" />
             </div>

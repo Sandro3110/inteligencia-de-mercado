@@ -1,10 +1,12 @@
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
-import { exportToCSV } from "@/lib/export";
-import { toast } from "sonner";
+'use client';
+
+import { useCallback, useMemo } from 'react';
+import { trpc } from '@/lib/trpc/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Link } from 'wouter';
+import { exportToCSV } from '@/lib/export';
+import { toast } from 'sonner';
 import {
   Building2,
   Users,
@@ -14,7 +16,7 @@ import {
   AlertCircle,
   XCircle,
   Clock,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   PieChart,
   Pie,
@@ -27,13 +29,34 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-} from "recharts";
-import { CardSkeleton, ChartSkeleton } from "@/components/skeletons";
+} from 'recharts';
+import { CardSkeleton, ChartSkeleton } from '@/components/skeletons';
 
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'] as const;
 
 interface OverviewTabProps {
   projectId: number;
+}
+
+interface StatusItem {
+  status: string;
+  count: number;
+}
+
+interface ValidationData {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface EntityData {
+  name: string;
+  value: number;
+}
+
+function getStatusCount(statusArray: StatusItem[], status: string): number {
+  const item = statusArray.find((s) => s.status === status);
+  return item?.count || 0;
 }
 
 export function OverviewTab({ projectId }: OverviewTabProps) {
@@ -52,37 +75,89 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
     { enabled: !!projectId }
   );
 
-  const { data: allLeads } = trpc.leads.list.useQuery(
-    { projectId },
-    { enabled: !!projectId }
-  );
+  const { data: allLeads } = trpc.leads.list.useQuery({ projectId }, { enabled: !!projectId });
 
-  const handleExportClientes = () => {
+  const handleExportClientes = useCallback(() => {
     if (!allClientes || allClientes.length === 0) {
-      toast.error("Nenhum cliente para exportar");
+      toast.error('Nenhum cliente para exportar');
       return;
     }
-    exportToCSV(allClientes, "clientes-pav.csv");
-    toast.success("Clientes exportados com sucesso!");
-  };
+    exportToCSV(allClientes, 'clientes-pav.csv');
+    toast.success('Clientes exportados com sucesso!');
+  }, [allClientes]);
 
-  const handleExportConcorrentes = () => {
+  const handleExportConcorrentes = useCallback(() => {
     if (!allConcorrentes || allConcorrentes.length === 0) {
-      toast.error("Nenhum concorrente para exportar");
+      toast.error('Nenhum concorrente para exportar');
       return;
     }
-    exportToCSV(allConcorrentes, "concorrentes-pav.csv");
-    toast.success("Concorrentes exportados com sucesso!");
-  };
+    exportToCSV(allConcorrentes, 'concorrentes-pav.csv');
+    toast.success('Concorrentes exportados com sucesso!');
+  }, [allConcorrentes]);
 
-  const handleExportLeads = () => {
+  const handleExportLeads = useCallback(() => {
     if (!allLeads || allLeads.length === 0) {
-      toast.error("Nenhum lead para exportar");
+      toast.error('Nenhum lead para exportar');
       return;
     }
-    exportToCSV(allLeads, "leads-pav.csv");
-    toast.success("Leads exportados com sucesso!");
-  };
+    exportToCSV(allLeads, 'leads-pav.csv');
+    toast.success('Leads exportados com sucesso!');
+  }, [allLeads]);
+
+  const validationMetrics = useMemo(() => {
+    if (!stats) return null;
+
+    const clientesPending = getStatusCount(stats.validation.clientes, 'pending');
+    const clientesRich = getStatusCount(stats.validation.clientes, 'rich');
+    const clientesNeedsAdjustment = getStatusCount(stats.validation.clientes, 'needs_adjustment');
+    const clientesDiscarded = getStatusCount(stats.validation.clientes, 'discarded');
+
+    const concorrentesPending = getStatusCount(stats.validation.concorrentes, 'pending');
+    const concorrentesRich = getStatusCount(stats.validation.concorrentes, 'rich');
+
+    const leadsPending = getStatusCount(stats.validation.leads, 'pending');
+    const leadsRich = getStatusCount(stats.validation.leads, 'rich');
+
+    const totalValidated = clientesRich + concorrentesRich + leadsRich;
+    const totalPending = clientesPending + concorrentesPending + leadsPending;
+    const totalRecords = stats.totals.clientes + stats.totals.concorrentes + stats.totals.leads;
+    const validationProgress = Math.round((totalValidated / totalRecords) * 100);
+
+    return {
+      clientesPending,
+      clientesRich,
+      clientesNeedsAdjustment,
+      clientesDiscarded,
+      concorrentesPending,
+      concorrentesRich,
+      leadsPending,
+      leadsRich,
+      totalValidated,
+      totalPending,
+      totalRecords,
+      validationProgress,
+    };
+  }, [stats]);
+
+  const validationData = useMemo<ValidationData[]>(() => {
+    if (!validationMetrics) return [];
+    return [
+      { name: 'Validados', value: validationMetrics.totalValidated, color: COLORS[1] },
+      { name: 'Pendentes', value: validationMetrics.totalPending, color: COLORS[2] },
+      { name: 'Ajuste', value: validationMetrics.clientesNeedsAdjustment, color: COLORS[2] },
+      { name: 'Descartados', value: validationMetrics.clientesDiscarded, color: COLORS[3] },
+    ];
+  }, [validationMetrics]);
+
+  const entityData = useMemo<EntityData[]>(() => {
+    if (!stats) return [];
+    return [
+      { name: 'Mercados', value: stats.totals.mercados },
+      { name: 'Clientes', value: stats.totals.clientes },
+      { name: 'Concorrentes', value: stats.totals.concorrentes },
+      { name: 'Leads', value: stats.totals.leads },
+    ];
+  }, [stats]);
 
   if (isLoading) {
     return (
@@ -98,7 +173,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
     );
   }
 
-  if (!stats) {
+  if (!stats || !validationMetrics) {
     return (
       <div className="flex items-center justify-center py-12">
         <p className="text-muted-foreground">Erro ao carregar estatísticas</p>
@@ -106,69 +181,17 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
     );
   }
 
-  const getStatusCount = (statusArray: any[], status: string) => {
-    const item = statusArray.find((s: any) => s.status === status);
-    return item?.count || 0;
-  };
-
-  const clientesPending = getStatusCount(stats.validation.clientes, "pending");
-  const clientesRich = getStatusCount(stats.validation.clientes, "rich");
-  const clientesNeedsAdjustment = getStatusCount(
-    stats.validation.clientes,
-    "needs_adjustment"
-  );
-  const clientesDiscarded = getStatusCount(
-    stats.validation.clientes,
-    "discarded"
-  );
-
-  const concorrentesPending = getStatusCount(
-    stats.validation.concorrentes,
-    "pending"
-  );
-  const concorrentesRich = getStatusCount(
-    stats.validation.concorrentes,
-    "rich"
-  );
-
-  const leadsPending = getStatusCount(stats.validation.leads, "pending");
-  const leadsRich = getStatusCount(stats.validation.leads, "rich");
-
-  const totalValidated = clientesRich + concorrentesRich + leadsRich;
-  const totalPending = clientesPending + concorrentesPending + leadsPending;
-  const totalRecords =
-    stats.totals.clientes + stats.totals.concorrentes + stats.totals.leads;
-  const validationProgress = Math.round((totalValidated / totalRecords) * 100);
-
-  const validationData = [
-    { name: "Validados", value: totalValidated, color: COLORS[1] },
-    { name: "Pendentes", value: totalPending, color: COLORS[2] },
-    { name: "Ajuste", value: clientesNeedsAdjustment, color: COLORS[2] },
-    { name: "Descartados", value: clientesDiscarded, color: COLORS[3] },
-  ];
-
-  const entityData = [
-    { name: "Mercados", value: stats.totals.mercados },
-    { name: "Clientes", value: stats.totals.clientes },
-    { name: "Concorrentes", value: stats.totals.concorrentes },
-    { name: "Leads", value: stats.totals.leads },
-  ];
-
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-white border-slate-200 shadow-sm border-l-4 border-l-blue-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Mercados
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Mercados</CardTitle>
             <Building2 className="h-5 w-5 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
-              {stats.totals.mercados}
-            </div>
+            <div className="text-2xl font-bold text-slate-900">{stats.totals.mercados}</div>
             <Link href="/mercados">
               <a className="text-xs text-blue-600 hover:underline mt-1 inline-block">
                 Ver mercados →
@@ -179,21 +202,19 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
 
         <Card className="bg-white border-slate-200 shadow-sm border-l-4 border-l-green-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Clientes
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Clientes</CardTitle>
             <Users className="h-5 w-5 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
-              {stats.totals.clientes}
-            </div>
-            <button
+            <div className="text-2xl font-bold text-slate-900">{stats.totals.clientes}</div>
+            <Button
+              variant="link"
+              size="sm"
               onClick={handleExportClientes}
-              className="text-xs text-green-600 hover:underline mt-1"
+              className="text-xs text-green-600 hover:underline mt-1 p-0 h-auto"
             >
               Exportar CSV →
-            </button>
+            </Button>
           </CardContent>
         </Card>
 
@@ -205,35 +226,33 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
             <Target className="h-5 w-5 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
-              {stats.totals.concorrentes}
-            </div>
-            <button
+            <div className="text-2xl font-bold text-slate-900">{stats.totals.concorrentes}</div>
+            <Button
+              variant="link"
+              size="sm"
               onClick={handleExportConcorrentes}
-              className="text-xs text-purple-600 hover:underline mt-1"
+              className="text-xs text-purple-600 hover:underline mt-1 p-0 h-auto"
             >
               Exportar CSV →
-            </button>
+            </Button>
           </CardContent>
         </Card>
 
         <Card className="bg-white border-slate-200 shadow-sm border-l-4 border-l-orange-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Leads
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Leads</CardTitle>
             <TrendingUp className="h-5 w-5 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
-              {stats.totals.leads}
-            </div>
-            <button
+            <div className="text-2xl font-bold text-slate-900">{stats.totals.leads}</div>
+            <Button
+              variant="link"
+              size="sm"
               onClick={handleExportLeads}
-              className="text-xs text-orange-600 hover:underline mt-1"
+              className="text-xs text-orange-600 hover:underline mt-1 p-0 h-auto"
             >
               Exportar CSV →
-            </button>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -251,37 +270,37 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
               <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-green-500 transition-all duration-500"
-                  style={{ width: `${validationProgress}%` }}
+                  style={{ width: `${validationMetrics.validationProgress}%` }}
                 />
               </div>
             </div>
             <span className="text-2xl font-bold text-slate-900">
-              {validationProgress}%
+              {validationMetrics.validationProgress}%
             </span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <span className="text-slate-600">
-                Validados: <strong>{totalValidated}</strong>
+                Validados: <strong>{validationMetrics.totalValidated}</strong>
               </span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-yellow-600" />
               <span className="text-slate-600">
-                Pendentes: <strong>{totalPending}</strong>
+                Pendentes: <strong>{validationMetrics.totalPending}</strong>
               </span>
             </div>
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-orange-600" />
               <span className="text-slate-600">
-                Ajuste: <strong>{clientesNeedsAdjustment}</strong>
+                Ajuste: <strong>{validationMetrics.clientesNeedsAdjustment}</strong>
               </span>
             </div>
             <div className="flex items-center gap-2">
               <XCircle className="h-4 w-4 text-red-600" />
               <span className="text-slate-600">
-                Descartados: <strong>{clientesDiscarded}</strong>
+                Descartados: <strong>{validationMetrics.clientesDiscarded}</strong>
               </span>
             </div>
           </div>
@@ -304,7 +323,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={entry => `${entry.name}: ${entry.value}`}
+                  label={(entry) => `${entry.name}: ${entry.value}`}
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"

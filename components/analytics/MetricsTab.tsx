@@ -1,7 +1,10 @@
-import { trpc } from "@/lib/trpc";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { RefreshCw, Target, Users, CheckCircle2 } from "lucide-react";
+'use client';
+
+import { useState, useCallback, useMemo } from 'react';
+import { trpc } from '@/lib/trpc/client';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { RefreshCw, Target, Users, CheckCircle2 } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -16,20 +19,34 @@ import {
   Legend,
   ResponsiveContainer,
   Cell,
-} from "recharts";
-import { useState } from "react";
+} from 'recharts';
 
-const COLORS = [
-  "#3b82f6",
-  "#10b981",
-  "#f59e0b",
-  "#ef4444",
-  "#8b5cf6",
-  "#ec4899",
-];
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'] as const;
+
+const DAY_OPTIONS = [
+  { value: 7, label: '7 dias' },
+  { value: 30, label: '30 dias' },
+  { value: 90, label: '90 dias' },
+] as const;
+
+const TOOLTIP_STYLE = {
+  backgroundColor: '#ffffff',
+  border: '1px solid #e2e8f0',
+  borderRadius: '0.5rem',
+} as const;
+
+const LABEL_STYLE = {
+  color: '#0f172a',
+} as const;
 
 interface MetricsTabProps {
   projectId: number;
+}
+
+interface FunilData {
+  name: string;
+  value: number;
+  fill: string;
 }
 
 export function MetricsTab({ projectId }: MetricsTabProps) {
@@ -39,65 +56,62 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
     trpc.dashboard.distribuicaoGeografica.useQuery();
   const { data: distribuicaoSeg, refetch: refetchSeg } =
     trpc.dashboard.distribuicaoSegmentacao.useQuery();
-  const { data: timeline, refetch: refetchTimeline } =
-    trpc.dashboard.timelineValidacoes.useQuery({ days });
-  const { data: funil, refetch: refetchFunil } =
-    trpc.dashboard.funilConversao.useQuery();
-  const { data: top10, refetch: refetchTop10 } =
-    trpc.dashboard.top10Mercados.useQuery();
+  const { data: timeline, refetch: refetchTimeline } = trpc.dashboard.timelineValidacoes.useQuery({
+    days,
+  });
+  const { data: funil, refetch: refetchFunil } = trpc.dashboard.funilConversao.useQuery();
+  const { data: top10, refetch: refetchTop10 } = trpc.dashboard.top10Mercados.useQuery();
 
-  const handleRefreshAll = () => {
+  const handleRefreshAll = useCallback(() => {
     refetchGeo();
     refetchSeg();
     refetchTimeline();
     refetchFunil();
     refetchTop10();
-  };
+  }, [refetchGeo, refetchSeg, refetchTimeline, refetchFunil, refetchTop10]);
+
+  const handleSetDays = useCallback((value: number) => {
+    setDays(value);
+  }, []);
 
   // Preparar dados do funil
-  const funilData = funil
-    ? [
-        { name: "Leads", value: funil.leads, fill: "#3b82f6" },
-        { name: "Clientes", value: funil.clientes, fill: "#10b981" },
-        { name: "Validados", value: funil.validados, fill: "#f59e0b" },
-      ]
-    : [];
+  const funilData = useMemo<FunilData[]>(
+    () =>
+      funil
+        ? [
+            { name: 'Leads', value: funil.leads, fill: '#3b82f6' },
+            { name: 'Clientes', value: funil.clientes, fill: '#10b981' },
+            { name: 'Validados', value: funil.validados, fill: '#f59e0b' },
+          ]
+        : [],
+    [funil]
+  );
+
+  const validationRate = useMemo(() => {
+    if (!funil?.clientes) return '';
+    return `${((funil.validados / funil.clientes) * 100).toFixed(1)}% do total`;
+  }, [funil]);
 
   return (
     <div className="space-y-6">
       {/* Header com controles */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">
-            Métricas Detalhadas
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Análise e visualização de dados
-          </p>
+          <h2 className="text-xl font-semibold text-slate-900">Métricas Detalhadas</h2>
+          <p className="text-sm text-muted-foreground">Análise e visualização de dados</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex gap-2">
-            <Button
-              variant={days === 7 ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDays(7)}
-            >
-              7 dias
-            </Button>
-            <Button
-              variant={days === 30 ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDays(30)}
-            >
-              30 dias
-            </Button>
-            <Button
-              variant={days === 90 ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDays(90)}
-            >
-              90 dias
-            </Button>
+            {DAY_OPTIONS.map((option) => (
+              <Button
+                key={option.value}
+                variant={days === option.value ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => handleSetDays(option.value)}
+              >
+                {option.label}
+              </Button>
+            ))}
           </div>
           <Button variant="outline" size="sm" onClick={handleRefreshAll}>
             <RefreshCw className="w-4 h-4 mr-2" />
@@ -115,9 +129,7 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Total de Leads</p>
-              <p className="text-2xl font-bold text-slate-900">
-                {funil?.leads || 0}
-              </p>
+              <p className="text-2xl font-bold text-slate-900">{funil?.leads || 0}</p>
             </div>
           </div>
         </Card>
@@ -129,9 +141,7 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Total de Clientes</p>
-              <p className="text-2xl font-bold text-slate-900">
-                {funil?.clientes || 0}
-              </p>
+              <p className="text-2xl font-bold text-slate-900">{funil?.clientes || 0}</p>
             </div>
           </div>
         </Card>
@@ -142,17 +152,9 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
               <CheckCircle2 className="w-6 h-6 text-amber-500" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">
-                Clientes Validados
-              </p>
-              <p className="text-2xl font-bold text-slate-900">
-                {funil?.validados || 0}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {funil?.clientes
-                  ? `${((funil.validados / funil.clientes) * 100).toFixed(1)}% do total`
-                  : ""}
-              </p>
+              <p className="text-sm text-muted-foreground">Clientes Validados</p>
+              <p className="text-2xl font-bold text-slate-900">{funil?.validados || 0}</p>
+              <p className="text-xs text-muted-foreground">{validationRate}</p>
             </div>
           </div>
         </Card>
@@ -170,14 +172,7 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="uf" stroke="#64748b" />
               <YAxis stroke="#64748b" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "0.5rem",
-                }}
-                labelStyle={{ color: "#0f172a" }}
-              />
+              <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={LABEL_STYLE} />
               <Bar dataKey="count" fill="#3b82f6" name="Clientes" />
             </BarChart>
           </ResponsiveContainer>
@@ -197,22 +192,13 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
-                label={entry => `${entry.segmentacao}: ${entry.count}`}
+                label={(entry) => `${entry.segmentacao}: ${entry.count}`}
               >
                 {distribuicaoSeg?.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "0.5rem",
-                }}
-              />
+              <Tooltip contentStyle={TOOLTIP_STYLE} />
             </PieChart>
           </ResponsiveContainer>
         </Card>
@@ -227,14 +213,7 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="date" stroke="#64748b" />
               <YAxis stroke="#64748b" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "0.5rem",
-                }}
-                labelStyle={{ color: "#0f172a" }}
-              />
+              <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={LABEL_STYLE} />
               <Legend />
               <Line
                 type="monotone"
@@ -249,22 +228,13 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
 
         {/* Funil de Conversão */}
         <Card className="p-6 bg-white border-slate-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">
-            Funil de Conversão
-          </h3>
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Funil de Conversão</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={funilData} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis type="number" stroke="#64748b" />
               <YAxis dataKey="name" type="category" stroke="#64748b" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "0.5rem",
-                }}
-                labelStyle={{ color: "#0f172a" }}
-              />
+              <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={LABEL_STYLE} />
               <Bar dataKey="value" name="Quantidade">
                 {funilData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -283,25 +253,9 @@ export function MetricsTab({ projectId }: MetricsTabProps) {
             <BarChart data={top10} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis type="number" stroke="#64748b" />
-              <YAxis
-                dataKey="nome"
-                type="category"
-                stroke="#64748b"
-                width={300}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "0.5rem",
-                }}
-                labelStyle={{ color: "#0f172a" }}
-              />
-              <Bar
-                dataKey="quantidadeClientes"
-                fill="#8b5cf6"
-                name="Clientes"
-              />
+              <YAxis dataKey="nome" type="category" stroke="#64748b" width={300} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={LABEL_STYLE} />
+              <Bar dataKey="quantidadeClientes" fill="#8b5cf6" name="Clientes" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
