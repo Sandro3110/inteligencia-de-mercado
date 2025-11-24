@@ -257,48 +257,45 @@ class SDKServer {
   }
 
   async authenticateRequest(req: Request): Promise<User> {
-    // Regular authentication flow
+    // JWT-based authentication flow
     const cookies = this.parseCookies(req.headers.cookie);
     const sessionCookie = cookies.get(COOKIE_NAME);
-    const session = await this.verifySession(sessionCookie);
-
-    if (!session) {
-      throw ForbiddenError("Invalid session cookie");
+    
+    if (!sessionCookie) {
+      throw ForbiddenError("No session cookie");
     }
 
-    const sessionUserId = session.openId;
-    const { toMySQLTimestamp } = await import("../dateUtils");
-    const signedInAt = toMySQLTimestamp(new Date());
-    let user = await db.getUser(sessionUserId);
-
-    // If user not in DB, sync from OAuth server automatically
-    if (!user) {
-      try {
-        const userInfo = await this.getUserInfoWithJwt(sessionCookie ?? "");
-        await db.upsertUser({
-          id: userInfo.openId,
-          name: userInfo.name || null,
-          email: userInfo.email ?? null,
-          loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
-          lastSignedIn: signedInAt,
-        });
-        user = await db.getUser(userInfo.openId);
-      } catch (error) {
-        console.error("[Auth] Failed to sync user from OAuth:", error);
-        throw ForbiddenError("Failed to sync user info");
+    try {
+      // Verificar JWT token
+      const secret = new TextEncoder().encode(ENV.jwtSecret);
+      const { payload } = await jwtVerify(sessionCookie, secret);
+      
+      if (!payload.userId || typeof payload.userId !== 'string') {
+        throw ForbiddenError("Invalid token payload");
       }
+
+      // Buscar usuário no banco de dados
+      const user = await db.getUserById(payload.userId);
+      
+      if (!user) {
+        throw ForbiddenError("User not found");
+      }
+
+      // Verificar se usuário está ativo
+      if (!user.ativo) {
+        throw ForbiddenError("User is inactive");
+      }
+
+      // Atualizar último acesso
+      const { toMySQLTimestamp } = await import("../dateUtils");
+      const signedInAt = toMySQLTimestamp(new Date());
+      await db.updateUserLastSignIn(user.id, signedInAt);
+
+      return user;
+    } catch (error) {
+      console.error("[Auth] Authentication failed:", error);
+      throw ForbiddenError("Invalid session");
     }
-
-    if (!user) {
-      throw ForbiddenError("User not found");
-    }
-
-    await db.upsertUser({
-      id: user.id,
-      lastSignedIn: signedInAt,
-    });
-
-    return user;
   }
 }
 

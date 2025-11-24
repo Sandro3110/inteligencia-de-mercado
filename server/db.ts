@@ -158,6 +158,20 @@ export async function getUser(id: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getUserById(id: string) {
+  return getUser(id);
+}
+
+export async function updateUserLastSignIn(id: string, lastSignedIn: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update user: database not available");
+    return;
+  }
+
+  await db.update(users).set({ lastSignedIn }).where(eq(users.id, id));
+}
+
 // ============================================
 // DASHBOARD HELPERS
 // ============================================

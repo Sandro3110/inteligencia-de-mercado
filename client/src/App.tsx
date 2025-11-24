@@ -12,6 +12,7 @@ import { GlobalShortcuts } from "./components/GlobalShortcuts";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { AppSidebar } from "./components/AppSidebar";
 import { useRealtimeNotifications } from "./hooks/useRealtimeNotifications";
+import { AuthGuard } from "./components/AuthGuard";
 
 // Lazy load de páginas principais (carregamento imediato)
 import CascadeView from "./pages/CascadeView";
@@ -214,9 +215,11 @@ function App() {
                   <GlobalShortcuts />
                   <OnboardingTour />
                   <AppSidebar />
-                  <Suspense fallback={<PageLoader />}>
-                    <Router />
-                  </Suspense>
+                  <AuthGuard>
+                    <Suspense fallback={<PageLoader />}>
+                      <Router />
+                    </Suspense>
+                  </AuthGuard>
                 </TooltipProvider>
               </FilterProvider>
             </DashboardCustomizationProvider>
