@@ -5,33 +5,86 @@
  * Fase 42.1 - Integração completa ao Step 5
  */
 
-import { useState } from "react";
-import { trpc } from "@/lib/trpc/client";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { useState, useCallback, useMemo } from 'react';
+import { trpc } from '@/lib/trpc/client';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Loader2,
   Sparkles,
   CheckCircle2,
   AlertCircle,
   Plus,
-} from "lucide-react";
-// import type { ResearchWizardData } from './AllSteps';
-type ResearchWizardData = any;
+  type LucideIcon,
+} from 'lucide-react';
 
-interface PreResearchInterfaceProps {
-  data: ResearchWizardData;
-  updateData: (d: Partial<ResearchWizardData>) => void;
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const ENTITY_TYPE = {
+  MARKET: 'mercado',
+  CLIENT: 'cliente',
+} as const;
+
+const SEGMENTATION_TYPES = ['B2B', 'B2C', 'B2B2C', 'B2G'] as const;
+const COMPANY_SIZES = ['MEI', 'ME', 'EPP', 'Médio', 'Grande'] as const;
+
+const PLACEHOLDERS = {
+  MARKET:
+    'Ex: "Empresas de tecnologia no setor de saúde" ou "Mercados B2B de software"',
+  CLIENT:
+    'Ex: "Hospitais em São Paulo com mais de 100 leitos" ou "Clínicas de estética em Curitiba"',
+} as const;
+
+const DEFAULT_QUANTITY = 10;
+
+const MESSAGES = {
+  ERROR: 'Erro ao executar pré-pesquisa. Tente novamente.',
+  DESCRIPTION:
+    'Descreva em linguagem natural o que você procura e a IA buscará os dados',
+  REVIEW: 'Revise os resultados e selecione quais deseja adicionar ao wizard',
+} as const;
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+type EntityType = (typeof ENTITY_TYPE)[keyof typeof ENTITY_TYPE];
+type SegmentationType = (typeof SEGMENTATION_TYPES)[number];
+type CompanySize = (typeof COMPANY_SIZES)[number];
+
+interface Market {
+  nome: string;
+  segmentacao: SegmentationType;
+}
+
+interface Client {
+  nome: string;
+  razaoSocial?: string;
+  cnpj?: string;
+  site?: string;
+  email?: string;
+  telefone?: string;
+  cidade?: string;
+  uf?: string;
+  porte?: CompanySize;
+}
+
+interface ResearchWizardData {
+  projectId?: string;
+  mercados: Market[];
+  clientes?: Client[];
 }
 
 interface EntityResult {
@@ -50,70 +103,132 @@ interface EntityResult {
   selected?: boolean;
 }
 
+interface PreResearchInterfaceProps {
+  data: ResearchWizardData;
+  updateData: (d: Partial<ResearchWizardData>) => void;
+}
+
+interface PreResearchResult {
+  success: boolean;
+  entidades: EntityResult[];
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function isValidSegmentation(value: string): value is SegmentationType {
+  return SEGMENTATION_TYPES.includes(value as SegmentationType);
+}
+
+function isValidCompanySize(value: string): value is CompanySize {
+  return COMPANY_SIZES.includes(value as CompanySize);
+}
+
+function mapToMarket(entity: EntityResult): Market {
+  const segmentacao = entity.segmentacao || 'B2B';
+  return {
+    nome: entity.nome,
+    segmentacao: isValidSegmentation(segmentacao) ? segmentacao : 'B2B',
+  };
+}
+
+function mapToClient(entity: EntityResult): Client {
+  return {
+    nome: entity.nome,
+    razaoSocial: entity.razaoSocial,
+    cnpj: entity.cnpj,
+    site: entity.site,
+    email: entity.email,
+    telefone: entity.telefone,
+    cidade: entity.cidade,
+    uf: entity.uf,
+    porte: entity.porte && isValidCompanySize(entity.porte) 
+      ? entity.porte 
+      : undefined,
+  };
+}
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
 export default function PreResearchInterface({
   data,
   updateData,
 }: PreResearchInterfaceProps) {
-  const [prompt, setPrompt] = useState("");
-  const [tipo, setTipo] = useState<"mercado" | "cliente">("mercado");
+  const [prompt, setPrompt] = useState('');
+  const [tipo, setTipo] = useState<EntityType>(ENTITY_TYPE.MARKET);
   const [results, setResults] = useState<EntityResult[]>([]);
   const [showResults, setShowResults] = useState(false);
 
   const executeMutation = trpc.preResearch.execute.useMutation({
-    onSuccess: result => {
+    onSuccess: (result: PreResearchResult) => {
       if (result.success && result.entidades.length > 0) {
-        setResults(result.entidades.map(e => ({ ...e, selected: true })));
+        setResults(result.entidades.map((e) => ({ ...e, selected: true })));
         setShowResults(true);
       }
     },
   });
 
-  const handleExecute = () => {
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const selectedCount = useMemo(
+    () => results.filter((r) => r.selected).length,
+    [results]
+  );
+
+  const hasSelectedResults = useMemo(() => selectedCount > 0, [selectedCount]);
+
+  const currentPlaceholder = useMemo(
+    () =>
+      tipo === ENTITY_TYPE.MARKET ? PLACEHOLDERS.MARKET : PLACEHOLDERS.CLIENT,
+    [tipo]
+  );
+
+  const isMarketType = useMemo(
+    () => tipo === ENTITY_TYPE.MARKET,
+    [tipo]
+  );
+
+  const hasAddedMarkets = useMemo(
+    () => data.mercados.length > 0,
+    [data.mercados.length]
+  );
+
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
+  const handleExecute = useCallback(() => {
     if (!prompt.trim()) return;
 
     executeMutation.mutate({
       prompt: prompt.trim(),
       tipo,
-      quantidade: 10,
+      quantidade: DEFAULT_QUANTITY,
       projectId: data.projectId,
     });
-  };
+  }, [prompt, tipo, data.projectId, executeMutation]);
 
-  const toggleSelection = (index: number) => {
-    setResults(prev =>
+  const toggleSelection = useCallback((index: number) => {
+    setResults((prev) =>
       prev.map((r, i) => (i === index ? { ...r, selected: !r.selected } : r))
     );
-  };
+  }, []);
 
-  const handleAddSelected = () => {
-    const selected = results.filter(r => r.selected);
+  const handleAddSelected = useCallback(() => {
+    const selected = results.filter((r) => r.selected);
 
-    if (tipo === "mercado") {
-      const newMercados = selected.map(s => ({
-        nome: s.nome,
-        segmentacao: (s.segmentacao || "B2B") as
-          | "B2B"
-          | "B2C"
-          | "B2B2C"
-          | "B2G",
-      }));
-
+    if (tipo === ENTITY_TYPE.MARKET) {
+      const newMercados = selected.map(mapToMarket);
       updateData({
         mercados: [...data.mercados, ...newMercados],
       });
     } else {
-      const newClientes = selected.map(s => ({
-        nome: s.nome,
-        razaoSocial: s.razaoSocial,
-        cnpj: s.cnpj,
-        site: s.site,
-        email: s.email,
-        telefone: s.telefone,
-        cidade: s.cidade,
-        uf: s.uf,
-        porte: s.porte as "MEI" | "ME" | "EPP" | "Médio" | "Grande" | undefined,
-      }));
-
+      const newClientes = selected.map(mapToClient);
       updateData({
         clientes: [...(data.clientes || []), ...newClientes],
       });
@@ -122,8 +237,27 @@ export default function PreResearchInterface({
     // Limpar resultados
     setShowResults(false);
     setResults([]);
-    setPrompt("");
-  };
+    setPrompt('');
+  }, [results, tipo, data.mercados, data.clientes, updateData]);
+
+  const handleSetTipoMercado = useCallback(() => {
+    setTipo(ENTITY_TYPE.MARKET);
+  }, []);
+
+  const handleSetTipoCliente = useCallback(() => {
+    setTipo(ENTITY_TYPE.CLIENT);
+  }, []);
+
+  const handlePromptChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setPrompt(e.target.value);
+    },
+    []
+  );
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   return (
     <div className="space-y-6">
@@ -134,24 +268,21 @@ export default function PreResearchInterface({
             <Sparkles className="w-5 h-5 text-blue-600" />
             Pré-Pesquisa com IA
           </CardTitle>
-          <CardDescription>
-            Descreva em linguagem natural o que você procura e a IA buscará os
-            dados
-          </CardDescription>
+          <CardDescription>{MESSAGES.DESCRIPTION}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Seletor de Tipo */}
           <div className="flex gap-2">
             <Button
-              variant={tipo === "mercado" ? "default" : "outline"}
-              onClick={() => setTipo("mercado")}
+              variant={tipo === ENTITY_TYPE.MARKET ? 'default' : 'outline'}
+              onClick={handleSetTipoMercado}
               className="flex-1"
             >
               Buscar Mercados
             </Button>
             <Button
-              variant={tipo === "cliente" ? "default" : "outline"}
-              onClick={() => setTipo("cliente")}
+              variant={tipo === ENTITY_TYPE.CLIENT ? 'default' : 'outline'}
+              onClick={handleSetTipoCliente}
               className="flex-1"
             >
               Buscar Clientes
@@ -161,13 +292,9 @@ export default function PreResearchInterface({
           {/* Campo de Prompt */}
           <div>
             <Textarea
-              placeholder={
-                tipo === "mercado"
-                  ? 'Ex: "Empresas de tecnologia no setor de saúde" ou "Mercados B2B de software"'
-                  : 'Ex: "Hospitais em São Paulo com mais de 100 leitos" ou "Clínicas de estética em Curitiba"'
-              }
+              placeholder={currentPlaceholder}
               value={prompt}
-              onChange={e => setPrompt(e.target.value)}
+              onChange={handlePromptChange}
               rows={4}
               className="resize-none"
             />
@@ -197,9 +324,7 @@ export default function PreResearchInterface({
           {executeMutation.isError && (
             <Alert variant="destructive">
               <AlertCircle className="w-4 h-4" />
-              <AlertDescription>
-                Erro ao executar pré-pesquisa. Tente novamente.
-              </AlertDescription>
+              <AlertDescription>{MESSAGES.ERROR}</AlertDescription>
             </Alert>
           )}
         </CardContent>
@@ -211,20 +336,17 @@ export default function PreResearchInterface({
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>
-                Resultados Encontrados ({results.filter(r => r.selected).length}{" "}
-                selecionados)
+                Resultados Encontrados ({selectedCount} selecionados)
               </span>
               <Button
                 onClick={handleAddSelected}
-                disabled={results.filter(r => r.selected).length === 0}
+                disabled={!hasSelectedResults}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Selecionados
               </Button>
             </CardTitle>
-            <CardDescription>
-              Revise os resultados e selecione quais deseja adicionar ao wizard
-            </CardDescription>
+            <CardDescription>{MESSAGES.REVIEW}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {results.map((result, index) => (
@@ -232,7 +354,7 @@ export default function PreResearchInterface({
                 key={index}
                 className={`
                   p-4 cursor-pointer transition-all
-                  ${result.selected ? "border-2 border-blue-500 bg-blue-50" : "hover:border-gray-400"}
+                  ${result.selected ? 'border-2 border-blue-500 bg-blue-50' : 'hover:border-gray-400'}
                 `}
                 onClick={() => toggleSelection(index)}
               >
@@ -240,7 +362,7 @@ export default function PreResearchInterface({
                   <Checkbox
                     checked={result.selected}
                     onCheckedChange={() => toggleSelection(index)}
-                    onClick={e => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
                   />
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center justify-between">
@@ -256,7 +378,7 @@ export default function PreResearchInterface({
                       </p>
                     )}
 
-                    {tipo === "cliente" && (
+                    {!isMarketType && (
                       <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                         {result.razaoSocial && (
                           <div>Razão Social: {result.razaoSocial}</div>
@@ -276,7 +398,7 @@ export default function PreResearchInterface({
                       </div>
                     )}
 
-                    {tipo === "mercado" && result.categoria && (
+                    {isMarketType && result.categoria && (
                       <div className="text-sm text-muted-foreground">
                         Categoria: {result.categoria}
                       </div>
@@ -294,7 +416,7 @@ export default function PreResearchInterface({
       )}
 
       {/* Dados Já Adicionados */}
-      {data.mercados.length > 0 && (
+      {hasAddedMarkets && (
         <Alert>
           <CheckCircle2 className="w-4 h-4" />
           <AlertDescription>
