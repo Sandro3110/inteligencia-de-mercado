@@ -88,7 +88,54 @@ export async function runManualAggregation(
 }
 
 /**
- * Inicializar todos os cron jobs
+ * Executar job diário (para Vercel Cron)
+ * Esta função é chamada pelo endpoint /api/cron/daily
+ */
+export async function runDailyCronJobs() {
+  console.log("[Cron] Executando job diário via Vercel Cron...");
+
+  try {
+    const db = await getDb();
+    if (!db) {
+      throw new Error("Banco de dados não disponível");
+    }
+
+    // Buscar todos os projetos ativos
+    const activeProjects = await db
+      .select()
+      .from(projects)
+      .where(eq(projects.ativo, 1));
+
+    console.log(
+      `[Cron] Encontrados ${activeProjects.length} projetos ativos`
+    );
+
+    // Executar agregação para cada projeto
+    for (const project of activeProjects) {
+      console.log(
+        `[Cron] Agregando métricas do projeto: ${project.nome} (ID: ${project.id})`
+      );
+
+      try {
+        await runFullAggregation(project.id);
+        console.log(`[Cron] ✓ Projeto ${project.nome} agregado com sucesso`);
+      } catch (error) {
+        console.error(
+          `[Cron] ✗ Erro ao agregar projeto ${project.nome}:`,
+          error
+        );
+      }
+    }
+
+    console.log("[Cron] Job diário concluído");
+  } catch (error) {
+    console.error("[Cron] Erro no job diário:", error);
+    throw error;
+  }
+}
+
+/**
+ * Inicializar todos os cron jobs (para Railway/servidor tradicional)
  */
 export function initializeCronJobs() {
   console.log("[Cron] Inicializando cron jobs...");

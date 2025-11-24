@@ -1,0 +1,27 @@
+# Vercel Ignore File
+# Arquivos e pastas que não devem ser incluídos no deploy
+
+# Documentação
+*.md
+!README.md
+docs/
+
+# Testes
+e2e/
+test/
+test-results/
+playwright-report/
+**/*.test.ts
+**/*.spec.ts
+
+# Development
+.manus/
+patches/
+scripts/
+
+# Railway (não mais necessário)
+railway.json
+Procfile
+
+# Uploads e arquivos temporários
+/home/ubuntu/upload/
