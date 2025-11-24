@@ -18,6 +18,12 @@ import CascadeView from "./pages/CascadeView";
 import UnifiedCockpit from "./pages/UnifiedCockpit";
 import NotFound from "./pages/NotFound";
 
+// Páginas de autenticação
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+const UserManagement = lazy(() => import("./pages/UserManagement"));
+const EmailManagement = lazy(() => import("./pages/EmailManagement"));
+
 // Lazy load de páginas secundárias (carregamento sob demanda)
 // Dashboard, DashboardPage e AnalyticsDashboard foram fundidos em AnalyticsPage
 const Mercados = lazy(() => import("./pages/Mercados"));
@@ -66,6 +72,12 @@ function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
+      {/* Autenticação */}
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/users" component={UserManagement} />
+      <Route path="/email-management" component={EmailManagement} />
+
       {/* Cockpit Unificado - Página Principal */}
       <Route path={"/"} component={UnifiedCockpit} />
 

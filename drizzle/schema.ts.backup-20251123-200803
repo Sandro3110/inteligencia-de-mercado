@@ -927,24 +927,14 @@ export const tags = mysqlTable("tags", {
 });
 
 export const users = mysqlTable("users", {
-  id: varchar({ length: 64 }).primaryKey().notNull(),
-  email: varchar({ length: 320 }).unique().notNull(),
-  nome: varchar({ length: 255 }).notNull(),
-  empresa: varchar({ length: 255 }).notNull(),
-  cargo: varchar({ length: 100 }).notNull(),
-  setor: varchar({ length: 100 }).notNull(),
-  senhaHash: varchar({ length: 255 }).notNull(),
-  role: mysqlEnum(["admin", "visualizador"]).default("visualizador").notNull(),
-  ativo: tinyint().default(0).notNull(),
-  liberadoPor: varchar({ length: 64 }),
-  liberadoEm: timestamp({ mode: "string" }),
+  id: varchar({ length: 64 }).notNull(),
+  name: text(),
+  email: varchar({ length: 320 }),
+  loginMethod: varchar({ length: 64 }),
+  role: mysqlEnum(["user", "admin"]).default("user").notNull(),
   createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  lastSignedIn: timestamp({ mode: "string" }),
-}, table => [
-  index("idx_email").on(table.email),
-  index("idx_ativo").on(table.ativo),
-  index("idx_role").on(table.role),
-]);
+  lastSignedIn: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
+});
 
 export type NotificationPreference =
   typeof notificationPreferences.$inferSelect;
@@ -1160,92 +1150,3 @@ export const reportSchedules = mysqlTable(
 
 export type ReportSchedule = typeof reportSchedules.$inferSelect;
 export type InsertReportSchedule = typeof reportSchedules.$inferInsert;
-
-// ============================================================================
-// TABELAS DE AUTENTICAÇÃO E GESTÃO DE USUÁRIOS
-// ============================================================================
-
-export const userInvites = mysqlTable(
-  "user_invites",
-  {
-    id: varchar({ length: 64 }).primaryKey().notNull(),
-    email: varchar({ length: 320 }).notNull(),
-    perfil: mysqlEnum(["admin", "visualizador"]).notNull(),
-    token: varchar({ length: 255 }).unique().notNull(),
-    criadoPor: varchar({ length: 64 }).notNull(),
-    criadoEm: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP").notNull(),
-    expiraEm: timestamp({ mode: "string" }).notNull(),
-    usado: tinyint().default(0).notNull(),
-    usadoEm: timestamp({ mode: "string" }),
-    cancelado: tinyint().default(0).notNull(),
-  },
-  table => [
-    index("idx_token").on(table.token),
-    index("idx_email").on(table.email),
-    index("idx_usado").on(table.usado),
-    foreignKey({
-      columns: [table.criadoPor],
-      foreignColumns: [users.id],
-      name: "fk_invite_criado_por",
-    }),
-  ]
-);
-
-export type UserInvite = typeof userInvites.$inferSelect;
-export type InsertUserInvite = typeof userInvites.$inferInsert;
-
-export const passwordResets = mysqlTable(
-  "password_resets",
-  {
-    id: varchar({ length: 64 }).primaryKey().notNull(),
-    userId: varchar({ length: 64 }).notNull(),
-    token: varchar({ length: 255 }).unique().notNull(),
-    criadoEm: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP").notNull(),
-    expiraEm: timestamp({ mode: "string" }).notNull(),
-    usado: tinyint().default(0).notNull(),
-  },
-  table => [
-    index("idx_token").on(table.token),
-    index("idx_user").on(table.userId),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [users.id],
-      name: "fk_password_reset_user",
-    }),
-  ]
-);
-
-export type PasswordReset = typeof passwordResets.$inferSelect;
-export type InsertPasswordReset = typeof passwordResets.$inferInsert;
-
-export const loginAttempts = mysqlTable(
-  "login_attempts",
-  {
-    id: int().autoincrement().primaryKey().notNull(),
-    email: varchar({ length: 320 }).notNull(),
-    sucesso: tinyint().notNull(),
-    ip: varchar({ length: 45 }),
-    userAgent: text(),
-    tentativaEm: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP").notNull(),
-  },
-  table => [
-    index("idx_email_tentativa").on(table.email, table.tentativaEm),
-  ]
-);
-
-export type LoginAttempt = typeof loginAttempts.$inferSelect;
-export type InsertLoginAttempt = typeof loginAttempts.$inferInsert;
-
-export const emailConfig = mysqlTable("email_config", {
-  id: int().autoincrement().primaryKey().notNull(),
-  projectId: int().notNull(),
-  provider: varchar({ length: 50 }).default("resend").notNull(),
-  apiKey: varchar({ length: 255 }).notNull(),
-  fromEmail: varchar({ length: 320 }).notNull(),
-  fromName: varchar({ length: 255 }).notNull(),
-  createdAt: timestamp({ mode: "string" }).default("CURRENT_TIMESTAMP"),
-  updatedAt: timestamp({ mode: "string" }).defaultNow().onUpdateNow(),
-});
-
-export type EmailConfig = typeof emailConfig.$inferSelect;
-export type InsertEmailConfig = typeof emailConfig.$inferInsert;

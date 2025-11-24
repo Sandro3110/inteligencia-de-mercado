@@ -88,23 +88,36 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   }
 
   try {
-    const values: InsertUser = {
+    const values: Partial<InsertUser> = {
       id: user.id,
     };
     const updateSet: Record<string, unknown> = {};
 
-    const textFields = ["name", "email", "loginMethod"] as const;
-    type TextField = (typeof textFields)[number];
-
-    const assignNullable = (field: TextField) => {
-      const value = user[field];
-      if (value === undefined) return;
-      const normalized = value ?? null;
-      values[field] = normalized;
-      updateSet[field] = normalized;
-    };
-
-    textFields.forEach(assignNullable);
+    // Campos opcionais do novo schema
+    if (user.email !== undefined) {
+      values.email = user.email;
+      updateSet.email = user.email;
+    }
+    if (user.nome !== undefined) {
+      values.nome = user.nome;
+      updateSet.nome = user.nome;
+    }
+    if (user.empresa !== undefined) {
+      values.empresa = user.empresa;
+      updateSet.empresa = user.empresa;
+    }
+    if (user.cargo !== undefined) {
+      values.cargo = user.cargo;
+      updateSet.cargo = user.cargo;
+    }
+    if (user.setor !== undefined) {
+      values.setor = user.setor;
+      updateSet.setor = user.setor;
+    }
+    if (user.senhaHash !== undefined) {
+      values.senhaHash = user.senhaHash;
+      updateSet.senhaHash = user.senhaHash;
+    }
 
     if (user.lastSignedIn !== undefined) {
       values.lastSignedIn = user.lastSignedIn;
@@ -4468,7 +4481,7 @@ export async function getProjectsActivity(): Promise<{
           let userName: string | null = null;
           if (log.userId) {
             const user = await getUser(log.userId);
-            userName = user?.name || null;
+            userName = user?.nome || null;
           }
           return {
             action: log.action,

@@ -8,6 +8,9 @@ import { geocodingRouter } from "./routers/geocodingRouter";
 import { territorialRouter } from "./routers/territorialRouter";
 import { reportsRouter } from "./routers/reportsRouter";
 import { unifiedMapRouter } from "./routers/unifiedMapRouter";
+import { authRouter } from "./routers/authRouter";
+import { usersRouter } from "./routers/usersRouter";
+import { emailConfigRouter } from "./routers/emailConfigRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -42,7 +45,13 @@ export const appRouter = router({
     }),
   }),
 
-  auth: router({
+  // Sistema de autenticação com email/senha
+  auth: authRouter,
+  users: usersRouter,
+  emailConfig: emailConfigRouter,
+
+  // OAuth legacy (manter para compatibilidade)
+  oauth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
