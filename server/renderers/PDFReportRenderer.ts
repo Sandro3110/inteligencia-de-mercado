@@ -17,7 +17,7 @@ export class PDFReportRenderer {
   async render(
     title: string,
     analysis: AnalysisResult,
-    data: any[]
+    data: unknown[]
   ): Promise<{ url: string; size: number }> {
     return new Promise((resolve, reject) => {
       try {
@@ -296,7 +296,7 @@ export class PDFReportRenderer {
   /**
    * Renderiza análise SWOT
    */
-  private renderSWOT(doc: PDFKit.PDFDocument, swot: any): void {
+  private renderSWOT(doc: PDFKit.PDFDocument, swot: unknown): void {
     this.renderSectionHeader(doc, "4. Análise SWOT");
 
     const quadrants = [
@@ -367,7 +367,7 @@ export class PDFReportRenderer {
    */
   private renderRecommendations(
     doc: PDFKit.PDFDocument,
-    recommendations: any
+    recommendations: unknown
   ): void {
     this.renderSectionHeader(doc, "5. Recomendações Estratégicas");
 
@@ -420,7 +420,7 @@ export class PDFReportRenderer {
   /**
    * Renderiza amostra de dados
    */
-  private renderDataSample(doc: PDFKit.PDFDocument, data: any[]): void {
+  private renderDataSample(doc: PDFKit.PDFDocument, data: unknown[]): void {
     this.renderSectionHeader(doc, "6. Amostra de Dados");
 
     doc
@@ -514,7 +514,7 @@ export class PDFReportRenderer {
     return labels[key] || key;
   }
 
-  private formatMetricValue(value: any): string {
+  private formatMetricValue(value: unknown): string {
     if (typeof value === "number") {
       if (value > 1000000) {
         return `R$ ${(value / 1000000).toFixed(1)}M`;
@@ -549,7 +549,7 @@ export class PDFReportRenderer {
     return labels[category] || category;
   }
 
-  private formatValue(value: any): string {
+  private formatValue(value: unknown): string {
     if (value === null || value === undefined) return "-";
     if (value instanceof Date) return value.toLocaleDateString("pt-BR");
     if (typeof value === "object")

@@ -8,7 +8,7 @@ export class CSVRenderer {
    * Renderiza dados em formato CSV e faz upload para S3
    */
   async render(
-    data: any[],
+    data: unknown[],
     selectedFields: string[]
   ): Promise<{ url: string; size: number }> {
     if (data.length === 0) {
@@ -34,7 +34,7 @@ export class CSVRenderer {
   /**
    * Gera string CSV a partir dos dados
    */
-  private generateCSV(data: any[], selectedFields: string[]): string {
+  private generateCSV(data: unknown[], selectedFields: string[]): string {
     const lines: string[] = [];
 
     // Header
@@ -71,7 +71,7 @@ export class CSVRenderer {
   /**
    * Formata valor para exibição
    */
-  private formatValue(value: any): string {
+  private formatValue(value: unknown): string {
     if (value === null || value === undefined) return "";
     if (value instanceof Date) return value.toISOString();
     if (typeof value === "object") return JSON.stringify(value);

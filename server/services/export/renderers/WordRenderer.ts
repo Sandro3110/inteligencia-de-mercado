@@ -25,10 +25,10 @@ export interface WordRenderOptions {
 
 export class WordRenderer {
   async render(
-    data: any[],
+    data: unknown[],
     metadata: {
       context?: string;
-      filters?: any;
+      filters?: unknown;
       recordCount: number;
       generatedAt: Date;
       projectId?: number;
@@ -42,7 +42,7 @@ export class WordRenderer {
       pageNumbers = true,
     } = options;
 
-    const sections: any[] = [];
+    const sections: unknown[] = [];
 
     // Cabeçalho
     if (includeHeader) {
@@ -159,7 +159,7 @@ export class WordRenderer {
   /**
    * Cria tabela formatada com os dados
    */
-  private createTable(data: any[]): Table {
+  private createTable(data: unknown[]): Table {
     if (data.length === 0) {
       return new Table({ rows: [] });
     }
@@ -248,7 +248,7 @@ export class WordRenderer {
   /**
    * Formata valor de célula
    */
-  private formatCellValue(value: any): string {
+  private formatCellValue(value: unknown): string {
     if (value === null || value === undefined) return "";
     if (typeof value === "object") return JSON.stringify(value);
     if (typeof value === "boolean") return value ? "Sim" : "Não";

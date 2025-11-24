@@ -6,7 +6,7 @@ import { storagePut } from "../storage";
  */
 export interface ExcelSheetConfig {
   name: string;
-  data: any[];
+  data: unknown[];
   fields: string[];
 }
 
@@ -18,7 +18,7 @@ export class ExcelRenderer {
    * Renderiza dados em formato Excel e faz upload para S3
    */
   async render(
-    data: any[],
+    data: unknown[],
     selectedFields: string[],
     additionalSheets?: ExcelSheetConfig[]
   ): Promise<{ url: string; size: number }> {
@@ -65,7 +65,7 @@ export class ExcelRenderer {
   private addSheet(
     workbook: XLSX.WorkBook,
     sheetName: string,
-    data: any[],
+    data: unknown[],
     fields: string[]
   ): void {
     // Prepara dados para o Excel
@@ -112,7 +112,7 @@ export class ExcelRenderer {
   /**
    * Formata valor para Excel
    */
-  private formatValue(value: any): any {
+  private formatValue(value: unknown): string | number {
     if (value === null || value === undefined) return "";
     if (value instanceof Date) return value;
     if (typeof value === "object") return JSON.stringify(value);

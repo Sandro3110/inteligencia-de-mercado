@@ -60,7 +60,7 @@ export async function getCachedEnrichment(cnpj: string): Promise<any | null> {
  */
 export async function setCachedEnrichment(
   cnpj: string,
-  dados: any,
+  dados: unknown,
   fonte: string = "api"
 ): Promise<boolean> {
   if (!cnpj || cnpj.length !== 14) return false;

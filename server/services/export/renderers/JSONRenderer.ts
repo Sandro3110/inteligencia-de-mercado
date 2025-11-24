@@ -11,10 +11,10 @@ export interface JSONRenderOptions {
 
 export class JSONRenderer {
   async render(
-    data: any[],
+    data: unknown[],
     metadata: {
       context?: string;
-      filters?: any;
+      filters?: unknown;
       recordCount: number;
       generatedAt: Date;
       projectId?: number;
@@ -27,7 +27,7 @@ export class JSONRenderer {
       includeMetadata = true,
     } = options;
 
-    let output: any;
+    let output: unknown;
 
     if (includeMetadata) {
       output = {
@@ -55,7 +55,7 @@ export class JSONRenderer {
    * Converte dados flat em estrutura hierárquica
    * Exemplo: Cliente → [Produtos] → [Mercados]
    */
-  private nestData(data: any[]): any[] {
+  private nestData(data: unknown[]): unknown[] {
     // Agrupar por entidade principal (cliente/mercado/etc)
     const grouped = new Map<string, any>();
 
@@ -98,8 +98,8 @@ export class JSONRenderer {
   /**
    * Extrai campos principais da entidade (sem relacionamentos)
    */
-  private extractMainFields(record: any): any {
-    const main: any = {};
+  private extractMainFields(record: unknown): Record<string, unknown> {
+    const main: unknown = {};
 
     for (const [key, value] of Object.entries(record)) {
       // Ignorar campos de relacionamento
@@ -119,11 +119,11 @@ export class JSONRenderer {
   /**
    * Gera schema JSON para documentação
    */
-  generateSchema(data: any[]): any {
+  generateSchema(data: unknown[]): Record<string, unknown> {
     if (data.length === 0) return {};
 
     const sample = data[0];
-    const schema: any = {
+    const schema: unknown = {
       type: "object",
       properties: {},
     };
@@ -138,7 +138,7 @@ export class JSONRenderer {
     return schema;
   }
 
-  private inferType(value: any): string {
+  private inferType(value: unknown): string {
     if (value === null) return "null";
     if (typeof value === "number") return "number";
     if (typeof value === "boolean") return "boolean";

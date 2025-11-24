@@ -25,7 +25,7 @@ export class ExcelRenderer {
   /**
    * Renderiza array de objetos em Excel
    */
-  render(data: any[], fields: string[]): Buffer {
+  render(data: unknown[], fields: string[]): Buffer {
     if (!data || data.length === 0) {
       // Retorna workbook vazio
       const wb = XLSX.utils.book_new();
@@ -35,7 +35,7 @@ export class ExcelRenderer {
     }
 
     // Preparar dados
-    const rows: any[][] = [];
+    const rows: unknown[][] = [];
 
     // Headers
     if (this.options.includeHeaders) {
@@ -73,7 +73,7 @@ export class ExcelRenderer {
   /**
    * Formata valores para Excel
    */
-  private formatValue(value: any): any {
+  private formatValue(value: unknown): string | number {
     if (value === null || value === undefined) {
       return "";
     }

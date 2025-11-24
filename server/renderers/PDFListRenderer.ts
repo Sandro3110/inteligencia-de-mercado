@@ -15,7 +15,7 @@ export class PDFListRenderer {
    * Renderiza dados em formato PDF lista e faz upload para S3
    */
   async render(
-    data: any[],
+    data: unknown[],
     selectedFields: string[],
     title: string = "Exportação de Dados"
   ): Promise<{ url: string; size: number }> {
@@ -104,7 +104,7 @@ export class PDFListRenderer {
    */
   private renderTable(
     doc: PDFKit.PDFDocument,
-    data: any[],
+    data: unknown[],
     fields: string[]
   ): void {
     const rowHeight = 25;
@@ -218,7 +218,7 @@ export class PDFListRenderer {
   /**
    * Formata valor para exibição
    */
-  private formatValue(value: any): string {
+  private formatValue(value: unknown): string {
     if (value === null || value === undefined) return "-";
     if (value instanceof Date) return value.toLocaleDateString("pt-BR");
     if (typeof value === "object") return JSON.stringify(value);

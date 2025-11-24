@@ -15,8 +15,8 @@ type ChangeType = "created" | "updated" | "enriched" | "validated";
 
 interface Change {
   field: string;
-  oldValue: any;
-  newValue: any;
+  oldValue: unknown;
+  newValue: unknown;
 }
 
 /**

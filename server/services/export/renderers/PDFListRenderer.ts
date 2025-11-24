@@ -27,7 +27,7 @@ export class PDFListRenderer {
   /**
    * Renderiza array de objetos em PDF
    */
-  async render(data: any[], fields: string[]): Promise<Buffer> {
+  async render(data: unknown[], fields: string[]): Promise<Buffer> {
     return new Promise((resolve, reject) => {
       try {
         const doc = new PDFDocument({
@@ -128,7 +128,7 @@ export class PDFListRenderer {
   /**
    * Formata valores para PDF
    */
-  private formatValue(value: any): string {
+  private formatValue(value: unknown): string {
     if (value === null || value === undefined) {
       return "";
     }

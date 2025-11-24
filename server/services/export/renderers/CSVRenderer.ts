@@ -23,7 +23,7 @@ export class CSVRenderer {
   /**
    * Renderiza array de objetos em CSV
    */
-  render(data: any[], fields: string[]): string {
+  render(data: unknown[], fields: string[]): string {
     if (!data || data.length === 0) {
       return "";
     }
@@ -71,7 +71,7 @@ export class CSVRenderer {
   /**
    * Formata valores para CSV
    */
-  private formatValue(value: any): string {
+  private formatValue(value: unknown): string {
     if (value === null || value === undefined) {
       return "";
     }
