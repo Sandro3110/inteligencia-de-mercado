@@ -1,21 +1,25 @@
-'use client';
-
 /**
- * Componente Base de Mapa usando Leaflet
- *
- * Wrapper do react-leaflet com configurações padrão para o Brasil
+ * MapContainer Component
+ * Base map component using Leaflet
+ * Wrapper for react-leaflet with default configurations for Brazil
  */
 
-import { ReactNode } from 'react';
+'use client';
+
+import { ReactNode, useMemo } from 'react';
 import { MapContainer as LeafletMapContainer, TileLayer } from 'react-leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Fix para ícones do Leaflet no Vite
-import L from 'leaflet';
+// Leaflet icon images
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Configurar ícone padrão do Leaflet
+// ============================================================================
+// LEAFLET ICON CONFIGURATION
+// ============================================================================
+
+// Configure default Leaflet icon (fix for Vite)
 const DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
@@ -25,39 +29,96 @@ const DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
+// ============================================================================
+// TYPES
+// ============================================================================
+
 interface MapContainerProps {
-  /** Centro do mapa [latitude, longitude] */
+  /** Map center [latitude, longitude] */
   center?: [number, number];
-  /** Nível de zoom inicial (1-18) */
+  /** Initial zoom level (1-18) */
   zoom?: number;
-  /** Altura do mapa */
+  /** Map height */
   height?: string;
-  /** Largura do mapa */
+  /** Map width */
   width?: string;
-  /** Elementos filhos (marcadores, layers, etc) */
+  /** Child elements (markers, layers, etc) */
   children?: ReactNode;
-  /** Classe CSS adicional */
+  /** Additional CSS class */
   className?: string;
 }
 
-// Centro geográfico do Brasil
+interface MapStyle {
+  height: string;
+  width: string;
+}
+
+interface LeafletMapStyle {
+  height: string;
+  width: string;
+  borderRadius: string;
+}
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+// Geographic center of Brazil
 const BRAZIL_CENTER: [number, number] = [-14.235, -51.925];
 
 const DEFAULT_CONFIG = {
-  zoom: 4,
-  height: '100%',
-  width: '100%',
-  maxZoom: 18,
-  borderRadius: '0.5rem',
+  ZOOM: 4,
+  HEIGHT: '100%',
+  WIDTH: '100%',
+  MAX_ZOOM: 18,
+  BORDER_RADIUS: '0.5rem',
 } as const;
 
 const TILE_LAYER = {
-  url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  URL: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  ATTRIBUTION:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 } as const;
 
+const MAP_FEATURES = {
+  SCROLL_WHEEL_ZOOM: true,
+  ZOOM_CONTROL: true,
+  ATTRIBUTION_CONTROL: true,
+} as const;
+
+const STYLE_FULL_SIZE = {
+  HEIGHT: '100%',
+  WIDTH: '100%',
+} as const;
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
 /**
- * Componente de mapa base com configurações padrão para o Brasil
+ * Get container style
+ */
+function getContainerStyle(height: string, width: string): MapStyle {
+  return { height, width };
+}
+
+/**
+ * Get Leaflet map style
+ */
+function getLeafletMapStyle(): LeafletMapStyle {
+  return {
+    height: STYLE_FULL_SIZE.HEIGHT,
+    width: STYLE_FULL_SIZE.WIDTH,
+    borderRadius: DEFAULT_CONFIG.BORDER_RADIUS,
+  };
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+/**
+ * Base map component with default configurations for Brazil
  *
  * @example
  * ```tsx
@@ -70,27 +131,39 @@ const TILE_LAYER = {
  */
 export default function MapContainer({
   center = BRAZIL_CENTER,
-  zoom = DEFAULT_CONFIG.zoom,
-  height = DEFAULT_CONFIG.height,
-  width = DEFAULT_CONFIG.width,
+  zoom = DEFAULT_CONFIG.ZOOM,
+  height = DEFAULT_CONFIG.HEIGHT,
+  width = DEFAULT_CONFIG.WIDTH,
   children,
   className = '',
 }: MapContainerProps) {
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const containerStyle = useMemo(() => getContainerStyle(height, width), [height, width]);
+
+  const leafletMapStyle = useMemo(() => getLeafletMapStyle(), []);
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
+
   return (
-    <div style={{ height, width }} className={className}>
+    <div style={containerStyle} className={className}>
       <LeafletMapContainer
         center={center}
         zoom={zoom}
-        style={{ height: '100%', width: '100%', borderRadius: DEFAULT_CONFIG.borderRadius }}
-        scrollWheelZoom={true}
-        zoomControl={true}
-        attributionControl={true}
+        style={leafletMapStyle}
+        scrollWheelZoom={MAP_FEATURES.SCROLL_WHEEL_ZOOM}
+        zoomControl={MAP_FEATURES.ZOOM_CONTROL}
+        attributionControl={MAP_FEATURES.ATTRIBUTION_CONTROL}
       >
         {/* Tile Layer - OpenStreetMap */}
         <TileLayer
-          url={TILE_LAYER.url}
-          attribution={TILE_LAYER.attribution}
-          maxZoom={DEFAULT_CONFIG.maxZoom}
+          url={TILE_LAYER.URL}
+          attribution={TILE_LAYER.ATTRIBUTION}
+          maxZoom={DEFAULT_CONFIG.MAX_ZOOM}
         />
 
         {children}
