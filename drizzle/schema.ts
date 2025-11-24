@@ -983,7 +983,7 @@ export const researchDrafts = pgTable("research_drafts", {
   id: serial("id").primaryKey(),
   userId: varchar("userId", { length: 64 }).notNull(),
   projectId: integer("projectId"),
-  draftData: json("draftData").notNull(),
+  draftData: jsonb("draftData").notNull(),
   currentStep: integer("currentStep").default(1).notNull(),
   progressStatus: pgEnum("progressStatus", [
     "started",
@@ -1034,10 +1034,10 @@ export const reportSchedules = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     frequency: pgEnum("frequency", ["weekly", "monthly"]).notNull(),
     recipients: text("recipients").notNull(), // JSON array de emails
-    config: json("config").notNull(), // Configurações do relatório (filtros, formato, etc)
+    config: jsonb("config").notNull(), // Configurações do relatório (filtros, formato, etc)
     nextRunAt: timestamp("nextRunAt", { mode: "string" }).notNull(),
     lastRunAt: timestamp("lastRunAt", { mode: "string" }),
-    enabled: tinyinteger("enabled").default(1).notNull(),
+    enabled: smallint("enabled").default(1).notNull(),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
   },
