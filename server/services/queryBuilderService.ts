@@ -16,7 +16,7 @@ export interface QueryFilters {
 export interface WhereClause {
   field: string;
   operator: "=" | ">" | "<" | ">=" | "<=" | "IN" | "LIKE" | "BETWEEN";
-  value: any;
+  value: unknown;
   logicalOperator?: "AND" | "OR";
 }
 
@@ -289,7 +289,7 @@ export class QueryBuilderService {
     if (!db) return [];
 
     try {
-      const result: any = await db.execute(query);
+      const result: unknown = await db.execute(query);
       return result || [];
     } catch (error) {
       console.error("[QueryBuilderService] Erro ao executar query:", error);
@@ -301,7 +301,7 @@ export class QueryBuilderService {
    * Carrega dados relacionados em paralelo
    */
   async loadRelationships(
-    mainRecords: any[],
+    mainRecords: Record<string, unknown>[],
     relationships: RelationshipConfig[]
   ): Promise<any[]> {
     if (!relationships || relationships.length === 0) {
@@ -321,7 +321,7 @@ export class QueryBuilderService {
           SELECT * FROM ${rel.table}
           WHERE ${rel.foreignKey} IN (${mainIds.join(",")})
         `;
-        const result: any = await db.execute(query);
+        const result: unknown = await db.execute(query);
         return { alias: rel.alias, data: result || [], config: rel };
       });
 
@@ -333,13 +333,13 @@ export class QueryBuilderService {
 
         relationshipResults.forEach(({ alias, data, config }) => {
           const related = data.filter(
-            (r: any) => r[config.foreignKey] === record.id
+            (r: Record<string, unknown>) => r[config.foreignKey] === record.id
           );
 
           if (config.mode === "single_column") {
             // Concatena em string
             enriched[alias] = related
-              .map((r: any) => r[config.field])
+              .map((r: Record<string, unknown>) => r[config.field])
               .join("; ");
           } else {
             // Mantém array
@@ -379,7 +379,7 @@ export class QueryBuilderService {
 
     try {
       const countQuery = `SELECT COUNT(*) as count FROM ${filters.table} ${this.buildWhere(filters.where)}`;
-      const result: any = await db.execute(countQuery);
+      const result: unknown = await db.execute(countQuery);
       return result[0]?.count || 0;
     } catch (error) {
       console.error("[QueryBuilderService] Erro ao estimar registros:", error);
@@ -488,7 +488,7 @@ export class QueryBuilderService {
     return `ORDER BY ${orderStrings.join(", ")}`;
   }
 
-  private sanitizeValue(value: any): string {
+  private sanitizeValue(value: unknown): string {
     if (value === null || value === undefined) return "";
 
     const str = String(value);
