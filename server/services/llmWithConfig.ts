@@ -375,7 +375,7 @@ export async function validateLLMConfig(projectId: number): Promise<{
       valid: true,
       provider: config.provider,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       valid: false,
       provider: config.provider,

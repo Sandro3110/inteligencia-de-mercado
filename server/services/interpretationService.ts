@@ -333,7 +333,7 @@ Retorne APENAS o JSON estruturado, sem texto adicional.
       }
 
       // Executa query
-      const result: any = await db.execute(
+      const result: unknown = await db.execute(
         sql`SELECT COUNT(*) as count FROM ${sql.identifier(tableName)} WHERE ${conditions}`
       );
       return result[0]?.count || 0;
