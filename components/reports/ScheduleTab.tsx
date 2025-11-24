@@ -1,10 +1,12 @@
+'use client';
+
 /**
  * Aba de Agendamentos - Agendamento de Pesquisas Automáticas
  * Migrado de SchedulePage.tsx
  */
 
 import { useState } from "react";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

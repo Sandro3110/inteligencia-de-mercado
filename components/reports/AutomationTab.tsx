@@ -1,10 +1,12 @@
+'use client';
+
 /**
  * Aba de Automação - Agendamento de Relatórios Recorrentes
  * Migrado de ReportSchedules.tsx
  */
 
 import { useState } from "react";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc/client";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
 import {
   Card,
@@ -49,7 +51,13 @@ import { ptBR } from "date-fns/locale";
 export function AutomationTab() {
   const { selectedProjectId } = useSelectedProject();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [editingSchedule, setEditingSchedule] = useState<any>(null);
+  const [editingSchedule, setEditingSchedule] = useState<{
+    id: number;
+    name: string;
+    frequency: 'weekly' | 'monthly';
+    recipients: string[];
+    nextRun: string;
+  } | null>(null);
 
   // Form state
   const [name, setName] = useState("");
@@ -150,7 +158,13 @@ export function AutomationTab() {
     });
   };
 
-  const handleEdit = (schedule: any) => {
+  const handleEdit = (schedule: {
+    id: number;
+    name: string;
+    frequency: 'weekly' | 'monthly';
+    recipients: string[];
+    nextRun: string;
+  }) => {
     setEditingSchedule(schedule);
     setName(schedule.name);
     setFrequency(schedule.frequency);
