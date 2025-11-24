@@ -7,13 +7,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -38,10 +32,7 @@ import { FIELD_OPERATORS, OPERATOR_LABELS } from '@shared/advancedFilters';
 // CONSTANTS
 // ============================================================================
 
-const ENTITY_FIELDS: Record<
-  string,
-  Array<{ value: string; label: string }>
-> = {
+const ENTITY_FIELDS: Record<string, Array<{ value: string; label: string }>> = {
   leads: [
     { value: 'nome', label: 'Nome' },
     { value: 'tipo', label: 'Tipo' },
@@ -206,15 +197,9 @@ export function AdvancedFilterBuilder({
   // COMPUTED VALUES
   // ============================================================================
 
-  const fields = useMemo(
-    () => getFieldsForEntity(entityType),
-    [entityType]
-  );
+  const fields = useMemo(() => getFieldsForEntity(entityType), [entityType]);
 
-  const canRemoveGroup = useMemo(
-    () => filter.groups.length > 1,
-    [filter.groups.length]
-  );
+  const canRemoveGroup = useMemo(() => filter.groups.length > 1, [filter.groups.length]);
 
   // ============================================================================
   // HANDLERS
@@ -251,26 +236,19 @@ export function AdvancedFilterBuilder({
     });
   }, []);
 
-  const removeCondition = useCallback(
-    (groupIndex: number, conditionIndex: number) => {
-      setFilter((prev) => {
-        const newGroups = [...prev.groups];
-        if (newGroups[groupIndex].conditions.length === 1) return prev;
-        newGroups[groupIndex].conditions = newGroups[
-          groupIndex
-        ].conditions.filter((_, i) => i !== conditionIndex);
-        return { ...prev, groups: newGroups };
-      });
-    },
-    []
-  );
+  const removeCondition = useCallback((groupIndex: number, conditionIndex: number) => {
+    setFilter((prev) => {
+      const newGroups = [...prev.groups];
+      if (newGroups[groupIndex].conditions.length === 1) return prev;
+      newGroups[groupIndex].conditions = newGroups[groupIndex].conditions.filter(
+        (_, i) => i !== conditionIndex
+      );
+      return { ...prev, groups: newGroups };
+    });
+  }, []);
 
   const updateCondition = useCallback(
-    (
-      groupIndex: number,
-      conditionIndex: number,
-      updates: Partial<FilterCondition>
-    ) => {
+    (groupIndex: number, conditionIndex: number, updates: Partial<FilterCondition>) => {
       setFilter((prev) => {
         const newGroups = [...prev.groups];
         newGroups[groupIndex].conditions[conditionIndex] = {
@@ -283,16 +261,13 @@ export function AdvancedFilterBuilder({
     []
   );
 
-  const updateGroupOperator = useCallback(
-    (groupIndex: number, operator: LogicalOperator) => {
-      setFilter((prev) => {
-        const newGroups = [...prev.groups];
-        newGroups[groupIndex].logicalOperator = operator;
-        return { ...prev, groups: newGroups };
-      });
-    },
-    []
-  );
+  const updateGroupOperator = useCallback((groupIndex: number, operator: LogicalOperator) => {
+    setFilter((prev) => {
+      const newGroups = [...prev.groups];
+      newGroups[groupIndex].logicalOperator = operator;
+      return { ...prev, groups: newGroups };
+    });
+  }, []);
 
   const updateGlobalOperator = useCallback((operator: LogicalOperator) => {
     setFilter((prev) => ({ ...prev, globalOperator: operator }));
@@ -326,11 +301,7 @@ export function AdvancedFilterBuilder({
   );
 
   const handleValueChange = useCallback(
-    (
-      groupIndex: number,
-      conditionIndex: number,
-      e: React.ChangeEvent<HTMLInputElement>
-    ) => {
+    (groupIndex: number, conditionIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
       updateCondition(groupIndex, conditionIndex, { value: e.target.value });
     },
     [updateCondition]
@@ -347,12 +318,8 @@ export function AdvancedFilterBuilder({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={LOGICAL_OPERATORS.AND}>
-            {LOGICAL_OPERATOR_LABELS.AND}
-          </SelectItem>
-          <SelectItem value={LOGICAL_OPERATORS.OR}>
-            {LOGICAL_OPERATOR_LABELS.OR}
-          </SelectItem>
+          <SelectItem value={LOGICAL_OPERATORS.AND}>{LOGICAL_OPERATOR_LABELS.AND}</SelectItem>
+          <SelectItem value={LOGICAL_OPERATORS.OR}>{LOGICAL_OPERATOR_LABELS.OR}</SelectItem>
         </SelectContent>
       </Select>
     ),
@@ -360,16 +327,10 @@ export function AdvancedFilterBuilder({
   );
 
   const renderFieldSelect = useCallback(
-    (
-      groupIndex: number,
-      conditionIndex: number,
-      condition: FilterCondition
-    ) => (
+    (groupIndex: number, conditionIndex: number, condition: FilterCondition) => (
       <Select
         value={condition.field}
-        onValueChange={(value) =>
-          handleFieldChange(groupIndex, conditionIndex, value)
-        }
+        onValueChange={(value) => handleFieldChange(groupIndex, conditionIndex, value)}
       >
         <SelectTrigger className={WIDTHS.FIELD_SELECT}>
           <SelectValue placeholder={LABELS.FIELD_PLACEHOLDER} />
@@ -387,11 +348,7 @@ export function AdvancedFilterBuilder({
   );
 
   const renderOperatorSelect = useCallback(
-    (
-      groupIndex: number,
-      conditionIndex: number,
-      condition: FilterCondition
-    ) => {
+    (groupIndex: number, conditionIndex: number, condition: FilterCondition) => {
       const operators = getOperatorsForField(condition.field);
       return (
         <Select
@@ -418,17 +375,13 @@ export function AdvancedFilterBuilder({
   );
 
   const renderValueInput = useCallback(
-    (
-      groupIndex: number,
-      conditionIndex: number,
-      condition: FilterCondition
-    ) => {
+    (groupIndex: number, conditionIndex: number, condition: FilterCondition) => {
       if (isNullOperator(condition.operator)) return null;
 
       return (
         <Input
           placeholder={LABELS.VALUE_PLACEHOLDER}
-          value={condition.value || ''}
+          value={String(condition.value || '')}
           onChange={(e) => handleValueChange(groupIndex, conditionIndex, e)}
           className="flex-1"
         />
@@ -487,11 +440,7 @@ export function AdvancedFilterBuilder({
         <div className="flex items-center justify-between">
           <Badge variant="outline">{LABELS.GROUP_LABEL(groupIndex)}</Badge>
           {canRemoveGroup && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeGroup(groupIndex)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => removeGroup(groupIndex)}>
               <X className="w-4 h-4" />
             </Button>
           )}
@@ -528,9 +477,7 @@ export function AdvancedFilterBuilder({
       <CardContent className="space-y-4">
         {/* Global Operator */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
-            {LABELS.COMBINE_GROUPS}
-          </span>
+          <span className="text-sm text-muted-foreground">{LABELS.COMBINE_GROUPS}</span>
           {renderLogicalOperatorSelect(
             filter.globalOperator,
             updateGlobalOperator,
