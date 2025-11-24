@@ -1,14 +1,11 @@
 /**
  * Vercel Serverless Function Handler para tRPC
- * 
- * Este arquivo adapta o backend Express/tRPC para rodar como
- * Vercel Serverless Function.
  */
 
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { appRouter } from "../server/routers";
-import { createContext } from "../server/_core/context";
+import { appRouter } from "../server/routers.js";
+import { createContext } from "../server/_core/context.js";
 
 // Criar middleware tRPC
 const trpcMiddleware = createExpressMiddleware({
@@ -30,10 +27,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  // Adaptar req/res do Vercel para Express
-  const expressReq = req as any;
-  const expressRes = res as any;
+  try {
+    // Adaptar req/res do Vercel para Express
+    const expressReq = req as any;
+    const expressRes = res as any;
 
-  // Executar middleware tRPC
-  return trpcMiddleware(expressReq, expressRes);
+    // Executar middleware tRPC
+    return trpcMiddleware(expressReq, expressRes);
+  } catch (error) {
+    console.error("[tRPC] Error:", error);
+    res.status(500).json({ 
+      error: "Internal server error",
+      message: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
 }

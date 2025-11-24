@@ -6,23 +6,16 @@
   "framework": null,
   "outputDirectory": "dist/public",
   "functions": {
-    "api/**/*.js": {
+    "api/**/*.ts": {
       "runtime": "nodejs22.x",
-      "maxDuration": 60
+      "maxDuration": 60,
+      "memory": 1024
     }
   },
   "rewrites": [
     {
       "source": "/api/trpc/:path*",
       "destination": "/api/trpc"
-    },
-    {
-      "source": "/api/enrichment/progress/:jobId",
-      "destination": "/api/sse/enrichment"
-    },
-    {
-      "source": "/api/notifications/stream",
-      "destination": "/api/sse/notifications"
     },
     {
       "source": "/(.*)",
