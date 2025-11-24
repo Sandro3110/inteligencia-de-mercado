@@ -1,32 +1,41 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
+/**
+ * GeoCockpit - Validação e Ajuste de Coordenadas Geográficas
+ * Workflow de 3 passos para validar e ajustar coordenadas de entidades
+ */
+
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
-import { CheckCircle2, MapPin, Navigation } from "lucide-react";
-import { useEffect, useState } from "react";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
+import { CheckCircle2, MapPin, Navigation } from 'lucide-react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   MapContainer,
   Marker,
   Popup,
   TileLayer,
   useMapEvents,
-} from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+} from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 // Fix Leaflet default marker icons
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// ============================================================================
+// LEAFLET CONFIGURATION
+// ============================================================================
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -37,8 +46,98 @@ const DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const DEFAULT_COORDS = {
+  LAT: -23.5505, // São Paulo
+  LNG: -46.6333,
+} as const;
+
+const COORD_LIMITS = {
+  LAT_MIN: -90,
+  LAT_MAX: 90,
+  LNG_MIN: -180,
+  LNG_MAX: 180,
+} as const;
+
+const STEPS = {
+  VALIDATE: 1,
+  ADJUST: 2,
+  CONFIRM: 3,
+} as const;
+
+const STEP_LABELS = {
+  [STEPS.VALIDATE]: '1. Validar',
+  [STEPS.ADJUST]: '2. Ajustar',
+  [STEPS.CONFIRM]: '3. Salvar',
+} as const;
+
+const MAP_CONFIG = {
+  ZOOM: 15,
+  HEIGHT: '400px',
+  HEIGHT_CONFIRM: '300px',
+  ATTRIBUTION:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  TILE_URL: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+} as const;
+
+const INPUT_CONFIG = {
+  STEP: '0.000001',
+  DECIMAL_PLACES: 6,
+  PLACEHOLDER_LAT: '-23.550500',
+  PLACEHOLDER_LNG: '-46.633300',
+} as const;
+
+const LABELS = {
+  TITLE: 'GeoCockpit',
+  SUBTITLE: 'Validação e ajuste de coordenadas geográficas',
+  ADDRESS: 'Endereço',
+  LATITUDE: 'Latitude',
+  LONGITUDE: 'Longitude',
+  NO_ADDRESS: 'Não informado',
+  STEP1_TITLE: 'Passo 1: Validar Coordenadas da IA',
+  STEP1_DESCRIPTION: 'Verifique se as coordenadas retornadas pela IA estão corretas',
+  STEP2_TITLE: 'Passo 2: Ajustar Coordenadas',
+  STEP2_DESCRIPTION: 'Clique no mapa ou insira coordenadas manualmente',
+  STEP3_TITLE: 'Coordenadas Salvas com Sucesso!',
+  STEP3_DESCRIPTION: 'As coordenadas foram atualizadas no banco de dados',
+  NO_COORDS_MESSAGE: 'Coordenadas não disponíveis. Pule para o ajuste manual.',
+  FINAL_COORDS: 'Coordenadas Finais:',
+  VALIDATE_BUTTON: 'Validar e Avançar',
+  BACK_BUTTON: 'Voltar',
+  UPDATE_MAP_BUTTON: 'Atualizar Mapa',
+  SAVE_BUTTON: 'Salvar Coordenadas',
+  SAVING_BUTTON: 'Salvando...',
+  GO_TO_MANUAL: 'Ir para Ajuste Manual',
+} as const;
+
+const TOAST_MESSAGES = {
+  NO_COORDS_ERROR: 'Coordenadas não disponíveis',
+  NO_COORDS_DESCRIPTION: 'A IA não retornou coordenadas para este endereço.',
+  VALIDATED_SUCCESS: 'Coordenadas validadas!',
+  VALIDATED_DESCRIPTION: (lat: number, lng: number) =>
+    `Lat: ${lat.toFixed(INPUT_CONFIG.DECIMAL_PLACES)}, Lng: ${lng.toFixed(INPUT_CONFIG.DECIMAL_PLACES)}`,
+  MARKER_UPDATED: 'Marcador atualizado',
+  MARKER_DESCRIPTION: (lat: number, lng: number) =>
+    `Nova posição: ${lat.toFixed(INPUT_CONFIG.DECIMAL_PLACES)}, ${lng.toFixed(INPUT_CONFIG.DECIMAL_PLACES)}`,
+  INVALID_COORDS_ERROR: 'Coordenadas inválidas',
+  INVALID_COORDS_DESCRIPTION: 'Digite valores numéricos válidos.',
+  OUT_OF_RANGE_ERROR: 'Coordenadas fora do intervalo',
+  OUT_OF_RANGE_DESCRIPTION: 'Latitude: -90 a 90, Longitude: -180 a 180',
+  COORDS_UPDATED_SUCCESS: 'Coordenadas atualizadas!',
+  SAVE_SUCCESS: 'Coordenadas salvas!',
+  SAVE_DESCRIPTION: (entityName: string) => `${entityName} atualizado com sucesso.`,
+  SAVE_ERROR: 'Erro ao salvar',
+} as const;
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
 interface GeoCockpitProps {
-  entityType: "cliente" | "concorrente" | "lead";
+  entityType: 'cliente' | 'concorrente' | 'lead';
   entityId: number;
   entityName: string;
   address: string;
@@ -47,18 +146,62 @@ interface GeoCockpitProps {
   onSave: (lat: number, lng: number) => Promise<void>;
 }
 
-function MapClickHandler({
-  onClick,
-}: {
+interface MapClickHandlerProps {
   onClick: (lat: number, lng: number) => void;
-}) {
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function formatCoordinate(value: number): string {
+  return value.toFixed(INPUT_CONFIG.DECIMAL_PLACES);
+}
+
+function isValidLatitude(lat: number): boolean {
+  return lat >= COORD_LIMITS.LAT_MIN && lat <= COORD_LIMITS.LAT_MAX;
+}
+
+function isValidLongitude(lng: number): boolean {
+  return lng >= COORD_LIMITS.LNG_MIN && lng <= COORD_LIMITS.LNG_MAX;
+}
+
+function isValidCoordinates(lat: number, lng: number): boolean {
+  return isValidLatitude(lat) && isValidLongitude(lng);
+}
+
+function parseCoordinate(value: string): number {
+  return parseFloat(value);
+}
+
+function capitalizeEntityType(entityType: string): string {
+  return entityType.charAt(0).toUpperCase() + entityType.slice(1);
+}
+
+function getStepClasses(currentStep: number, targetStep: number): string {
+  return `flex items-center gap-2 px-3 py-1 rounded-full ${
+    currentStep >= targetStep
+      ? 'bg-primary text-primary-foreground'
+      : 'bg-muted'
+  }`;
+}
+
+// ============================================================================
+// MAP CLICK HANDLER COMPONENT
+// ============================================================================
+
+function MapClickHandler({ onClick }: MapClickHandlerProps) {
   useMapEvents({
-    click: e => {
+    click: (e) => {
       onClick(e.latlng.lat, e.latlng.lng);
     },
   });
   return null;
 }
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
 
 export default function GeoCockpit({
   entityType,
@@ -69,17 +212,25 @@ export default function GeoCockpit({
   initialLng,
   onSave,
 }: GeoCockpitProps) {
-  const [step, setStep] = useState(1);
-  const [lat, setLat] = useState<number>(initialLat || -23.5505);
-  const [lng, setLng] = useState<number>(initialLng || -46.6333);
+  // ============================================================================
+  // STATE
+  // ============================================================================
+
+  const [step, setStep] = useState(STEPS.VALIDATE);
+  const [lat, setLat] = useState<number>(initialLat || DEFAULT_COORDS.LAT);
+  const [lng, setLng] = useState<number>(initialLng || DEFAULT_COORDS.LNG);
   const [manualLat, setManualLat] = useState<string>(
-    String(initialLat || -23.5505)
+    String(initialLat || DEFAULT_COORDS.LAT)
   );
   const [manualLng, setManualLng] = useState<string>(
-    String(initialLng || -46.6333)
+    String(initialLng || DEFAULT_COORDS.LNG)
   );
   const [isValidated, setIsValidated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // ============================================================================
+  // EFFECTS
+  // ============================================================================
 
   useEffect(() => {
     if (initialLat && initialLng) {
@@ -91,106 +242,148 @@ export default function GeoCockpit({
     }
   }, [initialLat, initialLng]);
 
-  const handleValidate = () => {
-    if (!initialLat || !initialLng) {
-      toast.error("Coordenadas não disponíveis", {
-        description: "A IA não retornou coordenadas para este endereço.",
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const hasInitialCoords = useMemo(
+    () => !!(initialLat && initialLng),
+    [initialLat, initialLng]
+  );
+
+  const formattedLat = useMemo(() => formatCoordinate(lat), [lat]);
+  const formattedLng = useMemo(() => formatCoordinate(lng), [lng]);
+
+  const capitalizedEntityType = useMemo(
+    () => capitalizeEntityType(entityType),
+    [entityType]
+  );
+
+  const displayAddress = useMemo(
+    () => address || LABELS.NO_ADDRESS,
+    [address]
+  );
+
+  const saveButtonText = useMemo(
+    () => (isSaving ? LABELS.SAVING_BUTTON : LABELS.SAVE_BUTTON),
+    [isSaving]
+  );
+
+  const mapCenter = useMemo<[number, number]>(() => [lat, lng], [lat, lng]);
+
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
+  const handleValidate = useCallback(() => {
+    if (!hasInitialCoords) {
+      toast.error(TOAST_MESSAGES.NO_COORDS_ERROR, {
+        description: TOAST_MESSAGES.NO_COORDS_DESCRIPTION,
       });
       return;
     }
 
     setIsValidated(true);
-    setStep(2);
-    toast.success("Coordenadas validadas!", {
-      description: `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`,
+    setStep(STEPS.ADJUST);
+    toast.success(TOAST_MESSAGES.VALIDATED_SUCCESS, {
+      description: TOAST_MESSAGES.VALIDATED_DESCRIPTION(lat, lng),
     });
-  };
+  }, [hasInitialCoords, lat, lng]);
 
-  const handleMapClick = (newLat: number, newLng: number) => {
+  const handleMapClick = useCallback((newLat: number, newLng: number) => {
     setLat(newLat);
     setLng(newLng);
     setManualLat(String(newLat));
     setManualLng(String(newLng));
-    toast.info("Marcador atualizado", {
-      description: `Nova posição: ${newLat.toFixed(6)}, ${newLng.toFixed(6)}`,
+    toast.info(TOAST_MESSAGES.MARKER_UPDATED, {
+      description: TOAST_MESSAGES.MARKER_DESCRIPTION(newLat, newLng),
     });
-  };
+  }, []);
 
-  const handleManualUpdate = () => {
-    const newLat = parseFloat(manualLat);
-    const newLng = parseFloat(manualLng);
+  const handleManualUpdate = useCallback(() => {
+    const newLat = parseCoordinate(manualLat);
+    const newLng = parseCoordinate(manualLng);
 
     if (isNaN(newLat) || isNaN(newLng)) {
-      toast.error("Coordenadas inválidas", {
-        description: "Digite valores numéricos válidos.",
+      toast.error(TOAST_MESSAGES.INVALID_COORDS_ERROR, {
+        description: TOAST_MESSAGES.INVALID_COORDS_DESCRIPTION,
       });
       return;
     }
 
-    if (newLat < -90 || newLat > 90 || newLng < -180 || newLng > 180) {
-      toast.error("Coordenadas fora do intervalo", {
-        description: "Latitude: -90 a 90, Longitude: -180 a 180",
+    if (!isValidCoordinates(newLat, newLng)) {
+      toast.error(TOAST_MESSAGES.OUT_OF_RANGE_ERROR, {
+        description: TOAST_MESSAGES.OUT_OF_RANGE_DESCRIPTION,
       });
       return;
     }
 
     setLat(newLat);
     setLng(newLng);
-    toast.success("Coordenadas atualizadas!", {
-      description: `Lat: ${newLat.toFixed(6)}, Lng: ${newLng.toFixed(6)}`,
+    toast.success(TOAST_MESSAGES.COORDS_UPDATED_SUCCESS, {
+      description: TOAST_MESSAGES.VALIDATED_DESCRIPTION(newLat, newLng),
     });
-  };
+  }, [manualLat, manualLng]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     setIsSaving(true);
     try {
       await onSave(lat, lng);
-      toast.success("Coordenadas salvas!", {
-        description: `${entityName} atualizado com sucesso.`,
+      toast.success(TOAST_MESSAGES.SAVE_SUCCESS, {
+        description: TOAST_MESSAGES.SAVE_DESCRIPTION(entityName),
       });
-      setStep(3);
+      setStep(STEPS.CONFIRM);
     } catch (error) {
-      toast.error("Erro ao salvar", {
+      toast.error(TOAST_MESSAGES.SAVE_ERROR, {
         description:
-          error instanceof Error ? error.message : "Erro desconhecido",
+          error instanceof Error ? error.message : 'Erro desconhecido',
       });
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [lat, lng, onSave, entityName]);
 
-  return (
-    <div className="space-y-6">
-      {/* Header com Progresso */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">GeoCockpit</h2>
-          <p className="text-sm text-muted-foreground">
-            Validação e ajuste de coordenadas geográficas
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <div
-            className={`flex items-center gap-2 px-3 py-1 rounded-full ${step >= 1 ? "bg-primary text-primary-foreground" : "bg-muted"}`}
-          >
-            <span className="text-xs font-medium">1. Validar</span>
+  const handleGoToManual = useCallback(() => {
+    setStep(STEPS.ADJUST);
+  }, []);
+
+  const handleBackToValidate = useCallback(() => {
+    setStep(STEPS.VALIDATE);
+  }, []);
+
+  const handleManualLatChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setManualLat(e.target.value);
+    },
+    []
+  );
+
+  const handleManualLngChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setManualLng(e.target.value);
+    },
+    []
+  );
+
+  // ============================================================================
+  // RENDER HELPERS
+  // ============================================================================
+
+  const renderProgressSteps = useCallback(
+    () => (
+      <div className="flex items-center gap-2">
+        {Object.entries(STEP_LABELS).map(([stepNum, label]) => (
+          <div key={stepNum} className={getStepClasses(step, Number(stepNum))}>
+            <span className="text-xs font-medium">{label}</span>
           </div>
-          <div
-            className={`flex items-center gap-2 px-3 py-1 rounded-full ${step >= 2 ? "bg-primary text-primary-foreground" : "bg-muted"}`}
-          >
-            <span className="text-xs font-medium">2. Ajustar</span>
-          </div>
-          <div
-            className={`flex items-center gap-2 px-3 py-1 rounded-full ${step >= 3 ? "bg-primary text-primary-foreground" : "bg-muted"}`}
-          >
-            <span className="text-xs font-medium">3. Salvar</span>
-          </div>
-        </div>
+        ))}
       </div>
+    ),
+    [step]
+  );
 
-      <Separator />
-
-      {/* Informações da Entidade */}
+  const renderEntityInfo = useCallback(
+    () => (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -198,198 +391,253 @@ export default function GeoCockpit({
             {entityName}
           </CardTitle>
           <CardDescription>
-            {entityType.charAt(0).toUpperCase() + entityType.slice(1)} #
-            {entityId}
+            {capitalizedEntityType} #{entityId}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             <div>
-              <Label className="text-xs text-muted-foreground">Endereço</Label>
-              <p className="text-sm">{address || "Não informado"}</p>
+              <Label className="text-xs text-muted-foreground">
+                {LABELS.ADDRESS}
+              </Label>
+              <p className="text-sm">{displayAddress}</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-xs text-muted-foreground">
-                  Latitude
+                  {LABELS.LATITUDE}
                 </Label>
-                <p className="text-sm font-mono">{lat.toFixed(6)}</p>
+                <p className="text-sm font-mono">{formattedLat}</p>
               </div>
               <div>
                 <Label className="text-xs text-muted-foreground">
-                  Longitude
+                  {LABELS.LONGITUDE}
                 </Label>
-                <p className="text-sm font-mono">{lng.toFixed(6)}</p>
+                <p className="text-sm font-mono">{formattedLng}</p>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
+    ),
+    [
+      entityName,
+      capitalizedEntityType,
+      entityId,
+      displayAddress,
+      formattedLat,
+      formattedLng,
+    ]
+  );
 
-      {/* Passo 1: Validar Coordenadas */}
-      {step === 1 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Passo 1: Validar Coordenadas da IA</CardTitle>
-            <CardDescription>
-              Verifique se as coordenadas retornadas pela IA estão corretas
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {initialLat && initialLng ? (
-              <>
-                <div className="h-[400px] rounded-lg overflow-hidden border">
-                  <MapContainer
-                    center={[lat, lng]}
-                    zoom={15}
-                    style={{ height: "100%", width: "100%" }}
-                  >
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <Marker position={[lat, lng]}>
-                      <Popup>{entityName}</Popup>
-                    </Marker>
-                  </MapContainer>
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button onClick={handleValidate}>
-                    <CheckCircle2 className="mr-2 h-4 w-4" />
-                    Validar e Avançar
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-8">
-                <MapPin className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">
-                  Coordenadas não disponíveis. Pule para o ajuste manual.
-                </p>
-                <Button onClick={() => setStep(2)} className="mt-4">
-                  Ir para Ajuste Manual
+  const renderMap = useCallback(
+    (height: string) => (
+      <div className="rounded-lg overflow-hidden border" style={{ height }}>
+        <MapContainer
+          center={mapCenter}
+          zoom={MAP_CONFIG.ZOOM}
+          style={{ height: '100%', width: '100%' }}
+        >
+          <TileLayer
+            attribution={MAP_CONFIG.ATTRIBUTION}
+            url={MAP_CONFIG.TILE_URL}
+          />
+          <Marker position={mapCenter}>
+            <Popup>{entityName}</Popup>
+          </Marker>
+        </MapContainer>
+      </div>
+    ),
+    [mapCenter, entityName]
+  );
+
+  const renderStep1 = useCallback(
+    () => (
+      <Card>
+        <CardHeader>
+          <CardTitle>{LABELS.STEP1_TITLE}</CardTitle>
+          <CardDescription>{LABELS.STEP1_DESCRIPTION}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {hasInitialCoords ? (
+            <>
+              {renderMap(MAP_CONFIG.HEIGHT)}
+              <div className="flex justify-end gap-2">
+                <Button onClick={handleValidate}>
+                  <CheckCircle2 className="mr-2 h-4 w-4" />
+                  {LABELS.VALIDATE_BUTTON}
                 </Button>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Passo 2: Ajustar Coordenadas */}
-      {step === 2 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Passo 2: Ajustar Coordenadas</CardTitle>
-            <CardDescription>
-              Clique no mapa ou insira coordenadas manualmente
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="h-[400px] rounded-lg overflow-hidden border">
-              <MapContainer
-                center={[lat, lng]}
-                zoom={15}
-                style={{ height: "100%", width: "100%" }}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <Marker position={[lat, lng]}>
-                  <Popup>{entityName}</Popup>
-                </Marker>
-                <MapClickHandler onClick={handleMapClick} />
-              </MapContainer>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="manual-lat">Latitude</Label>
-                <Input
-                  id="manual-lat"
-                  type="number"
-                  step="0.000001"
-                  value={manualLat}
-                  onChange={e => setManualLat(e.target.value)}
-                  placeholder="-23.550500"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="manual-lng">Longitude</Label>
-                <Input
-                  id="manual-lng"
-                  type="number"
-                  step="0.000001"
-                  value={manualLng}
-                  onChange={e => setManualLng(e.target.value)}
-                  placeholder="-46.633300"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-between gap-2">
-              <Button variant="outline" onClick={() => setStep(1)}>
-                Voltar
+            </>
+          ) : (
+            <div className="text-center py-8">
+              <MapPin className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">
+                {LABELS.NO_COORDS_MESSAGE}
+              </p>
+              <Button onClick={handleGoToManual} className="mt-4">
+                {LABELS.GO_TO_MANUAL}
               </Button>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={handleManualUpdate}>
-                  <Navigation className="mr-2 h-4 w-4" />
-                  Atualizar Mapa
-                </Button>
-                <Button onClick={handleSave} disabled={isSaving}>
-                  {isSaving ? "Salvando..." : "Salvar Coordenadas"}
-                </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    ),
+    [hasInitialCoords, handleValidate, handleGoToManual, renderMap]
+  );
+
+  const renderStep2 = useCallback(
+    () => (
+      <Card>
+        <CardHeader>
+          <CardTitle>{LABELS.STEP2_TITLE}</CardTitle>
+          <CardDescription>{LABELS.STEP2_DESCRIPTION}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="rounded-lg overflow-hidden border" style={{ height: MAP_CONFIG.HEIGHT }}>
+            <MapContainer
+              center={mapCenter}
+              zoom={MAP_CONFIG.ZOOM}
+              style={{ height: '100%', width: '100%' }}
+            >
+              <TileLayer
+                attribution={MAP_CONFIG.ATTRIBUTION}
+                url={MAP_CONFIG.TILE_URL}
+              />
+              <Marker position={mapCenter}>
+                <Popup>{entityName}</Popup>
+              </Marker>
+              <MapClickHandler onClick={handleMapClick} />
+            </MapContainer>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="manual-lat">{LABELS.LATITUDE}</Label>
+              <Input
+                id="manual-lat"
+                type="number"
+                step={INPUT_CONFIG.STEP}
+                value={manualLat}
+                onChange={handleManualLatChange}
+                placeholder={INPUT_CONFIG.PLACEHOLDER_LAT}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="manual-lng">{LABELS.LONGITUDE}</Label>
+              <Input
+                id="manual-lng"
+                type="number"
+                step={INPUT_CONFIG.STEP}
+                value={manualLng}
+                onChange={handleManualLngChange}
+                placeholder={INPUT_CONFIG.PLACEHOLDER_LNG}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-between gap-2">
+            <Button variant="outline" onClick={handleBackToValidate}>
+              {LABELS.BACK_BUTTON}
+            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleManualUpdate}>
+                <Navigation className="mr-2 h-4 w-4" />
+                {LABELS.UPDATE_MAP_BUTTON}
+              </Button>
+              <Button onClick={handleSave} disabled={isSaving}>
+                {saveButtonText}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    ),
+    [
+      mapCenter,
+      entityName,
+      manualLat,
+      manualLng,
+      isSaving,
+      saveButtonText,
+      handleMapClick,
+      handleManualLatChange,
+      handleManualLngChange,
+      handleBackToValidate,
+      handleManualUpdate,
+      handleSave,
+    ]
+  );
+
+  const renderStep3 = useCallback(
+    () => (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-green-600">
+            <CheckCircle2 className="h-5 w-5" />
+            {LABELS.STEP3_TITLE}
+          </CardTitle>
+          <CardDescription>{LABELS.STEP3_DESCRIPTION}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {renderMap(MAP_CONFIG.HEIGHT_CONFIRM)}
+
+          <div className="bg-muted p-4 rounded-lg">
+            <p className="text-sm font-medium mb-2">{LABELS.FINAL_COORDS}</p>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-muted-foreground">{LABELS.LATITUDE}:</span>
+                <span className="ml-2 font-mono">{formattedLat}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">
+                  {LABELS.LONGITUDE}:
+                </span>
+                <span className="ml-2 font-mono">{formattedLng}</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </CardContent>
+      </Card>
+    ),
+    [formattedLat, formattedLng, renderMap]
+  );
 
-      {/* Passo 3: Confirmação */}
-      {step === 3 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-600">
-              <CheckCircle2 className="h-5 w-5" />
-              Coordenadas Salvas com Sucesso!
-            </CardTitle>
-            <CardDescription>
-              As coordenadas foram atualizadas no banco de dados
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="h-[300px] rounded-lg overflow-hidden border">
-              <MapContainer
-                center={[lat, lng]}
-                zoom={15}
-                style={{ height: "100%", width: "100%" }}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <Marker position={[lat, lng]}>
-                  <Popup>{entityName}</Popup>
-                </Marker>
-              </MapContainer>
-            </div>
+  const renderCurrentStep = useCallback(() => {
+    switch (step) {
+      case STEPS.VALIDATE:
+        return renderStep1();
+      case STEPS.ADJUST:
+        return renderStep2();
+      case STEPS.CONFIRM:
+        return renderStep3();
+      default:
+        return null;
+    }
+  }, [step, renderStep1, renderStep2, renderStep3]);
 
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-sm font-medium mb-2">Coordenadas Finais:</p>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Latitude:</span>
-                  <span className="ml-2 font-mono">{lat.toFixed(6)}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Longitude:</span>
-                  <span className="ml-2 font-mono">{lng.toFixed(6)}</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+  // ============================================================================
+  // RENDER
+  // ============================================================================
+
+  return (
+    <div className="space-y-6">
+      {/* Header com Progresso */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">{LABELS.TITLE}</h2>
+          <p className="text-sm text-muted-foreground">{LABELS.SUBTITLE}</p>
+        </div>
+        {renderProgressSteps()}
+      </div>
+
+      <Separator />
+
+      {/* Informações da Entidade */}
+      {renderEntityInfo()}
+
+      {/* Passo Atual */}
+      {renderCurrentStep()}
     </div>
   );
 }
