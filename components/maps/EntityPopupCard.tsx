@@ -1,11 +1,12 @@
-'use client';
-
 /**
- * Card Popup de Detalhes de Entidade
- * Exibe informações detalhadas ao clicar em um marcador
+ * EntityPopupCard Component
+ * Entity details popup card
+ * Displays detailed information when clicking on a marker
  */
 
-import { useCallback } from 'react';
+'use client';
+
+import { useCallback, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,10 @@ import {
 } from 'lucide-react';
 import { trpc } from '@/lib/trpc/client';
 import { useLocation } from 'wouter';
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 export type EntityType = 'mercado' | 'cliente' | 'produto' | 'concorrente' | 'lead';
 
@@ -70,6 +75,30 @@ interface EntityStats {
   totalProdutos?: number;
 }
 
+interface EntityData {
+  nome: string;
+  qualidadeScore?: number;
+  cidade?: string;
+  uf?: string;
+  mercado?: { nome: string };
+  mercados?: Mercado[];
+  email?: string;
+  telefone?: string;
+  site?: string;
+  siteOficial?: string;
+  tags?: TagData[];
+  stats?: EntityStats;
+  cliente?: { nome: string };
+  latitude?: number;
+  longitude?: number;
+}
+
+type QualityVariant = 'default' | 'secondary' | 'destructive';
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
 const ENTITY_CONFIG: Record<EntityType, EntityConfig> = {
   mercado: {
     label: 'Mercado',
@@ -101,17 +130,467 @@ const ENTITY_CONFIG: Record<EntityType, EntityConfig> = {
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
   },
-};
+} as const;
+
+const QUALITY_THRESHOLDS = {
+  HIGH: 70,
+  MEDIUM: 40,
+} as const;
+
+const ICON_SIZES = {
+  SMALL: 'w-3 h-3',
+  REGULAR: 'w-4 h-4',
+  LARGE: 'w-6 h-6',
+} as const;
+
+const CLASSES = {
+  DIALOG_CONTENT: 'max-w-2xl max-h-[80vh] overflow-y-auto',
+  HEADER_CONTAINER: 'flex items-center gap-3',
+  ICON_CONTAINER: 'p-2 rounded-lg',
+  HEADER_CONTENT: 'flex-1',
+  TITLE: 'text-xl',
+  BADGES_CONTAINER: 'flex items-center gap-2 mt-1',
+  CONTENT: 'space-y-4',
+  INFO_ROW: 'flex items-start gap-2',
+  INFO_ROW_CENTER: 'flex items-center gap-2',
+  ICON_MUTED: 'mt-0.5 text-muted-foreground',
+  ICON_MUTED_CENTER: 'text-muted-foreground',
+  INFO_LABEL: 'text-sm font-medium',
+  INFO_VALUE: 'text-sm text-muted-foreground',
+  LINK: 'text-sm text-blue-600 hover:underline',
+  BADGES_WRAP: 'flex flex-wrap gap-1 mt-1',
+  BADGE_SMALL: 'text-xs',
+  STATS_GRID: 'grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg',
+  STAT_LABEL: 'text-xs text-muted-foreground',
+  STAT_VALUE: 'text-lg font-semibold',
+  ACTIONS_CONTAINER: 'flex gap-2',
+  BUTTON_FULL: 'flex-1',
+  CONTACT_SECTION: 'space-y-2',
+  SKELETON_TITLE: 'h-6 w-48',
+  SKELETON_SUBTITLE: 'h-4 w-32',
+  SKELETON_BLOCK: 'h-20 w-full',
+  SKELETON_CONTAINER: 'space-y-4',
+} as const;
+
+const LABELS = {
+  ERROR_TITLE: 'Erro',
+  ERROR_MESSAGE: 'Não foi possível carregar os detalhes da entidade.',
+  LOCATION: 'Localização',
+  MARKET: 'Mercado',
+  MARKETS: 'Mercados',
+  TAGS: 'Tags',
+  CLIENTS: 'Clientes',
+  COMPETITORS: 'Concorrentes',
+  LEADS: 'Leads',
+  PRODUCTS: 'Produtos',
+  CLIENT: 'Cliente',
+  VIEW_DETAILS: 'Ver Detalhes',
+  OPEN_IN_MAPS: 'Abrir no Maps',
+} as const;
+
+const ROUTES = {
+  MERCADO: (id: number) => `/mercados/${id}`,
+} as const;
+
+const GOOGLE_MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=';
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
 
 /**
- * Determina a variante do badge baseado no score de qualidade
+ * Determine badge variant based on quality score
  */
-function getQualityVariant(score: number): 'default' | 'secondary' | 'destructive' {
-  if (score >= 70) return 'default';
-  if (score >= 40) return 'secondary';
+function getQualityVariant(score: number): QualityVariant {
+  if (score >= QUALITY_THRESHOLDS.HIGH) return 'default';
+  if (score >= QUALITY_THRESHOLDS.MEDIUM) return 'secondary';
   return 'destructive';
 }
 
+/**
+ * Check if entity has location data
+ */
+function hasLocation(entity: EntityData): boolean {
+  return Boolean(entity.cidade || entity.uf);
+}
+
+/**
+ * Check if entity has contact info
+ */
+function hasContact(entity: EntityData): boolean {
+  return Boolean(entity.email || entity.telefone);
+}
+
+/**
+ * Check if entity has coordinates
+ */
+function hasCoordinates(entity: EntityData): boolean {
+  return Boolean(entity.latitude && entity.longitude);
+}
+
+/**
+ * Get site URL
+ */
+function getSiteUrl(entity: EntityData): string | undefined {
+  return entity.site || entity.siteOficial;
+}
+
+/**
+ * Format location string
+ */
+function formatLocation(cidade?: string, uf?: string): string {
+  return `${cidade}, ${uf}`;
+}
+
+/**
+ * Build Google Maps URL
+ */
+function buildGoogleMapsUrl(latitude: number, longitude: number): string {
+  return `${GOOGLE_MAPS_URL}${latitude},${longitude}`;
+}
+
+/**
+ * Get icon container classes
+ */
+function getIconContainerClasses(bgColor: string): string {
+  return `${CLASSES.ICON_CONTAINER} ${bgColor}`;
+}
+
+/**
+ * Get icon classes
+ */
+function getIconClasses(size: string, color: string): string {
+  return `${size} ${color}`;
+}
+
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
+
+/**
+ * Loading skeleton
+ */
+interface LoadingSkeletonProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+function LoadingSkeleton({ isOpen, onClose }: LoadingSkeletonProps) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={CLASSES.DIALOG_CONTENT}>
+        <DialogHeader>
+          <Skeleton className={CLASSES.SKELETON_TITLE} />
+          <Skeleton className={CLASSES.SKELETON_SUBTITLE} />
+        </DialogHeader>
+        <div className={CLASSES.SKELETON_CONTAINER}>
+          <Skeleton className={CLASSES.SKELETON_BLOCK} />
+          <Skeleton className={CLASSES.SKELETON_BLOCK} />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/**
+ * Error state
+ */
+interface ErrorStateProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+function ErrorState({ isOpen, onClose }: ErrorStateProps) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{LABELS.ERROR_TITLE}</DialogTitle>
+          <DialogDescription>{LABELS.ERROR_MESSAGE}</DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/**
+ * Entity header
+ */
+interface EntityHeaderProps {
+  entity: EntityData;
+  config: EntityConfig;
+}
+
+function EntityHeader({ entity, config }: EntityHeaderProps) {
+  const Icon = config.icon;
+  const iconContainerClasses = useMemo(() => getIconContainerClasses(config.bgColor), [config.bgColor]);
+  const iconClasses = useMemo(() => getIconClasses(ICON_SIZES.LARGE, config.color), [config.color]);
+
+  return (
+    <div className={CLASSES.HEADER_CONTAINER}>
+      <div className={iconContainerClasses}>
+        <Icon className={iconClasses} />
+      </div>
+      <div className={CLASSES.HEADER_CONTENT}>
+        <DialogTitle className={CLASSES.TITLE}>{entity.nome}</DialogTitle>
+        <DialogDescription className={CLASSES.BADGES_CONTAINER}>
+          <Badge variant="outline">{config.label}</Badge>
+          {entity.qualidadeScore && (
+            <Badge variant={getQualityVariant(entity.qualidadeScore)}>
+              <Star className={`${ICON_SIZES.SMALL} mr-1`} />
+              {entity.qualidadeScore}
+            </Badge>
+          )}
+        </DialogDescription>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Location info
+ */
+interface LocationInfoProps {
+  entity: EntityData;
+}
+
+function LocationInfo({ entity }: LocationInfoProps) {
+  if (!hasLocation(entity)) return null;
+
+  return (
+    <div className={CLASSES.INFO_ROW}>
+      <MapPin className={`${ICON_SIZES.REGULAR} ${CLASSES.ICON_MUTED}`} />
+      <div>
+        <p className={CLASSES.INFO_LABEL}>{LABELS.LOCATION}</p>
+        <p className={CLASSES.INFO_VALUE}>{formatLocation(entity.cidade, entity.uf)}</p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Market info (single)
+ */
+interface MarketInfoProps {
+  entity: EntityData;
+}
+
+function MarketInfo({ entity }: MarketInfoProps) {
+  if (!entity.mercado) return null;
+
+  return (
+    <div className={CLASSES.INFO_ROW}>
+      <Building className={`${ICON_SIZES.REGULAR} ${CLASSES.ICON_MUTED}`} />
+      <div>
+        <p className={CLASSES.INFO_LABEL}>{LABELS.MARKET}</p>
+        <p className={CLASSES.INFO_VALUE}>{entity.mercado.nome}</p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Markets info (multiple)
+ */
+interface MarketsInfoProps {
+  entity: EntityData;
+}
+
+function MarketsInfo({ entity }: MarketsInfoProps) {
+  if (!entity.mercados || entity.mercados.length === 0) return null;
+
+  return (
+    <div className={CLASSES.INFO_ROW}>
+      <Building className={`${ICON_SIZES.REGULAR} ${CLASSES.ICON_MUTED}`} />
+      <div>
+        <p className={CLASSES.INFO_LABEL}>{LABELS.MARKETS}</p>
+        <div className={CLASSES.BADGES_WRAP}>
+          {entity.mercados.map((m) => (
+            <Badge key={m.mercadoId} variant="outline" className={CLASSES.BADGE_SMALL}>
+              {m.mercadoNome}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Contact info
+ */
+interface ContactInfoProps {
+  entity: EntityData;
+}
+
+function ContactInfo({ entity }: ContactInfoProps) {
+  if (!hasContact(entity)) return null;
+
+  return (
+    <div className={CLASSES.CONTACT_SECTION}>
+      {entity.email && (
+        <div className={CLASSES.INFO_ROW_CENTER}>
+          <Mail className={`${ICON_SIZES.REGULAR} ${CLASSES.ICON_MUTED_CENTER}`} />
+          <a href={`mailto:${entity.email}`} className={CLASSES.LINK}>
+            {entity.email}
+          </a>
+        </div>
+      )}
+      {entity.telefone && (
+        <div className={CLASSES.INFO_ROW_CENTER}>
+          <Phone className={`${ICON_SIZES.REGULAR} ${CLASSES.ICON_MUTED_CENTER}`} />
+          <a href={`tel:${entity.telefone}`} className={CLASSES.LINK}>
+            {entity.telefone}
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Website info
+ */
+interface WebsiteInfoProps {
+  entity: EntityData;
+}
+
+function WebsiteInfo({ entity }: WebsiteInfoProps) {
+  const siteUrl = useMemo(() => getSiteUrl(entity), [entity]);
+
+  if (!siteUrl) return null;
+
+  return (
+    <div className={CLASSES.INFO_ROW_CENTER}>
+      <Globe className={`${ICON_SIZES.REGULAR} ${CLASSES.ICON_MUTED_CENTER}`} />
+      <a href={siteUrl} target="_blank" rel="noopener noreferrer" className={CLASSES.LINK}>
+        {siteUrl}
+      </a>
+    </div>
+  );
+}
+
+/**
+ * Tags info
+ */
+interface TagsInfoProps {
+  entity: EntityData;
+}
+
+function TagsInfo({ entity }: TagsInfoProps) {
+  if (!entity.tags || entity.tags.length === 0) return null;
+
+  return (
+    <div className={CLASSES.INFO_ROW}>
+      <Tag className={`${ICON_SIZES.REGULAR} ${CLASSES.ICON_MUTED}`} />
+      <div>
+        <p className={CLASSES.INFO_LABEL}>{LABELS.TAGS}</p>
+        <div className={CLASSES.BADGES_WRAP}>
+          {entity.tags.map((tag) => (
+            <Badge
+              key={tag.id}
+              variant="outline"
+              style={{ borderColor: tag.color, color: tag.color }}
+            >
+              {tag.name}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Statistics info
+ */
+interface StatsInfoProps {
+  entity: EntityData;
+}
+
+function StatsInfo({ entity }: StatsInfoProps) {
+  if (!entity.stats) return null;
+
+  return (
+    <div className={CLASSES.STATS_GRID}>
+      <div>
+        <p className={CLASSES.STAT_LABEL}>{LABELS.CLIENTS}</p>
+        <p className={CLASSES.STAT_VALUE}>{entity.stats.totalClientes || 0}</p>
+      </div>
+      <div>
+        <p className={CLASSES.STAT_LABEL}>{LABELS.COMPETITORS}</p>
+        <p className={CLASSES.STAT_VALUE}>{entity.stats.totalConcorrentes || 0}</p>
+      </div>
+      <div>
+        <p className={CLASSES.STAT_LABEL}>{LABELS.LEADS}</p>
+        <p className={CLASSES.STAT_VALUE}>{entity.stats.totalLeads || 0}</p>
+      </div>
+      <div>
+        <p className={CLASSES.STAT_LABEL}>{LABELS.PRODUCTS}</p>
+        <p className={CLASSES.STAT_VALUE}>{entity.stats.totalProdutos || 0}</p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Client info (for products)
+ */
+interface ClientInfoProps {
+  entity: EntityData;
+}
+
+function ClientInfo({ entity }: ClientInfoProps) {
+  if (!entity.cliente) return null;
+
+  return (
+    <div className={CLASSES.INFO_ROW}>
+      <Users className={`${ICON_SIZES.REGULAR} ${CLASSES.ICON_MUTED}`} />
+      <div>
+        <p className={CLASSES.INFO_LABEL}>{LABELS.CLIENT}</p>
+        <p className={CLASSES.INFO_VALUE}>{entity.cliente.nome}</p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Action buttons
+ */
+interface ActionButtonsProps {
+  entity: EntityData;
+  entityType: EntityType;
+  entityId: number;
+  onNavigate: () => void;
+  onOpenMaps: () => void;
+}
+
+function ActionButtons({ entity, onNavigate, onOpenMaps }: ActionButtonsProps) {
+  const showMapsButton = useMemo(() => hasCoordinates(entity), [entity]);
+
+  return (
+    <div className={CLASSES.ACTIONS_CONTAINER}>
+      <Button onClick={onNavigate} className={CLASSES.BUTTON_FULL}>
+        <ExternalLink className={`${ICON_SIZES.REGULAR} mr-2`} />
+        {LABELS.VIEW_DETAILS}
+      </Button>
+      {showMapsButton && (
+        <Button onClick={onOpenMaps} variant="outline">
+          <Navigation className={`${ICON_SIZES.REGULAR} mr-2`} />
+          {LABELS.OPEN_IN_MAPS}
+        </Button>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+/**
+ * Entity details popup card
+ */
 export default function EntityPopupCard({
   isOpen,
   onClose,
@@ -120,28 +599,33 @@ export default function EntityPopupCard({
 }: EntityPopupCardProps) {
   const [, setLocation] = useLocation();
 
-  // Buscar detalhes da entidade
+  // ============================================================================
+  // QUERIES
+  // ============================================================================
+
   const { data: entity, isLoading } = trpc.unifiedMap.getEntityDetails.useQuery(
     { entityType, entityId },
     { enabled: isOpen }
   );
 
-  const config = ENTITY_CONFIG[entityType];
-  const Icon = config.icon;
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const config = useMemo(() => ENTITY_CONFIG[entityType], [entityType]);
+
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
 
   const handleNavigateToDetails = useCallback(() => {
-    // Navegar para página de detalhes específica
     switch (entityType) {
       case 'mercado':
-        setLocation(`/mercados/${entityId}`);
+        setLocation(ROUTES.MERCADO(entityId));
         break;
       case 'cliente':
       case 'concorrente':
       case 'lead':
-        // Abrir modal de detalhes (DetailPopup)
-        // Por enquanto apenas fecha
-        onClose();
-        break;
       case 'produto':
         onClose();
         break;
@@ -150,234 +634,52 @@ export default function EntityPopupCard({
 
   const handleOpenInMaps = useCallback(() => {
     if (entity?.latitude && entity?.longitude) {
-      window.open(
-        `https://www.google.com/maps/search/?api=1&query=${entity.latitude},${entity.longitude}`,
-        '_blank'
-      );
+      const url = buildGoogleMapsUrl(entity.latitude, entity.longitude);
+      window.open(url, '_blank');
     }
   }, [entity]);
 
+  // ============================================================================
+  // RENDER
+  // ============================================================================
+
   if (isLoading) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <Skeleton className="h-6 w-48" />
-            <Skeleton className="h-4 w-32" />
-          </DialogHeader>
-          <div className="space-y-4">
-            <Skeleton className="h-20 w-full" />
-            <Skeleton className="h-20 w-full" />
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
+    return <LoadingSkeleton isOpen={isOpen} onClose={onClose} />;
   }
 
   if (!entity) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Erro</DialogTitle>
-            <DialogDescription>
-              Não foi possível carregar os detalhes da entidade.
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    );
+    return <ErrorState isOpen={isOpen} onClose={onClose} />;
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className={CLASSES.DIALOG_CONTENT}>
         <DialogHeader>
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${config.bgColor}`}>
-              <Icon className={`w-6 h-6 ${config.color}`} />
-            </div>
-            <div className="flex-1">
-              <DialogTitle className="text-xl">{entity.nome}</DialogTitle>
-              <DialogDescription className="flex items-center gap-2 mt-1">
-                <Badge variant="outline">{config.label}</Badge>
-                {entity.qualidadeScore && (
-                  <Badge variant={getQualityVariant(entity.qualidadeScore)}>
-                    <Star className="w-3 h-3 mr-1" />
-                    {entity.qualidadeScore}
-                  </Badge>
-                )}
-              </DialogDescription>
-            </div>
-          </div>
+          <EntityHeader entity={entity} config={config} />
         </DialogHeader>
 
         <Separator />
 
-        {/* Informações específicas por tipo */}
-        <div className="space-y-4">
-          {/* Localização */}
-          {(entity.cidade || entity.uf) && (
-            <div className="flex items-start gap-2">
-              <MapPin className="w-4 h-4 mt-0.5 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Localização</p>
-                <p className="text-sm text-muted-foreground">
-                  {entity.cidade}, {entity.uf}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Mercado (para clientes, concorrentes, leads) */}
-          {entity.mercado && (
-            <div className="flex items-start gap-2">
-              <Building className="w-4 h-4 mt-0.5 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Mercado</p>
-                <p className="text-sm text-muted-foreground">{entity.mercado.nome}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Mercados (para clientes - múltiplos) */}
-          {entity.mercados && entity.mercados.length > 0 && (
-            <div className="flex items-start gap-2">
-              <Building className="w-4 h-4 mt-0.5 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Mercados</p>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {(entity.mercados as Mercado[]).map((m) => (
-                    <Badge key={m.mercadoId} variant="outline" className="text-xs">
-                      {m.mercadoNome}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Contato */}
-          {(entity.email || entity.telefone) && (
-            <div className="space-y-2">
-              {entity.email && (
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-muted-foreground" />
-                  <a
-                    href={`mailto:${entity.email}`}
-                    className="text-sm text-blue-600 hover:underline"
-                  >
-                    {entity.email}
-                  </a>
-                </div>
-              )}
-              {entity.telefone && (
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-muted-foreground" />
-                  <a
-                    href={`tel:${entity.telefone}`}
-                    className="text-sm text-blue-600 hover:underline"
-                  >
-                    {entity.telefone}
-                  </a>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Site */}
-          {(entity.site || entity.siteOficial) && (
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-muted-foreground" />
-              <a
-                href={entity.site || entity.siteOficial}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-blue-600 hover:underline"
-              >
-                {entity.site || entity.siteOficial}
-              </a>
-            </div>
-          )}
-
-          {/* Tags */}
-          {entity.tags && entity.tags.length > 0 && (
-            <div className="flex items-start gap-2">
-              <Tag className="w-4 h-4 mt-0.5 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Tags</p>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {(entity.tags as TagData[]).map((tag) => (
-                    <Badge
-                      key={tag.id}
-                      variant="outline"
-                      style={{ borderColor: tag.color, color: tag.color }}
-                    >
-                      {tag.name}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Estatísticas (para mercados) */}
-          {entity.stats && (
-            <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
-              <div>
-                <p className="text-xs text-muted-foreground">Clientes</p>
-                <p className="text-lg font-semibold">
-                  {(entity.stats as EntityStats).totalClientes || 0}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Concorrentes</p>
-                <p className="text-lg font-semibold">
-                  {(entity.stats as EntityStats).totalConcorrentes || 0}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Leads</p>
-                <p className="text-lg font-semibold">
-                  {(entity.stats as EntityStats).totalLeads || 0}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Produtos</p>
-                <p className="text-lg font-semibold">
-                  {(entity.stats as EntityStats).totalProdutos || 0}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Cliente (para produtos) */}
-          {entity.cliente && (
-            <div className="flex items-start gap-2">
-              <Users className="w-4 h-4 mt-0.5 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Cliente</p>
-                <p className="text-sm text-muted-foreground">{entity.cliente.nome}</p>
-              </div>
-            </div>
-          )}
+        <div className={CLASSES.CONTENT}>
+          <LocationInfo entity={entity} />
+          <MarketInfo entity={entity} />
+          <MarketsInfo entity={entity} />
+          <ContactInfo entity={entity} />
+          <WebsiteInfo entity={entity} />
+          <TagsInfo entity={entity} />
+          <StatsInfo entity={entity} />
+          <ClientInfo entity={entity} />
         </div>
 
         <Separator />
 
-        {/* Ações */}
-        <div className="flex gap-2">
-          <Button onClick={handleNavigateToDetails} className="flex-1">
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Ver Detalhes
-          </Button>
-          {entity.latitude && entity.longitude && (
-            <Button onClick={handleOpenInMaps} variant="outline">
-              <Navigation className="w-4 h-4 mr-2" />
-              Abrir no Maps
-            </Button>
-          )}
-        </div>
+        <ActionButtons
+          entity={entity}
+          entityType={entityType}
+          entityId={entityId}
+          onNavigate={handleNavigateToDetails}
+          onOpenMaps={handleOpenInMaps}
+        />
       </DialogContent>
     </Dialog>
   );
