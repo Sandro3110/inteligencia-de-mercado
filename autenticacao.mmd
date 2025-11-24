@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant Usuário
+    participant Frontend (React)
+    participant Backend (tRPC)
+    participant Database (SQLite)
+
+    Usuário->>Frontend (React): Acessa /login
+    Frontend (React)->>Usuário: Renderiza formulário de login
+
+    Usuário->>Frontend (React): Preenche email e senha
+    Frontend (React)->>Backend (tRPC): Envia requisição `auth.login`
+
+    Backend (tRPC)->>Database (SQLite): Busca usuário por email
+    Database (SQLite)-->>Backend (tRPC): Retorna dados do usuário
+
+    alt Usuário encontrado e senha correta
+        Backend (tRPC)->>Backend (tRPC): Gera token JWT
+        Backend (tRPC)->>Frontend (React): Retorna token e dados do usuário
+        Frontend (React)->>Usuário: Armazena token e redireciona para dashboard
+    else Usuário não encontrado ou senha incorreta
+        Backend (tRPC)->>Frontend (React): Retorna erro de autenticação
+        Frontend (React)->>Usuário: Exibe mensagem de erro
+    end

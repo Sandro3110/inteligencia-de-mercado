@@ -1,0 +1,26 @@
+direction: right
+
+Usuário: {
+  shape: person
+}
+
+Cloudflare: {
+  shape: cloud
+}
+
+Vercel: {
+  shape: hexagon
+}
+
+Railway: {
+  shape: hexagon
+}
+
+Resend: {
+  shape: hexagon
+}
+
+Usuário -> Cloudflare: "Acessa intelmarket.app"
+Cloudflare -> Vercel: "Serve frontend estático"
+Vercel -> Railway: "Requisições tRPC API"
+Railway -> Resend: "Envio de emails transacionais"

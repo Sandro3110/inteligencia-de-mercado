@@ -1,0 +1,25 @@
+graph TD
+    subgraph "Frontend (Vercel)"
+        A[React + Vite] --> B{tRPC Client};
+        B --> C[UI Components];
+        C --> D[Páginas e Rotas];
+    end
+
+    subgraph "Backend (Railway)"
+        E{tRPC Server} --> F[Express.js];
+        F --> G{Prisma ORM};
+        G --> H[(SQLite Database)];
+    end
+
+    subgraph "Serviços Externos"
+        I[Resend API];
+    end
+
+    B -- Requisições API --> E;
+    E -- Respostas API --> B;
+    F -- Envio de Emails --> I;
+
+    style A fill:#61DAFB,stroke:#000,stroke-width:2px
+    style E fill:#339933,stroke:#000,stroke-width:2px
+    style H fill:#f29111,stroke:#000,stroke-width:2px
+    style I fill:#e63946,stroke:#000,stroke-width:2px

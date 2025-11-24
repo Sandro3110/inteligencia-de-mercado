@@ -12,11 +12,15 @@ export function useAuth(options?: UseAuthOptions) {
   const { redirectOnUnauthenticated = false, redirectPath = "/login" } =
     options ?? {};
   const utils = trpc.useUtils();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+
+  // Não fazer query em rotas públicas
+  const isPublicRoute = location === "/login" || location === "/register";
 
   const meQuery = trpc.auth.me.useQuery(undefined, {
     retry: false,
     refetchOnWindowFocus: false,
+    enabled: !isPublicRoute, // Desabilitar query em rotas públicas
     // Tratar erro UNAUTHORIZED como estado válido (não autenticado)
     onError: (error) => {
       if (error.data?.code === "UNAUTHORIZED") {
