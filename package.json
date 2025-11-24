@@ -54,7 +54,7 @@
     "@types/react-grid-layout": "^1.3.6",
     "axios": "^1.12.0",
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^12.4.1",
+
     "canvas": "^3.2.0",
     "chart.js": "^4.5.1",
     "class-variance-authority": "^0.7.1",
@@ -150,9 +150,6 @@
       "react-joyride>react-dom": "$react-dom",
       "react-floater>react": "$react",
       "react-floater>react-dom": "$react-dom"
-    },
-    "onlyBuiltDependencies": [
-      "better-sqlite3"
-    ]
+    }
   }
 }
