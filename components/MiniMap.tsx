@@ -10,11 +10,7 @@ import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { MapPin, ExternalLink, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Link } from 'wouter';
 
 // ============================================================================
@@ -85,10 +81,10 @@ interface MiniMapProps {
 interface GoogleMapsWindow extends Window {
   google?: {
     maps?: {
-      Map: new (element: HTMLElement, options: any) => any;
-      Marker: new (options: any) => any;
+      Map: new (element: HTMLElement, options: google.maps.MapOptions) => google.maps.Map;
+      Marker: new (options: google.maps.MarkerOptions) => google.maps.Marker;
       SymbolPath: {
-        CIRCLE: any;
+        CIRCLE: google.maps.SymbolPath;
       };
     };
   };
@@ -101,9 +97,7 @@ declare const window: GoogleMapsWindow;
 // ============================================================================
 
 function isValidCoordinate(value: number | null | undefined): value is number {
-  return (
-    value !== null && value !== undefined && !isNaN(value) && isFinite(value)
-  );
+  return value !== null && value !== undefined && !isNaN(value) && isFinite(value);
 }
 
 function hasValidCoordinates(
