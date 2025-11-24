@@ -1,21 +1,143 @@
 'use client';
 
-import { useState, useEffect, useRef } from "react";
-import { trpc } from "@/lib/trpc/client";
-import { useSelectedProject } from "@/hooks/useSelectedProject";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Search, Building2, Users, Target, TrendingUp } from "lucide-react";
-import { useLocation } from "wouter";
-import Fuse from "fuse.js";
+/**
+ * GlobalSearch - Busca Global do Sistema
+ * Busca unificada por mercados, clientes, concorrentes e leads
+ */
+
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { trpc } from '@/lib/trpc/client';
+import { useSelectedProject } from '@/hooks/useSelectedProject';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+  Search,
+  Building2,
+  Users,
+  Target,
+  TrendingUp,
+  type LucideIcon,
+} from 'lucide-react';
+import { useLocation } from 'wouter';
+import Fuse from 'fuse.js';
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const SEARCH_CONFIG = {
+  LIMIT: 50,
+  MIN_QUERY_LENGTH: 1,
+  FUZZY_THRESHOLD: 0.3,
+  FUZZY_MIN_LENGTH: 3,
+  FOCUS_DELAY: 100,
+} as const;
+
+const SEARCH_KEYS = ['title', 'subtitle'] as const;
+
+const PLACEHOLDERS = {
+  INPUT: 'Buscar mercados, clientes, concorrentes, leads...',
+  EMPTY_STATE: 'Digite para buscar...',
+  EMPTY_SUBTITLE: 'Mercados, clientes, concorrentes e leads',
+  NO_RESULTS: 'Nenhum resultado encontrado',
+  NO_RESULTS_HINT: 'Tente buscar por nome, CNPJ ou email',
+} as const;
+
+const KEYBOARD_HINTS = {
+  NAVIGATE: 'Navegar',
+  SELECT: 'Selecionar',
+  CLOSE: 'Fechar',
+} as const;
+
+const KEYBOARD_KEYS = {
+  UP: '↑↓',
+  ENTER: 'Enter',
+  ESC: 'Esc',
+} as const;
+
+const ENTITY_TYPES = {
+  MERCADO: 'mercado',
+  CLIENTE: 'cliente',
+  CONCORRENTE: 'concorrente',
+  LEAD: 'lead',
+} as const;
+
+const TYPE_LABELS: Record<string, string> = {
+  [ENTITY_TYPES.MERCADO]: 'Mercado',
+  [ENTITY_TYPES.CLIENTE]: 'Cliente',
+  [ENTITY_TYPES.CONCORRENTE]: 'Concorrente',
+  [ENTITY_TYPES.LEAD]: 'Lead',
+};
+
+const TYPE_ROUTES: Record<string, (id: number) => string> = {
+  [ENTITY_TYPES.MERCADO]: (id) => `/mercado/${id}`,
+  [ENTITY_TYPES.CLIENTE]: () => '/',
+  [ENTITY_TYPES.CONCORRENTE]: () => '/',
+  [ENTITY_TYPES.LEAD]: () => '/',
+};
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 interface GlobalSearchProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+interface SearchResult {
+  id: number;
+  type: string;
+  title: string;
+  subtitle?: string;
+}
+
+type GroupedResults = Record<string, SearchResult[]>;
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function getTypeIcon(type: string): LucideIcon {
+  switch (type) {
+    case ENTITY_TYPES.MERCADO:
+      return Building2;
+    case ENTITY_TYPES.CLIENTE:
+      return Users;
+    case ENTITY_TYPES.CONCORRENTE:
+      return Target;
+    case ENTITY_TYPES.LEAD:
+      return TrendingUp;
+    default:
+      return Search;
+  }
+}
+
+function getTypeLabel(type: string): string {
+  return TYPE_LABELS[type] || type;
+}
+
+function getTypeRoute(type: string, id: number): string {
+  const routeFn = TYPE_ROUTES[type];
+  return routeFn ? routeFn(id) : '/';
+}
+
+function groupResultsByType(results: SearchResult[]): GroupedResults {
+  return results.reduce((acc, result) => {
+    if (!acc[result.type]) {
+      acc[result.type] = [];
+    }
+    acc[result.type].push(result);
+    return acc;
+  }, {} as GroupedResults);
+}
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
 export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [, setLocation] = useLocation();
   const { selectedProjectId } = useSelectedProject();
@@ -25,36 +147,97 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     {
       query,
       projectId: selectedProjectId || undefined,
-      limit: 50,
+      limit: SEARCH_CONFIG.LIMIT,
     },
-    { enabled: query.length > 0 }
+    { enabled: query.length >= SEARCH_CONFIG.MIN_QUERY_LENGTH }
   );
 
-  // Fuzzy search local para melhorar resultados
-  const fuse = new Fuse(results, {
-    keys: ["title", "subtitle"],
-    threshold: 0.3,
-    includeScore: true,
-  });
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
 
-  const filteredResults =
-    query.length > 0
-      ? query.length > 2
-        ? fuse.search(query).map(r => r.item)
-        : results
-      : [];
-
-  // Agrupar por tipo
-  const groupedResults = filteredResults.reduce(
-    (acc, result) => {
-      if (!acc[result.type]) {
-        acc[result.type] = [];
-      }
-      acc[result.type].push(result);
-      return acc;
-    },
-    {} as Record<string, typeof results>
+  const fuse = useMemo(
+    () =>
+      new Fuse(results, {
+        keys: [...SEARCH_KEYS],
+        threshold: SEARCH_CONFIG.FUZZY_THRESHOLD,
+        includeScore: true,
+      }),
+    [results]
   );
+
+  const filteredResults = useMemo(() => {
+    if (query.length === 0) return [];
+    if (query.length < SEARCH_CONFIG.FUZZY_MIN_LENGTH) return results;
+    return fuse.search(query).map((r) => r.item);
+  }, [query, results, fuse]);
+
+  const groupedResults = useMemo(
+    () => groupResultsByType(filteredResults),
+    [filteredResults]
+  );
+
+  const hasResults = useMemo(
+    () => filteredResults.length > 0,
+    [filteredResults.length]
+  );
+
+  const showEmptyState = useMemo(() => query.length === 0, [query.length]);
+
+  const showNoResults = useMemo(
+    () => !isLoading && query.length > 0 && !hasResults,
+    [isLoading, query.length, hasResults]
+  );
+
+  const showLoading = useMemo(
+    () => isLoading && query.length > 0,
+    [isLoading, query.length]
+  );
+
+  const resultsCountLabel = useMemo(
+    () => `${filteredResults.length} resultados`,
+    [filteredResults.length]
+  );
+
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
+  const handleSelect = useCallback(
+    (result: SearchResult) => {
+      onOpenChange(false);
+      setQuery('');
+      const route = getTypeRoute(result.type, result.id);
+      setLocation(route);
+    },
+    [onOpenChange, setLocation]
+  );
+
+  const handleQueryChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setQuery(e.target.value);
+    },
+    []
+  );
+
+  const handleNavigateDown = useCallback(() => {
+    setSelectedIndex((prev) => Math.min(prev + 1, filteredResults.length - 1));
+  }, [filteredResults.length]);
+
+  const handleNavigateUp = useCallback(() => {
+    setSelectedIndex((prev) => Math.max(prev - 1, 0));
+  }, []);
+
+  const handleSelectCurrent = useCallback(() => {
+    const currentResult = filteredResults[selectedIndex];
+    if (currentResult) {
+      handleSelect(currentResult);
+    }
+  }, [filteredResults, selectedIndex, handleSelect]);
+
+  // ============================================================================
+  // EFFECTS
+  // ============================================================================
 
   // Reset selected index quando resultados mudam
   useEffect(() => {
@@ -64,7 +247,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   // Focus input quando abrir
   useEffect(() => {
     if (open && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 100);
+      setTimeout(() => inputRef.current?.focus(), SEARCH_CONFIG.FOCUS_DELAY);
     }
   }, [open]);
 
@@ -73,71 +256,138 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     if (!open) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowDown") {
+      if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setSelectedIndex(prev =>
-          Math.min(prev + 1, filteredResults.length - 1)
-        );
-      } else if (e.key === "ArrowUp") {
+        handleNavigateDown();
+      } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setSelectedIndex(prev => Math.max(prev - 1, 0));
-      } else if (e.key === "Enter" && filteredResults[selectedIndex]) {
+        handleNavigateUp();
+      } else if (e.key === 'Enter') {
         e.preventDefault();
-        handleSelect(filteredResults[selectedIndex]);
+        handleSelectCurrent();
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open, selectedIndex, filteredResults]);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open, handleNavigateDown, handleNavigateUp, handleSelectCurrent]);
 
-  const handleSelect = (result: (typeof results)[0]) => {
-    onOpenChange(false);
-    setQuery("");
+  // ============================================================================
+  // RENDER HELPERS
+  // ============================================================================
 
-    // Navegar para a entidade selecionada
-    switch (result.type) {
-      case "mercado":
-        setLocation(`/mercado/${result.id}`);
-        break;
-      case "cliente":
-      case "concorrente":
-      case "lead":
-        // Por enquanto volta para home, pode ser melhorado
-        setLocation("/");
-        break;
-    }
-  };
+  const renderIcon = useCallback((type: string) => {
+    const Icon = getTypeIcon(type);
+    return <Icon className="h-4 w-4" />;
+  }, []);
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case "mercado":
-        return <Building2 className="h-4 w-4" />;
-      case "cliente":
-        return <Users className="h-4 w-4" />;
-      case "concorrente":
-        return <Target className="h-4 w-4" />;
-      case "lead":
-        return <TrendingUp className="h-4 w-4" />;
-      default:
-        return <Search className="h-4 w-4" />;
-    }
-  };
+  const renderEmptyState = useCallback(
+    () => (
+      <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+        <Search className="h-12 w-12 mb-2 opacity-50" />
+        <p className="text-sm">{PLACEHOLDERS.EMPTY_STATE}</p>
+        <p className="text-xs mt-1">{PLACEHOLDERS.EMPTY_SUBTITLE}</p>
+      </div>
+    ),
+    []
+  );
 
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case "mercado":
-        return "Mercado";
-      case "cliente":
-        return "Cliente";
-      case "concorrente":
-        return "Concorrente";
-      case "lead":
-        return "Lead";
-      default:
-        return type;
-    }
-  };
+  const renderNoResults = useCallback(
+    () => (
+      <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+        <Search className="h-12 w-12 mb-2 opacity-50" />
+        <p className="text-sm">{PLACEHOLDERS.NO_RESULTS}</p>
+        <p className="text-xs mt-1">{PLACEHOLDERS.NO_RESULTS_HINT}</p>
+      </div>
+    ),
+    []
+  );
+
+  const renderLoading = useCallback(
+    () => (
+      <div className="flex items-center justify-center py-8 text-muted-foreground">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+      </div>
+    ),
+    []
+  );
+
+  const renderResult = useCallback(
+    (result: SearchResult, isSelected: boolean) => (
+      <button
+        key={`${result.type}-${result.id}`}
+        onClick={() => handleSelect(result)}
+        className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
+          isSelected
+            ? 'bg-accent text-accent-foreground'
+            : 'hover:bg-accent/50'
+        }`}
+      >
+        <div className="flex-shrink-0 text-muted-foreground">
+          {renderIcon(result.type)}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-medium text-sm truncate">{result.title}</div>
+          {result.subtitle && (
+            <div className="text-xs text-muted-foreground truncate">
+              {result.subtitle}
+            </div>
+          )}
+        </div>
+      </button>
+    ),
+    [handleSelect, renderIcon]
+  );
+
+  const renderGroupedResults = useCallback(
+    () =>
+      Object.entries(groupedResults).map(([type, items]) => (
+        <div key={type} className="mb-4">
+          <div className="px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            {getTypeLabel(type)} ({items.length})
+          </div>
+          {items.map((result) => {
+            const globalIndex = filteredResults.indexOf(result);
+            const isSelected = globalIndex === selectedIndex;
+            return renderResult(result, isSelected);
+          })}
+        </div>
+      )),
+    [groupedResults, filteredResults, selectedIndex, renderResult]
+  );
+
+  const renderFooter = useCallback(
+    () => (
+      <div className="border-t px-4 py-2 text-xs text-muted-foreground flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+              {KEYBOARD_KEYS.UP}
+            </kbd>
+            {KEYBOARD_HINTS.NAVIGATE}
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+              {KEYBOARD_KEYS.ENTER}
+            </kbd>
+            {KEYBOARD_HINTS.SELECT}
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+              {KEYBOARD_KEYS.ESC}
+            </kbd>
+            {KEYBOARD_HINTS.CLOSE}
+          </span>
+        </div>
+        <span>{resultsCountLabel}</span>
+      </div>
+    ),
+    [resultsCountLabel]
+  );
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -147,104 +397,23 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
           <Search className="h-5 w-5 text-muted-foreground mr-3" />
           <Input
             ref={inputRef}
-            placeholder="Buscar mercados, clientes, concorrentes, leads..."
+            placeholder={PLACEHOLDERS.INPUT}
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={handleQueryChange}
             className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
           />
         </div>
 
         {/* Results */}
         <div className="max-h-[400px] overflow-y-auto p-2">
-          {isLoading && query.length > 0 && (
-            <div className="flex items-center justify-center py-8 text-muted-foreground">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            </div>
-          )}
-
-          {!isLoading && query.length > 0 && filteredResults.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-              <Search className="h-12 w-12 mb-2 opacity-50" />
-              <p className="text-sm">Nenhum resultado encontrado</p>
-              <p className="text-xs mt-1">
-                Tente buscar por nome, CNPJ ou email
-              </p>
-            </div>
-          )}
-
-          {query.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-              <Search className="h-12 w-12 mb-2 opacity-50" />
-              <p className="text-sm">Digite para buscar...</p>
-              <p className="text-xs mt-1">
-                Mercados, clientes, concorrentes e leads
-              </p>
-            </div>
-          )}
-
-          {Object.entries(groupedResults).map(([type, items]) => (
-            <div key={type} className="mb-4">
-              <div className="px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {getTypeLabel(type)} ({items.length})
-              </div>
-              {items.map((result, index) => {
-                const globalIndex = filteredResults.indexOf(result);
-                const isSelected = globalIndex === selectedIndex;
-
-                return (
-                  <button
-                    key={`${result.type}-${result.id}`}
-                    onClick={() => handleSelect(result)}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
-                      isSelected
-                        ? "bg-accent text-accent-foreground"
-                        : "hover:bg-accent/50"
-                    }`}
-                  >
-                    <div className="flex-shrink-0 text-muted-foreground">
-                      {getIcon(result.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm truncate">
-                        {result.title}
-                      </div>
-                      {result.subtitle && (
-                        <div className="text-xs text-muted-foreground truncate">
-                          {result.subtitle}
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
+          {showLoading && renderLoading()}
+          {showNoResults && renderNoResults()}
+          {showEmptyState && renderEmptyState()}
+          {hasResults && renderGroupedResults()}
         </div>
 
         {/* Footer */}
-        {filteredResults.length > 0 && (
-          <div className="border-t px-4 py-2 text-xs text-muted-foreground flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">↑↓</kbd>
-                Navegar
-              </span>
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
-                  Enter
-                </kbd>
-                Selecionar
-              </span>
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
-                  Esc
-                </kbd>
-                Fechar
-              </span>
-            </div>
-            <span>{filteredResults.length} resultados</span>
-          </div>
-        )}
+        {hasResults && renderFooter()}
       </DialogContent>
     </Dialog>
   );
