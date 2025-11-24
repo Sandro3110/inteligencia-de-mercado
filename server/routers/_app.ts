@@ -5,30 +5,36 @@
 
 import { createTRPCRouter } from '@/lib/trpc/server';
 
-// Importar routers
+// Importar todos os routers
 import { authRouter } from './auth';
-// import { usersRouter } from './users';
-// import { geocodingRouter } from './geocoding';
-// import { territorialRouter } from './territorial';
-// import { reportsRouter } from './reports';
-// import { exportRouter } from './export';
-// import { unifiedMapRouter } from './unifiedMap';
-// import { emailConfigRouter } from './emailConfig';
+import { usersRouter } from './users';
+import { geocodingRouter } from './geocoding';
+import { territorialRouter } from './territorial';
+import { reportsRouter } from './reports';
+import { exportRouter } from './export';
+import { unifiedMapRouter } from './unifiedMap';
+import { emailConfigRouter } from './emailConfig';
 
 /**
  * Router raiz da aplicação
  * Todos os routers são agregados aqui
  */
 export const appRouter = createTRPCRouter({
-  // Auth router
+  // Autenticação e usuários
   auth: authRouter,
-  // users: usersRouter,
-  // geocoding: geocodingRouter,
-  // territorial: territorialRouter,
-  // reports: reportsRouter,
-  // export: exportRouter,
-  // unifiedMap: unifiedMapRouter,
-  // emailConfig: emailConfigRouter,
+  users: usersRouter,
+
+  // Geocodificação e mapas
+  geocoding: geocodingRouter,
+  territorial: territorialRouter,
+  unifiedMap: unifiedMapRouter,
+
+  // Relatórios e exportação
+  reports: reportsRouter,
+  export: exportRouter,
+
+  // Configurações
+  emailConfig: emailConfigRouter,
 });
 
 /**
