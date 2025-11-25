@@ -33,7 +33,7 @@ export async function login(formData: FormData) {
   const result = loginSchema.safeParse({ email, password });
   if (!result.success) {
     return {
-      error: result.error.errors[0].message,
+      error: result.error.issues[0].message,
     };
   }
 
@@ -66,7 +66,7 @@ export async function register(formData: FormData) {
   const result = registerSchema.safeParse({ email, password, name });
   if (!result.success) {
     return {
-      error: result.error.errors[0].message,
+      error: result.error.issues[0].message,
     };
   }
 

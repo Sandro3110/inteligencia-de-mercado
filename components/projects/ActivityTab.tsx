@@ -104,8 +104,8 @@ interface ProjectWithActivity {
   nome: string;
   status: string;
   hasWarning: boolean;
-  daysSinceActivity?: number;
-  lastActivityAt?: string;
+  daysSinceActivity?: number | null;
+  lastActivityAt?: string | Date | null;
 }
 
 interface ActivityData {

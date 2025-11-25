@@ -3,6 +3,7 @@
  * Functions to generate badges for status, stages, and change types
  */
 
+import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import {
   STATUS_CONFIG,
@@ -22,7 +23,7 @@ import type { ValidationStatus, LeadStage, ChangeType } from '../types';
  * @param status - The validation status
  * @returns Badge component with appropriate styling and icon
  */
-export function getStatusBadge(status?: string): JSX.Element {
+export function getStatusBadge(status?: string | null): React.ReactElement {
   const validStatus = (status || 'default') as ValidationStatus | 'default';
   const config = STATUS_CONFIG[validStatus] || STATUS_CONFIG.default;
   const Icon = config.icon;
@@ -45,7 +46,7 @@ export function getStatusBadge(status?: string): JSX.Element {
  * @param stage - The lead stage
  * @returns Badge component with appropriate styling
  */
-export function getLeadStageBadge(stage?: string): JSX.Element | null {
+export function getLeadStageBadge(stage?: string): React.ReactElement | null {
   if (!stage) return null;
 
   const validStage = stage as LeadStage;
@@ -72,7 +73,7 @@ export function getLeadStageBadge(stage?: string): JSX.Element | null {
  * @param changeType - The type of change
  * @returns Icon component with appropriate styling
  */
-export function getChangeIcon(changeType?: string): JSX.Element {
+export function getChangeIcon(changeType?: string | null): React.ReactElement {
   const validChangeType = (changeType || 'default') as ChangeType | 'default';
   const config = CHANGE_TYPE_CONFIG[validChangeType] || CHANGE_TYPE_CONFIG.default;
   const Icon = config.icon;
@@ -90,7 +91,7 @@ export function getChangeIcon(changeType?: string): JSX.Element {
  * @param score - The quality score (0-100)
  * @returns Badge component with score
  */
-export function getQualityScoreBadge(score?: number): JSX.Element | null {
+export function getQualityScoreBadge(score?: number | null): React.ReactElement | null {
   if (score === undefined || score === null) return null;
 
   return (
@@ -110,7 +111,7 @@ export function getQualityScoreBadge(score?: number): JSX.Element | null {
  * @param count - The number of products
  * @returns Badge component with product count
  */
-export function getProductsCountBadge(count: number): JSX.Element | null {
+export function getProductsCountBadge(count: number): React.ReactElement | null {
   if (count === 0) return null;
 
   return (
@@ -130,7 +131,7 @@ export function getProductsCountBadge(count: number): JSX.Element | null {
  * @param segmentation - The segmentation value
  * @returns Badge component with segmentation
  */
-export function getSegmentationBadge(segmentation?: string): JSX.Element | null {
+export function getSegmentationBadge(segmentation?: string | null): React.ReactElement | null {
   if (!segmentation) return null;
 
   return (

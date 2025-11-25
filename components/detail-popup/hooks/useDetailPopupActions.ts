@@ -139,14 +139,14 @@ export function useDetailPopupActions(
   // ============================================================================
 
   const isValidating =
-    validateClienteMutation.isLoading ||
-    validateConcorrenteMutation.isLoading ||
-    validateLeadMutation.isLoading;
+    validateClienteMutation.isPending ||
+    validateConcorrenteMutation.isPending ||
+    validateLeadMutation.isPending;
 
   const isDiscarding =
-    validateClienteMutation.isLoading ||
-    validateConcorrenteMutation.isLoading ||
-    validateLeadMutation.isLoading;
+    validateClienteMutation.isPending ||
+    validateConcorrenteMutation.isPending ||
+    validateLeadMutation.isPending;
 
   // ============================================================================
   // RETURN

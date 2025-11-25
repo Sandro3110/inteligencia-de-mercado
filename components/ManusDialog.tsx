@@ -168,10 +168,10 @@ export function ManusDialog({
   // ============================================================================
 
   useEffect(() => {
-    if (!isControlled) {
+    if (!isControlled && internalOpen !== open) {
       setInternalOpen(open);
     }
-  }, [open, isControlled]);
+  }, [open, isControlled, internalOpen]);
 
   // ============================================================================
   // RENDER

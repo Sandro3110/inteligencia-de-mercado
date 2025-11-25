@@ -68,8 +68,8 @@ export async function trackMercadoChanges(
   const records = changes.map((change) => ({
     mercadoId,
     field: change.field,
-    oldValue: change.oldValue,
-    newValue: change.newValue,
+    oldValue: String(change.oldValue ?? ''),
+    newValue: String(change.newValue ?? ''),
     changeType,
     changedBy,
   }));
@@ -95,8 +95,8 @@ export async function trackClienteChanges(
   const records = changes.map((change) => ({
     clienteId,
     field: change.field,
-    oldValue: change.oldValue,
-    newValue: change.newValue,
+    oldValue: String(change.oldValue ?? ''),
+    newValue: String(change.newValue ?? ''),
     changeType,
     changedBy,
   }));
@@ -122,8 +122,8 @@ export async function trackConcorrenteChanges(
   const records = changes.map((change) => ({
     concorrenteId,
     field: change.field,
-    oldValue: change.oldValue,
-    newValue: change.newValue,
+    oldValue: String(change.oldValue ?? ''),
+    newValue: String(change.newValue ?? ''),
     changeType,
     changedBy,
   }));
@@ -151,8 +151,8 @@ export async function trackLeadChanges(
   const records = changes.map((change) => ({
     leadId,
     field: change.field,
-    oldValue: change.oldValue,
-    newValue: change.newValue,
+    oldValue: String(change.oldValue ?? ''),
+    newValue: String(change.newValue ?? ''),
     changeType,
     changedBy,
   }));

@@ -126,8 +126,8 @@ export async function createAlertHistory(
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  const [result] = await db.insert(intelligentAlertsHistory).values(data);
-  return Number(result.insertId);
+  const result = await db.insert(intelligentAlertsHistory).values(data).returning({ id: intelligentAlertsHistory.id });
+  return Number(result[0].id);
 }
 
 export async function getAlertsHistory(

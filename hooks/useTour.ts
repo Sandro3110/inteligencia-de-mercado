@@ -74,22 +74,27 @@ interface TourState {
 }
 
 export function useTour(tourId: TourType) {
-  const [state, setState] = useState<TourState>({
-    isRunning: false,
-    hasCompleted: false,
-  });
-
-  useEffect(() => {
-    // Load from localStorage
-    const stored = localStorage.getItem(`tour-${tourId}`);
-    if (stored) {
-      const data = JSON.parse(stored);
-      setState({
-        isRunning: data.isRunning || false,
-        hasCompleted: data.hasCompleted || false,
-      });
+  const [state, setState] = useState<TourState>(() => {
+    // Initialize from localStorage
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`tour-${tourId}`);
+      if (stored) {
+        try {
+          const data = JSON.parse(stored);
+          return {
+            isRunning: data.isRunning || false,
+            hasCompleted: data.hasCompleted || false,
+          };
+        } catch {
+          // Ignore parse errors
+        }
+      }
     }
-  }, [tourId]);
+    return {
+      isRunning: false,
+      hasCompleted: false,
+    };
+  });
 
   const startTour = useCallback(() => {
     const newState = { isRunning: true, hasCompleted: false };

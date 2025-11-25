@@ -5,7 +5,7 @@
  * Fetches projects and manages selection state
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { trpc } from '@/lib/trpc/client';
 
 // ============================================================================
@@ -14,13 +14,17 @@ import { trpc } from '@/lib/trpc/client';
 
 interface Project {
   id: number;
+  createdAt: string | null;
+  updatedAt: string | null;
   nome: string;
-  descricao?: string | null;
-  status?: string | null;
-  createdAt?: string | null;
-  totalPesquisas: number | null;
-  totalMercados: number | null;
-  totalClientes: number | null;
+  status: string;
+  descricao: string | null;
+  cor: string | null;
+  ativo: number;
+  executionMode: string | null;
+  maxParallelJobs: number | null;
+  isPaused: number | null;
+  lastActivityAt: string | null;
 }
 
 interface UseSelectedProjectReturn {
@@ -38,16 +42,23 @@ export function useSelectedProject(): UseSelectedProjectReturn {
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
 
   // Fetch all projects
-  const { data: projectsData, isLoading } = trpc.getProjects.useQuery();
+  const { data: projectsData, isLoading } = trpc.projects.list.useQuery();
 
-  const projects = (projectsData?.data as Project[]) || [];
+  const projects = (projectsData as Project[]) || [];
 
   // Auto-select first project if none selected
-  useEffect(() => {
+  const defaultProjectId = useMemo(() => {
     if (projects.length > 0 && !selectedProjectId) {
-      setSelectedProjectId(projects[0].id);
+      return projects[0].id;
     }
+    return selectedProjectId;
   }, [projects, selectedProjectId]);
+
+  useEffect(() => {
+    if (defaultProjectId && defaultProjectId !== selectedProjectId) {
+      setSelectedProjectId(defaultProjectId);
+    }
+  }, [defaultProjectId]);
 
   const selectProject = useCallback((id: number | null) => {
     setSelectedProjectId(id);

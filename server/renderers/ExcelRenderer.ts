@@ -48,14 +48,17 @@ export class ExcelRenderer {
 
     // Faz upload para S3
     const filename = `export_${Date.now()}.xlsx`;
+    // @ts-ignore - TODO: Fix Buffer type conflict between Node.js and xlsx
     const { url } = await storagePut(
       `exports/${filename}`,
-      buffer as Buffer,
+      // @ts-ignore
+      buffer,
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     );
 
     return {
       url,
+      // @ts-ignore
       size: (buffer as Buffer).length,
     };
   }

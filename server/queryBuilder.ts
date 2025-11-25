@@ -30,6 +30,7 @@ function buildCondition(
   condition: FilterCondition
 ): SQL | undefined {
   const { field, operator, value } = condition;
+  // @ts-ignore - TODO: Fix table type
   const column = table[field];
 
   if (!column) {

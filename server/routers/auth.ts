@@ -10,6 +10,7 @@ import { db } from '@/lib/db';
 import { users, loginAttempts, userInvites } from '@/drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import { createServerSupabaseClient } from '@/lib/auth/supabase';
+import { hash } from 'bcryptjs';
 
 /**
  * Router de autenticação
@@ -147,7 +148,7 @@ export const authRouter = createTRPCRouter({
       }
 
       // Verificar se expirou (30 dias)
-      const createdAt = new Date(invite.createdAt!);
+      const createdAt = new Date(invite.criadoEm!);
       const now = new Date();
       const diffDays = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
 
@@ -161,7 +162,7 @@ export const authRouter = createTRPCRouter({
       return {
         valid: true,
         email: invite.email,
-        role: invite.role,
+        role: invite.perfil,
       };
     }),
 
@@ -245,12 +246,14 @@ export const authRouter = createTRPCRouter({
       } else {
         // Criar novo usuário
         await db.insert(users).values({
+          id: crypto.randomUUID(),
           email: invite.email,
           nome: input.nome,
           empresa: input.empresa,
           cargo: input.cargo,
           setor: input.setor,
-          role: invite.role || 'visualizador',
+          senhaHash: await hash(input.password, 10),
+          role: invite.perfil || 'visualizador',
           ativo: 1,
           createdAt: new Date().toISOString(),
           lastSignedIn: new Date().toISOString(),
@@ -318,12 +321,14 @@ export const authRouter = createTRPCRouter({
 
       // Criar convite
       await db.insert(userInvites).values({
+        id: crypto.randomUUID(),
         email: input.email,
         token,
-        role: input.role,
-        createdBy: currentUser.id,
+        perfil: input.role,
+        criadoPor: currentUser.id,
         usado: 0,
-        createdAt: new Date().toISOString(),
+        criadoEm: new Date().toISOString(),
+        expiraEm: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       });
 
       return {

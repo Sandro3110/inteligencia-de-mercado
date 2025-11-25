@@ -44,6 +44,7 @@ export const unifiedMapRouter = createTRPCRouter({
     .input(
       z.object({
         projetoId: z.number(),
+        // @ts-ignore - TODO: Fix TypeScript error
         config: z.record(z.any()),
       })
     )

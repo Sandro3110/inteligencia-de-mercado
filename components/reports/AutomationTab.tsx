@@ -135,20 +135,38 @@ type Frequency = 'weekly' | 'monthly';
 
 interface Schedule {
   id: number;
+  projectId?: number;
+  userId?: string;
   name: string;
   frequency: Frequency;
-  recipients: string[];
-  nextRun: string;
+  recipients: any;
+  config?: unknown;
+  enabled?: number;
+  nextRun?: string;
+  nextRunAt?: string;
   lastRun?: string;
-  isActive: boolean;
+  lastRunAt?: string | null;
+  isActive?: boolean;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
 }
 
 interface EditingSchedule {
   id: number;
+  projectId?: number;
+  userId?: string;
   name: string;
   frequency: Frequency;
-  recipients: string[];
-  nextRun: string;
+  recipients: any;
+  config?: unknown;
+  enabled?: number;
+  nextRun?: string;
+  nextRunAt?: string;
+  lastRun?: string;
+  lastRunAt?: string | null;
+  isActive?: boolean;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
 }
 
 // ============================================================================
@@ -185,8 +203,10 @@ function getFrequencyLabel(frequency: string): string {
 
 function isSchedulePending(schedule: Schedule): boolean {
   const now = new Date();
-  const nextRun = new Date(schedule.nextRun);
-  return schedule.isActive && nextRun <= now;
+  const nextRunDate = schedule.nextRun || schedule.nextRunAt;
+  if (!nextRunDate) return false;
+  const nextRun = new Date(nextRunDate);
+  return (schedule.isActive || schedule.enabled === 1) && nextRun <= now;
 }
 
 // ============================================================================
@@ -336,7 +356,8 @@ export function AutomationTab() {
     setName(schedule.name);
     setFrequency(schedule.frequency);
     setRecipients(schedule.recipients.join(', '));
-    setNextRunDate(formatDateToInputValue(schedule.nextRun));
+    const nextRunValue = schedule.nextRun || schedule.nextRunAt || '';
+    setNextRunDate(nextRunValue ? formatDateToInputValue(nextRunValue) : '');
   }, []);
 
   const handleUpdate = useCallback(() => {
@@ -431,7 +452,7 @@ export function AutomationTab() {
                   <span className="flex items-center gap-1">
                     <Calendar className={ICON_SIZES.SMALL} />
                     {getFrequencyLabel(schedule.frequency)} - {LABELS.NEXT_EXECUTION}{' '}
-                    {new Date(schedule.nextRun).toLocaleString('pt-BR')}
+                    {schedule.nextRun || schedule.nextRunAt ? new Date(schedule.nextRun || schedule.nextRunAt!).toLocaleString('pt-BR') : 'N/A'}
                   </span>
                   <span className="flex items-center gap-1">
                     <Mail className={ICON_SIZES.SMALL} />
@@ -470,7 +491,7 @@ export function AutomationTab() {
             <div className="text-sm">
               <span className="font-medium">{LABELS.RECIPIENTS_LABEL}</span>
               <div className="flex flex-wrap gap-1 mt-1">
-                {schedule.recipients.map((email, idx) => (
+                {schedule.recipients.map((email: string, idx: number) => (
                   <Badge key={idx} variant="secondary" className="text-xs">
                     {email}
                   </Badge>

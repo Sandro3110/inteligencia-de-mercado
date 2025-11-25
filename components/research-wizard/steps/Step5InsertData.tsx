@@ -75,7 +75,7 @@ type InputMethod = typeof INPUT_METHODS[keyof typeof INPUT_METHODS];
 
 interface Mercado {
   nome: string;
-  segmentacao: string;
+  segmentacao?: string;
 }
 
 interface Step5Props {

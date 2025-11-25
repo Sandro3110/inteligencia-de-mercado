@@ -20,6 +20,14 @@ import type {
 export type { Cliente, Concorrente, Lead };
 
 // ============================================================================
+// ENUM TYPES FROM lib/types/entities
+// ============================================================================
+
+export type ValidationStatus = 'pending' | 'rich' | 'needs_adjustment' | 'discarded';
+export type LeadStage = 'novo' | 'em_contato' | 'negociacao' | 'fechado' | 'perdido';
+export type ChangeType = 'created' | 'updated' | 'enriched' | 'validated';
+
+// ============================================================================
 // ENTITY TYPE UNION
 // ============================================================================
 
@@ -39,7 +47,7 @@ export type HistoryEntry = ClienteHistory | ConcorrenteHistory | LeadHistory;
 // PRODUCT TYPES
 // ============================================================================
 
-export type Product = Produto;
+export type Product = Partial<Produto>;
 
 // ============================================================================
 // COMPONENT PROPS INTERFACES

@@ -21,8 +21,8 @@ import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 // Configure default Leaflet icon (fix for Vite)
 const DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
+  iconUrl: icon.src,
+  shadowUrl: iconShadow.src,
   iconSize: [25, 41] as [number, number],
   iconAnchor: [12, 41] as [number, number],
 });

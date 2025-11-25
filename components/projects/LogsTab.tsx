@@ -63,10 +63,12 @@ const MESSAGES = {
 // ============================================================================
 
 interface ActivityRecord {
-  id: string;
+  id: number;
   activityType: string;
-  description: string;
-  createdAt?: string;
+  description: string | null;
+  createdAt?: string | null;
+  metadata?: unknown;
+  projectId?: number;
 }
 
 // ============================================================================
@@ -145,7 +147,7 @@ export function LogsTab() {
       {/* Lista de Atividades */}
       <div className="space-y-4">
         {hasActivities ? (
-          activities.map((activity: ActivityRecord) => {
+          activities?.map((activity: ActivityRecord) => {
             const Icon = getActivityIcon(activity.activityType);
             const colorClass = getActivityColor(activity.activityType);
 

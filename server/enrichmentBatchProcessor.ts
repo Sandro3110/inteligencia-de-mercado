@@ -166,7 +166,7 @@ export async function startBatchEnrichment(options: BatchProcessorOptions): Prom
       } catch (error: unknown) {
         console.error(
           `[BatchProcessor] ❌ Erro ao enriquecer cliente ${cliente.id}:`,
-          error.message
+          error instanceof Error ? error.message : error
         );
 
         errosBloco++;
@@ -175,7 +175,7 @@ export async function startBatchEnrichment(options: BatchProcessorOptions): Prom
         currentJob.clientesComErro.push(cliente.id);
 
         if (onError) {
-          onError(error, cliente.id);
+          onError(error instanceof Error ? error : new Error(String(error)), cliente.id);
         }
       }
 

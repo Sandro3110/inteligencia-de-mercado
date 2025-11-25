@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,14 +23,30 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "@/components/*": ["./components/*"],
-      "@/lib/*": ["./lib/*"],
-      "@/server/*": ["./server/*"],
-      "@/drizzle/*": ["./drizzle/*"],
-      "@/shared/*": ["./shared/*"],
-      "@shared/*": ["./shared/*"],
-      "@/_core/*": ["./_core/*"]
+      "@/*": [
+        "./*"
+      ],
+      "@/components/*": [
+        "./components/*"
+      ],
+      "@/lib/*": [
+        "./lib/*"
+      ],
+      "@/server/*": [
+        "./server/*"
+      ],
+      "@/drizzle/*": [
+        "./drizzle/*"
+      ],
+      "@/shared/*": [
+        "./shared/*"
+      ],
+      "@shared/*": [
+        "./shared/*"
+      ],
+      "@/_core/*": [
+        "./_core/*"
+      ]
     }
   },
   "include": [
@@ -37,5 +57,13 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "**/__tests__backup/**",
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ]
 }

@@ -103,6 +103,15 @@ export function SmartAutocomplete({ value, onChange, projectId }: SmartAutocompl
     return () => clearTimeout(timer);
   }, [value, fetchSuggestions]);
 
+  const selectSuggestion = useCallback(
+    (suggestion: Suggestion) => {
+      onChange(suggestion.text);
+      setShowDropdown(false);
+      setSelectedIndex(0);
+    },
+    [onChange]
+  );
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (!showDropdown) return;
@@ -127,16 +136,7 @@ export function SmartAutocomplete({ value, onChange, projectId }: SmartAutocompl
           break;
       }
     },
-    [showDropdown, suggestions, selectedIndex]
-  );
-
-  const selectSuggestion = useCallback(
-    (suggestion: Suggestion) => {
-      onChange(suggestion.text);
-      setShowDropdown(false);
-      setSelectedIndex(0);
-    },
-    [onChange]
+    [showDropdown, suggestions, selectedIndex, selectSuggestion]
   );
 
   return (

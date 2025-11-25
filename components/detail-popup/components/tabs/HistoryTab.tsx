@@ -35,12 +35,12 @@ function EmptyHistoryState() {
  */
 interface HistoryItemProps {
   change: {
-    changeType?: string;
-    field?: string;
-    changedBy?: string;
-    changedAt: Date;
-    oldValue?: string;
-    newValue?: string;
+    changeType?: string | null;
+    field?: string | null;
+    changedBy?: string | null;
+    changedAt: Date | string | null;
+    oldValue?: string | null;
+    newValue?: string | null;
   };
   index: number;
 }

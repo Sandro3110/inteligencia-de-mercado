@@ -64,8 +64,8 @@ export async function getAllMapEntities(
   ];
 
   // Helper para construir condições comuns
-  const buildCommonConditions = (table: unknown) => {
-    const conditions: unknown[] = [
+  const buildCommonConditions = (table: any) => {
+    const conditions: any[] = [
       eq(table.projectId, filter.projectId),
       isNotNull(table.latitude),
       isNotNull(table.longitude),

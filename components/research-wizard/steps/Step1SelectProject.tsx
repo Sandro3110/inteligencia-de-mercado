@@ -148,9 +148,17 @@ const COLORS = {
 
 interface Project {
   id: number;
+  createdAt?: string | null;
+  updatedAt?: string | null;
   nome: string;
-  descricao?: string;
-  status: 'active' | 'hibernated';
+  status: string;
+  descricao?: string | null;
+  cor?: string | null;
+  ativo?: number;
+  executionMode?: string | null;
+  maxParallelJobs?: number | null;
+  isPaused?: number | null;
+  lastActivityAt?: string | null;
 }
 
 interface CanDeleteResult {
@@ -242,7 +250,7 @@ export function Step1SelectProject({ data, updateData }: Step1Props) {
       if (newProject) {
         refetch();
         updateData({
-          projectId: newProject.id,
+          projectId: String(newProject.id),
           projectName: newProject.nome,
         });
         setShowCreateProject(false);
@@ -260,7 +268,7 @@ export function Step1SelectProject({ data, updateData }: Step1Props) {
     onSuccess: () => {
       refetch();
       toast.success(TOAST_MESSAGES.SUCCESS_DELETE);
-      if (data.projectId === projectToDelete) {
+      if (data.projectId && parseInt(data.projectId) === projectToDelete) {
         updateData({ projectId: undefined, projectName: '' });
       }
       setProjectToDelete(null);
@@ -298,7 +306,7 @@ export function Step1SelectProject({ data, updateData }: Step1Props) {
   const hasProjects = useMemo(() => projects && projects.length > 0, [projects]);
 
   const selectedProject = useMemo(
-    () => projects?.find((p) => p.id === data.projectId),
+    () => projects?.find((p) => data.projectId && p.id === parseInt(data.projectId)),
     [projects, data.projectId]
   );
 
@@ -362,7 +370,7 @@ export function Step1SelectProject({ data, updateData }: Step1Props) {
     (value: string) => {
       const project = projects?.find((p) => p.id === parseInt(value, 10));
       updateData({
-        projectId: parseInt(value, 10),
+        projectId: value,
         projectName: project?.nome || '',
       });
     },
@@ -371,7 +379,7 @@ export function Step1SelectProject({ data, updateData }: Step1Props) {
 
   const handleOpenHibernateModal = useCallback(() => {
     if (data.projectId) {
-      setProjectToHibernate(data.projectId);
+      setProjectToHibernate(parseInt(data.projectId));
     }
   }, [data.projectId]);
 
@@ -387,13 +395,13 @@ export function Step1SelectProject({ data, updateData }: Step1Props) {
 
   const handleReactivate = useCallback(() => {
     if (data.projectId) {
-      reactivateProject.mutate(data.projectId);
+      reactivateProject.mutate(parseInt(data.projectId));
     }
   }, [data.projectId, reactivateProject]);
 
   const handleOpenDeleteModal = useCallback(() => {
     if (data.projectId) {
-      setProjectToDelete(data.projectId);
+      setProjectToDelete(parseInt(data.projectId));
     }
   }, [data.projectId]);
 
@@ -696,7 +704,7 @@ export function Step1SelectProject({ data, updateData }: Step1Props) {
                     {MESSAGES.DELETE_CAN}
                   </p>
                   <p className={`text-xs ${COLORS.WARNING.TEXT}`}>
-                    {formatProjectStats(canDeleteQuery.data.stats)}
+                    {formatProjectStats(canDeleteQuery.data.stats as { pesquisas: number; clientes: number; mercados: number; } | undefined)}
                   </p>
                 </div>
 
@@ -727,9 +735,9 @@ export function Step1SelectProject({ data, updateData }: Step1Props) {
                   <p className={`text-xs ${COLORS.ERROR.TEXT}`}>
                     {canDeleteQuery.data.reason}
                   </p>
-                  {canDeleteQuery.data.stats && (
+                  {(canDeleteQuery.data.stats as any) && (
                     <p className={`text-xs ${COLORS.ERROR.TEXT} mt-1`}>
-                      {formatProjectStats(canDeleteQuery.data.stats)}
+                      {formatProjectStats(canDeleteQuery.data.stats as { pesquisas: number; clientes: number; mercados: number; } | undefined)}
                     </p>
                   )}
                 </div>

@@ -167,13 +167,13 @@ async function processClienteWithRetry(
       recordCircuitBreakerSuccess();
       return { success: true, retries: attempt };
     } catch (error: unknown) {
-      lastError = error;
+      lastError = error instanceof Error ? error : new Error(String(error));
       recordCircuitBreakerFailure();
 
       const isLastAttempt = attempt === retryConfig.maxRetries;
 
       if (onError) {
-        onError(error, clienteId, !isLastAttempt);
+        onError(error instanceof Error ? error : new Error(String(error)), clienteId, !isLastAttempt);
       }
 
       if (!isLastAttempt) {

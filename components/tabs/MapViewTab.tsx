@@ -1,11 +1,14 @@
 'use client';
 
-import { UnifiedFilters } from '@/pages/UnifiedCockpit';
-import GeoCockpit from '@/pages/GeoCockpit';
+import GeoCockpit from '@/components/GeoCockpit';
 
 // ============================================================================
 // TYPES
 // ============================================================================
+
+interface UnifiedFilters {
+  [key: string]: any;
+}
 
 interface MapViewTabProps {
   filters: UnifiedFilters;
@@ -27,7 +30,13 @@ export default function MapViewTab({
 }: MapViewTabProps) {
   return (
     <div className="h-full w-full overflow-hidden">
-      <GeoCockpit />
+      <GeoCockpit 
+        entityType="lead" 
+        entityId={0} 
+        entityName="" 
+        address="" 
+        onSave={async () => {}} 
+      />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { useMemo } from 'react';
 import { trpc } from '@/lib/trpc/client';
 import type {
   Entity,
+  PartialEntity,
   EntityType,
   HistoryEntry,
   Product,
@@ -53,7 +54,7 @@ function getCurrentHistory(
  * @returns Object containing history, produtos, and loading states
  */
 export function useDetailPopupData(
-  item: Entity | null,
+  item: Entity | PartialEntity | null,
   type: EntityType,
   isOpen: boolean
 ): UseDetailPopupDataReturn {

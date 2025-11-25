@@ -3,19 +3,9 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   // Configurações de performance
   reactStrictMode: true,
-  swcMinify: true,
   
-  // Turbopack para dev (mais rápido que Webpack)
-  experimental: {
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
-  },
+  // Turbopack config (vazio para silenciar warning)
+  turbopack: {},
 
   // Otimização de imagens
   images: {

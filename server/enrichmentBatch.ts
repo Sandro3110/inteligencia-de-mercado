@@ -126,7 +126,7 @@ export async function enrichClientesBatch(
           concorrentes: 0,
           leads: 0,
           duration,
-          error: error.message,
+          error: error instanceof Error ? error.message : 'Unknown error',
         };
       }
     });

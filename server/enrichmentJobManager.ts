@@ -53,7 +53,7 @@ export async function createEnrichmentJob(
   const totalBatches = Math.ceil(totalClientes / batchSize);
 
   // Criar job
-  const [result] = await db.insert(enrichmentJobs).values({
+  const result = await db.insert(enrichmentJobs).values({
     projectId,
     status: 'pending',
     totalClientes,
@@ -64,9 +64,9 @@ export async function createEnrichmentJob(
     totalBatches,
     batchSize: batchSize,
     checkpointInterval: options.checkpointInterval || 50,
-  });
+  }).returning({ id: enrichmentJobs.id });
 
-  return result.insertId;
+  return result[0].id;
 }
 
 /**
@@ -175,7 +175,7 @@ export async function getJobProgress(jobId: number): Promise<JobProgress | null>
 
   return {
     jobId: job.id,
-    status: job.status,
+    status: job.status as 'pending' | 'running' | 'paused' | 'completed' | 'failed',
     totalClientes: job.totalClientes,
     processedClientes: job.processedClientes,
     successClientes: job.successClientes,
@@ -202,7 +202,7 @@ export async function listProjectJobs(projectId: number): Promise<JobProgress[]>
 
   return jobs.map((job) => ({
     jobId: job.id,
-    status: job.status,
+    status: job.status as 'pending' | 'running' | 'paused' | 'completed' | 'failed',
     totalClientes: job.totalClientes,
     processedClientes: job.processedClientes,
     successClientes: job.successClientes,
@@ -286,7 +286,7 @@ async function processJob(jobId: number): Promise<void> {
         const result = await enrichClienteOptimized(cliente.id, job.projectId);
         return { success: result.success, clienteId: cliente.id };
       } catch (error: unknown) {
-        console.error(`[Job ${jobId}] Erro ao processar cliente ${cliente.id}:`, error.message);
+        console.error(`[Job ${jobId}] Erro ao processar cliente ${cliente.id}:`, error instanceof Error ? error.message : error);
         return { success: false, clienteId: cliente.id };
       }
     });

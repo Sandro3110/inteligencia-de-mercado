@@ -5,7 +5,7 @@ import { trpc } from '@/lib/trpc/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'wouter';
-import { exportToCSV } from '@/lib/export';
+import { exportToCSV, formatDataForExport } from '@/lib/exportUtils';
 import { toast } from 'sonner';
 import {
   Building2,
@@ -39,7 +39,7 @@ interface OverviewTabProps {
 }
 
 interface StatusItem {
-  status: string;
+  status: string | null;
   count: number;
 }
 
@@ -56,7 +56,7 @@ interface EntityData {
 
 function getStatusCount(statusArray: StatusItem[], status: string): number {
   const item = statusArray.find((s) => s.status === status);
-  return item?.count || 0;
+  return item?.count ?? 0;
 }
 
 export function OverviewTab({ projectId }: OverviewTabProps) {
@@ -82,7 +82,8 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
       toast.error('Nenhum cliente para exportar');
       return;
     }
-    exportToCSV(allClientes, 'clientes-pav.csv');
+    const { headers, rows } = formatDataForExport(allClientes, Object.keys(allClientes[0] || {}).map(key => ({ key: key as any, label: key })));
+    exportToCSV({ headers, rows, filename: 'clientes-pav.csv' });
     toast.success('Clientes exportados com sucesso!');
   }, [allClientes]);
 
@@ -91,7 +92,8 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
       toast.error('Nenhum concorrente para exportar');
       return;
     }
-    exportToCSV(allConcorrentes, 'concorrentes-pav.csv');
+    const { headers, rows } = formatDataForExport(allConcorrentes, Object.keys(allConcorrentes[0] || {}).map(key => ({ key: key as any, label: key })));
+    exportToCSV({ headers, rows, filename: 'concorrentes-pav.csv' });
     toast.success('Concorrentes exportados com sucesso!');
   }, [allConcorrentes]);
 
@@ -100,7 +102,8 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
       toast.error('Nenhum lead para exportar');
       return;
     }
-    exportToCSV(allLeads, 'leads-pav.csv');
+    const { headers, rows } = formatDataForExport(allLeads, Object.keys(allLeads[0] || {}).map(key => ({ key: key as any, label: key })));
+    exportToCSV({ headers, rows, filename: 'leads-pav.csv' });
     toast.success('Leads exportados com sucesso!');
   }, [allLeads]);
 

@@ -31,9 +31,12 @@ export function registerOAuthRoutes(app: Express) {
       const { toPostgresTimestamp } = await import("../dateUtils");
       await db.upsertUser({
         id: userInfo.openId,
-        name: userInfo.name || null,
-        email: userInfo.email ?? null,
-        loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
+        nome: userInfo.name || "",
+        email: userInfo.email || "",
+        setor: "",
+        empresa: "",
+        cargo: "",
+        senhaHash: "",
         lastSignedIn: toPostgresTimestamp(new Date()),
       });
 

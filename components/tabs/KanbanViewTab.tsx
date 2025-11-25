@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { UnifiedFilters } from '@/pages/UnifiedCockpit';
+// UnifiedFilters type removed - defined locally
 import { trpc } from '@/lib/trpc/client';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
 import { useSelectedPesquisa } from '@/hooks/useSelectedPesquisa';
@@ -42,12 +42,16 @@ const MESSAGES = {
 
 type StageId = (typeof STAGES)[number]['id'];
 
+interface UnifiedFilters {
+  [key: string]: any;
+}
+
 interface Lead {
-  id: string;
+  id: number | string;
   nome: string;
-  cnpj?: string;
-  tipo?: string;
-  stage?: string;
+  cnpj?: string | null;
+  tipo?: string | null;
+  stage?: string | null;
 }
 
 interface KanbanViewTabProps {

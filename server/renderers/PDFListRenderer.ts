@@ -171,6 +171,7 @@ export class PDFListRenderer {
 
         x = this.MARGIN;
         fieldChunk.forEach(field => {
+          // @ts-ignore - TODO: Fix record type
           const value = this.formatValue(record[field]);
           doc.text(this.truncate(value, 30), x, y, {
             width: colWidth,

@@ -134,7 +134,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.lastSignedIn = now();
     }
 
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
+    await db.insert(users).values(values as any).onConflictDoUpdate({
+      target: users.id,
       set: updateSet,
     });
   } catch (error) {
@@ -1134,8 +1135,8 @@ export async function createProject(
   if (!db) return null;
 
   try {
-    const result = await db.insert(projects).values(data);
-    const insertId = Number(result[0].insertId);
+    const result = await db.insert(projects).values(data).returning({ id: projects.id });
+    const insertId = Number(result[0].id);
     const project = (await getProjectById(insertId)) || null;
 
     // Log de auditoria
@@ -1555,16 +1556,16 @@ export async function duplicateProject(
     }
 
     // Criar novo projeto
-    const [result] = await db.insert(projects).values({
+    const result = await db.insert(projects).values({
       nome: newName,
       descricao: originalProject.descricao,
       cor: originalProject.cor,
       ativo: 1,
       status: 'active',
       lastActivityAt: now(),
-    });
+    }).returning({ id: projects.id });
 
-    const newProjectId = Number(result.insertId);
+    const newProjectId = Number(result[0].id);
 
     // Copiar mercados únicos se solicitado
     if (options?.copyMarkets) {
@@ -1593,7 +1594,7 @@ export async function duplicateProject(
     return { success: true, newProjectId };
   } catch (error: unknown) {
     console.error('[Database] Failed to duplicate project:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
 
@@ -1680,7 +1681,7 @@ export async function createPesquisa(data: {
   if (!db) return null;
 
   try {
-    const [result] = await db.insert(pesquisas).values({
+    const result = await db.insert(pesquisas).values({
       projectId: data.projectId,
       nome: data.nome,
       descricao: data.descricao || null,
@@ -1689,12 +1690,12 @@ export async function createPesquisa(data: {
       qtdConcorrentesPorMercado: data.qtdConcorrentesPorMercado || 5,
       qtdLeadsPorMercado: data.qtdLeadsPorMercado || 10,
       qtdProdutosPorCliente: data.qtdProdutosPorCliente || 3,
-    });
+    }).returning({ id: pesquisas.id });
 
-    if (!result.insertId) return null;
+    if (!result[0]?.id) return null;
 
-    const pesquisa = await getPesquisaById(Number(result.insertId));
-    logger.debug(`[Pesquisa] Criada: ${data.nome} (ID: ${result.insertId})`);
+    const pesquisa = await getPesquisaById(Number(result[0].id));
+    logger.debug(`[Pesquisa] Criada: ${data.nome} (ID: ${result[0].id})`);
     return pesquisa || null;
   } catch (error) {
     console.error('[Database] Failed to create pesquisa:', error);
@@ -1828,7 +1829,7 @@ export async function createMercado(data: {
   }
 
   // Criar novo mercado
-  const [result] = await db.insert(mercadosUnicos).values({
+  const result = await db.insert(mercadosUnicos).values({
     projectId: data.projectId,
     pesquisaId: data.pesquisaId || null,
     mercadoHash,
@@ -1840,11 +1841,11 @@ export async function createMercado(data: {
     tendencias: data.tendencias || null,
     principaisPlayers: data.principaisPlayers || null,
     quantidadeClientes: data.quantidadeClientes || 0,
-  });
+  }).returning({ id: mercadosUnicos.id });
 
-  if (!result.insertId) return null;
+  if (!result[0]?.id) return null;
 
-  const mercado = await getMercadoById(Number(result.insertId));
+  const mercado = await getMercadoById(Number(result[0].id));
   if (!mercado) return null;
 
   // Registrar criação no histórico
@@ -1995,7 +1996,7 @@ export async function createCliente(data: {
   }
 
   // Criar novo cliente
-  const [result] = await db.insert(clientes).values({
+  const result = await db.insert(clientes).values({
     projectId: data.projectId,
     pesquisaId: data.pesquisaId || null,
     clienteHash: normalizedHash,
@@ -2015,14 +2016,14 @@ export async function createCliente(data: {
     qualidadeScore: data.qualidadeScore || 0,
     qualidadeClassificacao: data.qualidadeClassificacao || 'Ruim',
     validationStatus: data.validationStatus || 'pending',
-  });
+  }).returning({ id: clientes.id });
 
-  if (!result.insertId) return null;
+  if (!result[0]?.id) return null;
 
   const [cliente] = await db
     .select()
     .from(clientes)
-    .where(eq(clientes.id, Number(result.insertId)));
+    .where(eq(clientes.id, Number(result[0].id)));
 
   // Registrar criação no histórico
   const { trackCreation } = await import('./_core/historyTracker');
@@ -2186,7 +2187,7 @@ export async function createConcorrente(data: {
   }
 
   // Criar novo concorrente
-  const [result] = await db.insert(concorrentes).values({
+  const result = await db.insert(concorrentes).values({
     projectId: data.projectId,
     pesquisaId: data.pesquisaId || null,
     mercadoId: data.mercadoId,
@@ -2200,14 +2201,14 @@ export async function createConcorrente(data: {
     qualidadeScore: data.qualidadeScore || 0,
     qualidadeClassificacao: data.qualidadeClassificacao || 'Ruim',
     validationStatus: data.validationStatus || 'pending',
-  });
+  }).returning({ id: concorrentes.id });
 
-  if (!result.insertId) return null;
+  if (!result[0]?.id) return null;
 
   const [concorrente] = await db
     .select()
     .from(concorrentes)
-    .where(eq(concorrentes.id, Number(result.insertId)));
+    .where(eq(concorrentes.id, Number(result[0].id)));
 
   // Registrar criação no histórico
   const { trackCreation } = await import('./_core/historyTracker');
@@ -2338,26 +2339,32 @@ export async function createLead(data: {
   }
 
   // Criar novo lead
-  const result = (await db.execute(sql`
-    INSERT INTO leads (
-      projectId, pesquisaId, mercadoId, leadHash, nome, cnpj, site, email, telefone,
-      tipo, porte, regiao, setor, qualidadeScore, qualidadeClassificacao,
-      validationStatus, stage
-    ) VALUES (
-      ${data.projectId}, ${data.pesquisaId || null}, ${data.mercadoId}, ${leadHash}, ${data.nome},
-      ${data.cnpj || null}, ${data.site || null}, ${data.email || null}, ${data.telefone || null},
-      ${data.tipo || null}, ${data.porte || null}, ${data.regiao || null}, ${data.setor || null},
-      ${data.qualidadeScore || 0}, ${data.qualidadeClassificacao || 'Ruim'},
-      ${data.validationStatus || 'pending'}, 'novo'
-    )
-  `)) as any;
+  const result = await db.insert(leads).values({
+    projectId: data.projectId,
+    pesquisaId: data.pesquisaId || null,
+    mercadoId: data.mercadoId,
+    leadHash,
+    nome: data.nome,
+    cnpj: data.cnpj || null,
+    site: data.site || null,
+    email: data.email || null,
+    telefone: data.telefone || null,
+    tipo: data.tipo || null,
+    porte: data.porte || null,
+    regiao: data.regiao || null,
+    setor: data.setor || null,
+    qualidadeScore: data.qualidadeScore || 0,
+    qualidadeClassificacao: data.qualidadeClassificacao || 'Ruim',
+    validationStatus: data.validationStatus || 'pending',
+    stage: 'novo',
+  }).returning({ id: leads.id });
 
-  if (!result.insertId) return null;
+  if (!result[0]?.id) return null;
 
   const [lead] = await db
     .select()
     .from(leads)
-    .where(eq(leads.id, Number(result.insertId)));
+    .where(eq(leads.id, Number(result[0].id)));
 
   // Registrar criação no histórico
   const { trackCreation } = await import('./_core/historyTracker');
@@ -2440,16 +2447,16 @@ export async function createTemplate(data: {
   const db = await getDb();
   if (!db) return null;
 
-  const [result] = await db.insert(projectTemplates).values({
+  const result = await db.insert(projectTemplates).values({
     name: data.name,
     description: data.description || null,
     config: data.config,
     isDefault: data.isDefault || 0,
-  });
+  }).returning({ id: projectTemplates.id });
 
-  if (!result.insertId) return null;
+  if (!result[0]?.id) return null;
 
-  return await getTemplateById(Number(result.insertId));
+  return await getTemplateById(Number(result[0].id));
 }
 
 export async function updateTemplate(
@@ -2508,13 +2515,13 @@ export async function searchLeadsAdvanced(
   const { buildDynamicQuery, validateFilter } = await import('./queryBuilder');
 
   // Validar filtro
-  const validation = validateFilter(filter);
+  const validation = validateFilter(filter as any);
   if (!validation.valid) {
     throw new Error(validation.error || 'Filtro inválido');
   }
 
   // Construir query dinâmica
-  const whereClause = buildDynamicQuery(leads, filter);
+  const whereClause = buildDynamicQuery(leads, filter as any);
 
   // Combinar filtro de projeto com filtros dinâmicos
   const finalWhere = whereClause
@@ -2685,7 +2692,7 @@ export async function createNotification(data: {
   const db = await getDb();
   if (!db) return null;
 
-  const [result] = await db.insert(notifications).values({
+  const result = await db.insert(notifications).values({
     userId: data.userId || null,
     projectId: data.projectId || null,
     type: data.type,
@@ -2694,14 +2701,14 @@ export async function createNotification(data: {
     entityType: data.entityType || null,
     entityId: data.entityId || null,
     isRead: 0,
-  });
+  }).returning({ id: notifications.id });
 
-  if (!result.insertId) return null;
+  if (!result[0]?.id) return null;
 
   const [notification] = await db
     .select()
     .from(notifications)
-    .where(eq(notifications.id, Number(result.insertId)));
+    .where(eq(notifications.id, Number(result[0].id)));
   return notification;
 }
 
@@ -2951,10 +2958,10 @@ export async function createEnrichmentRun(projectId: number, totalClients: numbe
     totalClients,
     processedClients: 0,
     status: 'running',
-  });
+  }).returning({ id: enrichmentRuns.id });
 
   // Retornar o ID inserido
-  return Number(result[0].insertId);
+  return Number(result[0].id);
 }
 
 /**
@@ -3041,8 +3048,8 @@ export async function createScheduledEnrichment(data: InsertScheduledEnrichment)
   const db = await getDb();
   if (!db) throw new Error('Database not available');
 
-  const [result] = await db.insert(scheduledEnrichments).values(data);
-  return result.insertId;
+  const result = await db.insert(scheduledEnrichments).values(data).returning({ id: scheduledEnrichments.id });
+  return result[0].id;
 }
 
 export async function listScheduledEnrichments(projectId: number) {
@@ -3265,6 +3272,7 @@ export async function getFunnelData(projectId: number) {
   // Mapear para objeto
   const stageCounts: Record<string, number> = {};
   stageCountsResult.forEach((row: Record<string, unknown>) => {
+    // @ts-ignore - TODO: Fix type assertion for SQL result row
     stageCounts[row.stage] = row.count;
   });
 
@@ -4052,11 +4060,16 @@ export async function getQualityTrends(projectId: number, days: number = 30) {
       const dataPoints: Record<string, { total: number; count: number }> = {};
 
       const processarEntidades = (entidades: unknown[]) => {
+        // @ts-ignore - TODO: Fix type assertion for unknown array
         entidades.forEach((e: Record<string, unknown>) => {
+          // @ts-ignore - TODO: Fix entity type inference
           const entity = e.clientes || e.concorrentes || e.leads || e;
+          // @ts-ignore - TODO: Fix entity type inference
           if (!entity.createdAt) return;
 
+          // @ts-ignore - TODO: Fix entity type inference
           const data = new Date(entity.createdAt).toISOString().split('T')[0];
+          // @ts-ignore - TODO: Fix entity type inference
           const qualidade = entity.qualidadeScore || 0;
 
           if (!dataPoints[data]) {
@@ -4217,7 +4230,7 @@ export async function getProjectsActivity(): Promise<{
       return {
         id: project.id,
         nome: project.nome,
-        status: project.status,
+        status: project.status as 'active' | 'hibernated',
         lastActivityAt: project.lastActivityAt ? new Date(project.lastActivityAt) : null,
         daysSinceActivity,
         hasWarning,
@@ -4357,9 +4370,9 @@ export async function sendHibernationWarning(
       notificationSent: 0, // Será marcado como 1 após envio
       postponed: 0,
       hibernated: 0,
-    });
+    }).returning({ id: hibernationWarnings.id });
 
-    const warningId = Number(result[0].insertId);
+    const warningId = Number(result[0].id);
 
     // Enviar notificação para o proprietário
     const { notifyOwner } = await import('./_core/notification');
@@ -4574,10 +4587,10 @@ export async function upsertNotificationPreference(data: {
         type: data.type as any,
         enabled: data.enabled ? 1 : 0,
         channels: data.channels || { inApp: true },
-      });
+      }).returning({ id: notificationPreferences.id });
 
       return {
-        id: Number(result[0].insertId),
+        id: Number(result[0].id),
         userId: data.userId,
         type: data.type,
         enabled: data.enabled ? 1 : 0,
@@ -4751,16 +4764,18 @@ export async function saveResearchDraft(
         ? sql`
           INSERT INTO research_drafts (userId, projectId, draftData, currentStep, progressStatus)
           VALUES (${userId}, ${projectId ?? null}, ${draftJson}, ${currentStep}, ${progressStatus})
+          RETURNING id
         `
         : sql`
           INSERT INTO research_drafts (userId, projectId, draftData, currentStep)
           VALUES (${userId}, ${projectId ?? null}, ${draftJson}, ${currentStep})
+          RETURNING id
         `;
 
       const result = await db.execute(insertQuery);
 
       return {
-        id: Number((result as any)[0].insertId),
+        id: Number((result as any).rows[0].id),
         userId,
         projectId: projectId ?? null,
         draftData,
@@ -5383,8 +5398,8 @@ export async function createReportSchedule(data: InsertReportSchedule): Promise<
   if (!db) throw new Error('Database not available');
 
   try {
-    const result = await db.insert(reportSchedules).values(data);
-    const insertId = result[0].insertId;
+    const result = await db.insert(reportSchedules).values(data).returning({ id: reportSchedules.id });
+    const insertId = result[0].id;
 
     const created = await db
       .select()

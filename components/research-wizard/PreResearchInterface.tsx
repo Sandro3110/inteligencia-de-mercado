@@ -66,7 +66,7 @@ type CompanySize = (typeof COMPANY_SIZES)[number];
 
 interface Market {
   nome: string;
-  segmentacao: SegmentationType;
+  segmentacao?: string;
 }
 
 interface Client {
@@ -78,7 +78,7 @@ interface Client {
   telefone?: string;
   cidade?: string;
   uf?: string;
-  porte?: CompanySize;
+  porte?: string;
 }
 
 interface ResearchWizardData {
@@ -209,7 +209,7 @@ export default function PreResearchInterface({
       prompt: prompt.trim(),
       tipo,
       quantidade: DEFAULT_QUANTITY,
-      projectId: data.projectId,
+      projectId: data.projectId ? parseInt(data.projectId) : undefined,
     });
   }, [prompt, tipo, data.projectId, executeMutation]);
 

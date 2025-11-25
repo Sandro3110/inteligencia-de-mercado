@@ -166,10 +166,16 @@ type FilterStatus = (typeof FILTER_STATUS_OPTIONS)[number];
 interface Project {
   id: number;
   nome: string;
-  descricao?: string;
-  cor?: string;
+  descricao?: string | null;
+  cor?: string | null;
   status: string;
-  lastActivityAt?: string;
+  lastActivityAt?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  ativo?: number;
+  executionMode?: string | null;
+  maxParallelJobs?: number | null;
+  isPaused?: number | null;
 }
 
 interface ProjectsTabProps {

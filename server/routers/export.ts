@@ -19,7 +19,7 @@ export const exportRouter = createTRPCRouter({
         projetoId: z.number(),
         format: z.enum(['csv', 'xlsx', 'json', 'pdf']),
         tipo: z.enum(['cliente', 'concorrente', 'lead', 'all']).default('all'),
-        filters: z.record(z.any()).optional(),
+        filters: z.record(z.string(), z.any()).optional(),
       })
     )
     .mutation(async ({ input }) => {

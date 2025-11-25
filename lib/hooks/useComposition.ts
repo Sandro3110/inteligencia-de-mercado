@@ -1,4 +1,6 @@
-import { useRef, useCallback } from 'react';
+"use client";
+
+import { useState, useCallback } from 'react';
 
 /**
  * Hook to handle IME (Input Method Editor) composition events
@@ -9,11 +11,11 @@ export function useComposition<T extends HTMLElement = HTMLElement>(options?: {
   onCompositionStart?: (event: React.CompositionEvent<T>) => void;
   onCompositionEnd?: (event: React.CompositionEvent<T>) => void;
 }) {
-  const isComposingRef = useRef(false);
+  const [isComposing, setIsComposing] = useState(false);
 
   const onCompositionStart = useCallback(
     (event: React.CompositionEvent<T>) => {
-      isComposingRef.current = true;
+      setIsComposing(true);
       options?.onCompositionStart?.(event);
     },
     [options]
@@ -21,7 +23,7 @@ export function useComposition<T extends HTMLElement = HTMLElement>(options?: {
 
   const onCompositionEnd = useCallback(
     (event: React.CompositionEvent<T>) => {
-      isComposingRef.current = false;
+      setIsComposing(false);
       options?.onCompositionEnd?.(event);
     },
     [options]
@@ -29,15 +31,15 @@ export function useComposition<T extends HTMLElement = HTMLElement>(options?: {
 
   const onKeyDown = useCallback(
     (event: React.KeyboardEvent<T>) => {
-      if (!isComposingRef.current) {
+      if (!isComposing) {
         options?.onKeyDown?.(event);
       }
     },
-    [options]
+    [options, isComposing]
   );
 
   return {
-    isComposing: isComposingRef.current,
+    isComposing,
     onCompositionStart,
     onCompositionEnd,
     onKeyDown,

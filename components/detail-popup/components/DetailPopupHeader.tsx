@@ -80,11 +80,11 @@ export function DetailPopupHeader({
 
           {/* Badges */}
           <div className={CLASSES.BADGE_CONTAINER}>
-            {getStatusBadge(item.validationStatus)}
-            {getSegmentationBadge((item as { segmentacaoB2bB2c?: string }).segmentacaoB2bB2c)}
-            {getSegmentationBadge(item.segmentacao)}
+            {getStatusBadge((item as { validationStatus?: string | null }).validationStatus)}
+            {getSegmentationBadge((item as { segmentacaoB2bB2c?: string | null }).segmentacaoB2bB2c)}
+            {getSegmentationBadge((item as { segmentacao?: string | null }).segmentacao)}
             {leadStage && getLeadStageBadge(leadStage)}
-            {getQualityScoreBadge(item.qualidadeScore)}
+            {getQualityScoreBadge((item as { qualidadeScore?: number | null }).qualidadeScore)}
             {showProductsBadge && getProductsCountBadge(produtos.length)}
           </div>
         </div>

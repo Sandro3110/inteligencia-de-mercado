@@ -82,7 +82,8 @@ export async function setCachedEnrichment(
         fonte,
         dataAtualizacao: now(),
       })
-      .onDuplicateKeyUpdate({
+      .onConflictDoUpdate({
+        target: enrichmentCache.cnpj,
         set: {
           dadosJson,
           fonte,

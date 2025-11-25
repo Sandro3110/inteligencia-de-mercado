@@ -75,7 +75,7 @@ export function CompactModeToggle() {
     [isCompact]
   );
 
-  const Icon = useMemo(() => getIcon(isCompact), [isCompact]);
+  const IconComponent = getIcon(isCompact);
 
   // ============================================================================
   // EVENT HANDLERS
@@ -98,7 +98,7 @@ export function CompactModeToggle() {
           onClick={handleToggle}
           className={CLASSES.BUTTON}
         >
-          <Icon className={ICON_SIZES.SMALL} />
+          <IconComponent className={ICON_SIZES.SMALL} />
         </Button>
       </TooltipTrigger>
       <TooltipContent>

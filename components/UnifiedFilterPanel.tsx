@@ -143,9 +143,21 @@ function toggleArrayItem<T>(array: T[], item: T): T[] {
 // ============================================================================
 
 export function UnifiedFilterPanel() {
-  const { filters, updateFilters, clearFilters, hasActiveFilters } =
+  const { filters: rawFilters, updateFilters, clearFilters, hasActiveFilters } =
     useFilters();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Cast filters to typed version
+  const filters = {
+    estados: (rawFilters.estados || []) as string[],
+    cidades: (rawFilters.cidades || []) as string[],
+    tags: (rawFilters.tags || []) as string[],
+    statusValidacao: (rawFilters.statusValidacao || []) as string[],
+    qualidadeMin: rawFilters.qualidadeMin as number,
+    qualidadeMax: rawFilters.qualidadeMax as number,
+    searchTerm: rawFilters.searchTerm as string,
+    tipoEntidade: rawFilters.tipoEntidade as string,
+  };
 
   // Buscar opções de filtros do backend
   const { data: filterOptions } = trpc.mercados.getFilterOptions.useQuery();
@@ -165,13 +177,13 @@ export function UnifiedFilterPanel() {
   );
 
   const qualityRangeLabel = useMemo(
-    () => getQualityRangeLabel(filters.qualidadeMin, filters.qualidadeMax),
+    () => getQualityRangeLabel(filters.qualidadeMin as number, filters.qualidadeMax as number),
     [filters.qualidadeMin, filters.qualidadeMax]
   );
 
   const hasEstados = useMemo(
     () => filterOptions?.estados && filterOptions.estados.length > 0,
-    [filterOptions?.estados]
+    [filterOptions]
   );
 
   const hasTags = useMemo(

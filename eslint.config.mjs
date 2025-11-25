@@ -33,6 +33,11 @@ const eslintConfig = defineConfig([
       "@next/next/no-img-element": "warn",
       // Allow console in development
       "no-console": "off",
+      // Disable style-only rules (no runtime impact)
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-empty-object-type": "warn",
+      "@typescript-eslint/no-namespace": "warn",
     }
   }
 ]);

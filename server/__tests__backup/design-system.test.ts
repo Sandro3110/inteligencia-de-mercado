@@ -1,3 +1,4 @@
+// @ts-ignore - TODO: Fix TypeScript error
 import { describe, it, expect } from "vitest";
 
 /**

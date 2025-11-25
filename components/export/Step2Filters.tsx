@@ -58,7 +58,7 @@ export default function Step2Filters({ state, setState }: Step2FiltersProps) {
           ...prev.filters,
           geography: {
             ...prev.filters?.geography,
-            states: current.filter((s) => s !== uf),
+            states: current.filter((s: string) => s !== uf),
           },
         },
       }));
@@ -98,7 +98,7 @@ export default function Step2Filters({ state, setState }: Step2FiltersProps) {
           </Select>
 
           <div className="flex flex-wrap gap-2 mt-2">
-            {state.filters?.geography?.states?.map((uf) => (
+            {state.filters?.geography?.states?.map((uf: string) => (
               <Badge key={uf} variant="secondary" className="pl-2 pr-1">
                 {uf}
                 <button onClick={() => removeState(uf)} className="ml-1 hover:text-red-600">
@@ -184,7 +184,7 @@ export default function Step2Filters({ state, setState }: Step2FiltersProps) {
                           ...prev.filters?.quality,
                           status: checked
                             ? [...current, status]
-                            : current.filter((s) => s !== status),
+                            : current.filter((s: string) => s !== status),
                         },
                       },
                     }));
@@ -216,7 +216,7 @@ export default function Step2Filters({ state, setState }: Step2FiltersProps) {
                       ...prev.filters,
                       size: {
                         ...prev.filters?.size,
-                        porte: checked ? [...current, porte] : current.filter((p) => p !== porte),
+                        porte: checked ? [...current, porte] : current.filter((p: string) => p !== porte),
                       },
                     },
                   }));

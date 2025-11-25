@@ -50,11 +50,11 @@ interface Step7Props {
 // ============================================================================
 
 function getMercadosCount(data: ResearchWizardData): number {
-  return data.validatedData.mercados.length;
+  return data.validatedData?.mercados?.length || 0;
 }
 
 function getClientesCount(data: ResearchWizardData): number {
-  return data.validatedData.clientes.length;
+  return data.validatedData?.clientes?.length || 0;
 }
 
 // ============================================================================

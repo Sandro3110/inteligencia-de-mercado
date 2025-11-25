@@ -5,7 +5,7 @@
  * Fetches pesquisas for a project and manages selection state
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { trpc} from '@/lib/trpc/client';
 
 // ============================================================================
@@ -14,14 +14,16 @@ import { trpc} from '@/lib/trpc/client';
 
 interface Pesquisa {
   id: number;
+  projectId: number;
   nome: string;
-  descricao?: string | null;
-  status?: string | null;
-  createdAt?: string | null;
+  descricao: string | null;
+  dataImportacao: string | null;
   totalClientes: number | null;
-  totalConcorrentes: number | null;
-  totalLeads: number | null;
-  totalMercados: number | null;
+  clientesEnriquecidos: number | null;
+  status: string | null;
+  qtdConcorrentesPorMercado: number | null;
+  qtdLeadsPorMercado: number | null;
+  qtdProdutosPorCliente: number | null;
 }
 
 interface UseSelectedPesquisaReturn {
@@ -39,19 +41,26 @@ export function useSelectedPesquisa(projectId: number | null | undefined): UseSe
   const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(null);
 
   // Fetch pesquisas for the project
-  const { data: pesquisasData, isLoading } = trpc.getPesquisasByProject.useQuery(
+  const { data: pesquisasData, isLoading } = trpc.pesquisas.list.useQuery(
     { projectId: projectId! },
     { enabled: !!projectId }
   );
 
-  const pesquisas = (pesquisasData?.data as Pesquisa[]) || [];
+  const pesquisas = (pesquisasData as Pesquisa[]) || [];
 
   // Auto-select first pesquisa if none selected
-  useEffect(() => {
+  const defaultPesquisaId = useMemo(() => {
     if (pesquisas.length > 0 && !selectedPesquisaId) {
-      setSelectedPesquisaId(pesquisas[0].id);
+      return pesquisas[0].id;
     }
+    return selectedPesquisaId;
   }, [pesquisas, selectedPesquisaId]);
+
+  useEffect(() => {
+    if (defaultPesquisaId && defaultPesquisaId !== selectedPesquisaId) {
+      setSelectedPesquisaId(defaultPesquisaId);
+    }
+  }, [defaultPesquisaId]);
 
   const selectPesquisa = useCallback((id: number | null) => {
     setSelectedPesquisaId(id);

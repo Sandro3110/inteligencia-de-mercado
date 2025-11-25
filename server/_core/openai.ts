@@ -122,7 +122,7 @@ export async function testOpenAIConnection(): Promise<boolean> {
     });
 
     const content = result.choices[0]?.message?.content;
-    logger.debug('[OpenAI] Conexão OK:', content);
+    logger.debug('[OpenAI] Conexão OK:', { content });
     return true;
   } catch (error) {
     console.error('[OpenAI] Falha na conexão:', error);

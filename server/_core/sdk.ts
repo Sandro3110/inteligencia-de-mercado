@@ -32,7 +32,7 @@ const GET_USER_INFO_WITH_JWT_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserI
 
 class OAuthService {
   constructor(private client: ReturnType<typeof axios.create>) {
-    logger.debug('[OAuth] Initialized with baseURL:', ENV.oAuthServerUrl);
+    logger.debug('[OAuth] Initialized with baseURL:', { baseURL: ENV.oAuthServerUrl });
     if (!ENV.oAuthServerUrl) {
       console.error(
         '[OAuth] ERROR: OAUTH_SERVER_URL is not configured! Set OAUTH_SERVER_URL environment variable.'
@@ -244,7 +244,7 @@ class SDKServer {
 
     try {
       // Verificar JWT token
-      const secret = new TextEncoder().encode(ENV.jwtSecret);
+      const secret = new TextEncoder().encode(ENV.cookieSecret);
       const { payload } = await jwtVerify(sessionCookie, secret);
 
       if (!payload.userId || typeof payload.userId !== 'string') {

@@ -176,7 +176,7 @@ export function StepPreview({ step, data }: StepPreviewProps) {
   }, [data.inputMethod]);
 
   const mercadosCount = useMemo(() => data.mercados.length, [data.mercados]);
-  const clientesCount = useMemo(() => data.clientes.length, [data.clientes]);
+  const clientesCount = useMemo(() => data.clientes?.length || 0, [data.clientes]);
 
   const validatedMercadosCount = useMemo(
     () => data.validatedData?.mercados?.length || 0,
@@ -234,17 +234,17 @@ export function StepPreview({ step, data }: StepPreviewProps) {
         <div className="ml-6 grid grid-cols-3 gap-4 text-sm">
           <ParameterCard
             label={PARAMETER_LABELS.concorrentes}
-            value={data.qtdConcorrentes}
+            value={data.qtdConcorrentes || 0}
             colorClass={PARAMETER_COLORS.concorrentes}
           />
           <ParameterCard
             label={PARAMETER_LABELS.leads}
-            value={data.qtdLeads}
+            value={data.qtdLeads || 0}
             colorClass={PARAMETER_COLORS.leads}
           />
           <ParameterCard
             label={PARAMETER_LABELS.produtos}
-            value={data.qtdProdutos}
+            value={data.qtdProdutos || 0}
             colorClass={PARAMETER_COLORS.produtos}
           />
         </div>
@@ -278,7 +278,7 @@ export function StepPreview({ step, data }: StepPreviewProps) {
           <DataCountCard
             label={DATA_LABELS.clientes}
             count={clientesCount}
-            items={data.clientes}
+            items={data.clientes || []}
           />
         </div>
       </div>

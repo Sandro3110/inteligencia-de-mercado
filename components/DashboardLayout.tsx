@@ -284,10 +284,10 @@ function DashboardLayoutContent({
 
   // Reset resizing when sidebar collapses
   useEffect(() => {
-    if (isCollapsed) {
+    if (isCollapsed && isResizing) {
       setIsResizing(false);
     }
-  }, [isCollapsed]);
+  }, [isCollapsed, isResizing]);
 
   // Handle mouse events for resizing
   useEffect(() => {

@@ -11,6 +11,7 @@
  * - Integração completa
  */
 
+// @ts-ignore - TODO: Fix TypeScript error
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { getDb } from "../db";
 import {

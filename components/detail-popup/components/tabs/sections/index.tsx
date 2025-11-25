@@ -75,10 +75,10 @@ function InfoCard({ icon: Icon, label, value }: InfoCardProps) {
 
 export function BasicInfoSection({ item, type }: BasicInfoSectionProps) {
   const cnpj = (item as Cliente).cnpj;
-  const cnae = (item as { cnae?: string }).cnae;
-  const porte = (item as Cliente).porte;
-  const setor = (item as Cliente).setor;
-  const tipo = (item as { tipo?: string }).tipo;
+  const cnae = (item as { cnae?: string | null }).cnae;
+  const porte = (item as { porte?: string | null }).porte;
+  const setor = (item as { setor?: string | null }).setor;
+  const tipo = (item as { tipo?: string | null }).tipo;
 
   if (!cnpj && !cnae && !porte && !setor && !tipo) return null;
 
@@ -109,10 +109,10 @@ export function BasicInfoSection({ item, type }: BasicInfoSectionProps) {
 export function ContactSection({ item }: ContactSectionProps) {
   const email = (item as Cliente).email;
   const telefone = (item as Cliente).telefone;
-  const celular = (item as Cliente).celular;
-  const website = (item as Cliente).website;
+  const celular = (item as { celular?: string | null }).celular;
+  const website = (item as { website?: string | null }).website;
   const linkedin = (item as Cliente).linkedin;
-  const instagram = (item as Cliente).instagram;
+  const instagram = (item as { instagram?: string | null }).instagram;
 
   if (!email && !telefone && !celular && !website && !linkedin && !instagram) return null;
 
@@ -142,13 +142,13 @@ export function ContactSection({ item }: ContactSectionProps) {
 // ============================================================================
 
 export function LocationSection({ item }: LocationSectionProps) {
-  const endereco = (item as Cliente).endereco;
-  const cidade = (item as Cliente).cidade;
-  const estado = (item as Cliente).estado;
-  const cep = (item as Cliente).cep;
-  const pais = (item as Cliente).pais;
-  const latitude = (item as Cliente).latitude;
-  const longitude = (item as Cliente).longitude;
+  const endereco = (item as { endereco?: string | null }).endereco;
+  const cidade = (item as { cidade?: string | null }).cidade;
+  const estado = (item as { estado?: string | null }).estado;
+  const cep = (item as { cep?: string | null }).cep;
+  const pais = (item as { pais?: string | null }).pais;
+  const latitude = (item as { latitude?: number | null }).latitude;
+  const longitude = (item as { longitude?: number | null }).longitude;
 
   const hasLocation = endereco || cidade || estado || cep || pais;
   const hasCoordinates = latitude && longitude;
@@ -187,7 +187,7 @@ export function LocationSection({ item }: LocationSectionProps) {
 // ============================================================================
 
 export function ProductsSection({ item }: ProductsSectionProps) {
-  const descricao = (item as Cliente).descricao;
+  const descricao = (item as { descricao?: string | null }).descricao;
 
   if (!descricao) return null;
 
@@ -212,8 +212,8 @@ export function ProductsSection({ item }: ProductsSectionProps) {
 // ============================================================================
 
 export function FinancialSection({ item }: FinancialSectionProps) {
-  const faturamento = item.faturamento;
-  const numeroFuncionarios = item.numeroFuncionarios;
+  const faturamento = (item as { faturamento?: string | number | null }).faturamento;
+  const numeroFuncionarios = (item as { numeroFuncionarios?: number | null }).numeroFuncionarios;
 
   if (!faturamento && !numeroFuncionarios) return null;
 
@@ -229,7 +229,7 @@ export function FinancialSection({ item }: FinancialSectionProps) {
             <InfoCard
               icon={DollarSign}
               label={LABELS.FATURAMENTO}
-              value={formatCurrency(faturamento)}
+              value={formatCurrency(typeof faturamento === 'string' ? parseFloat(faturamento) : faturamento as number)}
             />
           )}
           {numeroFuncionarios && (
@@ -251,7 +251,7 @@ export function FinancialSection({ item }: FinancialSectionProps) {
 // ============================================================================
 
 export function ValidationSection({ item }: ValidationSectionProps) {
-  const observacoes = (item as Cliente).observacoes;
+  const observacoes = (item as { observacoes?: string | null }).observacoes;
 
   if (!observacoes) return null;
 
@@ -311,7 +311,7 @@ export function QualitySection({ item }: QualitySectionProps) {
 
 export function MetadataSection({ item }: MetadataSectionProps) {
   const createdAt = item.createdAt;
-  const updatedAt = item.updatedAt;
+  const updatedAt = (item as { updatedAt?: string | null }).updatedAt;
 
   if (!createdAt && !updatedAt) return null;
 

@@ -98,7 +98,7 @@ function filterInvalidMercados(mercados: Mercado[]): Mercado[] {
 
 function isDataValidated(data: ResearchWizardData): boolean {
   return (
-    data.validatedData.mercados.length > 0 || data.validatedData.clientes.length > 0
+    (data.validatedData?.mercados?.length || 0) > 0 || (data.validatedData?.clientes?.length || 0) > 0
   );
 }
 

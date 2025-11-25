@@ -113,10 +113,16 @@ interface Schedule {
   id: number;
   projectId: number;
   scheduledAt: string;
-  recurrence: Recurrence;
-  batchSize: number;
-  status: ScheduleStatus;
-  createdAt: string;
+  recurrence: string;
+  batchSize: number | null;
+  maxClients?: number | null;
+  timeout?: number | null;
+  status: string;
+  errorMessage?: string | null;
+  lastRunAt?: string | null;
+  nextRunAt?: string | null;
+  createdAt: string | null;
+  updatedAt?: string | null;
   executedAt?: string;
 }
 
@@ -273,21 +279,21 @@ export function ScheduleTab() {
 
   const handleBatchSizeChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setBatchSize(e.target.value);
+      setBatchSize(e.target.value as typeof BATCH_SIZE.DEFAULT);
     },
     []
   );
 
   const handleCancelSchedule = useCallback(
     (id: number) => {
-      cancelMutation.mutate(id);
+      cancelMutation.mutate({ id });
     },
     [cancelMutation]
   );
 
   const handleDeleteSchedule = useCallback(
     (id: number) => {
-      deleteMutation.mutate(id);
+      deleteMutation.mutate({ id });
     },
     [deleteMutation]
   );
@@ -318,10 +324,10 @@ export function ScheduleTab() {
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className={ICON_SIZES.SMALL} />
-                  {formatDistanceToNow(new Date(schedule.createdAt), {
+                  {schedule.createdAt ? formatDistanceToNow(new Date(schedule.createdAt), {
                     addSuffix: true,
                     locale: ptBR,
-                  })}
+                  }) : 'N/A'}
                 </span>
               </div>
 

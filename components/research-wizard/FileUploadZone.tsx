@@ -148,19 +148,6 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
     setIsDragging(false);
   }, []);
 
-  const handleDrop = useCallback(
-    (e: DragEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      setIsDragging(false);
-
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile) {
-        handleFileSelect(droppedFile);
-      }
-    },
-    [] // handleFileSelect will be defined below
-  );
-
   const parseCSV = useCallback((text: string) => {
     const lines = text.split('\n').filter((line) => line.trim());
     if (lines.length === 0) {
@@ -204,6 +191,19 @@ export default function FileUploadZone({ data, updateData, tipo }: FileUploadZon
       }
     },
     [parseCSV]
+  );
+
+  const handleDrop = useCallback(
+    (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setIsDragging(false);
+
+      const droppedFile = e.dataTransfer.files[0];
+      if (droppedFile) {
+        handleFileSelect(droppedFile);
+      }
+    },
+    [handleFileSelect]
   );
 
   const handleMappingComplete = useCallback(

@@ -92,9 +92,9 @@ export function Step2NameResearch({ data, updateData }: Step2Props) {
   // COMPUTED VALUES
   // ============================================================================
 
-  const charCount = useMemo(() => data.researchName.length, [data.researchName]);
+  const charCount = useMemo(() => data.researchName?.length || 0, [data.researchName]);
 
-  const isValid = useMemo(() => isNameValid(data.researchName), [data.researchName]);
+  const isValid = useMemo(() => isNameValid(data.researchName || ''), [data.researchName]);
 
   const charCountLabel = useMemo(() => getCharCountLabel(charCount), [charCount]);
 
@@ -139,7 +139,7 @@ export function Step2NameResearch({ data, updateData }: Step2Props) {
           </div>
           <Input
             placeholder={PLACEHOLDERS.NAME}
-            value={data.researchName}
+            value={data.researchName || ''}
             onChange={handleNameChange}
             className={`mt-2 ${inputClasses}`}
           />
@@ -149,7 +149,7 @@ export function Step2NameResearch({ data, updateData }: Step2Props) {
           <Label>{LABELS.FIELD_DESCRIPTION}</Label>
           <Textarea
             placeholder={PLACEHOLDERS.DESCRIPTION}
-            value={data.researchDescription}
+            value={data.researchDescription || ''}
             onChange={handleDescriptionChange}
             className="mt-2"
             rows={VALIDATION.DESCRIPTION_ROWS}

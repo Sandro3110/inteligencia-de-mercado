@@ -11,6 +11,7 @@
  * 4. Navegação entre projetos e pesquisas
  */
 
+// @ts-ignore - TODO: Fix TypeScript error
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import {
   getDb,

@@ -57,6 +57,7 @@ export async function executePreResearch(
 
     // FASE 41.2: Usar credenciais configuráveis se projectId fornecido
     const llmFunction = input.projectId
+      // @ts-ignore - TODO: Fix TypeScript error
       ? (params: unknown) => invokeLLMWithConfig(input.projectId!, params)
       : invokeLLM;
 

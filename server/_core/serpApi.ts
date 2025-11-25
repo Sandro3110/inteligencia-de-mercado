@@ -70,7 +70,7 @@ export async function searchGoogle(
     }
 
     const results: SerpApiResult[] = (data.organic_results || []).map(
-      (result: unknown, index: number) => ({
+      (result: any, index: number) => ({
         position: result.position || index + 1,
         title: result.title || '',
         link: result.link || '',

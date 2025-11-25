@@ -256,7 +256,8 @@ async function deleteMercadosByPesquisa(pesquisaId: number): Promise<number> {
 
   const result = await db.delete(mercadosUnicos).where(eq(mercadosUnicos.pesquisaId, pesquisaId));
 
-  return result[0].affectedRows || 0;
+  // PostgreSQL delete returns deleted rows, count them
+  return Array.isArray(result) ? result.length : 0;
 }
 
 async function deleteClientesByPesquisa(pesquisaId: number): Promise<number> {
@@ -265,7 +266,8 @@ async function deleteClientesByPesquisa(pesquisaId: number): Promise<number> {
 
   const result = await db.delete(clientes).where(eq(clientes.pesquisaId, pesquisaId));
 
-  return result[0].affectedRows || 0;
+  // PostgreSQL delete returns deleted rows, count them
+  return Array.isArray(result) ? result.length : 0;
 }
 
 async function deleteConcorrentesByPesquisa(pesquisaId: number): Promise<number> {
@@ -274,7 +276,8 @@ async function deleteConcorrentesByPesquisa(pesquisaId: number): Promise<number>
 
   const result = await db.delete(concorrentes).where(eq(concorrentes.pesquisaId, pesquisaId));
 
-  return result[0].affectedRows || 0;
+  // PostgreSQL delete returns deleted rows, count them
+  return Array.isArray(result) ? result.length : 0;
 }
 
 async function deleteLeadsByPesquisa(pesquisaId: number): Promise<number> {
@@ -283,5 +286,6 @@ async function deleteLeadsByPesquisa(pesquisaId: number): Promise<number> {
 
   const result = await db.delete(leads).where(eq(leads.pesquisaId, pesquisaId));
 
-  return result[0].affectedRows || 0;
+  // PostgreSQL delete returns deleted rows, count them
+  return Array.isArray(result) ? result.length : 0;
 }

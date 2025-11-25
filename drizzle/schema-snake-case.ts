@@ -38,9 +38,9 @@ export const activityLog = pgTable(
     created_at: timestamp({ mode: "string" }).defaultNow(),
   },
   table => [
-    index("idx_project").on(table.projectId),
-    index("idx_type").on(table.activityType),
-    index("idx_created").on(table.createdAt),
+    index("idx_project").on(table.project_id),
+    index("idx_type").on(table.activity_type),
+    index("idx_created").on(table.created_at),
   ]
 );
 
@@ -163,12 +163,12 @@ export const clientes = pgTable(
   "clientes",
   {
     id: serial(),
-    clienteHash: varchar({ length: 255 }),
+    cliente_hash: varchar({ length: 255 }),
     nome: varchar({ length: 255 }).notNull(),
     cnpj: varchar({ length: 20 }),
-    siteOficial: varchar({ length: 500 }),
-    produtoPrincipal: text(),
-    segmentacaoB2BB2C: varchar({ length: 20 }),
+    site_oficial: varchar({ length: 500 }),
+    produto_principal: text(),
+    segmentacao_b2b_b2c: varchar({ length: 20 }),
     email: varchar({ length: 320 }),
     telefone: varchar({ length: 50 }),
     linkedin: varchar({ length: 500 }),
@@ -177,25 +177,25 @@ export const clientes = pgTable(
     uf: varchar({ length: 2 }),
     cnae: varchar({ length: 20 }),
     porte: varchar({ length: 50 }),
-    qualidadeScore: integer(),
-    qualidadeClassificacao: varchar({ length: 50 }),
-    validationStatus: varchar({ length: 50 }).default("pending"),
-    validationNotes: text(),
-    validatedBy: varchar({ length: 64 }),
-    validatedAt: timestamp({ mode: "string" }),
+    qualidade_score: integer(),
+    qualidade_classificacao: varchar({ length: 50 }),
+    validation_status: varchar({ length: 50 }).default("pending"),
+    validation_notes: text(),
+    validated_by: varchar({ length: 64 }),
+    validated_at: timestamp({ mode: "string" }),
     created_at: timestamp({ mode: "string" }).defaultNow(),
     project_id: integer().default(1).notNull(),
     regiao: varchar({ length: 100 }),
-    faturamentoDeclarado: text(),
-    numeroEstabelecimentos: text(),
+    faturamento_declarado: text(),
+    numero_estabelecimentos: text(),
     pesquisa_id: integer(),
     latitude: numeric({ precision: 10, scale: 8 }),
     longitude: numeric({ precision: 11, scale: 8 }),
-    geocodedAt: timestamp({ mode: "string" }),
+    geocoded_at: timestamp({ mode: "string" }),
   },
   table => [
-    index("idx_clientes_projectId").on(table.projectId),
-    index("unique_cliente_hash").on(table.clienteHash),
+    index("idx_clientes_projectId").on(table.project_id),
+    index("unique_cliente_hash").on(table.cliente_hash),
   ]
 );
 
@@ -218,14 +218,14 @@ export const clientesMercados = pgTable(
     mercado_id: integer().notNull(),
     created_at: timestamp({ mode: "string" }).defaultNow(),
   },
-  table => [index("idx_cliente_mercado").on(table.clienteId, table.mercadoId)]
+  table => [index("idx_cliente_mercado").on(table.cliente_id, table.mercado_id)]
 );
 
 export const concorrentes = pgTable(
   "concorrentes",
   {
     id: serial(),
-    concorrenteHash: varchar({ length: 255 }),
+    concorrente_hash: varchar({ length: 255 }),
     mercado_id: integer().notNull(),
     nome: varchar({ length: 255 }).notNull(),
     cnpj: varchar({ length: 20 }),
@@ -233,27 +233,27 @@ export const concorrentes = pgTable(
     produto: text(),
     porte: varchar({ length: 50 }),
     faturamentoEstimado: text(),
-    qualidadeScore: integer(),
-    qualidadeClassificacao: varchar({ length: 50 }),
-    validationStatus: varchar({ length: 50 }).default("pending"),
-    validationNotes: text(),
-    validatedBy: varchar({ length: 64 }),
-    validatedAt: timestamp({ mode: "string" }),
+    qualidade_score: integer(),
+    qualidade_classificacao: varchar({ length: 50 }),
+    validation_status: varchar({ length: 50 }).default("pending"),
+    validation_notes: text(),
+    validated_by: varchar({ length: 64 }),
+    validated_at: timestamp({ mode: "string" }),
     created_at: timestamp({ mode: "string" }).defaultNow(),
     project_id: integer().default(1).notNull(),
     cidade: varchar({ length: 100 }),
     uf: varchar({ length: 2 }),
-    faturamentoDeclarado: text(),
-    numeroEstabelecimentos: text(),
+    faturamento_declarado: text(),
+    numero_estabelecimentos: text(),
     pesquisa_id: integer(),
     latitude: numeric({ precision: 10, scale: 8 }),
     longitude: numeric({ precision: 11, scale: 8 }),
-    geocodedAt: timestamp({ mode: "string" }),
+    geocoded_at: timestamp({ mode: "string" }),
   },
   table => [
-    index("idx_concorrentes_projectId").on(table.projectId),
-    index("unique_concorrente_hash").on(table.concorrenteHash),
-    index("idx_concorrente_hash").on(table.concorrenteHash),
+    index("idx_concorrentes_projectId").on(table.project_id),
+    index("unique_concorrente_hash").on(table.concorrente_hash),
+    index("idx_concorrente_hash").on(table.concorrente_hash),
   ]
 );
 
@@ -274,12 +274,12 @@ export const enrichmentCache = pgTable(
     cnpj: varchar({ length: 14 }).notNull(),
     dadosJson: text().notNull(),
     fonte: varchar({ length: 50 }),
-    dataAtualizacao: timestamp({ mode: "string" })
+    data_atualizacao: timestamp({ mode: "string" })
       .defaultNow()
       .notNull(),
     created_at: timestamp({ mode: "string" }).defaultNow(),
   },
-  table => [index("idx_data_atualizacao").on(table.dataAtualizacao)]
+  table => [index("idx_data_atualizacao").on(table.data_atualizacao)]
 );
 
 export const enrichmentConfigs = pgTable(
@@ -305,20 +305,20 @@ export const enrichmentConfigs = pgTable(
     anthropicApiKey: text(),
     googleMapsApiKey: text(),
   },
-  table => [index("projectId").on(table.projectId)]
+  table => [index("projectId").on(table.project_id)]
 );
 
 export const systemSettings = pgTable(
   "system_settings",
   {
     id: serial(),
-    settingKey: varchar({ length: 100 }).notNull(),
-    settingValue: text(),
+    setting_key: varchar({ length: 100 }).notNull(),
+    setting_value: text(),
     description: text(),
     created_at: timestamp({ mode: "string" }).defaultNow(),
     updated_at: timestamp({ mode: "string" }).defaultNow(),
   },
-  table => [index("idx_setting_key").on(table.settingKey)]
+  table => [index("idx_setting_key").on(table.setting_key)]
 );
 
 export const enrichmentJobs = pgTable("enrichment_jobs", {
@@ -365,7 +365,7 @@ export const enrichmentQueue = pgTable(
   },
   table => [
     index("idx_queue_status").on(table.status),
-    index("idx_queue_project").on(table.projectId),
+    index("idx_queue_project").on(table.project_id),
     index("idx_queue_priority").on(table.priority),
   ]
 );
@@ -428,7 +428,7 @@ export const intelligentAlertsConfigs = pgTable(
     updated_at: timestamp({ mode: "string" }).defaultNow(),
   },
   table => [
-    index("intelligent_alerts_configs_projectId_unique").on(table.projectId),
+    index("intelligent_alerts_configs_projectId_unique").on(table.project_id),
   ]
 );
 
@@ -471,7 +471,7 @@ export const leads = pgTable(
   "leads",
   {
     id: serial(),
-    leadHash: varchar({ length: 255 }),
+    lead_hash: varchar({ length: 255 }),
     mercado_id: integer().notNull(),
     nome: varchar({ length: 255 }).notNull(),
     cnpj: varchar({ length: 20 }),
@@ -482,30 +482,30 @@ export const leads = pgTable(
     porte: varchar({ length: 50 }),
     regiao: varchar({ length: 100 }),
     setor: varchar({ length: 100 }),
-    qualidadeScore: integer(),
-    qualidadeClassificacao: varchar({ length: 50 }),
+    qualidade_score: integer(),
+    qualidade_classificacao: varchar({ length: 50 }),
     leadStage: varchar({ length: 50 }).default("novo"),
     stageUpdatedAt: timestamp({ mode: "string" }).defaultNow(),
-    validationStatus: varchar({ length: 50 }).default("pending"),
-    validationNotes: text(),
-    validatedBy: varchar({ length: 64 }),
-    validatedAt: timestamp({ mode: "string" }),
+    validation_status: varchar({ length: 50 }).default("pending"),
+    validation_notes: text(),
+    validated_by: varchar({ length: 64 }),
+    validated_at: timestamp({ mode: "string" }),
     created_at: timestamp({ mode: "string" }).defaultNow(),
     project_id: integer().default(1).notNull(),
     cidade: varchar({ length: 100 }),
     uf: varchar({ length: 2 }),
-    faturamentoDeclarado: text(),
-    numeroEstabelecimentos: text(),
+    faturamento_declarado: text(),
+    numero_estabelecimentos: text(),
     pesquisa_id: integer(),
     stage: varchar({ length: 50 }).default("novo"),
     latitude: numeric({ precision: 10, scale: 8 }),
     longitude: numeric({ precision: 11, scale: 8 }),
-    geocodedAt: timestamp({ mode: "string" }),
+    geocoded_at: timestamp({ mode: "string" }),
   },
   table => [
-    index("idx_leads_projectId").on(table.projectId),
-    index("unique_lead_hash").on(table.leadHash),
-    index("idx_lead_hash").on(table.leadHash),
+    index("idx_leads_projectId").on(table.project_id),
+    index("unique_lead_hash").on(table.lead_hash),
+    index("idx_lead_hash").on(table.lead_hash),
   ]
 );
 
@@ -556,7 +556,7 @@ export const mercadosUnicos = pgTable(
   "mercados_unicos",
   {
     id: serial(),
-    mercadoHash: varchar({ length: 255 }),
+    mercado_hash: varchar({ length: 255 }),
     nome: varchar({ length: 255 }).notNull(),
     segmentacao: varchar({ length: 50 }),
     categoria: varchar({ length: 100 }),
@@ -570,9 +570,9 @@ export const mercadosUnicos = pgTable(
     pesquisa_id: integer(),
   },
   table => [
-    index("idx_mercados_projectId").on(table.projectId),
-    index("unique_mercado_hash").on(table.mercadoHash),
-    index("idx_mercado_hash").on(table.mercadoHash),
+    index("idx_mercados_projectId").on(table.project_id),
+    index("unique_mercado_hash").on(table.mercado_hash),
+    index("idx_mercado_hash").on(table.mercado_hash),
   ]
 );
 
@@ -596,9 +596,9 @@ export const exportHistory = pgTable(
     created_at: timestamp({ mode: "string" }).defaultNow(),
   },
   table => [
-    index("idx_export_user").on(table.userId),
-    index("idx_export_project").on(table.projectId),
-    index("idx_export_created").on(table.createdAt),
+    index("idx_export_user").on(table.user_id),
+    index("idx_export_project").on(table.project_id),
+    index("idx_export_created").on(table.created_at),
   ]
 );
 
@@ -618,8 +618,8 @@ export const savedFiltersExport = pgTable(
     updated_at: timestamp({ mode: "string" }).defaultNow(),
   },
   table => [
-    index("idx_saved_filter_user").on(table.userId),
-    index("idx_saved_filter_project").on(table.projectId),
+    index("idx_saved_filter_user").on(table.user_id),
+    index("idx_saved_filter_project").on(table.project_id),
   ]
 );
 
@@ -653,7 +653,7 @@ export const notificationPreferences = pgTable(
     created_at: timestamp({ mode: "string" }).defaultNow(),
     updated_at: timestamp({ mode: "string" }).defaultNow(),
   },
-  table => [index("idx_user_type").on(table.userId, table.type)]
+  table => [index("idx_user_type").on(table.user_id, table.type)]
 );
 
 export const operationalAlerts = pgTable("operational_alerts", {
@@ -711,8 +711,8 @@ export const produtos = pgTable(
   },
   table => [
     index("idx_produto_unique").on(
-      table.clienteId,
-      table.mercadoId,
+      table.cliente_id,
+      table.mercado_id,
       table.nome
     ),
   ]
@@ -812,8 +812,8 @@ export const scheduledEnrichments = pgTable("scheduled_enrichments", {
     .default("pending")
     .notNull(),
   errorMessage: text(),
-  lastRunAt: timestamp({ mode: "string" }),
-  nextRunAt: timestamp({ mode: "string" }),
+  last_run_at: timestamp({ mode: "string" }),
+  next_run_at: timestamp({ mode: "string" }),
   created_at: timestamp({ mode: "string" }).defaultNow(),
   updated_at: timestamp({ mode: "string" }).defaultNow(),
 });
@@ -1019,7 +1019,7 @@ export const pushSubscriptions = pgTable(
     created_at: timestamp("createdAt").defaultNow(),
     lastUsedAt: timestamp("lastUsedAt").defaultNow(),
   },
-  table => [index("idx_userId").on(table.userId)]
+  table => [index("idx_userId").on(table.user_id)]
 );
 
 export type PushSubscription = typeof pushSubscriptions.$inferSelect;
@@ -1040,16 +1040,16 @@ export const reportSchedules = pgTable(
     frequency: frequencyEnum("frequency").notNull(),
     recipients: text("recipients").notNull(), // JSON array de emails
     config: jsonb("config").notNull(), // Configurações do relatório (filtros, formato, etc)
-    nextRunAt: timestamp("nextRunAt", { mode: "string" }).notNull(),
-    lastRunAt: timestamp("lastRunAt", { mode: "string" }),
+    next_run_at: timestamp("nextRunAt", { mode: "string" }).notNull(),
+    last_run_at: timestamp("lastRunAt", { mode: "string" }),
     enabled: smallint("enabled").default(1).notNull(),
     created_at: timestamp("createdAt").defaultNow(),
     updated_at: timestamp("updatedAt").defaultNow(),
   },
   table => [
-    index("idx_userId").on(table.userId),
-    index("idx_projectId").on(table.projectId),
-    index("idx_nextRunAt").on(table.nextRunAt),
+    index("idx_userId").on(table.user_id),
+    index("idx_projectId").on(table.project_id),
+    index("idx_nextRunAt").on(table.next_run_at),
   ]
 );
 
@@ -1101,9 +1101,9 @@ export const passwordResets = pgTable(
   },
   table => [
     index("idx_token").on(table.token),
-    index("idx_user").on(table.userId),
+    index("idx_user").on(table.user_id),
     foreignKey({
-      columns: [table.userId],
+      columns: [table.user_id],
       foreignColumns: [users.id],
       name: "fk_password_reset_user",
     }),
@@ -1121,10 +1121,10 @@ export const loginAttempts = pgTable(
     sucesso: smallint().notNull(),
     ip: varchar({ length: 45 }),
     userAgent: text(),
-    tentativaEm: timestamp({ mode: "string" }).defaultNow().notNull(),
+    tentativa_em: timestamp({ mode: "string" }).defaultNow().notNull(),
   },
   table => [
-    index("idx_email_tentativa").on(table.email, table.tentativaEm),
+    index("idx_email_tentativa").on(table.email, table.tentativa_em),
   ]
 );
 

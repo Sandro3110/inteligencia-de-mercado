@@ -3,7 +3,7 @@
  * Types for entity list views (subset of full entity data)
  */
 
-import type { Cliente, Concorrente, Lead } from '@/drizzle/schema';
+import type { Cliente, Concorrente, Lead } from '@/drizzle/schema-snake-case';
 
 // ============================================================================
 // LIST ITEM TYPES (Subset returned by paginated APIs)
@@ -13,47 +13,44 @@ export interface ClienteListItem {
   id: number;
   nome: string;
   cnpj: string | null;
-  siteOficial: string | null;
-  produtoPrincipal: string | null;
-  segmentacaoB2BB2C: string | null;
+  site_oficial: string | null;
+  produto_principal: string | null;
+  segmentacao_b2b_b2c: string | null;
   email: string | null;
   telefone: string | null;
   cidade: string | null;
   uf: string | null;
-  validationStatus: string | null;
-  validationNotes: string | null;
-  validatedAt: string | null;
+  validation_status: string | null;
+  validation_notes: string | null;
+  validated_at: string | null;
 }
 
 export interface ConcorrenteListItem {
   id: number;
   nome: string;
   cnpj: string | null;
-  siteOficial: string | null;
-  produtoPrincipal: string | null;
-  segmentacaoB2BB2C: string | null;
-  email: string | null;
-  telefone: string | null;
+  site: string | null;
+  produto: string | null;
   cidade: string | null;
   uf: string | null;
-  validationStatus: string | null;
-  validationNotes: string | null;
-  validatedAt: string | null;
+  validation_status: string | null;
+  validation_notes: string | null;
+  validated_at: string | null;
 }
 
 export interface LeadListItem {
   id: number;
   nome: string;
-  empresa: string | null;
+  cnpj: string | null;
+  site: string | null;
   email: string | null;
   telefone: string | null;
-  cargo: string | null;
   cidade: string | null;
   uf: string | null;
   leadStage: string | null;
-  validationStatus: string | null;
-  validationNotes: string | null;
-  validatedAt: string | null;
+  validation_status: string | null;
+  validation_notes: string | null;
+  validated_at: string | null;
 }
 
 // ============================================================================
@@ -99,16 +96,16 @@ export function clienteListItemToCliente(item: ClienteListItem): Partial<Cliente
     id: item.id,
     nome: item.nome,
     cnpj: item.cnpj,
-    siteOficial: item.siteOficial,
-    produtoPrincipal: item.produtoPrincipal,
-    segmentacaoB2BB2C: item.segmentacaoB2BB2C,
+    site_oficial: item.site_oficial,
+    produto_principal: item.produto_principal,
+    segmentacao_b2b_b2c: item.segmentacao_b2b_b2c,
     email: item.email,
     telefone: item.telefone,
     cidade: item.cidade,
     uf: item.uf,
-    validationStatus: item.validationStatus,
-    validationNotes: item.validationNotes,
-    validatedAt: item.validatedAt,
+    validation_status: item.validation_status,
+    validation_notes: item.validation_notes,
+    validated_at: item.validated_at,
   };
 }
 
@@ -117,16 +114,13 @@ export function concorrenteListItemToConcorrente(item: ConcorrenteListItem): Par
     id: item.id,
     nome: item.nome,
     cnpj: item.cnpj,
-    siteOficial: item.siteOficial,
-    produtoPrincipal: item.produtoPrincipal,
-    segmentacaoB2BB2C: item.segmentacaoB2BB2C,
-    email: item.email,
-    telefone: item.telefone,
+    site: item.site,
+    produto: item.produto,
     cidade: item.cidade,
     uf: item.uf,
-    validationStatus: item.validationStatus,
-    validationNotes: item.validationNotes,
-    validatedAt: item.validatedAt,
+    validation_status: item.validation_status,
+    validation_notes: item.validation_notes,
+    validated_at: item.validated_at,
   };
 }
 
@@ -134,15 +128,15 @@ export function leadListItemToLead(item: LeadListItem): Partial<Lead> {
   return {
     id: item.id,
     nome: item.nome,
-    empresa: item.empresa,
+    cnpj: item.cnpj,
+    site: item.site,
     email: item.email,
     telefone: item.telefone,
-    cargo: item.cargo,
     cidade: item.cidade,
     uf: item.uf,
     leadStage: item.leadStage,
-    validationStatus: item.validationStatus,
-    validationNotes: item.validationNotes,
-    validatedAt: item.validatedAt,
+    validation_status: item.validation_status,
+    validation_notes: item.validation_notes,
+    validated_at: item.validated_at,
   };
 }

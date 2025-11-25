@@ -161,7 +161,7 @@ function ClearButton({ onClear }: ClearButtonProps) {
  */
 export default function SearchHistory({ onSelectSearch }: SearchHistoryProps) {
   // State
-  const [history, setHistory] = useState<string[]>([]);
+  const [history, setHistory] = useState<string[]>(() => loadHistoryFromStorage());
 
   // ============================================================================
   // COMPUTED VALUES
@@ -185,19 +185,11 @@ export default function SearchHistory({ onSelectSearch }: SearchHistoryProps) {
   }, []);
 
   const handleSelectSearch = useCallback(
-    (query: string) => {
-      onSelectSearch(query);
+    (searchTerm: string) => {
+      onSelectSearch(searchTerm);
     },
     [onSelectSearch]
   );
-
-  // ============================================================================
-  // EFFECTS
-  // ============================================================================
-
-  useEffect(() => {
-    loadHistory();
-  }, [loadHistory]);
 
   // ============================================================================
   // RENDER

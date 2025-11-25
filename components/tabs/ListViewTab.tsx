@@ -1,11 +1,14 @@
 'use client';
 
-import { UnifiedFilters } from '@/pages/UnifiedCockpit';
-import CascadeView from '@/pages/CascadeView';
+import CascadeViewContent from '@/components/CascadeViewContent';
 
 // ============================================================================
 // TYPES
 // ============================================================================
+
+interface UnifiedFilters {
+  [key: string]: any;
+}
 
 interface ListViewTabProps {
   filters: UnifiedFilters;
@@ -27,7 +30,7 @@ export default function ListViewTab({
 }: ListViewTabProps) {
   return (
     <div className="h-full w-full overflow-hidden">
-      <CascadeView />
+      <CascadeViewContent />
     </div>
   );
 }

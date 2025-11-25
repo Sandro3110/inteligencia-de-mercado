@@ -346,29 +346,29 @@ export default function Step4Output({ state, setState }: Step4OutputProps) {
   );
 
   const handleFormatChange = useCallback(
-    (value: ExportState['format']) => {
-      setState((prev) => ({ ...prev, format: value }));
+    (value: string) => {
+      setState((prev) => ({ ...prev, format: value as ExportState['format'] }));
     },
     [setState]
   );
 
   const handleOutputTypeChange = useCallback(
-    (value: ExportState['outputType']) => {
-      setState((prev) => ({ ...prev, outputType: value }));
+    (value: string) => {
+      setState((prev) => ({ ...prev, outputType: value as ExportState['outputType'] }));
     },
     [setState]
   );
 
   const handleDepthChange = useCallback(
-    (value: ExportState['depth']) => {
-      setState((prev) => ({ ...prev, depth: value }));
+    (value: string) => {
+      setState((prev) => ({ ...prev, depth: value as ExportState['depth'] }));
     },
     [setState]
   );
 
   const handleTemplateChange = useCallback(
-    (value: ExportState['templateType']) => {
-      setState((prev) => ({ ...prev, templateType: value }));
+    (value: string) => {
+      setState((prev) => ({ ...prev, templateType: value as ExportState['templateType'] }));
     },
     [setState]
   );

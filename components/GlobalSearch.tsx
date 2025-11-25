@@ -241,8 +241,10 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 
   // Reset selected index quando resultados mudam
   useEffect(() => {
-    setSelectedIndex(0);
-  }, [filteredResults.length]);
+    if (selectedIndex >= filteredResults.length) {
+      setSelectedIndex(0);
+    }
+  }, [filteredResults.length, selectedIndex]);
 
   // Focus input quando abrir
   useEffect(() => {
