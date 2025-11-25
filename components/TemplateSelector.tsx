@@ -74,9 +74,11 @@ interface TemplateConfig {
 interface Template {
   id: number;
   name: string;
-  description: string;
+  description: string | null;
   isDefault: number;
   config: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 
 interface TemplateCardProps {
