@@ -236,65 +236,65 @@ export function GlobalShortcuts() {
     {
       key: 'k',
       ctrl: true,
-      handler: handleShowSearch,
+      callback: handleShowSearch,
       description: 'Busca global',
     },
     {
       key: 'n',
       ctrl: true,
-      handler: createNavigationHandler(setLocation, ROUTES.ENRICHMENT),
+      callback: createNavigationHandler(setLocation, ROUTES.ENRICHMENT),
       description: 'Novo projeto de enriquecimento',
     },
     {
       key: '/',
       ctrl: true,
-      handler: handleShowHelp,
+      callback: handleShowHelp,
       description: 'Mostrar atalhos disponíveis',
     },
     {
       key: '?',
-      handler: handleShowHelp,
+      callback: handleShowHelp,
       description: 'Mostrar atalhos disponíveis',
     },
     {
       key: '1',
       ctrl: true,
-      handler: createNavigationHandler(setLocation, ROUTES.DASHBOARD),
+      callback: createNavigationHandler(setLocation, ROUTES.DASHBOARD),
       description: 'Navegar para Dashboard',
     },
     {
       key: '2',
       ctrl: true,
-      handler: createNavigationHandler(setLocation, ROUTES.MERCADOS),
+      callback: createNavigationHandler(setLocation, ROUTES.MERCADOS),
       description: 'Navegar para Mercados',
     },
     {
       key: '3',
       ctrl: true,
-      handler: createNavigationHandler(setLocation, ROUTES.ANALYTICS),
+      callback: createNavigationHandler(setLocation, ROUTES.ANALYTICS),
       description: 'Navegar para Analytics',
     },
     {
       key: '4',
       ctrl: true,
-      handler: createNavigationHandler(setLocation, ROUTES.ROI),
+      callback: createNavigationHandler(setLocation, ROUTES.ROI),
       description: 'Navegar para ROI',
     },
     {
       key: 'b',
       ctrl: true,
-      handler: handleToggleSidebar,
+      callback: handleToggleSidebar,
       description: 'Toggle sidebar (expandir/colapsar)',
     },
     // Gmail-style navigation (G + key)
     {
       key: 'g',
-      handler: handleGPress,
+      callback: handleGPress,
       description: 'Ativar modo de navegação rápida',
     },
     {
       key: 'h',
-      handler: createGNavigationHandler(
+      callback: createGNavigationHandler(
         gPressed,
         setGPressed,
         setLocation,
@@ -304,7 +304,7 @@ export function GlobalShortcuts() {
     },
     {
       key: 'p',
-      handler: createGNavigationHandler(
+      callback: createGNavigationHandler(
         gPressed,
         setGPressed,
         setLocation,
@@ -314,7 +314,7 @@ export function GlobalShortcuts() {
     },
     {
       key: 'm',
-      handler: createGNavigationHandler(
+      callback: createGNavigationHandler(
         gPressed,
         setGPressed,
         setLocation,
@@ -324,7 +324,7 @@ export function GlobalShortcuts() {
     },
     {
       key: 'a',
-      handler: createGNavigationHandler(
+      callback: createGNavigationHandler(
         gPressed,
         setGPressed,
         setLocation,
@@ -334,7 +334,7 @@ export function GlobalShortcuts() {
     },
     {
       key: 'e',
-      handler: createGNavigationHandler(
+      callback: createGNavigationHandler(
         gPressed,
         setGPressed,
         setLocation,
@@ -344,7 +344,7 @@ export function GlobalShortcuts() {
     },
     {
       key: 'r',
-      handler: createGNavigationHandler(
+      callback: createGNavigationHandler(
         gPressed,
         setGPressed,
         setLocation,
@@ -354,7 +354,7 @@ export function GlobalShortcuts() {
     },
     {
       key: 'n',
-      handler: createGNavigationHandler(
+      callback: createGNavigationHandler(
         gPressed,
         setGPressed,
         setLocation,
@@ -364,7 +364,7 @@ export function GlobalShortcuts() {
     },
     {
       key: 's',
-      handler: createGNavigationHandler(
+      callback: createGNavigationHandler(
         gPressed,
         setGPressed,
         setLocation,

@@ -134,7 +134,7 @@ function getSidebarWidthStyle(width: number): CSSProperties {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarWidth, setSidebarWidth] = useState(getInitialSidebarWidth);
-  const { loading, user } = useAuth();
+  const { isLoading, user } = useAuth();
 
   // ============================================================================
   // EFFECTS
@@ -148,7 +148,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   // RENDER
   // ============================================================================
 
-  if (loading) {
+  if (isLoading) {
     return <DashboardLayoutSkeleton />;
   }
 

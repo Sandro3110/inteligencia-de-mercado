@@ -158,9 +158,9 @@ interface DraftData {
 
 interface Draft {
   id: number;
-  projectId?: number;
+  projectId: number | null;
   currentStep: number;
-  draftData: DraftData;
+  draftData: unknown;
   updatedAt?: string;
 }
 
@@ -285,7 +285,7 @@ export default function DraftRecoveryModal({
   const handleContinue = useCallback(
     (draft: Draft) => {
       if (onContinueDraft) {
-        onContinueDraft(draft.draftData);
+        onContinueDraft(draft.draftData as DraftData);
         onOpenChange(false);
         toast.success(TOAST_MESSAGES.CONTINUE_SUCCESS, {
           description: TOAST_MESSAGES.CONTINUE_DESCRIPTION,
@@ -463,7 +463,7 @@ export default function DraftRecoveryModal({
   );
 
   const renderDraftCard = useCallback(
-    (draft: Draft) => {
+    (draft: any) => {
       const progressPercentage = calculateProgressPercentage(draft.currentStep);
       const stepLabel = getStepLabel(draft.currentStep);
       const formattedDate = draft.updatedAt

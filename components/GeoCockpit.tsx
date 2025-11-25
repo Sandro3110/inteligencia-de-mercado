@@ -38,8 +38,8 @@ import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 // ============================================================================
 
 const DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
+  iconUrl: typeof icon === 'string' ? icon : icon.src,
+  shadowUrl: typeof iconShadow === 'string' ? iconShadow : iconShadow.src,
   iconSize: [25, 41],
   iconAnchor: [12, 41],
 });
@@ -216,7 +216,7 @@ export default function GeoCockpit({
   // STATE
   // ============================================================================
 
-  const [step, setStep] = useState(STEPS.VALIDATE);
+  const [step, setStep] = useState<number>(STEPS.VALIDATE);
   const [lat, setLat] = useState<number>(initialLat || DEFAULT_COORDS.LAT);
   const [lng, setLng] = useState<number>(initialLng || DEFAULT_COORDS.LNG);
   const [manualLat, setManualLat] = useState<string>(

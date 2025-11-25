@@ -347,7 +347,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
             {getTypeLabel(type)} ({items.length})
           </div>
           {items.map((result) => {
-            const globalIndex = filteredResults.indexOf(result);
+            const globalIndex = filteredResults.indexOf(result as any);
             const isSelected = globalIndex === selectedIndex;
             return renderResult(result, isSelected);
           })}
