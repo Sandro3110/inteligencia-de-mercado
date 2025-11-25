@@ -77,7 +77,7 @@ const LABELS = {
   CANCEL_BUTTON: 'Cancelar',
   LOADING: 'Carregando...',
   EMPTY_STATE: 'Nenhum agendamento configurado',
-  BATCH_INFO: (size: number) => `Lote: ${size} clientes`,
+  BATCH_INFO: (size: number | null) => `Lote: ${size ?? 0} clientes`,
   MAX_INFO: (max: number) => ` • Máximo: ${max}`,
 } as const;
 
@@ -126,6 +126,13 @@ interface Schedule {
   batchSize: number | null;
   maxClients: number | null;
   status: string;
+  errorMessage?: string | null;
+  lastRunAt?: string | null;
+  nextRunAt?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  projectId?: number;
+  timeout?: number | null;
 }
 
 // ============================================================================
