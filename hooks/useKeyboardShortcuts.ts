@@ -8,7 +8,7 @@ export interface KeyboardShortcut {
   shift?: boolean;
   alt?: boolean;
   meta?: boolean;
-  callback: () => void;
+  callback: (event: KeyboardEvent) => void;
   description?: string;
 }
 
@@ -24,7 +24,7 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[]) {
 
         if (ctrlMatch && shiftMatch && altMatch && metaMatch && keyMatch) {
           event.preventDefault();
-          shortcut.callback();
+          shortcut.callback(event);
           break;
         }
       }
