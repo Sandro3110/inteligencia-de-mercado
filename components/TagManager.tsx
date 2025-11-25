@@ -109,7 +109,7 @@ function getColorButtonClasses(isSelected: boolean): string {
 export function TagManager() {
   const [isOpen, setIsOpen] = useState(false);
   const [newTagName, setNewTagName] = useState('');
-  const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR);
+  const [selectedColor, setSelectedColor] = useState<string>(DEFAULT_COLOR);
 
   const utils = trpc.useUtils();
 

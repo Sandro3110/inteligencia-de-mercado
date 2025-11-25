@@ -123,8 +123,8 @@ interface Schedule {
   id: number;
   scheduledAt: string;
   recurrence: string;
-  batchSize: number;
-  maxClients?: number;
+  batchSize: number | null;
+  maxClients: number | null;
   status: string;
 }
 
@@ -487,7 +487,7 @@ export function ScheduleEnrichment({
               </span>
             </div>
             <div className="text-sm text-slate-400 mt-1">
-              {LABELS.BATCH_INFO(schedule.batchSize)}
+              {LABELS.BATCH_INFO(schedule.batchSize || 0)}
               {schedule.maxClients && LABELS.MAX_INFO(schedule.maxClients)}
             </div>
           </div>
