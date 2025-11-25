@@ -1,6 +1,6 @@
 'use client';
 
-import { ProjectsTab } from '@/components/tabs/ProjectsTab';
+import { ProjectsTab } from '@/components/projects/ProjectsTab';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
 
 export default function ProjectsPage() {

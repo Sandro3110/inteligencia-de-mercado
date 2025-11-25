@@ -1,6 +1,6 @@
 'use client';
 
-import { GeoCockpit } from '@/components/GeoCockpit';
+import GeoCockpit from '@/components/GeoCockpit';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
 
 export default function MapsPage() {

@@ -1,6 +1,6 @@
 'use client';
 
-import { KanbanBoard } from '@/components/KanbanBoard';
+import KanbanBoard from '@/components/KanbanBoard';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
 
 export default function LeadsPage() {

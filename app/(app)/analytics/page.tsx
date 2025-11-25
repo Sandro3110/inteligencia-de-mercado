@@ -1,6 +1,6 @@
 'use client';
 
-import { EvolutionCharts } from '@/components/EvolutionCharts';
+import EvolutionCharts from '@/components/EvolutionCharts';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
 
 export default function AnalyticsPage() {
