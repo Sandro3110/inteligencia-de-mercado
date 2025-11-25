@@ -39,10 +39,7 @@ function isPublicRoute(location: string): boolean {
 
 function logBypassInfo(location: string, isAuthenticated: boolean, user: unknown): void {
   if (BYPASS_ENABLED) {
-    logger.debug(LOG_MESSAGES.BYPASS_ACTIVE);
-    logger.debug(LOG_MESSAGES.LOCATION, location);
-    logger.debug(LOG_MESSAGES.IS_AUTHENTICATED, isAuthenticated);
-    logger.debug(LOG_MESSAGES.USER, user);
+    logger.debug(LOG_MESSAGES.BYPASS_ACTIVE, { location, isAuthenticated, user });
   }
 }
 
@@ -67,7 +64,7 @@ function logBypassInfo(location: string, isAuthenticated: boolean, user: unknown
  */
 export function AuthGuard({ children }: AuthGuardProps) {
   // Auth
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, isLoading: loading, isAuthenticated } = useAuth();
 
   // Location
   const [location] = useLocation();
