@@ -13,7 +13,7 @@ export default function Header() {
 
       {/* Center - Search */}
       <div className="flex-1 max-w-2xl mx-8">
-        <GlobalSearch />
+        <GlobalSearch open={false} onOpenChange={() => {}} />
       </div>
 
       {/* Right Side - Project Selector */}

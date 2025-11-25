@@ -17,7 +17,13 @@ export default function MapsPage() {
 
       <div className="bg-white rounded-lg shadow p-6">
         {selectedProjectId ? (
-          <GeoCockpit />
+          <GeoCockpit 
+            entityType="cliente" 
+            entityId={selectedProjectId} 
+            entityName="Projeto" 
+            address="" 
+            onSave={async () => {}} 
+          />
         ) : (
           <div className="text-center py-12 text-gray-500">
             Selecione um projeto no header para visualizar os mapas

@@ -17,7 +17,7 @@ export default function LeadsPage() {
 
       <div>
         {selectedProjectId ? (
-          <KanbanBoard />
+          <KanbanBoard mercadoId={0} leads={[]} />
         ) : (
           <div className="bg-white rounded-lg shadow p-6 text-center py-12 text-gray-500">
             Selecione um projeto no header para visualizar leads

@@ -21,17 +21,17 @@ export default function EnrichmentPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold mb-4">Upload de Dados</h2>
-            <FileUploadParser />
+            <FileUploadParser onDataParsed={(data) => console.log('Data parsed:', data)} />
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold mb-4">Agendar Enriquecimento</h2>
-            <ScheduleEnrichment />
+            <ScheduleEnrichment projectId={selectedProjectId} />
           </div>
 
           <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold mb-4">Progresso</h2>
-            <EnrichmentProgress />
+            <EnrichmentProgress steps={[]} currentStep={0} totalProgress={0} />
           </div>
         </div>
       ) : (

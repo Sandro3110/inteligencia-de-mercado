@@ -16,7 +16,7 @@ export default function MarketsPage() {
             Explore e compare mercados potenciais
           </p>
         </div>
-        <CompararMercadosModal />
+        <CompararMercadosModal isOpen={false} onClose={() => {}} mercadoIds={[]} mercados={[]} />
       </div>
 
       <div className="space-y-4">
