@@ -17,7 +17,7 @@ export default function AnalyticsPage() {
 
       <div className="bg-white rounded-lg shadow p-6">
         {selectedProjectId ? (
-          <EvolutionCharts />
+          <EvolutionCharts runId={1} />
         ) : (
           <div className="text-center py-12 text-gray-500">
             Selecione um projeto no header para visualizar as análises
