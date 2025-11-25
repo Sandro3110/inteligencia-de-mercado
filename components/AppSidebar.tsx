@@ -34,11 +34,7 @@ import { cn } from '@/lib/utils';
 import { trpc } from '@/lib/trpc/client';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
 import { useUnreadNotificationsCount } from '@/hooks/useUnreadNotificationsCount';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 
 // ============================================================================
@@ -293,9 +289,7 @@ function formatBadgeCount(count: number): string {
 }
 
 function getSectionColors(priority?: Priority) {
-  return priority === PRIORITY_TYPES.CORE
-    ? SECTION_COLORS.CORE
-    : SECTION_COLORS.DEFAULT;
+  return priority === PRIORITY_TYPES.CORE ? SECTION_COLORS.CORE : SECTION_COLORS.DEFAULT;
 }
 
 // ============================================================================
@@ -310,7 +304,7 @@ export function AppSidebar() {
 
   const { selectedProjectId } = useSelectedProject();
   const { data: stats } = trpc.dashboard.stats.useQuery(
-    { projectId: selectedProjectId ?? undefined },
+    { projectId: selectedProjectId ? Number(selectedProjectId) : undefined },
     { enabled: !!selectedProjectId }
   );
 
@@ -323,15 +317,9 @@ export function AppSidebar() {
     [collapsed]
   );
 
-  const tooltipText = useMemo(
-    () => (collapsed ? TOOLTIPS.EXPAND : TOOLTIPS.COLLAPSE),
-    [collapsed]
-  );
+  const tooltipText = useMemo(() => (collapsed ? TOOLTIPS.EXPAND : TOOLTIPS.COLLAPSE), [collapsed]);
 
-  const hasProject = useMemo(
-    () => !!selectedProjectId && !!stats,
-    [selectedProjectId, stats]
-  );
+  const hasProject = useMemo(() => !!selectedProjectId && !!stats, [selectedProjectId, stats]);
 
   const projectStatsLabel = useMemo(() => {
     if (!stats) return '';
@@ -346,9 +334,7 @@ export function AppSidebar() {
     setCollapsed((prev) => {
       const newValue = !prev;
       localStorage.setItem(STORAGE_KEY, String(newValue));
-      window.dispatchEvent(
-        new CustomEvent('sidebar-toggle', { detail: { collapsed: newValue } })
-      );
+      window.dispatchEvent(new CustomEvent('sidebar-toggle', { detail: { collapsed: newValue } }));
       return newValue;
     });
   }, []);
@@ -362,10 +348,7 @@ export function AppSidebar() {
     [collapsed]
   );
 
-  const isActive = useCallback(
-    (href: string) => isActiveRoute(href, location),
-    [location]
-  );
+  const isActive = useCallback((href: string) => isActiveRoute(href, location), [location]);
 
   // ============================================================================
   // EFFECTS
@@ -376,10 +359,7 @@ export function AppSidebar() {
     const handleToggle = () => toggleSidebar();
     window.addEventListener('toggle-sidebar', handleToggle as EventListener);
     return () => {
-      window.removeEventListener(
-        'toggle-sidebar',
-        handleToggle as EventListener
-      );
+      window.removeEventListener('toggle-sidebar', handleToggle as EventListener);
     };
   }, [toggleSidebar]);
 
@@ -396,12 +376,8 @@ export function AppSidebar() {
           <span className="flex items-center gap-2 cursor-pointer">
             <BarChart3 className="w-6 h-6 text-blue-600" />
             <div className="flex flex-col">
-              <span className="text-sm font-semibold text-slate-900">
-                {APP_INFO.NAME}
-              </span>
-              <span className="text-xs text-slate-500">
-                {APP_INFO.SUBTITLE}
-              </span>
+              <span className="text-sm font-semibold text-slate-900">{APP_INFO.NAME}</span>
+              <span className="text-xs text-slate-500">{APP_INFO.SUBTITLE}</span>
             </div>
           </span>
         )}
@@ -420,11 +396,7 @@ export function AppSidebar() {
             onClick={toggleSidebar}
             className={cn('h-8 w-8', collapsed && 'mx-auto')}
           >
-            {collapsed ? (
-              <ChevronRight className="w-4 h-4" />
-            ) : (
-              <ChevronLeft className="w-4 h-4" />
-            )}
+            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </Button>
         </TooltipTrigger>
         <TooltipContent side="right">{tooltipText}</TooltipContent>
@@ -436,15 +408,9 @@ export function AppSidebar() {
   const renderProjectInfo = useCallback(
     () => (
       <div className="p-3 border-b border-slate-200 bg-slate-50">
-        <div className="text-xs font-semibold text-slate-600 mb-1">
-          {LABELS.ACTIVE_PROJECT}
-        </div>
-        <div className="text-sm font-medium text-slate-900">
-          Projeto #{selectedProjectId}
-        </div>
-        <div className="flex gap-2 mt-2 text-xs text-slate-600">
-          {projectStatsLabel}
-        </div>
+        <div className="text-xs font-semibold text-slate-600 mb-1">{LABELS.ACTIVE_PROJECT}</div>
+        <div className="text-sm font-medium text-slate-900">Projeto #{selectedProjectId}</div>
+        <div className="flex gap-2 mt-2 text-xs text-slate-600">{projectStatsLabel}</div>
       </div>
     ),
     [selectedProjectId, projectStatsLabel]
@@ -507,9 +473,7 @@ export function AppSidebar() {
         <>
           <div className="flex items-center gap-2">
             <SectionIcon className={cn('w-4 h-4', colors.ICON)} />
-            <span className={cn('text-sm font-semibold', colors.TEXT)}>
-              {section.title}
-            </span>
+            <span className={cn('text-sm font-semibold', colors.TEXT)}>{section.title}</span>
           </div>
           {isOpen ? (
             <ChevronDown className="w-4 h-4 text-slate-400" />
@@ -549,9 +513,7 @@ export function AppSidebar() {
               <div>
                 {item.title}
                 {item.shortcut && (
-                  <div className="text-xs text-slate-400 mt-1">
-                    {item.shortcut}
-                  </div>
+                  <div className="text-xs text-slate-400 mt-1">{item.shortcut}</div>
                 )}
               </div>
             </TooltipContent>
@@ -564,9 +526,7 @@ export function AppSidebar() {
           <a
             className={cn(
               'flex items-center justify-between px-3 py-2 rounded-md transition-colors group',
-              active
-                ? `${colors.ACTIVE} font-medium`
-                : `text-slate-600 ${colors.HOVER}`
+              active ? `${colors.ACTIVE} font-medium` : `text-slate-600 ${colors.HOVER}`
             )}
           >
             <div className="flex items-center gap-2">
@@ -613,27 +573,14 @@ export function AppSidebar() {
 
           {/* Section Items */}
           {(isOpen || collapsed) && (
-            <div
-              className={cn(
-                'mt-1',
-                collapsed ? 'space-y-1' : 'ml-2 space-y-0.5'
-              )}
-            >
-              {section.items.map((item) =>
-                renderNavItem(item, section.priority)
-              )}
+            <div className={cn('mt-1', collapsed ? 'space-y-1' : 'ml-2 space-y-0.5')}>
+              {section.items.map((item) => renderNavItem(item, section.priority))}
             </div>
           )}
         </div>
       );
     },
-    [
-      collapsed,
-      openSections,
-      toggleSection,
-      renderSectionHeader,
-      renderNavItem,
-    ]
+    [collapsed, openSections, toggleSection, renderSectionHeader, renderNavItem]
   );
 
   // ============================================================================

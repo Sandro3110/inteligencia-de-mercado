@@ -285,7 +285,7 @@ export function AlertConfig() {
         });
       } else {
         createMutation.mutate({
-          projectId: selectedProjectId,
+          projectId: Number(selectedProjectId),
           name: formData.name,
           type: formData.type,
           condition,

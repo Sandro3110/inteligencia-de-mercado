@@ -15,14 +15,15 @@ const PUBLIC_ROUTES = ['/login', '/register'];
 // ⚠️ VERSÃO DE TESTE - BYPASS DE AUTENTICAÇÃO
 // Esta versão permite acesso sem login para testes
 export function AuthGuard({ children }: AuthGuardProps) {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, isLoading: loading, isAuthenticated } = useAuth();
   const [location, setLocation] = useLocation();
 
   // 🔓 BYPASS ATIVADO - Permitir acesso a todas as rotas
-  logger.debug('🔓 AUTH BYPASS ATIVO - Permitindo acesso sem autenticação');
-  logger.debug('Location:', location);
-  logger.debug('IsAuthenticated:', isAuthenticated);
-  logger.debug('User:', user);
+  logger.debug('🔓 AUTH BYPASS ATIVO - Permitindo acesso sem autenticação', {
+    location,
+    isAuthenticated,
+    user,
+  });
 
   // Se está em rota pública, renderizar normalmente
   if (PUBLIC_ROUTES.includes(location)) {
