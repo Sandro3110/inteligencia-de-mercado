@@ -251,7 +251,7 @@ export function TemplateSelector({
         return (
           <TemplateCard
             key={template.id}
-            template={template}
+            template={template as Template}
             isSelected={isSelected}
             onSelect={onSelect}
           />

@@ -155,7 +155,7 @@ export function UnifiedFilterPanel() {
   // ============================================================================
 
   const activeFiltersCount = useMemo(
-    () => calculateActiveFiltersCount(filters),
+    () => calculateActiveFiltersCount(filters as any),
     [filters]
   );
 

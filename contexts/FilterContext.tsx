@@ -18,6 +18,7 @@ interface FilterContextType {
   filters: Filters;
   setFilters: (filters: Filters) => void;
   updateFilter: (key: string, value: unknown) => void;
+  updateFilters: (updates: Partial<Filters>) => void;
   clearFilters: () => void;
   hasActiveFilters: boolean;
 }
@@ -34,6 +35,13 @@ export function FilterProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  const updateFilters = (updates: Partial<Filters>) => {
+    setFilters((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+  };
+
   const clearFilters = () => {
     setFilters({});
   };
@@ -46,6 +54,7 @@ export function FilterProvider({ children }: { children: ReactNode }) {
         filters,
         setFilters,
         updateFilter,
+        updateFilters,
         clearFilters,
         hasActiveFilters,
       }}
