@@ -1,7 +1,9 @@
 export interface ExportData {
-  headers: string[];
+  headers: readonly string[] | string[];
   rows: (string | number | boolean | null)[][];
   filename?: string;
+  title?: string;
+  metadata?: Record<string, any>;
 }
 
 export function exportToCSV(data: ExportData): void {

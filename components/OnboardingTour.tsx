@@ -31,7 +31,7 @@ const FONT_SIZE = {
   TOOLTIP: 14,
 } as const;
 
-const JOYRIDE_STYLES: Styles = {
+const JOYRIDE_STYLES: Partial<Styles> = {
   options: {
     primaryColor: COLORS.PRIMARY,
     zIndex: Z_INDEX.TOUR,

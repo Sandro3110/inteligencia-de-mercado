@@ -91,13 +91,13 @@ export function ProtectedRoute({
   requireAdmin = false 
 }: ProtectedRouteProps) {
   // Auth
-  const { user, loading, isAuthenticated, isAdmin } = useAuth();
+  const { user, isLoading, isAuthenticated, isAdmin } = useAuth();
 
   // ============================================================================
   // COMPUTED VALUES
   // ============================================================================
 
-  const shouldShowLoading = useMemo(() => loading, [loading]);
+  const shouldShowLoading = useMemo(() => isLoading, [isLoading]);
 
   const shouldRedirectToLogin = useMemo(
     () => !isAuthenticated || !user,

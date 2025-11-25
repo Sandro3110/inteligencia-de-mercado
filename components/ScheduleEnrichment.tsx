@@ -164,12 +164,12 @@ export function ScheduleEnrichment({
   projectId,
   onClose,
 }: ScheduleEnrichmentProps) {
-  const [scheduledDate, setScheduledDate] = useState(FORM_DEFAULTS.DATE);
-  const [scheduledTime, setScheduledTime] = useState(FORM_DEFAULTS.TIME);
+  const [scheduledDate, setScheduledDate] = useState<string>(FORM_DEFAULTS.DATE);
+  const [scheduledTime, setScheduledTime] = useState<string>(FORM_DEFAULTS.TIME);
   const [recurrence, setRecurrence] = useState<RecurrenceType>(
     FORM_DEFAULTS.RECURRENCE
   );
-  const [batchSize, setBatchSize] = useState(FORM_DEFAULTS.BATCH_SIZE);
+  const [batchSize, setBatchSize] = useState<number>(FORM_DEFAULTS.BATCH_SIZE);
   const [maxClients, setMaxClients] = useState<number | undefined>(
     FORM_DEFAULTS.MAX_CLIENTS
   );

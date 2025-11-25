@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useWebSocket } from '@/hooks/useWebSocket';
+import { useUnreadNotificationsCount } from '@/hooks/useUnreadNotificationsCount';
 import { NotificationPanel } from './NotificationPanel';
 import { cn } from '@/lib/utils';
 
@@ -128,7 +129,8 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
 
   // Hooks
-  const { unreadCount, isConnected } = useWebSocket();
+  const { isConnected } = useWebSocket();
+  const unreadCount = useUnreadNotificationsCount((state) => state.count);
 
   // ============================================================================
   // COMPUTED VALUES

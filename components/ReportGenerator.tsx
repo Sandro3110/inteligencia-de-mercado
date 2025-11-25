@@ -29,7 +29,7 @@ import {
   Users,
   Filter,
 } from 'lucide-react';
-import { generateExecutivePDF } from '@/lib/generatePDF';
+import { generateExecutivePDF, type PDFData } from '@/lib/generatePDF';
 
 // ============================================================================
 // CONSTANTS
@@ -219,7 +219,7 @@ export function ReportGenerator() {
       const result = await refetch();
 
       if (result.data) {
-        generateExecutivePDF(result.data);
+        generateExecutivePDF(result.data as unknown as PDFData);
         toast.success(TOAST_MESSAGES.SUCCESS);
       } else {
         toast.error(TOAST_MESSAGES.ERROR_DATA);

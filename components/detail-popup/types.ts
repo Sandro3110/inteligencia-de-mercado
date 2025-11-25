@@ -1,123 +1,45 @@
 /**
  * Types for DetailPopup Component
- * Centralized type definitions for the detail popup system
+ * Uses Drizzle schema types for consistency
  */
 
-// ============================================================================
-// ENUMS AND LITERALS
-// ============================================================================
-
-export type EntityType = 'cliente' | 'concorrente' | 'lead';
-
-export type ValidationStatus = 'rich' | 'needs_adjustment' | 'discarded' | 'pending';
-
-export type LeadStage = 'novo' | 'em_contato' | 'negociacao' | 'fechado' | 'perdido';
-
-export type ChangeType = 'created' | 'updated' | 'enriched' | 'validated';
+import type {
+  Cliente,
+  Concorrente,
+  Lead,
+  ClienteHistory,
+  ConcorrenteHistory,
+  LeadHistory,
+  Produto,
+} from '@/drizzle/schema';
 
 // ============================================================================
-// ENTITY INTERFACES
+// RE-EXPORT DRIZZLE TYPES
 // ============================================================================
 
-export interface BaseEntity {
-  id: number;
-  nome?: string;
-  empresa?: string;
-  validationStatus?: ValidationStatus;
-  qualidadeScore?: number;
-  segmentacao?: string;
-  segmentacaoB2bB2c?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+export type { Cliente, Concorrente, Lead };
 
-export interface Cliente extends BaseEntity {
-  cnpj?: string;
-  razaoSocial?: string;
-  nomeFantasia?: string;
-  email?: string;
-  telefone?: string;
-  celular?: string;
-  website?: string;
-  linkedin?: string;
-  instagram?: string;
-  endereco?: string;
-  cidade?: string;
-  estado?: string;
-  cep?: string;
-  pais?: string;
-  latitude?: number;
-  longitude?: number;
-  setor?: string;
-  porte?: string;
-  faturamento?: number;
-  numeroFuncionarios?: number;
-  descricao?: string;
-  observacoes?: string;
-  tags?: string[];
-}
-
-export interface Concorrente extends BaseEntity {
-  cnpj?: string;
-  razaoSocial?: string;
-  nomeFantasia?: string;
-  email?: string;
-  telefone?: string;
-  website?: string;
-  endereco?: string;
-  cidade?: string;
-  estado?: string;
-  setor?: string;
-  porte?: string;
-  descricao?: string;
-}
-
-export interface Lead extends BaseEntity {
-  leadStage?: LeadStage;
-  email?: string;
-  telefone?: string;
-  celular?: string;
-  cargo?: string;
-  empresa?: string;
-  website?: string;
-  linkedin?: string;
-  cidade?: string;
-  estado?: string;
-  origem?: string;
-  interesse?: string;
-  observacoes?: string;
-}
+// ============================================================================
+// ENTITY TYPE UNION
+// ============================================================================
 
 export type Entity = Cliente | Concorrente | Lead;
 
-// ============================================================================
-// HISTORY INTERFACES
-// ============================================================================
+export type PartialEntity = Partial<Cliente> | Partial<Concorrente> | Partial<Lead>;
 
-export interface HistoryEntry {
-  id: number;
-  changeType: ChangeType;
-  changedBy?: string;
-  changedAt: Date;
-  changes?: Record<string, { old: unknown; new: unknown }>;
-  notes?: string;
-}
+export type EntityType = 'cliente' | 'concorrente' | 'lead';
 
 // ============================================================================
-// PRODUCT INTERFACES
+// HISTORY TYPES
 // ============================================================================
 
-export interface Product {
-  id: number;
-  clienteId: number;
-  nome: string;
-  descricao?: string;
-  categoria?: string;
-  preco?: number;
-  unidade?: string;
-  ativo: boolean;
-  createdAt: Date;
-}
+export type HistoryEntry = ClienteHistory | ConcorrenteHistory | LeadHistory;
+
+// ============================================================================
+// PRODUCT TYPES
+// ============================================================================
+
+export type Product = Produto;
 
 // ============================================================================
 // COMPONENT PROPS INTERFACES
@@ -126,19 +48,19 @@ export interface Product {
 export interface DetailPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  item: Entity;
+  item: PartialEntity;
   type: EntityType;
 }
 
 export interface DetailPopupHeaderProps {
-  item: Entity;
+  item: PartialEntity;
   type: EntityType;
   onClose: () => void;
   produtos: Product[];
 }
 
 export interface DetailPopupFooterProps {
-  item: Entity;
+  item: PartialEntity;
   type: EntityType;
   onValidate: () => void;
   onDiscard: () => void;
@@ -153,7 +75,7 @@ export interface DiscardDialogProps {
 }
 
 export interface DetailsTabProps {
-  item: Entity;
+  item: PartialEntity;
   type: EntityType;
   produtos: Product[];
 }
@@ -171,36 +93,36 @@ export interface ProductsTabProps {
 // ============================================================================
 
 export interface BasicInfoSectionProps {
-  item: Entity;
+  item: PartialEntity;
   type: EntityType;
 }
 
 export interface ContactSectionProps {
-  item: Entity;
+  item: PartialEntity;
 }
 
 export interface LocationSectionProps {
-  item: Entity;
+  item: PartialEntity;
 }
 
 export interface ProductsSectionProps {
-  item: Entity;
+  item: PartialEntity;
 }
 
 export interface FinancialSectionProps {
-  item: Cliente;
+  item: Partial<Cliente>;
 }
 
 export interface ValidationSectionProps {
-  item: Entity;
+  item: PartialEntity;
 }
 
 export interface QualitySectionProps {
-  item: Entity;
+  item: PartialEntity;
 }
 
 export interface MetadataSectionProps {
-  item: Entity;
+  item: PartialEntity;
 }
 
 // ============================================================================

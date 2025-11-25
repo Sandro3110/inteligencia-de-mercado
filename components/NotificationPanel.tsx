@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
-import { useWebSocket, Notification } from '@/hooks/useWebSocket';
+import { useNotifications, type Notification } from '@/hooks/useNotifications';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -138,14 +138,13 @@ function formatTimestamp(timestamp: string): string {
 // ============================================================================
 
 export function NotificationPanel() {
-  const {
-    notifications,
-    unreadCount,
-    isConnected,
-    markAsRead,
-    markAllAsRead,
-    clearNotifications,
-  } = useWebSocket();
+  const notifications = useNotifications((state) => state.notifications);
+  const isConnected = useNotifications((state) => state.isConnected);
+  const markAsRead = useNotifications((state) => state.markAsRead);
+  const markAllAsRead = useNotifications((state) => state.markAllAsRead);
+  const clearNotifications = useNotifications((state) => state.clearAll);
+  
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   // ============================================================================
   // COMPUTED VALUES

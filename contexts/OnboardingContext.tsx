@@ -11,11 +11,15 @@ export interface OnboardingStep {
 
 interface OnboardingContextType {
   isOnboardingComplete: boolean;
+  hasCompletedOnboarding: boolean;
+  isOnboarding: boolean;
   currentStep: number;
   steps: OnboardingStep[];
   completeStep: (stepId: string) => void;
   skipOnboarding: () => void;
   resetOnboarding: () => void;
+  startOnboarding: () => void;
+  markOnboardingComplete: () => void;
   nextStep: () => void;
   prevStep: () => void;
 }
@@ -129,15 +133,29 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const startOnboarding = () => {
+    setIsOnboardingComplete(false);
+    setCurrentStep(0);
+    saveToStorage({
+      isComplete: false,
+      currentStep: 0,
+      steps,
+    });
+  };
+
   return (
     <OnboardingContext.Provider
       value={{
         isOnboardingComplete,
+        hasCompletedOnboarding: isOnboardingComplete,
+        isOnboarding: !isOnboardingComplete,
         currentStep,
         steps,
         completeStep,
         skipOnboarding,
         resetOnboarding,
+        startOnboarding,
+        markOnboardingComplete: skipOnboarding,
         nextStep,
         prevStep,
       }}
