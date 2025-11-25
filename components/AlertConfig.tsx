@@ -191,7 +191,7 @@ export function AlertConfig() {
   // ============================================================================
 
   const { data: alerts, refetch } = trpc.alert.list.useQuery(
-    { projectId: selectedProjectId! },
+    { projectId: Number(selectedProjectId!) },
     { enabled: !!selectedProjectId }
   );
 
