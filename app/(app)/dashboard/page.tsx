@@ -1,25 +1,47 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useProject } from '@/lib/contexts/ProjectContext';
 import { trpc } from '@/lib/trpc/client';
 import { Building2, Users, Target, TrendingUp } from 'lucide-react';
 
 export default function DashboardPage() {
   const { selectedProjectId, setSelectedProjectId } = useProject();
+  const [localProjectId, setLocalProjectId] = useState<number | null>(null);
+
+  // Sincronizar com contexto
+  useEffect(() => {
+    console.log('📊 Dashboard - selectedProjectId do contexto:', selectedProjectId);
+    setLocalProjectId(selectedProjectId);
+  }, [selectedProjectId]);
 
   // Buscar projetos
   const { data: projects, isLoading: loadingProjects } = trpc.projects.list.useQuery();
   
-  // Buscar estatísticas usando o novo router dashboard
-  const { data: stats, isLoading: loadingStats } = trpc.dashboard.stats.useQuery(
-    selectedProjectId ? { projectId: selectedProjectId } : {},
-    { refetchOnWindowFocus: false }
+  // Buscar estatísticas usando o projeto local
+  const { data: stats, isLoading: loadingStats, refetch } = trpc.dashboard.stats.useQuery(
+    localProjectId ? { projectId: localProjectId } : {},
+    { 
+      refetchOnWindowFocus: false,
+      enabled: true // Sempre ativo
+    }
   );
+
+  console.log('📊 Dashboard - localProjectId:', localProjectId);
+  console.log('📊 Dashboard - stats:', stats);
+  console.log('📊 Dashboard - loadingStats:', loadingStats);
 
   const handleProjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     const newId = value ? Number(value) : null;
+    console.log('🔄 Dashboard - mudando projeto para:', newId);
     setSelectedProjectId(newId);
+    setLocalProjectId(newId);
+    
+    // Forçar refetch
+    setTimeout(() => {
+      refetch();
+    }, 100);
   };
 
   return (
@@ -38,7 +60,7 @@ export default function DashboardPage() {
             <div className="text-gray-500">Carregando projetos...</div>
           ) : projects && projects.length > 0 ? (
             <select
-              value={selectedProjectId === null ? '' : selectedProjectId}
+              value={localProjectId === null ? '' : localProjectId}
               onChange={handleProjectChange}
               className="w-full md:w-96 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
@@ -54,11 +76,11 @@ export default function DashboardPage() {
           )}
 
           {/* Indicador do projeto selecionado */}
-          {selectedProjectId && (
+          {localProjectId && (
             <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800">
                 ✓ Projeto selecionado GLOBALMENTE:{' '}
-                <strong>{projects?.find((p) => p.id === selectedProjectId)?.nome}</strong>
+                <strong>{projects?.find((p) => p.id === localProjectId)?.nome}</strong>
               </p>
               <p className="text-xs text-blue-600 mt-1">
                 Todas as páginas verão este projeto selecionado
@@ -71,14 +93,14 @@ export default function DashboardPage() {
       {/* Bem-vindo */}
       <div className="bg-white rounded-lg shadow p-6 mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-          🎉 Bem-vindo ao IntelMarket!
+          Bem-vindo ao IntelMarket! 🎉
         </h2>
         <p className="text-gray-600">
           Sistema de inteligência de mercado para análise de dados, leads e oportunidades.
         </p>
-        {selectedProjectId && (
+        {localProjectId && (
           <p className="text-sm text-blue-600 mt-2">
-            Visualizando dados do projeto: <strong>{projects?.find((p) => p.id === selectedProjectId)?.nome}</strong>
+            Visualizando dados do projeto: <strong>{projects?.find((p) => p.id === localProjectId)?.nome}</strong>
           </p>
         )}
       </div>
@@ -122,7 +144,7 @@ export default function DashboardPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium text-gray-600">Pesquisas</h3>
-            <TrendingUp className="w-8 h-8 text-orange-500" />
+            <TrendingUp className="w-8 h-8 text-yellow-500" />
           </div>
           <p className="text-3xl font-bold text-gray-900">
             {loadingStats ? '-' : stats?.pesquisas || 0}
@@ -130,8 +152,17 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Debug Info */}
+      <div className="bg-gray-100 rounded-lg shadow p-4 text-xs font-mono">
+        <p><strong>Debug Info:</strong></p>
+        <p>selectedProjectId (contexto): {selectedProjectId || 'null'}</p>
+        <p>localProjectId (local): {localProjectId || 'null'}</p>
+        <p>loadingStats: {loadingStats ? 'true' : 'false'}</p>
+        <p>stats: {JSON.stringify(stats || {})}</p>
+      </div>
+
       {/* Atividade Recente */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-lg shadow p-6 mt-8">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Atividade Recente</h2>
         <p className="text-gray-500 text-sm">Em breve: Timeline de atividades recentes</p>
       </div>
