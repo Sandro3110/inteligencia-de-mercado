@@ -6,6 +6,9 @@ import { trpc } from '@/lib/trpc/client';
 export default function DashboardPage() {
   const { selectedProjectId, setSelectedProjectId } = useProject();
 
+  // Log quando selectedProjectId muda
+  console.log('🔍 selectedProjectId atual:', selectedProjectId);
+
   // Buscar projetos
   const { data: projects, isLoading: loadingProjects } = trpc.projects.list.useQuery();
   
@@ -28,7 +31,9 @@ export default function DashboardPage() {
   const handleProjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     const newId = value ? Number(value) : null;
+    console.log('🎯 Projeto selecionado:', { value, newId });
     setSelectedProjectId(newId);
+    console.log('✅ setSelectedProjectId chamado com:', newId);
   };
 
   return (
