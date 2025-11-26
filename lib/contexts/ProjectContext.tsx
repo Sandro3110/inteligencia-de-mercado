@@ -11,16 +11,20 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  
+  console.log('🏗️ ProjectProvider - selectedProjectId:', selectedProjectId);
 
   // Persistir no localStorage
   useEffect(() => {
     const saved = localStorage.getItem('selectedProjectId');
+    console.log('💾 ProjectContext - carregando do localStorage:', saved);
     if (saved) {
       setSelectedProjectId(Number(saved));
     }
   }, []);
 
   useEffect(() => {
+    console.log('💾 ProjectContext - salvando no localStorage:', selectedProjectId);
     if (selectedProjectId) {
       localStorage.setItem('selectedProjectId', String(selectedProjectId));
     } else {
