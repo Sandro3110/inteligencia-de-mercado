@@ -1,4 +1,6 @@
 'use client';
+export const dynamic = 'force-dynamic';
+
 
 import { ReportGenerator } from '@/components/ReportGenerator';
 import { useSelectedProject } from '@/hooks/useSelectedProject';

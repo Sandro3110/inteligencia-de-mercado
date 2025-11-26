@@ -1,4 +1,6 @@
 'use client';
+export const dynamic = 'force-dynamic';
+
 
 import KanbanBoard from '@/components/KanbanBoard';
 import { useSelectedProject } from '@/hooks/useSelectedProject';

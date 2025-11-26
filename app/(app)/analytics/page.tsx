@@ -1,4 +1,6 @@
 'use client';
+export const dynamic = 'force-dynamic';
+
 
 import EvolutionCharts from '@/components/EvolutionCharts';
 import { useSelectedProject } from '@/hooks/useSelectedProject';

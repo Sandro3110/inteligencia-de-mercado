@@ -1,4 +1,6 @@
 'use client';
+export const dynamic = 'force-dynamic';
+
 
 import { AlertConfig } from '@/components/AlertConfig';
 import { NotificationPanel } from '@/components/NotificationPanel';

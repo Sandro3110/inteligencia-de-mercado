@@ -1,4 +1,6 @@
 'use client';
+export const dynamic = 'force-dynamic';
+
 
 import { ProjectsTab } from '@/components/projects/ProjectsTab';
 import { useSelectedProject } from '@/hooks/useSelectedProject';

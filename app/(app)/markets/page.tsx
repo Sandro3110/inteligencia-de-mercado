@@ -1,4 +1,6 @@
 'use client';
+export const dynamic = 'force-dynamic';
+
 
 import { MercadoAccordionCard } from '@/components/MercadoAccordionCard';
 import { CompararMercadosModal } from '@/components/CompararMercadosModal';

@@ -1,4 +1,6 @@
 'use client';
+export const dynamic = 'force-dynamic';
+
 
 import GeoCockpit from '@/components/GeoCockpit';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
