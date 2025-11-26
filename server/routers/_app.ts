@@ -16,6 +16,7 @@ import { unifiedMapRouter } from './unifiedMap';
 import { emailConfigRouter } from './emailConfig';
 import { projectsRouter } from './projects';
 import { pesquisasRouter } from './pesquisas';
+import { mercadosRouter } from './mercados';
 
 /**
  * Router raiz da aplicação
@@ -43,6 +44,9 @@ export const appRouter = createTRPCRouter({
 
   // Pesquisas
   pesquisas: pesquisasRouter,
+
+  // Mercados
+  mercados: mercadosRouter,
 });
 
 /**
