@@ -747,10 +747,10 @@ export const projects = pgTable("projects", {
   status: varchar({ length: 50 }).default("active").notNull(),
   createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
   updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
-  executionMode: varchar('execution_mode', { length: 50 }).default("sequential"),
-  maxParallelJobs: integer('max_parallel_jobs').default(3),
-  isPaused: integer('is_paused').default(0),
-  lastActivityAt: timestamp('last_activity_at', { mode: "string" }).defaultNow(),
+  executionMode: varchar('executionMode', { length: 50 }).default("sequential"),
+  maxParallelJobs: integer('maxParallelJobs').default(3),
+  isPaused: integer('isPaused').default(0),
+  lastActivityAt: timestamp('lastActivityAt', { mode: "string" }).defaultNow(),
 });
 
 export const recommendations = pgTable("recommendations", {
