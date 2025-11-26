@@ -52,8 +52,8 @@ export const alertConfigs = pgTable("alert_configs", {
   condition: text().notNull(),
   enabled: smallint().default(1).notNull(),
   lastTriggeredAt: timestamp('last_triggered_at', { mode: "string" }),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
 });
 
 export const alertHistory = pgTable("alert_history", {
@@ -341,8 +341,8 @@ export const enrichmentJobs = pgTable("enrichment_jobs", {
   estimatedTimeRemaining: integer('estimated_time_remaining'),
   lastClienteId: integer('last_cliente_id'),
   errorMessage: text('error_message'),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
 });
 
 export const enrichmentQueue = pgTable(
@@ -537,8 +537,8 @@ export const llmProviderConfigs = pgTable("llm_provider_configs", {
     "claude-3-5-sonnet-20241022"
   ),
   anthropicEnabled: integer('anthropic_enabled').default(0).notNull(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
 });
 
 export const mercadosHistory = pgTable("mercados_history", {
@@ -685,8 +685,8 @@ export const pesquisas = pgTable("pesquisas", {
   clientesEnriquecidos: integer('clientes_enriquecidos').default(0),
   status: varchar({ length: 50 }).default("importado"),
   ativo: integer().default(1).notNull(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
   qtdConcorrentesPorMercado: integer('qtd_concorrentes_por_mercado').default(5),
   qtdLeadsPorMercado: integer('qtd_leads_por_mercado').default(10),
   qtdProdutosPorCliente: integer('qtd_produtos_por_cliente').default(3),
@@ -734,8 +734,8 @@ export const projectTemplates = pgTable("project_templates", {
   description: text(),
   config: text().notNull(),
   isDefault: integer('is_default').default(0).notNull(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
 });
 
 export const projects = pgTable("projects", {
@@ -745,8 +745,8 @@ export const projects = pgTable("projects", {
   cor: varchar({ length: 7 }).default("#3b82f6"),
   ativo: integer().default(1).notNull(),
   status: varchar({ length: 50 }).default("active").notNull(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
   executionMode: varchar('execution_mode', { length: 50 }).default("sequential"),
   maxParallelJobs: integer('max_parallel_jobs').default(3),
   isPaused: integer('is_paused').default(0),
@@ -814,8 +814,8 @@ export const scheduledEnrichments = pgTable("scheduled_enrichments", {
   errorMessage: text('error_message'),
   lastRunAt: timestamp('last_run_at', { mode: "string" }),
   nextRunAt: timestamp('next_run_at', { mode: "string" }),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
 });
 
 export const tags = pgTable("tags", {
@@ -1138,8 +1138,8 @@ export const emailConfig = pgTable("email_config", {
   apiKey: varchar('api_key', { length: 255 }).notNull(),
   fromEmail: varchar('from_email', { length: 320 }).notNull(),
   fromName: varchar('from_name', { length: 255 }).notNull(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
 });
 
 export type EmailConfig = typeof emailConfig.$inferSelect;
