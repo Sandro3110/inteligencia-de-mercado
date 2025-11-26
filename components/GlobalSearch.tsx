@@ -18,7 +18,7 @@ import {
   TrendingUp,
   type LucideIcon,
 } from 'lucide-react';
-import { useLocation } from 'wouter';
+import { useRouter } from 'next/navigation';
 import Fuse from 'fuse.js';
 
 // ============================================================================
@@ -139,7 +139,7 @@ function groupResultsByType(results: SearchResult[]): GroupedResults {
 export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [, setLocation] = useLocation();
+  const router = useRouter();
   const { selectedProjectId } = useSelectedProject();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -208,9 +208,9 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
       onOpenChange(false);
       setQuery('');
       const route = getTypeRoute(result.type, result.id);
-      setLocation(route);
+      router.push(route);
     },
-    [onOpenChange, setLocation]
+    [onOpenChange, router]
   );
 
   const handleQueryChange = useCallback(
