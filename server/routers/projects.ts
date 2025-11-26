@@ -35,4 +35,163 @@ export const projectsRouter = createTRPCRouter({
 
       return result[0] || null;
     }),
+
+  /**
+   * Criar novo projeto
+   */
+  create: protectedProcedure
+    .input(
+      z.object({
+        nome: z.string().min(1),
+        descricao: z.string().optional(),
+        cor: z.string().default('#3b82f6'),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const result = await db
+        .insert(projects)
+        .values({
+          nome: input.nome,
+          descricao: input.descricao || null,
+          cor: input.cor,
+          ativo: 1,
+          status: 'active',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          lastActivityAt: new Date().toISOString(),
+        })
+        .returning();
+
+      return result[0];
+    }),
+
+  /**
+   * Atualizar projeto
+   */
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        nome: z.string().min(1).optional(),
+        descricao: z.string().optional(),
+        cor: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+
+      const result = await db
+        .update(projects)
+        .set({
+          ...data,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(projects.id, id))
+        .returning();
+
+      return result[0];
+    }),
+
+  /**
+   * Deletar projeto vazio
+   */
+  deleteEmpty: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const result = await db
+        .update(projects)
+        .set({
+          ativo: 0,
+          status: 'archived',
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(projects.id, input.id))
+        .returning();
+
+      return result[0];
+    }),
+
+  /**
+   * Hibernar projeto
+   */
+  hibernate: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const result = await db
+        .update(projects)
+        .set({
+          status: 'hibernated',
+          isPaused: 1,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(projects.id, input.id))
+        .returning();
+
+      return result[0];
+    }),
+
+  /**
+   * Reativar projeto
+   */
+  reactivate: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const result = await db
+        .update(projects)
+        .set({
+          status: 'active',
+          isPaused: 0,
+          ativo: 1,
+          updatedAt: new Date().toISOString(),
+          lastActivityAt: new Date().toISOString(),
+        })
+        .where(eq(projects.id, input.id))
+        .returning();
+
+      return result[0];
+    }),
+
+  /**
+   * Duplicar projeto
+   */
+  duplicate: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        newName: z.string().min(1),
+        copyMarkets: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      // Buscar projeto original
+      const original = await db
+        .select()
+        .from(projects)
+        .where(eq(projects.id, input.id))
+        .limit(1);
+
+      if (!original[0]) {
+        throw new Error('Projeto não encontrado');
+      }
+
+      // Criar cópia
+      const result = await db
+        .insert(projects)
+        .values({
+          nome: input.newName,
+          descricao: original[0].descricao,
+          cor: original[0].cor,
+          ativo: 1,
+          status: 'active',
+          executionMode: original[0].executionMode,
+          maxParallelJobs: original[0].maxParallelJobs,
+          isPaused: 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          lastActivityAt: new Date().toISOString(),
+        })
+        .returning();
+
+      return result[0];
+    }),
 });
