@@ -52,7 +52,7 @@ export default function DashboardPage() {
             <div className="text-gray-500">Carregando projetos...</div>
           ) : projects && projects.length > 0 ? (
             <select
-              value={selectedProjectId || ''}
+              value={selectedProjectId === null ? '' : selectedProjectId}
               onChange={handleProjectChange}
               className="w-full md:w-96 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
