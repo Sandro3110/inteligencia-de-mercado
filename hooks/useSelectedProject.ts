@@ -1,12 +1,13 @@
-"use client";
+'use client';
 
 /**
  * useSelectedProject - Hook for managing selected project
- * Fetches projects and manages selection state
+ * Fetches projects and manages selection state using ProjectContext
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { trpc } from '@/lib/trpc/client';
+import { useProject } from '@/lib/contexts/ProjectContext';
 
 // ============================================================================
 // TYPES
@@ -39,7 +40,8 @@ interface UseSelectedProjectReturn {
 // ============================================================================
 
 export function useSelectedProject(): UseSelectedProjectReturn {
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  // Use ProjectContext instead of local state
+  const { selectedProjectId, setSelectedProjectId } = useProject();
 
   // Fetch all projects
   const { data: projectsData, isLoading } = trpc.projects.list.useQuery();
@@ -54,15 +56,19 @@ export function useSelectedProject(): UseSelectedProjectReturn {
     return selectedProjectId;
   }, [projects, selectedProjectId]);
 
-  useEffect(() => {
+  // Auto-select first project on mount
+  useMemo(() => {
     if (defaultProjectId && defaultProjectId !== selectedProjectId) {
       setSelectedProjectId(defaultProjectId);
     }
-  }, [defaultProjectId]);
+  }, [defaultProjectId, selectedProjectId, setSelectedProjectId]);
 
-  const selectProject = useCallback((id: number | null) => {
-    setSelectedProjectId(id);
-  }, []);
+  const selectProject = useCallback(
+    (id: number | null) => {
+      setSelectedProjectId(id);
+    },
+    [setSelectedProjectId]
+  );
 
   return {
     selectedProjectId,
