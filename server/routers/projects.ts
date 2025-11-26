@@ -3,7 +3,7 @@
  */
 
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
+import { createTRPCRouter, publicProcedure } from '@/lib/trpc/server';
 import { db } from '@/lib/db';
 import { projects } from '@/drizzle/schema';
 import { eq, desc } from 'drizzle-orm';
@@ -12,7 +12,7 @@ export const projectsRouter = createTRPCRouter({
   /**
    * Listar todos os projetos
    */
-  list: protectedProcedure.query(async () => {
+  list: publicProcedure.query(async () => {
     const result = await db
       .select()
       .from(projects)
@@ -24,7 +24,7 @@ export const projectsRouter = createTRPCRouter({
   /**
    * Buscar projeto por ID
    */
-  getById: protectedProcedure
+  getById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
       const result = await db
@@ -39,7 +39,7 @@ export const projectsRouter = createTRPCRouter({
   /**
    * Criar novo projeto
    */
-  create: protectedProcedure
+  create: publicProcedure
     .input(
       z.object({
         nome: z.string().min(1),
@@ -68,7 +68,7 @@ export const projectsRouter = createTRPCRouter({
   /**
    * Atualizar projeto
    */
-  update: protectedProcedure
+  update: publicProcedure
     .input(
       z.object({
         id: z.number(),
@@ -95,7 +95,7 @@ export const projectsRouter = createTRPCRouter({
   /**
    * Deletar projeto vazio
    */
-  deleteEmpty: protectedProcedure
+  deleteEmpty: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
       const result = await db
@@ -114,7 +114,7 @@ export const projectsRouter = createTRPCRouter({
   /**
    * Hibernar projeto
    */
-  hibernate: protectedProcedure
+  hibernate: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
       const result = await db
@@ -133,7 +133,7 @@ export const projectsRouter = createTRPCRouter({
   /**
    * Reativar projeto
    */
-  reactivate: protectedProcedure
+  reactivate: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
       const result = await db
@@ -154,7 +154,7 @@ export const projectsRouter = createTRPCRouter({
   /**
    * Duplicar projeto
    */
-  duplicate: protectedProcedure
+  duplicate: publicProcedure
     .input(
       z.object({
         id: z.number(),
