@@ -17,6 +17,7 @@ import { emailConfigRouter } from './emailConfig';
 import { projectsRouter } from './projects';
 import { pesquisasRouter } from './pesquisas';
 import { mercadosRouter } from './mercados';
+import { leadsRouter } from './leads';
 
 /**
  * Router raiz da aplicação
@@ -47,6 +48,9 @@ export const appRouter = createTRPCRouter({
 
   // Mercados
   mercados: mercadosRouter,
+
+  // Leads
+  leads: leadsRouter,
 });
 
 /**
