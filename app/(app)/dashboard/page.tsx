@@ -2,38 +2,24 @@
 
 import { useProject } from '@/lib/contexts/ProjectContext';
 import { trpc } from '@/lib/trpc/client';
+import { Building2, Users, Target, TrendingUp } from 'lucide-react';
 
 export default function DashboardPage() {
   const { selectedProjectId, setSelectedProjectId } = useProject();
 
-  // Log quando selectedProjectId muda
-  console.log('🔍 selectedProjectId atual:', selectedProjectId);
-
   // Buscar projetos
   const { data: projects, isLoading: loadingProjects } = trpc.projects.list.useQuery();
   
-  // Buscar estatísticas do projeto selecionado
-  const { data: pesquisas } = trpc.pesquisas.list.useQuery(
-    selectedProjectId ? { projectId: selectedProjectId } : undefined,
-    { enabled: !!selectedProjectId }
-  );
-  
-  const { data: mercados } = trpc.mercados.list.useQuery(
-    selectedProjectId ? { projectId: selectedProjectId } : undefined,
-    { enabled: !!selectedProjectId }
-  );
-  
-  const { data: leads } = trpc.leads.list.useQuery(
+  // Buscar estatísticas usando o novo router dashboard
+  const { data: stats, isLoading: loadingStats } = trpc.dashboard.stats.useQuery(
     selectedProjectId ? { projectId: selectedProjectId } : {},
-    { enabled: !!selectedProjectId }
+    { refetchOnWindowFocus: false }
   );
 
   const handleProjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     const newId = value ? Number(value) : null;
-    console.log('🎯 Projeto selecionado:', { value, newId });
     setSelectedProjectId(newId);
-    console.log('✅ setSelectedProjectId chamado com:', newId);
   };
 
   return (
@@ -82,117 +68,72 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Welcome Card */}
+      {/* Bem-vindo */}
       <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Bem-vindo ao IntelMarket! 🎉</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+          🎉 Bem-vindo ao IntelMarket!
+        </h2>
         <p className="text-gray-600">
           Sistema de inteligência de mercado para análise de dados, leads e oportunidades.
         </p>
         {selectedProjectId && (
           <p className="text-sm text-blue-600 mt-2">
-            Visualizando dados do projeto:{' '}
-            <strong>{projects?.find((p) => p.id === selectedProjectId)?.nome}</strong>
+            Visualizando dados do projeto: <strong>{projects?.find((p) => p.id === selectedProjectId)?.nome}</strong>
           </p>
         )}
       </div>
 
-      {/* Stats Grid */}
+      {/* Cards de Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Projetos */}
         <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Projetos</p>
-              <p className="text-3xl font-bold text-gray-900">{projects?.length || 0}</p>
-            </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <svg
-                className="w-6 h-6 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-600">Projetos</h3>
+            <Building2 className="w-8 h-8 text-blue-500" />
           </div>
+          <p className="text-3xl font-bold text-gray-900">
+            {loadingStats ? '-' : stats?.projects || 0}
+          </p>
         </div>
 
+        {/* Leads */}
         <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Leads</p>
-              <p className="text-3xl font-bold text-gray-900">{leads?.length || 0}</p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <svg
-                className="w-6 h-6 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-            </div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-600">Leads</h3>
+            <Users className="w-8 h-8 text-green-500" />
           </div>
+          <p className="text-3xl font-bold text-gray-900">
+            {loadingStats ? '-' : stats?.leads || 0}
+          </p>
         </div>
 
+        {/* Mercados */}
         <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Mercados</p>
-              <p className="text-3xl font-bold text-gray-900">{mercados?.length || 0}</p>
-            </div>
-            <div className="p-3 bg-purple-100 rounded-full">
-              <svg
-                className="w-6 h-6 text-purple-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-600">Mercados</h3>
+            <Target className="w-8 h-8 text-purple-500" />
           </div>
+          <p className="text-3xl font-bold text-gray-900">
+            {loadingStats ? '-' : stats?.mercados || 0}
+          </p>
         </div>
 
+        {/* Pesquisas */}
         <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Pesquisas</p>
-              <p className="text-3xl font-bold text-gray-900">{pesquisas?.length || 0}</p>
-            </div>
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <svg
-                className="w-6 h-6 text-yellow-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-600">Pesquisas</h3>
+            <TrendingUp className="w-8 h-8 text-orange-500" />
           </div>
+          <p className="text-3xl font-bold text-gray-900">
+            {loadingStats ? '-' : stats?.pesquisas || 0}
+          </p>
         </div>
+      </div>
+
+      {/* Atividade Recente */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Atividade Recente</h2>
+        <p className="text-gray-500 text-sm">Em breve: Timeline de atividades recentes</p>
       </div>
     </div>
   );

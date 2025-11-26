@@ -18,6 +18,7 @@ import { projectsRouter } from './projects';
 import { pesquisasRouter } from './pesquisas';
 import { mercadosRouter } from './mercados';
 import { leadsRouter } from './leads';
+import { dashboardRouter } from './dashboard';
 
 /**
  * Router raiz da aplicação
@@ -51,6 +52,9 @@ export const appRouter = createTRPCRouter({
 
   // Leads
   leads: leadsRouter,
+
+  // Dashboard
+  dashboard: dashboardRouter,
 });
 
 /**
