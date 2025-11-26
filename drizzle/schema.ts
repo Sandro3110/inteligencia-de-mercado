@@ -677,19 +677,19 @@ export const operationalAlerts = pgTable("operational_alerts", {
 
 export const pesquisas = pgTable("pesquisas", {
   id: serial(),
-  projectId: integer('project_id').notNull(),
+  projectId: integer('projectId').notNull(),
   nome: varchar({ length: 255 }).notNull(),
   descricao: text(),
-  dataImportacao: timestamp('data_importacao', { mode: "string" }).defaultNow(),
-  totalClientes: integer('total_clientes').default(0),
-  clientesEnriquecidos: integer('clientes_enriquecidos').default(0),
+  dataImportacao: timestamp('dataImportacao', { mode: "string" }).defaultNow(),
+  totalClientes: integer('totalClientes').default(0),
+  clientesEnriquecidos: integer('clientesEnriquecidos').default(0),
   status: varchar({ length: 50 }).default("importado"),
   ativo: integer().default(1).notNull(),
   createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
   updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
-  qtdConcorrentesPorMercado: integer('qtd_concorrentes_por_mercado').default(5),
-  qtdLeadsPorMercado: integer('qtd_leads_por_mercado').default(10),
-  qtdProdutosPorCliente: integer('qtd_produtos_por_cliente').default(3),
+  qtdConcorrentesPorMercado: integer('qtdConcorrentesPorMercado').default(5),
+  qtdLeadsPorMercado: integer('qtdLeadsPorMercado').default(10),
+  qtdProdutosPorCliente: integer('qtdProdutosPorCliente').default(3),
 });
 
 export const produtos = pgTable(
