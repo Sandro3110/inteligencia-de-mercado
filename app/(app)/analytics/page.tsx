@@ -1,30 +1,20 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-
-import EvolutionCharts from '@/components/EvolutionCharts';
-import { useSelectedProject } from '@/hooks/useSelectedProject';
-
-export default function AnalyticsPage() {
-  const { selectedProjectId } = useSelectedProject();
-
+export default function Page() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Página em Desenvolvimento</h1>
         <p className="text-gray-600 mt-1">
-          Análises avançadas e métricas de desempenho
+          Esta funcionalidade está sendo implementada
         </p>
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
-        {selectedProjectId ? (
-          <EvolutionCharts runId={1} />
-        ) : (
-          <div className="text-center py-12 text-gray-500">
-            Selecione um projeto no header para visualizar as análises
-          </div>
-        )}
+        <p className="text-gray-600">
+          Em breve...
+        </p>
       </div>
     </div>
   );

@@ -1,24 +1,20 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-
-import { ProjectsTab } from '@/components/projects/ProjectsTab';
-import { useSelectedProject } from '@/hooks/useSelectedProject';
-
-export default function ProjectsPage() {
-  const { selectedProjectId } = useSelectedProject();
-
+export default function Page() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Projetos</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Página em Desenvolvimento</h1>
         <p className="text-gray-600 mt-1">
-          Gerencie seus projetos de pesquisa de mercado
+          Esta funcionalidade está sendo implementada
         </p>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <ProjectsTab />
+      <div className="bg-white rounded-lg shadow p-6">
+        <p className="text-gray-600">
+          Em breve...
+        </p>
       </div>
     </div>
   );
