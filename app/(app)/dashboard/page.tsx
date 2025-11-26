@@ -8,11 +8,26 @@ export default function DashboardPage() {
 
   // Buscar projetos
   const { data: projects, isLoading: loadingProjects } = trpc.projects.list.useQuery();
+  
+  // Buscar estatísticas do projeto selecionado
+  const { data: pesquisas } = trpc.pesquisas.list.useQuery(
+    selectedProjectId ? { projectId: selectedProjectId } : undefined,
+    { enabled: !!selectedProjectId }
+  );
+  
+  const { data: mercados } = trpc.mercados.list.useQuery(
+    selectedProjectId ? { projectId: selectedProjectId } : undefined,
+    { enabled: !!selectedProjectId }
+  );
+  
+  const { data: leads } = trpc.leads.list.useQuery(
+    selectedProjectId ? { projectId: selectedProjectId } : {},
+    { enabled: !!selectedProjectId }
+  );
 
   const handleProjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     const newId = value ? Number(value) : null;
-    console.log('[Dashboard] Mudando projeto:', { value, newId });
     setSelectedProjectId(newId);
   };
 
@@ -106,8 +121,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Leads</p>
-              <p className="text-3xl font-bold text-gray-900">-</p>
-              <p className="text-xs text-gray-500 mt-1">Em breve</p>
+              <p className="text-3xl font-bold text-gray-900">{leads?.length || 0}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-full">
               <svg
@@ -131,8 +145,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Mercados</p>
-              <p className="text-3xl font-bold text-gray-900">-</p>
-              <p className="text-xs text-gray-500 mt-1">Em breve</p>
+              <p className="text-3xl font-bold text-gray-900">{mercados?.length || 0}</p>
             </div>
             <div className="p-3 bg-purple-100 rounded-full">
               <svg
@@ -156,8 +169,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Pesquisas</p>
-              <p className="text-3xl font-bold text-gray-900">-</p>
-              <p className="text-xs text-gray-500 mt-1">Em breve</p>
+              <p className="text-3xl font-bold text-gray-900">{pesquisas?.length || 0}</p>
             </div>
             <div className="p-3 bg-yellow-100 rounded-full">
               <svg
@@ -176,44 +188,6 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Atividade Recente */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Atividade Recente</h3>
-        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-          <svg
-            className="w-16 h-16 mb-4 text-gray-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <p className="text-lg font-medium">Nenhuma atividade recente</p>
-          <p className="text-sm text-gray-400 mt-1">Selecione um projeto para ver atividades</p>
-        </div>
-      </div>
-
-      {/* Debug Info */}
-      <div className="mt-8 bg-gray-100 rounded-lg shadow p-4">
-        <h4 className="text-sm font-semibold text-gray-700 mb-2">🔍 Debug - Contexto Global:</h4>
-        <pre className="text-xs text-gray-600">
-          {JSON.stringify(
-            {
-              totalProjects: projects?.length || 0,
-              selectedProjectId: selectedProjectId,
-              selectedProjectName: projects?.find((p) => p.id === selectedProjectId)?.nome || null,
-            },
-            null,
-            2
-          )}
-        </pre>
       </div>
     </div>
   );

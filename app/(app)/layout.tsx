@@ -6,8 +6,8 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { ProjectProvider } from '@/lib/contexts/ProjectContext';
-// import Sidebar from '@/components/Sidebar';
-// import Header from '@/components/Header';
+import Sidebar from '@/components/Sidebar';
+import Header from '@/components/Header';
 
 export default function AppLayout({
   children,
@@ -32,12 +32,10 @@ export default function AppLayout({
   return (
     <ProjectProvider>
       <div className="flex h-screen bg-gray-50">
-        {/* Sidebar temporariamente removido para testes */}
-        {/* <Sidebar /> */}
+        <Sidebar />
         
         <div className="flex-1 flex flex-col">
-          {/* Header temporariamente removido para testes */}
-          {/* <Header /> */}
+          <Header />
           
           <main className="flex-1 overflow-auto">
             {children}
