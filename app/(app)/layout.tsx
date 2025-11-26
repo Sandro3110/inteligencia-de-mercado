@@ -5,8 +5,9 @@ export const dynamic = 'force-dynamic';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import Sidebar from '@/components/Sidebar';
-import Header from '@/components/Header';
+import { ProjectProvider } from '@/lib/contexts/ProjectContext';
+// import Sidebar from '@/components/Sidebar';
+// import Header from '@/components/Header';
 
 export default function AppLayout({
   children,
@@ -29,14 +30,20 @@ export default function AppLayout({
   }, [router]);
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Header />
-        <main className="flex-1 overflow-auto p-6">
-          {children}
-        </main>
+    <ProjectProvider>
+      <div className="flex h-screen bg-gray-50">
+        {/* Sidebar temporariamente removido para testes */}
+        {/* <Sidebar /> */}
+        
+        <div className="flex-1 flex flex-col">
+          {/* Header temporariamente removido para testes */}
+          {/* <Header /> */}
+          
+          <main className="flex-1 overflow-auto">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </ProjectProvider>
   );
 }

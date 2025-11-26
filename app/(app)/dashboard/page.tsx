@@ -1,10 +1,60 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
+import { useProject } from '@/lib/contexts/ProjectContext';
+import { trpc } from '@/lib/trpc/client';
 
 export default function DashboardPage() {
+  const { selectedProjectId, setSelectedProjectId } = useProject();
+  
+  // Buscar projetos
+  const { data: projects, isLoading: loadingProjects } = trpc.projects.list.useQuery();
+
   return (
-    <div className="p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
+      {/* Header com Seletor de Projetos */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">Dashboard</h1>
+        
+        {/* Seletor de Projetos GLOBAL */}
+        <div className="bg-white rounded-lg shadow p-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            🎯 Seletor Global de Projetos:
+          </label>
+          
+          {loadingProjects ? (
+            <div className="text-gray-500">Carregando projetos...</div>
+          ) : projects && projects.length > 0 ? (
+            <select
+              value={selectedProjectId || ''}
+              onChange={(e) => setSelectedProjectId(Number(e.target.value) || null)}
+              className="w-full md:w-96 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Todos os projetos</option>
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.nome}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div className="text-gray-500">Nenhum projeto encontrado</div>
+          )}
+          
+          {/* Indicador do projeto selecionado */}
+          {selectedProjectId && (
+            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                ✓ Projeto selecionado GLOBALMENTE: <strong>{projects?.find(p => p.id === selectedProjectId)?.nome}</strong>
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                Todas as páginas verão este projeto selecionado
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Welcome Card */}
       <div className="bg-white rounded-lg shadow p-6 mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
@@ -13,6 +63,11 @@ export default function DashboardPage() {
         <p className="text-gray-600">
           Sistema de inteligência de mercado para análise de dados, leads e oportunidades.
         </p>
+        {selectedProjectId && (
+          <p className="text-sm text-blue-600 mt-2">
+            Visualizando dados do projeto: <strong>{projects?.find(p => p.id === selectedProjectId)?.nome}</strong>
+          </p>
+        )}
       </div>
 
       {/* Stats Grid */}
@@ -21,7 +76,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Projetos</p>
-              <p className="text-3xl font-bold text-gray-900">0</p>
+              <p className="text-3xl font-bold text-gray-900">{projects?.length || 0}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-full">
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +90,8 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Leads</p>
-              <p className="text-3xl font-bold text-gray-900">0</p>
+              <p className="text-3xl font-bold text-gray-900">-</p>
+              <p className="text-xs text-gray-400 mt-1">Em breve</p>
             </div>
             <div className="p-3 bg-green-100 rounded-full">
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,7 +105,8 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Mercados</p>
-              <p className="text-3xl font-bold text-gray-900">0</p>
+              <p className="text-3xl font-bold text-gray-900">-</p>
+              <p className="text-xs text-gray-400 mt-1">Em breve</p>
             </div>
             <div className="p-3 bg-purple-100 rounded-full">
               <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,7 +120,8 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Pesquisas</p>
-              <p className="text-3xl font-bold text-gray-900">0</p>
+              <p className="text-3xl font-bold text-gray-900">-</p>
+              <p className="text-xs text-gray-400 mt-1">Em breve</p>
             </div>
             <div className="p-3 bg-yellow-100 rounded-full">
               <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,8 +140,25 @@ export default function DashboardPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
           <p className="text-gray-500">Nenhuma atividade recente</p>
-          <p className="text-sm text-gray-400 mt-1">Comece criando um novo projeto</p>
+          <p className="text-sm text-gray-400 mt-1">
+            {selectedProjectId 
+              ? 'Nenhuma atividade neste projeto ainda' 
+              : 'Selecione um projeto para ver atividades'}
+          </p>
         </div>
+      </div>
+
+      {/* Debug Info */}
+      <div className="mt-8 bg-gray-100 rounded-lg p-4">
+        <h4 className="text-sm font-semibold text-gray-700 mb-2">🔍 Debug - Contexto Global:</h4>
+        <pre className="text-xs text-gray-600">
+          {JSON.stringify({
+            totalProjects: projects?.length || 0,
+            selectedProjectId,
+            selectedProjectName: projects?.find(p => p.id === selectedProjectId)?.nome || null,
+            message: 'Este valor é compartilhado com TODAS as páginas'
+          }, null, 2)}
+        </pre>
       </div>
     </div>
   );
