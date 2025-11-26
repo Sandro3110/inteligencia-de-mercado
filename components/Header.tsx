@@ -1,7 +1,6 @@
 'use client';
 
 import { ProjectSelector } from '@/components/ProjectSelector';
-import { GlobalSearch } from '@/components/GlobalSearch';
 
 export default function Header() {
   return (
@@ -11,9 +10,11 @@ export default function Header() {
         <h1 className="text-lg font-semibold text-gray-900">IntelMarket</h1>
       </div>
 
-      {/* Center - Search */}
+      {/* Center - Placeholder for Search */}
       <div className="flex-1 max-w-2xl mx-8">
-        <GlobalSearch open={false} onOpenChange={() => {}} />
+        <div className="text-sm text-gray-500 text-center">
+          Busca global em desenvolvimento...
+        </div>
       </div>
 
       {/* Right Side - Project Selector */}
