@@ -4,8 +4,14 @@ import { db } from '@/lib/db';
 import { users } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 
-export async function POST(request: NextRequest, { params }: { params: { userId: string } }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {
   try {
+    // Next.js 15: params é uma Promise que precisa ser await
+    const { userId } = await params;
+
     const supabase = await createServerSupabaseClient();
     const {
       data: { user },
@@ -33,7 +39,7 @@ export async function POST(request: NextRequest, { params }: { params: { userId:
         liberadoPor: currentUser.id,
         liberadoEm: new Date().toISOString(),
       })
-      .where(eq(users.id, params.userId));
+      .where(eq(users.id, userId));
 
     return NextResponse.json({
       success: true,

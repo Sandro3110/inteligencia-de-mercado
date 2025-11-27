@@ -5,9 +5,13 @@ import { users } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { sendApprovalEmail } from '@/server/services/emailService';
 
-export async function POST(request: NextRequest, { params }: { params: { userId: string } }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {
   try {
-    const { userId } = params;
+    // Next.js 15: params é uma Promise que precisa ser await
+    const { userId } = await params;
     console.log('🔵 [API Approve] Iniciando aprovação:', { userId });
 
     // Verificar se usuário logado é admin
