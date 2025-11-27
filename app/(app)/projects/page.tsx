@@ -1,25 +1,67 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-/**
- * Página de Projetos
- * Usa o componente ProjectsTab completo com CRUD
- */
-
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProjectsTab } from '@/components/projects/ProjectsTabAdapted';
+import { FolderKanban, Activity, FileText } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const ActivityTab = dynamic(() => import('@/components/projects/ActivityTab'), { ssr: false });
+const LogsTab = dynamic(() => import('@/components/projects/LogsTab'), { ssr: false });
+
+type TabType = 'projects' | 'activity' | 'logs';
 
 export default function ProjectsPage() {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<TabType>('projects');
 
   const handleShowHistory = (projectId: number) => {
-    // Navegar para página de histórico do projeto
     router.push(`/projects/${projectId}/history`);
   };
 
+  const tabs = [
+    { id: 'projects', label: 'Projetos', icon: FolderKanban },
+    { id: 'activity', label: 'Atividades', icon: Activity },
+    { id: 'logs', label: 'Logs', icon: FileText },
+  ] as const;
+
   return (
-    <div className="h-full overflow-auto">
-      <ProjectsTab onShowHistory={handleShowHistory} />
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Projetos</h1>
+        <p className="text-gray-600">Gerencie seus projetos e acompanhe atividades</p>
+      </div>
+
+      <div className="bg-white rounded-lg shadow">
+        <div className="border-b border-gray-200">
+          <nav className="flex -mb-px">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as TabType)}
+                  className={`flex items-center gap-2 px-6 py-4 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        <div className="p-6">
+          {activeTab === 'projects' && <ProjectsTab onShowHistory={handleShowHistory} />}
+          {activeTab === 'activity' && <ActivityTab />}
+          {activeTab === 'logs' && <LogsTab />}
+        </div>
+      </div>
     </div>
   );
 }
