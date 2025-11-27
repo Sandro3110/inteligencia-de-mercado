@@ -5,6 +5,7 @@ import { trpc } from '@/lib/trpc/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Target, Users, CheckCircle2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import {
   BarChart,
   Bar,
@@ -51,6 +52,7 @@ interface FunilData {
 
 export default function MetricsTab({ projectId }: MetricsTabProps) {
   const [days, setDays] = useState(30);
+  const { toast } = useToast();
 
   const { data: distribuicaoGeo, refetch: refetchGeo } =
     trpc.dashboard.distribuicaoGeografica.useQuery();
@@ -62,13 +64,30 @@ export default function MetricsTab({ projectId }: MetricsTabProps) {
   const { data: funil, refetch: refetchFunil } = trpc.dashboard.funilConversao.useQuery();
   const { data: top10, refetch: refetchTop10 } = trpc.dashboard.top10Mercados.useQuery();
 
-  const handleRefreshAll = useCallback(() => {
-    refetchGeo();
-    refetchSeg();
-    refetchTimeline();
-    refetchFunil();
-    refetchTop10();
-  }, [refetchGeo, refetchSeg, refetchTimeline, refetchFunil, refetchTop10]);
+  const handleRefreshAll = useCallback(async () => {
+    try {
+      await Promise.all([
+        refetchGeo(),
+        refetchSeg(),
+        refetchTimeline(),
+        refetchFunil(),
+        refetchTop10(),
+      ]);
+      toast({
+        title: '✅ Métricas atualizadas!',
+        description: 'Todos os dados foram atualizados.',
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar:', error);
+      toast({
+        title: '❌ Erro ao atualizar',
+        description: 'Não foi possível atualizar as métricas.',
+        variant: 'destructive',
+        duration: 3000,
+      });
+    }
+  }, [refetchGeo, refetchSeg, refetchTimeline, refetchFunil, refetchTop10, toast]);
 
   const handleSetDays = useCallback((value: number) => {
     setDays(value);

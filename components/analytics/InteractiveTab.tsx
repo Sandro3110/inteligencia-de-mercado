@@ -28,6 +28,7 @@ import {
 } from 'recharts';
 import { TrendingUp, MapPin, PieChart as PieChartIcon, RefreshCw } from 'lucide-react';
 import { CardSkeleton, ChartSkeleton } from '@/components/skeletons';
+import { useToast } from '@/hooks/use-toast';
 
 const COLORS = [
   '#3b82f6',
@@ -68,6 +69,7 @@ interface Pesquisa {
 export default function InteractiveTab({ projectId }: InteractiveTabProps) {
   const [months, setMonths] = useState(6);
   const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(null);
+  const { toast } = useToast();
 
   // Buscar pesquisas do projeto selecionado
   const { data: pesquisas } = trpc.pesquisas.list.useQuery(undefined, {
@@ -97,11 +99,24 @@ export default function InteractiveTab({ projectId }: InteractiveTabProps) {
     { enabled: !!projectId }
   );
 
-  const handleRefresh = useCallback(() => {
-    refetchEvolution();
-    refetchGeographic();
-    refetchSegmentation();
-  }, [refetchEvolution, refetchGeographic, refetchSegmentation]);
+  const handleRefresh = useCallback(async () => {
+    try {
+      await Promise.all([refetchEvolution(), refetchGeographic(), refetchSegmentation()]);
+      toast({
+        title: '✅ Dados atualizados!',
+        description: 'Analytics atualizado com sucesso.',
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar:', error);
+      toast({
+        title: '❌ Erro ao atualizar',
+        description: 'Não foi possível atualizar os dados.',
+        variant: 'destructive',
+        duration: 3000,
+      });
+    }
+  }, [refetchEvolution, refetchGeographic, refetchSegmentation, toast]);
 
   const handlePesquisaChange = useCallback((value: string) => {
     setSelectedPesquisaId(value ? Number(value) : null);
@@ -135,10 +150,7 @@ export default function InteractiveTab({ projectId }: InteractiveTabProps) {
     <div className="space-y-6">
       {/* Controles */}
       <div className="flex items-center justify-end gap-4">
-        <Select
-          value={selectedPesquisaId?.toString() || ''}
-          onValueChange={handlePesquisaChange}
-        >
+        <Select value={selectedPesquisaId?.toString() || ''} onValueChange={handlePesquisaChange}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Todas as Pesquisas" />
           </SelectTrigger>
@@ -178,9 +190,7 @@ export default function InteractiveTab({ projectId }: InteractiveTabProps) {
             <TrendingUp className="w-5 h-5 text-blue-600" />
             <CardTitle className="text-slate-900">Evolução Temporal</CardTitle>
           </div>
-          <p className="text-sm text-slate-600 mt-1">
-            Mercados, clientes e leads criados por mês
-          </p>
+          <p className="text-sm text-slate-600 mt-1">Mercados, clientes e leads criados por mês</p>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -204,13 +214,7 @@ export default function InteractiveTab({ projectId }: InteractiveTabProps) {
                 strokeWidth={2}
                 name="Clientes"
               />
-              <Line
-                type="monotone"
-                dataKey="leads"
-                stroke="#f59e0b"
-                strokeWidth={2}
-                name="Leads"
-              />
+              <Line type="monotone" dataKey="leads" stroke="#f59e0b" strokeWidth={2} name="Leads" />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
