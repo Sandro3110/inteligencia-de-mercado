@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { useUnreadNotificationsCount } from '@/hooks/useUnreadNotificationsCount';
-import { NotificationPanel } from './NotificationPanel';
+import NotificationPanel from './NotificationPanel';
 import { cn } from '@/lib/utils';
 
 // ============================================================================
@@ -124,7 +124,7 @@ function StatusDot({ isConnected }: StatusDotProps) {
  * <NotificationBell />
  * ```
  */
-export function NotificationBell() {
+function NotificationBell() {
   // State
   const [open, setOpen] = useState(false);
 
@@ -183,3 +183,5 @@ export function NotificationBell() {
     </DropdownMenu>
   );
 }
+
+export default NotificationBell;

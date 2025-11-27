@@ -219,7 +219,7 @@ function StepCounter({ currentStep, totalSteps }: { currentStep: number; totalSt
  * />
  * ```
  */
-export function EnrichmentProgress({
+function EnrichmentProgress({
   steps,
   currentStep,
   totalProgress,
@@ -238,3 +238,5 @@ export function EnrichmentProgress({
     </div>
   );
 }
+
+export default EnrichmentProgress;

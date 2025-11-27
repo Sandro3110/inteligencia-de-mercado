@@ -93,8 +93,8 @@ export interface NotificationFiltersState {
 }
 
 interface NotificationFiltersProps {
-  filters: NotificationFiltersState;
-  onFiltersChange: (filters: NotificationFiltersState) => void;
+  filters?: NotificationFiltersState;
+  onFiltersChange?: (filters: NotificationFiltersState) => void;
   projects?: Array<{ id: number; nome: string }>;
 }
 
@@ -136,11 +136,11 @@ function parseProjectIdOrUndefined(value: string): number | undefined {
 // COMPONENT
 // ============================================================================
 
-export function NotificationFilters({
-  filters,
-  onFiltersChange,
+function NotificationFilters({
+  filters = {},
+  onFiltersChange = () => {},
   projects = [],
-}: NotificationFiltersProps) {
+}: NotificationFiltersProps = {}) {
   // ============================================================================
   // STATE
   // ============================================================================
@@ -450,3 +450,5 @@ export function NotificationFilters({
     </Card>
   );
 }
+
+export default NotificationFilters;

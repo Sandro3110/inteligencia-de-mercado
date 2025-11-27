@@ -2,7 +2,7 @@
 
 import { useProject } from '@/lib/contexts/ProjectContext';
 import { Zap, Play, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { EnrichmentProgress } from '@/components/EnrichmentProgress';
+import EnrichmentProgress from '@/components/EnrichmentProgress';
 
 export default function EnrichmentPage() {
   const { selectedProjectId } = useProject();

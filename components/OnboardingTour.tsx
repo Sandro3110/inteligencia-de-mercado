@@ -163,7 +163,7 @@ function isTourFinished(status: string): boolean {
  * <OnboardingTour />
  * ```
  */
-export function OnboardingTour() {
+function OnboardingTour() {
   // Context
   const { isOnboarding, markOnboardingComplete } = useOnboarding();
 
@@ -204,3 +204,5 @@ export function OnboardingTour() {
     />
   );
 }
+
+export default OnboardingTour;

@@ -66,7 +66,7 @@ function filterSelectedTags(allTags: Tag[], selectedIds: number[]): Tag[] {
 // COMPONENT
 // ============================================================================
 
-export function TagFilter({ selectedTags, onTagsChange }: TagFilterProps) {
+function TagFilter({ selectedTags, onTagsChange }: TagFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { data: allTags = [] } = trpc.tags.list.useQuery();
 
@@ -239,3 +239,5 @@ export function TagFilter({ selectedTags, onTagsChange }: TagFilterProps) {
     </div>
   );
 }
+
+export default TagFilter;

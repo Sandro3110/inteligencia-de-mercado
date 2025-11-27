@@ -106,7 +106,7 @@ function getColorButtonClasses(isSelected: boolean): string {
 // COMPONENT
 // ============================================================================
 
-export function TagManager() {
+function TagManager() {
   const [isOpen, setIsOpen] = useState(false);
   const [newTagName, setNewTagName] = useState('');
   const [selectedColor, setSelectedColor] = useState<string>(DEFAULT_COLOR);
@@ -337,3 +337,5 @@ export function TagManager() {
     </Dialog>
   );
 }
+
+export default TagManager;

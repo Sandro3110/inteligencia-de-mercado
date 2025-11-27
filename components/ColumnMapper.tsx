@@ -132,7 +132,7 @@ function getUniqueDuplicates(items: string[]): string[] {
 // COMPONENT
 // ============================================================================
 
-export function ColumnMapper({
+function ColumnMapper({
   sourceColumns,
   targetFields,
   onMappingComplete,
@@ -414,3 +414,5 @@ export function ColumnMapper({
     </div>
   );
 }
+
+export default ColumnMapper;

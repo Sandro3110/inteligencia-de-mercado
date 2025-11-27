@@ -144,8 +144,8 @@ const LAYOUT = {
 // ============================================================================
 
 interface DraftRecoveryModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   onContinueDraft?: (draftData: DraftData) => void;
 }
 
@@ -193,10 +193,10 @@ function parsePeriodOrUndefined(value: string): number | undefined {
 // ============================================================================
 
 export default function DraftRecoveryModal({
-  open,
-  onOpenChange,
+  open = false,
+  onOpenChange = () => {},
   onContinueDraft,
-}: DraftRecoveryModalProps) {
+}: DraftRecoveryModalProps = {}) {
   // ============================================================================
   // STATE
   // ============================================================================

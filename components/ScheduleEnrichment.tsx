@@ -167,7 +167,7 @@ function parseIntOrUndefined(value: string): number | undefined {
 // COMPONENT
 // ============================================================================
 
-export function ScheduleEnrichment({
+function ScheduleEnrichment({
   projectId,
   onClose,
 }: ScheduleEnrichmentProps) {
@@ -575,3 +575,5 @@ export function ScheduleEnrichment({
     </div>
   );
 }
+
+export default ScheduleEnrichment;

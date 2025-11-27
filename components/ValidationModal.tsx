@@ -182,7 +182,7 @@ function NotesSection({
 // MAIN COMPONENT
 // ============================================================================
 
-export function ValidationModal({
+function ValidationModal({
   open,
   onOpenChange,
   onSubmit,
@@ -245,3 +245,5 @@ export function ValidationModal({
     </Dialog>
   );
 }
+
+export default ValidationModal;

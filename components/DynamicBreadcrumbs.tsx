@@ -176,7 +176,7 @@ function BreadcrumbLink({ item, isLast }: BreadcrumbLinkProps) {
  * Exibe o caminho de navegação com ícones e links.
  * Inclui botão "Voltar" quando há mais de 2 níveis.
  */
-export function DynamicBreadcrumbs() {
+function DynamicBreadcrumbs() {
   // Hooks
   const [location] = useLocation();
 
@@ -223,3 +223,5 @@ export function DynamicBreadcrumbs() {
     </nav>
   );
 }
+
+export default DynamicBreadcrumbs;

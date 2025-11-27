@@ -158,7 +158,7 @@ function formatCurrency(value: number): string {
 // COMPONENT
 // ============================================================================
 
-export function CostEstimator({
+function CostEstimator({
   totalClientes,
   produtosPorMercado = 3,
   concorrentesPorMercado = 5,
@@ -329,3 +329,5 @@ export function CostEstimator({
     </Card>
   );
 }
+
+export default CostEstimator;

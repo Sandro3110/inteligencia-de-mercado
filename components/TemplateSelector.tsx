@@ -213,7 +213,7 @@ function TemplateCard({ template, isSelected, onSelect }: TemplateCardProps) {
  * />
  * ```
  */
-export function TemplateSelector({
+function TemplateSelector({
   onSelect,
   selectedTemplateId,
 }: TemplateSelectorProps) {
@@ -262,3 +262,5 @@ export function TemplateSelector({
     </div>
   );
 }
+
+export default TemplateSelector;

@@ -182,7 +182,7 @@ function createDefaultFilter(): AdvancedFilter {
 // COMPONENT
 // ============================================================================
 
-export function AdvancedFilterBuilder({
+function AdvancedFilterBuilder({
   entityType,
   onApply,
   onClear,
@@ -506,3 +506,5 @@ export function AdvancedFilterBuilder({
     </Card>
   );
 }
+
+export default AdvancedFilterBuilder;

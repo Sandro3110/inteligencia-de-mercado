@@ -7,7 +7,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useLocation } from 'wouter';
-import { GlobalSearch } from './GlobalSearch';
+import GlobalSearch from './GlobalSearch';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import {
   Dialog,
@@ -115,7 +115,7 @@ function createGNavigationHandler(
 // COMPONENT
 // ============================================================================
 
-export function GlobalShortcuts() {
+function GlobalShortcuts() {
   // ============================================================================
   // STATE
   // ============================================================================
@@ -449,3 +449,5 @@ export function GlobalShortcuts() {
     </>
   );
 }
+
+export default GlobalShortcuts;

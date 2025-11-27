@@ -62,7 +62,7 @@ function getIcon(isCompact: boolean): LucideIcon {
 // MAIN COMPONENT
 // ============================================================================
 
-export function CompactModeToggle() {
+function CompactModeToggle() {
   // Context
   const { isCompact, toggleCompact } = useCompactMode();
 
@@ -108,3 +108,5 @@ export function CompactModeToggle() {
     </Tooltip>
   );
 }
+
+export default CompactModeToggle;

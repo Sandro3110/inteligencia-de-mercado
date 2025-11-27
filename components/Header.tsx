@@ -1,10 +1,10 @@
 'use client';
 
 import { ProjectSelector } from '@/components/ProjectSelector';
-import { GlobalSearch } from '@/components/GlobalSearch';
+import GlobalSearch from '@/components/GlobalSearch';
 import { useState } from 'react';
 
-export default function Header() {
+export default function Header({ children }: { children?: React.ReactNode }) {
   const [searchOpen, setSearchOpen] = useState(false);
   
   return (

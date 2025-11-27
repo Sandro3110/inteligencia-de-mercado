@@ -174,7 +174,7 @@ function calculatePercentage(value: number, total: number): string {
 // COMPONENT
 // ============================================================================
 
-export function ActivityTab() {
+function ActivityTab() {
   const [selectedPeriod, setSelectedPeriod] = useState<Period>(DEFAULT_PERIOD);
   const [postponeDialogOpen, setPostponeDialogOpen] = useState(false);
   const [selectedProject, setSelectedProject] =
@@ -492,3 +492,5 @@ export function ActivityTab() {
     </div>
   );
 }
+
+export default ActivityTab;

@@ -136,7 +136,7 @@ function groupResultsByType(results: SearchResult[]): GroupedResults {
 // COMPONENT
 // ============================================================================
 
-export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
+function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
@@ -420,3 +420,5 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     </Dialog>
   );
 }
+
+export default GlobalSearch;

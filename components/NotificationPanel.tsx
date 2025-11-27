@@ -137,7 +137,7 @@ function formatTimestamp(timestamp: string): string {
 // COMPONENT
 // ============================================================================
 
-export function NotificationPanel() {
+function NotificationPanel() {
   const notifications = useNotifications((state) => state.notifications);
   const isConnected = useNotifications((state) => state.isConnected);
   const markAsRead = useNotifications((state) => state.markAsRead);
@@ -348,3 +348,5 @@ export function NotificationPanel() {
     </div>
   );
 }
+
+export default NotificationPanel;

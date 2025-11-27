@@ -54,7 +54,7 @@ interface SavedFilter {
 // COMPONENT
 // ============================================================================
 
-export function SavedFilters({ onApply }: SavedFiltersProps) {
+function SavedFilters({ onApply }: SavedFiltersProps) {
   const utils = trpc.useUtils();
   const { data: savedFilters = [] } = trpc.savedFilters.list.useQuery();
 
@@ -175,3 +175,5 @@ export function SavedFilters({ onApply }: SavedFiltersProps) {
     </DropdownMenu>
   );
 }
+
+export default SavedFilters;

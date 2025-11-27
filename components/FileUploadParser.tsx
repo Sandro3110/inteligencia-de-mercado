@@ -151,7 +151,7 @@ function looksLikeCSV(text: string): boolean {
 // COMPONENT
 // ============================================================================
 
-export function FileUploadParser({
+function FileUploadParser({
   onDataParsed,
   acceptedFormats = DEFAULT_ACCEPTED_FORMATS,
   maxSizeMB = DEFAULT_MAX_SIZE_MB,
@@ -458,3 +458,5 @@ export function FileUploadParser({
     </Card>
   );
 }
+
+export default FileUploadParser;

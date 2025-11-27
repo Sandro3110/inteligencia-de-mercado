@@ -65,7 +65,7 @@ function getThemeIcon(theme: string): ThemeIconConfig {
  * <ThemeToggle />
  * ```
  */
-export function ThemeToggle() {
+function ThemeToggle() {
   // Context
   const { theme, toggleTheme } = useTheme();
 
@@ -101,3 +101,5 @@ export function ThemeToggle() {
     </Button>
   );
 }
+
+export default ThemeToggle;

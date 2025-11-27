@@ -116,7 +116,7 @@ function getButtonLabel(hasCompleted: boolean): string {
  * <ContextualTour tourId="project-creation" autoStart />
  * ```
  */
-export function ContextualTour({
+function ContextualTour({
   tourId,
   autoStart = false,
   onComplete,
@@ -241,3 +241,5 @@ export function TourButton({ tourId, children, className }: TourButtonProps) {
     </button>
   );
 }
+
+export default ContextualTour;

@@ -87,7 +87,7 @@ function getActivityColor(activityType: string): string {
 // COMPONENT
 // ============================================================================
 
-export function LogsTab() {
+function LogsTab() {
   const { selectedProjectId } = useSelectedProject();
 
   const { data: activities, isLoading } = trpc.activity.recent.useQuery(
@@ -190,3 +190,5 @@ export function LogsTab() {
     </div>
   );
 }
+
+export default LogsTab;

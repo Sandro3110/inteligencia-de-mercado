@@ -315,7 +315,7 @@ function mapLeadToExportRow(lead: Lead): (string | number)[] {
 // COMPONENT
 // ============================================================================
 
-export function MercadoAccordionCard({
+function MercadoAccordionCard({
   mercado,
   selectedProjectId,
   isSelected = false,
@@ -951,3 +951,5 @@ export function MercadoAccordionCard({
     </>
   );
 }
+
+export default MercadoAccordionCard;
