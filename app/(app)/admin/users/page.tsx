@@ -137,70 +137,80 @@ export default function AdminUsersPage() {
     });
   };
 
-  const UserCard = ({ user, showActions = false }: { user: User; showActions?: boolean }) => (
-    <Card className="mb-4">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg">{user.nome}</CardTitle>
-            <CardDescription className="flex items-center gap-2 mt-1">
-              <Mail className="h-4 w-4" />
-              {user.email}
-            </CardDescription>
-          </div>
-          <Badge
-            variant={user.ativo === 1 ? 'default' : user.ativo === 0 ? 'secondary' : 'destructive'}
-          >
-            {user.ativo === 1 ? 'Aprovado' : user.ativo === 0 ? 'Pendente' : 'Rejeitado'}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="flex items-center gap-2 text-sm">
-            <Building className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium">Empresa:</span>
-            <span>{user.empresa}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Briefcase className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium">Cargo:</span>
-            <span>{user.cargo}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium">Setor:</span>
-            <span>{user.setor}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium">Cadastro:</span>
-            <span>{formatDate(user.created_at)}</span>
-          </div>
-        </div>
+  const UserCard = ({ user, showActions = false }: { user: User; showActions?: boolean }) => {
+    console.log('🟢 [UserCard] Renderizando:', { nome: user.nome, showActions, ativo: user.ativo });
 
-        {user.liberado_em && (
-          <div className="text-sm text-muted-foreground mb-4">
-            Aprovado em {formatDate(user.liberado_em)}
-            {user.liberado_por && ` por ${user.liberado_por}`}
+    return (
+      <Card className="mb-4">
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <CardTitle className="text-lg">{user.nome}</CardTitle>
+              <CardDescription className="flex items-center gap-2 mt-1">
+                <Mail className="h-4 w-4" />
+                {user.email}
+              </CardDescription>
+            </div>
+            <Badge
+              variant={
+                user.ativo === 1 ? 'default' : user.ativo === 0 ? 'secondary' : 'destructive'
+              }
+            >
+              {user.ativo === 1 ? 'Aprovado' : user.ativo === 0 ? 'Pendente' : 'Rejeitado'}
+            </Badge>
           </div>
-        )}
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="flex items-center gap-2 text-sm">
+              <Building className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">Empresa:</span>
+              <span>{user.empresa}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Briefcase className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">Cargo:</span>
+              <span>{user.cargo}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">Setor:</span>
+              <span>{user.setor}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">Cadastro:</span>
+              <span>{formatDate(user.created_at)}</span>
+            </div>
+          </div>
 
-        {showActions && (
-          <div className="flex gap-2">
-            <Button onClick={() => handleApprove(user.id)} className="flex-1" variant="default">
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Aprovar
-            </Button>
-            <Button onClick={() => handleReject(user.id)} className="flex-1" variant="destructive">
-              <XCircle className="h-4 w-4 mr-2" />
-              Rejeitar
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
+          {user.liberado_em && (
+            <div className="text-sm text-muted-foreground mb-4">
+              Aprovado em {formatDate(user.liberado_em)}
+              {user.liberado_por && ` por ${user.liberado_por}`}
+            </div>
+          )}
+
+          {showActions && (
+            <div className="flex gap-2">
+              <Button onClick={() => handleApprove(user.id)} className="flex-1" variant="default">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Aprovar
+              </Button>
+              <Button
+                onClick={() => handleReject(user.id)}
+                className="flex-1"
+                variant="destructive"
+              >
+                <XCircle className="h-4 w-4 mr-2" />
+                Rejeitar
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
 
   if (loading) {
     return (
@@ -278,6 +288,14 @@ export default function AdminUsersPage() {
         </TabsList>
 
         <TabsContent value="pending" className="mt-6">
+          {(() => {
+            console.log('🔵 [Pending Tab] Total de usuários pendentes:', pendingUsers.length);
+            console.log(
+              '🔵 [Pending Tab] Usuários:',
+              pendingUsers.map((u) => ({ nome: u.nome, id: u.id, ativo: u.ativo }))
+            );
+            return null;
+          })()}
           {pendingUsers.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center h-64">
