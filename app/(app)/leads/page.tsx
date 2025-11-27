@@ -14,14 +14,11 @@ export default function LeadsPage() {
   // Buscar leads com filtros (novo router com paginação)
   const { data: leadsData, isLoading } = trpc.leads.list.useQuery({
     projectId: selectedProjectId || undefined,
-    search: search || undefined,
-    leadStage: leadStage || undefined,
     validationStatus: validationStatus || undefined,
-    limit: 100,
   });
 
-  const leads = leadsData?.items || [];
-  const total = leadsData?.total || 0;
+  const leads = (leadsData as any)?.items || [];
+  const total = (leadsData as any)?.total || 0;
 
   if (!selectedProjectId) {
     return (
@@ -162,7 +159,7 @@ export default function LeadsPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {leads.map((lead) => (
+                  {leads.map((lead: any) => (
                   <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{lead.nome}</div>

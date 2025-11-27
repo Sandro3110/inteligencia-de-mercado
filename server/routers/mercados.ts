@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
-import { mercadosUnicos, clientes, leads } from '@/drizzle/schema';
+import { mercadosUnicos, clientes, clientesMercados, leads } from '@/drizzle/schema';
 import { eq, and, desc, count } from 'drizzle-orm';
 
 export const mercadosRouter = createTRPCRouter({
@@ -74,7 +74,7 @@ export const mercadosRouter = createTRPCRouter({
 
         // Buscar estatísticas relacionadas
         const [clientesCount, leadsCount] = await Promise.all([
-          db.select({ value: count() }).from(clientes).where(eq(clientes.mercadoId, id)),
+          db.select({ value: count() }).from(clientesMercados).where(eq(clientesMercados.mercadoId, id)),
           db.select({ value: count() }).from(leads).where(eq(leads.mercadoId, id)),
         ]);
 
@@ -129,8 +129,6 @@ export const mercadosRouter = createTRPCRouter({
             crescimentoAnual: input.crescimentoAnual,
             tendencias: input.tendencias,
             principaisPlayers: input.principaisPlayers,
-            latitude: input.latitude,
-            longitude: input.longitude,
             quantidadeClientes: 0,
           })
           .returning();
@@ -173,7 +171,7 @@ export const mercadosRouter = createTRPCRouter({
           .update(mercadosUnicos)
           .set({
             ...data,
-            updatedAt: new Date().toISOString(),
+            
           })
           .where(eq(mercadosUnicos.id, id))
           .returning();
@@ -227,7 +225,7 @@ export const mercadosRouter = createTRPCRouter({
           .update(mercadosUnicos)
           .set({
             quantidadeClientes: input.quantidadeClientes,
-            updatedAt: new Date().toISOString(),
+            
           })
           .where(eq(mercadosUnicos.id, input.id))
           .returning();

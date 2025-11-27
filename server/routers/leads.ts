@@ -197,7 +197,7 @@ export const leadsRouter = createTRPCRouter({
           .update(leads)
           .set({
             ...data,
-            updatedAt: new Date().toISOString(),
+            
           })
           .where(eq(leads.id, id))
           .returning();
@@ -251,7 +251,7 @@ export const leadsRouter = createTRPCRouter({
           .update(leads)
           .set({
             leadStage: input.leadStage,
-            updatedAt: new Date().toISOString(),
+            
           })
           .where(eq(leads.id, input.id))
           .returning();
@@ -284,7 +284,7 @@ export const leadsRouter = createTRPCRouter({
           .update(leads)
           .set({
             validationStatus: input.validationStatus,
-            updatedAt: new Date().toISOString(),
+            
           })
           .where(eq(leads.id, input.id))
           .returning();
