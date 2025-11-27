@@ -137,7 +137,7 @@ function getAdminNotificationTemplate(
   userId: string
 ) {
   const approveUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/users/${userId}/approve`;
-  
+
   return {
     subject: '🔔 Novo Cadastro Pendente - IntelMarket',
     html: `
@@ -245,7 +245,7 @@ function getAdminNotificationTemplate(
  */
 function getApprovalEmailTemplate(userName: string) {
   const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/login`;
-  
+
   return {
     subject: '✅ Seu Acesso ao IntelMarket Foi Aprovado!',
     html: `
@@ -381,7 +381,7 @@ function getApprovalEmailTemplate(userName: string) {
 export async function sendWelcomeEmail(userName: string, userEmail: string) {
   try {
     const template = getWelcomeEmailTemplate(userName, userEmail);
-    
+
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: userEmail,
@@ -413,6 +413,11 @@ export async function sendAdminNotification(
   userDepartment: string,
   userId: string
 ) {
+  console.log('🔔 [sendAdminNotification] Iniciando envio de notificação para admin');
+  console.log('📧 [sendAdminNotification] Destinatários:', ADMIN_EMAILS);
+  console.log('📤 [sendAdminNotification] Remetente:', FROM_EMAIL);
+  console.log('👤 [sendAdminNotification] Usuário:', userName, '(' + userEmail + ')');
+
   try {
     const template = getAdminNotificationTemplate(
       userName,
@@ -422,7 +427,10 @@ export async function sendAdminNotification(
       userDepartment,
       userId
     );
-    
+
+    console.log('📝 [sendAdminNotification] Template gerado, assunto:', template.subject);
+    console.log('📤 [sendAdminNotification] Chamando Resend API...');
+
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: ADMIN_EMAILS,
@@ -431,14 +439,16 @@ export async function sendAdminNotification(
     });
 
     if (error) {
-      console.error('Erro ao enviar notificação para admin:', error);
+      console.error('❌ [sendAdminNotification] ERRO ao enviar notificação:');
+      console.error('❌ [sendAdminNotification] Detalhes:', JSON.stringify(error, null, 2));
       throw error;
     }
 
-    console.log('Notificação enviada para admins:', data);
+    console.log('✅ [sendAdminNotification] Notificação enviada com sucesso!');
+    console.log('📊 [sendAdminNotification] Resposta:', JSON.stringify(data, null, 2));
     return data;
   } catch (error) {
-    console.error('Erro ao enviar notificação para admin:', error);
+    console.error('❌ [sendAdminNotification] EXCEÇÃO capturada:', error);
     throw error;
   }
 }
@@ -449,7 +459,7 @@ export async function sendAdminNotification(
 export async function sendApprovalEmail(userName: string, userEmail: string) {
   try {
     const template = getApprovalEmailTemplate(userName);
-    
+
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: userEmail,
