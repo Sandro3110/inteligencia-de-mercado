@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useProject } from '@/lib/contexts/ProjectContext';
 import { trpc } from '@/lib/trpc/client';
-import { Target, MapPin, TrendingUp, Users, Map as MapIcon, Layers, Filter } from 'lucide-react';
+import { Target, MapPin, TrendingUp, Users, Map as MapIcon, Layers, Filter, Clock, DollarSign } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 // Lazy load componentes de mapa
@@ -15,20 +15,21 @@ const CustomMarker = dynamic(() => import('@/components/maps/CustomMarker'), { s
 const EntityMarker = dynamic(() => import('@/components/maps/EntityMarker'), { ssr: false });
 const EntityPopupCard = dynamic(() => import('@/components/maps/EntityPopupCard'), { ssr: false });
 const HeatmapLayer = dynamic(() => import('@/components/maps/HeatmapLayer'), { ssr: false });
-const CompararMercadosModal = dynamic(() => import('@/components/CompararMercadosModal'), {
-  ssr: false,
-});
+const MiniMap = dynamic(() => import('@/components/MiniMap'), { ssr: false });
+const CompararMercadosModal = dynamic(() => import('@/components/CompararMercadosModal'), { ssr: false });
 const GeoCockpit = dynamic(() => import('@/components/GeoCockpit'), { ssr: false });
 const EnrichmentProgress = dynamic(() => import('@/components/EnrichmentProgress'), { ssr: false });
+const ScheduleEnrichment = dynamic(() => import('@/components/ScheduleEnrichment'), { ssr: false });
+const CostEstimator = dynamic(() => import('@/components/CostEstimator'), { ssr: false });
+const MercadoAccordionCard = dynamic(() => import('@/components/MercadoAccordionCard'), { ssr: false });
 
 export default function MarketsPage() {
   const { selectedProjectId } = useProject();
-  const [activeTab, setActiveTab] = useState<
-    'list' | 'map' | 'compare' | 'geocoding' | 'enrichment'
-  >('list');
+  const [activeTab, setActiveTab] = useState<'list' | 'map' | 'compare' | 'geocoding' | 'enrichment' | 'schedule' | 'costs'>('list');
   const [showFilters, setShowFilters] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
+  const [showMiniMap, setShowMiniMap] = useState(true);
 
   const { data: mercados, isLoading } = trpc.mercados.list.useQuery({
     projectId: selectedProjectId || undefined,
@@ -64,6 +65,8 @@ export default function MarketsPage() {
             { id: 'compare', label: 'Comparar', icon: TrendingUp },
             { id: 'geocoding', label: 'Geocoding', icon: MapPin },
             { id: 'enrichment', label: 'Enriquecimento', icon: Users },
+            { id: 'schedule', label: 'Agendamento', icon: Clock },
+            { id: 'costs', label: 'Custos', icon: DollarSign },
           ].map((tab) => {
             const Icon = tab.icon;
             return (
@@ -97,31 +100,9 @@ export default function MarketsPage() {
               ))}
             </div>
           ) : mercados && mercados.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-4">
               {mercados.map((mercado: any) => (
-                <div
-                  key={mercado.id}
-                  className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900">{mercado.nome}</h3>
-                    {mercado.categoria && (
-                      <span className="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded">
-                        {mercado.categoria}
-                      </span>
-                    )}
-                  </div>
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4" />
-                      <span>{mercado.totalClientes || 0} clientes</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      <span>{mercado.cidade || 'N/A'}</span>
-                    </div>
-                  </div>
-                </div>
+                <MercadoAccordionCard key={mercado.id} mercado={mercado} />
               ))}
             </div>
           ) : (
@@ -159,10 +140,24 @@ export default function MarketsPage() {
               <Layers className="w-5 h-5" />
               Heatmap
             </button>
+            <button
+              onClick={() => setShowMiniMap(!showMiniMap)}
+              className={`px-4 py-2 rounded-lg shadow hover:shadow-lg transition-shadow flex items-center gap-2 ${
+                showMiniMap ? 'bg-purple-600 text-white' : 'bg-white'
+              }`}
+            >
+              <MapIcon className="w-5 h-5" />
+              MiniMap
+            </button>
           </div>
 
           {showFilters && <MapFilters onClose={() => setShowFilters(false)} />}
           {showLegend && <MapLegend />}
+          {showMiniMap && (
+            <div className="absolute bottom-4 right-4 z-10">
+              <MiniMap markers={mercados || []} />
+            </div>
+          )}
 
           <div className="bg-white rounded-lg shadow p-4">
             <MapContainer
@@ -178,6 +173,8 @@ export default function MarketsPage() {
       {activeTab === 'compare' && <CompararMercadosModal />}
       {activeTab === 'geocoding' && <GeoCockpit />}
       {activeTab === 'enrichment' && <EnrichmentProgress />}
+      {activeTab === 'schedule' && <ScheduleEnrichment />}
+      {activeTab === 'costs' && <CostEstimator />}
     </div>
   );
 }
