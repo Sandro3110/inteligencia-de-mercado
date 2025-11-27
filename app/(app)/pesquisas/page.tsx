@@ -7,12 +7,17 @@ import { useState } from 'react';
 
 export default function PesquisasPage() {
   const { selectedProjectId } = useProject();
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showWizard, setShowWizard] = useState(false);
   
   // Buscar pesquisas (filtradas por projeto se houver seleção)
-  const { data: pesquisas, isLoading } = trpc.pesquisas.list.useQuery(
+  const { data: pesquisas, isLoading, refetch } = trpc.pesquisas.list.useQuery(
     selectedProjectId ? { projectId: selectedProjectId } : undefined
   );
+
+  const handleWizardComplete = () => {
+    setShowWizard(false);
+    refetch();
+  };
 
   if (!selectedProjectId) {
     return (
@@ -61,7 +66,7 @@ export default function PesquisasPage() {
           </p>
         </div>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => setShowWizard(true)}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
         >
           <Plus className="w-5 h-5" />
@@ -176,7 +181,7 @@ export default function PesquisasPage() {
             Crie sua primeira pesquisa para começar a mapear mercados e identificar oportunidades
           </p>
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => setShowWizard(true)}
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -185,16 +190,16 @@ export default function PesquisasPage() {
         </div>
       )}
 
-      {/* Modal de Criação (placeholder) */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      {/* Wizard Modal - TODO: Implementar wizard completo */}
+      {showWizard && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
             <h2 className="text-2xl font-bold mb-4">Nova Pesquisa</h2>
             <p className="text-gray-600 mb-6">
-              Wizard de criação será implementado em breve...
+              Wizard de criação completo será implementado em breve...
             </p>
             <button
-              onClick={() => setShowCreateModal(false)}
+              onClick={() => setShowWizard(false)}
               className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg transition-colors"
             >
               Fechar
