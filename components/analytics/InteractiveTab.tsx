@@ -65,7 +65,7 @@ interface Pesquisa {
   nome: string;
 }
 
-export function InteractiveTab({ projectId }: InteractiveTabProps) {
+export default function InteractiveTab({ projectId }: InteractiveTabProps) {
   const [months, setMonths] = useState(6);
   const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(null);
 

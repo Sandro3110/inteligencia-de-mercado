@@ -49,7 +49,7 @@ interface FunilData {
   fill: string;
 }
 
-export function MetricsTab({ projectId }: MetricsTabProps) {
+export default function MetricsTab({ projectId }: MetricsTabProps) {
   const [days, setDays] = useState(30);
 
   const { data: distribuicaoGeo, refetch: refetchGeo } =

@@ -59,7 +59,7 @@ function getStatusCount(statusArray: StatusItem[], status: string): number {
   return item?.count ?? 0;
 }
 
-export function OverviewTab({ projectId }: OverviewTabProps) {
+export default function OverviewTab({ projectId }: OverviewTabProps) {
   const { data: stats, isLoading } = trpc.dashboard.stats.useQuery(
     { projectId },
     { enabled: !!projectId }

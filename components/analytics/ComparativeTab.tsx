@@ -99,7 +99,7 @@ function formatDate(date: string | Date): string {
   });
 }
 
-export function ComparativeTab({ projectId }: ComparativeTabProps) {
+export default function ComparativeTab({ projectId }: ComparativeTabProps) {
   const [period, setPeriod] = useState<number>(30);
 
   const { data: kpis } = trpc.analytics.kpis.useQuery({ projectId }, { enabled: !!projectId });
