@@ -1,164 +1,128 @@
 'use client';
 
+import { useState } from 'react';
 import { useProject } from '@/lib/contexts/ProjectContext';
 import { trpc } from '@/lib/trpc/client';
-import { Building2, Search, Globe, Users, TrendingUp, Target } from 'lucide-react';
+import {
+  LayoutDashboard,
+  TrendingUp,
+  Users,
+  Globe,
+  FileText,
+  Building2,
+  BarChart3,
+  Bell,
+} from 'lucide-react';
 import dynamic from 'next/dynamic';
 
-// Lazy load charts para melhor performance
 const EvolutionCharts = dynamic(() => import('@/components/EvolutionCharts'), {
   ssr: false,
-  loading: () => (
-    <div className="bg-white rounded-lg shadow p-12 text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-      <p className="text-gray-600 mt-4">Carregando gráficos...</p>
-    </div>
-  ),
+  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg" />,
 });
 
 export default function DashboardPage() {
   const { selectedProjectId } = useProject();
-  
-  // Buscar estatísticas usando router existente
-  const { data: stats, isLoading: loadingStats, error } = trpc.dashboard.stats.useQuery(
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'notifications'>('overview');
+
+  const { data: stats, isLoading } = trpc.dashboard.stats.useQuery(
     selectedProjectId ? { projectId: selectedProjectId } : undefined,
-    {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    }
+    { enabled: !!selectedProjectId }
   );
 
-  // Log para debug
-  if (error) {
-    console.error('Dashboard stats error:', error);
-  }
+  const statsData = (stats as any) || {};
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-        <p className="text-gray-600">
-          {selectedProjectId 
-            ? 'Visão geral do projeto selecionado'
-            : 'Visão geral de todos os projetos'}
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+          <LayoutDashboard className="w-8 h-8 text-blue-600" />
+          Dashboard
+        </h1>
+        <p className="text-gray-600">Visão geral do sistema e métricas principais</p>
       </div>
 
-      {/* Cards de Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {/* Projetos */}
-        <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-600">Projetos</h3>
-            <Building2 className="w-8 h-8 text-blue-500" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">
-            {loadingStats ? (
-              <span className="animate-pulse">-</span>
-            ) : (
-              (stats as any)?.projects || 0
-            )}
-          </p>
-          <p className="text-xs text-gray-500 mt-2">Total de projetos no sistema</p>
-        </div>
-
-        {/* Pesquisas */}
-        <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-600">Pesquisas</h3>
-            <Search className="w-8 h-8 text-green-500" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">
-            {loadingStats ? (
-              <span className="animate-pulse">-</span>
-            ) : (
-              (stats as any)?.pesquisas || 0
-            )}
-          </p>
-          <p className="text-xs text-gray-500 mt-2">Pesquisas realizadas</p>
-        </div>
-
-        {/* Mercados */}
-        <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-600">Mercados</h3>
-            <Globe className="w-8 h-8 text-purple-500" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">
-            {loadingStats ? (
-              <span className="animate-pulse">-</span>
-            ) : (
-              (stats as any)?.mercados || 0
-            )}
-          </p>
-          <p className="text-xs text-gray-500 mt-2">Mercados mapeados</p>
-        </div>
-
-        {/* Leads */}
-        <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-600">Leads</h3>
-            <Users className="w-8 h-8 text-orange-500" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">
-            {loadingStats ? (
-              <span className="animate-pulse">-</span>
-            ) : (
-              (stats as any)?.leads || 0
-            )}
-          </p>
-          <p className="text-xs text-gray-500 mt-2">Leads capturados</p>
-        </div>
-
-        {/* Clientes */}
-        <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-600">Clientes</h3>
-            <Target className="w-8 h-8 text-cyan-500" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">
-            {loadingStats ? (
-              <span className="animate-pulse">-</span>
-            ) : (
-              (stats as any)?.clientes || 0
-            )}
-          </p>
-          <p className="text-xs text-gray-500 mt-2">Clientes identificados</p>
-        </div>
-
-        {/* Concorrentes */}
-        <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-600">Concorrentes</h3>
-            <TrendingUp className="w-8 h-8 text-red-500" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">
-            {loadingStats ? (
-              <span className="animate-pulse">-</span>
-            ) : (
-              (stats as any)?.concorrentes || 0
-            )}
-          </p>
-          <p className="text-xs text-gray-500 mt-2">Concorrentes mapeados</p>
-        </div>
+      <div className="mb-6 border-b border-gray-200">
+        <nav className="flex gap-8">
+          {[
+            { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+            { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+            { id: 'notifications', label: 'Notificações', icon: Bell },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`pb-4 px-2 border-b-2 transition-colors flex items-center gap-2 ${
+                  activeTab === tab.id
+                    ? 'border-blue-600 text-blue-600 font-medium'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </nav>
       </div>
 
-      {/* Gráficos de Evolução */}
-      {!loadingStats && stats && selectedProjectId && (
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Evolução Temporal</h2>
-          <EvolutionCharts runId={selectedProjectId} />
+      {activeTab === 'overview' && (
+        <>
+          {!selectedProjectId ? (
+            <div className="bg-white rounded-lg shadow p-12 text-center">
+              <LayoutDashboard className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+              <p className="text-lg font-medium text-gray-700">Selecione um projeto</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {[
+                  { label: 'Projetos', value: statsData.projects, icon: FileText, color: 'blue' },
+                  { label: 'Pesquisas', value: statsData.pesquisas, icon: FileText, color: 'purple' },
+                  { label: 'Mercados', value: statsData.mercados, icon: Globe, color: 'green' },
+                  { label: 'Leads', value: statsData.leads, icon: Users, color: 'yellow' },
+                  { label: 'Clientes', value: statsData.clientes, icon: Building2, color: 'indigo' },
+                  { label: 'Concorrentes', value: statsData.concorrentes, icon: TrendingUp, color: 'red' },
+                ].map((stat) => {
+                  const Icon = stat.icon;
+                  return (
+                    <div key={stat.label} className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className={`p-3 bg-${stat.color}-100 rounded-lg`}>
+                          <Icon className={`w-6 h-6 text-${stat.color}-600`} />
+                        </div>
+                      </div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                        {isLoading ? '-' : stat.value || 0}
+                      </h3>
+                      <p className="text-sm text-gray-600">{stat.label}</p>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Evolução Temporal</h2>
+                <EvolutionCharts runId={selectedProjectId} />
+              </div>
+            </>
+          )}
+        </>
+      )}
+
+      {activeTab === 'analytics' && (
+        <div className="bg-white rounded-lg shadow p-8 text-center">
+          <BarChart3 className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Analytics Avançado</h3>
+          <p className="text-gray-600">Análises detalhadas e métricas avançadas</p>
         </div>
       )}
 
-      {/* Mensagem de seleção de projeto */}
-      {!selectedProjectId && (
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <p className="text-blue-900 font-medium">💡 Dica</p>
-          <p className="text-blue-700 text-sm mt-1">
-            Selecione um projeto no seletor global para ver estatísticas específicas
-          </p>
+      {activeTab === 'notifications' && (
+        <div className="bg-white rounded-lg shadow p-8 text-center">
+          <Bell className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Central de Notificações</h3>
+          <p className="text-gray-600">Acompanhe notificações e alertas</p>
         </div>
       )}
     </div>
