@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { ProjectProvider } from '@/lib/contexts/ProjectContext';
+import { OnboardingProvider } from '@/contexts/OnboardingContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { CompactModeProvider } from '@/contexts/CompactModeContext';
 import nextDynamic from 'next/dynamic';
 
 const Sidebar = nextDynamic(() => import('@/components/Sidebar'), { ssr: false });
@@ -64,54 +67,60 @@ export default function AppLayout({
   };
 
   return (
-    <ErrorBoundary>
-      <ProjectProvider>
-        <GlobalShortcuts />
-        <DraftRecoveryModal />
-        
-        <div className="flex h-screen bg-gray-50">
-          <Sidebar />
-          
-          <div className="flex-1 flex flex-col">
-            <Header>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setShowGlobalSearch(true)}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-600 flex items-center gap-2"
-                >
-                  <span>Buscar...</span>
-                  <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs">⌘K</kbd>
-                </button>
-                <NotificationBell />
-                <CompactModeToggle />
-                <ThemeToggle />
+    <ThemeProvider>
+      <CompactModeProvider>
+        <OnboardingProvider>
+          <ErrorBoundary>
+            <ProjectProvider>
+              <GlobalShortcuts />
+              <DraftRecoveryModal />
+              
+              <div className="flex h-screen bg-gray-50">
+                <Sidebar />
+                
+                <div className="flex-1 flex flex-col">
+                  <Header>
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setShowGlobalSearch(true)}
+                        className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-600 flex items-center gap-2"
+                      >
+                        <span>Buscar...</span>
+                        <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs">⌘K</kbd>
+                      </button>
+                      <NotificationBell />
+                      <CompactModeToggle />
+                      <ThemeToggle />
+                    </div>
+                  </Header>
+                  
+                  <div className="px-8 py-4 bg-white border-b border-gray-200">
+                    <DynamicBreadcrumbs />
+                  </div>
+
+                  <main className="flex-1 overflow-auto">
+                    {children}
+                  </main>
+                </div>
               </div>
-            </Header>
-            
-            <div className="px-8 py-4 bg-white border-b border-gray-200">
-              <DynamicBreadcrumbs />
-            </div>
 
-            <main className="flex-1 overflow-auto">
-              {children}
-            </main>
-          </div>
-        </div>
+              {/* Modais e Overlays Globais */}
+              {showGlobalSearch && (
+                <GlobalSearch 
+                  isOpen={showGlobalSearch} 
+                  onClose={() => setShowGlobalSearch(false)} 
+                />
+              )}
 
-        {/* Modais e Overlays Globais */}
-        {showGlobalSearch && (
-          <GlobalSearch 
-            isOpen={showGlobalSearch} 
-            onClose={() => setShowGlobalSearch(false)} 
-          />
-        )}
+              {showOnboarding && (
+                <OnboardingTour onComplete={handleOnboardingComplete} />
+              )}
 
-        {showOnboarding && (
-          <OnboardingTour onComplete={handleOnboardingComplete} />
-        )}
-
-        <ContextualTour />
-      </ProjectProvider>
-    </ErrorBoundary>
+              <ContextualTour />
+            </ProjectProvider>
+          </ErrorBoundary>
+        </OnboardingProvider>
+      </CompactModeProvider>
+    </ThemeProvider>
   );
 }
