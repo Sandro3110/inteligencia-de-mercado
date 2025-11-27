@@ -70,9 +70,6 @@ export interface AnalysisMetrics {
   conversionPotential?: number;
 }
 
-// @ts-ignore - TODO: Fix TypeScript error
-import { invokeLLM } from "../_core/llm";
-
 /**
  * Tipo de template de análise
  */
