@@ -5,29 +5,25 @@ import { users } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { sendApprovalEmail } from '@/server/services/emailService';
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+export async function POST(request: NextRequest, { params }: { params: { userId: string } }) {
   try {
     const { userId } = params;
 
     // Verificar se usuário logado é admin
     const supabase = await createServerSupabaseClient();
-    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    const {
+      data: { user: currentUser },
+    } = await supabase.auth.getUser();
 
     if (!currentUser) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
     // Buscar dados do usuário atual no banco
     const [currentUserData] = await db
       .select()
       .from(users)
-      .where(eq(users.id, currentUser.id))
+      .where(eq(users.email, currentUser.email))
       .limit(1);
 
     if (!currentUserData || currentUserData.role !== 'admin') {
@@ -38,24 +34,14 @@ export async function POST(
     }
 
     // Buscar usuário a ser aprovado
-    const [userToApprove] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
+    const [userToApprove] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
 
     if (!userToApprove) {
-      return NextResponse.json(
-        { error: 'Usuário não encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
     if (userToApprove.ativo === 1) {
-      return NextResponse.json(
-        { error: 'Usuário já está aprovado' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Usuário já está aprovado' }, { status: 400 });
     }
 
     // Aprovar usuário
@@ -63,7 +49,7 @@ export async function POST(
       .update(users)
       .set({
         ativo: 1,
-        liberadoPor: currentUser.id,
+        liberadoPor: currentUserData.id,
         liberadoEm: new Date().toISOString(),
       })
       .where(eq(users.id, userId))
@@ -91,9 +77,6 @@ export async function POST(
     });
   } catch (error) {
     console.error('Erro ao aprovar usuário:', error);
-    return NextResponse.json(
-      { error: 'Erro ao processar aprovação' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erro ao processar aprovação' }, { status: 500 });
   }
 }

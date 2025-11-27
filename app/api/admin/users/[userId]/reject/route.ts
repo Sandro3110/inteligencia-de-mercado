@@ -4,27 +4,19 @@ import { db } from '@/lib/db';
 import { users } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+export async function POST(request: NextRequest, { params }: { params: { userId: string } }) {
   try {
     const supabase = await createServerSupabaseClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
     // Verificar se é admin
-    const [currentUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, user.email))
-      .limit(1);
+    const [currentUser] = await db.select().from(users).where(eq(users.email, user.email)).limit(1);
 
     if (!currentUser || currentUser.role !== 'admin') {
       return NextResponse.json(
@@ -38,8 +30,8 @@ export async function POST(
       .update(users)
       .set({
         ativo: -1,
-        liberadoPor: currentUser.email,
-        liberadoEm: new Date(),
+        liberadoPor: currentUser.id,
+        liberadoEm: new Date().toISOString(),
       })
       .where(eq(users.id, params.userId));
 
@@ -49,9 +41,6 @@ export async function POST(
     });
   } catch (error) {
     console.error('Erro ao rejeitar usuário:', error);
-    return NextResponse.json(
-      { error: 'Erro ao rejeitar usuário' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erro ao rejeitar usuário' }, { status: 500 });
   }
 }
