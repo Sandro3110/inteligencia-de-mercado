@@ -1,44 +1,141 @@
 'use client';
 
+import { useState } from 'react';
 import { useProject } from '@/lib/contexts/ProjectContext';
 import { trpc } from '@/lib/trpc/client';
+import { Users, Search, Filter } from 'lucide-react';
 
 export default function LeadsPage() {
   const { selectedProjectId } = useProject();
+  const [search, setSearch] = useState('');
+  const [leadStage, setLeadStage] = useState<string>('');
+  const [validationStatus, setValidationStatus] = useState<string>('');
   
-  // Buscar leads (filtrados por projeto se houver seleção)
-  const { data: leads, isLoading } = trpc.leads.list.useQuery(
-    selectedProjectId ? { projectId: selectedProjectId } : {}
-  );
+  // Buscar leads com filtros (novo router com paginação)
+  const { data: leadsData, isLoading } = trpc.leads.list.useQuery({
+    projectId: selectedProjectId || undefined,
+    search: search || undefined,
+    leadStage: leadStage || undefined,
+    validationStatus: validationStatus || undefined,
+    limit: 100,
+  });
 
-  if (isLoading) {
+  const leads = leadsData?.items || [];
+  const total = leadsData?.total || 0;
+
+  if (!selectedProjectId) {
     return (
-      <div className="p-6">
+      <div className="p-8">
         <h1 className="text-3xl font-bold mb-4">Leads</h1>
-        <p>Carregando leads...</p>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+          <Users className="w-16 h-16 mx-auto mb-4 text-yellow-600" />
+          <p className="text-lg font-medium text-yellow-900">Selecione um projeto</p>
+          <p className="text-sm text-yellow-700 mt-2">
+            Para visualizar leads, selecione um projeto no seletor global
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Leads</h1>
-        <p className="text-gray-600 mt-1">
-          Gerencie seus leads e oportunidades
-        </p>
-        
-        {/* Indicador de filtro */}
-        {selectedProjectId && (
-          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg inline-block">
-            <p className="text-sm text-blue-800">
-              🔍 Filtrando por projeto selecionado globalmente
-            </p>
-          </div>
-        )}
+    <div className="min-h-screen bg-gray-50 p-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Leads</h1>
+        <p className="text-gray-600">Gerencie leads e oportunidades de negócio</p>
       </div>
 
-      {leads && leads.length > 0 ? (
+      {/* Filtros */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Filter className="w-5 h-5 text-gray-600" />
+          <h2 className="text-lg font-semibold">Filtros</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Busca */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Buscar
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Nome, CNPJ ou email..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Estágio */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Estágio
+            </label>
+            <select
+              value={leadStage}
+              onChange={(e) => setLeadStage(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Todos</option>
+              <option value="novo">Novo</option>
+              <option value="contato">Contato</option>
+              <option value="qualificado">Qualificado</option>
+              <option value="proposta">Proposta</option>
+              <option value="negociacao">Negociação</option>
+              <option value="ganho">Ganho</option>
+              <option value="perdido">Perdido</option>
+            </select>
+          </div>
+
+          {/* Status de Validação */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Status de Validação
+            </label>
+            <select
+              value={validationStatus}
+              onChange={(e) => setValidationStatus(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Todos</option>
+              <option value="pendente">Pendente</option>
+              <option value="validado">Validado</option>
+              <option value="invalido">Inválido</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            {total} lead{total !== 1 ? 's' : ''} encontrado{total !== 1 ? 's' : ''}
+          </p>
+          {(search || leadStage || validationStatus) && (
+            <button
+              onClick={() => {
+                setSearch('');
+                setLeadStage('');
+                setValidationStatus('');
+              }}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Limpar filtros
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Lista de Leads */}
+      {isLoading ? (
+        <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="text-gray-600 mt-4">Carregando leads...</p>
+        </div>
+      ) : leads.length > 0 ? (
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -51,13 +148,13 @@ export default function LeadsPage() {
                     CNPJ
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Localização
+                    Cidade/UF
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Setor
+                    Estágio
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Stage
+                    Validação
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Contato
@@ -66,43 +163,44 @@ export default function LeadsPage() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {leads.map((lead) => (
-                  <tr key={lead.id} className="hover:bg-gray-50">
+                  <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{lead.nome}</div>
-                      {lead.porte && (
-                        <div className="text-xs text-gray-500">{lead.porte}</div>
+                      {lead.setor && (
+                        <div className="text-xs text-gray-500">{lead.setor}</div>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{lead.cnpj || '-'}</div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {lead.cnpj || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {lead.cidade && lead.uf ? `${lead.cidade}/${lead.uf}` : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {lead.cidade && lead.uf ? `${lead.cidade}/${lead.uf}` : lead.cidade || lead.uf || '-'}
-                      </div>
-                      {lead.regiao && (
-                        <div className="text-xs text-gray-500">{lead.regiao}</div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{lead.setor || '-'}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        lead.leadStage === 'novo' ? 'bg-blue-100 text-blue-800' :
-                        lead.leadStage === 'qualificado' ? 'bg-green-100 text-green-800' :
-                        lead.leadStage === 'contatado' ? 'bg-yellow-100 text-yellow-800' :
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        lead.leadStage === 'ganho' ? 'bg-green-100 text-green-800' :
+                        lead.leadStage === 'perdido' ? 'bg-red-100 text-red-800' :
+                        lead.leadStage === 'qualificado' ? 'bg-blue-100 text-blue-800' :
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {lead.leadStage || 'novo'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        lead.validationStatus === 'validado' ? 'bg-green-100 text-green-800' :
+                        lead.validationStatus === 'invalido' ? 'bg-red-100 text-red-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {lead.validationStatus || 'pendente'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {lead.email && (
                         <div className="text-xs">{lead.email}</div>
                       )}
                       {lead.telefone && (
-                        <div className="text-xs">{lead.telefone}</div>
+                        <div className="text-xs text-gray-500">{lead.telefone}</div>
                       )}
                       {!lead.email && !lead.telefone && '-'}
                     </td>
@@ -111,40 +209,18 @@ export default function LeadsPage() {
               </tbody>
             </table>
           </div>
-          
-          <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
-            <p className="text-sm text-gray-600">
-              Mostrando {leads.length} leads (limitado a 100 por página)
-            </p>
-          </div>
         </div>
       ) : (
-        <div className="bg-white p-12 rounded-lg shadow text-center">
-          <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <p className="text-gray-600 text-lg font-medium">
-            {selectedProjectId 
-              ? 'Nenhum lead encontrado para este projeto' 
-              : 'Nenhum lead encontrado'}
-          </p>
+        <div className="bg-white rounded-lg shadow p-12 text-center">
+          <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <p className="text-gray-600 text-lg font-medium">Nenhum lead encontrado</p>
           <p className="text-gray-500 text-sm mt-2">
-            Importe ou crie leads para começar
+            {search || leadStage || validationStatus
+              ? 'Tente ajustar os filtros'
+              : 'Crie um novo lead para começar'}
           </p>
         </div>
       )}
-
-      {/* Debug Info */}
-      <div className="bg-gray-100 rounded-lg p-4">
-        <h4 className="text-sm font-semibold text-gray-700 mb-2">🔍 Debug - Reatividade:</h4>
-        <pre className="text-xs text-gray-600">
-          {JSON.stringify({
-            selectedProjectId,
-            totalLeads: leads?.length || 0,
-            message: 'Esta página REAGE ao projeto selecionado no Dashboard'
-          }, null, 2)}
-        </pre>
-      </div>
     </div>
   );
 }

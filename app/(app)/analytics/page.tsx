@@ -2,179 +2,159 @@
 
 import { useProject } from '@/lib/contexts/ProjectContext';
 import { trpc } from '@/lib/trpc/client';
+import { BarChart3, TrendingUp, Users, Target, Award, Percent } from 'lucide-react';
 
 export default function AnalyticsPage() {
   const { selectedProjectId } = useProject();
   
-  // Buscar dados para analytics
-  const { data: projects } = trpc.projects.list.useQuery();
-  const { data: pesquisas } = trpc.pesquisas.list.useQuery(
-    selectedProjectId ? { projectId: selectedProjectId } : undefined
-  );
-  const { data: mercados } = trpc.mercados.list.useQuery(
-    selectedProjectId ? { projectId: selectedProjectId } : undefined
+  // Buscar overview do novo router de analytics
+  const { data: overview, isLoading: loadingOverview } = trpc.analytics.overview.useQuery(
+    selectedProjectId ? { projectId: selectedProjectId } : undefined,
+    { enabled: !!selectedProjectId }
   );
 
-  // Calcular métricas
-  const totalProjects = projects?.length || 0;
-  const totalPesquisas = pesquisas?.length || 0;
-  const totalMercados = mercados?.length || 0;
-  const totalClientes = pesquisas?.reduce((sum, p) => sum + (p.totalClientes || 0), 0) || 0;
-  const clientesEnriquecidos = pesquisas?.reduce((sum, p) => sum + (p.clientesEnriquecidos || 0), 0) || 0;
-  const taxaEnriquecimento = totalClientes > 0 
-    ? ((clientesEnriquecidos / totalClientes) * 100).toFixed(1) 
-    : '0';
+  // Buscar leads por estágio
+  const { data: leadsByStage, isLoading: loadingStage } = trpc.analytics.leadsByStage.useQuery(
+    selectedProjectId ? { projectId: selectedProjectId } : undefined,
+    { enabled: !!selectedProjectId }
+  );
+
+  // Buscar leads por validação
+  const { data: leadsByValidation } = trpc.analytics.leadsByValidation.useQuery(
+    selectedProjectId ? { projectId: selectedProjectId } : undefined,
+    { enabled: !!selectedProjectId }
+  );
+
+  // Buscar top mercados
+  const { data: topMarkets } = trpc.analytics.topMarkets.useQuery(
+    selectedProjectId ? { projectId: selectedProjectId, limit: 5 } : undefined,
+    { enabled: !!selectedProjectId }
+  );
+
+  if (!selectedProjectId) {
+    return (
+      <div className="p-8">
+        <h1 className="text-3xl font-bold mb-4">Analytics</h1>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+          <BarChart3 className="w-16 h-16 mx-auto mb-4 text-yellow-600" />
+          <p className="text-lg font-medium text-yellow-900">Selecione um projeto</p>
+          <p className="text-sm text-yellow-700 mt-2">
+            Para visualizar analytics, selecione um projeto no seletor global
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Analytics</h1>
-        <p className="text-gray-600 mt-1">
-          Visualize métricas e indicadores do sistema
-        </p>
-        
-        {/* Indicador de filtro */}
-        {selectedProjectId && (
-          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg inline-block">
-            <p className="text-sm text-blue-800">
-              🔍 Filtrando por projeto selecionado globalmente
-            </p>
+    <div className="min-h-screen bg-gray-50 p-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Analytics</h1>
+        <p className="text-gray-600">Métricas e análises detalhadas do projeto</p>
+      </div>
+
+      {/* Cards de Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-600">Pesquisas</h3>
+            <TrendingUp className="w-8 h-8 text-blue-500" />
           </div>
+          <p className="text-3xl font-bold text-gray-900">
+            {loadingOverview ? '-' : overview?.pesquisas || 0}
+          </p>
+          <p className="text-xs text-gray-500 mt-2">Total de pesquisas</p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-600">Mercados</h3>
+            <Target className="w-8 h-8 text-purple-500" />
+          </div>
+          <p className="text-3xl font-bold text-gray-900">
+            {loadingOverview ? '-' : overview?.mercados || 0}
+          </p>
+          <p className="text-xs text-gray-500 mt-2">Mercados mapeados</p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-600">Leads</h3>
+            <Users className="w-8 h-8 text-green-500" />
+          </div>
+          <p className="text-3xl font-bold text-gray-900">
+            {loadingOverview ? '-' : overview?.leads || 0}
+          </p>
+          <p className="text-xs text-gray-500 mt-2">Total de leads</p>
+        </div>
+      </div>
+
+      {/* Distribuição de Leads por Estágio */}
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <Award className="w-6 h-6 text-blue-600" />
+          Leads por Estágio
+        </h2>
+        {loadingStage ? (
+          <p className="text-gray-500">Carregando...</p>
+        ) : leadsByStage && leadsByStage.length > 0 ? (
+          <div className="space-y-3">
+            {leadsByStage.map((item) => (
+              <div key={item.stage} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="font-medium text-gray-700 capitalize">{item.stage}</span>
+                <span className="text-2xl font-bold text-blue-600">{item.count}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">Nenhum dado disponível</p>
         )}
       </div>
 
-      {/* Cards de Métricas Principais */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Projetos */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Projetos</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{totalProjects}</p>
-            </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
+      {/* Distribuição de Leads por Status de Validação */}
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <Percent className="w-6 h-6 text-green-600" />
+          Leads por Status de Validação
+        </h2>
+        {leadsByValidation && leadsByValidation.length > 0 ? (
+          <div className="space-y-3">
+            {leadsByValidation.map((item) => (
+              <div key={item.status} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="font-medium text-gray-700 capitalize">{item.status}</span>
+                <span className="text-2xl font-bold text-green-600">{item.count}</span>
+              </div>
+            ))}
           </div>
-          <p className="text-xs text-gray-500 mt-4">Total de projetos ativos</p>
-        </div>
-
-        {/* Pesquisas */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Pesquisas</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{totalPesquisas}</p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-4">
-            {selectedProjectId ? 'Pesquisas do projeto selecionado' : 'Total de pesquisas'}
-          </p>
-        </div>
-
-        {/* Mercados */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Mercados</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{totalMercados}</p>
-            </div>
-            <div className="p-3 bg-purple-100 rounded-full">
-              <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-4">
-            {selectedProjectId ? 'Mercados do projeto selecionado' : 'Total de mercados mapeados'}
-          </p>
-        </div>
-
-        {/* Clientes */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Clientes</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{totalClientes.toLocaleString()}</p>
-            </div>
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-4">Total de clientes nas pesquisas</p>
-        </div>
-
-        {/* Clientes Enriquecidos */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Enriquecidos</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{clientesEnriquecidos.toLocaleString()}</p>
-            </div>
-            <div className="p-3 bg-indigo-100 rounded-full">
-              <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-4">Clientes com dados enriquecidos</p>
-        </div>
-
-        {/* Taxa de Enriquecimento */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Taxa de Enriquecimento</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{taxaEnriquecimento}%</p>
-            </div>
-            <div className="p-3 bg-pink-100 rounded-full">
-              <svg className="w-8 h-8 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-4">Percentual de clientes enriquecidos</p>
-        </div>
+        ) : (
+          <p className="text-gray-500">Nenhum dado disponível</p>
+        )}
       </div>
 
-      {/* Gráfico Placeholder */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-xl font-bold mb-4">Visão Geral</h2>
-        <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <div className="text-center">
-            <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <p className="text-gray-600 font-medium">Gráficos em desenvolvimento</p>
-            <p className="text-gray-500 text-sm mt-2">Em breve: gráficos interativos e relatórios detalhados</p>
+      {/* Top 5 Mercados */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <Target className="w-6 h-6 text-purple-600" />
+          Top 5 Mercados
+        </h2>
+        {topMarkets && topMarkets.length > 0 ? (
+          <div className="space-y-3">
+            {topMarkets.map((market, index) => (
+              <div key={market.mercadoId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-600 rounded-full font-bold">
+                    {index + 1}
+                  </span>
+                  <span className="font-medium text-gray-700">{market.mercadoNome}</span>
+                </div>
+                <span className="text-xl font-bold text-purple-600">{market.leadsCount} leads</span>
+              </div>
+            ))}
           </div>
-        </div>
-      </div>
-
-      {/* Debug Info */}
-      <div className="bg-gray-100 rounded-lg p-4">
-        <h4 className="text-sm font-semibold text-gray-700 mb-2">🔍 Debug - Reatividade:</h4>
-        <pre className="text-xs text-gray-600">
-          {JSON.stringify({
-            selectedProjectId,
-            totalProjects,
-            totalPesquisas,
-            totalMercados,
-            totalClientes,
-            clientesEnriquecidos,
-            taxaEnriquecimento: `${taxaEnriquecimento}%`,
-            message: 'Esta página REAGE ao projeto selecionado no Dashboard'
-          }, null, 2)}
-        </pre>
+        ) : (
+          <p className="text-gray-500">Nenhum mercado encontrado</p>
+        )}
       </div>
     </div>
   );
