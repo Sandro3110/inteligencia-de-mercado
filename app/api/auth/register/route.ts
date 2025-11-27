@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/auth/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { db } from '@/lib/db';
 import { users } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
@@ -33,18 +33,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Criar usuário no Supabase Auth
-    const supabase = await createServerSupabaseClient();
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    // Criar cliente Supabase Admin (não envia email de confirmação)
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    );
+
+    // Criar usuário no Supabase Auth usando Admin API (SEM enviar email)
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      options: {
-        data: {
-          nome,
-          empresa,
-          cargo,
-          setor,
-        },
+      email_confirm: true, // Marca email como confirmado (não envia email)
+      user_metadata: {
+        nome,
+        empresa,
+        cargo,
+        setor,
       },
     });
 
@@ -82,7 +92,7 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    // Enviar email de boas-vindas para o usuário
+    // Enviar email de boas-vindas para o usuário (NOSSO email personalizado)
     try {
       await sendWelcomeEmail(nome, email);
     } catch (emailError) {
@@ -104,9 +114,6 @@ export async function POST(request: NextRequest) {
       console.error('Erro ao enviar notificação para admin:', emailError);
       // Não bloquear o cadastro se o email falhar
     }
-
-    // Fazer logout imediato (usuário não pode acessar sem aprovação)
-    await supabase.auth.signOut();
 
     return NextResponse.json({
       success: true,
