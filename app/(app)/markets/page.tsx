@@ -13,13 +13,23 @@ const MapFilters = dynamic(() => import('@/components/maps/MapFilters'), { ssr: 
 const MapLegend = dynamic(() => import('@/components/maps/MapLegend'), { ssr: false });
 const CustomMarker = dynamic(() => import('@/components/maps/CustomMarker'), { ssr: false });
 const EntityMarker = dynamic(() => import('@/components/maps/EntityMarker'), { ssr: false });
+const EntityPopupCard = dynamic(() => import('@/components/maps/EntityPopupCard'), { ssr: false });
+const HeatmapLayer = dynamic(() => import('@/components/maps/HeatmapLayer'), { ssr: false });
+const CompararMercadosModal = dynamic(() => import('@/components/CompararMercadosModal'), {
+  ssr: false,
+});
+const GeoCockpit = dynamic(() => import('@/components/GeoCockpit'), { ssr: false });
+const EnrichmentProgress = dynamic(() => import('@/components/EnrichmentProgress'), { ssr: false });
 
 export default function MarketsPage() {
   const { selectedProjectId } = useProject();
-  const [activeTab, setActiveTab] = useState<'list' | 'map' | 'compare' | 'geocoding' | 'enrichment'>('list');
+  const [activeTab, setActiveTab] = useState<
+    'list' | 'map' | 'compare' | 'geocoding' | 'enrichment'
+  >('list');
   const [showFilters, setShowFilters] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
-  
+  const [showHeatmap, setShowHeatmap] = useState(false);
+
   const { data: mercados, isLoading } = trpc.mercados.list.useQuery({
     projectId: selectedProjectId || undefined,
   });
@@ -89,7 +99,10 @@ export default function MarketsPage() {
           ) : mercados && mercados.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {mercados.map((mercado: any) => (
-                <div key={mercado.id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6">
+                <div
+                  key={mercado.id}
+                  className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+                >
                   <div className="flex items-start justify-between mb-4">
                     <h3 className="text-lg font-bold text-gray-900">{mercado.nome}</h3>
                     {mercado.categoria && (
@@ -137,60 +150,34 @@ export default function MarketsPage() {
               <Layers className="w-5 h-5" />
               Legenda
             </button>
+            <button
+              onClick={() => setShowHeatmap(!showHeatmap)}
+              className={`px-4 py-2 rounded-lg shadow hover:shadow-lg transition-shadow flex items-center gap-2 ${
+                showHeatmap ? 'bg-purple-600 text-white' : 'bg-white'
+              }`}
+            >
+              <Layers className="w-5 h-5" />
+              Heatmap
+            </button>
           </div>
-          
-          {showFilters && (
-            <div className="absolute top-16 right-4 z-10 bg-white rounded-lg shadow-lg p-4 w-64">
-              <h3 className="font-semibold mb-2">Filtros de Mapa</h3>
-              <p className="text-sm text-gray-600">Filtros avançados disponíveis</p>
-            </div>
-          )}
 
-          {showLegend && (
-            <div className="absolute bottom-4 left-4 z-10 bg-white rounded-lg shadow-lg p-4">
-              <h3 className="font-semibold mb-2">Legenda</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-blue-500 rounded-full" />
-                  <span>Clientes</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-red-500 rounded-full" />
-                  <span>Concorrentes</span>
-                </div>
-              </div>
-            </div>
-          )}
+          {showFilters && <MapFilters onClose={() => setShowFilters(false)} />}
+          {showLegend && <MapLegend />}
 
           <div className="bg-white rounded-lg shadow p-4">
-            <MapContainer markers={mercados || []} />
+            <MapContainer
+              markers={mercados || []}
+              showHeatmap={showHeatmap}
+              MarkerComponent={EntityMarker}
+              PopupComponent={EntityPopupCard}
+            />
           </div>
         </div>
       )}
 
-      {activeTab === 'compare' && (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Comparar Mercados</h3>
-          <p className="text-gray-600">Compare mercados lado a lado</p>
-        </div>
-      )}
-
-      {activeTab === 'geocoding' && (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <MapPin className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Geocoding</h3>
-          <p className="text-gray-600">Validação e correção de endereços</p>
-        </div>
-      )}
-
-      {activeTab === 'enrichment' && (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Enriquecimento</h3>
-          <p className="text-gray-600">Jobs de enriquecimento de dados</p>
-        </div>
-      )}
+      {activeTab === 'compare' && <CompararMercadosModal />}
+      {activeTab === 'geocoding' && <GeoCockpit />}
+      {activeTab === 'enrichment' && <EnrichmentProgress />}
     </div>
   );
 }
