@@ -5,17 +5,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  Users, 
-  UserCheck, 
+import {
+  CheckCircle,
+  XCircle,
+  Clock,
+  Users,
+  UserCheck,
   UserX,
   Mail,
   Building,
   Briefcase,
-  Calendar
+  Calendar,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -47,7 +47,7 @@ export default function AdminUsersPage() {
       setLoading(true);
       const response = await fetch('/api/admin/users');
       const data = await response.json();
-      
+
       if (data.users) {
         setUsers(data.users);
       }
@@ -60,48 +60,72 @@ export default function AdminUsersPage() {
   };
 
   const handleApprove = async (userId: string) => {
+    console.log('🔵 [handleApprove] Iniciando aprovação do usuário:', userId);
+
     try {
+      toast.loading('Aprovando usuário...');
+
       const response = await fetch(`/api/admin/users/${userId}/approve`, {
         method: 'POST',
       });
 
+      console.log('🔵 [handleApprove] Status da resposta:', response.status);
+
       const data = await response.json();
+      console.log('🔵 [handleApprove] Dados da resposta:', data);
 
       if (response.ok) {
+        toast.dismiss();
         toast.success('Usuário aprovado com sucesso!');
+        console.log('✅ [handleApprove] Usuário aprovado com sucesso');
         fetchUsers(); // Recarregar lista
       } else {
+        toast.dismiss();
+        console.error('❌ [handleApprove] Erro:', data.error);
         toast.error(data.error || 'Erro ao aprovar usuário');
       }
     } catch (error) {
-      console.error('Erro ao aprovar usuário:', error);
+      toast.dismiss();
+      console.error('❌ [handleApprove] Exceção:', error);
       toast.error('Erro ao aprovar usuário');
     }
   };
 
   const handleReject = async (userId: string) => {
+    console.log('🔴 [handleReject] Iniciando rejeição do usuário:', userId);
+
     try {
+      toast.loading('Rejeitando usuário...');
+
       const response = await fetch(`/api/admin/users/${userId}/reject`, {
         method: 'POST',
       });
 
+      console.log('🔴 [handleReject] Status da resposta:', response.status);
+
       const data = await response.json();
+      console.log('🔴 [handleReject] Dados da resposta:', data);
 
       if (response.ok) {
+        toast.dismiss();
         toast.success('Usuário rejeitado');
+        console.log('✅ [handleReject] Usuário rejeitado com sucesso');
         fetchUsers(); // Recarregar lista
       } else {
+        toast.dismiss();
+        console.error('❌ [handleReject] Erro:', data.error);
         toast.error(data.error || 'Erro ao rejeitar usuário');
       }
     } catch (error) {
-      console.error('Erro ao rejeitar usuário:', error);
+      toast.dismiss();
+      console.error('❌ [handleReject] Exceção:', error);
       toast.error('Erro ao rejeitar usuário');
     }
   };
 
-  const pendingUsers = users.filter(u => u.ativo === 0);
-  const approvedUsers = users.filter(u => u.ativo === 1);
-  const rejectedUsers = users.filter(u => u.ativo === -1);
+  const pendingUsers = users.filter((u) => u.ativo === 0);
+  const approvedUsers = users.filter((u) => u.ativo === 1);
+  const rejectedUsers = users.filter((u) => u.ativo === -1);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('pt-BR', {
@@ -124,7 +148,9 @@ export default function AdminUsersPage() {
               {user.email}
             </CardDescription>
           </div>
-          <Badge variant={user.ativo === 1 ? 'default' : user.ativo === 0 ? 'secondary' : 'destructive'}>
+          <Badge
+            variant={user.ativo === 1 ? 'default' : user.ativo === 0 ? 'secondary' : 'destructive'}
+          >
             {user.ativo === 1 ? 'Aprovado' : user.ativo === 0 ? 'Pendente' : 'Rejeitado'}
           </Badge>
         </div>
@@ -162,19 +188,11 @@ export default function AdminUsersPage() {
 
         {showActions && (
           <div className="flex gap-2">
-            <Button
-              onClick={() => handleApprove(user.id)}
-              className="flex-1"
-              variant="default"
-            >
+            <Button onClick={() => handleApprove(user.id)} className="flex-1" variant="default">
               <CheckCircle className="h-4 w-4 mr-2" />
               Aprovar
             </Button>
-            <Button
-              onClick={() => handleReject(user.id)}
-              className="flex-1"
-              variant="destructive"
-            >
+            <Button onClick={() => handleReject(user.id)} className="flex-1" variant="destructive">
               <XCircle className="h-4 w-4 mr-2" />
               Rejeitar
             </Button>
@@ -215,9 +233,7 @@ export default function AdminUsersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{pendingUsers.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Aguardando aprovação
-            </p>
+            <p className="text-xs text-muted-foreground">Aguardando aprovação</p>
           </CardContent>
         </Card>
 
@@ -228,9 +244,7 @@ export default function AdminUsersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{approvedUsers.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Com acesso ativo
-            </p>
+            <p className="text-xs text-muted-foreground">Com acesso ativo</p>
           </CardContent>
         </Card>
 
@@ -241,9 +255,7 @@ export default function AdminUsersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{users.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Todos os usuários
-            </p>
+            <p className="text-xs text-muted-foreground">Todos os usuários</p>
           </CardContent>
         </Card>
       </div>
@@ -278,7 +290,7 @@ export default function AdminUsersPage() {
             </Card>
           ) : (
             <div>
-              {pendingUsers.map(user => (
+              {pendingUsers.map((user) => (
                 <UserCard key={user.id} user={user} showActions={true} />
               ))}
             </div>
@@ -295,7 +307,7 @@ export default function AdminUsersPage() {
             </Card>
           ) : (
             <div>
-              {approvedUsers.map(user => (
+              {approvedUsers.map((user) => (
                 <UserCard key={user.id} user={user} />
               ))}
             </div>
@@ -312,7 +324,7 @@ export default function AdminUsersPage() {
             </Card>
           ) : (
             <div>
-              {rejectedUsers.map(user => (
+              {rejectedUsers.map((user) => (
                 <UserCard key={user.id} user={user} />
               ))}
             </div>

@@ -1,8 +1,7 @@
 'use client';
 
 import { useProject } from '@/lib/contexts/ProjectContext';
-import { Zap, Play, CheckCircle, XCircle, Clock } from 'lucide-react';
-import EnrichmentProgress from '@/components/EnrichmentProgress';
+import { Zap, Play, Clock, Users, TrendingUp, MapPin } from 'lucide-react';
 
 export default function EnrichmentPage() {
   const { selectedProjectId } = useProject();
@@ -12,9 +11,7 @@ export default function EnrichmentPage() {
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-2xl mx-auto text-center py-12">
           <Zap className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Selecione um Projeto
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Selecione um Projeto</h2>
           <p className="text-gray-600">
             Escolha um projeto no seletor global para gerenciar enriquecimentos
           </p>
@@ -23,39 +20,7 @@ export default function EnrichmentPage() {
     );
   }
 
-  // Mock job para demonstração
-  const mockJob = {
-    id: 1,
-    totalClients: 100,
-    processedClients: 85,
-    successCount: 80,
-    errorCount: 5,
-    startedAt: new Date().toISOString(),
-  };
-
-  const steps = [
-    {
-      id: 'init',
-      label: 'Inicialização',
-      status: 'completed' as const,
-      message: 'Preparando job de enriquecimento',
-    },
-    {
-      id: 'processing',
-      label: 'Processamento',
-      status: 'in_progress' as const,
-      message: `Processando ${mockJob.totalClients} clientes`,
-      progress: Math.round((mockJob.processedClients / mockJob.totalClients) * 100),
-    },
-    {
-      id: 'finalization',
-      label: 'Finalização',
-      status: 'pending' as const,
-      message: 'Aguardando conclusão',
-    },
-  ];
-
-  const totalProgress = Math.round((mockJob.processedClients / mockJob.totalClients) * 100);
+  // TODO: Implementar integração com API de enriquecimento real
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -63,9 +28,7 @@ export default function EnrichmentPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Enriquecimento</h1>
-          <p className="text-gray-600">
-            Gerencie jobs de enriquecimento de dados
-          </p>
+          <p className="text-gray-600">Gerencie jobs de enriquecimento de dados</p>
         </div>
         <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
           <Play className="w-5 h-5" />
@@ -73,61 +36,67 @@ export default function EnrichmentPage() {
         </button>
       </div>
 
-      {/* Job de Demonstração */}
-      <div className="bg-white rounded-lg shadow">
-        {/* Header do Job */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <h3 className="text-lg font-bold text-gray-900">
-                  Job #{mockJob.id}
-                </h3>
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 animate-pulse">
-                  <Clock className="w-3 h-3 inline mr-1" />
-                  running
-                </span>
+      {/* Funcionalidade em Desenvolvimento */}
+      <div className="bg-white rounded-lg shadow p-12 text-center">
+        <div className="max-w-2xl mx-auto">
+          <Zap className="w-20 h-20 mx-auto mb-6 text-blue-500" />
+
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Enriquecimento de Dados</h2>
+
+          <p className="text-lg text-gray-600 mb-8">
+            Esta funcionalidade permite enriquecer automaticamente seus dados de clientes e leads
+            com informações adicionais.
+          </p>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-blue-600" />
+                </div>
               </div>
-              <div className="flex items-center gap-4 text-sm text-gray-600">
-                <span>Total: {mockJob.totalClients} clientes</span>
-                <span>•</span>
-                <span>Processados: {mockJob.processedClients}</span>
-                <span>•</span>
-                <span>Sucesso: {mockJob.successCount}</span>
-                {mockJob.errorCount > 0 && (
-                  <>
-                    <span>•</span>
-                    <span className="text-red-600">Erros: {mockJob.errorCount}</span>
-                  </>
-                )}
+              <div className="text-left">
+                <h3 className="text-lg font-semibold text-blue-900 mb-2">🚧 Em Desenvolvimento</h3>
+                <p className="text-blue-800">
+                  A integração com APIs de enriquecimento de dados está sendo desenvolvida e estará
+                  disponível em breve.
+                </p>
               </div>
             </div>
-            <Zap className="w-8 h-8 flex-shrink-0 text-blue-500 animate-pulse" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+            <div className="bg-gray-50 rounded-lg p-6">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-purple-600" />
+              </div>
+              <h4 className="font-semibold text-gray-900 mb-2">Dados de Empresa</h4>
+              <p className="text-sm text-gray-600">
+                CNPJ, razão social, endereço, telefone, email e mais
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-lg p-6">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                <TrendingUp className="w-6 h-6 text-green-600" />
+              </div>
+              <h4 className="font-semibold text-gray-900 mb-2">Dados Financeiros</h4>
+              <p className="text-sm text-gray-600">
+                Faturamento, número de funcionários, porte da empresa
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-lg p-6">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                <MapPin className="w-6 h-6 text-orange-600" />
+              </div>
+              <h4 className="font-semibold text-gray-900 mb-2">Localização</h4>
+              <p className="text-sm text-gray-600">
+                Coordenadas geográficas, região, estado, cidade
+              </p>
+            </div>
           </div>
         </div>
-
-        {/* Progress */}
-        <div className="p-6">
-          <EnrichmentProgress
-            steps={steps}
-            currentStep={1}
-            totalProgress={totalProgress}
-          />
-        </div>
-
-        {/* Footer */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between text-xs text-gray-500">
-          <span>
-            Iniciado: {new Date(mockJob.startedAt).toLocaleString('pt-BR')}
-          </span>
-          <span className="text-blue-600 font-medium">Em andamento...</span>
-        </div>
-      </div>
-
-      {/* Info */}
-      <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
-        <p className="font-medium mb-1">💡 Demonstração</p>
-        <p>Este é um job de exemplo. Integração com API de enriquecimento será implementada em breve.</p>
       </div>
     </div>
   );
