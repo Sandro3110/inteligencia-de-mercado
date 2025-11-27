@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL = 'contato@intelmarket.app';
-const ADMIN_EMAILS = ['sandrodireto@gmail.com']; // Lista de admins
+const ADMIN_EMAILS = ['contato@intelmarket.app']; // Email padrão para notificações de novos usuários
 
 // ============================================================================
 // TEMPLATES DE EMAIL
