@@ -155,7 +155,6 @@ export default function ComparePage() {
       {/* Modal */}
       {modalOpen && (
         <CompararMercadosModal
-          open={modalOpen}
           onOpenChange={setModalOpen}
           mercadoIds={selectedMercados}
         />

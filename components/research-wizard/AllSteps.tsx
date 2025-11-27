@@ -18,6 +18,5 @@ export { Step1SelectProject } from './steps/Step1SelectProject';
 export { Step2NameResearch } from './steps/Step2NameResearch';
 export { Step3ConfigureParams } from './steps/Step3ConfigureParams';
 export { Step4ChooseMethod } from './steps/Step4ChooseMethod';
-export { Step5InsertData } from './steps/Step5InsertData';
 export { Step6ValidateData } from './steps/Step6ValidateData';
 export { Step7Summary } from './steps/Step7Summary';
