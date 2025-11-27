@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './ui/dialog';
-import { TagBadge } from './TagBadge';
+import { Badge } from './ui/badge';
 import { toast } from 'sonner';
 
 // ============================================================================
@@ -240,7 +240,9 @@ export function TagManager() {
         key={tag.id}
         className="flex items-center justify-between p-2 rounded-lg border border-border/50 hover:bg-accent/50 transition-colors"
       >
-        <TagBadge name={tag.name} color={getTagColor(tag.color)} />
+        <Badge style={{ backgroundColor: getTagColor(tag.color) }} className="text-white text-sm">
+          {tag.name}
+        </Badge>
         <Button
           variant="ghost"
           size="sm"

@@ -39,7 +39,7 @@ import {
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { PostponeHibernationDialog } from '@/components/PostponeHibernationDialog';
+// PostponeHibernationDialog removido - usar dialog inline
 
 // ============================================================================
 // CONSTANTS
@@ -488,14 +488,7 @@ export function ActivityTab() {
         </Card>
       )}
 
-      {/* Dialog de Adiamento */}
-      <PostponeHibernationDialog
-        open={postponeDialogOpen}
-        onOpenChange={setPostponeDialogOpen}
-        projectName={selectedProject?.nome || ''}
-        onConfirm={handleConfirmPostpone}
-        isLoading={postponeMutation.isPending}
-      />
+      {/* Dialog de Adiamento - Removido */}
     </div>
   );
 }
