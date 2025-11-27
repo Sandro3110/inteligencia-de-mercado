@@ -1,17 +1,16 @@
 'use client';
-export const dynamic = 'force-dynamic';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProjectsTab } from '@/components/projects/ProjectsTabAdapted';
 import { FolderKanban, Activity, FileText, Search, Filter } from 'lucide-react';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 
-const ActivityTab = dynamic(() => import('@/components/projects/ActivityTab'), { ssr: false });
-const LogsTab = dynamic(() => import('@/components/projects/LogsTab'), { ssr: false });
-const PesquisaSelector = dynamic(() => import('@/components/PesquisaSelector'), { ssr: false });
-const SearchFieldSelector = dynamic(() => import('@/components/SearchFieldSelector'), { ssr: false });
-const MultiSelectFilter = dynamic(() => import('@/components/MultiSelectFilter'), { ssr: false });
+const ActivityTab = nextDynamic(() => import('@/components/projects/ActivityTab'), { ssr: false });
+const LogsTab = nextDynamic(() => import('@/components/projects/LogsTab'), { ssr: false });
+const PesquisaSelector = nextDynamic(() => import('@/components/PesquisaSelector'), { ssr: false });
+const SearchFieldSelector = nextDynamic(() => import('@/components/SearchFieldSelector'), { ssr: false });
+const MultiSelectFilter = nextDynamic(() => import('@/components/MultiSelectFilter'), { ssr: false });
 
 type TabType = 'projects' | 'activity' | 'logs' | 'search' | 'filters';
 

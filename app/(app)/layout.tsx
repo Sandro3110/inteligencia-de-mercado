@@ -1,25 +1,23 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { ProjectProvider } from '@/lib/contexts/ProjectContext';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 
-const Sidebar = dynamic(() => import('@/components/Sidebar'), { ssr: false });
-const Header = dynamic(() => import('@/components/Header'), { ssr: false });
-const GlobalSearch = dynamic(() => import('@/components/GlobalSearch'), { ssr: false });
-const GlobalShortcuts = dynamic(() => import('@/components/GlobalShortcuts'), { ssr: false });
-const NotificationBell = dynamic(() => import('@/components/NotificationBell'), { ssr: false });
-const ErrorBoundary = dynamic(() => import('@/components/ErrorBoundary'), { ssr: false });
-const ThemeToggle = dynamic(() => import('@/components/ThemeToggle'), { ssr: false });
-const CompactModeToggle = dynamic(() => import('@/components/CompactModeToggle'), { ssr: false });
-const DynamicBreadcrumbs = dynamic(() => import('@/components/DynamicBreadcrumbs'), { ssr: false });
-const OnboardingTour = dynamic(() => import('@/components/OnboardingTour'), { ssr: false });
-const ContextualTour = dynamic(() => import('@/components/ContextualTour'), { ssr: false });
-const DraftRecoveryModal = dynamic(() => import('@/components/DraftRecoveryModal'), { ssr: false });
+const Sidebar = nextDynamic(() => import('@/components/Sidebar'), { ssr: false });
+const Header = nextDynamic(() => import('@/components/Header'), { ssr: false });
+const GlobalSearch = nextDynamic(() => import('@/components/GlobalSearch'), { ssr: false });
+const GlobalShortcuts = nextDynamic(() => import('@/components/GlobalShortcuts'), { ssr: false });
+const NotificationBell = nextDynamic(() => import('@/components/NotificationBell'), { ssr: false });
+const ErrorBoundary = nextDynamic(() => import('@/components/ErrorBoundary'), { ssr: false });
+const ThemeToggle = nextDynamic(() => import('@/components/ThemeToggle'), { ssr: false });
+const CompactModeToggle = nextDynamic(() => import('@/components/CompactModeToggle'), { ssr: false });
+const DynamicBreadcrumbs = nextDynamic(() => import('@/components/DynamicBreadcrumbs'), { ssr: false });
+const OnboardingTour = nextDynamic(() => import('@/components/OnboardingTour'), { ssr: false });
+const ContextualTour = nextDynamic(() => import('@/components/ContextualTour'), { ssr: false });
+const DraftRecoveryModal = nextDynamic(() => import('@/components/DraftRecoveryModal'), { ssr: false });
 
 export default function AppLayout({
   children,
