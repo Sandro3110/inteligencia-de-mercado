@@ -55,14 +55,21 @@ export default function MetricsTab({ projectId }: MetricsTabProps) {
   const { toast } = useToast();
 
   const { data: distribuicaoGeo, refetch: refetchGeo } =
-    trpc.dashboard.distribuicaoGeografica.useQuery();
+    trpc.dashboard.distribuicaoGeografica.useQuery({ projectId }, { enabled: !!projectId });
   const { data: distribuicaoSeg, refetch: refetchSeg } =
-    trpc.dashboard.distribuicaoSegmentacao.useQuery();
-  const { data: timeline, refetch: refetchTimeline } = trpc.dashboard.timelineValidacoes.useQuery({
-    days,
-  });
-  const { data: funil, refetch: refetchFunil } = trpc.dashboard.funilConversao.useQuery();
-  const { data: top10, refetch: refetchTop10 } = trpc.dashboard.top10Mercados.useQuery();
+    trpc.dashboard.distribuicaoSegmentacao.useQuery({ projectId }, { enabled: !!projectId });
+  const { data: timeline, refetch: refetchTimeline } = trpc.dashboard.timelineValidacoes.useQuery(
+    { projectId, days },
+    { enabled: !!projectId }
+  );
+  const { data: funil, refetch: refetchFunil } = trpc.dashboard.funilConversao.useQuery(
+    { projectId },
+    { enabled: !!projectId }
+  );
+  const { data: top10, refetch: refetchTop10 } = trpc.dashboard.top10Mercados.useQuery(
+    { projectId },
+    { enabled: !!projectId }
+  );
 
   const handleRefreshAll = useCallback(async () => {
     try {
