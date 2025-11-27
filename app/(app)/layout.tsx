@@ -38,12 +38,28 @@ export default function AppLayout({
       
       if (!user) {
         router.push('/login');
-      } else {
+        return;
+      }
+
+      // Verificar se usuário está aprovado
+      try {
+        const response = await fetch('/api/auth/check-approval');
+        const data = await response.json();
+
+        if (!data.approved) {
+          // Usuário não aprovado, redirecionar para página de pendência
+          router.push('/pending-approval');
+          return;
+        }
+
         // Verificar se é primeira visita para mostrar onboarding
         const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
         if (!hasSeenOnboarding) {
           setShowOnboarding(true);
         }
+      } catch (error) {
+        console.error('Erro ao verificar aprovação:', error);
+        router.push('/login');
       }
     };
 
