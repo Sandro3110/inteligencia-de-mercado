@@ -2,20 +2,46 @@
 
 import { useProject } from '@/lib/contexts/ProjectContext';
 import { trpc } from '@/lib/trpc/client';
-import { Plus, Search, Calendar, Users, TrendingUp } from 'lucide-react';
+import { Plus, Search, Calendar, Users, TrendingUp, FileText } from 'lucide-react';
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
+
+const Step1SelectProject = dynamic(() => import('@/components/research-wizard/AllSteps').then(mod => ({ default: mod.Step1SelectProject })), { ssr: false });
+const Step2NameResearch = dynamic(() => import('@/components/research-wizard/AllSteps').then(mod => ({ default: mod.Step2NameResearch })), { ssr: false });
+const Step3ConfigureParams = dynamic(() => import('@/components/research-wizard/AllSteps').then(mod => ({ default: mod.Step3ConfigureParams })), { ssr: false });
+const Step4ChooseMethod = dynamic(() => import('@/components/research-wizard/AllSteps').then(mod => ({ default: mod.Step4ChooseMethod })), { ssr: false });
+const Step6ValidateData = dynamic(() => import('@/components/research-wizard/AllSteps').then(mod => ({ default: mod.Step6ValidateData })), { ssr: false });
+const Step7Summary = dynamic(() => import('@/components/research-wizard/AllSteps').then(mod => ({ default: mod.Step7Summary })), { ssr: false });
 
 export default function PesquisasPage() {
   const { selectedProjectId } = useProject();
   const [showWizard, setShowWizard] = useState(false);
+  const [wizardStep, setWizardStep] = useState(1);
+  const [wizardData, setWizardData] = useState<any>({});
   
-  // Buscar pesquisas (filtradas por projeto se houver seleção)
   const { data: pesquisas, isLoading, refetch } = trpc.pesquisas.list.useQuery(
     selectedProjectId ? { projectId: selectedProjectId } : undefined
   );
 
-  const handleWizardComplete = () => {
+  const handleStartWizard = () => {
+    setShowWizard(true);
+    setWizardStep(1);
+    setWizardData({});
+  };
+
+  const handleWizardNext = (data: any) => {
+    setWizardData({ ...wizardData, ...data });
+    setWizardStep(wizardStep + 1);
+  };
+
+  const handleWizardBack = () => {
+    setWizardStep(wizardStep - 1);
+  };
+
+  const handleWizardClose = () => {
     setShowWizard(false);
+    setWizardStep(1);
+    setWizardData({});
     refetch();
   };
 
@@ -24,12 +50,8 @@ export default function PesquisasPage() {
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-2xl mx-auto text-center py-12">
           <Search className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Selecione um Projeto
-          </h2>
-          <p className="text-gray-600">
-            Escolha um projeto no seletor global para visualizar e gerenciar pesquisas
-          </p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Selecione um Projeto</h2>
+          <p className="text-gray-600">Escolha um projeto no seletor global</p>
         </div>
       </div>
     );
@@ -57,16 +79,13 @@ export default function PesquisasPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Pesquisas</h1>
-          <p className="text-gray-600">
-            Gerencie suas pesquisas de mercado e importações de dados
-          </p>
+          <p className="text-gray-600">Gerencie suas pesquisas de mercado</p>
         </div>
         <button
-          onClick={() => setShowWizard(true)}
+          onClick={handleStartWizard}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
         >
           <Plus className="w-5 h-5" />
@@ -74,15 +93,10 @@ export default function PesquisasPage() {
         </button>
       </div>
 
-      {/* Lista de Pesquisas */}
       {pesquisas && pesquisas.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {pesquisas.map((pesquisa) => (
-            <div 
-              key={pesquisa.id} 
-              className="bg-white rounded-lg shadow hover:shadow-xl transition-all cursor-pointer group"
-            >
-              {/* Header do Card */}
+            <div key={pesquisa.id} className="bg-white rounded-lg shadow hover:shadow-xl transition-all cursor-pointer group">
               <div className="p-6 border-b border-gray-100">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
@@ -102,16 +116,13 @@ export default function PesquisasPage() {
                 </p>
               </div>
 
-              {/* Estatísticas */}
               <div className="p-6 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Users className="w-4 h-4" />
                     <span className="text-sm">Total de Clientes</span>
                   </div>
-                  <span className="font-bold text-gray-900">
-                    {pesquisa.totalClientes || 0}
-                  </span>
+                  <span className="font-bold text-gray-900">{pesquisa.totalClientes || 0}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -120,9 +131,7 @@ export default function PesquisasPage() {
                     <span className="text-sm">Enriquecidos</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-gray-900">
-                      {pesquisa.clientesEnriquecidos || 0}
-                    </span>
+                    <span className="font-bold text-gray-900">{pesquisa.clientesEnriquecidos || 0}</span>
                     {(pesquisa.totalClientes || 0) > 0 && (
                       <span className="text-xs text-gray-500">
                         ({Math.round(((pesquisa.clientesEnriquecidos || 0) / (pesquisa.totalClientes || 1)) * 100)}%)
@@ -137,17 +146,14 @@ export default function PesquisasPage() {
                     <span className="text-sm">Importado em</span>
                   </div>
                   <span className="text-sm text-gray-900">
-                    {pesquisa.dataImportacao 
-                      ? new Date(pesquisa.dataImportacao).toLocaleDateString('pt-BR')
-                      : '-'}
+                    {pesquisa.dataImportacao ? new Date(pesquisa.dataImportacao).toLocaleDateString('pt-BR') : '-'}
                   </span>
                 </div>
 
-                {/* Barra de Progresso */}
                 {(pesquisa.totalClientes || 0) > 0 && (
                   <div className="pt-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-gray-600">Progresso de Enriquecimento</span>
+                      <span className="text-xs text-gray-600">Progresso</span>
                       <span className="text-xs font-medium text-gray-900">
                         {Math.round(((pesquisa.clientesEnriquecidos || 0) / (pesquisa.totalClientes || 1)) * 100)}%
                       </span>
@@ -155,16 +161,13 @@ export default function PesquisasPage() {
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
                         className="bg-blue-600 h-2 rounded-full transition-all"
-                        style={{ 
-                          width: `${Math.min(((pesquisa.clientesEnriquecidos || 0) / (pesquisa.totalClientes || 1)) * 100, 100)}%` 
-                        }}
+                        style={{ width: `${Math.min(((pesquisa.clientesEnriquecidos || 0) / (pesquisa.totalClientes || 1)) * 100, 100)}%` }}
                       ></div>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Footer */}
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 text-xs text-gray-500">
                 ID: {pesquisa.id}
               </div>
@@ -174,14 +177,10 @@ export default function PesquisasPage() {
       ) : (
         <div className="bg-white rounded-lg shadow p-12 text-center">
           <Search className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-xl font-bold text-gray-900 mb-2">
-            Nenhuma pesquisa encontrada
-          </h3>
-          <p className="text-gray-600 mb-6">
-            Crie sua primeira pesquisa para começar a mapear mercados e identificar oportunidades
-          </p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Nenhuma pesquisa encontrada</h3>
+          <p className="text-gray-600 mb-6">Crie sua primeira pesquisa</p>
           <button
-            onClick={() => setShowWizard(true)}
+            onClick={handleStartWizard}
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -190,20 +189,48 @@ export default function PesquisasPage() {
         </div>
       )}
 
-      {/* Wizard Modal - TODO: Implementar wizard completo */}
+      {/* Wizard Modal com 7 Steps */}
       {showWizard && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-            <h2 className="text-2xl font-bold mb-4">Nova Pesquisa</h2>
-            <p className="text-gray-600 mb-6">
-              Wizard de criação completo será implementado em breve...
-            </p>
-            <button
-              onClick={() => setShowWizard(false)}
-              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg transition-colors"
-            >
-              Fechar
-            </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">Nova Pesquisa - Wizard</h2>
+                <button onClick={handleWizardClose} className="text-gray-400 hover:text-gray-600">✕</button>
+              </div>
+
+              <div className="mt-4 flex items-center gap-2">
+                {[1, 2, 3, 4, 5, 6, 7].map((step) => (
+                  <div
+                    key={step}
+                    className={`flex-1 h-2 rounded-full transition-colors ${
+                      step <= wizardStep ? 'bg-blue-600' : 'bg-gray-200'
+                    }`}
+                  />
+                ))}
+              </div>
+              <p className="mt-2 text-sm text-gray-600">Passo {wizardStep} de 7</p>
+            </div>
+
+            <div className="p-6">
+              {wizardStep === 1 && <Step1SelectProject onNext={handleWizardNext} initialData={wizardData} />}
+              {wizardStep === 2 && <Step2NameResearch onNext={handleWizardNext} onBack={handleWizardBack} initialData={wizardData} />}
+              {wizardStep === 3 && <Step3ConfigureParams onNext={handleWizardNext} onBack={handleWizardBack} initialData={wizardData} />}
+              {wizardStep === 4 && <Step4ChooseMethod onNext={handleWizardNext} onBack={handleWizardBack} initialData={wizardData} />}
+              {wizardStep === 5 && (
+                <div className="text-center py-12">
+                  <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                  <h3 className="text-lg font-semibold mb-2">Inserir Dados</h3>
+                  <p className="text-gray-600 mb-6">Step 5 em desenvolvimento</p>
+                  <div className="flex gap-4 justify-center">
+                    <button onClick={handleWizardBack} className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Voltar</button>
+                    <button onClick={() => handleWizardNext({})} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Próximo</button>
+                  </div>
+                </div>
+              )}
+              {wizardStep === 6 && <Step6ValidateData onNext={handleWizardNext} onBack={handleWizardBack} initialData={wizardData} />}
+              {wizardStep === 7 && <Step7Summary onFinish={handleWizardClose} onBack={handleWizardBack} data={wizardData} />}
+            </div>
           </div>
         </div>
       )}
