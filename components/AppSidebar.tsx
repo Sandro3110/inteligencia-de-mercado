@@ -5,39 +5,29 @@
  * Menu de navegação com seções colapsáveis e priorização de funcionalidades
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation, Link } from 'wouter';
 import {
   BarChart3,
   Home,
   FileText,
   Zap,
-  Activity,
-  TrendingUp,
-  DollarSign,
-  Settings,
   Bell,
   ChevronDown,
   ChevronRight,
   ChevronLeft,
-  Plus,
   Download,
   Sparkles,
   FolderOpen,
   FileStack,
   MapPin,
-  HelpCircle,
-  CheckCircle,
   Users,
   Globe,
+  Search,
+  Settings,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { trpc } from '@/lib/trpc/client';
-import { useSelectedProject } from '@/hooks/useSelectedProject';
-import { useUnreadNotificationsCount } from '@/hooks/useUnreadNotificationsCount';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
 
 // ============================================================================
 // CONSTANTS
@@ -60,17 +50,6 @@ const TOOLTIPS = {
   COLLAPSE: 'Recolher menu',
 } as const;
 
-const LABELS = {
-  ACTIVE_PROJECT: 'Projeto Ativo',
-  MARKETS: 'mercados',
-  LEADS: 'leads',
-} as const;
-
-const BADGE_LIMITS = {
-  MAX_DISPLAY: 9,
-  OVERFLOW_SUFFIX: '+',
-} as const;
-
 const PRIORITY_TYPES = {
   CORE: 'core',
   HIGH: 'high',
@@ -79,13 +58,6 @@ const PRIORITY_TYPES = {
 } as const;
 
 type Priority = (typeof PRIORITY_TYPES)[keyof typeof PRIORITY_TYPES];
-
-const PRIORITY_COLORS: Record<Priority, string> = {
-  [PRIORITY_TYPES.CORE]: 'text-blue-600 bg-blue-50 border-blue-200',
-  [PRIORITY_TYPES.HIGH]: 'text-green-600 bg-green-50 border-green-200',
-  [PRIORITY_TYPES.MEDIUM]: 'text-purple-600 bg-purple-50 border-purple-200',
-  [PRIORITY_TYPES.LOW]: 'text-gray-600 bg-gray-50 border-gray-200',
-};
 
 const SECTION_COLORS = {
   CORE: {
@@ -100,12 +72,6 @@ const SECTION_COLORS = {
     HOVER: 'hover:bg-slate-100',
     ACTIVE: 'bg-blue-100 text-blue-700',
   },
-} as const;
-
-const NOTIFICATION_BADGE_COLORS = {
-  PING: 'bg-red-400',
-  SOLID: 'bg-red-500',
-  TEXT: 'text-white',
 } as const;
 
 // ============================================================================
@@ -128,19 +94,12 @@ interface NavSection {
   priority?: Priority;
 }
 
-interface DashboardStats {
-  totals: {
-    mercados: number;
-    leads: number;
-  };
-}
-
 // ============================================================================
 // NAVIGATION SECTIONS
 // ============================================================================
 
 const NAV_SECTIONS: NavSection[] = [
-  // 🎯 CORE DO SISTEMA (Prioridade Máxima)
+  // 🎯 CORE DO SISTEMA
   {
     title: '🎯 Core',
     icon: Zap,
@@ -152,6 +111,7 @@ const NAV_SECTIONS: NavSection[] = [
       { title: 'Pesquisas', href: '/pesquisas', icon: FileStack },
       { title: 'Mercados', href: '/markets', icon: Globe },
       { title: 'Leads', href: '/leads', icon: Users },
+      { title: 'Busca Global', href: '/search', icon: Search, badge: 'Novo' },
     ],
   },
 
@@ -165,10 +125,11 @@ const NAV_SECTIONS: NavSection[] = [
       { title: 'Analytics', href: '/analytics', icon: BarChart3, shortcut: 'Ctrl+A' },
       { title: 'Enriquecimento', href: '/enrichment', icon: Sparkles, shortcut: 'Ctrl+E' },
       { title: 'Exportar Dados', href: '/export', icon: Download, shortcut: 'Ctrl+X' },
+      { title: 'Comparar Mercados', href: '/compare', icon: BarChart3, badge: 'Novo' },
     ],
   },
 
-  // ⚙️ AUTOMAÇÃO E RELATÓRIOS
+  // ⚙️ AUTOMAÇÃO E SISTEMA
   {
     title: '⚙️ Automação',
     icon: Settings,
@@ -177,6 +138,18 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { title: 'Relatórios', href: '/reports', icon: FileText },
       { title: 'Alertas', href: '/alerts', icon: Bell },
+      { title: 'Notificações', href: '/notifications', icon: Bell, badge: 'Novo' },
+    ],
+  },
+
+  // 🔧 FERRAMENTAS
+  {
+    title: '🔧 Ferramentas',
+    icon: MapPin,
+    priority: PRIORITY_TYPES.LOW,
+    defaultOpen: false,
+    items: [
+      { title: 'Geocoding', href: '/geocoding', icon: MapPin, badge: 'Novo' },
     ],
   },
 ];
@@ -201,22 +174,10 @@ function getInitialOpenSections(): Record<string, boolean> {
   );
 }
 
-function getPriorityColor(priority?: Priority): string {
-  if (!priority) return PRIORITY_COLORS[PRIORITY_TYPES.LOW];
-  return PRIORITY_COLORS[priority] || PRIORITY_COLORS[PRIORITY_TYPES.LOW];
-}
-
 function isActiveRoute(href: string, location: string): boolean {
   const cleanHref = href.split('?')[0];
   const cleanLocation = location.split('?')[0];
   return cleanLocation === cleanHref;
-}
-
-function formatBadgeCount(count: number): string {
-  if (count > BADGE_LIMITS.MAX_DISPLAY) {
-    return `${BADGE_LIMITS.MAX_DISPLAY}${BADGE_LIMITS.OVERFLOW_SUFFIX}`;
-  }
-  return String(count);
 }
 
 function getSectionColors(priority?: Priority) {
