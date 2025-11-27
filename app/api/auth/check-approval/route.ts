@@ -16,11 +16,11 @@ export async function GET() {
       );
     }
 
-    // Buscar dados do usuário no banco
+    // Buscar dados do usuário no banco por email
     const [userData] = await db
       .select()
       .from(users)
-      .where(eq(users.id, user.id))
+      .where(eq(users.email, user.email))
       .limit(1);
 
     if (!userData) {
