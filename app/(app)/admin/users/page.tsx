@@ -37,6 +37,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('pending');
+  const [processingUserId, setProcessingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -62,9 +63,10 @@ export default function AdminUsersPage() {
   const handleApprove = async (userId: string) => {
     console.log('🔵 [handleApprove] Iniciando aprovação do usuário:', userId);
 
-    try {
-      toast.loading('Aprovando usuário...');
+    setProcessingUserId(userId);
+    const toastId = toast.loading('Aprovando usuário...');
 
+    try {
       const response = await fetch(`/api/admin/users/${userId}/approve`, {
         method: 'POST',
       });
@@ -75,28 +77,31 @@ export default function AdminUsersPage() {
       console.log('🔵 [handleApprove] Dados da resposta:', data);
 
       if (response.ok) {
-        toast.dismiss();
-        toast.success('Usuário aprovado com sucesso!');
+        toast.dismiss(toastId);
+        toast.success('✅ Usuário aprovado com sucesso!', { duration: 3000 });
         console.log('✅ [handleApprove] Usuário aprovado com sucesso');
-        fetchUsers(); // Recarregar lista
+        await fetchUsers(); // Recarregar lista
       } else {
-        toast.dismiss();
+        toast.dismiss(toastId);
         console.error('❌ [handleApprove] Erro:', data.error);
-        toast.error(data.error || 'Erro ao aprovar usuário');
+        toast.error('❌ ' + (data.error || 'Erro ao aprovar usuário'), { duration: 4000 });
       }
     } catch (error) {
-      toast.dismiss();
+      toast.dismiss(toastId);
       console.error('❌ [handleApprove] Exceção:', error);
-      toast.error('Erro ao aprovar usuário');
+      toast.error('❌ Erro ao aprovar usuário', { duration: 4000 });
+    } finally {
+      setProcessingUserId(null);
     }
   };
 
   const handleReject = async (userId: string) => {
     console.log('🔴 [handleReject] Iniciando rejeição do usuário:', userId);
 
-    try {
-      toast.loading('Rejeitando usuário...');
+    setProcessingUserId(userId);
+    const toastId = toast.loading('Rejeitando usuário...');
 
+    try {
       const response = await fetch(`/api/admin/users/${userId}/reject`, {
         method: 'POST',
       });
@@ -107,19 +112,21 @@ export default function AdminUsersPage() {
       console.log('🔴 [handleReject] Dados da resposta:', data);
 
       if (response.ok) {
-        toast.dismiss();
-        toast.success('Usuário rejeitado');
+        toast.dismiss(toastId);
+        toast.success('✅ Usuário rejeitado com sucesso!', { duration: 3000 });
         console.log('✅ [handleReject] Usuário rejeitado com sucesso');
-        fetchUsers(); // Recarregar lista
+        await fetchUsers(); // Recarregar lista
       } else {
-        toast.dismiss();
+        toast.dismiss(toastId);
         console.error('❌ [handleReject] Erro:', data.error);
-        toast.error(data.error || 'Erro ao rejeitar usuário');
+        toast.error('❌ ' + (data.error || 'Erro ao rejeitar usuário'), { duration: 4000 });
       }
     } catch (error) {
-      toast.dismiss();
+      toast.dismiss(toastId);
       console.error('❌ [handleReject] Exceção:', error);
-      toast.error('Erro ao rejeitar usuário');
+      toast.error('❌ Erro ao rejeitar usuário', { duration: 4000 });
+    } finally {
+      setProcessingUserId(null);
     }
   };
 
@@ -193,17 +200,41 @@ export default function AdminUsersPage() {
 
           {showActions && (
             <div className="flex gap-2">
-              <Button onClick={() => handleApprove(user.id)} className="flex-1" variant="default">
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Aprovar
+              <Button
+                onClick={() => handleApprove(user.id)}
+                className="flex-1"
+                variant="default"
+                disabled={processingUserId === user.id}
+              >
+                {processingUserId === user.id ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Processando...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Aprovar
+                  </>
+                )}
               </Button>
               <Button
                 onClick={() => handleReject(user.id)}
                 className="flex-1"
                 variant="destructive"
+                disabled={processingUserId === user.id}
               >
-                <XCircle className="h-4 w-4 mr-2" />
-                Rejeitar
+                {processingUserId === user.id ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Processando...
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-4 w-4 mr-2" />
+                    Rejeitar
+                  </>
+                )}
               </Button>
             </div>
           )}
