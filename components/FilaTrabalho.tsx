@@ -110,15 +110,15 @@ function groupItemsByMercado(items: SelectedItem[]): ItemsByMercado {
 // COMPONENT
 // ============================================================================
 
-export function FilaTrabalho({
-  isOpen,
-  onClose,
-  items,
-  onRemoveItem,
-  onClearAll,
-  onValidateAll,
-  onDiscardAll,
-}: FilaTrabalhoProps) {
+export default function FilaTrabalho({
+  isOpen = true,
+  onClose = () => {},
+  items = [],
+  onRemoveItem = () => {},
+  onClearAll = () => {},
+  onValidateAll = () => {},
+  onDiscardAll = () => {},
+}: Partial<FilaTrabalhoProps> = {}) {
   // ============================================================================
   // COMPUTED VALUES
   // ============================================================================

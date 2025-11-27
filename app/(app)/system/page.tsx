@@ -83,8 +83,12 @@ export default function SystemPage() {
 
       {activeTab === 'history' && (
         <div className="space-y-6">
-          <HistoryFilters />
-          <HistoryTimeline />
+          <HistoryFilters 
+            onFilterChange={() => {}}
+            onExportCSV={() => {}}
+            onExportPDF={() => {}}
+          />
+          <HistoryTimeline history={[]} />
         </div>
       )}
 

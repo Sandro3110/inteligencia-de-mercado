@@ -180,7 +180,7 @@ function getAlertTypeInfo(type: string): AlertTypeInfo {
 // COMPONENT
 // ============================================================================
 
-export function AlertConfig() {
+export default function AlertConfig() {
   const { selectedProjectId } = useSelectedProject();
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
