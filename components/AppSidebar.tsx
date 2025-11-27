@@ -1,30 +1,16 @@
 'use client';
 
-/**
- * AppSidebar - Sidebar Principal da Aplicação
- * Menu de navegação com seções colapsáveis e priorização de funcionalidades
- */
-
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, Link } from 'wouter';
 import {
-  BarChart3,
-  Home,
-  FileText,
-  Zap,
-  Bell,
-  ChevronDown,
-  ChevronRight,
-  ChevronLeft,
-  Download,
-  Sparkles,
-  FolderOpen,
-  FileStack,
-  MapPin,
-  Users,
-  Globe,
+  LayoutDashboard,
+  FolderKanban,
   Search,
+  Globe,
+  Users,
   Settings,
+  ChevronLeft,
+  ChevronRight,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -34,44 +20,9 @@ import { cn } from '@/lib/utils';
 // ============================================================================
 
 const STORAGE_KEY = 'sidebar-collapsed';
-
-const SIDEBAR_WIDTH = {
-  EXPANDED: 'w-64',
-  COLLAPSED: 'w-16',
-} as const;
-
 const APP_INFO = {
   NAME: 'IntelMarket',
   SUBTITLE: 'Inteligência de Mercado',
-} as const;
-
-const TOOLTIPS = {
-  EXPAND: 'Expandir menu',
-  COLLAPSE: 'Recolher menu',
-} as const;
-
-const PRIORITY_TYPES = {
-  CORE: 'core',
-  HIGH: 'high',
-  MEDIUM: 'medium',
-  LOW: 'low',
-} as const;
-
-type Priority = (typeof PRIORITY_TYPES)[keyof typeof PRIORITY_TYPES];
-
-const SECTION_COLORS = {
-  CORE: {
-    ICON: 'text-blue-600',
-    TEXT: 'text-blue-700',
-    HOVER: 'hover:bg-blue-50',
-    ACTIVE: 'bg-blue-100 text-blue-700',
-  },
-  DEFAULT: {
-    ICON: 'text-slate-600',
-    TEXT: 'text-slate-700',
-    HOVER: 'hover:bg-slate-100',
-    ACTIVE: 'bg-blue-100 text-blue-700',
-  },
 } as const;
 
 // ============================================================================
@@ -79,78 +30,52 @@ const SECTION_COLORS = {
 // ============================================================================
 
 interface NavItem {
-  title: string;
   href: string;
+  label: string;
   icon: LucideIcon;
-  shortcut?: string;
-  badge?: string;
-}
-
-interface NavSection {
-  title: string;
-  icon: LucideIcon;
-  items: NavItem[];
-  defaultOpen?: boolean;
-  priority?: Priority;
+  description: string;
 }
 
 // ============================================================================
-// NAVIGATION SECTIONS
+// NAVIGATION ITEMS (6 PÁGINAS PRINCIPAIS)
 // ============================================================================
 
-const NAV_SECTIONS: NavSection[] = [
-  // 🎯 CORE DO SISTEMA
+const NAV_ITEMS: NavItem[] = [
   {
-    title: '🎯 Core',
-    icon: Zap,
-    priority: PRIORITY_TYPES.CORE,
-    defaultOpen: true,
-    items: [
-      { title: 'Dashboard', href: '/dashboard', icon: Home, shortcut: 'Ctrl+H' },
-      { title: 'Projetos', href: '/projects', icon: FolderOpen },
-      { title: 'Pesquisas', href: '/pesquisas', icon: FileStack },
-      { title: 'Mercados', href: '/markets', icon: Globe },
-      { title: 'Leads', href: '/leads', icon: Users },
-      { title: 'Busca Global', href: '/search', icon: Search, badge: 'Novo' },
-    ],
+    href: '/dashboard',
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    description: 'Visão geral e analytics',
   },
-
-  // 📊 ANÁLISE E INTELIGÊNCIA
   {
-    title: '📊 Análise',
-    icon: BarChart3,
-    priority: PRIORITY_TYPES.HIGH,
-    defaultOpen: false,
-    items: [
-      { title: 'Analytics', href: '/analytics', icon: BarChart3, shortcut: 'Ctrl+A' },
-      { title: 'Enriquecimento', href: '/enrichment', icon: Sparkles, shortcut: 'Ctrl+E' },
-      { title: 'Exportar Dados', href: '/export', icon: Download, shortcut: 'Ctrl+X' },
-      { title: 'Comparar Mercados', href: '/compare', icon: BarChart3, badge: 'Novo' },
-    ],
+    href: '/projects',
+    label: 'Projetos',
+    icon: FolderKanban,
+    description: 'Gestão de projetos',
   },
-
-  // ⚙️ AUTOMAÇÃO E SISTEMA
   {
-    title: '⚙️ Automação',
+    href: '/pesquisas',
+    label: 'Pesquisas',
+    icon: Search,
+    description: 'Pesquisas de mercado',
+  },
+  {
+    href: '/markets',
+    label: 'Mercados',
+    icon: Globe,
+    description: 'Análise de mercados',
+  },
+  {
+    href: '/leads',
+    label: 'Leads',
+    icon: Users,
+    description: 'Gestão de leads',
+  },
+  {
+    href: '/system',
+    label: 'Sistema',
     icon: Settings,
-    priority: PRIORITY_TYPES.MEDIUM,
-    defaultOpen: false,
-    items: [
-      { title: 'Relatórios', href: '/reports', icon: FileText },
-      { title: 'Alertas', href: '/alerts', icon: Bell },
-      { title: 'Notificações', href: '/notifications', icon: Bell, badge: 'Novo' },
-    ],
-  },
-
-  // 🔧 FERRAMENTAS
-  {
-    title: '🔧 Ferramentas',
-    icon: MapPin,
-    priority: PRIORITY_TYPES.LOW,
-    defaultOpen: false,
-    items: [
-      { title: 'Geocoding', href: '/geocoding', icon: MapPin, badge: 'Novo' },
-    ],
+    description: 'Configurações',
   },
 ];
 
@@ -164,24 +89,10 @@ function getInitialCollapsedState(): boolean {
   return stored === 'true';
 }
 
-function getInitialOpenSections(): Record<string, boolean> {
-  return NAV_SECTIONS.reduce(
-    (acc, section) => {
-      acc[section.title] = section.defaultOpen ?? false;
-      return acc;
-    },
-    {} as Record<string, boolean>
-  );
-}
-
 function isActiveRoute(href: string, location: string): boolean {
   const cleanHref = href.split('?')[0];
   const cleanLocation = location.split('?')[0];
-  return cleanLocation === cleanHref;
-}
-
-function getSectionColors(priority?: Priority) {
-  return priority === PRIORITY_TYPES.CORE ? SECTION_COLORS.CORE : SECTION_COLORS.DEFAULT;
+  return cleanLocation === cleanHref || cleanLocation.startsWith(cleanHref + '/');
 }
 
 // ============================================================================
@@ -191,7 +102,6 @@ function getSectionColors(priority?: Priority) {
 export function AppSidebar() {
   const [location] = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(getInitialCollapsedState);
-  const [openSections, setOpenSections] = useState(getInitialOpenSections);
 
   // Persistir estado collapsed
   useEffect(() => {
@@ -199,13 +109,6 @@ export function AppSidebar() {
       localStorage.setItem(STORAGE_KEY, String(isCollapsed));
     }
   }, [isCollapsed]);
-
-  const toggleSection = useCallback((sectionTitle: string) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [sectionTitle]: !prev[sectionTitle],
-    }));
-  }, []);
 
   const toggleCollapsed = useCallback(() => {
     setIsCollapsed((prev) => !prev);
@@ -215,21 +118,21 @@ export function AppSidebar() {
     <aside
       className={cn(
         'h-screen bg-white border-r border-gray-200 flex flex-col transition-all duration-300',
-        isCollapsed ? SIDEBAR_WIDTH.COLLAPSED : SIDEBAR_WIDTH.EXPANDED
+        isCollapsed ? 'w-16' : 'w-64'
       )}
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex items-center justify-between">
         {!isCollapsed && (
           <div>
-            <h1 className="text-lg font-bold text-gray-900">{APP_INFO.NAME}</h1>
+            <h1 className="text-xl font-bold text-blue-600">{APP_INFO.NAME}</h1>
             <p className="text-xs text-gray-500">{APP_INFO.SUBTITLE}</p>
           </div>
         )}
         <button
           onClick={toggleCollapsed}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          title={isCollapsed ? TOOLTIPS.EXPAND : TOOLTIPS.COLLAPSE}
+          title={isCollapsed ? 'Expandir menu' : 'Recolher menu'}
         >
           {isCollapsed ? (
             <ChevronRight className="w-5 h-5 text-gray-600" />
@@ -240,74 +143,46 @@ export function AppSidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-2">
-        {NAV_SECTIONS.map((section) => {
-          const isOpen = openSections[section.title];
-          const colors = getSectionColors(section.priority);
+      <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+        {NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+          const isActive = isActiveRoute(item.href, location);
 
           return (
-            <div key={section.title} className="mb-2">
-              {/* Section Header */}
-              <button
-                onClick={() => toggleSection(section.title)}
+            <Link key={item.href} href={item.href}>
+              <a
                 className={cn(
-                  'w-full flex items-center justify-between p-2 rounded-lg transition-colors',
-                  colors.HOVER
+                  'flex items-center gap-3 px-3 py-3 rounded-lg transition-all',
+                  isActive
+                    ? 'bg-blue-50 text-blue-700 font-medium'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900',
+                  isCollapsed && 'justify-center'
                 )}
+                title={isCollapsed ? item.label : undefined}
               >
-                <div className="flex items-center gap-2">
-                  <section.icon className={cn('w-5 h-5', colors.ICON)} />
-                  {!isCollapsed && (
-                    <span className={cn('text-sm font-medium', colors.TEXT)}>
-                      {section.title}
-                    </span>
-                  )}
-                </div>
+                <Icon className={cn('w-5 h-5', isActive ? 'text-blue-600' : 'text-gray-500')} />
                 {!isCollapsed && (
-                  <ChevronDown
-                    className={cn(
-                      'w-4 h-4 transition-transform',
-                      isOpen ? 'rotate-180' : '',
-                      colors.ICON
-                    )}
-                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm truncate">{item.label}</div>
+                    <div className="text-xs text-gray-500 truncate">{item.description}</div>
+                  </div>
                 )}
-              </button>
-
-              {/* Section Items */}
-              {isOpen && (
-                <div className="mt-1 space-y-1">
-                  {section.items.map((item) => {
-                    const isActive = isActiveRoute(item.href, location);
-
-                    return (
-                      <Link key={item.href} href={item.href}>
-                        <a
-                          className={cn(
-                            'flex items-center gap-3 p-2 rounded-lg transition-colors',
-                            isActive ? colors.ACTIVE : colors.HOVER,
-                            isCollapsed ? 'justify-center' : 'pl-9'
-                          )}
-                        >
-                          <item.icon className="w-5 h-5" />
-                          {!isCollapsed && (
-                            <span className="text-sm flex-1">{item.title}</span>
-                          )}
-                          {!isCollapsed && item.badge && (
-                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
-                              {item.badge}
-                            </span>
-                          )}
-                        </a>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+              </a>
+            </Link>
           );
         })}
       </nav>
+
+      {/* Footer */}
+      {!isCollapsed && (
+        <div className="p-4 border-t border-gray-200">
+          <div className="text-xs text-gray-500 text-center">
+            v1.0.0 • © 2025 IntelMarket
+          </div>
+        </div>
+      )}
     </aside>
   );
 }
+
+export default AppSidebar;
