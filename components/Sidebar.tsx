@@ -70,6 +70,12 @@ const menuItems: MenuItem[] = [
     icon: '⚙️',
     section: 'operations',
   },
+  {
+    name: 'Usuários',
+    href: '/admin/users',
+    icon: '👥',
+    section: 'operations',
+  },
 ];
 
 const sectionTitles = {
