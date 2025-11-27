@@ -132,10 +132,11 @@ const LAYOUT = {
 // ============================================================================
 
 interface CompararMercadosModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  mercadoIds: number[];
-  mercados: Mercado[];
+  isOpen?: boolean;
+  onClose?: () => void;
+  onOpenChange?: (open: boolean) => void;
+  mercadoIds?: number[];
+  mercados?: Mercado[];
 }
 
 interface Mercado {
@@ -259,10 +260,11 @@ function hasActiveFilters(
 // COMPONENT
 // ============================================================================
 
-export function CompararMercadosModal({
-  isOpen,
-  onClose,
-  mercadoIds,
+export default function CompararMercadosModal({
+  isOpen = false,
+  onClose = () => {},
+  onOpenChange,
+  mercadoIds = [],
   mercados,
 }: CompararMercadosModalProps) {
   // ============================================================================
