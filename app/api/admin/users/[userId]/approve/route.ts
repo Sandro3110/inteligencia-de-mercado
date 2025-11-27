@@ -8,6 +8,7 @@ import { sendApprovalEmail } from '@/server/services/emailService';
 export async function POST(request: NextRequest, { params }: { params: { userId: string } }) {
   try {
     const { userId } = params;
+    console.log('🔵 [API Approve] Iniciando aprovação:', { userId });
 
     // Verificar se usuário logado é admin
     const supabase = await createServerSupabaseClient();
@@ -16,8 +17,10 @@ export async function POST(request: NextRequest, { params }: { params: { userId:
     } = await supabase.auth.getUser();
 
     if (!currentUser) {
+      console.error('❌ [API Approve] Usuário não autenticado');
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
+    console.log('✅ [API Approve] Usuário autenticado:', currentUser.email);
 
     // Buscar dados do usuário atual no banco
     const [currentUserData] = await db
@@ -26,7 +29,13 @@ export async function POST(request: NextRequest, { params }: { params: { userId:
       .where(eq(users.email, currentUser.email))
       .limit(1);
 
+    console.log('🔵 [API Approve] Dados do usuário atual:', {
+      email: currentUserData?.email,
+      role: currentUserData?.role,
+    });
+
     if (!currentUserData || currentUserData.role !== 'admin') {
+      console.error('❌ [API Approve] Acesso negado. Role:', currentUserData?.role);
       return NextResponse.json(
         { error: 'Acesso negado. Apenas administradores podem aprovar usuários.' },
         { status: 403 }
@@ -36,7 +45,14 @@ export async function POST(request: NextRequest, { params }: { params: { userId:
     // Buscar usuário a ser aprovado
     const [userToApprove] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
 
+    console.log('🔵 [API Approve] Usuário a aprovar:', {
+      id: userToApprove?.id,
+      email: userToApprove?.email,
+      ativo: userToApprove?.ativo,
+    });
+
     if (!userToApprove) {
+      console.error('❌ [API Approve] Usuário não encontrado:', userId);
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
@@ -45,6 +61,11 @@ export async function POST(request: NextRequest, { params }: { params: { userId:
     }
 
     // Aprovar usuário
+    console.log('🔵 [API Approve] Atualizando usuário:', {
+      userId,
+      liberadoPor: currentUserData.id,
+    });
+
     const [approvedUser] = await db
       .update(users)
       .set({
@@ -54,6 +75,11 @@ export async function POST(request: NextRequest, { params }: { params: { userId:
       })
       .where(eq(users.id, userId))
       .returning();
+
+    console.log('✅ [API Approve] Usuário atualizado:', {
+      id: approvedUser.id,
+      ativo: approvedUser.ativo,
+    });
 
     // Enviar email de aprovação
     try {
@@ -76,7 +102,18 @@ export async function POST(request: NextRequest, { params }: { params: { userId:
       },
     });
   } catch (error) {
-    console.error('Erro ao aprovar usuário:', error);
-    return NextResponse.json({ error: 'Erro ao processar aprovação' }, { status: 500 });
+    console.error('❌ [API Approve] ERRO COMPLETO:', error);
+    console.error('❌ [API Approve] Stack:', error instanceof Error ? error.stack : 'N/A');
+    console.error(
+      '❌ [API Approve] Message:',
+      error instanceof Error ? error.message : String(error)
+    );
+    return NextResponse.json(
+      {
+        error: 'Erro ao processar aprovação',
+        details: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
   }
 }

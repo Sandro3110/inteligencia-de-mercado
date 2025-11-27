@@ -1,6 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   CheckCircle,
   XCircle,
@@ -13,6 +17,7 @@ import {
   Briefcase,
   Calendar,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface User {
   id: string;
@@ -31,7 +36,7 @@ interface User {
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
+  const [activeTab, setActiveTab] = useState('pending');
 
   useEffect(() => {
     fetchUsers();
@@ -48,7 +53,7 @@ export default function AdminUsersPage() {
       }
     } catch (error) {
       console.error('Erro ao buscar usuários:', error);
-      alert('Erro ao carregar usuários');
+      toast.error('Erro ao carregar usuários');
     } finally {
       setLoading(false);
     }
@@ -57,11 +62,9 @@ export default function AdminUsersPage() {
   const handleApprove = async (userId: string) => {
     console.log('🔵 [handleApprove] Iniciando aprovação do usuário:', userId);
 
-    if (!confirm('Tem certeza que deseja aprovar este usuário?')) {
-      return;
-    }
-
     try {
+      toast.loading('Aprovando usuário...');
+
       const response = await fetch(`/api/admin/users/${userId}/approve`, {
         method: 'POST',
       });
@@ -72,27 +75,28 @@ export default function AdminUsersPage() {
       console.log('🔵 [handleApprove] Dados da resposta:', data);
 
       if (response.ok) {
-        alert('✅ Usuário aprovado com sucesso!');
+        toast.dismiss();
+        toast.success('Usuário aprovado com sucesso!');
         console.log('✅ [handleApprove] Usuário aprovado com sucesso');
-        fetchUsers();
+        fetchUsers(); // Recarregar lista
       } else {
+        toast.dismiss();
         console.error('❌ [handleApprove] Erro:', data.error);
-        alert('❌ ' + (data.error || 'Erro ao aprovar usuário'));
+        toast.error(data.error || 'Erro ao aprovar usuário');
       }
     } catch (error) {
+      toast.dismiss();
       console.error('❌ [handleApprove] Exceção:', error);
-      alert('❌ Erro ao aprovar usuário');
+      toast.error('Erro ao aprovar usuário');
     }
   };
 
   const handleReject = async (userId: string) => {
     console.log('🔴 [handleReject] Iniciando rejeição do usuário:', userId);
 
-    if (!confirm('Tem certeza que deseja rejeitar este usuário?')) {
-      return;
-    }
-
     try {
+      toast.loading('Rejeitando usuário...');
+
       const response = await fetch(`/api/admin/users/${userId}/reject`, {
         method: 'POST',
       });
@@ -103,16 +107,19 @@ export default function AdminUsersPage() {
       console.log('🔴 [handleReject] Dados da resposta:', data);
 
       if (response.ok) {
-        alert('✅ Usuário rejeitado');
+        toast.dismiss();
+        toast.success('Usuário rejeitado');
         console.log('✅ [handleReject] Usuário rejeitado com sucesso');
-        fetchUsers();
+        fetchUsers(); // Recarregar lista
       } else {
+        toast.dismiss();
         console.error('❌ [handleReject] Erro:', data.error);
-        alert('❌ ' + (data.error || 'Erro ao rejeitar usuário'));
+        toast.error(data.error || 'Erro ao rejeitar usuário');
       }
     } catch (error) {
+      toast.dismiss();
       console.error('❌ [handleReject] Exceção:', error);
-      alert('❌ Erro ao rejeitar usuário');
+      toast.error('Erro ao rejeitar usuário');
     }
   };
 
@@ -130,369 +137,218 @@ export default function AdminUsersPage() {
     });
   };
 
+  const UserCard = ({ user, showActions = false }: { user: User; showActions?: boolean }) => {
+    console.log('🟢 [UserCard] Renderizando:', { nome: user.nome, showActions, ativo: user.ativo });
+
+    return (
+      <Card className="mb-4">
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <CardTitle className="text-lg">{user.nome}</CardTitle>
+              <CardDescription className="flex items-center gap-2 mt-1">
+                <Mail className="h-4 w-4" />
+                {user.email}
+              </CardDescription>
+            </div>
+            <Badge
+              variant={
+                user.ativo === 1 ? 'default' : user.ativo === 0 ? 'secondary' : 'destructive'
+              }
+            >
+              {user.ativo === 1 ? 'Aprovado' : user.ativo === 0 ? 'Pendente' : 'Rejeitado'}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="flex items-center gap-2 text-sm">
+              <Building className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">Empresa:</span>
+              <span>{user.empresa}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Briefcase className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">Cargo:</span>
+              <span>{user.cargo}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">Setor:</span>
+              <span>{user.setor}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">Cadastro:</span>
+              <span>{formatDate(user.created_at)}</span>
+            </div>
+          </div>
+
+          {user.liberado_em && (
+            <div className="text-sm text-muted-foreground mb-4">
+              Aprovado em {formatDate(user.liberado_em)}
+              {user.liberado_por && ` por ${user.liberado_por}`}
+            </div>
+          )}
+
+          {showActions && (
+            <div className="flex gap-2">
+              <Button onClick={() => handleApprove(user.id)} className="flex-1" variant="default">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Aprovar
+              </Button>
+              <Button
+                onClick={() => handleReject(user.id)}
+                className="flex-1"
+                variant="destructive"
+              >
+                <XCircle className="h-4 w-4 mr-2" />
+                Rejeitar
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center' }}>
-        <div
-          style={{
-            display: 'inline-block',
-            width: '48px',
-            height: '48px',
-            border: '4px solid #e5e7eb',
-            borderTopColor: '#3b82f6',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            marginBottom: '16px',
-          }}
-        />
-        <p style={{ color: '#6b7280' }}>Carregando usuários...</p>
-        <style>{`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Carregando usuários...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
-  const currentUsers =
-    activeTab === 'pending'
-      ? pendingUsers
-      : activeTab === 'approved'
-        ? approvedUsers
-        : rejectedUsers;
-
   return (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-      {/* Header */}
-      <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '30px', fontWeight: 'bold', marginBottom: '8px' }}>
-          Administração de Usuários
-        </h1>
-        <p style={{ color: '#6b7280' }}>Gerencie cadastros, aprovações e permissões de usuários</p>
+    <div className="container mx-auto p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold mb-2">Administração de Usuários</h1>
+        <p className="text-muted-foreground">
+          Gerencie cadastros, aprovações e permissões de usuários
+        </p>
       </div>
 
-      {/* Stats Cards */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px',
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            padding: '20px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '8px',
-            }}
-          >
-            <span style={{ fontSize: '14px', fontWeight: '500', color: '#6b7280' }}>Pendentes</span>
-            <Clock size={16} color="#eab308" />
-          </div>
-          <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{pendingUsers.length}</div>
-          <p style={{ fontSize: '12px', color: '#9ca3af' }}>Aguardando aprovação</p>
-        </div>
+      {/* Cards de Estatísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pendentes</CardTitle>
+            <Clock className="h-4 w-4 text-yellow-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{pendingUsers.length}</div>
+            <p className="text-xs text-muted-foreground">Aguardando aprovação</p>
+          </CardContent>
+        </Card>
 
-        <div
-          style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            padding: '20px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '8px',
-            }}
-          >
-            <span style={{ fontSize: '14px', fontWeight: '500', color: '#6b7280' }}>Aprovados</span>
-            <UserCheck size={16} color="#22c55e" />
-          </div>
-          <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{approvedUsers.length}</div>
-          <p style={{ fontSize: '12px', color: '#9ca3af' }}>Com acesso ativo</p>
-        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Aprovados</CardTitle>
+            <UserCheck className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{approvedUsers.length}</div>
+            <p className="text-xs text-muted-foreground">Com acesso ativo</p>
+          </CardContent>
+        </Card>
 
-        <div
-          style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            padding: '20px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '8px',
-            }}
-          >
-            <span style={{ fontSize: '14px', fontWeight: '500', color: '#6b7280' }}>Total</span>
-            <Users size={16} color="#3b82f6" />
-          </div>
-          <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{users.length}</div>
-          <p style={{ fontSize: '12px', color: '#9ca3af' }}>Todos os usuários</p>
-        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total</CardTitle>
+            <Users className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{users.length}</div>
+            <p className="text-xs text-muted-foreground">Todos os usuários</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Tabs */}
-      <div style={{ borderBottom: '1px solid #e5e7eb', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', gap: '32px' }}>
-          <button
-            onClick={() => setActiveTab('pending')}
-            style={{
-              padding: '12px 8px',
-              borderBottom: activeTab === 'pending' ? '2px solid #3b82f6' : '2px solid transparent',
-              color: activeTab === 'pending' ? '#3b82f6' : '#6b7280',
-              fontWeight: activeTab === 'pending' ? '600' : '500',
-              backgroundColor: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '14px',
-            }}
-          >
-            <Clock
-              size={16}
-              style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }}
-            />
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="pending" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
             Pendentes ({pendingUsers.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('approved')}
-            style={{
-              padding: '12px 8px',
-              borderBottom:
-                activeTab === 'approved' ? '2px solid #3b82f6' : '2px solid transparent',
-              color: activeTab === 'approved' ? '#3b82f6' : '#6b7280',
-              fontWeight: activeTab === 'approved' ? '600' : '500',
-              backgroundColor: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '14px',
-            }}
-          >
-            <UserCheck
-              size={16}
-              style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }}
-            />
+          </TabsTrigger>
+          <TabsTrigger value="approved" className="flex items-center gap-2">
+            <UserCheck className="h-4 w-4" />
             Aprovados ({approvedUsers.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('rejected')}
-            style={{
-              padding: '12px 8px',
-              borderBottom:
-                activeTab === 'rejected' ? '2px solid #3b82f6' : '2px solid transparent',
-              color: activeTab === 'rejected' ? '#3b82f6' : '#6b7280',
-              fontWeight: activeTab === 'rejected' ? '600' : '500',
-              backgroundColor: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '14px',
-            }}
-          >
-            <UserX
-              size={16}
-              style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }}
-            />
+          </TabsTrigger>
+          <TabsTrigger value="rejected" className="flex items-center gap-2">
+            <UserX className="h-4 w-4" />
             Rejeitados ({rejectedUsers.length})
-          </button>
-        </div>
-      </div>
+          </TabsTrigger>
+        </TabsList>
 
-      {/* User Cards */}
-      {currentUsers.length === 0 ? (
-        <div
-          style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            padding: '64px',
-            textAlign: 'center',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          }}
-        >
-          {activeTab === 'pending' && (
-            <Clock size={48} color="#d1d5db" style={{ marginBottom: '16px' }} />
-          )}
-          {activeTab === 'approved' && (
-            <UserCheck size={48} color="#d1d5db" style={{ marginBottom: '16px' }} />
-          )}
-          {activeTab === 'rejected' && (
-            <UserX size={48} color="#d1d5db" style={{ marginBottom: '16px' }} />
-          )}
-          <p style={{ fontSize: '18px', fontWeight: '500', marginBottom: '8px' }}>
-            Nenhum usuário{' '}
-            {activeTab === 'pending'
-              ? 'pendente'
-              : activeTab === 'approved'
-                ? 'aprovado'
-                : 'rejeitado'}
-          </p>
-          <p style={{ fontSize: '14px', color: '#9ca3af' }}>
-            {activeTab === 'pending' && 'Todos os cadastros foram processados'}
-          </p>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {currentUsers.map((user) => (
-            <div
-              key={user.id}
-              style={{
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                padding: '24px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              }}
-            >
-              {/* User Header */}
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'start',
-                  marginBottom: '16px',
-                }}
-              >
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>
-                    {user.nome}
-                  </h3>
-                  <div
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6b7280' }}
-                  >
-                    <Mail size={16} />
-                    <span style={{ fontSize: '14px' }}>{user.email}</span>
-                  </div>
-                </div>
-                <span
-                  style={{
-                    padding: '4px 12px',
-                    borderRadius: '12px',
-                    fontSize: '12px',
-                    fontWeight: '500',
-                    backgroundColor:
-                      user.ativo === 1 ? '#dcfce7' : user.ativo === 0 ? '#fef3c7' : '#fee2e2',
-                    color: user.ativo === 1 ? '#166534' : user.ativo === 0 ? '#854d0e' : '#991b1b',
-                  }}
-                >
-                  {user.ativo === 1 ? 'Aprovado' : user.ativo === 0 ? 'Pendente' : 'Rejeitado'}
-                </span>
-              </div>
-
-              {/* User Info Grid */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '16px',
-                  marginBottom: '16px',
-                }}
-              >
-                <div
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}
-                >
-                  <Building size={16} color="#9ca3af" />
-                  <span style={{ fontWeight: '500' }}>Empresa:</span>
-                  <span>{user.empresa}</span>
-                </div>
-                <div
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}
-                >
-                  <Briefcase size={16} color="#9ca3af" />
-                  <span style={{ fontWeight: '500' }}>Cargo:</span>
-                  <span>{user.cargo}</span>
-                </div>
-                <div
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}
-                >
-                  <Users size={16} color="#9ca3af" />
-                  <span style={{ fontWeight: '500' }}>Setor:</span>
-                  <span>{user.setor}</span>
-                </div>
-                <div
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}
-                >
-                  <Calendar size={16} color="#9ca3af" />
-                  <span style={{ fontWeight: '500' }}>Cadastro:</span>
-                  <span>{formatDate(user.created_at)}</span>
-                </div>
-              </div>
-
-              {/* Approval Info */}
-              {user.liberado_em && (
-                <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '16px' }}>
-                  Aprovado em {formatDate(user.liberado_em)}
-                  {user.liberado_por && ` por ${user.liberado_por}`}
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              {user.ativo === 0 && (
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <button
-                    onClick={() => handleApprove(user.id)}
-                    style={{
-                      flex: 1,
-                      padding: '12px 24px',
-                      backgroundColor: '#3b82f6',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                    }}
-                  >
-                    <CheckCircle size={16} />
-                    Aprovar
-                  </button>
-                  <button
-                    onClick={() => handleReject(user.id)}
-                    style={{
-                      flex: 1,
-                      padding: '12px 24px',
-                      backgroundColor: '#ef4444',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                    }}
-                  >
-                    <XCircle size={16} />
-                    Rejeitar
-                  </button>
-                </div>
-              )}
+        <TabsContent value="pending" className="mt-6">
+          {(() => {
+            console.log('🔵 [Pending Tab] Total de usuários pendentes:', pendingUsers.length);
+            console.log(
+              '🔵 [Pending Tab] Usuários:',
+              pendingUsers.map((u) => ({ nome: u.nome, id: u.id, ativo: u.ativo }))
+            );
+            return null;
+          })()}
+          {pendingUsers.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center h-64">
+                <Clock className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-lg font-medium">Nenhum usuário pendente</p>
+                <p className="text-sm text-muted-foreground">
+                  Todos os cadastros foram processados
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div>
+              {pendingUsers.map((user) => (
+                <UserCard key={user.id} user={user} showActions={true} />
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          )}
+        </TabsContent>
+
+        <TabsContent value="approved" className="mt-6">
+          {approvedUsers.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center h-64">
+                <UserCheck className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-lg font-medium">Nenhum usuário aprovado</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div>
+              {approvedUsers.map((user) => (
+                <UserCard key={user.id} user={user} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="rejected" className="mt-6">
+          {rejectedUsers.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center h-64">
+                <UserX className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-lg font-medium">Nenhum usuário rejeitado</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div>
+              {rejectedUsers.map((user) => (
+                <UserCard key={user.id} user={user} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
