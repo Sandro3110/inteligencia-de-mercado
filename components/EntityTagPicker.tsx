@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { trpc } from '@/lib/trpc/client';
-import { TagPicker } from './TagPicker';
+import { Badge } from '@/components/ui/badge';
 
 // ============================================================================
 // CONSTANTS
@@ -34,45 +34,27 @@ export interface EntityTagPickerProps {
 }
 
 // ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-function mapEntityTag(tag: RawEntityTag): EntityTag {
-  return {
-    tagId: tag.tagId,
-    name: tag.name,
-    color: tag.color || DEFAULT_COLOR,
-  };
-}
-
-function mapEntityTags(tags: RawEntityTag[]): EntityTag[] {
-  return tags.map(mapEntityTag);
-}
-
-// ============================================================================
-// MAIN COMPONENT
+// COMPONENT
 // ============================================================================
 
 /**
  * EntityTagPicker
  * 
- * Componente que busca e exibe tags associadas a uma entidade específica.
- * Utiliza tRPC para buscar as tags e delega a renderização para TagPicker.
+ * Componente que busca e exibe tags de uma entidade específica.
+ * Utiliza tRPC para buscar as tags e exibe como badges.
  * 
  * @example
- * ```tsx
  * <EntityTagPicker entityType="mercado" entityId={123} />
- * ```
  */
 export function EntityTagPicker({
   entityType,
   entityId,
 }: EntityTagPickerProps) {
   // ============================================================================
-  // QUERIES
+  // DATA FETCHING
   // ============================================================================
 
-  const { data: entityTags = [] } = trpc.tags.getEntityTags.useQuery({
+  const { data: rawTags = [], isLoading } = trpc.tags.getEntityTags.useQuery({
     entityType,
     entityId,
   });
@@ -81,20 +63,39 @@ export function EntityTagPicker({
   // COMPUTED VALUES
   // ============================================================================
 
-  const mappedTags = useMemo(
-    () => mapEntityTags(entityTags),
-    [entityTags]
+  const mappedTags: EntityTag[] = useMemo(
+    () =>
+      rawTags.map((tag: RawEntityTag) => ({
+        tagId: tag.tagId,
+        name: tag.name,
+        color: tag.color || DEFAULT_COLOR,
+      })),
+    [rawTags]
   );
 
   // ============================================================================
   // RENDER
   // ============================================================================
 
+  if (isLoading) {
+    return <div className="text-sm text-gray-500">Carregando tags...</div>;
+  }
+
+  if (mappedTags.length === 0) {
+    return <div className="text-sm text-gray-400">Sem tags</div>;
+  }
+
   return (
-    <TagPicker
-      entityType={entityType}
-      entityId={entityId}
-      currentTags={mappedTags}
-    />
+    <div className="inline-flex gap-2 flex-wrap">
+      {mappedTags.map((tag) => (
+        <Badge 
+          key={tag.tagId} 
+          style={{ backgroundColor: tag.color }}
+          className="text-white"
+        >
+          {tag.name}
+        </Badge>
+      ))}
+    </div>
   );
 }

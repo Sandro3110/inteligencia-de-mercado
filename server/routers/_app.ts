@@ -6,14 +6,14 @@
 import { createTRPCRouter } from '@/lib/trpc/server';
 
 // Importar todos os routers
-import { authRouter } from './auth';
-import { usersRouter } from './users';
-import { geocodingRouter } from './geocoding';
-import { territorialRouter } from './territorial';
-import { reportsRouter } from './reports';
-import { exportRouter } from './export';
-import { unifiedMapRouter } from './unifiedMap';
-import { emailConfigRouter } from './emailConfig';
+import { authRouter } from './authRouter';
+import { usersRouter } from './usersRouter';
+import { geocodingRouter } from './geocodingRouter';
+import { territorialRouter } from './territorialRouter';
+import { reportsRouter } from './reportsRouter';
+import { exportRouter } from './exportRouter';
+import { unifiedMapRouter } from './unifiedMapRouter';
+import { emailConfigRouter } from './emailConfigRouter';
 import { projectsRouter } from './projects';
 import { pesquisasRouter } from './pesquisas';
 import { mercadosRouter } from './mercados';

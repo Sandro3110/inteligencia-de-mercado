@@ -10,7 +10,7 @@ import { Filter, X } from 'lucide-react';
 import { trpc } from '@/lib/trpc/client';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { TagBadge } from '@/components/TagBadge';
+// TagBadge removido - usar Badge diretamente
 import { Badge } from '@/components/ui/badge';
 
 // ============================================================================
@@ -162,7 +162,9 @@ export function TagFilter({ selectedTags, onTagsChange }: TagFilterProps) {
               : 'hover:bg-accent/50 border border-transparent'
           }`}
         >
-          <TagBadge name={tag.name} color={tagColor} size={BADGE_SIZE} />
+          <Badge style={{ backgroundColor: tagColor }} className="text-white text-xs">
+            {tag.name}
+          </Badge>
           {isSelected && (
             <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
               <X className="w-3 h-3 text-primary-foreground" />
@@ -191,13 +193,13 @@ export function TagFilter({ selectedTags, onTagsChange }: TagFilterProps) {
     () => (
       <div className="flex flex-wrap gap-1.5">
         {selectedTagObjects.map((tag) => (
-          <TagBadge
+          <Badge
             key={tag.id}
-            name={tag.name}
-            color={getTagColor(tag.color)}
-            size={BADGE_SIZE}
-            onRemove={() => toggleTag(tag.id)}
-          />
+            style={{ backgroundColor: tag.color || DEFAULT_TAG_COLOR }}
+            className="text-white text-xs"
+          >
+            {tag.name}
+          </Badge>
         ))}
       </div>
     ),
