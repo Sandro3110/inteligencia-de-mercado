@@ -2,6 +2,9 @@
 
 import { useProject } from '@/lib/contexts/ProjectContext';
 import { Bell } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const AlertConfig = dynamic(() => import('@/components/AlertConfig'), { ssr: false });
 
 export default function AlertsPage() {
   const { selectedProjectId } = useProject();
@@ -13,9 +16,6 @@ export default function AlertsPage() {
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
           <Bell className="w-16 h-16 mx-auto mb-4 text-yellow-600" />
           <p className="text-lg font-medium text-yellow-900">Selecione um projeto</p>
-          <p className="text-sm text-yellow-700 mt-2">
-            Para visualizar alertas, selecione um projeto no seletor global
-          </p>
         </div>
       </div>
     );
@@ -23,20 +23,12 @@ export default function AlertsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Alertas</h1>
-        <p className="text-gray-600">Configure notificações automáticas</p>
+        <p className="text-gray-600">Configure notificações automáticas e alertas personalizados</p>
       </div>
 
-      {/* Placeholder */}
-      <div className="bg-white rounded-lg shadow p-12 text-center">
-        <Bell className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-        <p className="text-gray-600 text-lg font-medium">Funcionalidade em desenvolvimento</p>
-        <p className="text-gray-500 text-sm mt-2">
-          Em breve: configuração de alertas e notificações automáticas
-        </p>
-      </div>
+      <AlertConfig />
     </div>
   );
 }
