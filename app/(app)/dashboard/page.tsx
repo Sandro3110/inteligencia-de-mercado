@@ -8,9 +8,18 @@ export default function DashboardPage() {
   const { selectedProjectId } = useProject();
   
   // Buscar estatísticas usando router existente
-  const { data: stats, isLoading: loadingStats } = trpc.dashboard.stats.useQuery(
-    selectedProjectId ? { projectId: selectedProjectId } : {}
+  const { data: stats, isLoading: loadingStats, error } = trpc.dashboard.stats.useQuery(
+    selectedProjectId ? { projectId: selectedProjectId } : undefined,
+    {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    }
   );
+
+  // Log para debug
+  if (error) {
+    console.error('Dashboard stats error:', error);
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
