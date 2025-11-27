@@ -4,13 +4,16 @@ export const dynamic = 'force-dynamic';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProjectsTab } from '@/components/projects/ProjectsTabAdapted';
-import { FolderKanban, Activity, FileText } from 'lucide-react';
+import { FolderKanban, Activity, FileText, Search, Filter } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 const ActivityTab = dynamic(() => import('@/components/projects/ActivityTab'), { ssr: false });
 const LogsTab = dynamic(() => import('@/components/projects/LogsTab'), { ssr: false });
+const PesquisaSelector = dynamic(() => import('@/components/PesquisaSelector'), { ssr: false });
+const SearchFieldSelector = dynamic(() => import('@/components/SearchFieldSelector'), { ssr: false });
+const MultiSelectFilter = dynamic(() => import('@/components/MultiSelectFilter'), { ssr: false });
 
-type TabType = 'projects' | 'activity' | 'logs';
+type TabType = 'projects' | 'activity' | 'logs' | 'search' | 'filters';
 
 export default function ProjectsPage() {
   const router = useRouter();
@@ -24,6 +27,8 @@ export default function ProjectsPage() {
     { id: 'projects', label: 'Projetos', icon: FolderKanban },
     { id: 'activity', label: 'Atividades', icon: Activity },
     { id: 'logs', label: 'Logs', icon: FileText },
+    { id: 'search', label: 'Busca Avançada', icon: Search },
+    { id: 'filters', label: 'Filtros', icon: Filter },
   ] as const;
 
   return (
@@ -60,6 +65,13 @@ export default function ProjectsPage() {
           {activeTab === 'projects' && <ProjectsTab onShowHistory={handleShowHistory} />}
           {activeTab === 'activity' && <ActivityTab />}
           {activeTab === 'logs' && <LogsTab />}
+          {activeTab === 'search' && (
+            <div className="space-y-6">
+              <PesquisaSelector />
+              <SearchFieldSelector />
+            </div>
+          )}
+          {activeTab === 'filters' && <MultiSelectFilter />}
         </div>
       </div>
     </div>

@@ -1,10 +1,16 @@
 'use client';
 
-import { Settings, Bell, FileText, Activity } from 'lucide-react';
+import { Settings, Bell, FileText, Activity, History, List } from 'lucide-react';
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
+
+const AlertConfig = dynamic(() => import('@/components/AlertConfig'), { ssr: false });
+const HistoryTimeline = dynamic(() => import('@/components/HistoryTimeline'), { ssr: false });
+const HistoryFilters = dynamic(() => import('@/components/HistoryFilters'), { ssr: false });
+const FilaTrabalho = dynamic(() => import('@/components/FilaTrabalho'), { ssr: false });
 
 export default function SystemPage() {
-  const [activeTab, setActiveTab] = useState<'alerts' | 'settings' | 'logs'>('alerts');
+  const [activeTab, setActiveTab] = useState<'alerts' | 'settings' | 'logs' | 'history' | 'queue'>('alerts');
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -22,54 +28,34 @@ export default function SystemPage() {
       {/* Tabs */}
       <div className="mb-6 border-b border-gray-200">
         <nav className="flex gap-8">
-          <button
-            onClick={() => setActiveTab('alerts')}
-            className={`pb-4 px-2 border-b-2 transition-colors flex items-center gap-2 ${
-              activeTab === 'alerts'
-                ? 'border-blue-600 text-blue-600 font-medium'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Bell className="w-5 h-5" />
-            Alertas
-          </button>
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`pb-4 px-2 border-b-2 transition-colors flex items-center gap-2 ${
-              activeTab === 'settings'
-                ? 'border-blue-600 text-blue-600 font-medium'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Settings className="w-5 h-5" />
-            Configurações
-          </button>
-          <button
-            onClick={() => setActiveTab('logs')}
-            className={`pb-4 px-2 border-b-2 transition-colors flex items-center gap-2 ${
-              activeTab === 'logs'
-                ? 'border-blue-600 text-blue-600 font-medium'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Activity className="w-5 h-5" />
-            Logs
-          </button>
+          {[
+            { id: 'alerts', label: 'Alertas', icon: Bell },
+            { id: 'settings', label: 'Configurações', icon: Settings },
+            { id: 'logs', label: 'Logs', icon: Activity },
+            { id: 'history', label: 'Histórico', icon: History },
+            { id: 'queue', label: 'Fila de Trabalho', icon: List },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`pb-4 px-2 border-b-2 transition-colors flex items-center gap-2 ${
+                  activeTab === tab.id
+                    ? 'border-blue-600 text-blue-600 font-medium'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                {tab.label}
+              </button>
+            );
+          })}
         </nav>
       </div>
 
       {/* Content */}
-      {activeTab === 'alerts' && (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <Bell className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Configuração de Alertas
-          </h3>
-          <p className="text-gray-600">
-            Configure alertas automáticos para eventos importantes
-          </p>
-        </div>
-      )}
+      {activeTab === 'alerts' && <AlertConfig />}
 
       {activeTab === 'settings' && (
         <div className="bg-white rounded-lg shadow p-8 text-center">
@@ -94,6 +80,15 @@ export default function SystemPage() {
           </p>
         </div>
       )}
+
+      {activeTab === 'history' && (
+        <div className="space-y-6">
+          <HistoryFilters />
+          <HistoryTimeline />
+        </div>
+      )}
+
+      {activeTab === 'queue' && <FilaTrabalho />}
     </div>
   );
 }

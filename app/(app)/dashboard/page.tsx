@@ -19,6 +19,8 @@ const EvolutionCharts = dynamic(() => import('@/components/EvolutionCharts'), {
   ssr: false,
   loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg" />,
 });
+const NotificationPanel = dynamic(() => import('@/components/NotificationPanel'), { ssr: false });
+const NotificationFilters = dynamic(() => import('@/components/NotificationFilters'), { ssr: false });
 
 export default function DashboardPage() {
   const { selectedProjectId } = useProject();
@@ -119,10 +121,9 @@ export default function DashboardPage() {
       )}
 
       {activeTab === 'notifications' && (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <Bell className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Central de Notificações</h3>
-          <p className="text-gray-600">Acompanhe notificações e alertas</p>
+        <div className="space-y-6">
+          <NotificationFilters />
+          <NotificationPanel />
         </div>
       )}
     </div>
