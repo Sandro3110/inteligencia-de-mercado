@@ -28,6 +28,8 @@ import {
   MapPin,
   HelpCircle,
   CheckCircle,
+  Users,
+  Globe,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -49,7 +51,7 @@ const SIDEBAR_WIDTH = {
 } as const;
 
 const APP_INFO = {
-  NAME: 'Gestor PAV',
+  NAME: 'IntelMarket',
   SUBTITLE: 'Inteligência de Mercado',
 } as const;
 
@@ -145,37 +147,11 @@ const NAV_SECTIONS: NavSection[] = [
     priority: PRIORITY_TYPES.CORE,
     defaultOpen: true,
     items: [
-      { title: 'Cockpit Unificado', href: '/', icon: Home, shortcut: 'Ctrl+H' },
-      {
-        title: 'Nova Pesquisa',
-        href: '/research/new',
-        icon: Plus,
-        badge: 'Criar',
-      },
+      { title: 'Dashboard', href: '/dashboard', icon: Home, shortcut: 'Ctrl+H' },
+      { title: 'Projetos', href: '/projects', icon: FolderOpen },
       { title: 'Pesquisas', href: '/pesquisas', icon: FileStack },
-      {
-        title: 'Enriquecer Dados',
-        href: '/enrichment',
-        icon: Sparkles,
-        shortcut: 'Ctrl+E',
-      },
-      {
-        title: 'Acompanhar Progresso',
-        href: '/enrichment-progress',
-        icon: Activity,
-      },
-      {
-        title: 'Ver Resultados',
-        href: '/resultados-enriquecimento',
-        icon: CheckCircle,
-      },
-      {
-        title: 'Exportar Dados',
-        href: '/export',
-        icon: Download,
-        shortcut: 'Ctrl+X',
-      },
-      { title: 'Gerenciar Projetos', href: '/projetos', icon: FolderOpen },
+      { title: 'Mercados', href: '/markets', icon: Globe },
+      { title: 'Leads', href: '/leads', icon: Users },
     ],
   },
 
@@ -186,67 +162,21 @@ const NAV_SECTIONS: NavSection[] = [
     priority: PRIORITY_TYPES.HIGH,
     defaultOpen: false,
     items: [
-      {
-        title: 'Analytics Unificado',
-        href: '/analytics',
-        icon: BarChart3,
-        shortcut: 'Ctrl+A',
-      },
-      { title: 'Tendências', href: '/tendencias', icon: TrendingUp },
-      {
-        title: 'Performance e Conversão',
-        href: '/performance',
-        icon: DollarSign,
-        shortcut: 'Ctrl+R',
-      },
+      { title: 'Analytics', href: '/analytics', icon: BarChart3, shortcut: 'Ctrl+A' },
+      { title: 'Enriquecimento', href: '/enrichment', icon: Sparkles, shortcut: 'Ctrl+E' },
+      { title: 'Exportar Dados', href: '/export', icon: Download, shortcut: 'Ctrl+X' },
     ],
   },
 
-  // ⚙️ CONFIGURAÇÕES E AUTOMAÇÃO
+  // ⚙️ AUTOMAÇÃO E RELATÓRIOS
   {
-    title: '⚙️ Configurações',
+    title: '⚙️ Automação',
     icon: Settings,
     priority: PRIORITY_TYPES.MEDIUM,
     defaultOpen: false,
     items: [
-      {
-        title: 'Configurações do Sistema',
-        href: '/configuracoes/sistema',
-        icon: Settings,
-      },
-      {
-        title: 'Parâmetros Enriquecimento',
-        href: '/enrichment-settings',
-        icon: Settings,
-      },
-      { title: 'Configurar Alertas', href: '/alertas', icon: Bell },
-      { title: 'Relatórios e Automação', href: '/relatorios', icon: FileText },
-      { title: 'Configurar IA (LLM)', href: '/admin/llm', icon: Zap },
-    ],
-  },
-
-  // 📁 SISTEMA E HISTÓRICO
-  {
-    title: '📁 Sistema',
-    icon: FileStack,
-    priority: PRIORITY_TYPES.LOW,
-    defaultOpen: false,
-    items: [
-      { title: 'Central de Notificações', href: '/notificacoes', icon: Bell },
-      {
-        title: 'Configurações de Notificações',
-        href: '/notificacoes/config',
-        icon: Settings,
-      },
-      { title: 'Geocodificação', href: '/geocodificacao', icon: MapPin },
-      { title: 'Gerenciar Geocodificação', href: '/geo-admin', icon: Settings },
-      { title: 'Monitoramento', href: '/monitoring', icon: Activity },
-      {
-        title: 'Central de Ajuda',
-        href: '/ajuda',
-        icon: HelpCircle,
-        shortcut: '?',
-      },
+      { title: 'Relatórios', href: '/reports', icon: FileText },
+      { title: 'Alertas', href: '/alerts', icon: Bell },
     ],
   },
 ];
@@ -256,6 +186,7 @@ const NAV_SECTIONS: NavSection[] = [
 // ============================================================================
 
 function getInitialCollapsedState(): boolean {
+  if (typeof window === 'undefined') return false;
   const stored = localStorage.getItem(STORAGE_KEY);
   return stored === 'true';
 }
@@ -298,313 +229,124 @@ function getSectionColors(priority?: Priority) {
 
 export function AppSidebar() {
   const [location] = useLocation();
-  const { count: unreadCount } = useUnreadNotificationsCount();
-  const [collapsed, setCollapsed] = useState(getInitialCollapsedState);
+  const [isCollapsed, setIsCollapsed] = useState(getInitialCollapsedState);
   const [openSections, setOpenSections] = useState(getInitialOpenSections);
 
-  const { selectedProjectId } = useSelectedProject();
-  const { data: stats } = trpc.dashboard.stats.useQuery(
-    { projectId: selectedProjectId ? Number(selectedProjectId) : undefined },
-    { enabled: !!selectedProjectId }
-  );
+  // Persistir estado collapsed
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, String(isCollapsed));
+    }
+  }, [isCollapsed]);
 
-  // ============================================================================
-  // COMPUTED VALUES
-  // ============================================================================
-
-  const sidebarWidth = useMemo(
-    () => (collapsed ? SIDEBAR_WIDTH.COLLAPSED : SIDEBAR_WIDTH.EXPANDED),
-    [collapsed]
-  );
-
-  const tooltipText = useMemo(() => (collapsed ? TOOLTIPS.EXPAND : TOOLTIPS.COLLAPSE), [collapsed]);
-
-  const hasProject = useMemo(() => !!selectedProjectId && !!stats, [selectedProjectId, stats]);
-
-  const projectStatsLabel = useMemo(() => {
-    if (!stats) return '';
-    return `${stats.totals.mercados} ${LABELS.MARKETS} • ${stats.totals.leads} ${LABELS.LEADS}`;
-  }, [stats]);
-
-  // ============================================================================
-  // HANDLERS
-  // ============================================================================
-
-  const toggleSidebar = useCallback(() => {
-    setCollapsed((prev) => {
-      const newValue = !prev;
-      localStorage.setItem(STORAGE_KEY, String(newValue));
-      window.dispatchEvent(new CustomEvent('sidebar-toggle', { detail: { collapsed: newValue } }));
-      return newValue;
-    });
+  const toggleSection = useCallback((sectionTitle: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [sectionTitle]: !prev[sectionTitle],
+    }));
   }, []);
 
-  const toggleSection = useCallback(
-    (title: string) => {
-      if (!collapsed) {
-        setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
-      }
-    },
-    [collapsed]
-  );
-
-  const isActive = useCallback((href: string) => isActiveRoute(href, location), [location]);
-
-  // ============================================================================
-  // EFFECTS
-  // ============================================================================
-
-  // Listener para evento de toggle sidebar
-  useEffect(() => {
-    const handleToggle = () => toggleSidebar();
-    window.addEventListener('toggle-sidebar', handleToggle as EventListener);
-    return () => {
-      window.removeEventListener('toggle-sidebar', handleToggle as EventListener);
-    };
-  }, [toggleSidebar]);
-
-  // ============================================================================
-  // RENDER HELPERS
-  // ============================================================================
-
-  const renderLogo = useCallback(
-    () => (
-      <Link href="/">
-        {collapsed ? (
-          <BarChart3 className="w-6 h-6 text-blue-600 cursor-pointer mx-auto" />
-        ) : (
-          <span className="flex items-center gap-2 cursor-pointer">
-            <BarChart3 className="w-6 h-6 text-blue-600" />
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-slate-900">{APP_INFO.NAME}</span>
-              <span className="text-xs text-slate-500">{APP_INFO.SUBTITLE}</span>
-            </div>
-          </span>
-        )}
-      </Link>
-    ),
-    [collapsed]
-  );
-
-  const renderToggleButton = useCallback(
-    () => (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSidebar}
-            className={cn('h-8 w-8', collapsed && 'mx-auto')}
-          >
-            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="right">{tooltipText}</TooltipContent>
-      </Tooltip>
-    ),
-    [collapsed, tooltipText, toggleSidebar]
-  );
-
-  const renderProjectInfo = useCallback(
-    () => (
-      <div className="p-3 border-b border-slate-200 bg-slate-50">
-        <div className="text-xs font-semibold text-slate-600 mb-1">{LABELS.ACTIVE_PROJECT}</div>
-        <div className="text-sm font-medium text-slate-900">Projeto #{selectedProjectId}</div>
-        <div className="flex gap-2 mt-2 text-xs text-slate-600">{projectStatsLabel}</div>
-      </div>
-    ),
-    [selectedProjectId, projectStatsLabel]
-  );
-
-  const renderNotificationBadge = useCallback(
-    (isCollapsed: boolean) => {
-      if (unreadCount === 0) return null;
-
-      const displayCount = formatBadgeCount(unreadCount);
-      const badgeSize = isCollapsed ? 'h-4 w-4' : 'h-5 w-5';
-      const fontSize = isCollapsed ? 'text-[10px]' : 'text-xs';
-      const position = isCollapsed ? '-top-1 -right-1' : '';
-
-      return (
-        <span className={cn('relative flex', badgeSize, position)}>
-          <span
-            className={cn(
-              'animate-ping absolute inline-flex h-full w-full rounded-full opacity-75',
-              NOTIFICATION_BADGE_COLORS.PING
-            )}
-          ></span>
-          <span
-            className={cn(
-              'relative inline-flex items-center justify-center rounded-full font-bold',
-              badgeSize,
-              fontSize,
-              NOTIFICATION_BADGE_COLORS.SOLID,
-              NOTIFICATION_BADGE_COLORS.TEXT
-            )}
-          >
-            {displayCount}
-          </span>
-        </span>
-      );
-    },
-    [unreadCount]
-  );
-
-  const renderSectionHeader = useCallback(
-    (section: NavSection) => {
-      const isOpen = openSections[section.title];
-      const SectionIcon = section.icon;
-      const colors = getSectionColors(section.priority);
-
-      if (collapsed) {
-        return (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex items-center">
-                <SectionIcon className={cn('w-5 h-5', colors.ICON)} />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="right">{section.title}</TooltipContent>
-          </Tooltip>
-        );
-      }
-
-      return (
-        <>
-          <div className="flex items-center gap-2">
-            <SectionIcon className={cn('w-4 h-4', colors.ICON)} />
-            <span className={cn('text-sm font-semibold', colors.TEXT)}>{section.title}</span>
-          </div>
-          {isOpen ? (
-            <ChevronDown className="w-4 h-4 text-slate-400" />
-          ) : (
-            <ChevronRight className="w-4 h-4 text-slate-400" />
-          )}
-        </>
-      );
-    },
-    [collapsed, openSections]
-  );
-
-  const renderNavItem = useCallback(
-    (item: NavItem, sectionPriority?: Priority) => {
-      const ItemIcon = item.icon;
-      const active = isActive(item.href);
-      const colors = getSectionColors(sectionPriority);
-      const isNotificationItem = item.href === '/notificacoes';
-
-      if (collapsed) {
-        return (
-          <Tooltip key={item.href}>
-            <TooltipTrigger asChild>
-              <Link href={item.href}>
-                <a
-                  className={cn(
-                    'flex items-center justify-center p-2 rounded-md transition-colors relative',
-                    active ? colors.ACTIVE : `text-slate-600 ${colors.HOVER}`
-                  )}
-                >
-                  <ItemIcon className="w-5 h-5" />
-                  {isNotificationItem && renderNotificationBadge(true)}
-                </a>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              <div>
-                {item.title}
-                {item.shortcut && (
-                  <div className="text-xs text-slate-400 mt-1">{item.shortcut}</div>
-                )}
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        );
-      }
-
-      return (
-        <Link key={item.href} href={item.href}>
-          <a
-            className={cn(
-              'flex items-center justify-between px-3 py-2 rounded-md transition-colors group',
-              active ? `${colors.ACTIVE} font-medium` : `text-slate-600 ${colors.HOVER}`
-            )}
-          >
-            <div className="flex items-center gap-2">
-              <ItemIcon className="w-4 h-4" />
-              <span className="text-sm">{item.title}</span>
-            </div>
-            {isNotificationItem && unreadCount > 0 ? (
-              renderNotificationBadge(false)
-            ) : item.badge ? (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold">
-                {item.badge}
-              </span>
-            ) : null}
-            {item.shortcut && !item.badge && (
-              <span className="text-xs text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                {item.shortcut}
-              </span>
-            )}
-          </a>
-        </Link>
-      );
-    },
-    [collapsed, isActive, unreadCount, renderNotificationBadge]
-  );
-
-  const renderSection = useCallback(
-    (section: NavSection) => {
-      const isOpen = openSections[section.title];
-      const colors = getSectionColors(section.priority);
-
-      return (
-        <div key={section.title} className="mb-1">
-          {/* Section Header */}
-          <button
-            onClick={() => toggleSection(section.title)}
-            className={cn(
-              'w-full flex items-center justify-between px-3 py-2 rounded-md transition-colors',
-              collapsed ? 'justify-center' : '',
-              colors.HOVER
-            )}
-          >
-            {renderSectionHeader(section)}
-          </button>
-
-          {/* Section Items */}
-          {(isOpen || collapsed) && (
-            <div className={cn('mt-1', collapsed ? 'space-y-1' : 'ml-2 space-y-0.5')}>
-              {section.items.map((item) => renderNavItem(item, section.priority))}
-            </div>
-          )}
-        </div>
-      );
-    },
-    [collapsed, openSections, toggleSection, renderSectionHeader, renderNavItem]
-  );
-
-  // ============================================================================
-  // RENDER
-  // ============================================================================
+  const toggleCollapsed = useCallback(() => {
+    setIsCollapsed((prev) => !prev);
+  }, []);
 
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 h-screen bg-white border-r border-slate-200 overflow-y-auto z-50 transition-all duration-300',
-        sidebarWidth
+        'h-screen bg-white border-r border-gray-200 flex flex-col transition-all duration-300',
+        isCollapsed ? SIDEBAR_WIDTH.COLLAPSED : SIDEBAR_WIDTH.EXPANDED
       )}
     >
-      {/* Logo + Toggle */}
-      <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-        {renderLogo()}
-        {renderToggleButton()}
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+        {!isCollapsed && (
+          <div>
+            <h1 className="text-lg font-bold text-gray-900">{APP_INFO.NAME}</h1>
+            <p className="text-xs text-gray-500">{APP_INFO.SUBTITLE}</p>
+          </div>
+        )}
+        <button
+          onClick={toggleCollapsed}
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          title={isCollapsed ? TOOLTIPS.EXPAND : TOOLTIPS.COLLAPSE}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="w-5 h-5 text-gray-600" />
+          ) : (
+            <ChevronLeft className="w-5 h-5 text-gray-600" />
+          )}
+        </button>
       </div>
 
-      {/* Project Selector */}
-      {!collapsed && hasProject && renderProjectInfo()}
-
       {/* Navigation */}
-      <nav className="p-2">{NAV_SECTIONS.map(renderSection)}</nav>
+      <nav className="flex-1 overflow-y-auto p-2">
+        {NAV_SECTIONS.map((section) => {
+          const isOpen = openSections[section.title];
+          const colors = getSectionColors(section.priority);
+
+          return (
+            <div key={section.title} className="mb-2">
+              {/* Section Header */}
+              <button
+                onClick={() => toggleSection(section.title)}
+                className={cn(
+                  'w-full flex items-center justify-between p-2 rounded-lg transition-colors',
+                  colors.HOVER
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <section.icon className={cn('w-5 h-5', colors.ICON)} />
+                  {!isCollapsed && (
+                    <span className={cn('text-sm font-medium', colors.TEXT)}>
+                      {section.title}
+                    </span>
+                  )}
+                </div>
+                {!isCollapsed && (
+                  <ChevronDown
+                    className={cn(
+                      'w-4 h-4 transition-transform',
+                      isOpen ? 'rotate-180' : '',
+                      colors.ICON
+                    )}
+                  />
+                )}
+              </button>
+
+              {/* Section Items */}
+              {isOpen && (
+                <div className="mt-1 space-y-1">
+                  {section.items.map((item) => {
+                    const isActive = isActiveRoute(item.href, location);
+
+                    return (
+                      <Link key={item.href} href={item.href}>
+                        <a
+                          className={cn(
+                            'flex items-center gap-3 p-2 rounded-lg transition-colors',
+                            isActive ? colors.ACTIVE : colors.HOVER,
+                            isCollapsed ? 'justify-center' : 'pl-9'
+                          )}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          {!isCollapsed && (
+                            <span className="text-sm flex-1">{item.title}</span>
+                          )}
+                          {!isCollapsed && item.badge && (
+                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                              {item.badge}
+                            </span>
+                          )}
+                        </a>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </nav>
     </aside>
   );
 }
