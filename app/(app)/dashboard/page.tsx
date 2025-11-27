@@ -3,6 +3,18 @@
 import { useProject } from '@/lib/contexts/ProjectContext';
 import { trpc } from '@/lib/trpc/client';
 import { Building2, Search, Globe, Users, TrendingUp, Target } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+// Lazy load charts para melhor performance
+const EvolutionCharts = dynamic(() => import('@/components/EvolutionCharts'), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-white rounded-lg shadow p-12 text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+      <p className="text-gray-600 mt-4">Carregando gráficos...</p>
+    </div>
+  ),
+});
 
 export default function DashboardPage() {
   const { selectedProjectId } = useProject();
@@ -34,7 +46,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Cards de Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Projetos */}
         <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
           <div className="flex items-center justify-between mb-4">
@@ -131,6 +143,14 @@ export default function DashboardPage() {
           <p className="text-xs text-gray-500 mt-2">Concorrentes mapeados</p>
         </div>
       </div>
+
+      {/* Gráficos de Evolução */}
+      {!loadingStats && stats && selectedProjectId && (
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Evolução Temporal</h2>
+          <EvolutionCharts runId={selectedProjectId} />
+        </div>
+      )}
 
       {/* Mensagem de seleção de projeto */}
       {!selectedProjectId && (
