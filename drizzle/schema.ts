@@ -32,10 +32,10 @@ export const activityLog = pgTable(
   {
     id: serial(),
     projectId: integer('projectId').notNull(),
-    activityType: varchar('activity_type', { length: 50 }).notNull(),
+    activityType: varchar('activityType', { length: 50 }).notNull(),
     description: text(),
     metadata: jsonb(),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
   },
   table => [
     index("idx_project").on(table.projectId),
@@ -48,22 +48,22 @@ export const alertConfigs = pgTable("alert_configs", {
   id: serial(),
   projectId: integer('projectId').notNull(),
   name: varchar({ length: 255 }).notNull(),
-  alertType: varchar('alert_type', { length: 50 }).notNull(),
+  alertType: varchar('alertType', { length: 50 }).notNull(),
   condition: text().notNull(),
   enabled: smallint().default(1).notNull(),
-  lastTriggeredAt: timestamp('last_triggered_at', { mode: "string" }),
+  lastTriggeredAt: timestamp('lastTriggeredAt', { mode: "string" }),
   createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
   updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
 });
 
 export const alertHistory = pgTable("alert_history", {
   id: serial(),
-  alertConfigId: integer('alert_config_id').notNull(),
+  alertConfigId: integer('alertConfigId').notNull(),
   projectId: integer('projectId').notNull(),
-  alertType: varchar('alert_type', { length: 50 }).notNull(),
+  alertType: varchar('alertType', { length: 50 }).notNull(),
   condition: text().notNull(),
   message: text().notNull(),
-  triggeredAt: timestamp('triggered_at', { mode: "string" })
+  triggeredAt: timestamp('triggeredAt', { mode: "string" })
     .defaultNow()
     .notNull(),
 });
@@ -72,65 +72,65 @@ export const analyticsDimensoes = pgTable("analytics_dimensoes", {
   id: serial(),
   projectId: integer('projectId').notNull(),
   pesquisaId: integer('pesquisaId'),
-  dimensaoTipo: varchar('dimensao_tipo', { length: 50 }).notNull(),
-  dimensaoValor: varchar('dimensao_valor', { length: 100 }).notNull(),
-  totalLeads: integer('total_leads').default(0),
-  qualidadeMedia: integer('qualidade_media').default(0),
-  taxaConversaoSf: integer('taxa_conversao_sf').default(0),
-  custoMedioLead: integer('custo_medio_lead').default(0),
+  dimensaoTipo: varchar('dimensaoTipo', { length: 50 }).notNull(),
+  dimensaoValor: varchar('dimensaoValor', { length: 100 }).notNull(),
+  totalLeads: integer('totalLeads').default(0),
+  qualidadeMedia: integer('qualidadeMedia').default(0),
+  taxaConversaoSf: integer('taxaConversaoSf').default(0),
+  custoMedioLead: integer('custoMedioLead').default(0),
   roi: integer().default(0),
-  updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
 });
 
 export const analyticsMercados = pgTable("analytics_mercados", {
   id: serial(),
   projectId: integer('projectId').notNull(),
   pesquisaId: integer('pesquisaId'),
-  mercadoId: integer('mercado_id').notNull(),
+  mercadoId: integer('mercadoId').notNull(),
   periodo: timestamp({ mode: "string" }).notNull(),
-  totalClientes: integer('total_clientes').default(0),
-  totalConcorrentes: integer('total_concorrentes').default(0),
-  totalLeadsGerados: integer('total_leads_gerados').default(0),
-  taxaCoberturaMercado: integer('taxa_cobertura_mercado').default(0),
-  qualidadeMediaLeads: integer('qualidade_media_leads').default(0),
-  leadsAltaQualidade: integer('leads_alta_qualidade').default(0),
-  leadsMediaQualidade: integer('leads_media_qualidade').default(0),
-  leadsBaixaQualidade: integer('leads_baixa_qualidade').default(0),
-  leadsEnriquecidos: integer('leads_enriquecidos').default(0),
-  taxaSucessoEnriquecimento: integer('taxa_sucesso_enriquecimento').default(0),
-  tempoMedioEnriquecimentoMin: integer('tempo_medio_enriquecimento_min').default(0),
-  custoEnriquecimentoTotal: integer('custo_enriquecimento_total').default(0),
-  leadsValidados: integer('leads_validados').default(0),
-  leadsAprovados: integer('leads_aprovados').default(0),
-  leadsDescartados: integer('leads_descartados').default(0),
-  taxaAprovacao: integer('taxa_aprovacao').default(0),
-  leadsExportadosSf: integer('leads_exportados_sf').default(0),
-  leadsConvertidosSf: integer('leads_convertidos_sf').default(0),
-  taxaConversaoSf: integer('taxa_conversao_sf').default(0),
-  horasPesquisa: integer('horas_pesquisa').default(0),
-  custoTotal: integer('custo_total').default(0),
+  totalClientes: integer('totalClientes').default(0),
+  totalConcorrentes: integer('totalConcorrentes').default(0),
+  totalLeadsGerados: integer('totalLeadsGerados').default(0),
+  taxaCoberturaMercado: integer('taxaCoberturaMercado').default(0),
+  qualidadeMediaLeads: integer('qualidadeMediaLeads').default(0),
+  leadsAltaQualidade: integer('leadsAltaQualidade').default(0),
+  leadsMediaQualidade: integer('leadsMediaQualidade').default(0),
+  leadsBaixaQualidade: integer('leadsBaixaQualidade').default(0),
+  leadsEnriquecidos: integer('leadsEnriquecidos').default(0),
+  taxaSucessoEnriquecimento: integer('taxaSucessoEnriquecimento').default(0),
+  tempoMedioEnriquecimentoMin: integer('tempoMedioEnriquecimentoMin').default(0),
+  custoEnriquecimentoTotal: integer('custoEnriquecimentoTotal').default(0),
+  leadsValidados: integer('leadsValidados').default(0),
+  leadsAprovados: integer('leadsAprovados').default(0),
+  leadsDescartados: integer('leadsDescartados').default(0),
+  taxaAprovacao: integer('taxaAprovacao').default(0),
+  leadsExportadosSf: integer('leadsExportadosSf').default(0),
+  leadsConvertidosSf: integer('leadsConvertidosSf').default(0),
+  taxaConversaoSf: integer('taxaConversaoSf').default(0),
+  horasPesquisa: integer('horasPesquisa').default(0),
+  custoTotal: integer('custoTotal').default(0),
   roi: integer().default(0),
-  updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
 });
 
 export const analyticsPesquisas = pgTable("analytics_pesquisas", {
   id: serial(),
   projectId: integer('projectId').notNull(),
   pesquisaId: integer('pesquisaId').notNull(),
-  totalMercadosMapeados: integer('total_mercados_mapeados').default(0),
-  totalClientesBase: integer('total_clientes_base').default(0),
-  totalLeadsGerados: integer('total_leads_gerados').default(0),
-  taxaConversaoClienteLead: integer('taxa_conversao_cliente_lead').default(0),
-  qualidadeMediaGeral: integer('qualidade_media_geral').default(0),
-  distribuicaoQualidade: text('distribuicao_qualidade'),
-  taxaSucessoEnriquecimento: integer('taxa_sucesso_enriquecimento').default(0),
-  tempoTotalEnriquecimentoHoras: integer('tempo_total_enriquecimento_horas').default(0),
-  custoTotalEnriquecimento: integer('custo_total_enriquecimento').default(0),
-  leadsExportadosSf: integer('leads_exportados_sf').default(0),
-  leadsConvertidosSf: integer('leads_convertidos_sf').default(0),
-  taxaConversaoSf: integer('taxa_conversao_sf').default(0),
+  totalMercadosMapeados: integer('totalMercadosMapeados').default(0),
+  totalClientesBase: integer('totalClientesBase').default(0),
+  totalLeadsGerados: integer('totalLeadsGerados').default(0),
+  taxaConversaoClienteLead: integer('taxaConversaoClienteLead').default(0),
+  qualidadeMediaGeral: integer('qualidadeMediaGeral').default(0),
+  distribuicaoQualidade: text('distribuicaoQualidade'),
+  taxaSucessoEnriquecimento: integer('taxaSucessoEnriquecimento').default(0),
+  tempoTotalEnriquecimentoHoras: integer('tempoTotalEnriquecimentoHoras').default(0),
+  custoTotalEnriquecimento: integer('custoTotalEnriquecimento').default(0),
+  leadsExportadosSf: integer('leadsExportadosSf').default(0),
+  leadsConvertidosSf: integer('leadsConvertidosSf').default(0),
+  taxaConversaoSf: integer('taxaConversaoSf').default(0),
   valorPipelineGerado: integer('valor_pipeline_gerado').default(0),
   custoTotalPesquisa: integer('custo_total_pesquisa').default(0),
   valorGerado: integer('valor_gerado').default(0),
@@ -138,25 +138,25 @@ export const analyticsPesquisas = pgTable("analytics_pesquisas", {
   dataInicio: timestamp('data_inicio', { mode: "string" }),
   dataConclusao: timestamp('data_conclusao', { mode: "string" }),
   duracaoDias: integer('duracao_dias').default(0),
-  updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
 });
 
 export const analyticsTimeline = pgTable("analytics_timeline", {
   id: serial(),
   projectId: integer('projectId').notNull(),
   data: timestamp({ mode: "string" }).notNull(),
-  leadsGeradosDia: integer('leads_gerados_dia').default(0),
-  leadsEnriquecidosDia: integer('leads_enriquecidos_dia').default(0),
-  leadsValidadosDia: integer('leads_validados_dia').default(0),
-  leadsExportadosSfDia: integer('leads_exportados_sf_dia').default(0),
-  qualidadeMediaDia: integer('qualidade_media_dia').default(0),
-  custoDia: integer('custo_dia').default(0),
-  leadsAcumulados: integer('leads_acumulados').default(0),
-  custoAcumulado: integer('custo_acumulado').default(0),
-  valorGeradoAcumulado: integer('valor_gerado_acumulado').default(0),
-  updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  leadsGeradosDia: integer('leadsGeradosDia').default(0),
+  leadsEnriquecidosDia: integer('leadsEnriquecidosDia').default(0),
+  leadsValidadosDia: integer('leadsValidadosDia').default(0),
+  leadsExportadosSfDia: integer('leadsExportadosSfDia').default(0),
+  qualidadeMediaDia: integer('qualidadeMediaDia').default(0),
+  custoDia: integer('custoDia').default(0),
+  leadsAcumulados: integer('leadsAcumulados').default(0),
+  custoAcumulado: integer('custoAcumulado').default(0),
+  valorGeradoAcumulado: integer('valorGeradoAcumulado').default(0),
+  updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
 });
 
 export const clientes = pgTable(
@@ -215,8 +215,8 @@ export const clientesMercados = pgTable(
   {
     id: serial(),
     clienteId: integer('cliente_id').notNull(),
-    mercadoId: integer('mercado_id').notNull(),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+    mercadoId: integer('mercadoId').notNull(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
   },
   table => [index("idx_cliente_mercado").on(table.clienteId, table.mercadoId)]
 );
@@ -226,7 +226,7 @@ export const concorrentes = pgTable(
   {
     id: serial(),
     concorrenteHash: varchar('concorrente_hash', { length: 255 }),
-    mercadoId: integer('mercado_id').notNull(),
+    mercadoId: integer('mercadoId').notNull(),
     nome: varchar({ length: 255 }).notNull(),
     cnpj: varchar({ length: 20 }),
     site: varchar({ length: 500 }),
@@ -239,7 +239,7 @@ export const concorrentes = pgTable(
     validationNotes: text('validation_notes'),
     validatedBy: varchar('validated_by', { length: 64 }),
     validatedAt: timestamp('validated_at', { mode: "string" }),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
     projectId: integer('projectId').default(1).notNull(),
     cidade: varchar({ length: 100 }),
     uf: varchar({ length: 2 }),
@@ -277,7 +277,7 @@ export const enrichmentCache = pgTable(
     dataAtualizacao: timestamp('data_atualizacao', { mode: "string" })
       .defaultNow()
       .notNull(),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
   },
   table => [index("idx_data_atualizacao").on(table.dataAtualizacao)]
 );
@@ -299,8 +299,8 @@ export const enrichmentConfigs = pgTable(
     enableQualityScore: integer('enable_quality_score').default(1).notNull(),
     enableAutoRetry: integer('enable_auto_retry').default(1).notNull(),
     maxRetries: integer('max_retries').default(2).notNull(),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-    updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+    updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
     geminiApiKey: text('gemini_api_key'),
     anthropicApiKey: text('anthropic_api_key'),
     googleMapsApiKey: text('google_maps_api_key'),
@@ -315,8 +315,8 @@ export const systemSettings = pgTable(
     settingKey: varchar('setting_key', { length: 100 }).notNull(),
     settingValue: text('setting_value'),
     description: text(),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-    updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+    updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
   },
   table => [index("idx_setting_key").on(table.settingKey)]
 );
@@ -327,7 +327,7 @@ export const enrichmentJobs = pgTable("enrichment_jobs", {
   status: varchar({ length: 50 })
     .default("pending")
     .notNull(),
-  totalClientes: integer('total_clientes').notNull(),
+  totalClientes: integer('totalClientes').notNull(),
   processedClientes: integer('processed_clientes').default(0).notNull(),
   successClientes: integer('success_clientes').default(0).notNull(),
   failedClientes: integer('failed_clientes').default(0).notNull(),
@@ -359,7 +359,7 @@ export const enrichmentQueue = pgTable(
     clienteData: jsonb('cliente_data').notNull(),
     result: jsonb(),
     errorMessage: text('error_message'),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
     startedAt: timestamp('started_at', { mode: "string" }),
     completedAt: timestamp('completed_at', { mode: "string" }),
   },
@@ -394,7 +394,7 @@ export const entityTags = pgTable("entity_tags", {
   tagId: integer('tag_id').notNull(),
   entityType: varchar('entity_type', { length: 50 }).notNull(),
   entityId: integer('entity_id').notNull(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
 });
 
 export const hibernationWarnings = pgTable("hibernation_warnings", {
@@ -409,7 +409,7 @@ export const hibernationWarnings = pgTable("hibernation_warnings", {
   postponed: integer().default(0).notNull(),
   postponedUntil: timestamp('postponed_until', { mode: "string" }),
   hibernated: integer().default(0).notNull(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
 });
 
 export const intelligentAlertsConfigs = pgTable(
@@ -424,8 +424,8 @@ export const intelligentAlertsConfigs = pgTable(
     notifyOnCircuitBreaker: integer('notify_on_circuit_breaker').default(1).notNull(),
     notifyOnErrorRate: integer('notify_on_error_rate').default(1).notNull(),
     notifyOnProcessingTime: integer('notify_on_processing_time').default(1).notNull(),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-    updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+    updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
   },
   table => [
     index("intelligent_alerts_configs_projectId_unique").on(table.projectId),
@@ -437,7 +437,7 @@ export const intelligentAlertsHistory = pgTable(
   {
     id: serial(),
     projectId: integer('projectId').notNull(),
-    alertType: varchar('alert_type', { length: 50 }).notNull(),
+    alertType: varchar('alertType', { length: 50 }).notNull(),
     severity: varchar({ length: 50 })
       .default("info")
       .notNull(),
@@ -450,7 +450,7 @@ export const intelligentAlertsHistory = pgTable(
     totalClients: integer('total_clients'),
     isRead: integer('is_read').default(0).notNull(),
     isDismissed: integer('is_dismissed').default(0).notNull(),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
     readAt: timestamp('read_at', { mode: "string" }),
     dismissedAt: timestamp('dismissed_at', { mode: "string" }),
   }
@@ -464,7 +464,7 @@ export const leadConversions = pgTable("lead_conversions", {
   convertedAt: timestamp('converted_at', { mode: "string" }).defaultNow(),
   notes: text(),
   status: varchar({ length: 50 }).default("won"),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
 });
 
 export const leads = pgTable(
@@ -472,7 +472,7 @@ export const leads = pgTable(
   {
     id: serial(),
     leadHash: varchar('lead_hash', { length: 255 }),
-    mercadoId: integer('mercado_id').notNull(),
+    mercadoId: integer('mercadoId').notNull(),
     nome: varchar({ length: 255 }).notNull(),
     cnpj: varchar({ length: 20 }),
     site: varchar({ length: 500 }),
@@ -490,7 +490,7 @@ export const leads = pgTable(
     validationNotes: text('validation_notes'),
     validatedBy: varchar('validated_by', { length: 64 }),
     validatedAt: timestamp('validated_at', { mode: "string" }),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
     projectId: integer('projectId').default(1).notNull(),
     cidade: varchar({ length: 100 }),
     uf: varchar({ length: 2 }),
@@ -543,7 +543,7 @@ export const llmProviderConfigs = pgTable("llm_provider_configs", {
 
 export const mercadosHistory = pgTable("mercados_history", {
   id: serial(),
-  mercadoId: integer('mercado_id').notNull(),
+  mercadoId: integer('mercadoId').notNull(),
   field: varchar({ length: 100 }),
   oldValue: text('old_value'),
   newValue: text('new_value'),
@@ -593,7 +593,7 @@ export const exportHistory = pgTable(
     fileUrl: text('file_url'),
     fileSize: integer('file_size').default(0),
     generationTime: integer('generation_time').default(0),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
   },
   table => [
     index("idx_export_user").on(table.userId),
@@ -614,8 +614,8 @@ export const savedFiltersExport = pgTable(
     description: text(),
     entityType: varchar('entity_type', { length: 50 }).notNull(),
     filters: jsonb().notNull(),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-    updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+    updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
   },
   table => [
     index("idx_saved_filter_user").on(table.userId),
@@ -635,7 +635,7 @@ export const notifications = pgTable("notifications", {
   entityType: varchar('entity_type', { length: 50 }),
   entityId: integer('entity_id'),
   isRead: integer('is_read').default(0).notNull(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
 });
 
 export const notificationPreferences = pgTable(
@@ -650,8 +650,8 @@ export const notificationPreferences = pgTable(
     channels: jsonb()
       .$type<{ email?: boolean; push?: boolean; inApp?: boolean }>()
       .default({ inApp: true }),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-    updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+    updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
   },
   table => [index("idx_user_type").on(table.userId, table.type)]
 );
@@ -659,7 +659,7 @@ export const notificationPreferences = pgTable(
 export const operationalAlerts = pgTable("operational_alerts", {
   id: serial(),
   projectId: integer('projectId').notNull(),
-  alertType: varchar('alert_type', { length: 50 }).notNull(),
+  alertType: varchar('alertType', { length: 50 }).notNull(),
   severity: varchar({ length: 50 })
     .default("medium")
     .notNull(),
@@ -670,7 +670,7 @@ export const operationalAlerts = pgTable("operational_alerts", {
   valorEsperado: text('valor_esperado'),
   isRead: integer('is_read').default(0).notNull(),
   isDismissed: integer('is_dismissed').default(0).notNull(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
   readAt: timestamp('read_at', { mode: "string" }),
   dismissedAt: timestamp('dismissed_at', { mode: "string" }),
 });
@@ -698,15 +698,15 @@ export const produtos = pgTable(
     id: serial(),
     projectId: integer('projectId').notNull(),
     clienteId: integer('cliente_id').notNull(),
-    mercadoId: integer('mercado_id').notNull(),
+    mercadoId: integer('mercadoId').notNull(),
     nome: varchar({ length: 255 }).notNull(),
     descricao: text(),
     categoria: varchar({ length: 100 }),
     preco: text(),
     unidade: varchar({ length: 50 }),
     ativo: integer().default(1).notNull(),
-    createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-    updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
+    createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
+    updatedAt: timestamp('updatedAt', { mode: "string" }).defaultNow(),
     pesquisaId: integer('pesquisaId'),
   },
   table => [
@@ -725,7 +725,7 @@ export const projectAuditLog = pgTable("project_audit_log", {
   action: varchar({ length: 50 }).notNull(),
   changes: text(),
   metadata: text(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
 });
 
 export const projectTemplates = pgTable("project_templates", {
@@ -767,7 +767,7 @@ export const recommendations = pgTable("recommendations", {
   roiEsperado: integer('roi_esperado').default(0),
   isApplied: integer('is_applied').default(0).notNull(),
   isDismissed: integer('is_dismissed').default(0).notNull(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
   appliedAt: timestamp('applied_at', { mode: "string" }),
   dismissedAt: timestamp('dismissed_at', { mode: "string" }),
 });
@@ -785,7 +785,7 @@ export const salesforceSyncLog = pgTable("salesforce_sync_log", {
     .notNull(),
   errorMessage: text('error_message'),
   leadIds: text('lead_ids'),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
   completedAt: timestamp('completed_at', { mode: "string" }),
 });
 
@@ -794,7 +794,7 @@ export const savedFilters = pgTable("saved_filters", {
   userId: varchar('user_id', { length: 64 }).notNull(),
   name: varchar({ length: 100 }).notNull(),
   filtersJson: text('filters_json').notNull(),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
   projectId: integer('projectId'),
   isPublic: integer('is_public').default(0).notNull(),
   shareToken: varchar('share_token', { length: 64 }),
@@ -822,7 +822,7 @@ export const tags = pgTable("tags", {
   id: serial(),
   name: varchar({ length: 50 }).notNull(),
   color: varchar({ length: 7 }).default("#3b82f6"),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
 });
 
 export const users = pgTable("users", {
@@ -837,7 +837,7 @@ export const users = pgTable("users", {
   ativo: smallint().default(0).notNull(),
   liberadoPor: varchar('liberado_por', { length: 64 }),
   liberadoEm: timestamp('liberado_em', { mode: "string" }),
-  createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
+  createdAt: timestamp('createdAt', { mode: "string" }).defaultNow(),
   lastSignedIn: timestamp('last_signed_in', { mode: "string" }),
 }, table => [
   index("idx_email").on(table.email),
