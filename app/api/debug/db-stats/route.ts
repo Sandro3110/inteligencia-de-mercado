@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/server/db';
 import { projects, pesquisas, clientes, concorrentes, leads, mercadosUnicos } from '@/drizzle/schema';
-import { sql, count } from 'drizzle-orm';
+import { count } from 'drizzle-orm';
 
 export async function GET() {
   try {
-    const db = getDb();
+    const db = await getDb();
+    
+    if (!db) {
+      return NextResponse.json({
+        success: false,
+        error: 'Database not available',
+      }, { status: 500 });
+    }
 
     // Buscar todos os projetos
     const allProjects = await db.select({
@@ -13,7 +20,7 @@ export async function GET() {
       nome: projects.nome,
       status: projects.status,
       ativo: projects.ativo,
-    }).from(projects).orderBy(projects.id);
+    }).from(projects);
 
     // Buscar todas as pesquisas
     const allPesquisas = await db.select({
@@ -21,7 +28,7 @@ export async function GET() {
       nome: pesquisas.nome,
       projectId: pesquisas.projectId,
       status: pesquisas.status,
-    }).from(pesquisas).orderBy(pesquisas.projectId, pesquisas.id);
+    }).from(pesquisas);
 
     // Contar clientes por projeto
     const clientesCount = await db.select({
