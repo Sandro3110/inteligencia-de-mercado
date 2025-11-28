@@ -6,6 +6,7 @@ import { trpc } from '@/lib/trpc/client';
 import { ArrowLeft, Plus, FileText, Zap, BarChart3, Download } from 'lucide-react';
 import { PesquisaCard } from '@/components/dashboard/PesquisaCard';
 import { toast } from 'sonner';
+import { PesquisaModal } from '@/components/pesquisas/PesquisaModal';
 
 export default function ProjectDetailsPage() {
   const router = useRouter();
@@ -35,8 +36,31 @@ export default function ProjectDetailsPage() {
     toast.info('Exportação em desenvolvimento');
   };
 
+  const [isCreatePesquisaModalOpen, setIsCreatePesquisaModalOpen] = useState(false);
+
+  const trpcUtils = trpc.useUtils();
+
+  const createPesquisaMutation = trpc.pesquisas.createWithCSV.useMutation({
+    onSuccess: () => {
+      toast.success('Pesquisa criada com sucesso!');
+      setIsCreatePesquisaModalOpen(false);
+      trpcUtils.dashboard.getProjectPesquisas.invalidate();
+      trpcUtils.dashboard.stats.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Erro ao criar pesquisa: ${error.message}`);
+    },
+  });
+
   const handleNewPesquisa = () => {
-    toast.info('Modal de nova pesquisa em desenvolvimento (Checkpoint 3)');
+    setIsCreatePesquisaModalOpen(true);
+  };
+
+  const handleCreatePesquisa = (data: { nome: string; descricao: string; csvData: string[][] }) => {
+    createPesquisaMutation.mutate({
+      projectId,
+      ...data,
+    });
   };
 
   if (isLoading) {
@@ -160,6 +184,14 @@ export default function ProjectDetailsPage() {
           </div>
         )}
       </div>
+
+      {/* Modal */}
+      <PesquisaModal
+        isOpen={isCreatePesquisaModalOpen}
+        onClose={() => setIsCreatePesquisaModalOpen(false)}
+        onSubmit={handleCreatePesquisa}
+        isLoading={createPesquisaMutation.isPending}
+      />
 
       {/* Quick Actions (placeholder for future) */}
       <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
