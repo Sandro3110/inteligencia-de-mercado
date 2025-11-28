@@ -5,6 +5,8 @@ import { logger } from '@/lib/logger';
  *
  * Usa connection pooling otimizado para ambientes serverless.
  * Evita criar múltiplas conexões a cada invocação da função.
+ *
+ * IMPORTANT: Using PostgreSQL (pgTable) - Fixed 2025-11-28
  */
 
 import { drizzle } from 'drizzle-orm/postgres-js';
