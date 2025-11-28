@@ -67,6 +67,7 @@ export const resultsRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
+      console.log('[Results] getClientes called with input:', input);
       const db = await getDb();
       if (!db) throw new Error('Database connection failed');
 
@@ -108,6 +109,13 @@ export const resultsRouter = createTRPCRouter({
           .from(schema.clientes)
           .where(and(...conditions)),
       ]);
+
+      console.log(
+        '[Results] getClientes found:',
+        data.length,
+        'items, total:',
+        countResult[0]?.count
+      );
 
       return {
         data,
