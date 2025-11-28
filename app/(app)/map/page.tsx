@@ -6,6 +6,7 @@ import { Map as MapIcon, Filter, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { MapSidebar } from '@/components/map/MapSidebar';
 import { EntityDetailCard } from '@/components/map/EntityDetailCard';
+import type { ViewMode } from '@/components/map/MapContainer';
 
 // Importar MapContainer dinamicamente para evitar SSR
 const MapContainer = dynamic(
@@ -37,6 +38,7 @@ interface MapEntity {
 export default function MapPage() {
   const [selectedEntity, setSelectedEntity] = useState<MapEntity | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('markers');
   const [filters, setFilters] = useState({
     entityTypes: ['clientes', 'leads', 'concorrentes'] as ('clientes' | 'leads' | 'concorrentes')[],
     uf: undefined as string | undefined,
@@ -135,6 +137,43 @@ export default function MapPage() {
                 }`}
               >
                 📈 Concorrentes
+              </button>
+            </div>
+
+            {/* View Mode Selector */}
+            <div className="flex items-center gap-2 border-l border-gray-300 pl-4">
+              <button
+                onClick={() => setViewMode('markers')}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  viewMode === 'markers'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title="Marcadores individuais"
+              >
+                📍 Marcadores
+              </button>
+              <button
+                onClick={() => setViewMode('cluster')}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  viewMode === 'cluster'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title="Agrupar marcadores próximos"
+              >
+                🔵 Clusters
+              </button>
+              <button
+                onClick={() => setViewMode('heatmap')}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  viewMode === 'heatmap'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title="Mapa de calor (densidade)"
+              >
+                🔥 Heatmap
               </button>
             </div>
 
@@ -290,7 +329,11 @@ export default function MapPage() {
               </div>
             </div>
           ) : (
-            <MapContainer entities={entities} onMarkerClick={handleMarkerClick} />
+            <MapContainer
+              entities={entities}
+              viewMode={viewMode}
+              onMarkerClick={handleMarkerClick}
+            />
           )}
         </div>
 
