@@ -1,16 +1,32 @@
 import { NextResponse } from 'next/server';
-import { getServerlessDb } from '@/server/lib/drizzle-serverless';
-import { projects, pesquisas, clientes } from '@/drizzle/schema';
+import postgres from 'postgres';
 import { enrichClienteOptimized } from '@/server/enrichmentOptimized';
 
 export const maxDuration = 300; // 5 minutos
+export const dynamic = 'force-dynamic';
 
 export async function POST() {
   const results: any[] = [];
   const startTime = Date.now();
+  let sql: any = null;
 
   try {
-    const sql = getServerlessDb();
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'DATABASE_URL não configurada',
+        },
+        { status: 500 }
+      );
+    }
+
+    sql = postgres(process.env.DATABASE_URL, {
+      max: 1,
+      idle_timeout: 20,
+      connect_timeout: 10,
+      ssl: process.env.NODE_ENV === 'production' ? 'require' : false,
+    });
 
     // FASE 1: Criar Projeto
     const [project] = await sql`
@@ -179,6 +195,9 @@ export async function POST() {
       },
     });
 
+    // Fechar conexão
+    await sql.end();
+
     // Relatório Final
     const totalDuration = Date.now() - startTime;
     const totalTests = results.length;
@@ -204,6 +223,8 @@ export async function POST() {
       results,
     });
   } catch (error: any) {
+    if (sql) await sql.end();
+
     return NextResponse.json(
       {
         success: false,
