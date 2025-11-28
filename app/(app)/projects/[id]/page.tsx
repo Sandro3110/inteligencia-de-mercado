@@ -65,6 +65,12 @@ export default function ProjectDetailsPage() {
     });
   };
 
+  const handlePesquisaCreated = () => {
+    setIsCreatePesquisaModalOpen(false);
+    trpcUtils.dashboard.getProjectPesquisas.invalidate();
+    trpcUtils.dashboard.stats.invalidate();
+  };
+
   // Mutation para exportar projeto completo
   const exportProjectMutation = trpc.export.exportProjectExcel.useMutation({
     onSuccess: (data) => {

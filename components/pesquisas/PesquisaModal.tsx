@@ -12,20 +12,33 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { CSVUpload } from './CSVUpload';
+import { trpc } from '@/lib/trpc/client';
+import { toast } from 'sonner';
 
 interface PesquisaModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { nome: string; descricao: string; csvData: string[][] }) => void;
-  isLoading?: boolean;
+  projectId: number;
+  onSuccess: () => void;
 }
 
-export function PesquisaModal({ isOpen, onClose, onSubmit, isLoading }: PesquisaModalProps) {
+export function PesquisaModal({ isOpen, onClose, projectId, onSuccess }: PesquisaModalProps) {
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [csvData, setCsvData] = useState<string[][] | null>(null);
   const [step, setStep] = useState<'info' | 'upload'>('info');
+
+  const createPesquisaMutation = trpc.pesquisas.createWithCSV.useMutation({
+    onSuccess: () => {
+      toast.success('Pesquisa criada com sucesso!');
+      onSuccess();
+      handleClose();
+    },
+    onError: (error) => {
+      toast.error(`Erro ao criar pesquisa: ${error.message}`);
+    },
+  });
 
   const handleFileSelect = (file: File, data: string[][]) => {
     setSelectedFile(file);
@@ -49,11 +62,17 @@ export function PesquisaModal({ isOpen, onClose, onSubmit, isLoading }: Pesquisa
 
   const handleSubmit = () => {
     if (!nome.trim() || !csvData) return;
-    onSubmit({ nome, descricao, csvData });
+
+    createPesquisaMutation.mutate({
+      projectId,
+      nome,
+      descricao,
+      csvData,
+    });
   };
 
   const handleClose = () => {
-    if (!isLoading) {
+    if (!createPesquisaMutation.isPending) {
       setNome('');
       setDescricao('');
       setSelectedFile(null);
@@ -62,6 +81,8 @@ export function PesquisaModal({ isOpen, onClose, onSubmit, isLoading }: Pesquisa
       onClose();
     }
   };
+
+  const isLoading = createPesquisaMutation.isPending;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
