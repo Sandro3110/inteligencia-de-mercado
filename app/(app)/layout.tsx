@@ -105,15 +105,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <div className="flex-1 flex flex-col">
                     <Header>
                       <div className="flex items-center gap-4">
-                        <button
-                          onClick={() => setShowGlobalSearch(true)}
-                          className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-600 flex items-center gap-2"
-                        >
-                          <span>Buscar...</span>
-                          <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs">
-                            ⌘K
-                          </kbd>
-                        </button>
                         <NotificationBell />
                         <CompactModeToggle />
                         <ThemeToggle />
