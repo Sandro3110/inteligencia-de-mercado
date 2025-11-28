@@ -3,152 +3,146 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
+import { useSidebar } from '@/lib/contexts/SidebarContext';
+import { LayoutDashboard, FolderKanban, Users, Settings, Map } from 'lucide-react';
+import * as Tooltip from '@radix-ui/react-tooltip';
 
 interface MenuItem {
   name: string;
   href: string;
-  icon: string;
-  section: 'analysis' | 'intelligence' | 'operations';
+  icon: React.ComponentType<{ className?: string }>;
 }
 
-// Menu items organizados por seção
+// Menu simplificado - apenas 5 itens essenciais
 const menuItems: MenuItem[] = [
-  // ANÁLISE E PESQUISA
   {
     name: 'Dashboard',
     href: '/dashboard',
-    icon: '📊',
-    section: 'analysis',
+    icon: LayoutDashboard,
   },
   {
     name: 'Projetos',
     href: '/projects',
-    icon: '📂',
-    section: 'analysis',
+    icon: FolderKanban,
   },
   {
-    name: 'Pesquisas',
-    href: '/pesquisas',
-    icon: '🔎',
-    section: 'analysis',
-  },
-  {
-    name: 'Mapas',
-    href: '/maps',
-    icon: '🗺️',
-    section: 'analysis',
-  },
-  {
-    name: 'Analytics',
-    href: '/analytics',
-    icon: '📈',
-    section: 'analysis',
-  },
-  // INTELIGÊNCIA DE DADOS
-  {
-    name: 'Mercados',
-    href: '/markets',
-    icon: '🌍',
-    section: 'intelligence',
-  },
-  {
-    name: 'Leads',
-    href: '/leads',
-    icon: '👥',
-    section: 'intelligence',
-  },
-  {
-    name: 'Enriquecimento',
-    href: '/enrichment',
-    icon: '✨',
-    section: 'intelligence',
-  },
-  // GESTÃO E OPERAÇÕES
-  {
-    name: 'Sistema',
-    href: '/system',
-    icon: '⚙️',
-    section: 'operations',
+    name: 'Mapa',
+    href: '/map',
+    icon: Map,
   },
   {
     name: 'Usuários',
     href: '/admin/users',
-    icon: '👥',
-    section: 'operations',
+    icon: Users,
   },
   {
     name: 'Configurações',
     href: '/settings',
-    icon: '⚙️',
-    section: 'operations',
+    icon: Settings,
   },
 ];
-
-const sectionTitles = {
-  analysis: 'Análise e Pesquisa',
-  intelligence: 'Inteligência de Dados',
-  operations: 'Gestão e Operações',
-};
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { selectedProject } = useSelectedProject();
-
-  // Agrupar itens por seção
-  const sections = {
-    analysis: menuItems.filter((item) => item.section === 'analysis'),
-    intelligence: menuItems.filter((item) => item.section === 'intelligence'),
-    operations: menuItems.filter((item) => item.section === 'operations'),
-  };
+  const { isCollapsed, collapseSidebar } = useSidebar();
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-      {/* Header */}
-      <div className="p-6 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-gray-900">IntelMarket</h1>
-        {selectedProject && (
-          <p className="text-sm text-gray-600 mt-1 truncate">{selectedProject.nome}</p>
+    <Tooltip.Provider delayDuration={300}>
+      <>
+        {/* Mobile Backdrop */}
+        {!isCollapsed && (
+          <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={collapseSidebar} />
         )}
-      </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-4">
-        {Object.entries(sections).map(([sectionKey, items]) => (
-          <div key={sectionKey} className="mb-6">
-            <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-3">
-              {sectionTitles[sectionKey as keyof typeof sectionTitles]}
-            </h2>
+        {/* Sidebar */}
+        <aside
+          className={`
+            bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out
+            fixed lg:relative inset-y-0 left-0 z-50
+            ${isCollapsed ? 'w-16 -translate-x-full lg:translate-x-0' : 'w-64 translate-x-0'}
+          `}
+        >
+          {/* Header */}
+          <div className={`p-6 border-b border-gray-200 ${isCollapsed ? 'px-3' : ''}`}>
+            {isCollapsed ? (
+              <div className="flex justify-center">
+                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">IM</span>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h1 className="text-2xl font-bold text-gray-900">IntelMarket</h1>
+                {selectedProject && (
+                  <p className="text-sm text-gray-600 mt-1 truncate">{selectedProject.nome}</p>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 overflow-y-auto p-4">
             <ul className="space-y-1">
-              {items.map((item) => {
-                const isActive = pathname === item.href;
+              {menuItems.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href);
+                const Icon = item.icon;
+
+                const linkContent = (
+                  <Link
+                    href={item.href}
+                    className={`
+                    flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
+                    ${
+                      isActive
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                    }
+                    ${isCollapsed ? 'justify-center' : ''}
+                  `}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    {!isCollapsed && <span>{item.name}</span>}
+                  </Link>
+                );
+
                 return (
                   <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      className={`
-                        flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                        ${
-                          isActive
-                            ? 'bg-blue-50 text-blue-600'
-                            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                        }
-                      `}
-                    >
-                      <span className="text-lg">{item.icon}</span>
-                      <span>{item.name}</span>
-                    </Link>
+                    {isCollapsed ? (
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>{linkContent}</Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content
+                            side="right"
+                            sideOffset={10}
+                            className="bg-gray-900 text-white px-3 py-2 rounded-lg text-sm shadow-lg z-50"
+                          >
+                            {item.name}
+                            <Tooltip.Arrow className="fill-gray-900" />
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    ) : (
+                      linkContent
+                    )}
                   </li>
                 );
               })}
             </ul>
-          </div>
-        ))}
-      </nav>
+          </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="text-xs text-gray-500 text-center">IntelMarket v1.0.0</div>
-      </div>
-    </aside>
+          {/* Footer */}
+          <div className="p-4 border-t border-gray-200">
+            {isCollapsed ? (
+              <div className="flex justify-center">
+                <div className="w-2 h-2 bg-green-500 rounded-full" title="v2.0"></div>
+              </div>
+            ) : (
+              <div className="text-xs text-gray-500 text-center">IntelMarket v2.0</div>
+            )}
+          </div>
+        </aside>
+      </>
+    </Tooltip.Provider>
   );
 }

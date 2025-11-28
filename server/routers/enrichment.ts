@@ -1,35 +1,164 @@
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
-import { enrichmentQueue, enrichmentJobs, enrichmentRuns } from '@/drizzle/schema';
-import { eq, desc, sql, and } from 'drizzle-orm';
+import { enrichmentJobs, pesquisas } from '@/drizzle/schema';
+import { eq, desc, and } from 'drizzle-orm';
 
 export const enrichmentRouter = createTRPCRouter({
-  listJobs: protectedProcedure
-    .input(z.object({ projectId: z.number(), limit: z.number().default(20) }))
+  /**
+   * Buscar job de enriquecimento por pesquisaId
+   */
+  getJob: protectedProcedure
+    .input(z.object({ pesquisaId: z.number() }))
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error('Database connection failed');
-      return await db.select().from(enrichmentJobs).where(eq(enrichmentJobs.projectId, input.projectId)).orderBy(desc(enrichmentJobs.createdAt)).limit(input.limit);
+
+      const [job] = await db
+        .select()
+        .from(enrichmentJobs)
+        .where(eq(enrichmentJobs.projectId, input.pesquisaId))
+        .orderBy(desc(enrichmentJobs.createdAt))
+        .limit(1);
+
+      return job || null;
     }),
 
-  stats: protectedProcedure
-    .input(z.object({ projectId: z.number() }))
-    .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error('Database connection failed');
-      const [total] = await db.select({ count: sql<number>`count(*)::int` }).from(enrichmentJobs).where(eq(enrichmentJobs.projectId, input.projectId));
-      const [pending] = await db.select({ count: sql<number>`count(*)::int` }).from(enrichmentQueue).where(eq(enrichmentQueue.projectId, input.projectId));
-      const [completed] = await db.select({ count: sql<number>`count(*)::int` }).from(enrichmentJobs).where(and(eq(enrichmentJobs.projectId, input.projectId), eq(enrichmentJobs.status, 'completed')));
-      return { totalJobs: total?.count || 0, pendingQueue: pending?.count || 0, completed: completed?.count || 0 };
-    }),
-
-  createJob: protectedProcedure
-    .input(z.object({ projectId: z.number(), entityType: z.enum(['lead', 'cliente', 'concorrente']), entityIds: z.array(z.number()) }))
+  /**
+   * Iniciar enriquecimento
+   */
+  start: protectedProcedure
+    .input(z.object({ pesquisaId: z.number() }))
     .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error('Database connection failed');
-      const [job] = await db.insert(enrichmentJobs).values({ projectId: input.projectId, entityType: input.entityType, status: 'pending', totalEntities: input.entityIds.length }).returning();
-      return job;
+
+      try {
+        // 1. Buscar pesquisa
+        const [pesquisa] = await db
+          .select()
+          .from(pesquisas)
+          .where(eq(pesquisas.id, input.pesquisaId))
+          .limit(1);
+
+        if (!pesquisa) {
+          throw new Error('Pesquisa não encontrada');
+        }
+
+        if (pesquisa.totalClientes === 0) {
+          throw new Error('Pesquisa não tem clientes para enriquecer');
+        }
+
+        // 2. Criar job
+        const totalBatches = Math.ceil(pesquisa.totalClientes / 5);
+
+        const [job] = await db
+          .insert(enrichmentJobs)
+          .values({
+            projectId: input.pesquisaId,
+            status: 'running',
+            totalClientes: pesquisa.totalClientes,
+            processedClientes: 0,
+            successClientes: 0,
+            failedClientes: 0,
+            currentBatch: 0,
+            totalBatches,
+            batchSize: 5,
+            checkpointInterval: 50,
+            startedAt: new Date().toISOString(),
+          })
+          .returning();
+
+        // 3. Atualizar status da pesquisa
+        await db
+          .update(pesquisas)
+          .set({ status: 'enriquecendo' })
+          .where(eq(pesquisas.id, input.pesquisaId));
+
+        // 4. Trigger background processing
+        // This will be handled by the API route
+        fetch('/api/enrichment/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jobId: job.id, pesquisaId: input.pesquisaId }),
+        }).catch((err) => console.error('Failed to trigger enrichment:', err));
+
+        return job;
+      } catch (error) {
+        console.error('[Enrichment] Error starting:', error);
+        throw error;
+      }
     }),
+
+  /**
+   * Pausar enriquecimento
+   */
+  pause: protectedProcedure.input(z.object({ jobId: z.number() })).mutation(async ({ input }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database connection failed');
+
+    await db
+      .update(enrichmentJobs)
+      .set({
+        status: 'paused',
+        pausedAt: new Date().toISOString(),
+      })
+      .where(eq(enrichmentJobs.id, input.jobId));
+
+    return { success: true };
+  }),
+
+  /**
+   * Retomar enriquecimento
+   */
+  resume: protectedProcedure.input(z.object({ jobId: z.number() })).mutation(async ({ input }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database connection failed');
+
+    const [job] = await db
+      .select()
+      .from(enrichmentJobs)
+      .where(eq(enrichmentJobs.id, input.jobId))
+      .limit(1);
+
+    if (!job) {
+      throw new Error('Job não encontrado');
+    }
+
+    await db
+      .update(enrichmentJobs)
+      .set({
+        status: 'running',
+        pausedAt: null,
+      })
+      .where(eq(enrichmentJobs.id, input.jobId));
+
+    // Trigger background processing
+    fetch('/api/enrichment/process', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobId: job.id, pesquisaId: job.projectId }),
+    }).catch((err) => console.error('Failed to trigger enrichment:', err));
+
+    return { success: true };
+  }),
+
+  /**
+   * Cancelar enriquecimento
+   */
+  cancel: protectedProcedure.input(z.object({ jobId: z.number() })).mutation(async ({ input }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database connection failed');
+
+    await db
+      .update(enrichmentJobs)
+      .set({
+        status: 'failed',
+        errorMessage: 'Cancelado pelo usuário',
+        completedAt: new Date().toISOString(),
+      })
+      .where(eq(enrichmentJobs.id, input.jobId));
+
+    return { success: true };
+  }),
 });
