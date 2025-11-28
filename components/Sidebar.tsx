@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
-import { LayoutDashboard, FolderKanban, Users, Settings } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Users, Settings, Map } from 'lucide-react';
 
 interface MenuItem {
   name: string;
@@ -22,6 +22,11 @@ const menuItems: MenuItem[] = [
     name: 'Projetos',
     href: '/projects',
     icon: FolderKanban,
+  },
+  {
+    name: 'Mapa',
+    href: '/map',
+    icon: Map,
   },
   {
     name: 'Usuários',

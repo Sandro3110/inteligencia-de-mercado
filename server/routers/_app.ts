@@ -15,6 +15,7 @@ import { enrichmentRouter } from './enrichment';
 import { exportRouter } from './export';
 import { settingsRouter } from './settings';
 import { resultsRouter } from './results';
+import { mapRouter } from './map';
 
 /**
  * Router raiz da aplicação - SIMPLIFICADO
@@ -35,6 +36,7 @@ export const appRouter = createTRPCRouter({
   export: exportRouter,
   settings: settingsRouter,
   results: resultsRouter,
+  map: mapRouter,
 });
 
 /**
