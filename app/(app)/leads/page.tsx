@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useProject } from '@/lib/contexts/ProjectContext';
+import { useApp } from '@/lib/contexts/AppContext';
 import { trpc } from '@/lib/trpc/client';
 import { Users, Search, Filter, List, Columns, Tag, FileText } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -14,7 +14,7 @@ const SavedFilters = dynamic(() => import('@/components/SavedFilters'), { ssr: f
 const AdvancedFilterBuilder = dynamic(() => import('@/components/AdvancedFilterBuilder'), { ssr: false });
 
 export default function LeadsPage() {
-  const { selectedProjectId } = useProject();
+  const { selectedProjectId } = useApp();
   const [activeTab, setActiveTab] = useState<'list' | 'kanban' | 'tags' | 'filters'>('list');
   const [search, setSearch] = useState('');
   const [leadStage, setLeadStage] = useState<string>('');

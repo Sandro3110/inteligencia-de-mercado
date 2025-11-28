@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useProject } from '@/lib/contexts/ProjectContext';
+import { useApp } from '@/lib/contexts/AppContext';
 import { trpc } from '@/lib/trpc/client';
 import {
   LayoutDashboard,
@@ -23,7 +23,7 @@ const NotificationPanel = dynamic(() => import('@/components/NotificationPanel')
 const NotificationFilters = dynamic(() => import('@/components/NotificationFilters'), { ssr: false });
 
 export default function DashboardPage() {
-  const { selectedProjectId } = useProject();
+  const { selectedProjectId } = useApp();
   const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'notifications'>('overview');
 
   const { data: stats, isLoading } = trpc.dashboard.stats.useQuery(

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { ProjectProvider } from '@/lib/contexts/ProjectContext';
+import { AppProvider } from '@/lib/contexts/AppContext';
 import { OnboardingProvider } from '@/contexts/OnboardingContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { CompactModeProvider } from '@/contexts/CompactModeContext';
@@ -87,7 +87,7 @@ export default function AppLayout({
       <CompactModeProvider>
         <OnboardingProvider>
           <ErrorBoundary>
-            <ProjectProvider>
+            <AppProvider>
               <GlobalShortcuts />
               <DraftRecoveryModal />
               
@@ -133,7 +133,7 @@ export default function AppLayout({
               )}
 
               <ContextualTour />
-            </ProjectProvider>
+            </AppProvider>
           </ErrorBoundary>
         </OnboardingProvider>
       </CompactModeProvider>

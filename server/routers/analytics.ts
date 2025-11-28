@@ -16,8 +16,10 @@ import {
   pesquisas,
   clientes,
   concorrentes,
+  projects,
 } from '@/drizzle/schema';
 import { eq, and, desc, count, sql } from 'drizzle-orm';
+import type { AnalyticsStatsResponse } from '@/lib/types/api';
 
 export const analyticsRouter = createTRPCRouter({
   /**
@@ -84,7 +86,14 @@ export const analyticsRouter = createTRPCRouter({
           .where(eq(leads.projectId, projectId))
           .groupBy(leads.validationStatus);
 
-        return {
+        // Buscar nome do projeto
+        const [project] = await db
+          .select({ nome: projects.nome })
+          .from(projects)
+          .where(eq(projects.id, projectId))
+          .limit(1);
+
+        const response: AnalyticsStatsResponse = {
           totals: {
             mercados: mercadosResult[0]?.value || 0,
             clientes: clientesResult[0]?.value || 0,
@@ -96,7 +105,15 @@ export const analyticsRouter = createTRPCRouter({
             concorrentes: concorrentesValidation,
             leads: leadsValidation,
           },
+          metadata: {
+            projectId,
+            projectName: project?.nome || 'Desconhecido',
+            lastUpdate: new Date().toISOString(),
+            timestamp: new Date().toISOString(),
+          },
         };
+
+        return response;
       } catch (error) {
         console.error('[Analytics] Error fetching stats:', error);
         throw new Error('Failed to fetch analytics stats');

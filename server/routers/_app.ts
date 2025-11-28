@@ -22,6 +22,8 @@ import { dashboardRouter } from './dashboard';
 import { analyticsRouter } from './analytics';
 import { enrichmentRouter } from './enrichment';
 import { alertsRouter } from './alerts';
+import { clientesRouter } from './clientes';
+import { concorrentesRouter } from './concorrentes';
 
 /**
  * Router raiz da aplicação
@@ -67,6 +69,12 @@ export const appRouter = createTRPCRouter({
 
   // Alerts
   alerts: alertsRouter,
+
+  // Clientes
+  clientes: clientesRouter,
+
+  // Concorrentes
+  concorrentes: concorrentesRouter,
 });
 
 /**

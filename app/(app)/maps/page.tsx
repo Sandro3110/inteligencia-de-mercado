@@ -1,10 +1,10 @@
 'use client';
 
-import { useProject } from '@/lib/contexts/ProjectContext';
+import { useApp } from '@/lib/contexts/AppContext';
 import { trpc } from '@/lib/trpc/client';
 
 export default function MapsPage() {
-  const { selectedProjectId } = useProject();
+  const { selectedProjectId } = useApp();
 
   // Buscar mercados (filtrados por projeto se houver seleção)
   const { data: mercados, isLoading } = trpc.mercados.list.useQuery(

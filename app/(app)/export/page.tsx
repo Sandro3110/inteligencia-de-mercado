@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useProject } from '@/lib/contexts/ProjectContext';
+import { useApp } from '@/lib/contexts/AppContext';
 import { Download, FileSpreadsheet, FileText, Database } from 'lucide-react';
 import { SaveConfigDialog } from '@/components/export/SaveConfigDialog';
 import { toast } from 'sonner';
@@ -10,7 +10,7 @@ type ExportFormat = 'csv' | 'xlsx' | 'json';
 type ExportType = 'leads' | 'mercados' | 'clientes' | 'concorrentes';
 
 export default function ExportPage() {
-  const { selectedProjectId } = useProject();
+  const { selectedProjectId } = useApp();
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('csv');
   const [selectedType, setSelectedType] = useState<ExportType>('leads');
   const [isExporting, setIsExporting] = useState(false);

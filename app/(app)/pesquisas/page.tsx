@@ -1,6 +1,6 @@
 'use client';
 
-import { useProject } from '@/lib/contexts/ProjectContext';
+import { useApp } from '@/lib/contexts/AppContext';
 import { trpc } from '@/lib/trpc/client';
 import { Plus, Search, Calendar, Users, TrendingUp, FileText, Upload, History, Filter } from 'lucide-react';
 import { useState } from 'react';
@@ -19,7 +19,7 @@ const TemplateSelector = dynamic(() => import('@/components/TemplateSelector'), 
 const SearchHistory = dynamic(() => import('@/components/SearchHistory'), { ssr: false });
 
 export default function PesquisasPage() {
-  const { selectedProjectId } = useProject();
+  const { selectedProjectId } = useApp();
   const [activeTab, setActiveTab] = useState<'list' | 'upload' | 'templates' | 'history'>('list');
   const [showWizard, setShowWizard] = useState(false);
   const [wizardStep, setWizardStep] = useState(1);

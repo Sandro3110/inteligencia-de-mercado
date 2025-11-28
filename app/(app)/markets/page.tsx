@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useProject } from '@/lib/contexts/ProjectContext';
+import { useApp } from '@/lib/contexts/AppContext';
 import { trpc } from '@/lib/trpc/client';
 import { Target, MapPin, TrendingUp, Users, Map as MapIcon, Layers, Filter, Clock, DollarSign } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -24,7 +24,7 @@ const CostEstimator = dynamic(() => import('@/components/CostEstimator'), { ssr:
 const MercadoAccordionCard = dynamic(() => import('@/components/MercadoAccordionCard'), { ssr: false });
 
 export default function MarketsPage() {
-  const { selectedProjectId } = useProject();
+  const { selectedProjectId } = useApp();
   const [activeTab, setActiveTab] = useState<'list' | 'map' | 'compare' | 'geocoding' | 'enrichment' | 'schedule' | 'costs'>('list');
   const [showFilters, setShowFilters] = useState(false);
   const [showLegend, setShowLegend] = useState(true);

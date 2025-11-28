@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useProject } from '@/lib/contexts/ProjectContext';
+import { useApp } from '@/lib/contexts/AppContext';
 import { BarChart3, TrendingUp, Target, Activity } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -13,7 +13,7 @@ const InteractiveTab = dynamic(() => import('@/components/analytics/InteractiveT
 type TabType = 'overview' | 'metrics' | 'comparative' | 'interactive';
 
 export default function AnalyticsPage() {
-  const { selectedProjectId } = useProject();
+  const { selectedProjectId } = useApp();
   const [activeTab, setActiveTab] = useState<TabType>('overview');
 
   if (!selectedProjectId) {

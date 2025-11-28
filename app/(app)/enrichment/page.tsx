@@ -1,10 +1,10 @@
 'use client';
 
-import { useProject } from '@/lib/contexts/ProjectContext';
+import { useApp } from '@/lib/contexts/AppContext';
 import { Zap, Play, Clock, Users, TrendingUp, MapPin } from 'lucide-react';
 
 export default function EnrichmentPage() {
-  const { selectedProjectId } = useProject();
+  const { selectedProjectId } = useApp();
 
   if (!selectedProjectId) {
     return (
