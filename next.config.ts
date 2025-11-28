@@ -3,12 +3,12 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   // Configurações de performance
   reactStrictMode: true,
-  
+
   // Ignorar erros de TypeScript no build (temporário)
   typescript: {
     ignoreBuildErrors: true,
   },
-  
+
   // Turbopack config (vazio para silenciar warning)
   turbopack: {},
 
@@ -41,6 +41,72 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   generateEtags: true,
+
+  // Redirects de páginas antigas para novas rotas
+  async redirects() {
+    return [
+      {
+        source: '/analytics',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/system',
+        destination: '/settings',
+        permanent: true,
+      },
+      {
+        source: '/markets',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/leads',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/enrichment',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/admin/diagnostico',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/admin/test-buttons',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/admin/test-ui',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/export',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/recommendations',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/reports',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/alerts',
+        destination: '/dashboard',
+        permanent: true,
+      },
+    ];
+  },
 
   // Configuração de headers de segurança
   async headers() {
@@ -103,12 +169,7 @@ const nextConfig: NextConfig = {
   },
 
   // Transpile packages específicos
-  transpilePackages: [
-    'react-leaflet',
-    'leaflet',
-    'leaflet.heat',
-    'leaflet.markercluster',
-  ],
+  transpilePackages: ['react-leaflet', 'leaflet', 'leaflet.heat', 'leaflet.markercluster'],
 };
 
 export default nextConfig;
