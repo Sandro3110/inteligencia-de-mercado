@@ -60,9 +60,9 @@ export async function POST(request: Request) {
       // Atualizar
       await sql`
         UPDATE llm_provider_configs
-        SET openai_api_key = ${apiKey},
-            openai_enabled = 1,
-            active_provider = 'openai',
+        SET "openaiApiKey" = ${apiKey},
+            "openaiEnabled" = 1,
+            "activeProvider" = 'openai',
             "updatedAt" = NOW()
         WHERE "projectId" = ${projectId}
       `;
@@ -80,10 +80,10 @@ export async function POST(request: Request) {
       const [config] = await sql`
         INSERT INTO llm_provider_configs (
           "projectId",
-          active_provider,
-          openai_api_key,
-          openai_model,
-          openai_enabled,
+          "activeProvider",
+          "openaiApiKey",
+          "openaiModel",
+          "openaiEnabled",
           "createdAt",
           "updatedAt"
         ) VALUES (
