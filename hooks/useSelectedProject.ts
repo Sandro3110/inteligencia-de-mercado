@@ -7,7 +7,7 @@
 
 import { useCallback, useMemo, useEffect } from 'react';
 import { trpc } from '@/lib/trpc/client';
-import { useProject } from '@/lib/contexts/ProjectContext';
+import { useApp } from '@/lib/contexts/AppContext';
 
 // ============================================================================
 // TYPES
@@ -41,7 +41,7 @@ interface UseSelectedProjectReturn {
 
 export function useSelectedProject(): UseSelectedProjectReturn {
   // Use ProjectContext instead of local state
-  const { selectedProjectId, setSelectedProjectId } = useProject();
+  const { selectedProjectId, selectProject: setSelectedProjectId } = useApp();
   
   console.log('🔍 useSelectedProject - selectedProjectId:', selectedProjectId);
 
