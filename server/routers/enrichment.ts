@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
-import { enrichmentJobs, pesquisas } from '@/drizzle/schema';
+import { enrichmentJobs, pesquisas, pesquisas as pesquisasTable } from '@/drizzle/schema';
 import { eq, desc, and } from 'drizzle-orm';
 
 export const enrichmentRouter = createTRPCRouter({
@@ -161,4 +161,74 @@ export const enrichmentRouter = createTRPCRouter({
 
     return { success: true };
   }),
+
+  /**
+   * Enriquecer todas as pesquisas de um projeto em lote
+   */
+  enrichAll: protectedProcedure
+    .input(z.object({ projectId: z.number() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database connection failed');
+
+      // Buscar todas as pesquisas do projeto
+      const allPesquisas = await db
+        .select()
+        .from(pesquisasTable)
+        .where(eq(pesquisasTable.projectId, input.projectId));
+
+      if (allPesquisas.length === 0) {
+        throw new Error('Projeto não possui pesquisas');
+      }
+
+      // Iniciar enriquecimento para cada pesquisa
+      const results = [];
+      for (const pesquisa of allPesquisas) {
+        try {
+          // Criar job para cada pesquisa
+          const totalBatches = Math.ceil((pesquisa.totalClientes || 0) / 5);
+
+          const [job] = await db
+            .insert(enrichmentJobs)
+            .values({
+              projectId: pesquisa.id,
+              status: 'running',
+              totalClientes: pesquisa.totalClientes || 0,
+              processedClientes: 0,
+              successClientes: 0,
+              failedClientes: 0,
+              currentBatch: 0,
+              totalBatches,
+              batchSize: 5,
+              checkpointInterval: 50,
+              startedAt: new Date().toISOString(),
+            })
+            .returning();
+
+          // Atualizar status da pesquisa
+          await db
+            .update(pesquisasTable)
+            .set({ status: 'enriquecendo' })
+            .where(eq(pesquisasTable.id, pesquisa.id));
+
+          // Trigger background processing
+          fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/enrichment/process`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jobId: job.id, pesquisaId: pesquisa.id }),
+          }).catch((err) => console.error('Failed to trigger enrichment:', err));
+
+          results.push({ pesquisaId: pesquisa.id, status: 'started', jobId: job.id });
+        } catch (error) {
+          results.push({ pesquisaId: pesquisa.id, status: 'error' });
+        }
+      }
+
+      return {
+        total: allPesquisas.length,
+        started: results.filter((r) => r.status === 'started').length,
+        failed: results.filter((r) => r.status === 'error').length,
+        results,
+      };
+    }),
 });
