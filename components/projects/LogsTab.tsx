@@ -7,7 +7,7 @@
 
 import { useMemo } from 'react';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
-import { ProjectSelector } from '@/components/ProjectSelector';
+import ProjectSelector from '@/components/ProjectSelector';
 import {
   Card,
   CardContent,

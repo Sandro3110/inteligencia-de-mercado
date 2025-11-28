@@ -1,6 +1,6 @@
 'use client';
 
-import { ProjectSelector } from '@/components/ProjectSelector';
+import ProjectSelector from '@/components/ProjectSelector';
 import GlobalSearch from '@/components/GlobalSearch';
 import { useState } from 'react';
 
