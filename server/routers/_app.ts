@@ -16,6 +16,7 @@ import { exportRouter } from './export';
 import { settingsRouter } from './settings';
 import { resultsRouter } from './results';
 import { mapRouter } from './map';
+import { reportsRouter } from './reports';
 
 /**
  * Router raiz da aplicação - SIMPLIFICADO
@@ -37,6 +38,7 @@ export const appRouter = createTRPCRouter({
   settings: settingsRouter,
   results: resultsRouter,
   map: mapRouter,
+  reports: reportsRouter,
 });
 
 /**

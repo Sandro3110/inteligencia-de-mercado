@@ -7,6 +7,7 @@ import { ArrowLeft, Plus, FileText, Zap, BarChart3, Download } from 'lucide-reac
 import { PesquisaCard } from '@/components/dashboard/PesquisaCard';
 import { toast } from 'sonner';
 import { PesquisaModal } from '@/components/pesquisas/PesquisaModal';
+import { EnrichAllModal } from '@/components/enrichment/EnrichAllModal';
 
 export default function ProjectDetailsPage() {
   const router = useRouter();
@@ -37,6 +38,7 @@ export default function ProjectDetailsPage() {
   };
 
   const [isCreatePesquisaModalOpen, setIsCreatePesquisaModalOpen] = useState(false);
+  const [isEnrichAllModalOpen, setIsEnrichAllModalOpen] = useState(false);
 
   const trpcUtils = trpc.useUtils();
 
@@ -103,22 +105,60 @@ export default function ProjectDetailsPage() {
     exportProjectMutation.mutate({ projectId });
   };
 
+  // Mutation para enriquecer todas as pesquisas
+  const enrichAllMutation = trpc.enrichment.enrichAll.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Enriquecimento iniciado para ${data.started} pesquisas!`);
+      if (data.failed > 0) {
+        toast.warning(`${data.failed} pesquisas falharam ao iniciar`);
+      }
+      setIsEnrichAllModalOpen(false);
+      trpcUtils.dashboard.getProjectPesquisas.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Erro ao iniciar enriquecimento: ${error.message}`);
+    },
+  });
+
   const handleEnrichAll = () => {
     if (!pesquisas || pesquisas.length === 0) {
       toast.error('Não há pesquisas para enriquecer');
       return;
     }
-    // TODO: Implementar fila de enriquecimento
-    toast.info('Enriquecimento em lote em desenvolvimento');
+    setIsEnrichAllModalOpen(true);
   };
+
+  const handleConfirmEnrichAll = () => {
+    enrichAllMutation.mutate({ projectId });
+  };
+
+  // Mutation para gerar relatório PDF
+  const generateReportMutation = trpc.reports.generateProjectReport.useMutation({
+    onSuccess: (data) => {
+      // Converter base64 para blob e fazer download
+      const blob = base64ToBlob(data.data, data.mimeType);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = data.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('Relatório gerado com sucesso!');
+    },
+    onError: (error) => {
+      toast.error(`Erro ao gerar relatório: ${error.message}`);
+    },
+  });
 
   const handleViewReport = () => {
     if (!pesquisas || pesquisas.length === 0) {
       toast.error('Não há dados para gerar relatório');
       return;
     }
-    // TODO: Implementar relatório PDF com IA
-    toast.info('Relatório consolidado em desenvolvimento');
+    toast.loading('Gerando relatório analítico com IA...');
+    generateReportMutation.mutate({ projectId });
   };
 
   if (isLoading) {
@@ -209,11 +249,13 @@ export default function ProjectDetailsPage() {
           </button>
           <button
             onClick={handleViewReport}
-            disabled={!pesquisas || pesquisas.length === 0}
+            disabled={!pesquisas || pesquisas.length === 0 || generateReportMutation.isPending}
             className="flex items-center gap-2 px-4 py-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <BarChart3 className="w-4 h-4 text-blue-600" />
-            <span>Ver Relatório Consolidado</span>
+            <span>
+              {generateReportMutation.isPending ? 'Gerando...' : 'Ver Relatório Consolidado'}
+            </span>
           </button>
           <button
             onClick={handleExportAll}
@@ -274,12 +316,20 @@ export default function ProjectDetailsPage() {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Modals */}
       <PesquisaModal
         isOpen={isCreatePesquisaModalOpen}
         onClose={() => setIsCreatePesquisaModalOpen(false)}
-        onSubmit={handleCreatePesquisa}
-        isLoading={createPesquisaMutation.isPending}
+        projectId={projectId}
+        onSuccess={handlePesquisaCreated}
+      />
+
+      <EnrichAllModal
+        isOpen={isEnrichAllModalOpen}
+        onClose={() => setIsEnrichAllModalOpen(false)}
+        onConfirm={handleConfirmEnrichAll}
+        pesquisas={pesquisas || []}
+        isLoading={enrichAllMutation.isPending}
       />
     </div>
   );
