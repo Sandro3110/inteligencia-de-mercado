@@ -63,6 +63,64 @@ export default function ProjectDetailsPage() {
     });
   };
 
+  // Mutation para exportar projeto completo
+  const exportProjectMutation = trpc.export.exportProjectExcel.useMutation({
+    onSuccess: (data) => {
+      // Converter base64 para blob e fazer download
+      const blob = base64ToBlob(data.data, data.mimeType);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = data.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('Projeto exportado com sucesso!');
+    },
+    onError: (error) => {
+      toast.error(`Erro ao exportar: ${error.message}`);
+    },
+  });
+
+  // Helper para converter base64 em blob
+  const base64ToBlob = (base64: string, mimeType: string) => {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mimeType });
+  };
+
+  const handleExportAll = () => {
+    if (!pesquisas || pesquisas.length === 0) {
+      toast.error('Não há pesquisas para exportar');
+      return;
+    }
+    toast.loading('Exportando projeto...');
+    exportProjectMutation.mutate({ projectId });
+  };
+
+  const handleEnrichAll = () => {
+    if (!pesquisas || pesquisas.length === 0) {
+      toast.error('Não há pesquisas para enriquecer');
+      return;
+    }
+    // TODO: Implementar fila de enriquecimento
+    toast.info('Enriquecimento em lote em desenvolvimento');
+  };
+
+  const handleViewReport = () => {
+    if (!pesquisas || pesquisas.length === 0) {
+      toast.error('Não há dados para gerar relatório');
+      return;
+    }
+    // TODO: Implementar relatório PDF com IA
+    toast.info('Relatório consolidado em desenvolvimento');
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
@@ -137,6 +195,37 @@ export default function ProjectDetailsPage() {
         </div>
       </div>
 
+      {/* Quick Actions */}
+      <div className="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 className="font-semibold text-blue-900 mb-4">Ações Rápidas</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <button
+            onClick={handleEnrichAll}
+            disabled={!pesquisas || pesquisas.length === 0}
+            className="flex items-center gap-2 px-4 py-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Zap className="w-4 h-4 text-blue-600" />
+            <span>Enriquecer Todas</span>
+          </button>
+          <button
+            onClick={handleViewReport}
+            disabled={!pesquisas || pesquisas.length === 0}
+            className="flex items-center gap-2 px-4 py-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <BarChart3 className="w-4 h-4 text-blue-600" />
+            <span>Ver Relatório Consolidado</span>
+          </button>
+          <button
+            onClick={handleExportAll}
+            disabled={!pesquisas || pesquisas.length === 0 || exportProjectMutation.isPending}
+            className="flex items-center gap-2 px-4 py-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4 text-blue-600" />
+            <span>{exportProjectMutation.isPending ? 'Exportando...' : 'Exportar Tudo'}</span>
+          </button>
+        </div>
+      </div>
+
       {/* Pesquisas Section */}
       <div>
         <div className="flex items-center justify-between mb-6">
@@ -192,25 +281,6 @@ export default function ProjectDetailsPage() {
         onSubmit={handleCreatePesquisa}
         isLoading={createPesquisaMutation.isPending}
       />
-
-      {/* Quick Actions (placeholder for future) */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="font-semibold text-blue-900 mb-2">Ações Rápidas</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="flex items-center gap-2 px-4 py-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors text-sm">
-            <Zap className="w-4 h-4 text-blue-600" />
-            <span>Enriquecer Todas</span>
-          </button>
-          <button className="flex items-center gap-2 px-4 py-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors text-sm">
-            <BarChart3 className="w-4 h-4 text-blue-600" />
-            <span>Ver Relatório Consolidado</span>
-          </button>
-          <button className="flex items-center gap-2 px-4 py-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors text-sm">
-            <Download className="w-4 h-4 text-blue-600" />
-            <span>Exportar Tudo</span>
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

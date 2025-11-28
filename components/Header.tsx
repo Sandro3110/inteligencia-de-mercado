@@ -1,6 +1,5 @@
 'use client';
 
-import ProjectSelector from '@/components/ProjectSelector';
 import GlobalSearch from '@/components/GlobalSearch';
 import { useSidebar } from '@/lib/contexts/SidebarContext';
 import { Menu, X } from 'lucide-react';
@@ -41,9 +40,7 @@ export default function Header({ children }: { children?: React.ReactNode }) {
         <div className="hidden md:block md:w-48 lg:w-64">
           <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
         </div>
-        <div className="hidden sm:block">
-          <ProjectSelector />
-        </div>
+
         {children}
       </div>
     </header>

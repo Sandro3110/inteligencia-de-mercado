@@ -1,223 +1,33 @@
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
-import { clientes, leads, concorrentes, mercadosUnicos } from '@/drizzle/schema';
-import { eq } from 'drizzle-orm';
+import {
+  clientes,
+  leads,
+  concorrentes,
+  mercadosUnicos,
+  pesquisas as pesquisasTable,
+} from '@/drizzle/schema';
+import { eq, inArray } from 'drizzle-orm';
 
 /**
- * Export Router - Exportação de dados para CSV
+ * Helper para gerar CSV
  */
-export const exportRouter = createTRPCRouter({
-  /**
-   * Exportar clientes para CSV
-   */
-  exportClientes: protectedProcedure
-    .input(z.object({ pesquisaId: z.number() }))
-    .mutation(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error('Database connection failed');
-
-      const data = await db
-        .select()
-        .from(clientes)
-        .where(eq(clientes.pesquisaId, input.pesquisaId));
-
-      const csv = generateCSV(data, [
-        { key: 'id', label: 'ID' },
-        { key: 'nome', label: 'Nome' },
-        { key: 'cnpj', label: 'CNPJ' },
-        { key: 'cidade', label: 'Cidade' },
-        { key: 'uf', label: 'UF' },
-        { key: 'setor', label: 'Setor' },
-        { key: 'produtoPrincipal', label: 'Produto Principal' },
-        { key: 'telefone', label: 'Telefone' },
-        { key: 'email', label: 'Email' },
-        { key: 'siteOficial', label: 'Site' },
-        { key: 'validationStatus', label: 'Status' },
-      ]);
-
-      return {
-        filename: `clientes_${input.pesquisaId}_${Date.now()}.csv`,
-        data: csv,
-      };
-    }),
-
-  /**
-   * Exportar leads para CSV
-   */
-  exportLeads: protectedProcedure
-    .input(z.object({ pesquisaId: z.number() }))
-    .mutation(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error('Database connection failed');
-
-      const data = await db.select().from(leads).where(eq(leads.pesquisaId, input.pesquisaId));
-
-      const csv = generateCSV(data, [
-        { key: 'id', label: 'ID' },
-        { key: 'nome', label: 'Nome' },
-        { key: 'setor', label: 'Setor' },
-        { key: 'cidade', label: 'Cidade' },
-        { key: 'uf', label: 'UF' },
-        { key: 'qualidadeClassificacao', label: 'Potencial' },
-        { key: 'qualidadeScore', label: 'Score' },
-        { key: 'justificativa', label: 'Justificativa' },
-        { key: 'porte', label: 'Porte' },
-      ]);
-
-      return {
-        filename: `leads_${input.pesquisaId}_${Date.now()}.csv`,
-        data: csv,
-      };
-    }),
-
-  /**
-   * Exportar concorrentes para CSV
-   */
-  exportConcorrentes: protectedProcedure
-    .input(z.object({ pesquisaId: z.number() }))
-    .mutation(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error('Database connection failed');
-
-      const data = await db
-        .select()
-        .from(concorrentes)
-        .where(eq(concorrentes.pesquisaId, input.pesquisaId));
-
-      const csv = generateCSV(data, [
-        { key: 'id', label: 'ID' },
-        { key: 'nome', label: 'Nome' },
-        { key: 'descricao', label: 'Descrição' },
-        { key: 'porte', label: 'Porte' },
-        { key: 'cidade', label: 'Cidade' },
-        { key: 'uf', label: 'UF' },
-        { key: 'regiao', label: 'Região' },
-      ]);
-
-      return {
-        filename: `concorrentes_${input.pesquisaId}_${Date.now()}.csv`,
-        data: csv,
-      };
-    }),
-
-  /**
-   * Exportar mercados para CSV
-   */
-  exportMercados: protectedProcedure
-    .input(z.object({ pesquisaId: z.number() }))
-    .mutation(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error('Database connection failed');
-
-      const data = await db
-        .select()
-        .from(mercadosUnicos)
-        .where(eq(mercadosUnicos.pesquisaId, input.pesquisaId));
-
-      const csv = generateCSV(data, [
-        { key: 'id', label: 'ID' },
-        { key: 'nome', label: 'Nome' },
-        { key: 'categoria', label: 'Categoria' },
-        { key: 'segmentacao', label: 'Segmentação' },
-        { key: 'tamanhoEstimado', label: 'Tamanho Estimado' },
-        { key: 'quantidadeClientes', label: 'Quantidade de Clientes' },
-      ]);
-
-      return {
-        filename: `mercados_${input.pesquisaId}_${Date.now()}.csv`,
-        data: csv,
-      };
-    }),
-
-  /**
-   * Exportar tudo (consolidado)
-   */
-  exportAll: protectedProcedure
-    .input(z.object({ pesquisaId: z.number() }))
-    .mutation(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error('Database connection failed');
-
-      // Buscar todos os dados
-      const [clientesData, leadsData, concorrentesData, mercadosData] = await Promise.all([
-        db.select().from(clientes).where(eq(clientes.pesquisaId, input.pesquisaId)),
-        db.select().from(leads).where(eq(leads.pesquisaId, input.pesquisaId)),
-        db.select().from(concorrentes).where(eq(concorrentes.pesquisaId, input.pesquisaId)),
-        db.select().from(mercadosUnicos).where(eq(mercadosUnicos.pesquisaId, input.pesquisaId)),
-      ]);
-
-      // Gerar CSVs individuais
-      const clientesCSV = generateCSV(clientesData, [
-        { key: 'nome', label: 'Nome' },
-        { key: 'cnpj', label: 'CNPJ' },
-        { key: 'cidade', label: 'Cidade' },
-        { key: 'uf', label: 'UF' },
-      ]);
-
-      const leadsCSV = generateCSV(leadsData, [
-        { key: 'nome', label: 'Nome' },
-        { key: 'setor', label: 'Setor' },
-        { key: 'qualidadeClassificacao', label: 'Potencial' },
-      ]);
-
-      const concorrentesCSV = generateCSV(concorrentesData, [
-        { key: 'nome', label: 'Nome' },
-        { key: 'porte', label: 'Porte' },
-        { key: 'cidade', label: 'Cidade' },
-      ]);
-
-      const mercadosCSV = generateCSV(mercadosData, [
-        { key: 'nome', label: 'Nome' },
-        { key: 'categoria', label: 'Categoria' },
-      ]);
-
-      // Consolidar em um único CSV com separadores
-      const consolidatedCSV = [
-        '=== CLIENTES ===',
-        clientesCSV,
-        '',
-        '=== LEADS ===',
-        leadsCSV,
-        '',
-        '=== CONCORRENTES ===',
-        concorrentesCSV,
-        '',
-        '=== MERCADOS ===',
-        mercadosCSV,
-      ].join('\n');
-
-      return {
-        filename: `relatorio_completo_${input.pesquisaId}_${Date.now()}.csv`,
-        data: consolidatedCSV,
-      };
-    }),
-});
-
-/**
- * Helper para gerar CSV a partir de dados
- */
-function generateCSV<T extends Record<string, any>>(
-  data: T[],
-  columns: Array<{ key: string; label: string }>
-): string {
-  if (data.length === 0) {
-    return columns.map((col) => col.label).join(',');
-  }
+function generateCSV(data: any[], columns: { key: string; label: string }[]): string {
+  if (!data || data.length === 0) return '';
 
   // Header
   const header = columns.map((col) => col.label).join(',');
 
   // Rows
-  const rows = data.map((item) => {
+  const rows = data.map((row) => {
     return columns
       .map((col) => {
-        const value = item[col.key];
+        const value = row[col.key];
         if (value === null || value === undefined) return '';
-
-        // Escape quotes and wrap in quotes if contains comma or newline
+        // Escape quotes and wrap in quotes if contains comma
         const stringValue = String(value);
-        if (stringValue.includes(',') || stringValue.includes('\n') || stringValue.includes('"')) {
+        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
           return `"${stringValue.replace(/"/g, '""')}"`;
         }
         return stringValue;
@@ -227,3 +37,168 @@ function generateCSV<T extends Record<string, any>>(
 
   return [header, ...rows].join('\n');
 }
+
+/**
+ * Export Router - Exportação de dados para CSV e Excel
+ */
+export const exportRouter = createTRPCRouter({
+  /**
+   * Exportar projeto completo para Excel com 5 abas
+   */
+  exportProjectExcel: protectedProcedure
+    .input(z.object({ projectId: z.number() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database connection failed');
+
+      const ExcelJS = (await import('exceljs')).default;
+      const workbook = new ExcelJS.Workbook();
+
+      // Buscar todas as pesquisas do projeto
+      const pesquisas = await db
+        .select()
+        .from(pesquisasTable)
+        .where(eq(pesquisasTable.projectId, input.projectId));
+
+      if (pesquisas.length === 0) {
+        throw new Error('Projeto não possui pesquisas');
+      }
+
+      const pesquisaIds = pesquisas.map((p) => p.id);
+
+      // 1. Aba Mercados
+      const mercadosData = await db
+        .select()
+        .from(mercadosUnicos)
+        .where(inArray(mercadosUnicos.pesquisaId, pesquisaIds));
+
+      const mercadosSheet = workbook.addWorksheet('Mercados');
+      mercadosSheet.columns = [
+        { header: 'ID', key: 'id', width: 10 },
+        { header: 'Nome', key: 'nome', width: 30 },
+        { header: 'Descrição', key: 'descricao', width: 50 },
+        { header: 'Tamanho Estimado', key: 'tamanhoEstimado', width: 20 },
+        { header: 'Potencial', key: 'potencial', width: 15 },
+        { header: 'Cidade', key: 'cidade', width: 20 },
+        { header: 'UF', key: 'uf', width: 10 },
+      ];
+      mercadosSheet.addRows(mercadosData);
+      mercadosSheet.getRow(1).font = { bold: true };
+      mercadosSheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF4472C4' },
+      };
+      mercadosSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+
+      // 2. Aba Clientes
+      const clientesData = await db
+        .select()
+        .from(clientes)
+        .where(inArray(clientes.pesquisaId, pesquisaIds));
+
+      const clientesSheet = workbook.addWorksheet('Clientes');
+      clientesSheet.columns = [
+        { header: 'ID', key: 'id', width: 10 },
+        { header: 'Nome', key: 'nome', width: 30 },
+        { header: 'CNPJ', key: 'cnpj', width: 20 },
+        { header: 'Cidade', key: 'cidade', width: 20 },
+        { header: 'UF', key: 'uf', width: 10 },
+        { header: 'Setor', key: 'setor', width: 20 },
+        { header: 'Produto Principal', key: 'produtoPrincipal', width: 30 },
+        { header: 'Telefone', key: 'telefone', width: 15 },
+        { header: 'Email', key: 'email', width: 30 },
+        { header: 'Site', key: 'siteOficial', width: 30 },
+        { header: 'Status', key: 'validationStatus', width: 15 },
+      ];
+      clientesSheet.addRows(clientesData);
+      clientesSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      clientesSheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF4472C4' },
+      };
+
+      // 3. Aba Produtos (vazia por enquanto - estrutura para futuro)
+      const produtosSheet = workbook.addWorksheet('Produtos');
+      produtosSheet.columns = [
+        { header: 'ID', key: 'id', width: 10 },
+        { header: 'Nome', key: 'nome', width: 30 },
+        { header: 'Descrição', key: 'descricao', width: 50 },
+        { header: 'Categoria', key: 'categoria', width: 20 },
+        { header: 'Cliente', key: 'cliente', width: 30 },
+      ];
+      produtosSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      produtosSheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF4472C4' },
+      };
+
+      // 4. Aba Concorrentes
+      const concorrentesData = await db
+        .select()
+        .from(concorrentes)
+        .where(inArray(concorrentes.pesquisaId, pesquisaIds));
+
+      const concorrentesSheet = workbook.addWorksheet('Concorrentes');
+      concorrentesSheet.columns = [
+        { header: 'ID', key: 'id', width: 10 },
+        { header: 'Nome', key: 'nome', width: 30 },
+        { header: 'Cidade', key: 'cidade', width: 20 },
+        { header: 'UF', key: 'uf', width: 10 },
+        { header: 'Porte', key: 'porte', width: 15 },
+        { header: 'Descrição', key: 'descricao', width: 50 },
+        { header: 'Posicionamento', key: 'posicionamento', width: 30 },
+        { header: 'Diferenciais', key: 'diferenciais', width: 30 },
+        { header: 'Telefone', key: 'telefone', width: 15 },
+        { header: 'Email', key: 'email', width: 30 },
+        { header: 'Site', key: 'siteOficial', width: 30 },
+      ];
+      concorrentesSheet.addRows(concorrentesData);
+      concorrentesSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      concorrentesSheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF4472C4' },
+      };
+
+      // 5. Aba Leads
+      const leadsData = await db.select().from(leads).where(inArray(leads.pesquisaId, pesquisaIds));
+
+      const leadsSheet = workbook.addWorksheet('Leads');
+      leadsSheet.columns = [
+        { header: 'ID', key: 'id', width: 10 },
+        { header: 'Nome', key: 'nome', width: 30 },
+        { header: 'Cidade', key: 'cidade', width: 20 },
+        { header: 'UF', key: 'uf', width: 10 },
+        { header: 'Segmento', key: 'segmento', width: 20 },
+        { header: 'Porte', key: 'porte', width: 15 },
+        { header: 'Qualidade', key: 'qualidade', width: 15 },
+        { header: 'Potencial', key: 'potencial', width: 15 },
+        { header: 'Score', key: 'score', width: 10 },
+        { header: 'Stage', key: 'stage', width: 15 },
+        { header: 'Justificativa', key: 'justificativa', width: 50 },
+        { header: 'Telefone', key: 'telefone', width: 15 },
+        { header: 'Email', key: 'email', width: 30 },
+        { header: 'Site', key: 'siteOficial', width: 30 },
+      ];
+      leadsSheet.addRows(leadsData);
+      leadsSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      leadsSheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF4472C4' },
+      };
+
+      // Gerar buffer do Excel
+      const buffer = await workbook.xlsx.writeBuffer();
+      const base64 = buffer.toString('base64');
+
+      return {
+        filename: `projeto_${input.projectId}_${Date.now()}.xlsx`,
+        data: base64,
+        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      };
+    }),
+});
