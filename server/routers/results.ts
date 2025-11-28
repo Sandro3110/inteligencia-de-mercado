@@ -100,18 +100,21 @@ export const resultsRouter = createTRPCRouter({
         );
       }
 
+      // Simplificar query para debug
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+      
       const [data, countResult] = await Promise.all([
         db
           .select()
           .from(schema.clientes)
-          .where(and(...conditions))
+          .where(whereClause)
           .limit(input.pageSize)
           .offset(offset)
           .orderBy(desc(schema.clientes.createdAt)),
         db
           .select({ count: count() })
           .from(schema.clientes)
-          .where(and(...conditions)),
+          .where(whereClause),
       ]);
 
         console.log(
