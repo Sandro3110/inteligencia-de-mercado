@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface ExportConfig {
   context?: string;
@@ -51,7 +51,6 @@ export function SaveConfigDialog({ open, onClose, onSave, currentConfig }: SaveC
   const [description, setDescription] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [saving, setSaving] = useState(false);
-  const { toast } = useToast();
 
   const handleSave = useCallback(async () => {
     if (!name.trim()) return;
@@ -66,8 +65,7 @@ export function SaveConfigDialog({ open, onClose, onSave, currentConfig }: SaveC
       });
 
       // Toast de sucesso
-      toast({
-        title: '✅ Configuração salva!',
+      toast.success('✅ Configuração salva!', {
         description: `Template "${name.trim()}" salvo com sucesso.`,
         duration: 3000,
       });
@@ -79,10 +77,8 @@ export function SaveConfigDialog({ open, onClose, onSave, currentConfig }: SaveC
       onClose();
     } catch (error) {
       console.error('Erro ao salvar configuração:', error);
-      toast({
-        title: '❌ Erro ao salvar',
+      toast.error('❌ Erro ao salvar', {
         description: 'Não foi possível salvar a configuração. Tente novamente.',
-        variant: 'destructive',
         duration: 4000,
       });
     } finally {

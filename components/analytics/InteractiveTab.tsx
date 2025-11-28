@@ -28,7 +28,7 @@ import {
 } from 'recharts';
 import { TrendingUp, MapPin, PieChart as PieChartIcon, RefreshCw } from 'lucide-react';
 import { CardSkeleton, ChartSkeleton } from '@/components/skeletons';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const COLORS = [
   '#3b82f6',
@@ -69,7 +69,6 @@ interface Pesquisa {
 export default function InteractiveTab({ projectId }: InteractiveTabProps) {
   const [months, setMonths] = useState(6);
   const [selectedPesquisaId, setSelectedPesquisaId] = useState<number | null>(null);
-  const { toast } = useToast();
 
   // Buscar pesquisas do projeto selecionado
   const { data: pesquisas } = trpc.pesquisas.list.useQuery(undefined, {
@@ -102,21 +101,18 @@ export default function InteractiveTab({ projectId }: InteractiveTabProps) {
   const handleRefresh = useCallback(async () => {
     try {
       await Promise.all([refetchEvolution(), refetchGeographic(), refetchSegmentation()]);
-      toast({
-        title: '✅ Dados atualizados!',
+      toast.success('✅ Dados atualizados!', {
         description: 'Analytics atualizado com sucesso.',
-        duration: 2000,
+        duration: 3000,
       });
     } catch (error) {
       console.error('Erro ao atualizar:', error);
-      toast({
-        title: '❌ Erro ao atualizar',
+      toast.error('❌ Erro ao atualizar', {
         description: 'Não foi possível atualizar os dados.',
-        variant: 'destructive',
-        duration: 3000,
+        duration: 4000,
       });
     }
-  }, [refetchEvolution, refetchGeographic, refetchSegmentation, toast]);
+  }, [refetchEvolution, refetchGeographic, refetchSegmentation]);
 
   const handlePesquisaChange = useCallback((value: string) => {
     setSelectedPesquisaId(value ? Number(value) : null);
