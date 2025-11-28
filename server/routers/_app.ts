@@ -26,6 +26,7 @@ import { alertsRouter } from './alerts';
 import { clientesRouter } from './clientes';
 import { concorrentesRouter } from './concorrentes';
 import { reportsRouter as premiumReportsRouter } from './reports';
+import { settingsRouter } from './settings';
 
 /**
  * Router raiz da aplicação
@@ -83,6 +84,9 @@ export const appRouter = createTRPCRouter({
 
   // Concorrentes
   concorrentes: concorrentesRouter,
+
+  // Settings
+  settings: settingsRouter,
 });
 
 /**

@@ -76,6 +76,12 @@ const menuItems: MenuItem[] = [
     icon: '👥',
     section: 'operations',
   },
+  {
+    name: 'Configurações',
+    href: '/settings',
+    icon: '⚙️',
+    section: 'operations',
+  },
 ];
 
 const sectionTitles = {
@@ -101,9 +107,7 @@ export default function Sidebar() {
       <div className="p-6 border-b border-gray-200">
         <h1 className="text-2xl font-bold text-gray-900">IntelMarket</h1>
         {selectedProject && (
-          <p className="text-sm text-gray-600 mt-1 truncate">
-            {selectedProject.nome}
-          </p>
+          <p className="text-sm text-gray-600 mt-1 truncate">{selectedProject.nome}</p>
         )}
       </div>
 
@@ -143,9 +147,7 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="p-4 border-t border-gray-200">
-        <div className="text-xs text-gray-500 text-center">
-          IntelMarket v1.0.0
-        </div>
+        <div className="text-xs text-gray-500 text-center">IntelMarket v1.0.0</div>
       </div>
     </aside>
   );
