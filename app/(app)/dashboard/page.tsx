@@ -116,9 +116,31 @@ export default function DashboardPage() {
     router.push(`/projects/${projectId}/surveys/${pesquisaId}/results`);
   };
 
-  const handleExport = (_projectId: number, _pesquisaId: number) => {
-    // TODO: Implementar exportação
-    toast.info('Exportação em desenvolvimento');
+  const handleExport = async (_projectId: number, pesquisaId: number) => {
+    try {
+      toast.info('Gerando arquivo Excel...');
+      
+      const response = await fetch(`/api/export/excel?pesquisaId=${pesquisaId}`);
+      
+      if (!response.ok) {
+        throw new Error('Erro ao gerar Excel');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `pesquisa_${pesquisaId}_completo.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success('Excel exportado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao exportar:', error);
+      toast.error('Erro ao exportar Excel');
+    }
   };
 
   // Encontrar projeto selecionado para mostrar nome

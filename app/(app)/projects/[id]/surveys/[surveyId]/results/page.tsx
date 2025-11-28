@@ -25,7 +25,9 @@ export default function ResultsPage() {
   const pageSize = 20;
 
   // Queries
+  console.log('[ResultsPage] surveyId from URL:', surveyId);
   const { data: pesquisa } = trpc.pesquisas.getById.useQuery(surveyId);
+  console.log('[ResultsPage] pesquisa data:', pesquisa);
   const { data: kpis } = trpc.results.getKPIs.useQuery({ pesquisaId: surveyId });
 
   const { data: clientesData, isLoading: loadingClientes } = trpc.results.getClientes.useQuery(
@@ -138,7 +140,7 @@ export default function ResultsPage() {
     {
       key: 'validationStatus',
       label: 'Status',
-      render: (item: any) => (
+      render: (item: Record<string, unknown>) => (
         <span
           className={`px-2 py-1 rounded text-xs font-medium ${
             item.validationStatus === 'approved'
@@ -160,7 +162,7 @@ export default function ResultsPage() {
     {
       key: 'qualidadeClassificacao',
       label: 'Potencial',
-      render: (item: any) => (
+      render: (item: Record<string, unknown>) => (
         <span
           className={`px-2 py-1 rounded text-xs font-medium ${
             item.qualidadeClassificacao === 'Alto'

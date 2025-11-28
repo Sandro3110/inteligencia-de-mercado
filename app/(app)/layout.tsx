@@ -21,11 +21,7 @@ const CompactModeToggle = nextDynamic(() => import('@/components/CompactModeTogg
   ssr: false,
 });
 
-const OnboardingTour = nextDynamic(() => import('@/components/OnboardingTour'), { ssr: false });
-const ContextualTour = nextDynamic(() => import('@/components/ContextualTour'), { ssr: false });
-const DraftRecoveryModal = nextDynamic(() => import('@/components/DraftRecoveryModal'), {
-  ssr: false,
-});
+// Tours removidos para melhorar performance
 const Toaster = nextDynamic(
   () => import('@/components/ui/sonner').then((m) => ({ default: m.Toaster })),
   { ssr: false }
@@ -34,7 +30,6 @@ const Toaster = nextDynamic(
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -59,11 +54,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        // Verificar se é primeira visita para mostrar onboarding
-        const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
-        if (!hasSeenOnboarding) {
-          setShowOnboarding(true);
-        }
+        // Onboarding removido para melhorar performance
       } catch (error) {
         console.error('Erro ao verificar aprovação:', error);
         router.push('/login');
@@ -84,10 +75,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [router]);
 
-  const handleOnboardingComplete = () => {
-    localStorage.setItem('hasSeenOnboarding', 'true');
-    setShowOnboarding(false);
-  };
+  // handleOnboardingComplete removido
 
   return (
     <ThemeProvider>
@@ -97,7 +85,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <ErrorBoundary>
               <AppProvider>
                 <GlobalShortcuts />
-                <DraftRecoveryModal />
 
                 <div className="flex h-screen bg-gray-50">
                   <Sidebar />
@@ -123,9 +110,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   />
                 )}
 
-                {showOnboarding && <OnboardingTour onComplete={handleOnboardingComplete} />}
-
-                <ContextualTour />
+                {/* Tours removidos */}
                 <Toaster />
               </AppProvider>
             </ErrorBoundary>

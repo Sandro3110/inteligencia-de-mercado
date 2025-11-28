@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { trpc } from '@/lib/trpc/client';
 import { Settings, Key, Save, Eye, EyeOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -15,21 +15,26 @@ export default function SettingsPage() {
   const [openaiKey, setOpenaiKey] = useState('');
   const [geminiKey, setGeminiKey] = useState('');
   const [anthropicKey, setAnthropicKey] = useState('');
+  const [keysLoaded, setKeysLoaded] = useState(false);
 
   const trpcUtils = trpc.useUtils();
 
   // Queries
-  const { data: settings, isLoading } = trpc.settings.getAll.useQuery(undefined, {
-    onSuccess: (data) => {
-      const openai = data.find((s) => s.settingKey === 'OPENAI_API_KEY');
-      const gemini = data.find((s) => s.settingKey === 'GEMINI_API_KEY');
-      const anthropic = data.find((s) => s.settingKey === 'ANTHROPIC_API_KEY');
+  const { data: settings, isLoading } = trpc.settings.getAll.useQuery();
 
-      if (openai?.settingValue) setOpenaiKey(openai.settingValue);
-      if (gemini?.settingValue) setGeminiKey(gemini.settingValue);
-      if (anthropic?.settingValue) setAnthropicKey(anthropic.settingValue);
-    },
-  });
+  // Carregar valores quando settings mudar
+  useEffect(() => {
+    if (settings && !keysLoaded) {
+      const openai = settings.find((s) => s.settingKey === 'OPENAI_API_KEY');
+      const gemini = settings.find((s) => s.settingKey === 'GEMINI_API_KEY');
+      const anthropic = settings.find((s) => s.settingKey === 'ANTHROPIC_API_KEY');
+
+      setOpenaiKey(openai?.settingValue || '');
+      setGeminiKey(gemini?.settingValue || '');
+      setAnthropicKey(anthropic?.settingValue || '');
+      setKeysLoaded(true);
+    }
+  }, [settings, keysLoaded]);
 
   // Mutations
   const saveMutation = trpc.settings.set.useMutation({
@@ -64,7 +69,7 @@ export default function SettingsPage() {
             description: 'Anthropic Claude API Key',
           }),
       ]);
-    } catch (error) {
+    } catch {
       // Error already handled by mutation
     }
   };
