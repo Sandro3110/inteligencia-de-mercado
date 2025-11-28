@@ -6,8 +6,8 @@ import { FileText, Download, Calendar } from 'lucide-react';
 
 export default function ReportsPanel() {
   const { selectedProjectId } = useApp();
-  const { data: schedules } = trpc.reports.listSchedules.useQuery({ projectId: selectedProjectId! }, { enabled: !!selectedProjectId });
-  const { data: history } = trpc.reports.exportHistory.useQuery({ projectId: selectedProjectId!, limit: 10 }, { enabled: !!selectedProjectId });
+  const { data: schedules } = trpc.premiumReports.listSchedules.useQuery({ projectId: selectedProjectId! }, { enabled: !!selectedProjectId });
+  const { data: history } = trpc.premiumReports.exportHistory.useQuery({ projectId: selectedProjectId!, limit: 10 }, { enabled: !!selectedProjectId });
 
   if (!selectedProjectId) return <div className="p-8 text-center text-gray-600">Selecione um projeto</div>;
 

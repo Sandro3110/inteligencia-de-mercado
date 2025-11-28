@@ -25,6 +25,7 @@ import { recommendationsRouter } from './recommendations';
 import { alertsRouter } from './alerts';
 import { clientesRouter } from './clientes';
 import { concorrentesRouter } from './concorrentes';
+import { reportsRouter as premiumReportsRouter } from './reports';
 
 /**
  * Router raiz da aplicação
@@ -67,9 +68,12 @@ export const appRouter = createTRPCRouter({
 
   // Enrichment
   enrichment: enrichmentRouter,
+
+  // Recommendations
   recommendations: recommendationsRouter,
-  reports: reportsRouter,
-import { recommendationsRouter } from './recommendations';
+
+  // Premium Reports
+  premiumReports: premiumReportsRouter,
 
   // Alerts
   alerts: alertsRouter,
