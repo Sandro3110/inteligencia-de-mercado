@@ -67,10 +67,13 @@ export const resultsRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      console.log('[Results] getClientes called with input:', input);
+      console.log('[Results] getClientes called with input:', JSON.stringify(input));
       try {
         const db = await getDb();
-        if (!db) throw new Error('Database connection failed');
+        if (!db) {
+          console.error('[Results] Database connection failed');
+          throw new Error('Database connection failed');
+        }
 
       const offset = (input.page - 1) * input.pageSize;
 
