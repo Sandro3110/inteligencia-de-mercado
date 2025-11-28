@@ -6,13 +6,13 @@
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
-import { 
-  projects, 
-  pesquisas, 
-  mercadosUnicos, 
-  leads, 
-  clientes, 
-  concorrentes 
+import {
+  projects,
+  pesquisas,
+  mercadosUnicos,
+  leads,
+  clientes,
+  concorrentes,
 } from '@/drizzle/schema';
 import { eq, count, desc, and } from 'drizzle-orm';
 
@@ -23,8 +23,8 @@ export const dashboardRouter = createTRPCRouter({
   stats: protectedProcedure
     .input(
       z.object({
-        projectId: z.number().optional(),
-      }).optional()
+        projectId: z.number(),
+      })
     )
     .query(async ({ input }) => {
       const db = await getDb();
@@ -32,65 +32,67 @@ export const dashboardRouter = createTRPCRouter({
         throw new Error('Database connection failed');
       }
 
-      const projectId = input?.projectId;
+      const { projectId } = input;
 
       try {
-        // Contar projetos ativos
-        const [projectsResult] = await db
-          .select({ value: count() })
-          .from(projects)
-          .where(eq(projects.ativo, 1));
-
-        const projectsCount = projectsResult?.value || 0;
-
-        // Se projectId fornecido, buscar stats específicas
-        if (projectId) {
-          const [
-            pesquisasResult,
-            mercadosResult,
-            leadsResult,
-            clientesResult,
-            concorrentesResult,
-          ] = await Promise.all([
-            db.select({ value: count() }).from(pesquisas).where(eq(pesquisas.projectId, projectId)),
-            db.select({ value: count() }).from(mercadosUnicos).where(eq(mercadosUnicos.projectId, projectId)),
-            db.select({ value: count() }).from(leads).where(eq(leads.projectId, projectId)),
+        // Contar totais
+        const [mercadosResult, clientesResult, concorrentesResult, leadsResult] = await Promise.all(
+          [
+            db
+              .select({ value: count() })
+              .from(mercadosUnicos)
+              .where(eq(mercadosUnicos.projectId, projectId)),
             db.select({ value: count() }).from(clientes).where(eq(clientes.projectId, projectId)),
-            db.select({ value: count() }).from(concorrentes).where(eq(concorrentes.projectId, projectId)),
-          ]);
+            db
+              .select({ value: count() })
+              .from(concorrentes)
+              .where(eq(concorrentes.projectId, projectId)),
+            db.select({ value: count() }).from(leads).where(eq(leads.projectId, projectId)),
+          ]
+        );
 
-          return {
-            projects: projectsCount,
-            pesquisas: pesquisasResult[0]?.value || 0,
-            mercados: mercadosResult[0]?.value || 0,
-            leads: leadsResult[0]?.value || 0,
-            clientes: clientesResult[0]?.value || 0,
-            concorrentes: concorrentesResult[0]?.value || 0,
-          };
-        }
+        // Contar por status de validação - CLIENTES
+        const clientesValidation = await db
+          .select({
+            status: clientes.validationStatus,
+            count: count(),
+          })
+          .from(clientes)
+          .where(eq(clientes.projectId, projectId))
+          .groupBy(clientes.validationStatus);
 
-        // Stats gerais (todos os projetos)
-        const [
-          pesquisasResult,
-          mercadosResult,
-          leadsResult,
-          clientesResult,
-          concorrentesResult,
-        ] = await Promise.all([
-          db.select({ value: count() }).from(pesquisas),
-          db.select({ value: count() }).from(mercadosUnicos),
-          db.select({ value: count() }).from(leads),
-          db.select({ value: count() }).from(clientes),
-          db.select({ value: count() }).from(concorrentes),
-        ]);
+        // Contar por status de validação - CONCORRENTES
+        const concorrentesValidation = await db
+          .select({
+            status: concorrentes.validationStatus,
+            count: count(),
+          })
+          .from(concorrentes)
+          .where(eq(concorrentes.projectId, projectId))
+          .groupBy(concorrentes.validationStatus);
+
+        // Contar por status de validação - LEADS
+        const leadsValidation = await db
+          .select({
+            status: leads.validationStatus,
+            count: count(),
+          })
+          .from(leads)
+          .where(eq(leads.projectId, projectId))
+          .groupBy(leads.validationStatus);
 
         return {
-          projects: projectsCount,
-          pesquisas: pesquisasResult[0]?.value || 0,
-          mercados: mercadosResult[0]?.value || 0,
-          leads: leadsResult[0]?.value || 0,
-          clientes: clientesResult[0]?.value || 0,
-          concorrentes: concorrentesResult[0]?.value || 0,
+          totals: {
+            mercados: mercadosResult[0]?.value || 0,
+            clientes: clientesResult[0]?.value || 0,
+            concorrentes: concorrentesResult[0]?.value || 0,
+            leads: leadsResult[0]?.value || 0,
+          },
+          validation: {
+            clientes: clientesValidation,
+            concorrentes: concorrentesValidation,
+            leads: leadsValidation,
+          },
         };
       } catch (error) {
         console.error('[Dashboard] Error fetching stats:', error);
@@ -103,10 +105,12 @@ export const dashboardRouter = createTRPCRouter({
    */
   recentActivity: protectedProcedure
     .input(
-      z.object({
-        projectId: z.number().optional(),
-        limit: z.number().min(1).max(50).default(10),
-      }).optional()
+      z
+        .object({
+          projectId: z.number().optional(),
+          limit: z.number().min(1).max(50).default(10),
+        })
+        .optional()
     )
     .query(async ({ input }) => {
       const db = await getDb();
@@ -119,7 +123,7 @@ export const dashboardRouter = createTRPCRouter({
 
       try {
         // Buscar projetos recentes (atualizados recentemente)
-        const whereClause = projectId 
+        const whereClause = projectId
           ? and(eq(projects.ativo, 1), eq(projects.id, projectId))
           : eq(projects.ativo, 1);
 
@@ -152,9 +156,11 @@ export const dashboardRouter = createTRPCRouter({
    * Obter resumo do projeto específico
    */
   projectSummary: protectedProcedure
-    .input(z.object({
-      projectId: z.number(),
-    }))
+    .input(
+      z.object({
+        projectId: z.number(),
+      })
+    )
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) {
@@ -174,19 +180,26 @@ export const dashboardRouter = createTRPCRouter({
         }
 
         // Buscar estatísticas detalhadas
-        const [
-          pesquisasResult,
-          mercadosResult,
-          leadsResult,
-          clientesResult,
-          concorrentesResult,
-        ] = await Promise.all([
-          db.select({ value: count() }).from(pesquisas).where(eq(pesquisas.projectId, input.projectId)),
-          db.select({ value: count() }).from(mercadosUnicos).where(eq(mercadosUnicos.projectId, input.projectId)),
-          db.select({ value: count() }).from(leads).where(eq(leads.projectId, input.projectId)),
-          db.select({ value: count() }).from(clientes).where(eq(clientes.projectId, input.projectId)),
-          db.select({ value: count() }).from(concorrentes).where(eq(concorrentes.projectId, input.projectId)),
-        ]);
+        const [pesquisasResult, mercadosResult, leadsResult, clientesResult, concorrentesResult] =
+          await Promise.all([
+            db
+              .select({ value: count() })
+              .from(pesquisas)
+              .where(eq(pesquisas.projectId, input.projectId)),
+            db
+              .select({ value: count() })
+              .from(mercadosUnicos)
+              .where(eq(mercadosUnicos.projectId, input.projectId)),
+            db.select({ value: count() }).from(leads).where(eq(leads.projectId, input.projectId)),
+            db
+              .select({ value: count() })
+              .from(clientes)
+              .where(eq(clientes.projectId, input.projectId)),
+            db
+              .select({ value: count() })
+              .from(concorrentes)
+              .where(eq(concorrentes.projectId, input.projectId)),
+          ]);
 
         return {
           project: {
