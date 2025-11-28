@@ -34,7 +34,7 @@ export async function GET(request: Request) {
       const pesquisas = await sql`
         SELECT id, nome, status 
         FROM pesquisas 
-        WHERE project_id = ${projectId}
+        WHERE "projectId" = ${projectId}
         ORDER BY id
       `;
 
@@ -42,53 +42,53 @@ export async function GET(request: Request) {
       const clientes = await sql`
         SELECT COUNT(*)::int as count 
         FROM clientes 
-        WHERE project_id = ${projectId}
+        WHERE "projectId" = ${projectId}
       `;
 
       const concorrentes = await sql`
         SELECT COUNT(*)::int as count 
         FROM concorrentes 
-        WHERE project_id = ${projectId}
+        WHERE "projectId" = ${projectId}
       `;
 
       const leads = await sql`
         SELECT COUNT(*)::int as count 
         FROM leads 
-        WHERE project_id = ${projectId}
+        WHERE "projectId" = ${projectId}
       `;
 
       const mercados = await sql`
         SELECT COUNT(*)::int as count 
         FROM mercados_unicos 
-        WHERE project_id = ${projectId}
+        WHERE "projectId" = ${projectId}
       `;
 
       // Buscar alguns exemplos
       const clientesExemplos = await sql`
         SELECT id, nome, cnpj, validation_status 
         FROM clientes 
-        WHERE project_id = ${projectId}
+        WHERE "projectId" = ${projectId}
         LIMIT 3
       `;
 
       const concorrentesExemplos = await sql`
         SELECT id, nome, cnpj, validation_status 
         FROM concorrentes 
-        WHERE project_id = ${projectId}
+        WHERE "projectId" = ${projectId}
         LIMIT 3
       `;
 
       const leadsExemplos = await sql`
         SELECT id, nome, cnpj, validation_status 
         FROM leads 
-        WHERE project_id = ${projectId}
+        WHERE "projectId" = ${projectId}
         LIMIT 3
       `;
 
       const mercadosExemplos = await sql`
         SELECT id, nome, categoria 
         FROM mercados_unicos 
-        WHERE project_id = ${projectId}
+        WHERE "projectId" = ${projectId}
         LIMIT 3
       `;
 
