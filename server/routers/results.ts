@@ -68,8 +68,9 @@ export const resultsRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       console.log('[Results] getClientes called with input:', input);
-      const db = await getDb();
-      if (!db) throw new Error('Database connection failed');
+      try {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
 
       const offset = (input.page - 1) * input.pageSize;
 
@@ -110,20 +111,26 @@ export const resultsRouter = createTRPCRouter({
           .where(and(...conditions)),
       ]);
 
-      console.log(
-        '[Results] getClientes found:',
-        data.length,
-        'items, total:',
-        countResult[0]?.count
-      );
+        console.log(
+          '[Results] getClientes found:',
+          data.length,
+          'items, total:',
+          countResult[0]?.count
+        );
 
-      return {
-        data,
-        total: countResult[0]?.count || 0,
-        page: input.page,
-        pageSize: input.pageSize,
-        totalPages: Math.ceil((countResult[0]?.count || 0) / input.pageSize),
-      };
+        const result = {
+          data,
+          total: countResult[0]?.count || 0,
+          page: input.page,
+          pageSize: input.pageSize,
+          totalPages: Math.ceil((countResult[0]?.count || 0) / input.pageSize),
+        };
+        console.log('[Results] getClientes returning:', JSON.stringify(result).substring(0, 200));
+        return result;
+      } catch (error) {
+        console.error('[Results] getClientes error:', error);
+        throw error;
+      }
     }),
 
   /**

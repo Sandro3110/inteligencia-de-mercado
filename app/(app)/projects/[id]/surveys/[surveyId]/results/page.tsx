@@ -30,7 +30,7 @@ export default function ResultsPage() {
   console.log('[ResultsPage] pesquisa data:', pesquisa);
   const { data: kpis } = trpc.results.getKPIs.useQuery({ pesquisaId: surveyId });
 
-  const { data: clientesData, isLoading: loadingClientes } = trpc.results.getClientes.useQuery(
+  const { data: clientesData, isLoading: loadingClientes, error: clientesError } = trpc.results.getClientes.useQuery(
     {
       pesquisaId: surveyId,
       page,
@@ -40,6 +40,9 @@ export default function ResultsPage() {
     },
     { enabled: activeTab === 'clientes' }
   );
+  console.log('[ResultsPage] clientesData:', clientesData);
+  console.log('[ResultsPage] clientesError:', clientesError);
+  console.log('[ResultsPage] loadingClientes:', loadingClientes);
 
   const { data: leadsData, isLoading: loadingLeads } = trpc.results.getLeads.useQuery(
     {
