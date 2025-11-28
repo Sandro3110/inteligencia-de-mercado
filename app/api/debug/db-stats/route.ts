@@ -20,55 +20,95 @@ export async function GET() {
       ORDER BY id
     `);
 
-    // Buscar todas as pesquisas
-    const allPesquisas = await db.execute(sql`
-      SELECT id, nome, project_id as "projectId", status 
-      FROM pesquisas 
-      ORDER BY project_id, id
+    // Listar todas as tabelas do banco
+    const tables = await db.execute(sql`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      ORDER BY table_name
     `);
 
-    // Contar clientes por projeto
-    const clientesCount = await db.execute(sql`
-      SELECT project_id as "projectId", COUNT(*)::int as count 
-      FROM clientes 
-      GROUP BY project_id 
-      ORDER BY project_id
-    `);
+    // Tentar buscar pesquisas (pode não existir)
+    let allPesquisas: any = { rows: [], error: null };
+    try {
+      allPesquisas = await db.execute(sql`
+        SELECT id, nome, project_id as "projectId", status 
+        FROM pesquisas 
+        ORDER BY project_id, id 
+        LIMIT 10
+      `);
+    } catch (e) {
+      allPesquisas.error = e instanceof Error ? e.message : 'Erro ao buscar pesquisas';
+    }
 
-    // Contar concorrentes por projeto
-    const concorrentesCount = await db.execute(sql`
-      SELECT project_id as "projectId", COUNT(*)::int as count 
-      FROM concorrentes 
-      GROUP BY project_id 
-      ORDER BY project_id
-    `);
+    // Tentar contar clientes
+    let clientesCount: any = { rows: [], error: null };
+    try {
+      clientesCount = await db.execute(sql`
+        SELECT project_id as "projectId", COUNT(*)::int as count 
+        FROM clientes 
+        GROUP BY project_id 
+        ORDER BY project_id
+      `);
+    } catch (e) {
+      clientesCount.error = e instanceof Error ? e.message : 'Erro ao contar clientes';
+    }
 
-    // Contar leads por projeto
-    const leadsCount = await db.execute(sql`
-      SELECT project_id as "projectId", COUNT(*)::int as count 
-      FROM leads 
-      GROUP BY project_id 
-      ORDER BY project_id
-    `);
+    // Tentar contar concorrentes
+    let concorrentesCount: any = { rows: [], error: null };
+    try {
+      concorrentesCount = await db.execute(sql`
+        SELECT project_id as "projectId", COUNT(*)::int as count 
+        FROM concorrentes 
+        GROUP BY project_id 
+        ORDER BY project_id
+      `);
+    } catch (e) {
+      concorrentesCount.error = e instanceof Error ? e.message : 'Erro ao contar concorrentes';
+    }
 
-    // Contar mercados por projeto
-    const mercadosCount = await db.execute(sql`
-      SELECT project_id as "projectId", COUNT(*)::int as count 
-      FROM "mercadosUnicos" 
-      GROUP BY project_id 
-      ORDER BY project_id
-    `);
+    // Tentar contar leads
+    let leadsCount: any = { rows: [], error: null };
+    try {
+      leadsCount = await db.execute(sql`
+        SELECT project_id as "projectId", COUNT(*)::int as count 
+        FROM leads 
+        GROUP BY project_id 
+        ORDER BY project_id
+      `);
+    } catch (e) {
+      leadsCount.error = e instanceof Error ? e.message : 'Erro ao contar leads';
+    }
+
+    // Tentar contar mercados
+    let mercadosCount: any = { rows: [], error: null };
+    try {
+      mercadosCount = await db.execute(sql`
+        SELECT project_id as "projectId", COUNT(*)::int as count 
+        FROM "mercadosUnicos" 
+        GROUP BY project_id 
+        ORDER BY project_id
+      `);
+    } catch (e) {
+      mercadosCount.error = e instanceof Error ? e.message : 'Erro ao contar mercados';
+    }
 
     return NextResponse.json({
       success: true,
       data: {
+        tables: tables.rows,
         projects: allProjects.rows,
-        pesquisas: allPesquisas.rows,
+        pesquisas: allPesquisas.rows || [],
+        pesquisasError: allPesquisas.error,
         counts: {
-          clientes: clientesCount.rows,
-          concorrentes: concorrentesCount.rows,
-          leads: leadsCount.rows,
-          mercados: mercadosCount.rows,
+          clientes: clientesCount.rows || [],
+          clientesError: clientesCount.error,
+          concorrentes: concorrentesCount.rows || [],
+          concorrentesError: concorrentesCount.error,
+          leads: leadsCount.rows || [],
+          leadsError: leadsCount.error,
+          mercados: mercadosCount.rows || [],
+          mercadosError: mercadosCount.error,
         },
       },
     });
