@@ -1,9 +1,7 @@
 'use client';
 
-import GlobalSearch from '@/components/GlobalSearch';
 import { useSidebar } from '@/lib/contexts/SidebarContext';
 import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
 import dynamic from 'next/dynamic';
 
 const DynamicBreadcrumbs = dynamic(() => import('@/components/DynamicBreadcrumbs'), {
@@ -11,7 +9,6 @@ const DynamicBreadcrumbs = dynamic(() => import('@/components/DynamicBreadcrumbs
 });
 
 export default function Header({ children }: { children?: React.ReactNode }) {
-  const [searchOpen, setSearchOpen] = useState(false);
   const { isCollapsed, toggleSidebar } = useSidebar();
 
   return (
@@ -36,13 +33,7 @@ export default function Header({ children }: { children?: React.ReactNode }) {
       </div>
 
       {/* Right Side - Search + Project Selector + Actions */}
-      <div className="flex items-center gap-2 lg:gap-4 flex-shrink-0">
-        <div className="hidden md:block md:w-48 lg:w-64">
-          <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
-        </div>
-
-        {children}
-      </div>
+      <div className="flex items-center gap-2 lg:gap-4 flex-shrink-0">{children}</div>
     </header>
   );
 }
