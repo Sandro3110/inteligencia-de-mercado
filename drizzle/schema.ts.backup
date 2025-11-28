@@ -31,7 +31,7 @@ export const activityLog = pgTable(
   "activity_log",
   {
     id: serial(),
-    projectId: integer('projectId').notNull(),
+    projectId: integer('project_id').notNull(),
     activityType: varchar('activity_type', { length: 50 }).notNull(),
     description: text(),
     metadata: jsonb(),
@@ -46,7 +46,7 @@ export const activityLog = pgTable(
 
 export const alertConfigs = pgTable("alert_configs", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   name: varchar({ length: 255 }).notNull(),
   alertType: varchar('alert_type', { length: 50 }).notNull(),
   condition: text().notNull(),
@@ -59,7 +59,7 @@ export const alertConfigs = pgTable("alert_configs", {
 export const alertHistory = pgTable("alert_history", {
   id: serial(),
   alertConfigId: integer('alert_config_id').notNull(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   alertType: varchar('alert_type', { length: 50 }).notNull(),
   condition: text().notNull(),
   message: text().notNull(),
@@ -70,8 +70,8 @@ export const alertHistory = pgTable("alert_history", {
 
 export const analyticsDimensoes = pgTable("analytics_dimensoes", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
-  pesquisaId: integer('pesquisaId'),
+  projectId: integer('project_id').notNull(),
+  pesquisaId: integer('pesquisa_id'),
   dimensaoTipo: varchar('dimensao_tipo', { length: 50 }).notNull(),
   dimensaoValor: varchar('dimensao_valor', { length: 100 }).notNull(),
   totalLeads: integer('total_leads').default(0),
@@ -85,8 +85,8 @@ export const analyticsDimensoes = pgTable("analytics_dimensoes", {
 
 export const analyticsMercados = pgTable("analytics_mercados", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
-  pesquisaId: integer('pesquisaId'),
+  projectId: integer('project_id').notNull(),
+  pesquisaId: integer('pesquisa_id'),
   mercadoId: integer('mercado_id').notNull(),
   periodo: timestamp({ mode: "string" }).notNull(),
   totalClientes: integer('total_clientes').default(0),
@@ -117,8 +117,8 @@ export const analyticsMercados = pgTable("analytics_mercados", {
 
 export const analyticsPesquisas = pgTable("analytics_pesquisas", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
-  pesquisaId: integer('pesquisaId').notNull(),
+  projectId: integer('project_id').notNull(),
+  pesquisaId: integer('pesquisa_id').notNull(),
   totalMercadosMapeados: integer('total_mercados_mapeados').default(0),
   totalClientesBase: integer('total_clientes_base').default(0),
   totalLeadsGerados: integer('total_leads_gerados').default(0),
@@ -144,7 +144,7 @@ export const analyticsPesquisas = pgTable("analytics_pesquisas", {
 
 export const analyticsTimeline = pgTable("analytics_timeline", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   data: timestamp({ mode: "string" }).notNull(),
   leadsGeradosDia: integer('leads_gerados_dia').default(0),
   leadsEnriquecidosDia: integer('leads_enriquecidos_dia').default(0),
@@ -179,16 +179,16 @@ export const clientes = pgTable(
     porte: varchar({ length: 50 }),
     qualidadeScore: integer('qualidade_score'),
     qualidadeClassificacao: varchar('qualidade_classificacao', { length: 50 }),
-    validationStatus: varchar('validationStatus', { length: 50 }).default("pending"),
+    validationStatus: varchar('validation_status', { length: 50 }).default("pending"),
     validationNotes: text('validation_notes'),
     validatedBy: varchar('validated_by', { length: 64 }),
     validatedAt: timestamp('validated_at', { mode: "string" }),
     createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-    projectId: integer('projectId').default(1).notNull(),
+    projectId: integer('project_id').default(1).notNull(),
     regiao: varchar({ length: 100 }),
     faturamentoDeclarado: text('faturamento_declarado'),
     numeroEstabelecimentos: text('numero_estabelecimentos'),
-    pesquisaId: integer('pesquisaId'),
+    pesquisaId: integer('pesquisa_id'),
     latitude: numeric({ precision: 10, scale: 8 }),
     longitude: numeric({ precision: 11, scale: 8 }),
     geocodedAt: timestamp('geocoded_at', { mode: "string" }),
@@ -235,17 +235,17 @@ export const concorrentes = pgTable(
     faturamentoEstimado: text('faturamento_estimado'),
     qualidadeScore: integer('qualidade_score'),
     qualidadeClassificacao: varchar('qualidade_classificacao', { length: 50 }),
-    validationStatus: varchar('validationStatus', { length: 50 }).default("pending"),
+    validationStatus: varchar('validation_status', { length: 50 }).default("pending"),
     validationNotes: text('validation_notes'),
     validatedBy: varchar('validated_by', { length: 64 }),
     validatedAt: timestamp('validated_at', { mode: "string" }),
     createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-    projectId: integer('projectId').default(1).notNull(),
+    projectId: integer('project_id').default(1).notNull(),
     cidade: varchar({ length: 100 }),
     uf: varchar({ length: 2 }),
     faturamentoDeclarado: text('faturamento_declarado'),
     numeroEstabelecimentos: text('numero_estabelecimentos'),
-    pesquisaId: integer('pesquisaId'),
+    pesquisaId: integer('pesquisa_id'),
     latitude: numeric({ precision: 10, scale: 8 }),
     longitude: numeric({ precision: 11, scale: 8 }),
     geocodedAt: timestamp('geocoded_at', { mode: "string" }),
@@ -286,7 +286,7 @@ export const enrichmentConfigs = pgTable(
   "enrichment_configs",
   {
     id: serial(),
-    projectId: integer('projectId').notNull(),
+    projectId: integer('project_id').notNull(),
     openaiApiKey: text('openai_api_key'),
     serpapiKey: text('serpapi_key'),
     receitawsKey: text('receitaws_key'),
@@ -323,7 +323,7 @@ export const systemSettings = pgTable(
 
 export const enrichmentJobs = pgTable("enrichment_jobs", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   status: varchar({ length: 50 })
     .default("pending")
     .notNull(),
@@ -349,7 +349,7 @@ export const enrichmentQueue = pgTable(
   "enrichment_queue",
   {
     id: serial(),
-    projectId: integer('projectId')
+    projectId: integer('project_id')
       .notNull()
       .references(() => projects.id, { onDelete: "cascade" }),
     status: varchar({ length: 50 }).default(
@@ -372,7 +372,7 @@ export const enrichmentQueue = pgTable(
 
 export const enrichmentRuns = pgTable("enrichment_runs", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   startedAt: timestamp('started_at', { mode: "string" })
     .defaultNow()
     .notNull(),
@@ -399,7 +399,7 @@ export const entityTags = pgTable("entity_tags", {
 
 export const hibernationWarnings = pgTable("hibernation_warnings", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   warningDate: timestamp('warning_date', { mode: "string" })
     .defaultNow()
     .notNull(),
@@ -416,7 +416,7 @@ export const intelligentAlertsConfigs = pgTable(
   "intelligent_alerts_configs",
   {
     id: serial(),
-    projectId: integer('projectId').notNull(),
+    projectId: integer('project_id').notNull(),
     circuitBreakerThreshold: integer('circuit_breaker_threshold').default(10).notNull(),
     errorRateThreshold: integer('error_rate_threshold').default(10).notNull(),
     processingTimeThreshold: integer('processing_time_threshold').default(60).notNull(),
@@ -436,7 +436,7 @@ export const intelligentAlertsHistory = pgTable(
   "intelligent_alerts_history",
   {
     id: serial(),
-    projectId: integer('projectId').notNull(),
+    projectId: integer('project_id').notNull(),
     alertType: varchar('alert_type', { length: 50 }).notNull(),
     severity: varchar({ length: 50 })
       .default("info")
@@ -459,7 +459,7 @@ export const intelligentAlertsHistory = pgTable(
 export const leadConversions = pgTable("lead_conversions", {
   id: serial(),
   leadId: integer('lead_id').notNull(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   dealValue: numeric('deal_value', { precision: 15, scale: 2 }),
   convertedAt: timestamp('converted_at', { mode: "string" }).defaultNow(),
   notes: text(),
@@ -486,17 +486,17 @@ export const leads = pgTable(
     qualidadeClassificacao: varchar('qualidade_classificacao', { length: 50 }),
     leadStage: varchar('lead_stage', { length: 50 }).default("novo"),
     stageUpdatedAt: timestamp('stage_updated_at', { mode: "string" }).defaultNow(),
-    validationStatus: varchar('validationStatus', { length: 50 }).default("pending"),
+    validationStatus: varchar('validation_status', { length: 50 }).default("pending"),
     validationNotes: text('validation_notes'),
     validatedBy: varchar('validated_by', { length: 64 }),
     validatedAt: timestamp('validated_at', { mode: "string" }),
     createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-    projectId: integer('projectId').default(1).notNull(),
+    projectId: integer('project_id').default(1).notNull(),
     cidade: varchar({ length: 100 }),
     uf: varchar({ length: 2 }),
     faturamentoDeclarado: text('faturamento_declarado'),
     numeroEstabelecimentos: text('numero_estabelecimentos'),
-    pesquisaId: integer('pesquisaId'),
+    pesquisaId: integer('pesquisa_id'),
     stage: varchar({ length: 50 }).default("novo"),
     latitude: numeric({ precision: 10, scale: 8 }),
     longitude: numeric({ precision: 11, scale: 8 }),
@@ -522,7 +522,7 @@ export const leadsHistory = pgTable("leads_history", {
 
 export const llmProviderConfigs = pgTable("llm_provider_configs", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   activeProvider: varchar('active_provider', { length: 50 })
     .default("openai")
     .notNull(),
@@ -583,8 +583,8 @@ export const exportHistory = pgTable(
     userId: varchar('user_id', { length: 64 })
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
-    projectId: integer('projectId').references(() => projects.id, { onDelete: "cascade" }),
-    pesquisaId: integer('pesquisaId').references(() => pesquisas.id, { onDelete: "cascade" }),
+    projectId: integer('project_id').references(() => projects.id, { onDelete: "cascade" }),
+    pesquisaId: integer('pesquisa_id').references(() => pesquisas.id, { onDelete: "cascade" }),
     context: text(),
     filters: jsonb(),
     format: varchar({ length: 50 }).notNull(),
@@ -609,7 +609,7 @@ export const savedFiltersExport = pgTable(
     userId: varchar('user_id', { length: 64 })
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
-    projectId: integer('projectId').references(() => projects.id, { onDelete: "cascade" }),
+    projectId: integer('project_id').references(() => projects.id, { onDelete: "cascade" }),
     name: varchar({ length: 255 }).notNull(),
     description: text(),
     entityType: varchar('entity_type', { length: 50 }).notNull(),
@@ -628,7 +628,7 @@ export const notifications = pgTable("notifications", {
   userId: varchar('user_id', { length: 64 }).references(() => users.id, {
     onDelete: "cascade",
   }),
-  projectId: integer('projectId').references(() => projects.id, { onDelete: "cascade" }),
+  projectId: integer('project_id').references(() => projects.id, { onDelete: "cascade" }),
   type: varchar({ length: 50 }).notNull(),
   title: varchar({ length: 255 }).notNull(),
   message: text().notNull(),
@@ -658,7 +658,7 @@ export const notificationPreferences = pgTable(
 
 export const operationalAlerts = pgTable("operational_alerts", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   alertType: varchar('alert_type', { length: 50 }).notNull(),
   severity: varchar({ length: 50 })
     .default("medium")
@@ -696,7 +696,7 @@ export const produtos = pgTable(
   "produtos",
   {
     id: serial(),
-    projectId: integer('projectId').notNull(),
+    projectId: integer('project_id').notNull(),
     clienteId: integer('cliente_id').notNull(),
     mercadoId: integer('mercado_id').notNull(),
     nome: varchar({ length: 255 }).notNull(),
@@ -707,7 +707,7 @@ export const produtos = pgTable(
     ativo: integer().default(1).notNull(),
     createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
     updatedAt: timestamp('updated_at', { mode: "string" }).defaultNow(),
-    pesquisaId: integer('pesquisaId'),
+    pesquisaId: integer('pesquisa_id'),
   },
   table => [
     index("idx_produto_unique").on(
@@ -720,7 +720,7 @@ export const produtos = pgTable(
 
 export const projectAuditLog = pgTable("project_audit_log", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   userId: varchar('user_id', { length: 64 }),
   action: varchar({ length: 50 }).notNull(),
   changes: text(),
@@ -755,7 +755,7 @@ export const projects = pgTable("projects", {
 
 export const recommendations = pgTable("recommendations", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   tipo: varchar({ length: 50 }).notNull(),
   prioridade: varchar({ length: 50 }).default("media").notNull(),
   titulo: varchar({ length: 255 }).notNull(),
@@ -774,8 +774,8 @@ export const recommendations = pgTable("recommendations", {
 
 export const salesforceSyncLog = pgTable("salesforce_sync_log", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
-  pesquisaId: integer('pesquisaId'),
+  projectId: integer('project_id').notNull(),
+  pesquisaId: integer('pesquisa_id'),
   syncType: varchar('sync_type', { length: 50 }).default("manual").notNull(),
   totalLeadsExportados: integer('total_leads_exportados').default(0),
   totalLeadsSucesso: integer('total_leads_sucesso').default(0),
@@ -795,14 +795,14 @@ export const savedFilters = pgTable("saved_filters", {
   name: varchar({ length: 100 }).notNull(),
   filtersJson: text('filters_json').notNull(),
   createdAt: timestamp('created_at', { mode: "string" }).defaultNow(),
-  projectId: integer('projectId'),
+  projectId: integer('project_id'),
   isPublic: integer('is_public').default(0).notNull(),
   shareToken: varchar('share_token', { length: 64 }),
 });
 
 export const scheduledEnrichments = pgTable("scheduled_enrichments", {
   id: serial(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   scheduledAt: timestamp('scheduled_at', { mode: "string" }).notNull(),
   recurrence: varchar({ length: 50 }).default("once").notNull(),
   batchSize: integer('batch_size').default(50),
@@ -1133,7 +1133,7 @@ export type InsertLoginAttempt = typeof loginAttempts.$inferInsert;
 
 export const emailConfig = pgTable("email_config", {
   id: serial().primaryKey().notNull(),
-  projectId: integer('projectId').notNull(),
+  projectId: integer('project_id').notNull(),
   provider: varchar({ length: 50 }).default("resend").notNull(),
   apiKey: varchar('api_key', { length: 255 }).notNull(),
   fromEmail: varchar('from_email', { length: 320 }).notNull(),
