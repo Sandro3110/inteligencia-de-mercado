@@ -7,6 +7,7 @@ import { AppProvider } from '@/lib/contexts/AppContext';
 import { OnboardingProvider } from '@/contexts/OnboardingContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { CompactModeProvider } from '@/contexts/CompactModeContext';
+import { SidebarProvider } from '@/lib/contexts/SidebarContext';
 import nextDynamic from 'next/dynamic';
 
 const Sidebar = nextDynamic(() => import('@/components/Sidebar'), { ssr: false });
@@ -19,9 +20,7 @@ const ThemeToggle = nextDynamic(() => import('@/components/ThemeToggle'), { ssr:
 const CompactModeToggle = nextDynamic(() => import('@/components/CompactModeToggle'), {
   ssr: false,
 });
-const DynamicBreadcrumbs = nextDynamic(() => import('@/components/DynamicBreadcrumbs'), {
-  ssr: false,
-});
+
 const OnboardingTour = nextDynamic(() => import('@/components/OnboardingTour'), { ssr: false });
 const ContextualTour = nextDynamic(() => import('@/components/ContextualTour'), { ssr: false });
 const DraftRecoveryModal = nextDynamic(() => import('@/components/DraftRecoveryModal'), {
@@ -93,56 +92,54 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
       <CompactModeProvider>
-        <OnboardingProvider>
-          <ErrorBoundary>
-            <AppProvider>
-              <GlobalShortcuts />
-              <DraftRecoveryModal />
+        <SidebarProvider>
+          <OnboardingProvider>
+            <ErrorBoundary>
+              <AppProvider>
+                <GlobalShortcuts />
+                <DraftRecoveryModal />
 
-              <div className="flex h-screen bg-gray-50">
-                <Sidebar />
+                <div className="flex h-screen bg-gray-50">
+                  <Sidebar />
 
-                <div className="flex-1 flex flex-col">
-                  <Header>
-                    <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => setShowGlobalSearch(true)}
-                        className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-600 flex items-center gap-2"
-                      >
-                        <span>Buscar...</span>
-                        <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs">
-                          ⌘K
-                        </kbd>
-                      </button>
-                      <NotificationBell />
-                      <CompactModeToggle />
-                      <ThemeToggle />
-                    </div>
-                  </Header>
+                  <div className="flex-1 flex flex-col">
+                    <Header>
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={() => setShowGlobalSearch(true)}
+                          className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-600 flex items-center gap-2"
+                        >
+                          <span>Buscar...</span>
+                          <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs">
+                            ⌘K
+                          </kbd>
+                        </button>
+                        <NotificationBell />
+                        <CompactModeToggle />
+                        <ThemeToggle />
+                      </div>
+                    </Header>
 
-                  <div className="px-8 py-4 bg-white border-b border-gray-200">
-                    <DynamicBreadcrumbs />
+                    <main className="flex-1 overflow-auto">{children}</main>
                   </div>
-
-                  <main className="flex-1 overflow-auto">{children}</main>
                 </div>
-              </div>
 
-              {/* Modais e Overlays Globais */}
-              {showGlobalSearch && (
-                <GlobalSearch
-                  isOpen={showGlobalSearch}
-                  onClose={() => setShowGlobalSearch(false)}
-                />
-              )}
+                {/* Modais e Overlays Globais */}
+                {showGlobalSearch && (
+                  <GlobalSearch
+                    isOpen={showGlobalSearch}
+                    onClose={() => setShowGlobalSearch(false)}
+                  />
+                )}
 
-              {showOnboarding && <OnboardingTour onComplete={handleOnboardingComplete} />}
+                {showOnboarding && <OnboardingTour onComplete={handleOnboardingComplete} />}
 
-              <ContextualTour />
-              <Toaster />
-            </AppProvider>
-          </ErrorBoundary>
-        </OnboardingProvider>
+                <ContextualTour />
+                <Toaster />
+              </AppProvider>
+            </ErrorBoundary>
+          </OnboardingProvider>
+        </SidebarProvider>
       </CompactModeProvider>
     </ThemeProvider>
   );
