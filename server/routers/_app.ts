@@ -12,7 +12,7 @@ import { projectsRouter } from './projects';
 import { pesquisasRouter } from './pesquisas';
 import { dashboardRouter } from './dashboard';
 import { enrichmentRouter } from './enrichment';
-import { exportRouter } from './exportRouter';
+import { exportRouter } from './export';
 import { settingsRouter } from './settings';
 import { resultsRouter } from './results';
 

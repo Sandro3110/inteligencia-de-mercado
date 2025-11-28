@@ -89,8 +89,66 @@ export default function ResultsPage() {
     setPage(1);
   };
 
-  const handleExport = () => {
-    toast.info('Exportação em desenvolvimento (Checkpoint 6)');
+  const exportMutation = trpc.export.exportClientes.useMutation();
+  const exportLeadsMutation = trpc.export.exportLeads.useMutation();
+  const exportConcorrentesMutation = trpc.export.exportConcorrentes.useMutation();
+  const exportMercadosMutation = trpc.export.exportMercados.useMutation();
+  const exportAllMutation = trpc.export.exportAll.useMutation();
+
+  const handleExport = async () => {
+    try {
+      let result;
+
+      // Exportar baseado na tab ativa
+      switch (activeTab) {
+        case 'clientes':
+          result = await exportMutation.mutateAsync({ pesquisaId: surveyId });
+          break;
+        case 'leads':
+          result = await exportLeadsMutation.mutateAsync({ pesquisaId: surveyId });
+          break;
+        case 'concorrentes':
+          result = await exportConcorrentesMutation.mutateAsync({ pesquisaId: surveyId });
+          break;
+        case 'mercados':
+          result = await exportMercadosMutation.mutateAsync({ pesquisaId: surveyId });
+          break;
+      }
+
+      if (result) {
+        // Download CSV
+        const blob = new Blob([result.data], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = result.filename;
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+        toast.success('Dados exportados com sucesso!');
+      }
+    } catch (error) {
+      toast.error('Erro ao exportar dados');
+      console.error('Export error:', error);
+    }
+  };
+
+  const handleExportAll = async () => {
+    try {
+      const result = await exportAllMutation.mutateAsync({ pesquisaId: surveyId });
+
+      // Download CSV
+      const blob = new Blob([result.data], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = result.filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+
+      toast.success('Relatório completo exportado com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao exportar relatório');
+      console.error('Export error:', error);
+    }
   };
 
   const tabs = [
@@ -260,10 +318,36 @@ export default function ResultsPage() {
             <p className="text-gray-600">Pesquisa: {pesquisa?.nome}</p>
           </div>
 
-          <Button onClick={handleExport} className="flex items-center gap-2">
-            <Download className="w-4 h-4" />
-            Exportar
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleExport}
+              disabled={
+                exportMutation.isPending ||
+                exportLeadsMutation.isPending ||
+                exportConcorrentesMutation.isPending ||
+                exportMercadosMutation.isPending
+              }
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              {exportMutation.isPending ||
+              exportLeadsMutation.isPending ||
+              exportConcorrentesMutation.isPending ||
+              exportMercadosMutation.isPending
+                ? 'Exportando...'
+                : `Exportar ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`}
+            </Button>
+
+            <Button
+              onClick={handleExportAll}
+              disabled={exportAllMutation.isPending}
+              className="flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              {exportAllMutation.isPending ? 'Exportando...' : 'Exportar Tudo'}
+            </Button>
+          </div>
         </div>
       </div>
 
