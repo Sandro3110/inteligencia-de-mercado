@@ -1,0 +1,317 @@
+/**
+ * Results Router - Consolidação de resultados de pesquisas
+ * Substitui routers separados de clientes, leads, concorrentes e mercados
+ */
+
+import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
+import { z } from 'zod';
+import { db } from '@/server/db';
+import * as schema from '@/drizzle/schema';
+import { eq, and, or, like, desc, sql } from 'drizzle-orm';
+
+export const resultsRouter = createTRPCRouter({
+  /**
+   * Buscar KPIs de uma pesquisa
+   */
+  getKPIs: protectedProcedure
+    .input(z.object({ pesquisaId: z.number() }))
+    .query(async ({ input }) => {
+      const [clientes, concorrentes, leads, mercados] = await Promise.all([
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(schema.clientes)
+          .where(eq(schema.clientes.pesquisaId, input.pesquisaId)),
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(schema.concorrentes)
+          .where(eq(schema.concorrentes.pesquisaId, input.pesquisaId)),
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(schema.leads)
+          .where(eq(schema.leads.pesquisaId, input.pesquisaId)),
+        db
+          .select({ count: sql<number>`count(distinct id)` })
+          .from(schema.mercadosUnicos)
+          .where(eq(schema.mercadosUnicos.pesquisaId, input.pesquisaId)),
+      ]);
+
+      return {
+        totalClientes: clientes[0].count,
+        totalConcorrentes: concorrentes[0].count,
+        totalLeads: leads[0].count,
+        totalMercados: mercados[0].count,
+      };
+    }),
+
+  /**
+   * Buscar clientes com filtros e paginação
+   */
+  getClientes: protectedProcedure
+    .input(
+      z.object({
+        pesquisaId: z.number(),
+        page: z.number().default(1),
+        pageSize: z.number().default(20),
+        filters: z
+          .object({
+            setor: z.string().optional(),
+            cidade: z.string().optional(),
+            uf: z.string().optional(),
+            validationStatus: z.string().optional(),
+          })
+          .optional(),
+        searchQuery: z.string().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const offset = (input.page - 1) * input.pageSize;
+
+      const conditions = [eq(schema.clientes.pesquisaId, input.pesquisaId)];
+
+      if (input.filters?.setor) {
+        conditions.push(like(schema.clientes.produtoPrincipal, `%${input.filters.setor}%`));
+      }
+      if (input.filters?.cidade) {
+        conditions.push(eq(schema.clientes.cidade, input.filters.cidade));
+      }
+      if (input.filters?.uf) {
+        conditions.push(eq(schema.clientes.uf, input.filters.uf));
+      }
+      if (input.filters?.validationStatus) {
+        conditions.push(eq(schema.clientes.validationStatus, input.filters.validationStatus));
+      }
+      if (input.searchQuery) {
+        conditions.push(
+          or(
+            like(schema.clientes.nome, `%${input.searchQuery}%`),
+            like(schema.clientes.cnpj, `%${input.searchQuery}%`)
+          )
+        );
+      }
+
+      const [data, countResult] = await Promise.all([
+        db
+          .select()
+          .from(schema.clientes)
+          .where(and(...conditions))
+          .limit(input.pageSize)
+          .offset(offset)
+          .orderBy(desc(schema.clientes.createdAt)),
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(schema.clientes)
+          .where(and(...conditions)),
+      ]);
+
+      return {
+        data,
+        total: countResult[0].count,
+        page: input.page,
+        pageSize: input.pageSize,
+        totalPages: Math.ceil(countResult[0].count / input.pageSize),
+      };
+    }),
+
+  /**
+   * Buscar leads com filtros e paginação
+   */
+  getLeads: protectedProcedure
+    .input(
+      z.object({
+        pesquisaId: z.number(),
+        page: z.number().default(1),
+        pageSize: z.number().default(20),
+        filters: z
+          .object({
+            setor: z.string().optional(),
+            cidade: z.string().optional(),
+            uf: z.string().optional(),
+            qualidadeClassificacao: z.string().optional(),
+          })
+          .optional(),
+        searchQuery: z.string().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const offset = (input.page - 1) * input.pageSize;
+
+      const conditions = [eq(schema.leads.pesquisaId, input.pesquisaId)];
+
+      if (input.filters?.setor) {
+        conditions.push(eq(schema.leads.setor, input.filters.setor));
+      }
+      if (input.filters?.cidade) {
+        conditions.push(eq(schema.leads.cidade, input.filters.cidade));
+      }
+      if (input.filters?.uf) {
+        conditions.push(eq(schema.leads.uf, input.filters.uf));
+      }
+      if (input.filters?.qualidadeClassificacao) {
+        conditions.push(
+          eq(schema.leads.qualidadeClassificacao, input.filters.qualidadeClassificacao)
+        );
+      }
+      if (input.searchQuery) {
+        conditions.push(
+          or(
+            like(schema.leads.nome, `%${input.searchQuery}%`),
+            like(schema.leads.cnpj, `%${input.searchQuery}%`)
+          )
+        );
+      }
+
+      const [data, countResult] = await Promise.all([
+        db
+          .select()
+          .from(schema.leads)
+          .where(and(...conditions))
+          .limit(input.pageSize)
+          .offset(offset)
+          .orderBy(desc(schema.leads.qualidadeScore)),
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(schema.leads)
+          .where(and(...conditions)),
+      ]);
+
+      return {
+        data,
+        total: countResult[0].count,
+        page: input.page,
+        pageSize: input.pageSize,
+        totalPages: Math.ceil(countResult[0].count / input.pageSize),
+      };
+    }),
+
+  /**
+   * Buscar concorrentes com filtros e paginação
+   */
+  getConcorrentes: protectedProcedure
+    .input(
+      z.object({
+        pesquisaId: z.number(),
+        page: z.number().default(1),
+        pageSize: z.number().default(20),
+        filters: z
+          .object({
+            porte: z.string().optional(),
+            cidade: z.string().optional(),
+            uf: z.string().optional(),
+          })
+          .optional(),
+        searchQuery: z.string().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const offset = (input.page - 1) * input.pageSize;
+
+      const conditions = [eq(schema.concorrentes.pesquisaId, input.pesquisaId)];
+
+      if (input.filters?.porte) {
+        conditions.push(eq(schema.concorrentes.porte, input.filters.porte));
+      }
+      if (input.filters?.cidade) {
+        conditions.push(eq(schema.concorrentes.cidade, input.filters.cidade));
+      }
+      if (input.filters?.uf) {
+        conditions.push(eq(schema.concorrentes.uf, input.filters.uf));
+      }
+      if (input.searchQuery) {
+        conditions.push(
+          or(
+            like(schema.concorrentes.nome, `%${input.searchQuery}%`),
+            like(schema.concorrentes.cnpj, `%${input.searchQuery}%`)
+          )
+        );
+      }
+
+      const [data, countResult] = await Promise.all([
+        db
+          .select()
+          .from(schema.concorrentes)
+          .where(and(...conditions))
+          .limit(input.pageSize)
+          .offset(offset)
+          .orderBy(desc(schema.concorrentes.createdAt)),
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(schema.concorrentes)
+          .where(and(...conditions)),
+      ]);
+
+      return {
+        data,
+        total: countResult[0].count,
+        page: input.page,
+        pageSize: input.pageSize,
+        totalPages: Math.ceil(countResult[0].count / input.pageSize),
+      };
+    }),
+
+  /**
+   * Buscar mercados com paginação
+   */
+  getMercados: protectedProcedure
+    .input(
+      z.object({
+        pesquisaId: z.number(),
+        page: z.number().default(1),
+        pageSize: z.number().default(20),
+        searchQuery: z.string().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const offset = (input.page - 1) * input.pageSize;
+
+      const conditions = [eq(schema.mercadosUnicos.pesquisaId, input.pesquisaId)];
+
+      if (input.searchQuery) {
+        conditions.push(like(schema.mercadosUnicos.nome, `%${input.searchQuery}%`));
+      }
+
+      const [data, countResult] = await Promise.all([
+        db
+          .select()
+          .from(schema.mercadosUnicos)
+          .where(and(...conditions))
+          .limit(input.pageSize)
+          .offset(offset)
+          .orderBy(desc(schema.mercadosUnicos.quantidadeClientes)),
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(schema.mercadosUnicos)
+          .where(and(...conditions)),
+      ]);
+
+      return {
+        data,
+        total: countResult[0].count,
+        page: input.page,
+        pageSize: input.pageSize,
+        totalPages: Math.ceil(countResult[0].count / input.pageSize),
+      };
+    }),
+
+  /**
+   * Buscar detalhes de um cliente
+   */
+  getClienteById: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const [cliente] = await db
+        .select()
+        .from(schema.clientes)
+        .where(eq(schema.clientes.id, input.id));
+
+      return cliente || null;
+    }),
+
+  /**
+   * Buscar detalhes de um lead
+   */
+  getLeadById: protectedProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+    const [lead] = await db.select().from(schema.leads).where(eq(schema.leads.id, input.id));
+
+    return lead || null;
+  }),
+});
