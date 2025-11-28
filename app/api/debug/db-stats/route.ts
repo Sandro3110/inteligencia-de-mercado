@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/server/db';
-import { projects, pesquisas, clientes, concorrentes, leads, mercadosUnicos } from '@/drizzle/schema';
-import { count } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 
 export async function GET() {
   try {
@@ -15,55 +14,61 @@ export async function GET() {
     }
 
     // Buscar todos os projetos
-    const allProjects = await db.select({
-      id: projects.id,
-      nome: projects.nome,
-      status: projects.status,
-      ativo: projects.ativo,
-    }).from(projects);
+    const allProjects = await db.execute(sql`
+      SELECT id, nome, status, ativo 
+      FROM projects 
+      ORDER BY id
+    `);
 
     // Buscar todas as pesquisas
-    const allPesquisas = await db.select({
-      id: pesquisas.id,
-      nome: pesquisas.nome,
-      projectId: pesquisas.projectId,
-      status: pesquisas.status,
-    }).from(pesquisas);
+    const allPesquisas = await db.execute(sql`
+      SELECT id, nome, project_id as "projectId", status 
+      FROM pesquisas 
+      ORDER BY project_id, id
+    `);
 
     // Contar clientes por projeto
-    const clientesCount = await db.select({
-      projectId: clientes.projectId,
-      count: count(),
-    }).from(clientes).groupBy(clientes.projectId);
+    const clientesCount = await db.execute(sql`
+      SELECT project_id as "projectId", COUNT(*)::int as count 
+      FROM clientes 
+      GROUP BY project_id 
+      ORDER BY project_id
+    `);
 
     // Contar concorrentes por projeto
-    const concorrentesCount = await db.select({
-      projectId: concorrentes.projectId,
-      count: count(),
-    }).from(concorrentes).groupBy(concorrentes.projectId);
+    const concorrentesCount = await db.execute(sql`
+      SELECT project_id as "projectId", COUNT(*)::int as count 
+      FROM concorrentes 
+      GROUP BY project_id 
+      ORDER BY project_id
+    `);
 
     // Contar leads por projeto
-    const leadsCount = await db.select({
-      projectId: leads.projectId,
-      count: count(),
-    }).from(leads).groupBy(leads.projectId);
+    const leadsCount = await db.execute(sql`
+      SELECT project_id as "projectId", COUNT(*)::int as count 
+      FROM leads 
+      GROUP BY project_id 
+      ORDER BY project_id
+    `);
 
     // Contar mercados por projeto
-    const mercadosCount = await db.select({
-      projectId: mercadosUnicos.projectId,
-      count: count(),
-    }).from(mercadosUnicos).groupBy(mercadosUnicos.projectId);
+    const mercadosCount = await db.execute(sql`
+      SELECT project_id as "projectId", COUNT(*)::int as count 
+      FROM "mercadosUnicos" 
+      GROUP BY project_id 
+      ORDER BY project_id
+    `);
 
     return NextResponse.json({
       success: true,
       data: {
-        projects: allProjects,
-        pesquisas: allPesquisas,
+        projects: allProjects.rows,
+        pesquisas: allPesquisas.rows,
         counts: {
-          clientes: clientesCount,
-          concorrentes: concorrentesCount,
-          leads: leadsCount,
-          mercados: mercadosCount,
+          clientes: clientesCount.rows,
+          concorrentes: concorrentesCount.rows,
+          leads: leadsCount.rows,
+          mercados: mercadosCount.rows,
         },
       },
     });
