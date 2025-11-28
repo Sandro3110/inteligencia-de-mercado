@@ -22,9 +22,11 @@ export const dashboardRouter = createTRPCRouter({
    */
   stats: protectedProcedure
     .input(
-      z.object({
-        projectId: z.number(),
-      })
+      z
+        .object({
+          projectId: z.number().optional(),
+        })
+        .optional()
     )
     .query(async ({ input }) => {
       const db = await getDb();
@@ -32,67 +34,64 @@ export const dashboardRouter = createTRPCRouter({
         throw new Error('Database connection failed');
       }
 
-      const { projectId } = input;
+      const projectId = input?.projectId;
 
       try {
-        // Contar totais
-        const [mercadosResult, clientesResult, concorrentesResult, leadsResult] = await Promise.all(
-          [
-            db
-              .select({ value: count() })
-              .from(mercadosUnicos)
-              .where(eq(mercadosUnicos.projectId, projectId)),
-            db.select({ value: count() }).from(clientes).where(eq(clientes.projectId, projectId)),
-            db
-              .select({ value: count() })
-              .from(concorrentes)
-              .where(eq(concorrentes.projectId, projectId)),
-            db.select({ value: count() }).from(leads).where(eq(leads.projectId, projectId)),
-          ]
-        );
+        // Contar projetos ativos
+        const [projectsResult] = await db
+          .select({ value: count() })
+          .from(projects)
+          .where(eq(projects.ativo, 1));
 
-        // Contar por status de validação - CLIENTES
-        const clientesValidation = await db
-          .select({
-            status: clientes.validationStatus,
-            count: count(),
-          })
-          .from(clientes)
-          .where(eq(clientes.projectId, projectId))
-          .groupBy(clientes.validationStatus);
+        const projectsCount = projectsResult?.value || 0;
 
-        // Contar por status de validação - CONCORRENTES
-        const concorrentesValidation = await db
-          .select({
-            status: concorrentes.validationStatus,
-            count: count(),
-          })
-          .from(concorrentes)
-          .where(eq(concorrentes.projectId, projectId))
-          .groupBy(concorrentes.validationStatus);
+        // Se projectId fornecido, buscar stats específicas
+        if (projectId) {
+          const [pesquisasResult, mercadosResult, leadsResult, clientesResult, concorrentesResult] =
+            await Promise.all([
+              db
+                .select({ value: count() })
+                .from(pesquisas)
+                .where(eq(pesquisas.projectId, projectId)),
+              db
+                .select({ value: count() })
+                .from(mercadosUnicos)
+                .where(eq(mercadosUnicos.projectId, projectId)),
+              db.select({ value: count() }).from(leads).where(eq(leads.projectId, projectId)),
+              db.select({ value: count() }).from(clientes).where(eq(clientes.projectId, projectId)),
+              db
+                .select({ value: count() })
+                .from(concorrentes)
+                .where(eq(concorrentes.projectId, projectId)),
+            ]);
 
-        // Contar por status de validação - LEADS
-        const leadsValidation = await db
-          .select({
-            status: leads.validationStatus,
-            count: count(),
-          })
-          .from(leads)
-          .where(eq(leads.projectId, projectId))
-          .groupBy(leads.validationStatus);
-
-        return {
-          totals: {
+          return {
+            projects: projectsCount,
+            pesquisas: pesquisasResult[0]?.value || 0,
             mercados: mercadosResult[0]?.value || 0,
+            leads: leadsResult[0]?.value || 0,
             clientes: clientesResult[0]?.value || 0,
             concorrentes: concorrentesResult[0]?.value || 0,
-            leads: leadsResult[0]?.value || 0,
-          },
-          validation: {
-            clientes: clientesValidation,
-            concorrentes: concorrentesValidation,
-            leads: leadsValidation,
-          },
+          };
+        }
+
+        // Stats gerais (todos os projetos)
+        const [pesquisasResult, mercadosResult, leadsResult, clientesResult, concorrentesResult] =
+          await Promise.all([
+            db.select({ value: count() }).from(pesquisas),
+            db.select({ value: count() }).from(mercadosUnicos),
+            db.select({ value: count() }).from(leads),
+            db.select({ value: count() }).from(clientes),
+            db.select({ value: count() }).from(concorrentes),
+          ]);
+
+        return {
+          projects: projectsCount,
+          pesquisas: pesquisasResult[0]?.value || 0,
+          mercados: mercadosResult[0]?.value || 0,
+          leads: leadsResult[0]?.value || 0,
+          clientes: clientesResult[0]?.value || 0,
+          concorrentes: concorrentesResult[0]?.value || 0,
         };
       } catch (error) {
         console.error('[Dashboard] Error fetching stats:', error);
