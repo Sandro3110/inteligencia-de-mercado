@@ -72,6 +72,9 @@ export default function ResultsPage() {
     { enabled: activeTab === 'mercados' }
   );
 
+  // Export mutation - usar a mesma do projeto (Excel com 5 abas)
+  const exportProjectMutation = trpc.export.exportProject.useMutation();
+
   // Handlers
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -89,64 +92,26 @@ export default function ResultsPage() {
     setPage(1);
   };
 
-  const exportMutation = trpc.export.exportClientes.useMutation();
-  const exportLeadsMutation = trpc.export.exportLeads.useMutation();
-  const exportConcorrentesMutation = trpc.export.exportConcorrentes.useMutation();
-  const exportMercadosMutation = trpc.export.exportMercados.useMutation();
-  const exportAllMutation = trpc.export.exportAll.useMutation();
-
   const handleExport = async () => {
     try {
-      let result;
-
-      // Exportar baseado na tab ativa
-      switch (activeTab) {
-        case 'clientes':
-          result = await exportMutation.mutateAsync({ pesquisaId: surveyId });
-          break;
-        case 'leads':
-          result = await exportLeadsMutation.mutateAsync({ pesquisaId: surveyId });
-          break;
-        case 'concorrentes':
-          result = await exportConcorrentesMutation.mutateAsync({ pesquisaId: surveyId });
-          break;
-        case 'mercados':
-          result = await exportMercadosMutation.mutateAsync({ pesquisaId: surveyId });
-          break;
-      }
+      // Usar a mesma exportação Excel do projeto (5 abas)
+      const result = await exportProjectMutation.mutateAsync({ projectId });
 
       if (result) {
-        // Download CSV
-        const blob = new Blob([result.data], { type: 'text/csv;charset=utf-8;' });
+        // Download Excel
+        const blob = new Blob([Buffer.from(result.data, 'base64')], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = result.filename;
         link.click();
         URL.revokeObjectURL(link.href);
 
-        toast.success('Dados exportados com sucesso!');
+        toast.success('Excel exportado com sucesso!');
       }
     } catch (error) {
-      toast.error('Erro ao exportar dados');
-      console.error('Export error:', error);
-    }
-  };
-
-  const handleExportAll = async () => {
-    try {
-      const result = await exportAllMutation.mutateAsync({ pesquisaId: surveyId });
-
-      // Download CSV
-      const blob = new Blob([result.data], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = result.filename;
-      link.click();
-      URL.revokeObjectURL(link.href);
-
-      toast.success('Relatório completo exportado com sucesso!');
-    } catch (error) {
-      toast.error('Erro ao exportar relatório');
+      toast.error('Erro ao exportar Excel');
       console.error('Export error:', error);
     }
   };
@@ -301,12 +266,12 @@ export default function ResultsPage() {
   const currentData = getCurrentData();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
       {/* Header */}
       <div className="mb-8">
         <button
           onClick={() => router.push(`/projects/${projectId}`)}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4"
         >
           <ArrowLeft className="w-5 h-5" />
           Voltar para Projeto
@@ -314,46 +279,26 @@ export default function ResultsPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Resultados</h1>
-            <p className="text-gray-600">Pesquisa: {pesquisa?.nome}</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Resultados</h1>
+            <p className="text-gray-600 dark:text-gray-400">Pesquisa: {pesquisa?.nome}</p>
           </div>
 
           <div className="flex gap-2">
             <Button
               onClick={handleExport}
-              disabled={
-                exportMutation.isPending ||
-                exportLeadsMutation.isPending ||
-                exportConcorrentesMutation.isPending ||
-                exportMercadosMutation.isPending
-              }
-              variant="outline"
+              disabled={exportProjectMutation.isPending}
               className="flex items-center gap-2"
             >
               <Download className="w-4 h-4" />
-              {exportMutation.isPending ||
-              exportLeadsMutation.isPending ||
-              exportConcorrentesMutation.isPending ||
-              exportMercadosMutation.isPending
-                ? 'Exportando...'
-                : `Exportar ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`}
-            </Button>
-
-            <Button
-              onClick={handleExportAll}
-              disabled={exportAllMutation.isPending}
-              className="flex items-center gap-2"
-            >
-              <Download className="w-4 h-4" />
-              {exportAllMutation.isPending ? 'Exportando...' : 'Exportar Tudo'}
+              {exportProjectMutation.isPending ? 'Exportando...' : 'Exportar Excel'}
             </Button>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-lg shadow mb-6">
-        <div className="border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6">
+        <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="flex -mb-px">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -368,13 +313,13 @@ export default function ResultsPage() {
                   }}
                   className={`flex items-center gap-2 px-6 py-4 border-b-2 font-medium text-sm transition-colors ${
                     activeTab === tab.id
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
                   {tab.label}
-                  <span className="ml-1 px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">
+                  <span className="ml-1 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-full">
                     {tab.count}
                   </span>
                 </button>
