@@ -3,6 +3,10 @@
  * Usado para gerar dados reais de mercados, produtos, concorrentes e leads
  */
 
+import { getDb } from '../db';
+import { systemSettings } from '../../drizzle/schema';
+import { eq } from 'drizzle-orm';
+
 interface OpenAIMessage {
   role: "system" | "user" | "assistant";
   content: string;
@@ -28,10 +32,33 @@ async function callOpenAI(
   messages: OpenAIMessage[],
   temperature = 0.7
 ): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  // Buscar chave do banco primeiro
+  let apiKey: string | null = null;
+  
+  try {
+    const db = await getDb();
+    if (db) {
+      const [setting] = await db
+        .select()
+        .from(systemSettings)
+        .where(eq(systemSettings.settingKey, 'OPENAI_API_KEY'))
+        .limit(1);
+      
+      if (setting && setting.settingValue) {
+        apiKey = setting.settingValue;
+      }
+    }
+  } catch (error) {
+    console.warn('[OpenAI] Erro ao buscar chave do banco, usando ENV:', error);
+  }
+  
+  // Fallback para ENV
+  if (!apiKey) {
+    apiKey = process.env.OPENAI_API_KEY || null;
+  }
 
   if (!apiKey) {
-    throw new Error("OPENAI_API_KEY not configured");
+    throw new Error("OPENAI_API_KEY not configured in database or environment");
   }
 
   try {

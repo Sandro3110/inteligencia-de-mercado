@@ -2,15 +2,14 @@ import { logger } from '@/lib/logger';
 
 /**
  * Wrapper de LLM com Credenciais Configuráveis
- * Fase 41.2 - Permitir usuário trocar provedor de IA
- *
- * Busca credenciais do banco (enrichment_configs) com fallback para ENV
+ * 
+ * Busca credenciais do banco (system_settings) com fallback para ENV
  * Suporta múltiplos provedores: OpenAI, Gemini, Anthropic
  */
 
 import { eq } from 'drizzle-orm';
 import { getDb } from '../db';
-import { enrichmentConfigs } from '../../drizzle/schema';
+import { systemSettings } from '../../drizzle/schema';
 import { invokeLLM as coreInvokeLLM, type InvokeParams, type InvokeResult } from '../_core/llm';
 
 interface LLMConfig {
@@ -20,22 +19,19 @@ interface LLMConfig {
 }
 
 /**
- * Cache de configurações por projeto (evita múltiplas queries)
+ * Cache de configurações (evita múltiplas queries)
  */
-const configCache = new Map<number, LLMConfig>();
+let configCache: LLMConfig | null = null;
+let cacheTimestamp: number = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
-const cacheTimestamps = new Map<number, number>();
 
 /**
- * Busca configuração de LLM para um projeto
+ * Busca configuração de LLM do system_settings
  */
-async function getLLMConfig(projectId: number): Promise<LLMConfig | null> {
+async function getLLMConfig(): Promise<LLMConfig | null> {
   // Verificar cache
-  const cached = configCache.get(projectId);
-  const timestamp = cacheTimestamps.get(projectId);
-
-  if (cached && timestamp && Date.now() - timestamp < CACHE_TTL) {
-    return cached;
+  if (configCache && cacheTimestamp && Date.now() - cacheTimestamp < CACHE_TTL) {
+    return configCache;
   }
 
   const db = await getDb();
@@ -44,33 +40,43 @@ async function getLLMConfig(projectId: number): Promise<LLMConfig | null> {
   }
 
   try {
-    const result = await db
+    // Buscar chaves de API do system_settings
+    const settings = await db
       .select()
-      .from(enrichmentConfigs)
-      .where(eq(enrichmentConfigs.projectId, projectId))
-      .limit(1);
+      .from(systemSettings)
+      .where(
+        eq(systemSettings.settingKey, 'OPENAI_API_KEY')
+      );
 
-    if (result.length === 0) {
-      return null;
-    }
+    const geminiSettings = await db
+      .select()
+      .from(systemSettings)
+      .where(
+        eq(systemSettings.settingKey, 'GEMINI_API_KEY')
+      );
 
-    const config = result[0];
+    const anthropicSettings = await db
+      .select()
+      .from(systemSettings)
+      .where(
+        eq(systemSettings.settingKey, 'ANTHROPIC_API_KEY')
+      );
 
     // Determinar provedor e API key (prioridade: OpenAI > Gemini > Anthropic)
     let apiKey: string | null = null;
-    let provider: 'openai' | 'gemini' | 'anthropic' = 'gemini';
+    let provider: 'openai' | 'gemini' | 'anthropic' = 'openai';
     let model: string | undefined;
 
-    if (config.openaiApiKey) {
-      apiKey = config.openaiApiKey;
+    if (settings.length > 0 && settings[0].settingValue) {
+      apiKey = settings[0].settingValue;
       provider = 'openai';
       model = 'gpt-4o';
-    } else if (config.geminiApiKey) {
-      apiKey = config.geminiApiKey;
+    } else if (geminiSettings.length > 0 && geminiSettings[0].settingValue) {
+      apiKey = geminiSettings[0].settingValue;
       provider = 'gemini';
       model = 'gemini-2.5-flash';
-    } else if (config.anthropicApiKey) {
-      apiKey = config.anthropicApiKey;
+    } else if (anthropicSettings.length > 0 && anthropicSettings[0].settingValue) {
+      apiKey = anthropicSettings[0].settingValue;
       provider = 'anthropic';
       model = 'claude-3-5-sonnet-20241022';
     }
@@ -86,8 +92,8 @@ async function getLLMConfig(projectId: number): Promise<LLMConfig | null> {
     };
 
     // Atualizar cache
-    configCache.set(projectId, llmConfig);
-    cacheTimestamps.set(projectId, Date.now());
+    configCache = llmConfig;
+    cacheTimestamp = Date.now();
 
     return llmConfig;
   } catch (error) {
@@ -252,7 +258,7 @@ async function invokeAnthropic(apiKey: string, params: InvokeParams): Promise<In
 /**
  * Invoca LLM com credenciais configuráveis
  *
- * @param projectId - ID do projeto (para buscar credenciais)
+ * @param projectId - ID do projeto (mantido por compatibilidade, mas não usado)
  * @param params - Parâmetros do LLM
  * @returns Resultado da invocação
  */
@@ -260,11 +266,11 @@ export async function invokeLLMWithConfig(
   projectId: number,
   params: InvokeParams
 ): Promise<InvokeResult> {
-  // Buscar configuração do projeto
-  const config = await getLLMConfig(projectId);
+  // Buscar configuração global
+  const config = await getLLMConfig();
 
   if (config) {
-    logger.debug(`[LLM] Usando credenciais do projeto ${projectId} (${config.provider})`);
+    logger.debug(`[LLM] Usando credenciais globais (${config.provider})`);
 
     try {
       // Invocar provedor específico
@@ -307,36 +313,31 @@ export async function invokeLLMWithConfig(
 /**
  * Limpa cache de configurações (útil após atualizar credenciais)
  */
-export function clearLLMConfigCache(projectId?: number) {
-  if (projectId) {
-    configCache.delete(projectId);
-    cacheTimestamps.delete(projectId);
-  } else {
-    configCache.clear();
-    cacheTimestamps.clear();
-  }
+export function clearLLMConfigCache() {
+  configCache = null;
+  cacheTimestamp = 0;
 }
 
 /**
- * Valida se as credenciais de um projeto estão funcionando
+ * Valida se as credenciais estão funcionando
  */
-export async function validateLLMConfig(projectId: number): Promise<{
+export async function validateLLMConfig(): Promise<{
   valid: boolean;
   provider?: string;
   error?: string;
 }> {
-  const config = await getLLMConfig(projectId);
+  const config = await getLLMConfig();
 
   if (!config) {
     return {
       valid: false,
-      error: 'Nenhuma credencial configurada para este projeto',
+      error: 'Nenhuma credencial configurada no sistema',
     };
   }
 
   try {
     // Fazer uma chamada simples para testar
-    const result = await invokeLLMWithConfig(projectId, {
+    const result = await invokeLLMWithConfig(0, {
       messages: [
         { role: 'system', content: 'Você é um assistente útil.' },
         { role: 'user', content: 'Responda apenas "OK"' },
@@ -358,9 +359,9 @@ export async function validateLLMConfig(projectId: number): Promise<{
 }
 
 /**
- * Lista provedores disponíveis para um projeto
+ * Lista provedores disponíveis
  */
-export async function getAvailableProviders(projectId: number): Promise<
+export async function getAvailableProviders(): Promise<
   {
     provider: 'openai' | 'gemini' | 'anthropic';
     configured: boolean;
@@ -373,36 +374,38 @@ export async function getAvailableProviders(projectId: number): Promise<
   }
 
   try {
-    const result = await db
+    const openaiSettings = await db
       .select()
-      .from(enrichmentConfigs)
-      .where(eq(enrichmentConfigs.projectId, projectId))
+      .from(systemSettings)
+      .where(eq(systemSettings.settingKey, 'OPENAI_API_KEY'))
       .limit(1);
 
-    if (result.length === 0) {
-      return [
-        { provider: 'openai', configured: false },
-        { provider: 'gemini', configured: false },
-        { provider: 'anthropic', configured: false },
-      ];
-    }
+    const geminiSettings = await db
+      .select()
+      .from(systemSettings)
+      .where(eq(systemSettings.settingKey, 'GEMINI_API_KEY'))
+      .limit(1);
 
-    const config = result[0];
+    const anthropicSettings = await db
+      .select()
+      .from(systemSettings)
+      .where(eq(systemSettings.settingKey, 'ANTHROPIC_API_KEY'))
+      .limit(1);
 
     return [
       {
         provider: 'openai',
-        configured: !!config.openaiApiKey,
+        configured: openaiSettings.length > 0 && !!openaiSettings[0].settingValue,
         model: 'gpt-4o',
       },
       {
         provider: 'gemini',
-        configured: !!config.geminiApiKey,
+        configured: geminiSettings.length > 0 && !!geminiSettings[0].settingValue,
         model: 'gemini-2.5-flash',
       },
       {
         provider: 'anthropic',
-        configured: !!config.anthropicApiKey,
+        configured: anthropicSettings.length > 0 && !!anthropicSettings[0].settingValue,
         model: 'claude-3-5-sonnet-20241022',
       },
     ];

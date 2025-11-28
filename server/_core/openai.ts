@@ -6,6 +6,9 @@ import { logger } from '@/lib/logger';
  */
 
 import type { Message, InvokeResult, ResponseFormat, Tool, ToolChoice } from './llm';
+import { getDb } from '../db';
+import { systemSettings } from '../../drizzle/schema';
+import { eq } from 'drizzle-orm';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const DEFAULT_MODEL = 'gpt-4o-mini';
@@ -22,10 +25,33 @@ export async function invokeOpenAI(params: {
   tools?: Tool[];
   tool_choice?: ToolChoice;
 }): Promise<InvokeResult> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  // Buscar chave do banco primeiro
+  let apiKey: string | null = null;
+  
+  try {
+    const db = await getDb();
+    if (db) {
+      const [setting] = await db
+        .select()
+        .from(systemSettings)
+        .where(eq(systemSettings.settingKey, 'OPENAI_API_KEY'))
+        .limit(1);
+      
+      if (setting && setting.settingValue) {
+        apiKey = setting.settingValue;
+      }
+    }
+  } catch (error) {
+    console.warn('[OpenAI] Erro ao buscar chave do banco, usando ENV:', error);
+  }
+  
+  // Fallback para ENV
+  if (!apiKey) {
+    apiKey = process.env.OPENAI_API_KEY || null;
+  }
 
   if (!apiKey) {
-    throw new Error('OPENAI_API_KEY não configurada');
+    throw new Error('OPENAI_API_KEY não configurada no banco ou ambiente');
   }
 
   const {
