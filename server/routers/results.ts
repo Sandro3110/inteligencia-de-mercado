@@ -5,9 +5,9 @@
 
 import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
 import { z } from 'zod';
-import { db } from '@/server/db';
+import { getDb } from '@/server/db';
 import * as schema from '@/drizzle/schema';
-import { eq, and, or, like, desc, sql } from 'drizzle-orm';
+import { eq, and, or, like, desc, count } from 'drizzle-orm';
 
 export const resultsRouter = createTRPCRouter({
   /**
@@ -16,30 +16,33 @@ export const resultsRouter = createTRPCRouter({
   getKPIs: protectedProcedure
     .input(z.object({ pesquisaId: z.number() }))
     .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database connection failed');
+
       const [clientes, concorrentes, leads, mercados] = await Promise.all([
         db
-          .select({ count: sql<number>`count(*)` })
+          .select({ count: count() })
           .from(schema.clientes)
           .where(eq(schema.clientes.pesquisaId, input.pesquisaId)),
         db
-          .select({ count: sql<number>`count(*)` })
+          .select({ count: count() })
           .from(schema.concorrentes)
           .where(eq(schema.concorrentes.pesquisaId, input.pesquisaId)),
         db
-          .select({ count: sql<number>`count(*)` })
+          .select({ count: count() })
           .from(schema.leads)
           .where(eq(schema.leads.pesquisaId, input.pesquisaId)),
         db
-          .select({ count: sql<number>`count(distinct id)` })
+          .select({ count: count() })
           .from(schema.mercadosUnicos)
           .where(eq(schema.mercadosUnicos.pesquisaId, input.pesquisaId)),
       ]);
 
       return {
-        totalClientes: clientes[0].count,
-        totalConcorrentes: concorrentes[0].count,
-        totalLeads: leads[0].count,
-        totalMercados: mercados[0].count,
+        totalClientes: clientes[0]?.count || 0,
+        totalConcorrentes: concorrentes[0]?.count || 0,
+        totalLeads: leads[0]?.count || 0,
+        totalMercados: mercados[0]?.count || 0,
       };
     }),
 
@@ -64,6 +67,9 @@ export const resultsRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database connection failed');
+
       const offset = (input.page - 1) * input.pageSize;
 
       const conditions = [eq(schema.clientes.pesquisaId, input.pesquisaId)];
@@ -85,7 +91,7 @@ export const resultsRouter = createTRPCRouter({
           or(
             like(schema.clientes.nome, `%${input.searchQuery}%`),
             like(schema.clientes.cnpj, `%${input.searchQuery}%`)
-          )
+          )!
         );
       }
 
@@ -98,17 +104,17 @@ export const resultsRouter = createTRPCRouter({
           .offset(offset)
           .orderBy(desc(schema.clientes.createdAt)),
         db
-          .select({ count: sql<number>`count(*)` })
+          .select({ count: count() })
           .from(schema.clientes)
           .where(and(...conditions)),
       ]);
 
       return {
         data,
-        total: countResult[0].count,
+        total: countResult[0]?.count || 0,
         page: input.page,
         pageSize: input.pageSize,
-        totalPages: Math.ceil(countResult[0].count / input.pageSize),
+        totalPages: Math.ceil((countResult[0]?.count || 0) / input.pageSize),
       };
     }),
 
@@ -133,6 +139,9 @@ export const resultsRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database connection failed');
+
       const offset = (input.page - 1) * input.pageSize;
 
       const conditions = [eq(schema.leads.pesquisaId, input.pesquisaId)];
@@ -156,7 +165,7 @@ export const resultsRouter = createTRPCRouter({
           or(
             like(schema.leads.nome, `%${input.searchQuery}%`),
             like(schema.leads.cnpj, `%${input.searchQuery}%`)
-          )
+          )!
         );
       }
 
@@ -169,17 +178,17 @@ export const resultsRouter = createTRPCRouter({
           .offset(offset)
           .orderBy(desc(schema.leads.qualidadeScore)),
         db
-          .select({ count: sql<number>`count(*)` })
+          .select({ count: count() })
           .from(schema.leads)
           .where(and(...conditions)),
       ]);
 
       return {
         data,
-        total: countResult[0].count,
+        total: countResult[0]?.count || 0,
         page: input.page,
         pageSize: input.pageSize,
-        totalPages: Math.ceil(countResult[0].count / input.pageSize),
+        totalPages: Math.ceil((countResult[0]?.count || 0) / input.pageSize),
       };
     }),
 
@@ -203,6 +212,9 @@ export const resultsRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database connection failed');
+
       const offset = (input.page - 1) * input.pageSize;
 
       const conditions = [eq(schema.concorrentes.pesquisaId, input.pesquisaId)];
@@ -221,7 +233,7 @@ export const resultsRouter = createTRPCRouter({
           or(
             like(schema.concorrentes.nome, `%${input.searchQuery}%`),
             like(schema.concorrentes.cnpj, `%${input.searchQuery}%`)
-          )
+          )!
         );
       }
 
@@ -234,17 +246,17 @@ export const resultsRouter = createTRPCRouter({
           .offset(offset)
           .orderBy(desc(schema.concorrentes.createdAt)),
         db
-          .select({ count: sql<number>`count(*)` })
+          .select({ count: count() })
           .from(schema.concorrentes)
           .where(and(...conditions)),
       ]);
 
       return {
         data,
-        total: countResult[0].count,
+        total: countResult[0]?.count || 0,
         page: input.page,
         pageSize: input.pageSize,
-        totalPages: Math.ceil(countResult[0].count / input.pageSize),
+        totalPages: Math.ceil((countResult[0]?.count || 0) / input.pageSize),
       };
     }),
 
@@ -261,6 +273,9 @@ export const resultsRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database connection failed');
+
       const offset = (input.page - 1) * input.pageSize;
 
       const conditions = [eq(schema.mercadosUnicos.pesquisaId, input.pesquisaId)];
@@ -278,17 +293,17 @@ export const resultsRouter = createTRPCRouter({
           .offset(offset)
           .orderBy(desc(schema.mercadosUnicos.quantidadeClientes)),
         db
-          .select({ count: sql<number>`count(*)` })
+          .select({ count: count() })
           .from(schema.mercadosUnicos)
           .where(and(...conditions)),
       ]);
 
       return {
         data,
-        total: countResult[0].count,
+        total: countResult[0]?.count || 0,
         page: input.page,
         pageSize: input.pageSize,
-        totalPages: Math.ceil(countResult[0].count / input.pageSize),
+        totalPages: Math.ceil((countResult[0]?.count || 0) / input.pageSize),
       };
     }),
 
@@ -298,6 +313,9 @@ export const resultsRouter = createTRPCRouter({
   getClienteById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database connection failed');
+
       const [cliente] = await db
         .select()
         .from(schema.clientes)
@@ -310,6 +328,9 @@ export const resultsRouter = createTRPCRouter({
    * Buscar detalhes de um lead
    */
   getLeadById: protectedProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database connection failed');
+
     const [lead] = await db.select().from(schema.leads).where(eq(schema.leads.id, input.id));
 
     return lead || null;

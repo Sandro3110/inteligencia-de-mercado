@@ -223,4 +223,111 @@ export const dashboardRouter = createTRPCRouter({
         throw new Error('Failed to fetch project summary');
       }
     }),
+
+  /**
+   * Obter lista de projetos com contagens
+   */
+  getProjects: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) {
+      throw new Error('Database connection failed');
+    }
+
+    try {
+      const projectsData = await db
+        .select({
+          id: projects.id,
+          nome: projects.nome,
+          descricao: projects.descricao,
+          status: projects.status,
+          createdAt: projects.createdAt,
+        })
+        .from(projects)
+        .where(eq(projects.ativo, 1))
+        .orderBy(desc(projects.createdAt));
+
+      // Para cada projeto, buscar contagens
+      const projectsWithCounts = await Promise.all(
+        projectsData.map(async (project) => {
+          const [pesquisasResult, leadsResult, clientesResult] = await Promise.all([
+            db
+              .select({ count: count() })
+              .from(pesquisas)
+              .where(and(eq(pesquisas.projectId, project.id), eq(pesquisas.ativo, 1))),
+            db.select({ count: count() }).from(leads).where(eq(leads.projectId, project.id)),
+            db.select({ count: count() }).from(clientes).where(eq(clientes.projectId, project.id)),
+          ]);
+
+          return {
+            ...project,
+            pesquisasCount: pesquisasResult[0]?.count || 0,
+            leadsCount: leadsResult[0]?.count || 0,
+            clientesCount: clientesResult[0]?.count || 0,
+          };
+        })
+      );
+
+      return projectsWithCounts;
+    } catch (error) {
+      console.error('[Dashboard] Error fetching projects:', error);
+      throw new Error('Failed to fetch projects');
+    }
+  }),
+
+  /**
+   * Obter pesquisas de um projeto com contagens
+   */
+  getProjectPesquisas: protectedProcedure
+    .input(z.object({ projectId: z.number() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new Error('Database connection failed');
+      }
+
+      try {
+        const pesquisasData = await db
+          .select({
+            id: pesquisas.id,
+            projectId: pesquisas.projectId,
+            nome: pesquisas.nome,
+            descricao: pesquisas.descricao,
+            totalClientes: pesquisas.totalClientes,
+            clientesEnriquecidos: pesquisas.clientesEnriquecidos,
+            status: pesquisas.status,
+          })
+          .from(pesquisas)
+          .where(and(eq(pesquisas.projectId, input.projectId), eq(pesquisas.ativo, 1)))
+          .orderBy(desc(pesquisas.createdAt));
+
+        // Para cada pesquisa, buscar contagens
+        const pesquisasWithCounts = await Promise.all(
+          pesquisasData.map(async (pesquisa) => {
+            const [leadsResult, mercadosResult, concorrentesResult] = await Promise.all([
+              db.select({ count: count() }).from(leads).where(eq(leads.pesquisaId, pesquisa.id)),
+              db
+                .select({ count: count() })
+                .from(mercadosUnicos)
+                .where(eq(mercadosUnicos.pesquisaId, pesquisa.id)),
+              db
+                .select({ count: count() })
+                .from(concorrentes)
+                .where(eq(concorrentes.pesquisaId, pesquisa.id)),
+            ]);
+
+            return {
+              ...pesquisa,
+              leadsCount: leadsResult[0]?.count || 0,
+              mercadosCount: mercadosResult[0]?.count || 0,
+              concorrentesCount: concorrentesResult[0]?.count || 0,
+            };
+          })
+        );
+
+        return pesquisasWithCounts;
+      } catch (error) {
+        console.error('[Dashboard] Error fetching project pesquisas:', error);
+        throw new Error('Failed to fetch project pesquisas');
+      }
+    }),
 });
