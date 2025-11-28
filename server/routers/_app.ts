@@ -68,6 +68,7 @@ export const appRouter = createTRPCRouter({
   // Enrichment
   enrichment: enrichmentRouter,
   recommendations: recommendationsRouter,
+  reports: reportsRouter,
 import { recommendationsRouter } from './recommendations';
 
   // Alerts
