@@ -21,6 +21,7 @@ import { leadsRouter } from './leads';
 import { dashboardRouter } from './dashboard';
 import { analyticsRouter } from './analytics';
 import { enrichmentRouter } from './enrichment';
+import { recommendationsRouter } from './recommendations';
 import { alertsRouter } from './alerts';
 import { clientesRouter } from './clientes';
 import { concorrentesRouter } from './concorrentes';
@@ -66,6 +67,8 @@ export const appRouter = createTRPCRouter({
 
   // Enrichment
   enrichment: enrichmentRouter,
+  recommendations: recommendationsRouter,
+import { recommendationsRouter } from './recommendations';
 
   // Alerts
   alerts: alertsRouter,
