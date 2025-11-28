@@ -11,7 +11,7 @@ import { logger } from '@/lib/logger';
 
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import * as schema from '../../drizzle/schema.js';
+import * as schema from '../../drizzle/schema';
 
 // Cache global de conexão (persiste entre invocações)
 let cachedDb: ReturnType<typeof drizzle> | null = null;
