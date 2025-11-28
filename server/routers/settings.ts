@@ -1,128 +1,98 @@
 import { z } from 'zod';
-import { router, protectedProcedure } from '../_core/trpc';
-import { getDb } from '../db';
-import { llmProviderConfigs } from '@/drizzle/schema';
+import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
+import { getDb } from '@/server/db';
+import { systemSettings } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 
-export const settingsRouter = router({
-  // Buscar configurações de LLM do projeto
-  getLlmConfig: protectedProcedure
-    .input(z.object({ projectId: z.number() }))
-    .query(async ({ input }) => {
-      const db = getDb();
-      if (!db) throw new Error('Database not available');
+/**
+ * Settings Router - Gerenciamento de configurações do sistema
+ */
+export const settingsRouter = createTRPCRouter({
+  /**
+   * Buscar todas as configurações
+   */
+  getAll: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new Error('Database connection failed');
 
-      const [config] = await db
-        .select()
-        .from(llmProviderConfigs)
-        .where(eq(llmProviderConfigs.projectId, input.projectId))
-        .limit(1);
+    return await db.select().from(systemSettings);
+  }),
 
-      return config || null;
-    }),
+  /**
+   * Buscar configuração específica
+   */
+  get: protectedProcedure.input(z.object({ key: z.string() })).query(async ({ input }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database connection failed');
 
-  // Salvar/atualizar configurações de LLM
-  saveLlmConfig: protectedProcedure
+    const [setting] = await db
+      .select()
+      .from(systemSettings)
+      .where(eq(systemSettings.settingKey, input.key))
+      .limit(1);
+
+    return setting || null;
+  }),
+
+  /**
+   * Salvar/atualizar configuração
+   */
+  set: protectedProcedure
     .input(
       z.object({
-        projectId: z.number(),
-        activeProvider: z.enum(['openai', 'gemini', 'anthropic']),
-        openaiApiKey: z.string().optional(),
-        openaiModel: z.string().optional(),
-        openaiEnabled: z.boolean().optional(),
-        geminiApiKey: z.string().optional(),
-        geminiModel: z.string().optional(),
-        geminiEnabled: z.boolean().optional(),
-        anthropicApiKey: z.string().optional(),
-        anthropicModel: z.string().optional(),
-        anthropicEnabled: z.boolean().optional(),
+        key: z.string(),
+        value: z.string(),
+        description: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
-      const db = getDb();
-      if (!db) throw new Error('Database not available');
+      const db = await getDb();
+      if (!db) throw new Error('Database connection failed');
 
       // Verificar se já existe
       const [existing] = await db
         .select()
-        .from(llmProviderConfigs)
-        .where(eq(llmProviderConfigs.projectId, input.projectId))
+        .from(systemSettings)
+        .where(eq(systemSettings.settingKey, input.key))
         .limit(1);
 
       if (existing) {
-        // Atualizar
-        await db
-          .update(llmProviderConfigs)
+        // Update
+        const [updated] = await db
+          .update(systemSettings)
           .set({
-            activeProvider: input.activeProvider,
-            openaiApiKey: input.openaiApiKey,
-            openaiModel: input.openaiModel,
-            openaiEnabled: input.openaiEnabled ? 1 : 0,
-            geminiApiKey: input.geminiApiKey,
-            geminiModel: input.geminiModel,
-            geminiEnabled: input.geminiEnabled ? 1 : 0,
-            anthropicApiKey: input.anthropicApiKey,
-            anthropicModel: input.anthropicModel,
-            anthropicEnabled: input.anthropicEnabled ? 1 : 0,
+            settingValue: input.value,
+            description: input.description || existing.description,
             updatedAt: new Date().toISOString(),
           })
-          .where(eq(llmProviderConfigs.projectId, input.projectId));
+          .where(eq(systemSettings.settingKey, input.key))
+          .returning();
 
-        return { success: true, action: 'updated' };
+        return updated;
       } else {
-        // Inserir
-        await db.insert(llmProviderConfigs).values({
-          projectId: input.projectId,
-          activeProvider: input.activeProvider,
-          openaiApiKey: input.openaiApiKey,
-          openaiModel: input.openaiModel || 'gpt-4o',
-          openaiEnabled: input.openaiEnabled ? 1 : 0,
-          geminiApiKey: input.geminiApiKey,
-          geminiModel: input.geminiModel || 'gemini-2.0-flash-exp',
-          geminiEnabled: input.geminiEnabled ? 1 : 0,
-          anthropicApiKey: input.anthropicApiKey,
-          anthropicModel: input.anthropicModel || 'claude-3-5-sonnet-20241022',
-          anthropicEnabled: input.anthropicEnabled ? 1 : 0,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
+        // Insert
+        const [created] = await db
+          .insert(systemSettings)
+          .values({
+            settingKey: input.key,
+            settingValue: input.value,
+            description: input.description,
+          })
+          .returning();
 
-        return { success: true, action: 'created' };
+        return created;
       }
     }),
 
-  // Testar conexão com provider
-  testLlmConnection: protectedProcedure
-    .input(
-      z.object({
-        provider: z.enum(['openai', 'gemini', 'anthropic']),
-        apiKey: z.string(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      try {
-        if (input.provider === 'openai') {
-          const response = await fetch('https://api.openai.com/v1/models', {
-            headers: {
-              Authorization: `Bearer ${input.apiKey}`,
-            },
-          });
+  /**
+   * Deletar configuração
+   */
+  delete: protectedProcedure.input(z.object({ key: z.string() })).mutation(async ({ input }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database connection failed');
 
-          if (response.ok) {
-            return { success: true, message: 'Conexão com OpenAI estabelecida com sucesso' };
-          } else {
-            const error = await response.json();
-            return {
-              success: false,
-              message: error.error?.message || 'Erro ao conectar com OpenAI',
-            };
-          }
-        }
+    await db.delete(systemSettings).where(eq(systemSettings.settingKey, input.key));
 
-        // TODO: Implementar testes para Gemini e Anthropic
-        return { success: false, message: 'Provider não implementado ainda' };
-      } catch (error: any) {
-        return { success: false, message: error.message };
-      }
-    }),
+    return { success: true };
+  }),
 });
