@@ -1,9 +1,4 @@
 // SISTEMA DE CAMADAS: Prompts especializados para fallback inteligente
-import { OpenAI } from 'openai';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 interface ClienteBasico {
   nome: string;
@@ -88,23 +83,37 @@ IMPORTANTE:
   console.log(`[Camada 3A] Gerando mercados especializados para: ${cliente.nome}`);
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: 'Você é um especialista em mercados B2B. Retorne APENAS JSON válido.',
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      temperature: 0.2,
-      max_tokens: 8000,
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: 'Você é um especialista em mercados B2B. Retorne APENAS JSON válido.',
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.2,
+        max_tokens: 8000,
+      }),
     });
 
-    const content = completion.choices[0]?.message?.content;
+    if (!response.ok) {
+      throw new Error(`OpenAI error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const completion = data;
+
+    const content = completion.choices?.[0]?.message?.content;
     if (!content) {
       throw new Error('No content in OpenAI response');
     }
@@ -168,23 +177,37 @@ IMPORTANTE:
   console.log(`[Camada 3B] Enriquecendo dados do cliente: ${cliente.nome}`);
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: 'Você é um especialista em dados empresariais. Retorne APENAS JSON válido.',
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      temperature: 0.1,
-      max_tokens: 1000,
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: 'Você é um especialista em dados empresariais. Retorne APENAS JSON válido.',
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.1,
+        max_tokens: 1000,
+      }),
     });
 
-    const content = completion.choices[0]?.message?.content;
+    if (!response.ok) {
+      throw new Error(`OpenAI error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const completion = data;
+
+    const content = completion.choices?.[0]?.message?.content;
     if (!content) {
       throw new Error('No content in OpenAI response');
     }
