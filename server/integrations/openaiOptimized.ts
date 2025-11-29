@@ -149,15 +149,18 @@ Para cada mercado, forneça:
    - Descrição detalhada (benefícios, aplicações)
    - Categoria/tipo
 
-⚔️ **10 CONCORRENTES DIRETOS:**
-   **CRITÉRIOS DE SELEÇÃO:**
-   - Empresas REAIS que existem no Brasil
-   - Competem DIRETAMENTE pelos mesmos clientes
-   - Porte SIMILAR (pequeno/médio/grande)
-   - Região SIMILAR (se empresa for regional)
-   - NÃO liste apenas grandes marcas nacionais
-   - NÃO liste empresas de segmentos diferentes
-   - Priorize empresas específicas do nicho
+⚔️ **CONCORRENTES DIRETOS (MÍNIMO 8, IDEAL 10-12):**
+   
+   ⚠️ **IMPORTANTE:** Você DEVE gerar pelo menos 8 concorrentes.
+   Se não encontrar 8 empresas que atendam TODOS os critérios abaixo,
+   relaxe os critérios de região ou porte, mas SEMPRE gere pelo menos 8.
+   
+   **CRITÉRIOS DE SELEÇÃO (EM ORDEM DE PRIORIDADE):**
+   1. OBRIGATÓRIO: Empresas REAIS que existem no Brasil
+   2. OBRIGATÓRIO: Competem no mesmo mercado/segmento
+   3. PREFERENCIAL: Porte similar (pode variar se necessário)
+   4. PREFERENCIAL: Região similar (pode expandir se necessário)
+   5. ACEITÁVEL: Grandes marcas nacionais (se necessário para completar)
    
    Para cada concorrente:
    - Nome oficial da empresa
@@ -170,7 +173,12 @@ Para cada mercado, forneça:
    - Latitude e longitude aproximadas do centro da cidade
    - Região de atuação (se relevante)
 
-💼 **5 LEADS QUALIFICADOS:**
+💼 **LEADS QUALIFICADOS (MÍNIMO 5, IDEAL 8-10):**
+   
+   ⚠️ **IMPORTANTE:** Você DEVE gerar pelo menos 5 leads.
+   Se não encontrar 5 empresas, expanda para regiões próximas ou
+   segmentos adjacentes, mas SEMPRE gere pelo menos 5.
+   
    **CRITÉRIOS DE QUALIFICAÇÃO:**
    - Empresas REAIS que existem no Brasil
    - Têm MOTIVO REAL para comprar (especifique!)
@@ -306,7 +314,7 @@ Para cada mercado, forneça:
             content: userPrompt,
           },
         ],
-        temperature: 0.3, // Mais baixa para respostas factuais e consistentes
+        temperature: 0.8, // Mais alta para gerar mais concorrentes/leads de primeira
         max_tokens: 5000, // Aumentado para acomodar descrições detalhadas
         response_format: { type: 'json_object' }, // Força resposta em JSON
       }),

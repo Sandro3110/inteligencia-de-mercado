@@ -109,10 +109,10 @@ export async function enrichClienteOptimized(
       throw new Error(`Cliente ${clienteId} not found`);
     }
 
-    logger.debug(`[Enrich] 🚀 Starting OPTIMIZED enrichment for: ${cliente.nome}`);
+    console.log(`[Enrich] 🚀 Starting OPTIMIZED enrichment for: ${cliente.nome}`);
 
     // 2. SISTEMA DE CAMADAS: Tentar gerar dados com fallback inteligente
-    logger.debug(`[Enrich] CAMADA 1: Tentando gerar TUDO com 1 chamada...`);
+    console.log(`[Enrich] CAMADA 1: Tentando gerar TUDO com 1 chamada...`);
     let allData;
 
     try {
@@ -123,13 +123,13 @@ export async function enrichClienteOptimized(
         cidade: cliente.cidade || undefined,
       });
     } catch (error) {
-      logger.warn(`[Enrich] CAMADA 1 falhou com erro: ${error}`);
+      console.log(`[Enrich] ⚠️ CAMADA 1 falhou com erro: ${error}`);
       allData = { mercados: [], clienteEnriquecido: null };
     }
 
     // CAMADA 2: Verificar se precisa de fallback
     if (!allData.mercados || allData.mercados.length === 0) {
-      logger.warn(`[Enrich] CAMADA 1 falhou (0 mercados). Tentando CAMADA 3A...`);
+      console.log(`[Enrich] CAMADA 1 falhou (0 mercados). Tentando CAMADA 3A...`);
 
       // CAMADA 3A: Prompt especializado para mercados
       const mercadosEspecializados = await generateMercadosEspecializados({
@@ -142,10 +142,10 @@ export async function enrichClienteOptimized(
       });
 
       if (mercadosEspecializados && mercadosEspecializados.length > 0) {
-        logger.info(`[Enrich] ✅ CAMADA 3A: ${mercadosEspecializados.length} mercados gerados`);
+        console.log(`[Enrich] ✅ CAMADA 3A: ${mercadosEspecializados.length} mercados gerados`);
         allData.mercados = mercadosEspecializados;
       } else {
-        logger.warn(`[Enrich] CAMADA 3A falhou. Usando CAMADA 4 (dados mínimos)...`);
+        console.log(`[Enrich] CAMADA 3A falhou. Usando CAMADA 4 (dados mínimos)...`);
 
         // CAMADA 4: Dados mínimos garantidos
         const dadosMinimos = generateDadosMinimos({
@@ -161,15 +161,94 @@ export async function enrichClienteOptimized(
         if (!allData.clienteEnriquecido) {
           allData.clienteEnriquecido = dadosMinimos.clienteEnriquecido;
         }
-        logger.info(`[Enrich] ✅ CAMADA 4: Dados mínimos garantidos`);
+        console.log(`[Enrich] ✅ CAMADA 4: Dados mínimos garantidos`);
       }
     } else {
-      logger.info(`[Enrich] ✅ CAMADA 1: ${allData.mercados.length} mercados gerados`);
+      console.log(`[Enrich] ✅ CAMADA 1: ${allData.mercados.length} mercados gerados`);
+
+      // FASE 2: VALIDAÇÃO DE QUANTIDADE
+      const totalConcorrentes = allData.mercados.reduce(
+        (sum, m) => sum + (m.concorrentes?.length || 0),
+        0
+      );
+      const totalLeads = allData.mercados.reduce((sum, m) => sum + (m.leads?.length || 0), 0);
+
+      if (totalConcorrentes < 8 || totalLeads < 5) {
+        console.log(
+          `[Enrich] ⚠️ CAMADA 1: Quantidade baixa (${totalConcorrentes}C ${totalLeads}L). Ativando CAMADA 3C...`
+        );
+
+        // CAMADA 3C: Completar concorrentes e leads
+        const { generateMaisConcorrentes, generateMaisLeads } =
+          await import('./integrations/openaiLayered');
+
+        for (const mercado of allData.mercados) {
+          // Completar concorrentes se < 8
+          const concorrentesAtuais = mercado.concorrentes?.length || 0;
+          if (concorrentesAtuais < 8) {
+            const faltam = 8 - concorrentesAtuais;
+            const maisConcorrentes = await generateMaisConcorrentes(
+              {
+                nome: cliente.nome,
+                cnpj: cliente.cnpj || undefined,
+                produtoPrincipal: cliente.produtoPrincipal || undefined,
+                cidade: cliente.cidade || undefined,
+                uf: cliente.uf || undefined,
+              },
+              mercado.mercado?.nome || 'Mercado',
+              mercado.concorrentes || [],
+              faltam
+            );
+
+            if (maisConcorrentes.length > 0) {
+              mercado.concorrentes = [...(mercado.concorrentes || []), ...maisConcorrentes];
+              console.log(
+                `[Enrich] ✅ CAMADA 3C: +${maisConcorrentes.length} concorrentes adicionados`
+              );
+            }
+          }
+
+          // Completar leads se < 5
+          const leadsAtuais = mercado.leads?.length || 0;
+          if (leadsAtuais < 5) {
+            const faltam = 5 - leadsAtuais;
+            const maisLeads = await generateMaisLeads(
+              {
+                nome: cliente.nome,
+                cnpj: cliente.cnpj || undefined,
+                produtoPrincipal: cliente.produtoPrincipal || undefined,
+                cidade: cliente.cidade || undefined,
+                uf: cliente.uf || undefined,
+              },
+              mercado.mercado?.nome || 'Mercado',
+              mercado.leads || [],
+              faltam
+            );
+
+            if (maisLeads.length > 0) {
+              mercado.leads = [...(mercado.leads || []), ...maisLeads];
+              console.log(`[Enrich] ✅ CAMADA 3C: +${maisLeads.length} leads adicionados`);
+            }
+          }
+        }
+
+        // Recalcular totais
+        const novoTotalConcorrentes = allData.mercados.reduce(
+          (sum, m) => sum + (m.concorrentes?.length || 0),
+          0
+        );
+        const novoTotalLeads = allData.mercados.reduce((sum, m) => sum + (m.leads?.length || 0), 0);
+        console.log(
+          `[Enrich] ✅ CAMADA 3C: Total final (${novoTotalConcorrentes}C ${novoTotalLeads}L)`
+        );
+      } else {
+        console.log(`[Enrich] ✅ CAMADA 1: Quantidade OK (${totalConcorrentes}C ${totalLeads}L)`);
+      }
     }
 
     // CAMADA 3B: Se dados do cliente estão incompletos, tentar enriquecer
     if (!allData.clienteEnriquecido || !allData.clienteEnriquecido.cnae) {
-      logger.debug(`[Enrich] CAMADA 3B: Enriquecendo dados do cliente...`);
+      console.log(`[Enrich] CAMADA 3B: Enriquecendo dados do cliente...`);
       const dadosCliente = await generateDadosClienteEspecializados({
         nome: cliente.nome,
         cnpj: cliente.cnpj || undefined,
@@ -185,7 +264,7 @@ export async function enrichClienteOptimized(
           ...allData.clienteEnriquecido,
           ...dadosCliente,
         };
-        logger.info(`[Enrich] ✅ CAMADA 3B: Dados do cliente enriquecidos`);
+        console.log(`[Enrich] ✅ CAMADA 3B: Dados do cliente enriquecidos`);
       }
     }
 
@@ -237,7 +316,7 @@ export async function enrichClienteOptimized(
       if (Object.keys(updateData).length > 0) {
         // @ts-ignore
         await db.update(clientes).set(updateData).where(eq(clientes.id, clienteId));
-        logger.debug(`[Enrich] Updated cliente with enriched data (including coordinates)`);
+        console.log(`[Enrich] Updated cliente with enriched data (including coordinates)`);
       }
     }
 
@@ -261,7 +340,7 @@ export async function enrichClienteOptimized(
 
       if (existingMercado) {
         mercadoId = existingMercado.id;
-        logger.debug(`[Enrich] Reusing mercado: ${mercadoData.nome}`);
+        console.log(`[Enrich] Reusing mercado: ${mercadoData.nome}`);
       } else {
         const newMercado = await db
           .insert(mercadosUnicos)
@@ -279,7 +358,7 @@ export async function enrichClienteOptimized(
 
         mercadoId = Number(newMercado[0].id);
         result.mercadosCreated++;
-        logger.debug(`[Enrich] Created mercado: ${mercadoData.nome}`);
+        console.log(`[Enrich] Created mercado: ${mercadoData.nome}`);
       }
 
       // 3.2 Associar cliente ao mercado
@@ -449,10 +528,10 @@ export async function enrichClienteOptimized(
     result.success = true;
     result.duration = Date.now() - startTime;
 
-    logger.debug(
+    console.log(
       `[Enrich] ✅ OPTIMIZED success for ${cliente.nome} in ${(result.duration / 1000).toFixed(1)}s`
     );
-    logger.debug(
+    console.log(
       `[Enrich] Created: ${result.mercadosCreated}M ${result.produtosCreated}P ${result.concorrentesCreated}C ${result.leadsCreated}L`
     );
 
@@ -488,7 +567,7 @@ export async function enrichClientesParallel(
   for (let i = 0; i < clienteIds.length; i += concurrency) {
     const batch = clienteIds.slice(i, i + concurrency);
 
-    logger.debug(
+    console.log(
       `\n[Enrich] Processing batch ${Math.floor(i / concurrency) + 1}/${Math.ceil(clienteIds.length / concurrency)}: ${batch.length} clientes`
     );
 

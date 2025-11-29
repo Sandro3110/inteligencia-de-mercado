@@ -313,3 +313,200 @@ function getRegiaoByUF(uf: string): string {
   };
   return regioes[uf.toUpperCase()] || 'Não identificada';
 }
+
+/**
+ * CAMADA 3C: Gerar MAIS concorrentes para completar mínimo de 8
+ */
+export async function generateMaisConcorrentes(
+  cliente: ClienteBasico,
+  mercado: string,
+  concorrentesExistentes: any[],
+  quantidadeFaltante: number
+): Promise<any[]> {
+  const apiKey = process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    return [];
+  }
+
+  const concorrentesNomes = concorrentesExistentes.map((c) => c.nome).join(', ');
+
+  const prompt = `**CONTEXTO:**
+Empresa: ${cliente.nome}
+Mercado: ${mercado}
+Produto: ${cliente.produtoPrincipal || 'Não informado'}
+
+**CONCORRENTES JÁ LISTADOS:**
+${concorrentesNomes}
+
+**SUA TAREFA:**
+Gerar MAIS ${quantidadeFaltante} concorrentes DIFERENTES dos já listados.
+
+**CRITÉRIOS (EM ORDEM DE PRIORIDADE):**
+1. OBRIGATÓRIO: Empresas REAIS que existem no Brasil
+2. OBRIGATÓRIO: Competem no mesmo mercado/segmento
+3. PREFERENCIAL: Porte similar (pode variar)
+4. PREFERENCIAL: Região similar (pode expandir)
+5. ACEITÁVEL: Grandes marcas nacionais
+
+**FORMATO JSON:**
+{
+  "concorrentes": [
+    {
+      "nome": "Nome oficial da empresa",
+      "descricao": "Descrição breve",
+      "porte": "Pequeno|Médio|Grande",
+      "cnae": "código CNAE",
+      "setor": "Setor de atuação",
+      "email": "email@empresa.com.br",
+      "telefone": "(11) 1234-5678",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "latitude": -23.5505,
+      "longitude": -46.6333
+    }
+  ]
+}`;
+
+  console.log(`[Camada 3C] Gerando +${quantidadeFaltante} concorrentes...`);
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'Você é um especialista em pesquisa de mercado B2B brasileiro. Retorne APENAS JSON válido.',
+          },
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 2000,
+        response_format: { type: 'json_object' },
+      }),
+    });
+
+    if (!response.ok) {
+      return [];
+    }
+
+    const data = await response.json();
+    const content = data.choices[0]?.message?.content;
+
+    if (!content) {
+      return [];
+    }
+
+    const parsed = JSON.parse(content);
+    console.log(`[Camada 3C] ✅ +${parsed.concorrentes?.length || 0} concorrentes adicionados`);
+    return parsed.concorrentes || [];
+  } catch (error) {
+    console.log(`[Camada 3C] Erro ao gerar mais concorrentes: ${error}`);
+    return [];
+  }
+}
+
+/**
+ * CAMADA 3C: Gerar MAIS leads para completar mínimo de 5
+ */
+export async function generateMaisLeads(
+  cliente: ClienteBasico,
+  mercado: string,
+  leadsExistentes: any[],
+  quantidadeFaltante: number
+): Promise<any[]> {
+  const apiKey = process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    return [];
+  }
+
+  const leadsNomes = leadsExistentes.map((l) => l.nome).join(', ');
+
+  const prompt = `**CONTEXTO:**
+Empresa: ${cliente.nome}
+Mercado: ${mercado}
+Produto: ${cliente.produtoPrincipal || 'Não informado'}
+
+**LEADS JÁ LISTADOS:**
+${leadsNomes}
+
+**SUA TAREFA:**
+Gerar MAIS ${quantidadeFaltante} leads DIFERENTES dos já listados.
+
+**CRITÉRIOS:**
+1. OBRIGATÓRIO: Empresas REAIS que existem no Brasil
+2. OBRIGATÓRIO: Têm motivo real para comprar
+3. PREFERENCIAL: Porte adequado
+4. PREFERENCIAL: Região adequada
+5. ACEITÁVEL: Expandir para segmentos adjacentes
+
+**FORMATO JSON:**
+{
+  "leads": [
+    {
+      "nome": "Nome oficial da empresa",
+      "segmento": "Segmento de atuação",
+      "potencial": "Alto|Médio|Baixo",
+      "justificativa": "Por que comprariam?",
+      "porte": "Pequeno|Médio|Grande",
+      "cnae": "código CNAE",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "latitude": -23.5505,
+      "longitude": -46.6333
+    }
+  ]
+}`;
+
+  console.log(`[Camada 3C] Gerando +${quantidadeFaltante} leads...`);
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'Você é um especialista em prospecção B2B brasileiro. Retorne APENAS JSON válido.',
+          },
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 2000,
+        response_format: { type: 'json_object' },
+      }),
+    });
+
+    if (!response.ok) {
+      return [];
+    }
+
+    const data = await response.json();
+    const content = data.choices[0]?.message?.content;
+
+    if (!content) {
+      return [];
+    }
+
+    const parsed = JSON.parse(content);
+    console.log(`[Camada 3C] ✅ +${parsed.leads?.length || 0} leads adicionados`);
+    return parsed.leads || [];
+  } catch (error) {
+    console.log(`[Camada 3C] Erro ao gerar mais leads: ${error}`);
+    return [];
+  }
+}
