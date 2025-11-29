@@ -433,9 +433,54 @@ export default function CompararMercadosModal({
   // HANDLERS
   // ============================================================================
 
-  const handleExportPDF = useCallback(() => {
-    toast.info(TOAST_MESSAGES.EXPORT_INFO);
-  }, []);
+  const handleExportPDF = useCallback(async () => {
+    try {
+      toast.info('Gerando PDF de comparação...');
+
+      // Preparar dados para exportação
+      const exportData = {
+        mercados: mercadosData.map((data, idx) => ({
+          nome: data.mercado?.nome || `Mercado ${idx + 1}`,
+          segmentacao: data.mercado?.segmentacao || 'N/A',
+          totalClientes: data.clientes.length,
+          totalConcorrentes: data.concorrentes.length,
+          totalLeads: data.leads.length,
+          qualidadeMediaClientes: data.qualidadeMediaClientes,
+          qualidadeMediaConcorrentes: data.qualidadeMediaConcorrentes,
+          qualidadeMediaLeads: data.qualidadeMediaLeads,
+          qualidadeMediaGeral: data.qualidadeMediaGeral,
+        })),
+        chartData,
+      };
+
+      // Chamar API de exportação PDF
+      const response = await fetch('/api/export/comparacao-mercados-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(exportData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao gerar PDF');
+      }
+
+      // Download do PDF
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `comparacao_mercados_${new Date().getTime()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success('PDF exportado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao exportar PDF:', error);
+      toast.error('Erro ao exportar PDF');
+    }
+  }, [mercadosData, chartData]);
 
   const toggleFilters = useCallback(() => {
     setMostrarFiltros((prev) => !prev);
