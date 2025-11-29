@@ -22,6 +22,7 @@ interface ClienteEnriquecidoData {
   uf?: string;
   regiao?: string;
   porte?: string;
+  cnae?: string;
   email?: string;
   telefone?: string;
   linkedin?: string;
@@ -47,6 +48,10 @@ interface ConcorrenteData {
   nome: string;
   descricao: string;
   porte?: 'Pequeno' | 'Médio' | 'Grande';
+  cnae?: string;
+  setor?: string;
+  email?: string;
+  telefone?: string;
   regiao?: string;
   cidade?: string;
   uf?: string;
@@ -60,6 +65,7 @@ interface LeadData {
   potencial: 'Alto' | 'Médio' | 'Baixo';
   justificativa: string;
   porte?: 'Pequeno' | 'Médio' | 'Grande';
+  cnae?: string;
   cidade?: string;
   uf?: string;
   latitude?: number;
@@ -123,6 +129,7 @@ Gere um relatório completo de inteligência de mercado:
    - Pesquise informações reais sobre esta empresa
    - Se não informado, pesquise: site oficial, produto principal, cidade, UF, região
    - Estime: porte (Pequeno/Médio/Grande)
+   - **OBRIGATÓRIO:** Identifique o CNAE (Classificação Nacional de Atividades Econômicas) - código de 4 a 7 dígitos
    - Se possível, encontre: email, telefone, LinkedIn, Instagram
    - **IMPORTANTE:** Adicione latitude e longitude aproximadas do centro da cidade onde a empresa está localizada
    - NÃO invente dados - se não encontrar, deixe em branco
@@ -156,6 +163,9 @@ Para cada mercado, forneça:
    - Nome oficial da empresa
    - Descrição breve (diferencial, foco)
    - Porte estimado (Pequeno/Médio/Grande)
+   - CNAE (código de classificação, se conhecido)
+   - Setor/segmento de atuação
+   - Email e telefone (se disponível)
    - Cidade e UF (se conhecido)
    - Latitude e longitude aproximadas do centro da cidade
    - Região de atuação (se relevante)
@@ -174,6 +184,7 @@ Para cada mercado, forneça:
    - Potencial (Alto/Médio/Baixo) baseado em critérios objetivos
    - Justificativa ESPECÍFICA (por que comprariam? qual dor resolve?)
    - Porte estimado (Pequeno/Médio/Grande)
+   - CNAE (código de classificação, se conhecido)
    - Cidade e UF (se conhecido)
    - Latitude e longitude aproximadas do centro da cidade
 
@@ -186,6 +197,7 @@ Para cada mercado, forneça:
     "uf": "SP",
     "regiao": "Sudeste",
     "porte": "Médio",
+    "cnae": "2222-6/00",
     "email": "contato@empresa.com.br",
     "telefone": "(11) 1234-5678",
     "linkedin": "https://linkedin.com/company/empresa",
@@ -213,6 +225,10 @@ Para cada mercado, forneça:
           "nome": "Bemis Latin America",
           "descricao": "Líder em embalagens flexíveis, foco em alta barreira",
           "porte": "Grande",
+          "cnae": "2222-6/00",
+          "setor": "Embalagens Plásticas",
+          "email": "contato@bemis.com.br",
+          "telefone": "(11) 3456-7890",
           "cidade": "São Paulo",
           "uf": "SP",
           "latitude": -23.5505,
@@ -223,6 +239,10 @@ Para cada mercado, forneça:
           "nome": "Embalagens XYZ Ltda",
           "descricao": "Especializada em pequenos lotes customizados",
           "porte": "Pequeno",
+          "cnae": "2222-6/00",
+          "setor": "Embalagens Plásticas",
+          "email": "vendas@xyz.com.br",
+          "telefone": "(11) 9876-5432",
           "cidade": "São Paulo",
           "uf": "SP",
           "latitude": -23.5505,
@@ -237,6 +257,7 @@ Para cada mercado, forneça:
           "potencial": "Alto",
           "justificativa": "Maior compradora de embalagens do país, busca fornecedores regionais para reduzir custos logísticos. Tem programa de qualificação de fornecedores locais.",
           "porte": "Grande",
+          "cnae": "1053-8/00",
           "cidade": "São Paulo",
           "uf": "SP",
           "latitude": -23.5505,
@@ -248,6 +269,7 @@ Para cada mercado, forneça:
           "potencial": "Médio",
           "justificativa": "Rede com 15 lojas expandindo para produtos embalados. Precisa de embalagens personalizadas em pequenos volumes.",
           "porte": "Pequeno",
+          "cnae": "1091-1/02",
           "cidade": "São Paulo",
           "uf": "SP",
           "latitude": -23.5505,
