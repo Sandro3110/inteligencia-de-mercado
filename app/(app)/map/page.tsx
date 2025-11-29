@@ -41,6 +41,8 @@ export default function MapPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('markers');
   const [filters, setFilters] = useState({
     entityTypes: ['clientes', 'leads', 'concorrentes'] as ('clientes' | 'leads' | 'concorrentes')[],
+    projectId: undefined as number | undefined,
+    pesquisaId: undefined as number | undefined,
     uf: undefined as string | undefined,
     cidade: undefined as string | undefined,
     setor: undefined as string | undefined,
@@ -51,6 +53,8 @@ export default function MapPage() {
   // Queries
   const { data: mapData, isLoading } = trpc.map.getMapData.useQuery({
     entityTypes: filters.entityTypes,
+    projectId: filters.projectId,
+    pesquisaId: filters.pesquisaId,
     filters: {
       uf: filters.uf,
       cidade: filters.cidade,
@@ -59,6 +63,13 @@ export default function MapPage() {
       qualidade: filters.qualidade,
     },
   });
+
+  // Buscar projetos e pesquisas para os dropdowns
+  const { data: projects } = trpc.project.list.useQuery({});
+  const { data: pesquisas } = trpc.pesquisa.listByProject.useQuery(
+    { projectId: filters.projectId! },
+    { enabled: !!filters.projectId }
+  );
 
   const { data: availableFilters } = trpc.map.getAvailableFilters.useQuery({});
 
@@ -84,6 +95,8 @@ export default function MapPage() {
   const clearFilters = () => {
     setFilters({
       entityTypes: ['clientes', 'leads', 'concorrentes'],
+      projectId: undefined,
+      pesquisaId: undefined,
       uf: undefined,
       cidade: undefined,
       setor: undefined,
@@ -93,7 +106,7 @@ export default function MapPage() {
   };
 
   const hasActiveFilters =
-    filters.uf || filters.cidade || filters.setor || filters.porte || filters.qualidade;
+    filters.projectId || filters.pesquisaId || filters.uf || filters.cidade || filters.setor || filters.porte || filters.qualidade;
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -204,6 +217,47 @@ export default function MapPage() {
         {/* Filters Panel */}
         {showFilters && (
           <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <div className="grid grid-cols-7 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Projeto</label>
+                <select
+                  value={filters.projectId || ''}
+                  onChange={(e) => {
+                    const projectId = e.target.value ? parseInt(e.target.value) : undefined;
+                    setFilters({ ...filters, projectId, pesquisaId: undefined });
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Todos</option>
+                  {projects?.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Pesquisa</label>
+                <select
+                  value={filters.pesquisaId || ''}
+                  onChange={(e) => {
+                    const pesquisaId = e.target.value ? parseInt(e.target.value) : undefined;
+                    setFilters({ ...filters, pesquisaId });
+                  }}
+                  disabled={!filters.projectId}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                >
+                  <option value="">Todas</option>
+                  {pesquisas?.map((pesquisa) => (
+                    <option key={pesquisa.id} value={pesquisa.id}>
+                      {pesquisa.nome}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <div className="grid grid-cols-5 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>

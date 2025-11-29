@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../_core/trpc';
 import { getDb } from '../db';
-import { clientes, leads, concorrentes } from '../../drizzle/schema';
-import { eq, and, isNotNull, sql } from 'drizzle-orm';
+import { clientes, leads, concorrentes, pesquisas } from '../../drizzle/schema';
+import { eq, and, isNotNull, inArray, sql } from 'drizzle-orm';
 
 /**
  * Map Router
@@ -37,6 +37,16 @@ export const mapRouter = router({
 
       const results: Array<Record<string, unknown>> = [];
 
+      // Se projectId foi fornecido mas pesquisaId não, buscar todas as pesquisas do projeto
+      let pesquisaIds: number[] | undefined;
+      if (input.projectId && !input.pesquisaId) {
+        const projectPesquisas = await db
+          .select({ id: pesquisas.id })
+          .from(pesquisas)
+          .where(eq(pesquisas.projectId, input.projectId));
+        pesquisaIds = projectPesquisas.map(p => p.id);
+      }
+
       // Buscar clientes
       if (input.entityTypes.includes('clientes')) {
         const clientesQuery = db
@@ -60,7 +70,8 @@ export const mapRouter = router({
             and(
               isNotNull(clientes.latitude),
               isNotNull(clientes.longitude),
-              input.pesquisaId ? eq(clientes.pesquisaId, input.pesquisaId) : undefined,
+              input.pesquisaId ? eq(clientes.pesquisaId, input.pesquisaId) : 
+                pesquisaIds && pesquisaIds.length > 0 ? inArray(clientes.pesquisaId, pesquisaIds) : undefined,
               input.filters?.uf ? eq(clientes.uf, input.filters.uf) : undefined,
               input.filters?.cidade ? eq(clientes.cidade, input.filters.cidade) : undefined,
               input.filters?.setor ? eq(clientes.setor, input.filters.setor) : undefined
@@ -103,7 +114,8 @@ export const mapRouter = router({
             and(
               isNotNull(leads.latitude),
               isNotNull(leads.longitude),
-              input.pesquisaId ? eq(leads.pesquisaId, input.pesquisaId) : undefined,
+              input.pesquisaId ? eq(leads.pesquisaId, input.pesquisaId) : 
+                pesquisaIds && pesquisaIds.length > 0 ? inArray(leads.pesquisaId, pesquisaIds) : undefined,
               input.filters?.uf ? eq(leads.uf, input.filters.uf) : undefined,
               input.filters?.cidade ? eq(leads.cidade, input.filters.cidade) : undefined,
               input.filters?.setor ? eq(leads.setor, input.filters.setor) : undefined,
@@ -145,7 +157,8 @@ export const mapRouter = router({
             and(
               isNotNull(concorrentes.latitude),
               isNotNull(concorrentes.longitude),
-              input.pesquisaId ? eq(concorrentes.pesquisaId, input.pesquisaId) : undefined,
+              input.pesquisaId ? eq(concorrentes.pesquisaId, input.pesquisaId) : 
+                pesquisaIds && pesquisaIds.length > 0 ? inArray(concorrentes.pesquisaId, pesquisaIds) : undefined,
               input.filters?.uf ? eq(concorrentes.uf, input.filters.uf) : undefined,
               input.filters?.cidade ? eq(concorrentes.cidade, input.filters.cidade) : undefined,
               input.filters?.porte ? eq(concorrentes.porte, input.filters.porte) : undefined
