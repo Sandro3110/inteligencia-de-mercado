@@ -337,7 +337,10 @@ export async function enrichClienteOptimized(
       );
     });
 
-    for (const mercadoItem of allData.mercados) {
+    // Garantir que mercados seja um array
+    const mercados = Array.isArray(allData.mercados) ? allData.mercados : [];
+
+    for (const mercadoItem of mercados) {
       const mercadoData = mercadoItem.mercado;
 
       // 3.1 Criar/buscar mercado único
