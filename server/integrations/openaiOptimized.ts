@@ -235,10 +235,7 @@ RETORNE EM JSON:
     result.mercados = result.mercados.slice(0, 2);
 
     // Validar e limitar cada mercado
-    console.log(
-      '[OpenAI] DEBUG: Raw mercados antes do slice:',
-      JSON.stringify(result.mercados, null, 2)
-    );
+    console.log(JSON.stringify(result.mercados, null, 2));
 
     // CORRIGIDO: Manter estrutura original da OpenAI (não criar nested object)
     result.mercados = result.mercados.map((m) => ({

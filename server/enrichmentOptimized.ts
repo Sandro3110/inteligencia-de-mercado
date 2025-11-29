@@ -330,28 +330,15 @@ export async function enrichClienteOptimized(
     }
 
     // 3. Processar cada mercado
-    console.log(`[Enrich] DEBUG: Total de mercados a processar: ${allData.mercados.length}`);
     allData.mercados.forEach((m, i) => {
-      console.log(
-        `[Enrich] DEBUG: Mercado ${i + 1}: ${m.mercado?.nome}, Concorrentes: ${m.concorrentes?.length || 0}, Leads: ${m.leads?.length || 0}`
-      );
+      console.log();
     });
 
     // Garantir que mercados seja um array
-    console.log('[Enrich] DEBUG: typeof allData:', typeof allData);
-    console.log('[Enrich] DEBUG: allData keys:', Object.keys(allData || {}));
-    console.log('[Enrich] DEBUG: typeof allData.mercados:', typeof allData?.mercados);
-    console.log(
-      '[Enrich] DEBUG: Array.isArray(allData.mercados):',
-      Array.isArray(allData?.mercados)
-    );
-    console.log(
-      '[Enrich] DEBUG: allData.mercados value:',
-      JSON.stringify(allData?.mercados).substring(0, 500)
-    );
+    console.log(Array.isArray(allData?.mercados));
+    console.log(JSON.stringify(allData?.mercados).substring(0, 500));
 
     const mercados = Array.isArray(allData.mercados) ? allData.mercados : [];
-    console.log('[Enrich] DEBUG: mercados.length:', mercados.length);
 
     // 2.5 Produtos globais serão inseridos no primeiro mercado (ver abaixo)
     // Não podemos inserir com mercadoId=null devido a constraint NOT NULL

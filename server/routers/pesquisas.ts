@@ -28,7 +28,6 @@ export const pesquisasRouter = createTRPCRouter({
       }
 
       try {
-        console.log('[Pesquisas.list] ===== DEBUG =====');
         console.log('[Pesquisas.list] Input raw:', input);
         console.log('[Pesquisas.list] Input type:', typeof input);
         console.log('[Pesquisas.list] Input.projectId:', input.projectId);
