@@ -341,7 +341,7 @@ export async function enrichClienteOptimized(
     const mercados = Array.isArray(allData.mercados) ? allData.mercados : [];
 
     for (const mercadoItem of mercados) {
-      const mercadoData = mercadoItem.mercado;
+      const mercadoData = mercadoItem; // CORRIGIDO: OpenAI retorna dados direto no item
 
       // 3.1 Criar/buscar mercado único
       const mercadoHash = crypto
