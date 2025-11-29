@@ -330,6 +330,13 @@ export async function enrichClienteOptimized(
     }
 
     // 3. Processar cada mercado
+    console.log(`[Enrich] DEBUG: Total de mercados a processar: ${allData.mercados.length}`);
+    allData.mercados.forEach((m, i) => {
+      console.log(
+        `[Enrich] DEBUG: Mercado ${i + 1}: ${m.mercado?.nome}, Concorrentes: ${m.concorrentes?.length || 0}, Leads: ${m.leads?.length || 0}`
+      );
+    });
+
     for (const mercadoItem of allData.mercados) {
       const mercadoData = mercadoItem.mercado;
 
