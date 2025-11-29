@@ -118,10 +118,16 @@ IMPORTANTE:
       throw new Error('No content in OpenAI response');
     }
 
-    const jsonContent = content
+    // Limpeza robusta de JSON
+    let jsonContent = content
       .replace(/```json\n?/g, '')
       .replace(/```\n?/g, '')
       .trim();
+
+    // Remover vírgulas extras antes de ] ou }
+    jsonContent = jsonContent.replace(/,\s*([\]}])/g, '$1');
+
+    // Tentar parsear
     const parsed = JSON.parse(jsonContent);
 
     if (!parsed.mercados || parsed.mercados.length === 0) {
@@ -212,10 +218,16 @@ IMPORTANTE:
       throw new Error('No content in OpenAI response');
     }
 
-    const jsonContent = content
+    // Limpeza robusta de JSON
+    let jsonContent = content
       .replace(/```json\n?/g, '')
       .replace(/```\n?/g, '')
       .trim();
+
+    // Remover vírgulas extras antes de ] ou }
+    jsonContent = jsonContent.replace(/,\s*([\]}])/g, '$1');
+
+    // Tentar parsear
     const parsed = JSON.parse(jsonContent);
 
     console.log(`[Camada 3B] ✅ Dados do cliente enriquecidos`);
