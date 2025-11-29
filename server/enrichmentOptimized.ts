@@ -238,7 +238,9 @@ export async function enrichClienteOptimized(
 
       if (Object.keys(updateData).length > 0) {
         await db.update(clientes).set(updateData).where(eq(clientes.id, clienteId));
-        logger.debug(`[Enrich] Updated cliente with enriched data`);
+        logger.debug(`[Enrich] Updated cliente with ${Object.keys(updateData).length} fields`);
+      } else {
+        logger.debug(`[Enrich] No cliente data to update (all fields empty)`);
       }
     }
 

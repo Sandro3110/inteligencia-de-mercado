@@ -270,18 +270,18 @@ async function executarEnriquecimento(projectId: number): Promise<void> {
   console.log('\n🚀 PASSO 6: Executando enriquecimento completo...\n');
 
   // Criar job de enriquecimento
-  const job = await createEnrichmentJob(projectId, {
+  const jobId = await createEnrichmentJob(projectId, {
     batchSize: 50,
     concurrency: 5,
   });
 
-  console.log(`✅ Job criado (ID: ${job.id})`);
+  console.log(`✅ Job criado (ID: ${jobId})`);
   console.log(`   Batch size: 50`);
   console.log(`   Concurrency: 5`);
   console.log(`\n🔄 Iniciando enriquecimento...\n`);
 
   // Iniciar job
-  await startEnrichmentJob(job.id);
+  await startEnrichmentJob(jobId);
 
   // Monitorar progresso
   let completo = false;
@@ -290,7 +290,7 @@ async function executarEnriquecimento(projectId: number): Promise<void> {
   while (!completo) {
     await new Promise((resolve) => setTimeout(resolve, 5000)); // Aguardar 5s
 
-    const progresso = await getJobProgress(job.id);
+    const progresso = await getJobProgress(jobId);
 
     if (progresso.processados > ultimoProgresso) {
       const percentual = Math.round((progresso.processados / progresso.total) * 100);
