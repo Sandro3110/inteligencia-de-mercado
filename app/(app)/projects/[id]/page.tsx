@@ -33,8 +33,32 @@ export default function ProjectDetailsPage() {
     router.push(`/projects/${projId}/surveys/${pesquisaId}/results`);
   };
 
-  const handleExport = (_projId: number, _pesquisaId: number) => {
-    toast.info('Exportação em desenvolvimento');
+  const handleExport = async (_projId: number, pesquisaId: number) => {
+    try {
+      toast.info('Gerando arquivo Excel...');
+      
+      const response = await fetch(`/api/export/excel?pesquisaId=${pesquisaId}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao gerar Excel');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `pesquisa_${pesquisaId}_completo.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success('Excel exportado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao exportar:', error);
+      toast.error(error instanceof Error ? error.message : 'Erro ao exportar Excel');
+    }
   };
 
   const [isCreatePesquisaModalOpen, setIsCreatePesquisaModalOpen] = useState(false);
