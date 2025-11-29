@@ -28,19 +28,27 @@ export const pesquisasRouter = createTRPCRouter({
       }
 
       try {
+        console.log('[Pesquisas.list] Input recebido:', JSON.stringify(input));
+
         if (input?.projectId) {
-          return await db
+          console.log('[Pesquisas.list] Filtrando por projectId:', input.projectId);
+          const result = await db
             .select()
             .from(pesquisas)
             .where(and(eq(pesquisas.projectId, input.projectId), eq(pesquisas.ativo, 1)))
             .orderBy(desc(pesquisas.createdAt));
+          console.log('[Pesquisas.list] Resultado filtrado:', result.length, 'pesquisas');
+          return result;
         }
 
-        return await db
+        console.log('[Pesquisas.list] Retornando TODAS as pesquisas (sem filtro)');
+        const result = await db
           .select()
           .from(pesquisas)
           .where(eq(pesquisas.ativo, 1))
           .orderBy(desc(pesquisas.createdAt));
+        console.log('[Pesquisas.list] Total:', result.length, 'pesquisas');
+        return result;
       } catch (error) {
         console.error('[Pesquisas] Error listing:', error);
         throw new Error('Failed to list pesquisas');
