@@ -12,7 +12,7 @@ import { ProjectForm } from './ProjectForm';
 interface ProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { nome: string; descricao: string; cor: string }) => void;
+  onSubmit: (data: { nome: string; descricao: string; cor: string; nomePesquisa?: string }) => void;
   initialData?: {
     nome: string;
     descricao: string;

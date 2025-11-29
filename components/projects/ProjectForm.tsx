@@ -11,7 +11,7 @@ interface ProjectFormProps {
     descricao: string;
     cor: string;
   };
-  onSubmit: (data: { nome: string; descricao: string; cor: string }) => void;
+  onSubmit: (data: { nome: string; descricao: string; cor: string; nomePesquisa?: string }) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
@@ -31,10 +31,11 @@ export function ProjectForm({ initialData, onSubmit, onCancel, isLoading }: Proj
   const [nome, setNome] = useState(initialData?.nome || '');
   const [descricao, setDescricao] = useState(initialData?.descricao || '');
   const [cor, setCor] = useState(initialData?.cor || '#3b82f6');
+  const [nomePesquisa, setNomePesquisa] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ nome, descricao, cor });
+    onSubmit({ nome, descricao, cor, nomePesquisa: nomePesquisa.trim() || nome });
   };
 
   return (
@@ -66,6 +67,24 @@ export function ProjectForm({ initialData, onSubmit, onCancel, isLoading }: Proj
           disabled={isLoading}
         />
       </div>
+
+      {!initialData && (
+        <div>
+          <label htmlFor="nomePesquisa" className="block text-sm font-medium text-gray-700 mb-1">
+            Nome da Pesquisa Inicial
+          </label>
+          <Input
+            id="nomePesquisa"
+            value={nomePesquisa}
+            onChange={(e) => setNomePesquisa(e.target.value)}
+            placeholder="Deixe vazio para usar o nome do projeto"
+            disabled={isLoading}
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Uma pesquisa inicial será criada automaticamente com este nome
+          </p>
+        </div>
+      )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Cor do Projeto</label>

@@ -13,10 +13,7 @@ export const projectsRouter = createTRPCRouter({
    * Listar todos os projetos
    */
   list: publicProcedure.query(async () => {
-    const result = await db
-      .select()
-      .from(projects)
-      .orderBy(desc(projects.createdAt));
+    const result = await db.select().from(projects).orderBy(desc(projects.createdAt));
 
     return result;
   }),
@@ -24,17 +21,11 @@ export const projectsRouter = createTRPCRouter({
   /**
    * Buscar projeto por ID
    */
-  getById: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .query(async ({ input }) => {
-      const result = await db
-        .select()
-        .from(projects)
-        .where(eq(projects.id, input.id))
-        .limit(1);
+  getById: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+    const result = await db.select().from(projects).where(eq(projects.id, input.id)).limit(1);
 
-      return result[0] || null;
-    }),
+    return result[0] || null;
+  }),
 
   /**
    * Criar novo projeto
@@ -45,10 +36,16 @@ export const projectsRouter = createTRPCRouter({
         nome: z.string().min(1),
         descricao: z.string().optional(),
         cor: z.string().default('#3b82f6'),
+        nomePesquisa: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
-      const result = await db
+      const { getDb } = await import('@/server/db');
+      const { pesquisas } = await import('@/drizzle/schema');
+      const database = await getDb();
+      if (!database) throw new Error('Database not available');
+
+      const result = await database
         .insert(projects)
         .values({
           nome: input.nome,
@@ -62,7 +59,23 @@ export const projectsRouter = createTRPCRouter({
         })
         .returning();
 
-      return result[0];
+      const project = result[0];
+
+      // Criar pesquisa inicial
+      if (project) {
+        const nomePesquisa = input.nomePesquisa?.trim() || input.nome;
+        await database.insert(pesquisas).values({
+          projectId: project.id,
+          nome: nomePesquisa,
+          descricao: `Pesquisa inicial do projeto ${input.nome}`,
+          status: 'active',
+          ativo: 1,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+      }
+
+      return project;
     }),
 
   /**
@@ -95,61 +108,55 @@ export const projectsRouter = createTRPCRouter({
   /**
    * Deletar projeto vazio
    */
-  deleteEmpty: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input }) => {
-      const result = await db
-        .update(projects)
-        .set({
-          ativo: 0,
-          status: 'archived',
-          updatedAt: new Date().toISOString(),
-        })
-        .where(eq(projects.id, input.id))
-        .returning();
+  deleteEmpty: publicProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+    const result = await db
+      .update(projects)
+      .set({
+        ativo: 0,
+        status: 'archived',
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(projects.id, input.id))
+      .returning();
 
-      return result[0];
-    }),
+    return result[0];
+  }),
 
   /**
    * Hibernar projeto
    */
-  hibernate: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input }) => {
-      const result = await db
-        .update(projects)
-        .set({
-          status: 'hibernated',
-          isPaused: 1,
-          updatedAt: new Date().toISOString(),
-        })
-        .where(eq(projects.id, input.id))
-        .returning();
+  hibernate: publicProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+    const result = await db
+      .update(projects)
+      .set({
+        status: 'hibernated',
+        isPaused: 1,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(projects.id, input.id))
+      .returning();
 
-      return result[0];
-    }),
+    return result[0];
+  }),
 
   /**
    * Reativar projeto
    */
-  reactivate: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input }) => {
-      const result = await db
-        .update(projects)
-        .set({
-          status: 'active',
-          isPaused: 0,
-          ativo: 1,
-          updatedAt: new Date().toISOString(),
-          lastActivityAt: new Date().toISOString(),
-        })
-        .where(eq(projects.id, input.id))
-        .returning();
+  reactivate: publicProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+    const result = await db
+      .update(projects)
+      .set({
+        status: 'active',
+        isPaused: 0,
+        ativo: 1,
+        updatedAt: new Date().toISOString(),
+        lastActivityAt: new Date().toISOString(),
+      })
+      .where(eq(projects.id, input.id))
+      .returning();
 
-      return result[0];
-    }),
+    return result[0];
+  }),
 
   /**
    * Duplicar projeto
@@ -164,11 +171,7 @@ export const projectsRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       // Buscar projeto original
-      const original = await db
-        .select()
-        .from(projects)
-        .where(eq(projects.id, input.id))
-        .limit(1);
+      const original = await db.select().from(projects).where(eq(projects.id, input.id)).limit(1);
 
       if (!original[0]) {
         throw new Error('Projeto não encontrado');

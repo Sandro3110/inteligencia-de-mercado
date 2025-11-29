@@ -61,7 +61,12 @@ export default function ProjectsPage() {
   });
 
   // Handlers
-  const handleCreate = (data: { nome: string; descricao: string; cor: string }) => {
+  const handleCreate = (data: {
+    nome: string;
+    descricao: string;
+    cor: string;
+    nomePesquisa?: string;
+  }) => {
     createMutation.mutate(data);
   };
 
