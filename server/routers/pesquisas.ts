@@ -19,7 +19,6 @@ export const pesquisasRouter = createTRPCRouter({
         .object({
           projectId: z.number().optional(),
         })
-        .optional()
         .default({})
     )
     .query(async ({ input }) => {
@@ -29,26 +28,32 @@ export const pesquisasRouter = createTRPCRouter({
       }
 
       try {
-        console.log('[Pesquisas.list] Input recebido:', JSON.stringify(input));
+        console.log('[Pesquisas.list] ===== DEBUG =====');
+        console.log('[Pesquisas.list] Input raw:', input);
+        console.log('[Pesquisas.list] Input type:', typeof input);
+        console.log('[Pesquisas.list] Input.projectId:', input.projectId);
+        console.log('[Pesquisas.list] Input.projectId type:', typeof input.projectId);
+        console.log('[Pesquisas.list] Condição (input.projectId):', !!input.projectId);
+        console.log('[Pesquisas.list] ==================');
 
-        if (input?.projectId) {
-          console.log('[Pesquisas.list] Filtrando por projectId:', input.projectId);
+        if (input.projectId) {
+          console.log('[Pesquisas.list] ✅ Filtrando por projectId:', input.projectId);
           const result = await db
             .select()
             .from(pesquisas)
             .where(and(eq(pesquisas.projectId, input.projectId), eq(pesquisas.ativo, 1)))
             .orderBy(desc(pesquisas.createdAt));
-          console.log('[Pesquisas.list] Resultado filtrado:', result.length, 'pesquisas');
+          console.log('[Pesquisas.list] ✅ Resultado filtrado:', result.length, 'pesquisas');
           return result;
         }
 
-        console.log('[Pesquisas.list] Retornando TODAS as pesquisas (sem filtro)');
+        console.log('[Pesquisas.list] ❌ Retornando TODAS as pesquisas (sem filtro)');
         const result = await db
           .select()
           .from(pesquisas)
           .where(eq(pesquisas.ativo, 1))
           .orderBy(desc(pesquisas.createdAt));
-        console.log('[Pesquisas.list] Total:', result.length, 'pesquisas');
+        console.log('[Pesquisas.list] ❌ Total:', result.length, 'pesquisas');
         return result;
       } catch (error) {
         console.error('[Pesquisas] Error listing:', error);
