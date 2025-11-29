@@ -1,84 +1,52 @@
-import { logger } from '@/lib/logger';
+// VERSÃO COM BATCH INSERTS - OTIMIZAÇÃO DE PERFORMANCE
+// Mudanças principais:
+// 1. Acumular concorrentes e leads em arrays
+// 2. Fazer batch insert no final
+// 3. Reduzir de ~20 queries para ~4 queries por cliente
 
-/**
- * Sistema de Enriquecimento OTIMIZADO
- * - 1 chamada OpenAI por cliente (vs 10-13 anterior)
- * - 0 chamadas SerpAPI (vs 45 anterior)
- * - Processamento paralelo (vs sequencial anterior)
- * - Tempo: 30-60s por cliente (vs 2-3min anterior)
- */
-
-import { getDb } from './db';
 import { eq } from 'drizzle-orm';
-import {
-  clientes,
-  mercadosUnicos,
-  produtos,
-  concorrentes,
-  leads,
-  clientesMercados,
-} from '../drizzle/schema';
-import { generateAllDataOptimized } from './integrations/openaiOptimized';
 import crypto from 'crypto';
-import { now, toPostgresTimestamp } from './dateUtils';
+import { getDb } from './db';
+import { clientes, mercados, produtos, concorrentes, leads } from '../drizzle/schema';
+import { generateAllDataOptimized } from './integrations/openaiOptimized';
+import logger from './logger';
 
-interface EnrichmentResult {
-  clienteId: number;
-  success: boolean;
-  mercadosCreated: number;
-  produtosCreated: number;
-  concorrentesCreated: number;
-  leadsCreated: number;
-  error?: string;
-  duration: number;
-}
-
-/**
- * Trunca string para tamanho máximo
- */
-function truncate(str: string | undefined | null, maxLength: number): string | null {
-  if (!str) return null;
+const truncate = (str: string | null | undefined, maxLength: number): string => {
+  if (!str) return '';
   return str.length > maxLength ? str.substring(0, maxLength) : str;
-}
+};
 
-/**
- * Calcula quality score baseado em critérios reais
- * CORRIGIDO: Considera mais campos e diferencia melhor
- */
+const now = () => new Date();
+
 function calculateQualityScore(data: {
-  hasNome?: boolean;
-  hasProduto?: boolean;
-  hasPorte?: boolean;
-  hasCidade?: boolean;
-  hasSite?: boolean;
-  hasCNPJ?: boolean;
+  hasNome: boolean;
+  hasProduto: boolean;
+  hasPorte: boolean;
+  hasCidade: boolean;
+  hasSite: boolean;
+  hasCNPJ: boolean;
+  hasCNAE?: boolean;
+  hasCoords?: boolean;
 }): number {
-  let score = 50; // Base score
-
-  if (data.hasNome) score += 10;
-  if (data.hasProduto) score += 15;
-  if (data.hasPorte) score += 10;
-  if (data.hasCidade) score += 5;
-  if (data.hasSite) score += 5;
-  if (data.hasCNPJ) score += 5;
-
-  return Math.min(100, score);
+  let score = 0;
+  if (data.hasNome) score += 20;
+  if (data.hasProduto) score += 20;
+  if (data.hasPorte) score += 15;
+  if (data.hasCidade) score += 15;
+  if (data.hasSite) score += 10;
+  if (data.hasCNPJ) score += 10;
+  if (data.hasCNAE) score += 5; // NOVO
+  if (data.hasCoords) score += 5; // NOVO
+  return Math.min(score, 100);
 }
 
-/**
- * Retorna classificação textual do quality score
- */
 function getQualityClassification(score: number): string {
-  if (score >= 90) return 'Excelente';
-  if (score >= 75) return 'Bom';
-  if (score >= 60) return 'Regular';
-  return 'Ruim';
+  if (score >= 80) return 'Alta';
+  if (score >= 50) return 'Média';
+  return 'Baixa';
 }
 
-/**
- * Enriquece um único cliente com dados reais (VERSÃO OTIMIZADA)
- */
-export async function enrichClienteOptimized(clienteId: number): Promise<{
+export async function enrichClienteOptimizedBatch(clienteId: number): Promise<{
   success: boolean;
   duration: number;
   mercadosCreated: number;
@@ -384,117 +352,4 @@ export async function enrichClienteOptimized(clienteId: number): Promise<{
 
     return result;
   }
-}
-export async function enrichClientesParallel(
-  clienteIds: number[],
-  projectId: number = 1,
-  concurrency: number = 5,
-  onProgress?: (current: number, total: number, result: EnrichmentResult) => void
-): Promise<EnrichmentResult[]> {
-  const results: EnrichmentResult[] = [];
-  let completed = 0;
-
-  logger.debug(
-    `\n[Enrich] 🚀 Starting PARALLEL enrichment: ${clienteIds.length} clientes, ${concurrency} concurrent`
-  );
-
-  // Processar em batches paralelos
-  for (let i = 0; i < clienteIds.length; i += concurrency) {
-    const batch = clienteIds.slice(i, i + concurrency);
-
-    logger.debug(
-      `\n[Enrich] Processing batch ${Math.floor(i / concurrency) + 1}/${Math.ceil(clienteIds.length / concurrency)}: ${batch.length} clientes`
-    );
-
-    // Executar batch em paralelo
-    const batchResults = await Promise.all(
-      batch.map((clienteId) => enrichClienteOptimized(clienteId, projectId))
-    );
-
-    // Processar resultados
-    for (const result of batchResults) {
-      results.push(result);
-      completed++;
-
-      if (onProgress) {
-        onProgress(completed, clienteIds.length, result);
-      }
-    }
-
-    // Pequeno delay entre batches para não sobrecarregar
-    if (i + concurrency < clienteIds.length) {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 1s entre batches
-    }
-  }
-
-  logger.debug(`\n[Enrich] ✅ PARALLEL enrichment completed: ${completed}/${clienteIds.length}`);
-
-  return results;
-}
-
-// ============================================
-// DEPRECATED FUNCTIONS (stubs for compatibility)
-// ============================================
-
-/**
- * @deprecated Use enrichClienteOptimized instead
- */
-export async function identifyMercados(clienteId: number, projectId: number = 1): Promise<any[]> {
-  console.warn('[DEPRECATED] identifyMercados is deprecated. Use enrichClienteOptimized instead.');
-  return [];
-}
-
-/**
- * @deprecated Use enrichClienteOptimized instead
- */
-export async function createProdutosCliente(
-  clienteId: number,
-  projectId: number = 1
-): Promise<any[]> {
-  console.warn(
-    '[DEPRECATED] createProdutosCliente is deprecated. Use enrichClienteOptimized instead.'
-  );
-  return [];
-}
-
-/**
- * @deprecated Use enrichClienteOptimized instead
- */
-export async function findConcorrentesCliente(
-  clienteId: number,
-  projectId: number = 1
-): Promise<any[]> {
-  console.warn(
-    '[DEPRECATED] findConcorrentesCliente is deprecated. Use enrichClienteOptimized instead.'
-  );
-  return [];
-}
-
-/**
- * @deprecated Use enrichClienteOptimized instead
- */
-export async function findLeadsCliente(clienteId: number, projectId: number = 1): Promise<any[]> {
-  console.warn('[DEPRECATED] findLeadsCliente is deprecated. Use enrichClienteOptimized instead.');
-  return [];
-}
-
-/**
- * @deprecated Use enrichClienteOptimized instead
- */
-export async function enrichClienteCompleto(
-  clienteId: number,
-  projectId: number = 1
-): Promise<any> {
-  console.warn(
-    '[DEPRECATED] enrichClienteCompleto is deprecated. Use enrichClienteOptimized instead.'
-  );
-  return enrichClienteOptimized(clienteId, projectId);
-}
-
-/**
- * @deprecated Use enrichClienteOptimized instead
- */
-export async function enrichCliente(clienteId: number, projectId: number = 1): Promise<any> {
-  console.warn('[DEPRECATED] enrichCliente is deprecated. Use enrichClienteOptimized instead.');
-  return enrichClienteOptimized(clienteId, projectId);
 }
