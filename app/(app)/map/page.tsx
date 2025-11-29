@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { trpc } from '@/lib/trpc/client';
-import { Map as MapIcon, Filter, X } from 'lucide-react';
+import { Map as MapIcon, Filter, X, Download } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { MapSidebar } from '@/components/map/MapSidebar';
 import { EntityDetailCard } from '@/components/map/EntityDetailCard';
+import { ExportMapModal, type ExportOptions } from '@/components/map/ExportMapModal';
+import html2canvas from 'html2canvas';
+import { toast } from 'sonner';
 import type { ViewMode } from '@/components/map/MapContainer';
 
 // Importar MapContainer dinamicamente para evitar SSR
@@ -38,7 +41,10 @@ interface MapEntity {
 export default function MapPage() {
   const [selectedEntity, setSelectedEntity] = useState<MapEntity | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('markers');
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const [filters, setFilters] = useState({
     entityTypes: ['clientes', 'leads', 'concorrentes'] as ('clientes' | 'leads' | 'concorrentes')[],
     projectId: undefined as number | undefined,
@@ -107,6 +113,75 @@ export default function MapPage() {
 
   const hasActiveFilters =
     filters.projectId || filters.pesquisaId || filters.uf || filters.cidade || filters.setor || filters.porte || filters.qualidade;
+
+  const handleExport = async (options: ExportOptions) => {
+    try {
+      setIsExporting(true);
+      toast.info('Capturando imagem do mapa...');
+
+      // Capturar imagem do mapa
+      if (!mapContainerRef.current) {
+        throw new Error('Mapa não encontrado');
+      }
+
+      const canvas = await html2canvas(mapContainerRef.current, {
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#f9fafb',
+      });
+
+      const mapImage = canvas.toDataURL('image/png');
+
+      toast.info('Gerando PDF...');
+
+      // Preparar dados para exportação
+      const exportData = {
+        mapImage,
+        options,
+        filters: {
+          projectId: filters.projectId,
+          pesquisaId: filters.pesquisaId,
+          entityTypes: filters.entityTypes,
+          uf: filters.uf,
+          cidade: filters.cidade,
+          setor: filters.setor,
+          porte: filters.porte,
+          qualidade: filters.qualidade,
+        },
+        entities: entities,
+      };
+
+      // Chamar API de exportação
+      const response = await fetch('/api/export/map-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(exportData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao gerar PDF');
+      }
+
+      // Download do PDF
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mapa_${new Date().getTime()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success('PDF exportado com sucesso!');
+      setShowExportModal(false);
+    } catch (error) {
+      console.error('Erro ao exportar:', error);
+      toast.error('Erro ao exportar PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -189,6 +264,15 @@ export default function MapPage() {
                 🔥 Heatmap
               </button>
             </div>
+
+            {/* Export Button */}
+            <button
+              onClick={() => setShowExportModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Exportar PDF
+            </button>
 
             {/* Filters Button */}
             <button
@@ -362,7 +446,7 @@ export default function MapPage() {
       {/* Map and Sidebar */}
       <div className="flex-1 flex overflow-hidden">
         {/* Map */}
-        <div className="flex-1 relative">
+        <div ref={mapContainerRef} className="flex-1 relative">
           {isLoading ? (
             <div className="w-full h-full flex items-center justify-center bg-gray-100">
               <div className="text-center">
@@ -403,6 +487,14 @@ export default function MapPage() {
       {selectedEntity && (
         <EntityDetailCard entity={selectedEntity} onClose={() => setSelectedEntity(null)} />
       )}
+
+      {/* Export Modal */}
+      <ExportMapModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={handleExport}
+        isExporting={isExporting}
+      />
     </div>
   );
 }
