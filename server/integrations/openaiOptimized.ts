@@ -108,7 +108,7 @@ SITE: ${cliente.siteOficial || 'Não informado'}
 
 TAREFA: Gerar dados de enriquecimento completos:
 
-1. **MERCADOS** (3 mercados onde o cliente atua):
+1. **MERCADO** (1 mercado CNAE onde o cliente atua):
    - Nome do mercado
    - Descrição
 
@@ -117,7 +117,7 @@ TAREFA: Gerar dados de enriquecimento completos:
    - Descrição
    - Categoria
 
-3. **CONCORRENTES** (10 concorrentes por mercado):
+3. **CONCORRENTES** (10 concorrentes TOTAIS):
    - Nome da empresa
    - CNPJ (formato: 12.345.678/0001-99)
    - Site oficial
@@ -125,13 +125,19 @@ TAREFA: Gerar dados de enriquecimento completos:
    - UF
    - Produto principal
 
-4. **LEADS** (6 leads por mercado):
+4. **LEADS** (6 leads TOTAIS):
    - Nome da empresa
    - CNPJ (formato: 12.345.678/0001-99)
    - Site oficial
    - Cidade
    - UF
    - Produto de interesse
+
+IMPORTANTE:
+- Gere EXATAMENTE 1 mercado
+- Gere EXATAMENTE 3 produtos
+- Gere EXATAMENTE 10 concorrentes (não duplicar)
+- Gere EXATAMENTE 6 leads (não duplicar clientes nem concorrentes)
 
 RETORNE EM JSON:
 {
