@@ -85,7 +85,8 @@ export const enrichmentRouter = createTRPCRouter({
 
         // 4. Trigger background processing
         // This will be handled by the API route
-        fetch('/api/enrichment/process', {
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.intelmarket.app';
+        fetch(`${baseUrl}/api/enrichment/process`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ jobId: job.id, pesquisaId: input.pesquisaId }),
@@ -142,7 +143,8 @@ export const enrichmentRouter = createTRPCRouter({
       .where(eq(enrichmentJobs.id, input.jobId));
 
     // Trigger background processing
-    fetch('/api/enrichment/process', {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.intelmarket.app';
+    fetch(`${baseUrl}/api/enrichment/process`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ jobId: job.id, pesquisaId: job.projectId }),
