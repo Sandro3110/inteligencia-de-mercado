@@ -353,30 +353,8 @@ export async function enrichClienteOptimized(
     const mercados = Array.isArray(allData.mercados) ? allData.mercados : [];
     console.log('[Enrich] DEBUG: mercados.length:', mercados.length);
 
-    // 2.5 Processar produtos (OpenAI retorna em allData.produtos)
-    if (allData.produtos && Array.isArray(allData.produtos) && allData.produtos.length > 0) {
-      const produtosToInsert = allData.produtos.map((produtoData: any) => ({
-        projectId,
-        pesquisaId: cliente.pesquisaId || null,
-        clienteId,
-        mercadoId: null, // Produtos globais não têm mercado específico
-        nome: truncate(produtoData.nome, 255) || '',
-        descricao: truncate(produtoData.descricao || '', 1000),
-        categoria: truncate(produtoData.categoria || '', 100),
-        preco: null,
-        unidade: null,
-        ativo: 1,
-        createdAt: toPostgresTimestamp(new Date()),
-      }));
-
-      try {
-        await db.insert(produtos).values(produtosToInsert).onConflictDoNothing();
-        result.produtosCreated += produtosToInsert.length;
-        console.log(`[Enrich] ✅ ${produtosToInsert.length} produtos globais inseridos`);
-      } catch (error: any) {
-        console.error(`[Enrich] ❌ Erro ao inserir produtos globais:`, error.message);
-      }
-    }
+    // 2.5 Produtos globais serão inseridos no primeiro mercado (ver abaixo)
+    // Não podemos inserir com mercadoId=null devido a constraint NOT NULL
 
     for (const mercadoItem of mercados) {
       const mercadoData = mercadoItem; // CORRIGIDO: OpenAI retorna dados direto no item
@@ -426,6 +404,33 @@ export async function enrichClienteOptimized(
           mercadoId,
         })
         .onConflictDoNothing();
+
+      // 3.2.5 Inserir produtos globais (allData.produtos) no primeiro mercado
+      if (allData.produtos && Array.isArray(allData.produtos) && allData.produtos.length > 0) {
+        const produtosGlobaisToInsert = allData.produtos.map((produtoData: any) => ({
+          projectId,
+          pesquisaId: cliente.pesquisaId || null,
+          clienteId,
+          mercadoId, // Usar mercadoId do primeiro mercado
+          nome: truncate(produtoData.nome, 255) || '',
+          descricao: truncate(produtoData.descricao || '', 1000),
+          categoria: truncate(produtoData.categoria || '', 100),
+          preco: null,
+          unidade: null,
+          ativo: 1,
+          createdAt: toPostgresTimestamp(new Date()),
+        }));
+
+        try {
+          await db.insert(produtos).values(produtosGlobaisToInsert).onConflictDoNothing();
+          result.produtosCreated += produtosGlobaisToInsert.length;
+          console.log(`[Enrich] ✅ ${produtosGlobaisToInsert.length} produtos globais inseridos`);
+        } catch (error: any) {
+          console.error(`[Enrich] ❌ Erro ao inserir produtos globais:`, error.message);
+        }
+        // Limpar array para não inserir novamente nos próximos mercados
+        allData.produtos = [];
+      }
 
       // 3.3 Inserir produtos em BATCH
       if (mercadoItem.produtos.length > 0) {
