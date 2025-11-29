@@ -173,7 +173,7 @@ export async function enrichClienteOptimized(
       );
       const totalLeads = allData.mercados.reduce((sum, m) => sum + (m.leads?.length || 0), 0);
 
-      if (totalConcorrentes < 8 || totalLeads < 5) {
+      if (totalConcorrentes < 10 || totalLeads < 6) {
         console.log(
           `[Enrich] ⚠️ CAMADA 1: Quantidade baixa (${totalConcorrentes}C ${totalLeads}L). Ativando CAMADA 3C...`
         );
@@ -183,10 +183,10 @@ export async function enrichClienteOptimized(
           await import('./integrations/openaiLayered');
 
         for (const mercado of allData.mercados) {
-          // Completar concorrentes se < 8
+          // Completar concorrentes se < 10
           const concorrentesAtuais = mercado.concorrentes?.length || 0;
-          if (concorrentesAtuais < 8) {
-            const faltam = 8 - concorrentesAtuais;
+          if (concorrentesAtuais < 10) {
+            const faltam = 10 - concorrentesAtuais;
             const maisConcorrentes = await generateMaisConcorrentes(
               {
                 nome: cliente.nome,
@@ -208,10 +208,10 @@ export async function enrichClienteOptimized(
             }
           }
 
-          // Completar leads se < 5
+          // Completar leads se < 6
           const leadsAtuais = mercado.leads?.length || 0;
-          if (leadsAtuais < 5) {
-            const faltam = 5 - leadsAtuais;
+          if (leadsAtuais < 6) {
+            const faltam = 6 - leadsAtuais;
             const maisLeads = await generateMaisLeads(
               {
                 nome: cliente.nome,

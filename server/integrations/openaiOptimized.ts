@@ -149,11 +149,11 @@ Para cada mercado, forneça:
    - Descrição detalhada (benefícios, aplicações)
    - Categoria/tipo
 
-⚔️ **CONCORRENTES DIRETOS (GERAR 8-12):**
+⚔️ **CONCORRENTES DIRETOS (GERAR 10-12):**
    
-   ⚠️ **IMPORTANTE:** Gere entre 8 e 12 concorrentes (ideal: 10).
+   ⚠️ **IMPORTANTE:** Gere entre 10 e 12 concorrentes.
    Se não encontrar empresas que atendam TODOS os critérios abaixo,
-   relaxe os critérios de região ou porte para atingir pelo menos 8.
+   relaxe os critérios de região ou porte para atingir pelo menos 10.
    
    **CRITÉRIOS DE SELEÇÃO (EM ORDEM DE PRIORIDADE):**
    1. OBRIGATÓRIO: Empresas REAIS que existem no Brasil
@@ -173,11 +173,11 @@ Para cada mercado, forneça:
    - Latitude e longitude aproximadas do centro da cidade
    - Região de atuação (se relevante)
 
-💼 **LEADS QUALIFICADOS (GERAR 5-10):**
+💼 **LEADS QUALIFICADOS (GERAR 6-10):**
    
-   ⚠️ **IMPORTANTE:** Gere entre 5 e 10 leads (ideal: 7-8).
+   ⚠️ **IMPORTANTE:** Gere entre 6 e 10 leads (ideal: 8).
    Se não encontrar empresas suficientes, expanda para regiões próximas ou
-   segmentos adjacentes para atingir pelo menos 5.
+   segmentos adjacentes para atingir pelo menos 6.
    
    **CRITÉRIOS DE QUALIFICAÇÃO:**
    - Empresas REAIS que existem no Brasil
@@ -314,7 +314,7 @@ Para cada mercado, forneça:
             content: userPrompt,
           },
         ],
-        temperature: 0.5, // Balanceado: criativo mas preciso
+        temperature: 0.8, // Mais criativa para gerar mais concorrentes/leads
         max_tokens: 5000, // Aumentado para acomodar descrições detalhadas
         response_format: { type: 'json_object' }, // Força resposta em JSON
       }),

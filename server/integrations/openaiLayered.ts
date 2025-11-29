@@ -522,3 +522,174 @@ Gerar MAIS ${quantidadeFaltante} leads DIFERENTES dos já listados.
     return [];
   }
 }
+
+// CAMADA 3C: Completar concorrentes (temperature alta para criatividade)
+export async function generateMaisConcorrentes(
+  cliente: ClienteBasico,
+  mercadoNome: string,
+  concorrentesExistentes: any[],
+  quantidadeFaltante: number
+): Promise<any[]> {
+  try {
+    const nomesExistentes = concorrentesExistentes.map((c) => c.nome).join(', ');
+
+    const prompt = `Você é um especialista em inteligência de mercado.
+
+TAREFA: Gere ${quantidadeFaltante} concorrentes ADICIONAIS para completar a lista.
+
+CLIENTE: ${cliente.nome}
+MERCADO: ${mercadoNome}
+PRODUTO: ${cliente.produtoPrincipal || 'N/A'}
+REGIÃO: ${cliente.cidade || 'Brasil'}, ${cliente.uf || ''}
+
+CONCORRENTES JÁ IDENTIFICADOS: ${nomesExistentes || 'Nenhum'}
+
+⚠️ IMPORTANTE:
+- NÃO repita os concorrentes já listados acima
+- Gere EXATAMENTE ${quantidadeFaltante} concorrentes NOVOS
+- Empresas REAIS que existem no Brasil
+- Podem ser de regiões próximas ou porte diferente
+- Seja CRIATIVO mas realista
+
+Retorne JSON:
+{
+  "concorrentes": [
+    {
+      "nome": "Nome da Empresa",
+      "cnae": "0000-0/00",
+      "setor": "Setor específico",
+      "porte": "Pequeno/Médio/Grande",
+      "cidade": "Cidade",
+      "uf": "UF",
+      "latitude": -23.55,
+      "longitude": -46.63,
+      "email": "contato@empresa.com.br",
+      "telefone": "(00) 0000-0000"
+    }
+  ]
+}`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.9, // ALTA para mais criatividade
+        max_tokens: 2000,
+        response_format: { type: 'json_object' },
+      }),
+    });
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error('No content in OpenAI response');
+    }
+
+    // Limpeza robusta de JSON
+    let jsonContent = content
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+
+    // Remover vírgulas extras antes de ] ou }
+    jsonContent = jsonContent.replace(/,\s*([\]}])/g, '$1');
+
+    const parsed = JSON.parse(jsonContent);
+
+    console.log(`[Camada 3C] ✅ ${parsed.concorrentes?.length || 0} concorrentes gerados`);
+    return parsed.concorrentes || [];
+  } catch (error) {
+    console.error('[Camada 3C] ❌ Erro ao gerar concorrentes:', error);
+    return [];
+  }
+}
+
+// CAMADA 3C: Completar leads (temperature alta para criatividade)
+export async function generateMaisLeads(
+  cliente: ClienteBasico,
+  mercadoNome: string,
+  leadsExistentes: any[],
+  quantidadeFaltante: number
+): Promise<any[]> {
+  try {
+    const nomesExistentes = leadsExistentes.map((l) => l.nome).join(', ');
+
+    const prompt = `Você é um especialista em inteligência de mercado.
+
+TAREFA: Gere ${quantidadeFaltante} leads ADICIONAIS para completar a lista.
+
+CLIENTE: ${cliente.nome}
+MERCADO: ${mercadoNome}
+PRODUTO: ${cliente.produtoPrincipal || 'N/A'}
+REGIÃO: ${cliente.cidade || 'Brasil'}, ${cliente.uf || ''}
+
+LEADS JÁ IDENTIFICADOS: ${nomesExistentes || 'Nenhum'}
+
+⚠️ IMPORTANTE:
+- NÃO repita os leads já listados acima
+- Gere EXATAMENTE ${quantidadeFaltante} leads NOVOS
+- Empresas REAIS que existem no Brasil
+- Têm MOTIVO REAL para comprar do cliente
+- Seja CRIATIVO mas realista
+
+Retorne JSON:
+{
+  "leads": [
+    {
+      "nome": "Nome da Empresa",
+      "cnae": "0000-0/00",
+      "setor": "Setor específico",
+      "porte": "Pequeno/Médio/Grande",
+      "cidade": "Cidade",
+      "uf": "UF",
+      "latitude": -23.55,
+      "longitude": -46.63,
+      "motivoCompra": "Por que compraria do cliente"
+    }
+  ]
+}`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.9, // ALTA para mais criatividade
+        max_tokens: 2000,
+        response_format: { type: 'json_object' },
+      }),
+    });
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error('No content in OpenAI response');
+    }
+
+    // Limpeza robusta de JSON
+    let jsonContent = content
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+
+    // Remover vírgulas extras antes de ] ou }
+    jsonContent = jsonContent.replace(/,\s*([\]}])/g, '$1');
+
+    const parsed = JSON.parse(jsonContent);
+
+    console.log(`[Camada 3C] ✅ ${parsed.leads?.length || 0} leads gerados`);
+    return parsed.leads || [];
+  } catch (error) {
+    console.error('[Camada 3C] ❌ Erro ao gerar leads:', error);
+    return [];
+  }
+}
