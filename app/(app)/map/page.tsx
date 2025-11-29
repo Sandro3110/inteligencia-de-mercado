@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { trpc } from '@/lib/trpc/client';
 import { Map as MapIcon, Filter, X, Download } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -72,10 +72,14 @@ export default function MapPage() {
 
   // Buscar projetos e pesquisas para os dropdowns
   const { data: projects } = trpc.dashboard.getProjects.useQuery();
-  const { data: pesquisas } = trpc.pesquisas.list.useQuery(
-    { projectId: filters.projectId },
-    { enabled: !!filters.projectId }
-  );
+  const { data: allPesquisas } = trpc.pesquisas.list.useQuery({});
+
+  // Filtrar pesquisas no frontend por projectId
+  const pesquisas = React.useMemo(() => {
+    if (!allPesquisas) return [];
+    if (!filters.projectId) return [];
+    return allPesquisas.filter((p) => p.projectId === filters.projectId);
+  }, [allPesquisas, filters.projectId]);
 
   const { data: availableFilters } = trpc.map.getAvailableFilters.useQuery({
     projectId: filters.projectId,
