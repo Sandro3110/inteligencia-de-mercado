@@ -30,7 +30,11 @@ export default function ResultsPage() {
   console.log('[ResultsPage] pesquisa data:', pesquisa);
   const { data: kpis } = trpc.results.getKPIs.useQuery({ pesquisaId: surveyId });
 
-  const { data: clientesData, isLoading: loadingClientes, error: clientesError } = trpc.results.getClientes.useQuery(
+  const {
+    data: clientesData,
+    isLoading: loadingClientes,
+    error: clientesError,
+  } = trpc.results.getClientes.useQuery(
     {
       pesquisaId: surveyId,
       page,
@@ -99,18 +103,29 @@ export default function ResultsPage() {
 
   const handleExport = async () => {
     try {
+      toast.info('Gerando arquivo Excel...');
+
       // Usar a mesma exportação Excel do projeto (5 abas)
       const result = await exportProjectMutation.mutateAsync({ projectId });
 
       if (result) {
-        // Download Excel
-        const blob = new Blob([Buffer.from(result.data, 'base64')], {
+        // Converter base64 para Blob (compatível com browser)
+        const binaryString = atob(result.data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        const blob = new Blob([bytes], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
+
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = result.filename;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
         URL.revokeObjectURL(link.href);
 
         toast.success('Excel exportado com sucesso!');
