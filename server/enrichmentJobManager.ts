@@ -53,20 +53,27 @@ export async function createEnrichmentJob(
   const totalBatches = Math.ceil(totalClientes / batchSize);
 
   // Criar job
-  const result = await db.insert(enrichmentJobs).values({
-    projectId,
-    status: 'pending',
-    totalClientes,
-    processedClientes: 0,
-    successClientes: 0,
-    failedClientes: 0,
-    currentBatch: 0,
-    totalBatches,
-    batchSize: batchSize,
-    checkpointInterval: options.checkpointInterval || 50,
-  }).returning({ id: enrichmentJobs.id });
+  const result = await db
+    .insert(enrichmentJobs)
+    .values({
+      projectId,
+      status: 'pending',
+      totalClientes,
+      processedClientes: 0,
+      successClientes: 0,
+      failedClientes: 0,
+      currentBatch: 0,
+      totalBatches,
+      batchSize: batchSize,
+      checkpointInterval: options.checkpointInterval || 50,
+    })
+    .returning();
 
-  return result[0].id;
+  if (!result || result.length === 0 || !result[0].id) {
+    throw new Error('Failed to create enrichment job');
+  }
+
+  return Number(result[0].id);
 }
 
 /**
@@ -286,7 +293,10 @@ async function processJob(jobId: number): Promise<void> {
         const result = await enrichClienteOptimized(cliente.id, job.projectId);
         return { success: result.success, clienteId: cliente.id };
       } catch (error: unknown) {
-        console.error(`[Job ${jobId}] Erro ao processar cliente ${cliente.id}:`, error instanceof Error ? error.message : error);
+        console.error(
+          `[Job ${jobId}] Erro ao processar cliente ${cliente.id}:`,
+          error instanceof Error ? error.message : error
+        );
         return { success: false, clienteId: cliente.id };
       }
     });
