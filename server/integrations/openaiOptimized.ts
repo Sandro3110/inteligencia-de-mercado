@@ -379,6 +379,11 @@ Para cada mercado, forneça:
     result.mercados = result.mercados.slice(0, 2);
 
     // Validar e limitar cada mercado
+    console.log(
+      '[OpenAI] DEBUG: Raw mercados antes do slice:',
+      JSON.stringify(result.mercados, null, 2)
+    );
+
     result.mercados = result.mercados.map((m) => ({
       mercado: m.mercado,
       produtos: (m.produtos || []).slice(0, 3),
