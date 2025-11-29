@@ -72,12 +72,15 @@ export default function MapPage() {
 
   // Buscar projetos e pesquisas para os dropdowns
   const { data: projects } = trpc.project.list.useQuery({});
-  const { data: pesquisas } = trpc.pesquisa.listByProject.useQuery(
-    { projectId: filters.projectId! },
+  const { data: pesquisas } = trpc.pesquisas.list.useQuery(
+    { projectId: filters.projectId },
     { enabled: !!filters.projectId }
   );
 
-  const { data: availableFilters } = trpc.map.getAvailableFilters.useQuery({});
+  const { data: availableFilters } = trpc.map.getAvailableFilters.useQuery({
+    projectId: filters.projectId,
+    pesquisaId: filters.pesquisaId,
+  });
 
   const entities = (mapData || []) as MapEntity[];
 
@@ -112,7 +115,13 @@ export default function MapPage() {
   };
 
   const hasActiveFilters =
-    filters.projectId || filters.pesquisaId || filters.uf || filters.cidade || filters.setor || filters.porte || filters.qualidade;
+    filters.projectId ||
+    filters.pesquisaId ||
+    filters.uf ||
+    filters.cidade ||
+    filters.setor ||
+    filters.porte ||
+    filters.qualidade;
 
   const handleExport = async (options: ExportOptions) => {
     try {
