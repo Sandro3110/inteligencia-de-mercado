@@ -340,6 +340,31 @@ export async function enrichClienteOptimized(
     // Garantir que mercados seja um array
     const mercados = Array.isArray(allData.mercados) ? allData.mercados : [];
 
+    // 2.5 Processar produtos (OpenAI retorna em allData.produtos)
+    if (allData.produtos && Array.isArray(allData.produtos) && allData.produtos.length > 0) {
+      const produtosToInsert = allData.produtos.map((produtoData: any) => ({
+        projectId,
+        pesquisaId: cliente.pesquisaId || null,
+        clienteId,
+        mercadoId: null, // Produtos globais não têm mercado específico
+        nome: truncate(produtoData.nome, 255) || '',
+        descricao: truncate(produtoData.descricao || '', 1000),
+        categoria: truncate(produtoData.categoria || '', 100),
+        preco: null,
+        unidade: null,
+        ativo: 1,
+        createdAt: toPostgresTimestamp(new Date()),
+      }));
+
+      try {
+        await db.insert(produtos).values(produtosToInsert).onConflictDoNothing();
+        result.produtosCreated += produtosToInsert.length;
+        console.log(`[Enrich] ✅ ${produtosToInsert.length} produtos globais inseridos`);
+      } catch (error: any) {
+        console.error(`[Enrich] ❌ Erro ao inserir produtos globais:`, error.message);
+      }
+    }
+
     for (const mercadoItem of mercados) {
       const mercadoData = mercadoItem; // CORRIGIDO: OpenAI retorna dados direto no item
 
