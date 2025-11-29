@@ -294,6 +294,10 @@ export async function enrichClienteOptimized(
       if (enriched.linkedin) updateData.linkedin = truncate(enriched.linkedin, 500);
       // @ts-ignore
       if (enriched.instagram) updateData.instagram = truncate(enriched.instagram, 500);
+      // @ts-ignore
+      if (enriched.cnae) updateData.cnae = truncate(enriched.cnae, 20);
+      // @ts-ignore
+      if (enriched.setor) updateData.setor = truncate(enriched.setor, 100);
 
       // Adicionar coordenadas geográficas
       // @ts-ignore
@@ -370,157 +374,185 @@ export async function enrichClienteOptimized(
         })
         .onConflictDoNothing();
 
-      // 3.3 Inserir produtos (com UPSERT para evitar duplicação)
-      for (const produtoData of mercadoItem.produtos) {
-        await db
-          .insert(produtos)
-          .values({
-            projectId,
-            pesquisaId: cliente.pesquisaId || null,
-            clienteId,
-            mercadoId,
-            nome: truncate(produtoData.nome, 255) || '',
-            descricao: truncate(produtoData.descricao || '', 1000),
-            categoria: truncate(produtoData.categoria || '', 100),
-            preco: null,
-            unidade: null,
-            ativo: 1,
-            createdAt: toPostgresTimestamp(new Date()),
-          })
-          .onConflictDoNothing();
-        result.produtosCreated++;
-      }
+      // 3.3 Inserir produtos em BATCH
+      if (mercadoItem.produtos.length > 0) {
+        const produtosToInsert = mercadoItem.produtos.map((produtoData) => ({
+          projectId,
+          pesquisaId: cliente.pesquisaId || null,
+          clienteId,
+          mercadoId,
+          nome: truncate(produtoData.nome, 255) || '',
+          descricao: truncate(produtoData.descricao || '', 1000),
+          categoria: truncate(produtoData.categoria || '', 100),
+          preco: null,
+          unidade: null,
+          ativo: 1,
+          createdAt: toPostgresTimestamp(new Date()),
+        }));
 
-      // 3.4 Inserir concorrentes
-      for (const concorrenteData of mercadoItem.concorrentes) {
-        const concorrenteHash = crypto
-          .createHash('md5')
-          .update(`${concorrenteData.nome}-${mercadoId}`)
-          .digest('hex');
-
-        // ✅ BUG FIX 2: Quality score melhorado
-        const qualityScore = calculateQualityScore({
-          hasNome: !!concorrenteData.nome,
-          hasProduto: !!concorrenteData.descricao,
-          hasPorte: !!concorrenteData.porte,
-          hasCidade: false,
-          hasSite: false,
-          hasCNPJ: false,
-        });
-
-        // Verificar se já existe
-        const [existing] = await db
-          .select()
-          .from(concorrentes)
-          .where(eq(concorrentes.concorrenteHash, concorrenteHash))
-          .limit(1);
-
-        if (!existing) {
-          const concorrenteInsert: unknown = {
-            projectId,
-            pesquisaId: cliente.pesquisaId || null,
-            mercadoId,
-            nome: truncate(concorrenteData.nome, 255) || '',
-            produto: truncate(concorrenteData.descricao || '', 1000),
-            porte: truncate(concorrenteData.porte || '', 50),
-            cnpj: null,
-            site: null,
-            cidade: truncate(concorrenteData.cidade || '', 100) || null,
-            uf: truncate(concorrenteData.uf || '', 2) || null,
-            faturamentoEstimado: null,
-            qualidadeScore: qualityScore,
-            qualidadeClassificacao: getQualityClassification(qualityScore),
-            validationStatus: 'pending',
-            concorrenteHash,
-            createdAt: now(),
-          };
-
-          // Adicionar coordenadas se disponíveis
-          // @ts-ignore
-          if (concorrenteData.latitude !== undefined && concorrenteData.latitude !== null) {
-            // @ts-ignore
-            concorrenteInsert.latitude = concorrenteData.latitude; // CORRIGIDO
-          }
-          // @ts-ignore
-          if (concorrenteData.longitude !== undefined && concorrenteData.longitude !== null) {
-            // @ts-ignore
-            concorrenteInsert.longitude = concorrenteData.longitude; // CORRIGIDO
-          }
-          // @ts-ignore
-          if (concorrenteData.latitude || concorrenteData.longitude) {
-            // @ts-ignore
-            concorrenteInsert.geocodedAt = now();
-          }
-
-          // @ts-ignore
-          await db.insert(concorrentes).values(concorrenteInsert);
-          result.concorrentesCreated++;
+        try {
+          await db.insert(produtos).values(produtosToInsert).onConflictDoNothing();
+          result.produtosCreated += produtosToInsert.length;
+          console.log(`[Enrich] ✅ ${produtosToInsert.length} produtos inseridos em batch`);
+        } catch (error: any) {
+          console.error(`[Enrich] ❌ Erro no batch insert de produtos:`, error.message);
         }
       }
 
-      // 3.5 Inserir leads
-      for (const leadData of mercadoItem.leads) {
-        const leadHash = crypto
-          .createHash('md5')
-          .update(`${leadData.nome}-${mercadoId}`)
-          .digest('hex');
+      // 3.4 Inserir concorrentes em BATCH
+      if (mercadoItem.concorrentes.length > 0) {
+        // Primeiro, buscar hashes existentes em batch
+        const concorrentesHashes = mercadoItem.concorrentes.map((c) =>
+          crypto.createHash('md5').update(`${c.nome}-${mercadoId}`).digest('hex')
+        );
 
-        // ✅ BUG FIX 2: Quality score melhorado
-        const qualityScore = calculateQualityScore({
-          hasNome: !!leadData.nome,
-          hasProduto: !!leadData.justificativa,
-          hasPorte: !!leadData.porte,
-          hasCidade: false,
-          hasSite: false,
-          hasCNPJ: false,
-        });
+        const existingConcorrentes = await db
+          .select({ concorrenteHash: concorrentes.concorrenteHash })
+          .from(concorrentes)
+          .where(eq(concorrentes.mercadoId, mercadoId));
 
-        // Verificar se já existe
-        const [existing] = await db
-          .select()
+        const existingHashes = new Set(existingConcorrentes.map((c) => c.concorrenteHash));
+
+        // Preparar inserts apenas para novos concorrentes
+        const concorrentesToInsert = mercadoItem.concorrentes
+          .map((concorrenteData, index) => {
+            const concorrenteHash = concorrentesHashes[index];
+            if (existingHashes.has(concorrenteHash)) return null;
+
+            const qualityScore = calculateQualityScore({
+              hasNome: !!concorrenteData.nome,
+              hasProduto: !!concorrenteData.descricao,
+              hasPorte: !!concorrenteData.porte,
+              hasCidade: !!concorrenteData.cidade,
+              hasSite: false,
+              hasCNPJ: false,
+            });
+
+            const concorrenteInsert: any = {
+              projectId,
+              pesquisaId: cliente.pesquisaId || null,
+              mercadoId,
+              nome: truncate(concorrenteData.nome, 255) || '',
+              produto: truncate(concorrenteData.descricao || '', 1000),
+              porte: truncate(concorrenteData.porte || '', 50),
+              cnpj: null,
+              cnae: truncate(concorrenteData.cnae || '', 20) || null,
+              setor: truncate(concorrenteData.setor || '', 100) || null,
+              email: truncate(concorrenteData.email || '', 255) || null,
+              telefone: truncate(concorrenteData.telefone || '', 20) || null,
+              site: truncate(concorrenteData.site || '', 255) || null,
+              cidade: truncate(concorrenteData.cidade || '', 100) || null,
+              uf: truncate(concorrenteData.uf || '', 2) || null,
+              faturamentoEstimado: null,
+              qualidadeScore: qualityScore,
+              qualidadeClassificacao: getQualityClassification(qualityScore),
+              validationStatus: 'pending',
+              concorrenteHash,
+              createdAt: now(),
+            };
+
+            // Adicionar coordenadas se disponíveis
+            if (concorrenteData.latitude !== undefined && concorrenteData.latitude !== null) {
+              concorrenteInsert.latitude = concorrenteData.latitude;
+            }
+            if (concorrenteData.longitude !== undefined && concorrenteData.longitude !== null) {
+              concorrenteInsert.longitude = concorrenteData.longitude;
+            }
+            if (concorrenteData.latitude || concorrenteData.longitude) {
+              concorrenteInsert.geocodedAt = now();
+            }
+
+            return concorrenteInsert;
+          })
+          .filter((c) => c !== null);
+
+        if (concorrentesToInsert.length > 0) {
+          try {
+            await db.insert(concorrentes).values(concorrentesToInsert);
+            result.concorrentesCreated += concorrentesToInsert.length;
+            console.log(
+              `[Enrich] ✅ ${concorrentesToInsert.length} concorrentes inseridos em batch`
+            );
+          } catch (error: any) {
+            console.error(`[Enrich] ❌ Erro no batch insert de concorrentes:`, error.message);
+          }
+        }
+      }
+
+      // 3.5 Inserir leads em BATCH
+      if (mercadoItem.leads.length > 0) {
+        // Primeiro, buscar hashes existentes em batch
+        const leadsHashes = mercadoItem.leads.map((l) =>
+          crypto.createHash('md5').update(`${l.nome}-${mercadoId}`).digest('hex')
+        );
+
+        const existingLeads = await db
+          .select({ leadHash: leads.leadHash })
           .from(leads)
-          .where(eq(leads.leadHash, leadHash))
-          .limit(1);
+          .where(eq(leads.mercadoId, mercadoId));
 
-        if (!existing) {
-          const leadInsert: unknown = {
-            projectId,
-            pesquisaId: cliente.pesquisaId || null,
-            mercadoId,
-            nome: truncate(leadData.nome, 255) || '',
-            setor: truncate(leadData.segmento || '', 100),
-            tipo: truncate(leadData.potencial || '', 20),
-            porte: truncate(leadData.porte || '', 50),
-            cidade: truncate(leadData.cidade || '', 100) || null,
-            uf: truncate(leadData.uf || '', 2) || null,
-            qualidadeScore: qualityScore,
-            qualidadeClassificacao: getQualityClassification(qualityScore),
-            validationStatus: 'pending',
-            stage: 'novo',
-            leadHash,
-            createdAt: now(),
-          };
+        const existingHashes = new Set(existingLeads.map((l) => l.leadHash));
 
-          // Adicionar coordenadas se disponíveis
-          // @ts-ignore
-          if (leadData.latitude !== undefined && leadData.latitude !== null) {
-            // @ts-ignore
-            leadInsert.latitude = leadData.latitude; // CORRIGIDO
-          }
-          // @ts-ignore
-          if (leadData.longitude !== undefined && leadData.longitude !== null) {
-            // @ts-ignore
-            leadInsert.longitude = leadData.longitude; // CORRIGIDO
-          }
-          // @ts-ignore
-          if (leadData.latitude || leadData.longitude) {
-            // @ts-ignore
-            leadInsert.geocodedAt = now();
-          }
+        // Preparar inserts apenas para novos leads
+        const leadsToInsert = mercadoItem.leads
+          .map((leadData, index) => {
+            const leadHash = leadsHashes[index];
+            if (existingHashes.has(leadHash)) return null;
 
-          // @ts-ignore
-          await db.insert(leads).values(leadInsert);
-          result.leadsCreated++;
+            const qualityScore = calculateQualityScore({
+              hasNome: !!leadData.nome,
+              hasProduto: !!leadData.justificativa,
+              hasPorte: !!leadData.porte,
+              hasCidade: !!leadData.cidade,
+              hasSite: false,
+              hasCNPJ: false,
+            });
+
+            const leadInsert: any = {
+              projectId,
+              pesquisaId: cliente.pesquisaId || null,
+              mercadoId,
+              nome: truncate(leadData.nome, 255) || '',
+              setor: truncate(leadData.segmento || '', 100),
+              tipo: truncate(leadData.potencial || '', 20),
+              porte: truncate(leadData.porte || '', 50),
+              cnae: truncate(leadData.cnae || '', 20) || null,
+              email: truncate(leadData.email || '', 255) || null,
+              telefone: truncate(leadData.telefone || '', 20) || null,
+              cidade: truncate(leadData.cidade || '', 100) || null,
+              uf: truncate(leadData.uf || '', 2) || null,
+              qualidadeScore: qualityScore,
+              qualidadeClassificacao: getQualityClassification(qualityScore),
+              validationStatus: 'pending',
+              stage: 'novo',
+              leadHash,
+              createdAt: now(),
+            };
+
+            // Adicionar coordenadas se disponíveis
+            if (leadData.latitude !== undefined && leadData.latitude !== null) {
+              leadInsert.latitude = leadData.latitude;
+            }
+            if (leadData.longitude !== undefined && leadData.longitude !== null) {
+              leadInsert.longitude = leadData.longitude;
+            }
+            if (leadData.latitude || leadData.longitude) {
+              leadInsert.geocodedAt = now();
+            }
+
+            return leadInsert;
+          })
+          .filter((l) => l !== null);
+
+        if (leadsToInsert.length > 0) {
+          try {
+            await db.insert(leads).values(leadsToInsert);
+            result.leadsCreated += leadsToInsert.length;
+            console.log(`[Enrich] ✅ ${leadsToInsert.length} leads inseridos em batch`);
+          } catch (error: any) {
+            console.error(`[Enrich] ❌ Erro no batch insert de leads:`, error.message);
+            console.error(`[Enrich] Detalhes:`, JSON.stringify(leadsToInsert, null, 2));
+          }
         }
       }
     }

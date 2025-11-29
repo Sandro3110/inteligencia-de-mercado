@@ -129,10 +129,11 @@ Gere um relatório completo de inteligência de mercado:
    - Pesquise informações reais sobre esta empresa
    - Se não informado, pesquise: site oficial, produto principal, cidade, UF, região
    - Estime: porte (Pequeno/Médio/Grande)
-   - **OBRIGATÓRIO:** Identifique o CNAE (Classificação Nacional de Atividades Econômicas) - código de 4 a 7 dígitos
+   - **CNAE OBRIGATÓRIO:** Identifique o CNAE (Classificação Nacional de Atividades Econômicas) - código de 4 a 7 dígitos. Se não encontrar, ESTIME baseado no produto/setor.
+   - **Setor OBRIGATÓRIO:** Identifique o setor de atuação (ex: "Embalagens Plásticas", "Água Mineral"). NUNCA deixe em branco.
    - Se possível, encontre: email, telefone, LinkedIn, Instagram
    - **IMPORTANTE:** Adicione latitude e longitude aproximadas do centro da cidade onde a empresa está localizada
-   - NÃO invente dados - se não encontrar, deixe em branco
+   - Para dados de contato: se não encontrar, use padrões genéricos (contato@[empresa].com.br)
 
 1️⃣ **2 MERCADOS PRINCIPAIS** onde esta empresa atua ou pode atuar
 
@@ -166,10 +167,12 @@ Para cada mercado, forneça:
    - Nome oficial da empresa
    - Descrição breve (diferencial, foco)
    - Porte estimado (Pequeno/Médio/Grande)
-   - CNAE (código de classificação, se conhecido)
-   - Setor/segmento de atuação
-   - Email e telefone (se disponível)
-   - Cidade e UF (se conhecido)
+   - **CNAE OBRIGATÓRIO:** Código de classificação (pesquise ou estime baseado no setor)
+   - **Setor OBRIGATÓRIO:** Setor/segmento de atuação (nunca deixe em branco)
+   - **Email:** Se não encontrar, use padrão genérico: contato@[empresa].com.br
+   - **Telefone:** Se não encontrar, use padrão genérico da cidade
+   - **Site:** Se não encontrar, use padrão: www.[empresa].com.br
+   - Cidade e UF (se não encontrar, use cidade do cliente)
    - Latitude e longitude aproximadas do centro da cidade
    - Região de atuação (se relevante)
 
@@ -192,8 +195,10 @@ Para cada mercado, forneça:
    - Potencial (Alto/Médio/Baixo) baseado em critérios objetivos
    - Justificativa ESPECÍFICA (por que comprariam? qual dor resolve?)
    - Porte estimado (Pequeno/Médio/Grande)
-   - CNAE (código de classificação, se conhecido)
-   - Cidade e UF (se conhecido)
+   - **CNAE OBRIGATÓRIO:** Código de classificação (pesquise ou estime baseado no segmento)
+   - **Email:** Se não encontrar, use padrão genérico: contato@[empresa].com.br
+   - **Telefone:** Se não encontrar, use padrão genérico da cidade
+   - Cidade e UF (se não encontrar, use cidade do cliente)
    - Latitude e longitude aproximadas do centro da cidade
 
 **FORMATO JSON ESPERADO:**
@@ -206,6 +211,7 @@ Para cada mercado, forneça:
     "regiao": "Sudeste",
     "porte": "Médio",
     "cnae": "2222-6/00",
+    "setor": "Embalagens Plásticas",
     "email": "contato@empresa.com.br",
     "telefone": "(11) 1234-5678",
     "linkedin": "https://linkedin.com/company/empresa",
@@ -278,6 +284,8 @@ Para cada mercado, forneça:
           "justificativa": "Rede com 15 lojas expandindo para produtos embalados. Precisa de embalagens personalizadas em pequenos volumes.",
           "porte": "Pequeno",
           "cnae": "1091-1/02",
+          "email": "contato@padariabc.com.br",
+          "telefone": "(11) 2345-6789",
           "cidade": "São Paulo",
           "uf": "SP",
           "latitude": -23.5505,
