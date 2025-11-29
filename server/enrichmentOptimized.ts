@@ -146,12 +146,12 @@ export async function enrichClienteOptimized(
       // @ts-ignore
       if (enriched.latitude !== undefined && enriched.latitude !== null) {
         // @ts-ignore
-        updateData.latitude = enriched.latitude.toString();
+        updateData.latitude = enriched.latitude; // CORRIGIDO: Passar número diretamente
       }
       // @ts-ignore
       if (enriched.longitude !== undefined && enriched.longitude !== null) {
         // @ts-ignore
-        updateData.longitude = enriched.longitude.toString();
+        updateData.longitude = enriched.longitude; // CORRIGIDO: Passar número diretamente
       }
       // @ts-ignore
       if (enriched.latitude || enriched.longitude) {
@@ -189,16 +189,19 @@ export async function enrichClienteOptimized(
         mercadoId = existingMercado.id;
         logger.debug(`[Enrich] Reusing mercado: ${mercadoData.nome}`);
       } else {
-        const newMercado = await db.insert(mercadosUnicos).values({
-          projectId,
-          pesquisaId: cliente.pesquisaId || null,
-          nome: truncate(mercadoData.nome, 255) || '',
-          categoria: truncate(mercadoData.categoria || '', 100),
-          segmentacao: truncate(mercadoData.segmentacao || '', 50),
-          tamanhoMercado: truncate(mercadoData.tamanhoEstimado || '', 500),
-          mercadoHash,
-          createdAt: now(),
-        }).returning({ id: mercadosUnicos.id });
+        const newMercado = await db
+          .insert(mercadosUnicos)
+          .values({
+            projectId,
+            pesquisaId: cliente.pesquisaId || null,
+            nome: truncate(mercadoData.nome, 255) || '',
+            categoria: truncate(mercadoData.categoria || '', 100),
+            segmentacao: truncate(mercadoData.segmentacao || '', 50),
+            tamanhoMercado: truncate(mercadoData.tamanhoEstimado || '', 500),
+            mercadoHash,
+            createdAt: now(),
+          })
+          .returning({ id: mercadosUnicos.id });
 
         mercadoId = Number(newMercado[0].id);
         result.mercadosCreated++;
@@ -283,12 +286,12 @@ export async function enrichClienteOptimized(
           // @ts-ignore
           if (concorrenteData.latitude !== undefined && concorrenteData.latitude !== null) {
             // @ts-ignore
-            concorrenteInsert.latitude = concorrenteData.latitude.toString();
+            concorrenteInsert.latitude = concorrenteData.latitude; // CORRIGIDO
           }
           // @ts-ignore
           if (concorrenteData.longitude !== undefined && concorrenteData.longitude !== null) {
             // @ts-ignore
-            concorrenteInsert.longitude = concorrenteData.longitude.toString();
+            concorrenteInsert.longitude = concorrenteData.longitude; // CORRIGIDO
           }
           // @ts-ignore
           if (concorrenteData.latitude || concorrenteData.longitude) {
@@ -349,12 +352,12 @@ export async function enrichClienteOptimized(
           // @ts-ignore
           if (leadData.latitude !== undefined && leadData.latitude !== null) {
             // @ts-ignore
-            leadInsert.latitude = leadData.latitude.toString();
+            leadInsert.latitude = leadData.latitude; // CORRIGIDO
           }
           // @ts-ignore
           if (leadData.longitude !== undefined && leadData.longitude !== null) {
             // @ts-ignore
-            leadInsert.longitude = leadData.longitude.toString();
+            leadInsert.longitude = leadData.longitude; // CORRIGIDO
           }
           // @ts-ignore
           if (leadData.latitude || leadData.longitude) {
