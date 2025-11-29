@@ -90,7 +90,7 @@ export async function generateAllDataOptimized(
   cliente: Cliente,
   retryCount = 0
 ): Promise<EnrichmentData> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
   const MAX_RETRIES = 2;
 
   if (!apiKey) {
