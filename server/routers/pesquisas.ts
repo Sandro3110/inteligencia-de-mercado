@@ -20,6 +20,7 @@ export const pesquisasRouter = createTRPCRouter({
           projectId: z.number().optional(),
         })
         .optional()
+        .default({})
     )
     .query(async ({ input }) => {
       const db = await getDb();
