@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface ProjectFormProps {
@@ -26,14 +26,27 @@ const PRESET_COLORS = [
 ];
 
 export function ProjectForm({ initialData, onSubmit, onCancel, isLoading }: ProjectFormProps) {
-  const [nome, setNome] = useState(initialData?.nome || '');
-  const [descricao, setDescricao] = useState(initialData?.descricao || '');
+  // Usar refs para inputs não controlados (sem re-render)
+  const nomeRef = useRef<HTMLInputElement>(null);
+  const descricaoRef = useRef<HTMLTextAreaElement>(null);
+  const nomePesquisaRef = useRef<HTMLInputElement>(null);
+
+  // Apenas cor precisa de estado visual
   const [cor, setCor] = useState(initialData?.cor || '#3b82f6');
-  const [nomePesquisa, setNomePesquisa] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ nome, descricao, cor, nomePesquisa: nomePesquisa.trim() || nome });
+
+    const nome = nomeRef.current?.value || '';
+    const descricao = descricaoRef.current?.value || '';
+    const nomePesquisa = nomePesquisaRef.current?.value || '';
+
+    onSubmit({
+      nome,
+      descricao,
+      cor,
+      nomePesquisa: nomePesquisa.trim() || nome,
+    });
   };
 
   return (
@@ -43,10 +56,10 @@ export function ProjectForm({ initialData, onSubmit, onCancel, isLoading }: Proj
           Nome do Projeto *
         </label>
         <input
+          ref={nomeRef}
           id="nome"
           type="text"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
+          defaultValue={initialData?.nome || ''}
           placeholder="Ex: Expansão Regional 2024"
           required
           disabled={isLoading}
@@ -59,9 +72,9 @@ export function ProjectForm({ initialData, onSubmit, onCancel, isLoading }: Proj
           Descrição
         </label>
         <textarea
+          ref={descricaoRef}
           id="descricao"
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
+          defaultValue={initialData?.descricao || ''}
           placeholder="Descreva o objetivo deste projeto..."
           rows={3}
           disabled={isLoading}
@@ -75,10 +88,10 @@ export function ProjectForm({ initialData, onSubmit, onCancel, isLoading }: Proj
             Nome da Pesquisa Inicial
           </label>
           <input
+            ref={nomePesquisaRef}
             id="nomePesquisa"
             type="text"
-            value={nomePesquisa}
-            onChange={(e) => setNomePesquisa(e.target.value)}
+            defaultValue=""
             placeholder="Deixe vazio para usar o nome do projeto"
             disabled={isLoading}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -108,7 +121,7 @@ export function ProjectForm({ initialData, onSubmit, onCancel, isLoading }: Proj
       </div>
 
       <div className="flex gap-3 pt-4">
-        <Button type="submit" disabled={isLoading || !nome.trim()} className="flex-1">
+        <Button type="submit" disabled={isLoading} className="flex-1">
           {isLoading ? 'Salvando...' : initialData ? 'Salvar Alterações' : 'Criar Projeto'}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
