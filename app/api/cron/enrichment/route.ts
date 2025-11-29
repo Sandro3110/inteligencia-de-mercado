@@ -15,6 +15,14 @@ export async function GET(request: NextRequest) {
   const BATCH_SIZE = 5; // Processar 5 clientes por execução
 
   try {
+    // Log environment check
+    console.log('[Cron] Environment check:', {
+      hasOpenAIKey: !!process.env.OPENAI_API_KEY,
+      keyPrefix: process.env.OPENAI_API_KEY?.substring(0, 10),
+      nodeEnv: process.env.NODE_ENV,
+      vercelEnv: process.env.VERCEL_ENV,
+    });
+
     const db = await getDb();
     if (!db) {
       console.error('[Cron] Database connection failed');
@@ -110,6 +118,14 @@ export async function GET(request: NextRequest) {
         console.log(`[Cron] Processing cliente ${cliente.id}: ${cliente.nome}`);
 
         try {
+          console.log(
+            `[Cron] Calling enrichClienteOptimized for cliente ${cliente.id} (${cliente.nome})`
+          );
+          console.log(`[Cron] Parameters:`, {
+            clienteId: cliente.id,
+            projectId: pesquisa.projectId,
+          });
+
           // CHAMADA CORRETA: Passar parâmetros diretos, não objeto!
           const result = await enrichClienteOptimized(cliente.id, pesquisa.projectId);
 
@@ -124,8 +140,17 @@ export async function GET(request: NextRequest) {
 
           return { clienteId: cliente.id, success: true, result };
         } catch (error: any) {
-          console.error(`[Cron] Error processing cliente ${cliente.id}:`, error);
-          return { clienteId: cliente.id, success: false, error: error.message };
+          console.error(`[Cron] DETAILED ERROR for cliente ${cliente.id}:`, {
+            message: error.message,
+            stack: error.stack,
+            name: error.name,
+            cause: error.cause,
+          });
+          return {
+            clienteId: cliente.id,
+            success: false,
+            error: `${error.name}: ${error.message}`,
+          };
         }
       })
     );
