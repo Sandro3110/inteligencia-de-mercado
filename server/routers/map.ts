@@ -341,38 +341,40 @@ export const mapRouter = router({
       const db = await getDb();
       if (!db) throw new Error('Database not available');
 
+      // Se projectId foi fornecido mas pesquisaId não, buscar todas as pesquisas do projeto
+      let pesquisaIds: number[] | undefined;
+      if (input.projectId && !input.pesquisaId) {
+        const projectPesquisas = await db
+          .select({ id: pesquisas.id })
+          .from(pesquisas)
+          .where(and(eq(pesquisas.projectId, input.projectId), eq(pesquisas.ativo, 1)));
+        pesquisaIds = projectPesquisas.map((p) => p.id);
+      }
+
+      // Construir condição de filtro
+      const pesquisaCondition = input.pesquisaId
+        ? eq(clientes.pesquisaId, input.pesquisaId)
+        : pesquisaIds && pesquisaIds.length > 0
+          ? inArray(clientes.pesquisaId, pesquisaIds)
+          : undefined;
+
       // Buscar UFs únicas
       const ufs = await db
         .selectDistinct({ uf: clientes.uf })
         .from(clientes)
-        .where(
-          and(
-            isNotNull(clientes.uf),
-            input.pesquisaId ? eq(clientes.pesquisaId, input.pesquisaId) : undefined
-          )
-        );
+        .where(and(isNotNull(clientes.uf), pesquisaCondition));
 
       // Buscar cidades únicas
       const cidades = await db
         .selectDistinct({ cidade: clientes.cidade })
         .from(clientes)
-        .where(
-          and(
-            isNotNull(clientes.cidade),
-            input.pesquisaId ? eq(clientes.pesquisaId, input.pesquisaId) : undefined
-          )
-        );
+        .where(and(isNotNull(clientes.cidade), pesquisaCondition));
 
       // Buscar setores únicos
       const setores = await db
         .selectDistinct({ setor: clientes.setor })
         .from(clientes)
-        .where(
-          and(
-            isNotNull(clientes.setor),
-            input.pesquisaId ? eq(clientes.pesquisaId, input.pesquisaId) : undefined
-          )
-        );
+        .where(and(isNotNull(clientes.setor), pesquisaCondition));
 
       return {
         ufs: ufs
