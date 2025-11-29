@@ -338,7 +338,20 @@ export async function enrichClienteOptimized(
     });
 
     // Garantir que mercados seja um array
+    console.log('[Enrich] DEBUG: typeof allData:', typeof allData);
+    console.log('[Enrich] DEBUG: allData keys:', Object.keys(allData || {}));
+    console.log('[Enrich] DEBUG: typeof allData.mercados:', typeof allData?.mercados);
+    console.log(
+      '[Enrich] DEBUG: Array.isArray(allData.mercados):',
+      Array.isArray(allData?.mercados)
+    );
+    console.log(
+      '[Enrich] DEBUG: allData.mercados value:',
+      JSON.stringify(allData?.mercados).substring(0, 500)
+    );
+
     const mercados = Array.isArray(allData.mercados) ? allData.mercados : [];
+    console.log('[Enrich] DEBUG: mercados.length:', mercados.length);
 
     // 2.5 Processar produtos (OpenAI retorna em allData.produtos)
     if (allData.produtos && Array.isArray(allData.produtos) && allData.produtos.length > 0) {

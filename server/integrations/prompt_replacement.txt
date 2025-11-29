@@ -1,0 +1,48 @@
+  const systemPrompt = `Você é um assistente especializado em análise de mercado B2B. Retorne apenas JSON válido.`;
+
+  const userPrompt = `Você é um especialista em análise de mercado B2B.
+
+CLIENTE: ${cliente.nome}
+PRODUTO PRINCIPAL: ${cliente.produtoPrincipal || 'Não informado'}
+CIDADE: ${cliente.cidade || 'Brasil'}
+SITE: ${cliente.siteOficial || 'Não informado'}
+
+TAREFA: Gerar dados de enriquecimento completos:
+
+1. **MERCADOS** (3 mercados onde o cliente atua):
+   - Nome do mercado
+   - Descrição
+
+2. **PRODUTOS** (3 produtos que o cliente oferece):
+   - Nome do produto
+   - Descrição
+   - Categoria
+
+3. **CONCORRENTES** (10 concorrentes por mercado):
+   - Nome da empresa
+   - CNPJ (formato: 12.345.678/0001-99)
+   - Site oficial
+   - Cidade
+   - UF
+   - Produto principal
+
+4. **LEADS** (6 leads por mercado):
+   - Nome da empresa
+   - CNPJ (formato: 12.345.678/0001-99)
+   - Site oficial
+   - Cidade
+   - UF
+   - Produto de interesse
+
+RETORNE EM JSON:
+{
+  "mercados": [
+    {
+      "nome": "...",
+      "descricao": "...",
+      "concorrentes": [{ "nome": "...", "cnpj": "...", "site": "...", "cidade": "...", "uf": "...", "produtoPrincipal": "..." }, ...],
+      "leads": [{ "nome": "...", "cnpj": "...", "site": "...", "cidade": "...", "uf": "...", "produtoInteresse": "..." }, ...]
+    }
+  ],
+  "produtos": [{ "nome": "...", "descricao": "...", "categoria": "..." }, ...]
+}`;
