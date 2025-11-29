@@ -97,211 +97,54 @@ export async function generateAllDataOptimized(
     throw new Error('OPENAI_API_KEY not configured');
   }
 
-  const systemPrompt = `Você é um especialista em pesquisa de mercado B2B brasileiro com 20 anos de experiência.
+  const systemPrompt = `Você é um assistente especializado em análise de mercado B2B. Retorne apenas JSON válido.`;
 
-**SUA MISSÃO:**
-Analisar empresas brasileiras e gerar inteligência de mercado acionável e de alta qualidade.
+  const userPrompt = `Você é um especialista em análise de mercado B2B.
 
-**PRINCÍPIOS DE QUALIDADE:**
-1. **Especificidade:** Prefira empresas específicas do nicho, não apenas grandes marcas nacionais
-2. **Relevância Regional:** Considere a localização da empresa (se regional, liste concorrentes regionais)
-3. **Porte Compatível:** Liste empresas de porte similar (pequeno com pequeno, grande com grande)
-4. **Competição Direta:** Foque em empresas que competem DIRETAMENTE pelos mesmos clientes
-5. **Leads Qualificados:** Leads devem ter MOTIVO REAL para comprar (não apenas "são grandes")
-6. **Dados Reais:** NUNCA invente empresas. Se não souber, deixe em branco.
+CLIENTE: ${cliente.nome}
+PRODUTO PRINCIPAL: ${cliente.produtoPrincipal || 'Não informado'}
+CIDADE: ${cliente.cidade || 'Brasil'}
+SITE: ${cliente.siteOficial || 'Não informado'}
 
-**FORMATO DE RESPOSTA:**
-Sempre retorne JSON válido e estruturado conforme especificado.`;
+TAREFA: Gerar dados de enriquecimento completos:
 
-  const userPrompt = `**EMPRESA PARA ANÁLISE:**
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 Nome: ${cliente.nome}
-${cliente.cnpj ? `🆔 CNPJ: ${cliente.cnpj}` : ''}
-🏭 Produto Principal: ${cliente.produtoPrincipal || 'Não informado - PESQUISE'}
-🌐 Site: ${cliente.siteOficial || 'Não informado - PESQUISE'}
-📍 Cidade: ${cliente.cidade || 'Brasil - PESQUISE'}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. **MERCADOS** (3 mercados onde o cliente atua):
+   - Nome do mercado
+   - Descrição
 
-**TAREFA:**
-Gere um relatório completo de inteligência de mercado:
+2. **PRODUTOS** (3 produtos que o cliente oferece):
+   - Nome do produto
+   - Descrição
+   - Categoria
 
-0️⃣ **PRIMEIRO: ENRIQUECER DADOS DO CLIENTE**
-   - Pesquise informações reais sobre esta empresa
-   - Se não informado, pesquise: site oficial, produto principal, cidade, UF, região
-   - Estime: porte (Pequeno/Médio/Grande)
-   - **CNAE OBRIGATÓRIO:** Identifique o CNAE (Classificação Nacional de Atividades Econômicas) - código de 4 a 7 dígitos. Se não encontrar, ESTIME baseado no produto/setor.
-   - **Setor OBRIGATÓRIO:** Identifique o setor de atuação (ex: "Embalagens Plásticas", "Água Mineral"). NUNCA deixe em branco.
-   - Se possível, encontre: email, telefone, LinkedIn, Instagram
-   - **IMPORTANTE:** Adicione latitude e longitude aproximadas do centro da cidade onde a empresa está localizada
-   - Para dados de contato: se não encontrar, use padrões genéricos (contato@[empresa].com.br)
+3. **CONCORRENTES** (10 concorrentes por mercado):
+   - Nome da empresa
+   - CNPJ (formato: 12.345.678/0001-99)
+   - Site oficial
+   - Cidade
+   - UF
+   - Produto principal
 
-1️⃣ **2 MERCADOS PRINCIPAIS** onde esta empresa atua ou pode atuar
+4. **LEADS** (6 leads por mercado):
+   - Nome da empresa
+   - CNPJ (formato: 12.345.678/0001-99)
+   - Site oficial
+   - Cidade
+   - UF
+   - Produto de interesse
 
-Para cada mercado, forneça:
-
-📊 **MERCADO:**
-   - Nome específico e descritivo
-   - Categoria (B2B, B2C ou B2G)
-   - Segmentação (público-alvo detalhado, max 50 chars)
-   - Tamanho estimado (valor/volume, max 100 chars)
-
-🎯 **3 PRODUTOS/SERVIÇOS:**
-   - Nome comercial
-   - Descrição detalhada (benefícios, aplicações)
-   - Categoria/tipo
-
-⚔️ **CONCORRENTES DIRETOS (GERAR 10-12):**
-   
-   ⚠️ **IMPORTANTE:** Gere entre 10 e 12 concorrentes.
-   Se não encontrar empresas que atendam TODOS os critérios abaixo,
-   relaxe os critérios de região ou porte para atingir pelo menos 10.
-   
-   **CRITÉRIOS DE SELEÇÃO (EM ORDEM DE PRIORIDADE):**
-   1. OBRIGATÓRIO: Empresas REAIS que existem no Brasil
-   2. OBRIGATÓRIO: Competem no mesmo mercado/segmento
-   3. PREFERENCIAL: Porte similar (pode variar se necessário)
-   4. PREFERENCIAL: Região similar (pode expandir se necessário)
-   5. ACEITÁVEL: Grandes marcas nacionais (se necessário para completar)
-   
-   Para cada concorrente:
-   - Nome oficial da empresa
-   - Descrição breve (diferencial, foco)
-   - Porte estimado (Pequeno/Médio/Grande)
-   - **CNAE OBRIGATÓRIO:** Código de classificação (pesquise ou estime baseado no setor)
-   - **Setor OBRIGATÓRIO:** Setor/segmento de atuação (nunca deixe em branco)
-   - **Email:** Se não encontrar, use padrão genérico: contato@[empresa].com.br
-   - **Telefone:** Se não encontrar, use padrão genérico da cidade
-   - **Site:** Se não encontrar, use padrão: www.[empresa].com.br
-   - Cidade e UF (se não encontrar, use cidade do cliente)
-   - Latitude e longitude aproximadas do centro da cidade
-   - Região de atuação (se relevante)
-
-💼 **LEADS QUALIFICADOS (GERAR 6-10):**
-   
-   ⚠️ **IMPORTANTE:** Gere entre 6 e 10 leads (ideal: 8).
-   Se não encontrar empresas suficientes, expanda para regiões próximas ou
-   segmentos adjacentes para atingir pelo menos 6.
-   
-   **CRITÉRIOS DE QUALIFICAÇÃO:**
-   - Empresas REAIS que existem no Brasil
-   - Têm MOTIVO REAL para comprar (especifique!)
-   - Porte adequado (não liste apenas grandes se empresa é pequena)
-   - Região adequada (considere logística/atendimento)
-   - Segmento compatível com o produto
-   
-   Para cada lead:
-   - Nome oficial da empresa
-   - Segmento de atuação
-   - Potencial (Alto/Médio/Baixo) baseado em critérios objetivos
-   - Justificativa ESPECÍFICA (por que comprariam? qual dor resolve?)
-   - Porte estimado (Pequeno/Médio/Grande)
-   - **CNAE OBRIGATÓRIO:** Código de classificação (pesquise ou estime baseado no segmento)
-   - **Email:** Se não encontrar, use padrão genérico: contato@[empresa].com.br
-   - **Telefone:** Se não encontrar, use padrão genérico da cidade
-   - Cidade e UF (se não encontrar, use cidade do cliente)
-   - Latitude e longitude aproximadas do centro da cidade
-
-**FORMATO JSON ESPERADO:**
+RETORNE EM JSON:
 {
-  "clienteEnriquecido": {
-    "siteOficial": "https://www.site-real-da-empresa.com.br",
-    "produtoPrincipal": "Descrição do produto/serviço principal",
-    "cidade": "São Paulo",
-    "uf": "SP",
-    "regiao": "Sudeste",
-    "porte": "Médio",
-    "cnae": "2222-6/00",
-    "setor": "Embalagens Plásticas",
-    "email": "contato@empresa.com.br",
-    "telefone": "(11) 1234-5678",
-    "linkedin": "https://linkedin.com/company/empresa",
-    "instagram": "@empresa",
-    "latitude": -23.5505,
-    "longitude": -46.6333
-  },
   "mercados": [
     {
-      "mercado": {
-        "nome": "Nome específico do mercado (ex: Embalagens Plásticas para Indústria Alimentícia)",
-        "categoria": "B2B",
-        "segmentacao": "Indústrias de alimentos que precisam...",
-        "tamanhoEstimado": "R$ 2,5 bilhões/ano no Brasil"
-      },
-      "produtos": [
-        {
-          "nome": "Embalagens Flexíveis Multicamadas",
-          "descricao": "Embalagens plásticas com barreira contra umidade e oxigênio, ideais para conservação de alimentos processados. Disponíveis em diversos tamanhos e formatos.",
-          "categoria": "Embalagens Flexíveis"
-        }
-      ],
-      "concorrentes": [
-        {
-          "nome": "Bemis Latin America",
-          "descricao": "Líder em embalagens flexíveis, foco em alta barreira",
-          "porte": "Grande",
-          "cnae": "2222-6/00",
-          "setor": "Embalagens Plásticas",
-          "email": "contato@bemis.com.br",
-          "telefone": "(11) 3456-7890",
-          "cidade": "São Paulo",
-          "uf": "SP",
-          "latitude": -23.5505,
-          "longitude": -46.6333,
-          "regiao": "Nacional"
-        },
-        {
-          "nome": "Embalagens XYZ Ltda",
-          "descricao": "Especializada em pequenos lotes customizados",
-          "porte": "Pequeno",
-          "cnae": "2222-6/00",
-          "setor": "Embalagens Plásticas",
-          "email": "vendas@xyz.com.br",
-          "telefone": "(11) 9876-5432",
-          "cidade": "São Paulo",
-          "uf": "SP",
-          "latitude": -23.5505,
-          "longitude": -46.6333,
-          "regiao": "São Paulo"
-        }
-      ],
-      "leads": [
-        {
-          "nome": "Nestlé Brasil",
-          "segmento": "Indústria Alimentícia",
-          "potencial": "Alto",
-          "justificativa": "Maior compradora de embalagens do país, busca fornecedores regionais para reduzir custos logísticos. Tem programa de qualificação de fornecedores locais.",
-          "porte": "Grande",
-          "cnae": "1053-8/00",
-          "cidade": "São Paulo",
-          "uf": "SP",
-          "latitude": -23.5505,
-          "longitude": -46.6333
-        },
-        {
-          "nome": "Padaria e Confeitaria ABC",
-          "segmento": "Panificação Artesanal",
-          "potencial": "Médio",
-          "justificativa": "Rede com 15 lojas expandindo para produtos embalados. Precisa de embalagens personalizadas em pequenos volumes.",
-          "porte": "Pequeno",
-          "cnae": "1091-1/02",
-          "email": "contato@padariabc.com.br",
-          "telefone": "(11) 2345-6789",
-          "cidade": "São Paulo",
-          "uf": "SP",
-          "latitude": -23.5505,
-          "longitude": -46.6333
-        }
-      ]
+      "nome": "...",
+      "descricao": "...",
+      "concorrentes": [{ "nome": "...", "cnpj": "...", "site": "...", "cidade": "...", "uf": "...", "produtoPrincipal": "..." }, ...],
+      "leads": [{ "nome": "...", "cnpj": "...", "site": "...", "cidade": "...", "uf": "...", "produtoInteresse": "..." }, ...]
     }
-  ]
-}
-
-**INSTRUÇÕES FINAIS:**
-✅ Retorne APENAS o JSON, sem markdown ou explicações
-✅ Liste APENAS empresas que você tem certeza que existem
-✅ Se não souber o porte/região, omita o campo
-✅ Justificativas devem ser ESPECÍFICAS e ACIONÁVEIS
-✅ Priorize QUALIDADE sobre quantidade`;
+  ],
+  "produtos": [{ "nome": "...", "descricao": "...", "categoria": "..." }, ...]
+}`;
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
