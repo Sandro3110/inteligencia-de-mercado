@@ -71,7 +71,7 @@ export default function MapPage() {
   });
 
   // Buscar projetos e pesquisas para os dropdowns
-  const { data: projects } = trpc.project.list.useQuery({});
+  const { data: projects } = trpc.dashboard.getProjects.useQuery();
   const { data: pesquisas } = trpc.pesquisas.list.useQuery(
     { projectId: filters.projectId },
     { enabled: !!filters.projectId }
