@@ -1,12 +1,5 @@
 'use client';
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { ProjectForm } from './ProjectForm';
 
 interface ProjectModalProps {
@@ -28,24 +21,51 @@ export function ProjectModal({
   initialData,
   isLoading,
 }: ProjectModalProps) {
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>{initialData ? 'Editar Projeto' : 'Novo Projeto'}</DialogTitle>
-          <DialogDescription>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Overlay */}
+      <div className="fixed inset-0 bg-black/50" onClick={onClose} />
+
+      {/* Modal */}
+      <div className="relative z-50 w-full max-w-[500px] mx-4 bg-white rounded-lg shadow-lg p-6">
+        {/* Header */}
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">
+            {initialData ? 'Editar Projeto' : 'Novo Projeto'}
+          </h2>
+          <p className="text-sm text-gray-600 mt-1">
             {initialData
               ? 'Atualize as informações do projeto'
               : 'Crie um novo projeto para organizar suas pesquisas'}
-          </DialogDescription>
-        </DialogHeader>
+          </p>
+        </div>
+
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+          disabled={isLoading}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+
+        {/* Form */}
         <ProjectForm
           initialData={initialData}
           onSubmit={onSubmit}
           onCancel={onClose}
           isLoading={isLoading}
         />
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

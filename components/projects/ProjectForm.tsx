@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 
 interface ProjectFormProps {
   initialData?: {
@@ -44,13 +42,15 @@ export function ProjectForm({ initialData, onSubmit, onCancel, isLoading }: Proj
         <label htmlFor="nome" className="block text-sm font-medium text-gray-700 mb-1">
           Nome do Projeto *
         </label>
-        <Input
+        <input
           id="nome"
+          type="text"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           placeholder="Ex: Expansão Regional 2024"
           required
           disabled={isLoading}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
         />
       </div>
 
@@ -58,13 +58,14 @@ export function ProjectForm({ initialData, onSubmit, onCancel, isLoading }: Proj
         <label htmlFor="descricao" className="block text-sm font-medium text-gray-700 mb-1">
           Descrição
         </label>
-        <Textarea
+        <textarea
           id="descricao"
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
           placeholder="Descreva o objetivo deste projeto..."
           rows={3}
           disabled={isLoading}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed resize-none"
         />
       </div>
 
@@ -73,12 +74,14 @@ export function ProjectForm({ initialData, onSubmit, onCancel, isLoading }: Proj
           <label htmlFor="nomePesquisa" className="block text-sm font-medium text-gray-700 mb-1">
             Nome da Pesquisa Inicial
           </label>
-          <Input
+          <input
             id="nomePesquisa"
+            type="text"
             value={nomePesquisa}
             onChange={(e) => setNomePesquisa(e.target.value)}
             placeholder="Deixe vazio para usar o nome do projeto"
             disabled={isLoading}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           />
           <p className="text-xs text-gray-500 mt-1">
             Uma pesquisa inicial será criada automaticamente com este nome
