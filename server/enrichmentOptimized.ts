@@ -113,12 +113,19 @@ export async function enrichClienteOptimized(
 
     // 2. SISTEMA DE CAMADAS: Tentar gerar dados com fallback inteligente
     logger.debug(`[Enrich] CAMADA 1: Tentando gerar TUDO com 1 chamada...`);
-    const allData = await generateAllDataOptimized({
-      nome: cliente.nome,
-      produtoPrincipal: cliente.produtoPrincipal || undefined,
-      siteOficial: cliente.siteOficial || undefined,
-      cidade: cliente.cidade || undefined,
-    });
+    let allData;
+
+    try {
+      allData = await generateAllDataOptimized({
+        nome: cliente.nome,
+        produtoPrincipal: cliente.produtoPrincipal || undefined,
+        siteOficial: cliente.siteOficial || undefined,
+        cidade: cliente.cidade || undefined,
+      });
+    } catch (error) {
+      logger.warn(`[Enrich] CAMADA 1 falhou com erro: ${error}`);
+      allData = { mercados: [], clienteEnriquecido: null };
+    }
 
     // CAMADA 2: Verificar se precisa de fallback
     if (!allData.mercados || allData.mercados.length === 0) {
