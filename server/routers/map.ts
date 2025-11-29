@@ -411,4 +411,74 @@ export const mapRouter = router({
           .sort(),
       };
     }),
+
+  /**
+   * Buscar estatísticas (totalizadores) independente de coordenadas
+   */
+  getMapStats: protectedProcedure
+    .input(
+      z
+        .object({
+          projectId: z.number().optional(),
+          pesquisaId: z.number().optional(),
+        })
+        .optional()
+        .default({})
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
+      // Se projectId foi fornecido mas pesquisaId não, buscar todas as pesquisas do projeto
+      let pesquisaIds: number[] | undefined;
+      if (input.projectId && !input.pesquisaId) {
+        const projectPesquisas = await db
+          .select({ id: pesquisas.id })
+          .from(pesquisas)
+          .where(and(eq(pesquisas.projectId, input.projectId), eq(pesquisas.ativo, 1)));
+        pesquisaIds = projectPesquisas.map((p) => p.id);
+      }
+
+      // Contar clientes
+      const clientesCount = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(clientes)
+        .where(
+          input.pesquisaId
+            ? eq(clientes.pesquisaId, input.pesquisaId)
+            : pesquisaIds && pesquisaIds.length > 0
+              ? inArray(clientes.pesquisaId, pesquisaIds)
+              : undefined
+        );
+
+      // Contar leads
+      const leadsCount = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(leads)
+        .where(
+          input.pesquisaId
+            ? eq(leads.pesquisaId, input.pesquisaId)
+            : pesquisaIds && pesquisaIds.length > 0
+              ? inArray(leads.pesquisaId, pesquisaIds)
+              : undefined
+        );
+
+      // Contar concorrentes
+      const concorrentesCount = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(concorrentes)
+        .where(
+          input.pesquisaId
+            ? eq(concorrentes.pesquisaId, input.pesquisaId)
+            : pesquisaIds && pesquisaIds.length > 0
+              ? inArray(concorrentes.pesquisaId, pesquisaIds)
+              : undefined
+        );
+
+      return {
+        clientes: Number(clientesCount[0]?.count || 0),
+        leads: Number(leadsCount[0]?.count || 0),
+        concorrentes: Number(concorrentesCount[0]?.count || 0),
+      };
+    }),
 });

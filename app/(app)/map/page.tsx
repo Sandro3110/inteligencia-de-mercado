@@ -84,6 +84,12 @@ export default function MapPage() {
     pesquisaId: filters.pesquisaId,
   });
 
+  // Buscar estatísticas (totalizadores) independente de coordenadas
+  const { data: mapStats } = trpc.map.getMapStats.useQuery({
+    projectId: filters.projectId,
+    pesquisaId: filters.pesquisaId,
+  });
+
   const entities = (mapData || []) as MapEntity[];
 
   const handleMarkerClick = (entity: MapEntity) => {
@@ -491,6 +497,7 @@ export default function MapPage() {
           entities={entities}
           selectedEntity={selectedEntity}
           onEntityClick={handleEntityClick}
+          stats={mapStats}
         />
       </div>
 

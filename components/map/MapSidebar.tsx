@@ -18,13 +18,23 @@ interface MapSidebarProps {
   entities: MapEntity[];
   selectedEntity: MapEntity | null;
   onEntityClick: (entity: MapEntity) => void;
+  stats?: {
+    clientes: number;
+    leads: number;
+    concorrentes: number;
+  };
 }
 
-export function MapSidebar({ entities, selectedEntity, onEntityClick }: MapSidebarProps) {
+export function MapSidebar({
+  entities,
+  selectedEntity,
+  onEntityClick,
+  stats: propStats,
+}: MapSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Calcular stats
-  const stats = {
+  // Usar stats da prop ou calcular baseado em entities (fallback)
+  const stats = propStats || {
     clientes: entities.filter((e) => e.type === 'cliente').length,
     leads: entities.filter((e) => e.type === 'lead').length,
     concorrentes: entities.filter((e) => e.type === 'concorrente').length,
