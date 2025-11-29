@@ -9,7 +9,8 @@ import {
   leads,
   systemSettings,
 } from '@/drizzle/schema';
-import { eq } from 'drizzle-orm';
+import { eq, count } from 'drizzle-orm';
+import { logEnrichmentCompleted, logEnrichmentFailed } from '@/server/utils/auditLog';
 
 interface Cliente {
   id: number;
@@ -207,6 +208,38 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
       })
       .where(eq(pesquisas.id, pesquisaId));
 
+    // 9. Coletar métricas finais
+    const [concorrentesCount] = await db
+      .select({ value: count() })
+      .from(concorrentes)
+      .where(eq(concorrentes.pesquisaId, pesquisaId));
+    const [leadsCount] = await db
+      .select({ value: count() })
+      .from(leads)
+      .where(eq(leads.pesquisaId, pesquisaId));
+    const [mercadosCount] = await db
+      .select({ value: count() })
+      .from(mercadosUnicos)
+      .where(eq(mercadosUnicos.pesquisaId, pesquisaId));
+
+    const duration = Math.floor((Date.now() - new Date(job.startedAt).getTime()) / 1000);
+
+    // 10. Registrar log de auditoria
+    await logEnrichmentCompleted({
+      pesquisaId,
+      pesquisaNome: pesquisa.nome,
+      duration,
+      clientesProcessados: processedCount,
+      clientesSucesso: successCount,
+      clientesFalha: failedCount,
+      metricas: {
+        concorrentes: concorrentesCount[0]?.value || 0,
+        leads: leadsCount[0]?.value || 0,
+        produtos: 0,
+        mercados: mercadosCount[0]?.value || 0,
+      },
+    });
+
     console.log(
       `[Enrichment] Job ${jobId} completed: ${successCount} success, ${failedCount} failed`
     );
@@ -222,6 +255,17 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
         completedAt: new Date().toISOString(),
       })
       .where(eq(enrichmentJobs.id, jobId));
+
+    // Registrar log de falha
+    const [pesquisa] = await db.select().from(pesquisas).where(eq(pesquisas.id, pesquisaId));
+    if (pesquisa) {
+      await logEnrichmentFailed({
+        pesquisaId,
+        pesquisaNome: pesquisa.nome,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        clientesProcessados: 0,
+      });
+    }
   }
 }
 

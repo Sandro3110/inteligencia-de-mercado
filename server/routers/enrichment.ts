@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
 import { enrichmentJobs, pesquisas, pesquisas as pesquisasTable } from '@/drizzle/schema';
 import { eq, desc, and } from 'drizzle-orm';
+import { logEnrichmentStarted } from '@/server/utils/auditLog';
 
 export const enrichmentRouter = createTRPCRouter({
   /**
@@ -74,6 +75,13 @@ export const enrichmentRouter = createTRPCRouter({
           .update(pesquisas)
           .set({ status: 'enriquecendo' })
           .where(eq(pesquisas.id, input.pesquisaId));
+
+        // 3.5 Registrar log de auditoria
+        await logEnrichmentStarted({
+          pesquisaId: input.pesquisaId,
+          pesquisaNome: pesquisa.nome,
+          totalClientes: pesquisa.totalClientes,
+        });
 
         // 4. Trigger background processing
         // This will be handled by the API route

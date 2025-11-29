@@ -1107,3 +1107,49 @@ export const emailConfig = pgTable('email_config', {
 
 export type EmailConfig = typeof emailConfig.$inferSelect;
 export type InsertEmailConfig = typeof emailConfig.$inferInsert;
+
+// ============================================================================
+// AUDIT LOGS - Sistema de Auditoria e Rastreamento
+// ============================================================================
+
+export const auditLogs = pgTable(
+  'audit_logs',
+  {
+    id: serial('id').primaryKey(),
+
+    // Identificação do recurso
+    resourceType: varchar('resource_type', { length: 50 }).notNull(), // 'project' ou 'survey'
+    resourceId: integer('resource_id').notNull(),
+    resourceName: varchar('resource_name', { length: 255 }),
+
+    // Tipo de evento
+    eventType: varchar('event_type', { length: 50 }).notNull(),
+    // Valores possíveis: 'created', 'updated', 'deleted', 'enrichment_started',
+    // 'enrichment_completed', 'enrichment_failed', 'enrichment_paused', 'enrichment_resumed'
+
+    // Detalhes do evento
+    eventData: jsonb('event_data'), // Dados adicionais do evento (ex: métricas, erros)
+
+    // Performance (apenas para eventos de enriquecimento)
+    duration: integer('duration'), // Duração em segundos
+    clientesProcessados: integer('clientes_processados'),
+    clientesSucesso: integer('clientes_sucesso'),
+    clientesFalha: integer('clientes_falha'),
+
+    // Metadados
+    userId: integer('user_id'),
+    ipAddress: varchar('ip_address', { length: 45 }),
+    userAgent: text('user_agent'),
+
+    // Timestamps
+    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+  },
+  (table) => [
+    index('idx_audit_resource').on(table.resourceType, table.resourceId),
+    index('idx_audit_event').on(table.eventType),
+    index('idx_audit_created').on(table.createdAt),
+  ]
+);
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;

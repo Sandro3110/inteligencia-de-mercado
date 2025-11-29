@@ -26,6 +26,11 @@ import {
 } from './integrations/openaiLayered';
 import crypto from 'crypto';
 import { now, toPostgresTimestamp } from './dateUtils';
+import {
+  logEnrichmentStarted,
+  logEnrichmentCompleted,
+  logEnrichmentFailed,
+} from './utils/auditLog';
 
 interface EnrichmentResult {
   clienteId: number;
@@ -468,7 +473,7 @@ export async function enrichClienteOptimized(
 
         if (concorrentesToInsert.length > 0) {
           try {
-            await db.insert(concorrentes).values(concorrentesToInsert);
+            await db.insert(concorrentes).values(concorrentesToInsert).onConflictDoNothing();
             result.concorrentesCreated += concorrentesToInsert.length;
             console.log(
               `[Enrich] ✅ ${concorrentesToInsert.length} concorrentes inseridos em batch`
@@ -546,7 +551,7 @@ export async function enrichClienteOptimized(
 
         if (leadsToInsert.length > 0) {
           try {
-            await db.insert(leads).values(leadsToInsert);
+            await db.insert(leads).values(leadsToInsert).onConflictDoNothing();
             result.leadsCreated += leadsToInsert.length;
             console.log(`[Enrich] ✅ ${leadsToInsert.length} leads inseridos em batch`);
           } catch (error: any) {
