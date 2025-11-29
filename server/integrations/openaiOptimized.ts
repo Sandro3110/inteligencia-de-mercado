@@ -341,10 +341,15 @@ Para cada mercado, forneça:
 
     const content = data.choices[0].message.content;
 
+    // LOG: JSON bruto da OpenAI
+    console.log('[OpenAI] RAW JSON Response:', content.substring(0, 1000) + '...');
+
     // Parse JSON
     let result: EnrichmentData;
     try {
       result = JSON.parse(content);
+      console.log('[OpenAI] Parsed mercados count:', result.mercados?.length || 0);
+      console.log('[OpenAI] Parsed produtos count:', result.produtos?.length || 0);
     } catch (parseError) {
       console.error('[OpenAI] Failed to parse JSON:', content);
       throw new Error('Invalid JSON response from OpenAI');
