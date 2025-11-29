@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/server/db';
-import { enrichmentJobs, clientes, pesquisas, systemSettings } from '@/drizzle/schema';
-import { eq, and } from 'drizzle-orm';
+import { enrichmentJobs, clientes, pesquisas } from '@/drizzle/schema';
+import { eq } from 'drizzle-orm';
 import { enrichClienteOptimized } from '@/server/enrichmentOptimized';
-import { logEnrichmentCompleted, logEnrichmentFailed } from '@/server/utils/auditLog';
 
 /**
  * Vercel Cron Job para processar enriquecimento em background
- * Executa a cada 1 minuto e processa 1 cliente por vez
+ * Executa a cada 1 minuto e processa até 5 clientes em paralelo
  *
  * GET /api/cron/enrichment
  */
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
+  const BATCH_SIZE = 5; // Processar 5 clientes por execução
 
   try {
     const db = await getDb();
@@ -21,21 +21,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Database connection failed' }, { status: 500 });
     }
 
-    // 1. Buscar API key
-    const [openaiSetting] = await db
-      .select()
-      .from(systemSettings)
-      .where(eq(systemSettings.settingKey, 'OPENAI_API_KEY'))
-      .limit(1);
-
-    if (!openaiSetting || !openaiSetting.settingValue) {
-      console.error('[Cron] OpenAI API key not configured');
-      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
-    }
-
-    const apiKey = openaiSetting.settingValue;
-
-    // 2. Buscar jobs ativos (running)
+    // 1. Buscar jobs ativos (running)
     const activeJobs = await db
       .select()
       .from(enrichmentJobs)
@@ -55,7 +41,7 @@ export async function GET(request: NextRequest) {
       `[Cron] Processing job ${job.id}, progress: ${job.processedClientes}/${job.totalClientes}`
     );
 
-    // 3. Buscar pesquisa
+    // 2. Buscar pesquisa
     const [pesquisa] = await db
       .select()
       .from(pesquisas)
@@ -67,7 +53,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Pesquisa not found' }, { status: 404 });
     }
 
-    // 4. Buscar próximo cliente não processado
+    // 3. Buscar todos os clientes da pesquisa
     const allClientes = await db
       .select()
       .from(clientes)
@@ -78,7 +64,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No clientes found' }, { status: 404 });
     }
 
-    // Verificar se já processamos todos
+    // 4. Verificar se já processamos todos
     if (job.processedClientes >= job.totalClientes) {
       console.log(`[Cron] Job ${job.id} completed! Updating status...`);
 
@@ -100,16 +86,6 @@ export async function GET(request: NextRequest) {
         })
         .where(eq(pesquisas.id, job.projectId));
 
-      // Log de auditoria
-      await logEnrichmentCompleted({
-        pesquisaId: job.projectId,
-        pesquisaNome: pesquisa.nome,
-        totalClientes: job.totalClientes,
-        successClientes: job.successClientes,
-        failedClientes: job.failedClientes,
-        durationMinutes: Math.round((Date.now() - new Date(job.startedAt).getTime()) / 60000),
-      });
-
       return NextResponse.json({
         message: 'Job completed successfully',
         jobId: job.id,
@@ -120,75 +96,94 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 5. Pegar o próximo cliente para processar
-    const cliente = allClientes[job.processedClientes];
+    // 5. Pegar próximo lote de clientes para processar
+    const clientesToProcess = allClientes.slice(
+      job.processedClientes,
+      job.processedClientes + BATCH_SIZE
+    );
 
-    console.log(`[Cron] Processing cliente ${cliente.id}: ${cliente.nome}`);
+    console.log(`[Cron] Processing batch of ${clientesToProcess.length} clientes`);
 
-    // 6. Processar cliente
-    try {
-      await enrichClienteOptimized({
-        clienteId: cliente.id,
-        pesquisaId: job.projectId,
-        projectId: pesquisa.projectId,
-        apiKey,
-      });
+    // 6. Processar clientes EM PARALELO
+    const results = await Promise.allSettled(
+      clientesToProcess.map(async (cliente) => {
+        console.log(`[Cron] Processing cliente ${cliente.id}: ${cliente.nome}`);
 
-      // Atualizar progresso (sucesso)
-      await db
-        .update(enrichmentJobs)
-        .set({
-          processedClientes: job.processedClientes + 1,
-          successClientes: job.successClientes + 1,
-          lastClienteId: cliente.id,
-        })
-        .where(eq(enrichmentJobs.id, job.id));
+        try {
+          // CHAMADA CORRETA: Passar parâmetros diretos, não objeto!
+          const result = await enrichClienteOptimized(cliente.id, pesquisa.projectId);
 
-      // Atualizar contador na pesquisa
-      await db
-        .update(pesquisas)
-        .set({
-          clientesEnriquecidos: job.successClientes + 1,
-        })
-        .where(eq(pesquisas.id, job.projectId));
+          console.log(`[Cron] Cliente ${cliente.id} processed:`, {
+            success: result.success,
+            mercados: result.mercadosCreated,
+            produtos: result.produtosCreated,
+            concorrentes: result.concorrentesCreated,
+            leads: result.leadsCreated,
+            duration: `${result.duration}ms`,
+          });
 
-      console.log(`[Cron] Cliente ${cliente.id} processed successfully`);
+          return { clienteId: cliente.id, success: true, result };
+        } catch (error: any) {
+          console.error(`[Cron] Error processing cliente ${cliente.id}:`, error);
+          return { clienteId: cliente.id, success: false, error: error.message };
+        }
+      })
+    );
 
-      return NextResponse.json({
-        message: 'Cliente processed successfully',
-        jobId: job.id,
-        clienteId: cliente.id,
-        clienteNome: cliente.nome,
-        progress: `${job.processedClientes + 1}/${job.totalClientes}`,
-        executionTime: `${Date.now() - startTime}ms`,
-      });
-    } catch (error: any) {
-      console.error(`[Cron] Error processing cliente ${cliente.id}:`, error);
+    // 7. Contar sucessos e falhas
+    let successCount = 0;
+    let failedCount = 0;
+    const processedDetails: any[] = [];
 
-      // Atualizar progresso (falha)
-      await db
-        .update(enrichmentJobs)
-        .set({
-          processedClientes: job.processedClientes + 1,
-          failedClientes: job.failedClientes + 1,
-          lastClienteId: cliente.id,
-          errorMessage: error.message,
-        })
-        .where(eq(enrichmentJobs.id, job.id));
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled' && result.value.success) {
+        successCount++;
+        processedDetails.push({
+          clienteId: result.value.clienteId,
+          status: 'success',
+          data: result.value.result,
+        });
+      } else {
+        failedCount++;
+        processedDetails.push({
+          clienteId: clientesToProcess[index].id,
+          status: 'failed',
+          error: result.status === 'fulfilled' ? result.value.error : 'Promise rejected',
+        });
+      }
+    });
 
-      return NextResponse.json(
-        {
-          message: 'Cliente processing failed',
-          jobId: job.id,
-          clienteId: cliente.id,
-          clienteNome: cliente.nome,
-          error: error.message,
-          progress: `${job.processedClientes + 1}/${job.totalClientes}`,
-          executionTime: `${Date.now() - startTime}ms`,
-        },
-        { status: 500 }
-      );
-    }
+    // 8. Atualizar progresso do job
+    await db
+      .update(enrichmentJobs)
+      .set({
+        processedClientes: job.processedClientes + clientesToProcess.length,
+        successClientes: job.successClientes + successCount,
+        failedClientes: job.failedClientes + failedCount,
+        lastClienteId: clientesToProcess[clientesToProcess.length - 1].id,
+      })
+      .where(eq(enrichmentJobs.id, job.id));
+
+    // 9. Atualizar contador na pesquisa
+    await db
+      .update(pesquisas)
+      .set({
+        clientesEnriquecidos: job.successClientes + successCount,
+      })
+      .where(eq(pesquisas.id, job.projectId));
+
+    console.log(`[Cron] Batch completed: ${successCount} success, ${failedCount} failed`);
+
+    return NextResponse.json({
+      message: 'Batch processed successfully',
+      jobId: job.id,
+      batchSize: clientesToProcess.length,
+      successCount,
+      failedCount,
+      progress: `${job.processedClientes + clientesToProcess.length}/${job.totalClientes}`,
+      processedDetails,
+      executionTime: `${Date.now() - startTime}ms`,
+    });
   } catch (error: any) {
     console.error('[Cron] Fatal error:', error);
     return NextResponse.json(
