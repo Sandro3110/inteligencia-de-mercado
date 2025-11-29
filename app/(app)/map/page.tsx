@@ -72,19 +72,12 @@ export default function MapPage() {
 
   // Buscar projetos e pesquisas para os dropdowns
   const { data: projects } = trpc.dashboard.getProjects.useQuery();
-  const { data: allPesquisas } = trpc.pesquisas.list.useQuery({});
 
-  // Filtrar pesquisas no frontend por projectId
-  const pesquisas = React.useMemo(() => {
-    // Se não há dados ainda, retorna array vazio
-    if (!allPesquisas || allPesquisas.length === 0) return [];
-
-    // Se não há projeto selecionado, retorna array vazio
-    if (!filters.projectId) return [];
-
-    // Filtra pesquisas pelo projectId
-    return allPesquisas.filter((p) => p.projectId === filters.projectId);
-  }, [allPesquisas, filters.projectId]);
+  // Buscar pesquisas filtradas por projectId diretamente na API
+  const { data: pesquisas } = trpc.pesquisas.list.useQuery(
+    { projectId: filters.projectId },
+    { enabled: !!filters.projectId } // Só executa se houver projectId
+  );
 
   const { data: availableFilters } = trpc.map.getAvailableFilters.useQuery({
     projectId: filters.projectId,
