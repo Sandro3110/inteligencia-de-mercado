@@ -384,7 +384,7 @@ export async function enrichClienteOptimized(
       // 3.1 Criar/buscar mercado único
       const mercadoHash = crypto
         .createHash('md5')
-        .update(`${mercadoData.nome}-${mercadoData.categoria}`)
+        .update(`${mercadoData.nome}-${mercadoData.descricao || 'B2B'}`)
         .digest('hex');
 
       let mercadoId: number;
@@ -405,9 +405,9 @@ export async function enrichClienteOptimized(
             projectId,
             pesquisaId: cliente.pesquisaId || null,
             nome: truncate(mercadoData.nome, 255) || '',
-            categoria: truncate(mercadoData.categoria || '', 100),
-            segmentacao: truncate(mercadoData.segmentacao || '', 50),
-            tamanhoMercado: truncate(mercadoData.tamanhoEstimado || '', 500),
+            categoria: 'B2B', // Categoria padrão
+            segmentacao: truncate(mercadoData.descricao || '', 50),
+            tamanhoMercado: truncate(mercadoData.descricao || '', 500),
             mercadoHash,
             createdAt: now(),
           })

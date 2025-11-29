@@ -75,11 +75,13 @@ interface LeadData {
 interface EnrichmentData {
   clienteEnriquecido: ClienteEnriquecidoData;
   mercados: Array<{
-    mercado: MercadoData;
+    nome: string;
+    descricao: string;
     produtos: ProdutoData[];
     concorrentes: ConcorrenteData[];
     leads: LeadData[];
   }>;
+  produtos?: ProdutoData[]; // Produtos globais retornados pela OpenAI
 }
 
 /**
@@ -238,8 +240,10 @@ RETORNE EM JSON:
       JSON.stringify(result.mercados, null, 2)
     );
 
+    // CORRIGIDO: Manter estrutura original da OpenAI (não criar nested object)
     result.mercados = result.mercados.map((m) => ({
-      mercado: m.mercado,
+      nome: m.nome,
+      descricao: m.descricao,
       produtos: (m.produtos || []).slice(0, 3),
       concorrentes: (m.concorrentes || []).slice(0, 10),
       leads: (m.leads || []).slice(0, 5),
