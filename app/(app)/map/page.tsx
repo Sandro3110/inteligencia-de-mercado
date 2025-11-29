@@ -76,28 +76,14 @@ export default function MapPage() {
 
   // Filtrar pesquisas no frontend por projectId
   const pesquisas = React.useMemo(() => {
-    console.log(
-      '[MAP] useMemo pesquisas - allPesquisas:',
-      allPesquisas?.length,
-      'projectId:',
-      filters.projectId
-    );
-    if (!allPesquisas) {
-      console.log('[MAP] allPesquisas é null/undefined');
-      return [];
-    }
-    if (!filters.projectId) {
-      console.log('[MAP] projectId não definido, retornando array vazio');
-      return [];
-    }
-    const filtered = allPesquisas.filter((p) => p.projectId === filters.projectId);
-    console.log(
-      '[MAP] Pesquisas filtradas:',
-      filtered.length,
-      'nomes:',
-      filtered.map((p) => p.nome)
-    );
-    return filtered;
+    // Se não há dados ainda, retorna array vazio
+    if (!allPesquisas || allPesquisas.length === 0) return [];
+
+    // Se não há projeto selecionado, retorna array vazio
+    if (!filters.projectId) return [];
+
+    // Filtra pesquisas pelo projectId
+    return allPesquisas.filter((p) => p.projectId === filters.projectId);
   }, [allPesquisas, filters.projectId]);
 
   const { data: availableFilters } = trpc.map.getAvailableFilters.useQuery({
