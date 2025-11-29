@@ -14,22 +14,25 @@ export const mapRouter = router({
    */
   getMapData: protectedProcedure
     .input(
-      z.object({
-        projectId: z.number().optional(),
-        pesquisaId: z.number().optional(),
-        entityTypes: z
-          .array(z.enum(['clientes', 'leads', 'concorrentes']))
-          .default(['clientes', 'leads', 'concorrentes']),
-        filters: z
-          .object({
-            uf: z.string().optional(),
-            cidade: z.string().optional(),
-            setor: z.string().optional(),
-            porte: z.string().optional(),
-            qualidade: z.string().optional(),
-          })
-          .optional(),
-      })
+      z
+        .object({
+          projectId: z.number().optional(),
+          pesquisaId: z.number().optional(),
+          entityTypes: z
+            .array(z.enum(['clientes', 'leads', 'concorrentes']))
+            .default(['clientes', 'leads', 'concorrentes']),
+          filters: z
+            .object({
+              uf: z.string().optional(),
+              cidade: z.string().optional(),
+              setor: z.string().optional(),
+              porte: z.string().optional(),
+              qualidade: z.string().optional(),
+            })
+            .optional(),
+        })
+        .optional()
+        .default({})
     )
     .query(async ({ input }) => {
       const db = await getDb();
@@ -44,7 +47,7 @@ export const mapRouter = router({
           .select({ id: pesquisas.id })
           .from(pesquisas)
           .where(eq(pesquisas.projectId, input.projectId));
-        pesquisaIds = projectPesquisas.map(p => p.id);
+        pesquisaIds = projectPesquisas.map((p) => p.id);
       }
 
       // Buscar clientes
@@ -70,8 +73,11 @@ export const mapRouter = router({
             and(
               isNotNull(clientes.latitude),
               isNotNull(clientes.longitude),
-              input.pesquisaId ? eq(clientes.pesquisaId, input.pesquisaId) : 
-                pesquisaIds && pesquisaIds.length > 0 ? inArray(clientes.pesquisaId, pesquisaIds) : undefined,
+              input.pesquisaId
+                ? eq(clientes.pesquisaId, input.pesquisaId)
+                : pesquisaIds && pesquisaIds.length > 0
+                  ? inArray(clientes.pesquisaId, pesquisaIds)
+                  : undefined,
               input.filters?.uf ? eq(clientes.uf, input.filters.uf) : undefined,
               input.filters?.cidade ? eq(clientes.cidade, input.filters.cidade) : undefined,
               input.filters?.setor ? eq(clientes.setor, input.filters.setor) : undefined
@@ -114,8 +120,11 @@ export const mapRouter = router({
             and(
               isNotNull(leads.latitude),
               isNotNull(leads.longitude),
-              input.pesquisaId ? eq(leads.pesquisaId, input.pesquisaId) : 
-                pesquisaIds && pesquisaIds.length > 0 ? inArray(leads.pesquisaId, pesquisaIds) : undefined,
+              input.pesquisaId
+                ? eq(leads.pesquisaId, input.pesquisaId)
+                : pesquisaIds && pesquisaIds.length > 0
+                  ? inArray(leads.pesquisaId, pesquisaIds)
+                  : undefined,
               input.filters?.uf ? eq(leads.uf, input.filters.uf) : undefined,
               input.filters?.cidade ? eq(leads.cidade, input.filters.cidade) : undefined,
               input.filters?.setor ? eq(leads.setor, input.filters.setor) : undefined,
@@ -157,8 +166,11 @@ export const mapRouter = router({
             and(
               isNotNull(concorrentes.latitude),
               isNotNull(concorrentes.longitude),
-              input.pesquisaId ? eq(concorrentes.pesquisaId, input.pesquisaId) : 
-                pesquisaIds && pesquisaIds.length > 0 ? inArray(concorrentes.pesquisaId, pesquisaIds) : undefined,
+              input.pesquisaId
+                ? eq(concorrentes.pesquisaId, input.pesquisaId)
+                : pesquisaIds && pesquisaIds.length > 0
+                  ? inArray(concorrentes.pesquisaId, pesquisaIds)
+                  : undefined,
               input.filters?.uf ? eq(concorrentes.uf, input.filters.uf) : undefined,
               input.filters?.cidade ? eq(concorrentes.cidade, input.filters.cidade) : undefined,
               input.filters?.porte ? eq(concorrentes.porte, input.filters.porte) : undefined
@@ -317,10 +329,13 @@ export const mapRouter = router({
    */
   getAvailableFilters: protectedProcedure
     .input(
-      z.object({
-        projectId: z.number().optional(),
-        pesquisaId: z.number().optional(),
-      })
+      z
+        .object({
+          projectId: z.number().optional(),
+          pesquisaId: z.number().optional(),
+        })
+        .optional()
+        .default({})
     )
     .query(async ({ input }) => {
       const db = await getDb();
