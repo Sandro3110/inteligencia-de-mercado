@@ -370,11 +370,23 @@ export const mapRouter = router({
         .from(clientes)
         .where(and(isNotNull(clientes.cidade), pesquisaCondition));
 
-      // Buscar setores únicos
-      const setores = await db
-        .selectDistinct({ setor: clientes.setor })
+      // Buscar CNAEs únicos (ao invés de setores)
+      const cnaes = await db
+        .selectDistinct({ cnae: clientes.cnae })
         .from(clientes)
-        .where(and(isNotNull(clientes.setor), pesquisaCondition));
+        .where(and(isNotNull(clientes.cnae), pesquisaCondition));
+
+      // Buscar portes únicos
+      const portes = await db
+        .selectDistinct({ porte: clientes.porte })
+        .from(clientes)
+        .where(and(isNotNull(clientes.porte), pesquisaCondition));
+
+      // Buscar qualidades únicas
+      const qualidades = await db
+        .selectDistinct({ qualidade: clientes.qualidadeClassificacao })
+        .from(clientes)
+        .where(and(isNotNull(clientes.qualidadeClassificacao), pesquisaCondition));
 
       return {
         ufs: ufs
@@ -385,12 +397,18 @@ export const mapRouter = router({
           .map((c) => c.cidade)
           .filter(Boolean)
           .sort(),
-        setores: setores
-          .map((s) => s.setor)
+        setores: cnaes
+          .map((c) => c.cnae)
           .filter(Boolean)
           .sort(),
-        portes: ['Pequeno', 'Médio', 'Grande'],
-        qualidades: ['Alto', 'Medio', 'Baixo'],
+        portes: portes
+          .map((p) => p.porte)
+          .filter(Boolean)
+          .sort(),
+        qualidades: qualidades
+          .map((q) => q.qualidade)
+          .filter(Boolean)
+          .sort(),
       };
     }),
 });
