@@ -26,6 +26,8 @@ export function useNotificationsPolling(options: UseNotificationsPollingOptions 
 
   const setConnected = useNotifications((state) => state.setConnected);
   const setCount = useUnreadNotificationsCount((state) => state.setCount);
+  const clearAll = useNotifications((state) => state.clearAll);
+  const addNotification = useNotifications((state) => state.addNotification);
 
   // Mutation para verificar jobs completados
   const checkCompletedJobs = trpc.notifications.checkCompletedJobs.useMutation();
@@ -62,15 +64,22 @@ export function useNotificationsPolling(options: UseNotificationsPollingOptions 
     return () => clearInterval(interval);
   }, [enabled, userId, pollingInterval]);
 
-  // Atualizar contador quando notificações mudarem
+  // Atualizar contador e store quando notificações mudarem
   useEffect(() => {
     if (unreadNotifications) {
       setCount(unreadNotifications.length);
 
-      // TODO: Adicionar notificações ao Zustand store se necessário
-      // Por enquanto, apenas atualiza o contador
+      // Limpar store e adicionar notificações da API
+      clearAll();
+      unreadNotifications.forEach((notification) => {
+        addNotification({
+          type: notification.type as 'info' | 'warning' | 'error' | 'success',
+          title: notification.title,
+          message: notification.message,
+        });
+      });
     }
-  }, [unreadNotifications, setCount]);
+  }, [unreadNotifications, setCount, clearAll, addNotification]);
 
   // Marcar como conectado no início
   useEffect(() => {
