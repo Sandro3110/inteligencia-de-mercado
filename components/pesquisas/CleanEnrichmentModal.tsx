@@ -25,20 +25,13 @@ export function CleanEnrichmentModal({
   isLoading,
   stats,
 }: CleanEnrichmentModalProps) {
-  const [confirmText, setConfirmText] = useState('');
-  const isConfirmed = confirmText.toUpperCase() === 'LIMPAR';
-
   if (!isOpen) return null;
 
   const handleConfirm = () => {
-    if (isConfirmed) {
-      onConfirm();
-      setConfirmText('');
-    }
+    onConfirm();
   };
 
   const handleClose = () => {
-    setConfirmText('');
     onClose();
   };
 
@@ -125,21 +118,6 @@ export function CleanEnrichmentModal({
               ✓ Os dados originais dos clientes (nome, CNPJ) serão <strong>preservados</strong>
             </p>
           </div>
-
-          {/* Confirmation Input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Para confirmar, digite <strong className="text-red-600">LIMPAR</strong>:
-            </label>
-            <input
-              type="text"
-              value={confirmText}
-              onChange={(e) => setConfirmText(e.target.value)}
-              disabled={isLoading}
-              placeholder="Digite LIMPAR para confirmar"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-          </div>
         </div>
 
         {/* Footer */}
@@ -153,7 +131,7 @@ export function CleanEnrichmentModal({
           </button>
           <button
             onClick={handleConfirm}
-            disabled={!isConfirmed || isLoading}
+            disabled={isLoading}
             className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading ? (
