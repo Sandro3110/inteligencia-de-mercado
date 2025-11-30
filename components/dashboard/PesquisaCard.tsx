@@ -78,12 +78,18 @@ export function PesquisaCard({
     },
   });
 
+  const trpcUtils = trpc.useUtils();
+
   const cleanMutation = trpc.pesquisas.cleanEnrichment.useMutation({
     onSuccess: (data) => {
       toast.success(
         `Limpeza concluída! Removidos: ${data.stats.leadsRemoved} leads, ${data.stats.concorrentesRemoved} concorrentes, ${data.stats.produtosRemoved} produtos`
       );
       setIsCleanModalOpen(false);
+      // Invalidar TODOS os caches relacionados
+      trpcUtils.pesquisas.getById.invalidate(pesquisa.id);
+      trpcUtils.pesquisas.list.invalidate();
+      trpcUtils.dashboard.getProjects.invalidate();
       if (onRefresh) onRefresh();
     },
     onError: (error) => {
