@@ -33,7 +33,7 @@ export const mapRouter = router({
       })
     )
     .query(async ({ input }) => {
-      console.log('🔍 [getMapData] Input:', JSON.stringify(input, null, 2));
+      // Removido log de debug
       const db = await getDb();
       if (!db) throw new Error('Database not available');
 
@@ -98,14 +98,22 @@ export const mapRouter = router({
           ...clientesData
             .filter((c) => c.latitude && c.longitude) // Garantir que não são null/undefined
             .map((c) => {
-              const lat = parseFloat(c.latitude as string);
-              const lng = parseFloat(c.longitude as string);
-              // Validar que não são NaN
-              if (isNaN(lat) || isNaN(lng)) {
-                console.warn(`Cliente ${c.id} tem coordenadas inválidas:`, {
-                  lat: c.latitude,
-                  lng: c.longitude,
-                });
+              const lat = parseFloat(c.latitude.toString());
+              const lng = parseFloat(c.longitude.toString());
+
+              // Validação robusta de coordenadas
+              if (isNaN(lat) || isNaN(lng) || !isFinite(lat) || !isFinite(lng)) {
+                console.warn(
+                  `[getMapData] Cliente ${c.id} tem coordenadas inválidas (NaN/Infinity)`
+                );
+                return null;
+              }
+
+              // Validar range geográfico
+              if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                console.warn(
+                  `[getMapData] Cliente ${c.id} tem coordenadas fora do range: lat=${lat}, lng=${lng}`
+                );
                 return null;
               }
               return {
@@ -164,13 +172,20 @@ export const mapRouter = router({
           ...leadsData
             .filter((l) => l.latitude && l.longitude)
             .map((l) => {
-              const lat = parseFloat(l.latitude as string);
-              const lng = parseFloat(l.longitude as string);
-              if (isNaN(lat) || isNaN(lng)) {
-                console.warn(`Lead ${l.id} tem coordenadas inválidas:`, {
-                  lat: l.latitude,
-                  lng: l.longitude,
-                });
+              const lat = parseFloat(l.latitude.toString());
+              const lng = parseFloat(l.longitude.toString());
+
+              // Validação robusta de coordenadas
+              if (isNaN(lat) || isNaN(lng) || !isFinite(lat) || !isFinite(lng)) {
+                console.warn(`[getMapData] Lead ${l.id} tem coordenadas inválidas (NaN/Infinity)`);
+                return null;
+              }
+
+              // Validar range geográfico
+              if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                console.warn(
+                  `[getMapData] Lead ${l.id} tem coordenadas fora do range: lat=${lat}, lng=${lng}`
+                );
                 return null;
               }
               return {
@@ -220,13 +235,22 @@ export const mapRouter = router({
           ...concorrentesData
             .filter((c) => c.latitude && c.longitude)
             .map((c) => {
-              const lat = parseFloat(c.latitude as string);
-              const lng = parseFloat(c.longitude as string);
-              if (isNaN(lat) || isNaN(lng)) {
-                console.warn(`Concorrente ${c.id} tem coordenadas inválidas:`, {
-                  lat: c.latitude,
-                  lng: c.longitude,
-                });
+              const lat = parseFloat(c.latitude.toString());
+              const lng = parseFloat(c.longitude.toString());
+
+              // Validação robusta de coordenadas
+              if (isNaN(lat) || isNaN(lng) || !isFinite(lat) || !isFinite(lng)) {
+                console.warn(
+                  `[getMapData] Concorrente ${c.id} tem coordenadas inválidas (NaN/Infinity)`
+                );
+                return null;
+              }
+
+              // Validar range geográfico
+              if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                console.warn(
+                  `[getMapData] Concorrente ${c.id} tem coordenadas fora do range: lat=${lat}, lng=${lng}`
+                );
                 return null;
               }
               return {
@@ -240,13 +264,8 @@ export const mapRouter = router({
         );
       }
 
-      console.log('🔍 [getMapData] Results count:', results.length);
-      console.log('🔍 [getMapData] First result:', JSON.stringify(results[0]));
-      console.log(
-        '🔍 [getMapData] Results type:',
-        Array.isArray(results) ? 'array' : typeof results
-      );
-      return results;
+      // Garantir retorno de array vazio se não houver resultados
+      return results.length > 0 ? results : [];
     }),
 
   /**

@@ -102,27 +102,49 @@ export default function MapPage() {
     pesquisaId: filters.pesquisaId,
   });
 
-  // Validar e garantir que entities sempre seja um array válido
+  // Validar, transformar e garantir que entities sempre seja um array válido
   const entities = React.useMemo(() => {
-    if (!mapData) return [];
-    if (!Array.isArray(mapData)) {
-      console.error('❌ mapData não é um array:', mapData);
+    // Validar se mapData existe e é array
+    if (!mapData || !Array.isArray(mapData)) {
+      if (mapData !== undefined) {
+        console.warn('[Map] mapData inválido:', typeof mapData);
+      }
       return [];
     }
-    // Filtrar entidades inválidas
-    return mapData.filter(
-      (e) => e && typeof e === 'object' && e.id && e.type && e.nome
-    ) as MapEntity[];
+
+    // Transformar e validar cada entidade
+    return mapData
+      .filter((entity) => {
+        // Validar campos obrigatórios
+        if (!entity || typeof entity !== 'object') return false;
+        if (!entity.id || !entity.type || !entity.nome) return false;
+        if (!entity.latitude || !entity.longitude) return false;
+
+        return true;
+      })
+      .map((entity) => {
+        // Converter coordenadas (podem vir como string ou number)
+        const lat =
+          typeof entity.latitude === 'string' ? parseFloat(entity.latitude) : entity.latitude;
+        const lng =
+          typeof entity.longitude === 'string' ? parseFloat(entity.longitude) : entity.longitude;
+
+        // Validar conversão
+        if (isNaN(lat) || isNaN(lng) || !isFinite(lat) || !isFinite(lng)) {
+          console.warn(`[Map] Conversão falhou para entidade ${entity.id}`);
+          return null;
+        }
+
+        return {
+          ...entity,
+          latitude: lat,
+          longitude: lng,
+        } as MapEntity;
+      })
+      .filter((entity): entity is MapEntity => entity !== null);
   }, [mapData]);
 
-  // DEBUG: Log para entender o problema
-  console.log('🔍 MAP DEBUG:', {
-    filters,
-    entitiesCount: entities.length,
-    isLoading,
-    hasMapData: !!mapData,
-    mapDataType: Array.isArray(mapData) ? 'array' : typeof mapData,
-  });
+  // Removido log de debug
 
   const handleMarkerClick = (entity: MapEntity) => {
     setSelectedEntity(entity);
@@ -357,7 +379,7 @@ export default function MapPage() {
                   value={filters.projectId || ''}
                   onChange={(e) => {
                     const projectId = e.target.value ? parseInt(e.target.value) : undefined;
-                    console.log('🔄 Mudando projectId:', projectId);
+                    // Mudando projectId
                     setFilters({ ...filters, projectId, pesquisaId: undefined });
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -377,7 +399,7 @@ export default function MapPage() {
                   value={filters.pesquisaId || ''}
                   onChange={(e) => {
                     const pesquisaId = e.target.value ? parseInt(e.target.value) : undefined;
-                    console.log('🔄 Mudando pesquisaId:', pesquisaId);
+                    // Mudando pesquisaId
                     setFilters({ ...filters, pesquisaId });
                   }}
                   disabled={!filters.projectId}

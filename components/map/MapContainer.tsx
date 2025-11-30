@@ -123,6 +123,29 @@ export function MapContainer({
     return () => clearTimeout(timer);
   }, []);
 
+  // Validar props antes de renderizar
+  if (!entities || !Array.isArray(entities)) {
+    console.warn('[MapContainer] Entidades inválidas:', typeof entities);
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <p className="text-gray-600">Erro ao carregar entidades</p>
+          <p className="text-sm text-gray-500 mt-2">Dados inválidos</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (entities.length === 0) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <p className="text-gray-600">Nenhuma entidade para exibir</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!mounted) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-100">
