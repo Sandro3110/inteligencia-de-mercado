@@ -241,6 +241,11 @@ export const mapRouter = router({
       }
 
       console.log('🔍 [getMapData] Results count:', results.length);
+      console.log('🔍 [getMapData] First result:', JSON.stringify(results[0]));
+      console.log(
+        '🔍 [getMapData] Results type:',
+        Array.isArray(results) ? 'array' : typeof results
+      );
       return results;
     }),
 
