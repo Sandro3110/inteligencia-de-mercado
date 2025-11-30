@@ -52,21 +52,27 @@ export async function fetchEnhancedReportData(
 ): Promise<EnhancedReportData> {
   console.log('[ReportData] Fetching metadata...');
   const metadata = await fetchMetadata(db, pesquisaId);
+  console.log('[ReportData] Metadata fetched:', metadata);
 
   console.log('[ReportData] Fetching mercados...');
   const mercados = await fetchMercados(db, pesquisaId);
+  console.log('[ReportData] Mercados fetched:', mercados.length);
 
   console.log('[ReportData] Fetching produtos...');
   const produtos = await fetchProdutos(db, pesquisaId);
+  console.log('[ReportData] Produtos fetched:', produtos.length);
 
   console.log('[ReportData] Fetching clientes...');
   const clientes = await fetchClientes(db, pesquisaId);
+  console.log('[ReportData] Clientes fetched:', clientes.total);
 
   console.log('[ReportData] Fetching leads...');
   const leads = await fetchLeads(db, pesquisaId);
+  console.log('[ReportData] Leads fetched:', leads.total);
 
   console.log('[ReportData] Fetching concorrentes...');
   const concorrentes = await fetchConcorrentes(db, pesquisaId);
+  console.log('[ReportData] Concorrentes fetched:', concorrentes.total);
 
   console.log('[ReportData] All data fetched successfully');
 

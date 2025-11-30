@@ -61,8 +61,8 @@ export async function fetchConcorrentes(
     .limit(50);
 
   const topConcorrentes = topConcorrentesResult.map((row) => ({
-    nome: row.nome,
-    mercado: row.mercado,
+    nome: row.nome || 'Sem nome',
+    mercado: row.mercado || 'Desconhecido',
     porte: row.porte || 'Não especificado',
   }));
 

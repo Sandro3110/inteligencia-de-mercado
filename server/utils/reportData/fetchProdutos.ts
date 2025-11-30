@@ -42,10 +42,10 @@ export async function fetchProdutos(db: Database, pesquisaId: number): Promise<P
       .limit(5); // Limitar a 5 mercados por produto
 
     produtosComMercados.push({
-      nome: produto.nome,
+      nome: produto.nome || 'Sem nome',
       categoria: produto.categoria || 'Não especificado',
-      count: Number(produto.count),
-      mercados: mercadosResult.map((m) => m.mercadoNome),
+      count: Number(produto.count || 0),
+      mercados: mercadosResult.map((m) => m.mercadoNome || 'Desconhecido').filter(Boolean),
     });
   }
 

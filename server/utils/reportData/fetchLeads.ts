@@ -78,8 +78,8 @@ export async function fetchLeads(db: Database, pesquisaId: number): Promise<Lead
     .limit(30);
 
   const topLeads = topLeadsResult.map((row) => ({
-    nome: row.nome,
-    mercado: row.mercado,
+    nome: row.nome || 'Sem nome',
+    mercado: row.mercado || 'Desconhecido',
     potencial: row.potencial || 'Não especificado',
   }));
 
