@@ -78,7 +78,10 @@ export default function MapPage() {
     {
       retry: false, // Não tentar novamente em caso de erro
       onError: (err) => {
-        console.error('❌ Erro ao carregar dados do mapa:', err);
+        console.error('[Map] Erro na query getMapData:');
+        console.error('[Map] Mensagem:', err.message);
+        console.error('[Map] Stack:', err.stack);
+        console.error('[Map] Erro completo:', err);
       },
     }
   );
