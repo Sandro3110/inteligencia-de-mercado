@@ -86,7 +86,8 @@ export const enrichmentRouter = createTRPCRouter({
       const [job] = await db
         .insert(enrichmentJobs)
         .values({
-          projectId: input.pesquisaId,
+          projectId: pesquisa.projectId,
+          pesquisaId: input.pesquisaId,
           status: 'running',
           totalClientes: pesquisa.totalClientes,
           processedClientes: 0,
@@ -231,7 +232,8 @@ export const enrichmentRouter = createTRPCRouter({
           const [job] = await db
             .insert(enrichmentJobs)
             .values({
-              projectId: pesquisa.id,
+              projectId: pesquisa.projectId,
+              pesquisaId: pesquisa.id,
               status: 'running',
               totalClientes: pesquisa.totalClientes || 0,
               processedClientes: 0,

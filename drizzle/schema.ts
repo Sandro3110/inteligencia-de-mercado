@@ -324,6 +324,7 @@ export const systemSettings = pgTable(
 export const enrichmentJobs = pgTable('enrichment_jobs', {
   id: serial(),
   projectId: integer('projectId').notNull(),
+  pesquisaId: integer('pesquisaId'),
   status: varchar({ length: 50 }).default('pending').notNull(),
   totalClientes: integer('totalClientes').notNull(),
   processedClientes: integer('processedClientes').default(0).notNull(),
