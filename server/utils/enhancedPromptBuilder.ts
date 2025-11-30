@@ -66,14 +66,16 @@ ${i + 1}. ${p.nome}
 **DISTRIBUIÇÃO GEOGRÁFICA DE CLIENTES:**
 - Total de clientes: ${data.clientes.total}
 - Estados com maior presença:
-${Object.entries(data.clientes.porEstado)
-  .sort(([, a], [, b]) => b - a)
-  .slice(0, 10)
-  .map(
-    ([uf, count], i) =>
-      `  ${i + 1}. ${uf}: ${count} clientes (${((count / data.clientes.total) * 100).toFixed(1)}%)`
-  )
-  .join('\n')}
+${
+  Object.entries(data.clientes.porEstado ?? {})
+    .sort(([, a], [, b]) => (b as number) - (a as number))
+    .slice(0, 10)
+    .map(
+      ([uf, count], i) =>
+        `  ${i + 1}. ${uf}: ${count} clientes (${((Number(count) / data.clientes.total) * 100).toFixed(1)}%)`
+    )
+    .join('\n') || '  Nenhum dado disponível'
+}
 
 - Principais cidades:
 ${data.clientes.porCidade
@@ -94,27 +96,33 @@ ${i + 1}. ${c.nome} - ${c.cidade}/${c.uf}
 
 **ANÁLISE DE LEADS (${data.leads.total} leads):**
 - Distribuição por mercado:
-${Object.entries(data.leads.porMercado)
-  .sort(([, a], [, b]) => b - a)
-  .slice(0, 10)
-  .map(([mercado, count], i) => `  ${i + 1}. ${mercado}: ${count} leads`)
-  .join('\n')}
+${
+  Object.entries(data.leads.porMercado ?? {})
+    .sort(([, a], [, b]) => (b as number) - (a as number))
+    .slice(0, 10)
+    .map(([mercado, count], i) => `  ${i + 1}. ${mercado}: ${count} leads`)
+    .join('\n') || '  Nenhum dado disponível'
+}
 
 - Distribuição por potencial:
-${Object.entries(data.leads.porPotencial)
-  .map(
-    ([potencial, count]) =>
-      `  • ${potencial}: ${count} leads (${((count / data.leads.total) * 100).toFixed(1)}%)`
-  )
-  .join('\n')}
+${
+  Object.entries(data.leads.porPotencial ?? {})
+    .map(
+      ([potencial, count]) =>
+        `  • ${potencial}: ${count} leads (${((Number(count) / data.leads.total) * 100).toFixed(1)}%)`
+    )
+    .join('\n') || '  Nenhum dado disponível'
+}
 
 **ANÁLISE DE CONCORRENTES (${data.concorrentes.total} concorrentes):**
 - Distribuição por mercado:
-${Object.entries(data.concorrentes.porMercado)
-  .sort(([, a], [, b]) => b - a)
-  .slice(0, 10)
-  .map(([mercado, count], i) => `  ${i + 1}. ${mercado}: ${count} concorrentes`)
-  .join('\n')}
+${
+  Object.entries(data.concorrentes.porMercado ?? {})
+    .sort(([, a], [, b]) => (b as number) - (a as number))
+    .slice(0, 10)
+    .map(([mercado, count], i) => `  ${i + 1}. ${mercado}: ${count} concorrentes`)
+    .join('\n') || '  Nenhum dado disponível'
+}
 
 ---
 

@@ -22,10 +22,29 @@ interface PesquisaCardProps {
 }
 
 export function PesquisaCard({ pesquisa, onEnrich, onViewResults, onExport }: PesquisaCardProps) {
-  const enrichmentPercentage =
+  // Calcular progresso de enriquecimento de clientes
+  const clientesPercentage =
     pesquisa.totalClientes > 0
       ? Math.round((pesquisa.clientesEnriquecidos / pesquisa.totalClientes) * 100)
       : 0;
+
+  // Estimativa de progresso geral baseado em todas as entidades
+  // Considera que cada entidade contribui para o progresso total
+  const hasLeads = pesquisa.leadsCount > 0;
+  const hasMercados = pesquisa.mercadosCount > 0;
+  const hasConcorrentes = pesquisa.concorrentesCount > 0;
+
+  // Progresso geral: média ponderada
+  // - Clientes: 40% (base principal)
+  // - Leads: 30% (se houver)
+  // - Mercados: 20% (se houver)
+  // - Concorrentes: 10% (se houver)
+  let overallProgress = clientesPercentage * 0.4;
+  if (hasLeads) overallProgress += 30;
+  if (hasMercados) overallProgress += 20;
+  if (hasConcorrentes) overallProgress += 10;
+
+  const enrichmentPercentage = Math.min(100, Math.round(overallProgress));
 
   return (
     <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
@@ -36,14 +55,20 @@ export function PesquisaCard({ pesquisa, onEnrich, onViewResults, onExport }: Pe
 
       <div className="mb-4">
         <div className="flex justify-between text-sm mb-1">
-          <span className="text-gray-600">Enriquecimento</span>
+          <span className="text-gray-600">Progresso Geral</span>
           <span className="font-semibold text-gray-900">{enrichmentPercentage}%</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div
+          className="w-full bg-gray-200 rounded-full h-2 cursor-help"
+          title={`Clientes: ${pesquisa.clientesEnriquecidos}/${pesquisa.totalClientes} (${clientesPercentage}%) | Leads: ${pesquisa.leadsCount} | Mercados: ${pesquisa.mercadosCount} | Concorrentes: ${pesquisa.concorrentesCount}`}
+        >
           <div
             className="bg-blue-600 h-2 rounded-full transition-all"
             style={{ width: `${enrichmentPercentage}%` }}
           />
+        </div>
+        <div className="text-xs text-gray-500 mt-1">
+          Clientes: {pesquisa.clientesEnriquecidos}/{pesquisa.totalClientes} ({clientesPercentage}%)
         </div>
       </div>
 
