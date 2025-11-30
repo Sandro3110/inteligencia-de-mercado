@@ -41,8 +41,8 @@ ${durationText}
   - Concorrentes identificados: ${totalConcorrentes}
   - Leads qualificados: ${totalLeads}
 
-**ANÁLISE DE MERCADOS (${data.mercados.length} mercados):**
-${data.mercados
+**ANÁLISE DE MERCADOS (${data.mercados?.length || 0} mercados):**
+${(data.mercados || [])
   .map(
     (m, i) => `
 ${i + 1}. ${m.nome}
@@ -59,7 +59,7 @@ ${i + 1}. ${m.nome}
   .join('\n')}
 
 **ANÁLISE DE PRODUTOS (Top 20 produtos):**
-${data.produtos
+${(data.produtos || [])
   .slice(0, 20)
   .map(
     (p, i) => `
@@ -72,27 +72,27 @@ ${i + 1}. ${p.nome}
   .join('\n')}
 
 **DISTRIBUIÇÃO GEOGRÁFICA DE CLIENTES:**
-- Total de clientes: ${data.clientes.total}
+- Total de clientes: ${data.clientes?.total || 0}
 - Estados com maior presença:
 ${
-  Object.entries(data.clientes.porEstado ?? {})
+  Object.entries(data.clientes?.porEstado ?? {})
     .sort(([, a], [, b]) => (b as number) - (a as number))
     .slice(0, 10)
     .map(
       ([uf, count], i) =>
-        `  ${i + 1}. ${uf}: ${count} clientes (${((Number(count) / data.clientes.total) * 100).toFixed(1)}%)`
+        `  ${i + 1}. ${uf}: ${count} clientes (${data.clientes?.total ? ((Number(count) / data.clientes.total) * 100).toFixed(1) : 0}%)`
     )
     .join('\n') || '  Nenhum dado disponível'
 }
 
 - Principais cidades:
-${data.clientes.porCidade
+${(data.clientes?.porCidade || [])
   .slice(0, 15)
   .map((c, i) => `  ${i + 1}. ${c.cidade}/${c.uf}: ${c.count} clientes`)
   .join('\n')}
 
 **TOP 30 CLIENTES:**
-${data.clientes.topClientes
+${(data.clientes?.topClientes || [])
   .slice(0, 30)
   .map(
     (c, i) => `
@@ -102,10 +102,10 @@ ${i + 1}. ${c.nome} - ${c.cidade}/${c.uf}
   )
   .join('\n')}
 
-**ANÁLISE DE LEADS (${data.leads.total} leads):**
+**ANÁLISE DE LEADS (${data.leads?.total || 0} leads):**
 - Distribuição por mercado:
 ${
-  Object.entries(data.leads.porMercado ?? {})
+  Object.entries(data.leads?.porMercado ?? {})
     .sort(([, a], [, b]) => (b as number) - (a as number))
     .slice(0, 10)
     .map(([mercado, count], i) => `  ${i + 1}. ${mercado}: ${count} leads`)
@@ -114,18 +114,18 @@ ${
 
 - Distribuição por potencial:
 ${
-  Object.entries(data.leads.porPotencial ?? {})
+  Object.entries(data.leads?.porPotencial ?? {})
     .map(
       ([potencial, count]) =>
-        `  • ${potencial}: ${count} leads (${((Number(count) / data.leads.total) * 100).toFixed(1)}%)`
+        `  • ${potencial}: ${count} leads (${data.leads?.total ? ((Number(count) / data.leads.total) * 100).toFixed(1) : 0}%)`
     )
     .join('\n') || '  Nenhum dado disponível'
 }
 
-**ANÁLISE DE CONCORRENTES (${data.concorrentes.total} concorrentes):**
+**ANÁLISE DE CONCORRENTES (${data.concorrentes?.total || 0} concorrentes):**
 - Distribuição por mercado:
 ${
-  Object.entries(data.concorrentes.porMercado ?? {})
+  Object.entries(data.concorrentes?.porMercado ?? {})
     .sort(([, a], [, b]) => (b as number) - (a as number))
     .slice(0, 10)
     .map(([mercado, count], i) => `  ${i + 1}. ${mercado}: ${count} concorrentes`)
