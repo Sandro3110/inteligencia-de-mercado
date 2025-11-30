@@ -36,6 +36,18 @@ export function PesquisaCard({
 }: PesquisaCardProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Buscar status do enrichment job para determinar se está finalizada
+  const { data: enrichmentJob } = trpc.pesquisas.getEnrichmentJobStatus.useQuery(
+    { pesquisaId: pesquisa.id },
+    { refetchInterval: 30000 } // Refetch a cada 30s
+  );
+
+  // Determinar se está finalizada baseado nos lotes processados
+  const isCompleted = enrichmentJob
+    ? enrichmentJob.currentBatch >= enrichmentJob.totalBatches &&
+      enrichmentJob.status === 'completed'
+    : false;
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
@@ -125,7 +137,7 @@ export function PesquisaCard({
           <div className="flex items-center gap-2">
             <span
               className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full ${
-                enrichmentPercentage >= 97
+                isCompleted
                   ? 'bg-green-100 text-green-800'
                   : enrichmentPercentage > 0
                     ? 'bg-blue-100 text-blue-800'
@@ -134,14 +146,14 @@ export function PesquisaCard({
             >
               <span
                 className={`w-2 h-2 rounded-full mr-1.5 ${
-                  enrichmentPercentage >= 97
+                  isCompleted
                     ? 'bg-green-500'
                     : enrichmentPercentage > 0
                       ? 'bg-blue-500 animate-pulse'
                       : 'bg-gray-400'
                 }`}
               />
-              {enrichmentPercentage >= 97
+              {isCompleted
                 ? 'Finalizada'
                 : enrichmentPercentage > 0
                   ? 'Em andamento'

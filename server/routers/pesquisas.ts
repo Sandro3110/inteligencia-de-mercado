@@ -440,4 +440,52 @@ export const pesquisasRouter = createTRPCRouter({
         throw new Error('Failed to recalculate metrics');
       }
     }),
+
+  /**
+   * Buscar status do enrichment job
+   */
+  getEnrichmentJobStatus: publicProcedure
+    .input(
+      z.object({
+        pesquisaId: z.number(),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new Error('Database connection failed');
+      }
+
+      try {
+        // Buscar enrichment job mais recente da pesquisa
+        const { enrichmentJobs } = await import('@/drizzle/schema');
+        const [job] = await db
+          .select({
+            id: enrichmentJobs.id,
+            status: enrichmentJobs.status,
+            currentBatch: enrichmentJobs.currentBatch,
+            totalBatches: enrichmentJobs.totalBatches,
+            completedAt: enrichmentJobs.completedAt,
+          })
+          .from(enrichmentJobs)
+          .where(eq(enrichmentJobs.pesquisaId, input.pesquisaId))
+          .orderBy(desc(enrichmentJobs.createdAt))
+          .limit(1);
+
+        if (!job) {
+          return null;
+        }
+
+        return {
+          id: job.id,
+          status: job.status,
+          currentBatch: job.currentBatch,
+          totalBatches: job.totalBatches,
+          completedAt: job.completedAt,
+        };
+      } catch (error) {
+        console.error('[Pesquisas] Error fetching enrichment job status:', error);
+        return null;
+      }
+    }),
 });
