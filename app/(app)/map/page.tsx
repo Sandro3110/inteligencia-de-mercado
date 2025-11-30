@@ -92,6 +92,14 @@ export default function MapPage() {
 
   const entities = (mapData || []) as MapEntity[];
 
+  // DEBUG: Log para entender o problema
+  console.log('🔍 MAP DEBUG:', {
+    filters,
+    entitiesCount: entities.length,
+    isLoading,
+    hasMapData: !!mapData,
+  });
+
   const handleMarkerClick = (entity: MapEntity) => {
     setSelectedEntity(entity);
   };
@@ -325,6 +333,7 @@ export default function MapPage() {
                   value={filters.projectId || ''}
                   onChange={(e) => {
                     const projectId = e.target.value ? parseInt(e.target.value) : undefined;
+                    console.log('🔄 Mudando projectId:', projectId);
                     setFilters({ ...filters, projectId, pesquisaId: undefined });
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -344,6 +353,7 @@ export default function MapPage() {
                   value={filters.pesquisaId || ''}
                   onChange={(e) => {
                     const pesquisaId = e.target.value ? parseInt(e.target.value) : undefined;
+                    console.log('🔄 Mudando pesquisaId:', pesquisaId);
                     setFilters({ ...filters, pesquisaId });
                   }}
                   disabled={!filters.projectId}
