@@ -189,10 +189,28 @@ export default function EnrichmentPage() {
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Progresso</h2>
           <ProgressBar
-            current={job.processedClientes}
-            total={job.totalClientes}
+            current={pesquisa.clientesEnriquecidos}
+            total={pesquisa.totalClientes}
             status={job.status as any}
           />
+          <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
+            <div>
+              <span className="text-gray-600">Processados:</span>
+              <span className="ml-2 font-semibold text-gray-900">
+                {pesquisa.clientesEnriquecidos}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-600">Restantes:</span>
+              <span className="ml-2 font-semibold text-blue-600">
+                {pesquisa.totalClientes - pesquisa.clientesEnriquecidos}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-600">Total:</span>
+              <span className="ml-2 font-semibold text-gray-900">{pesquisa.totalClientes}</span>
+            </div>
+          </div>
         </div>
       )}
 
