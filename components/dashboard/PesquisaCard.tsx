@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Zap, BarChart3, Download, RefreshCw, MapPin } from 'lucide-react';
+import { Zap, BarChart3, Download, RefreshCw, MapPin, FileText } from 'lucide-react';
 import { GenerateReportButton } from '@/components/enrichment-v3/GenerateReportButton';
 import { trpc } from '@/lib/trpc/client';
 
@@ -41,37 +41,62 @@ export function PesquisaCard({
 }: PesquisaCardProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Buscar status do enrichment job para determinar se está finalizada
+  // Buscar status do enrichment job
   const { data: enrichmentJob } = trpc.pesquisas.getEnrichmentJobStatus.useQuery(
     { pesquisaId: pesquisa.id },
-    { refetchInterval: 30000 } // Refetch a cada 30s
+    { refetchInterval: 30000 }
   );
 
   // Buscar status do geocoding job
   const { data: geocodingJob } = trpc.geocoding.getLatestJob.useQuery(
     { pesquisaId: pesquisa.id },
-    { refetchInterval: 30000 } // Refetch a cada 30s
+    { refetchInterval: 30000 }
   );
 
-  // Calcular progresso ANTES de determinar se está completo
+  // Calcular progresso
   const totalClientes = pesquisa.totalClientes;
   const enrichmentPercentage =
     totalClientes > 0 ? Math.round((pesquisa.clientesEnriquecidos / totalClientes) * 100) : 0;
 
-  // Determinar se está finalizada baseado nos lotes processados OU progresso >= 95%
   const isCompleted = enrichmentJob
     ? enrichmentJob.currentBatch >= enrichmentJob.totalBatches &&
       enrichmentJob.status === 'completed'
-    : enrichmentPercentage >= 95; // Considerar finalizada se >= 95% mesmo sem job
+    : enrichmentPercentage >= 95;
 
-  // Determinar status do geocoding
   const isGeocoding = geocodingJob?.status === 'processing';
   const geocodingCompleted = geocodingJob?.status === 'completed';
+
+  const geoTotal = pesquisa.geoEnriquecimentoTotal || 0;
+  const geoTotalEntidades = pesquisa.geoEnriquecimentoTotalEntidades || 0;
+  const geoPercentage =
+    geoTotalEntidades > 0 ? Math.round((geoTotal / geoTotalEntidades) * 100) : 0;
+
+  // Calcular qualidade média
+  const qualidadeClientes = pesquisa.clientesQualidadeMedia || 0;
+  const qualidadeLeads = pesquisa.leadsQualidadeMedia || 0;
+  const qualidadeConcorrentes = pesquisa.concorrentesQualidadeMedia || 0;
+
+  let qualidadeGeral = 0;
+  let totalPeso = 0;
+
+  if (qualidadeClientes > 0) {
+    qualidadeGeral += qualidadeClientes * 0.5;
+    totalPeso += 0.5;
+  }
+  if (qualidadeLeads > 0) {
+    qualidadeGeral += qualidadeLeads * 0.3;
+    totalPeso += 0.3;
+  }
+  if (qualidadeConcorrentes > 0) {
+    qualidadeGeral += qualidadeConcorrentes * 0.2;
+    totalPeso += 0.2;
+  }
+
+  const qualidadePercentage = totalPeso > 0 ? Math.round(qualidadeGeral / totalPeso) : 0;
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      // Apenas recarregar dados - a query já recalcula tudo
       if (onRefresh) {
         await onRefresh();
       }
@@ -81,157 +106,120 @@ export function PesquisaCard({
       setIsRefreshing(false);
     }
   };
-  // ===== CÁLCULO DE PROGRESSO =====
-  // Progresso baseado APENAS em clientes enriquecidos (base real)
-  // Mercados, leads e concorrentes são RESULTADOS do enriquecimento, não metas
-
-  // Metas estimadas (apenas para exibição de frações, não para cálculo de progresso)
-  const metaMercados = totalClientes * 2;
-  const metaProdutos = totalClientes * 3; // 3 produtos por cliente
-  const metaLeads = totalClientes * 13;
-  const metaConcorrentes = totalClientes * 18;
-
-  // Percentuais individuais (para exibição no detalhamento)
-  const clientesPercentage = enrichmentPercentage;
-  const mercadosPercentage =
-    metaMercados > 0 ? Math.min(100, Math.round((pesquisa.mercadosCount / metaMercados) * 100)) : 0;
-  const leadsPercentage =
-    metaLeads > 0 ? Math.min(100, Math.round((pesquisa.leadsCount / metaLeads) * 100)) : 0;
-  const concorrentesPercentage =
-    metaConcorrentes > 0
-      ? Math.min(100, Math.round((pesquisa.concorrentesCount / metaConcorrentes) * 100))
-      : 0;
-  const produtosPercentage =
-    metaProdutos > 0
-      ? Math.min(100, Math.round(((pesquisa.produtosCount || 0) / metaProdutos) * 100))
-      : 0;
-
-  // Enriquecimento geográfico
-  const geoTotal = pesquisa.geoEnriquecimentoTotal || 0;
-  const geoTotalEntidades = pesquisa.geoEnriquecimentoTotalEntidades || 0;
-  const geoPercentage =
-    geoTotalEntidades > 0 ? Math.round((geoTotal / geoTotalEntidades) * 100) : 0;
-
-  // ===== CÁLCULO DE QUALIDADE MÉDIA GERAL =====
-  const qualidadeClientes = pesquisa.clientesQualidadeMedia || 0;
-  const qualidadeLeads = pesquisa.leadsQualidadeMedia || 0;
-  const qualidadeConcorrentes = pesquisa.concorrentesQualidadeMedia || 0;
-
-  // Média ponderada de qualidade (apenas entidades que têm score)
-  let qualidadeGeral = 0;
-  let totalPeso = 0;
-
-  if (qualidadeClientes > 0) {
-    qualidadeGeral += qualidadeClientes * 0.5; // 50% peso
-    totalPeso += 0.5;
-  }
-  if (qualidadeLeads > 0) {
-    qualidadeGeral += qualidadeLeads * 0.3; // 30% peso
-    totalPeso += 0.3;
-  }
-  if (qualidadeConcorrentes > 0) {
-    qualidadeGeral += qualidadeConcorrentes * 0.2; // 20% peso
-    totalPeso += 0.2;
-  }
-
-  const qualidadePercentage = totalPeso > 0 ? Math.round(qualidadeGeral / totalPeso) : 0;
-
-  // Classificação de qualidade (reservado para uso futuro)
-  const _qualidadeClassificacao =
-    qualidadePercentage >= 71 ? 'Alta' : qualidadePercentage >= 41 ? 'Média' : 'Baixa';
-  const qualidadeCor =
-    qualidadePercentage >= 71
-      ? 'text-green-600'
-      : qualidadePercentage >= 41
-        ? 'text-yellow-600'
-        : 'text-red-600';
-  const qualidadeEstrelas =
-    qualidadePercentage >= 71 ? '⭐⭐⭐' : qualidadePercentage >= 41 ? '⭐⭐' : '⭐';
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
-      <h4 className="text-lg font-bold text-gray-900 mb-2">{pesquisa.nome}</h4>
-      <p className="text-sm text-gray-600 mb-4 line-clamp-2 min-h-[40px]">
-        {pesquisa.descricao || 'Sem descrição'}
-      </p>
-
-      <div className="mb-4 space-y-2">
-        {/* Status e Botão Atualizar Métricas */}
-        <div className="flex justify-between items-center mb-2">
-          {/* TAG de Status */}
-          <div className="flex items-center gap-2">
-            <span
-              className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full ${
-                isCompleted
-                  ? 'bg-green-100 text-green-800'
-                  : enrichmentPercentage > 0
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-100 text-gray-800'
-              }`}
-            >
-              <span
-                className={`w-2 h-2 rounded-full mr-1.5 ${
-                  isCompleted
-                    ? 'bg-green-500'
-                    : enrichmentPercentage > 0
-                      ? 'bg-blue-500 animate-pulse'
-                      : 'bg-gray-400'
-                }`}
-              />
-              {isCompleted
-                ? 'Finalizada'
-                : enrichmentPercentage > 0
-                  ? 'Em andamento'
-                  : 'Não iniciada'}
-            </span>
-
-            {/* TAG de Status de Geocodificação */}
-            {(geoPercentage > 0 || geocodingJob) && (
-              <span
-                className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full ${
-                  geoPercentage >= 95 || geocodingCompleted
-                    ? 'bg-emerald-100 text-emerald-800'
-                    : isGeocoding
-                      ? 'bg-amber-100 text-amber-800'
-                      : geoPercentage > 0
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-gray-100 text-gray-800'
-                }`}
-                title="Status da Geocodificação"
-              >
-                <MapPin className={`w-3 h-3 mr-1 ${isGeocoding ? 'animate-pulse' : ''}`} />
-                {geoPercentage >= 95 || geocodingCompleted
-                  ? 'Geocodificado'
-                  : isGeocoding
-                    ? `Geocodificando ${geocodingJob?.currentBatch || 0}/${geocodingJob?.totalBatches || 0}`
-                    : geoPercentage > 0
-                      ? `Parcialmente geocodificado (${geoPercentage}%)`
-                      : 'Geocodificação pendente'}
-              </span>
-            )}
+    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+      {/* Header */}
+      <div className="p-6 border-b border-gray-100">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1">
+            <h4 className="text-xl font-bold text-gray-900 mb-1">{pesquisa.nome}</h4>
+            <p className="text-sm text-gray-500 line-clamp-1">
+              {pesquisa.descricao || 'Sem descrição'}
+            </p>
           </div>
-
-          {/* Botão Atualizar */}
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Recalcular métricas"
+            className="ml-3 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50"
+            title="Atualizar métricas"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Atualizando...' : 'Atualizar'}
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           </button>
         </div>
 
+        {/* Status Badges */}
+        <div className="flex flex-wrap gap-2">
+          <span
+            className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${
+              isCompleted
+                ? 'bg-green-50 text-green-700 border border-green-200'
+                : enrichmentPercentage > 0
+                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                  : 'bg-gray-50 text-gray-600 border border-gray-200'
+            }`}
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full mr-2 ${
+                isCompleted
+                  ? 'bg-green-500'
+                  : enrichmentPercentage > 0
+                    ? 'bg-blue-500 animate-pulse'
+                    : 'bg-gray-400'
+              }`}
+            />
+            {isCompleted
+              ? 'Finalizada'
+              : enrichmentPercentage > 0
+                ? 'Em andamento'
+                : 'Não iniciada'}
+          </span>
+
+          {(geoPercentage > 0 || geocodingJob) && (
+            <span
+              className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${
+                geoPercentage >= 95 || geocodingCompleted
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  : isGeocoding
+                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                    : 'bg-blue-50 text-blue-600 border border-blue-200'
+              }`}
+            >
+              <MapPin className={`w-3 h-3 mr-1.5 ${isGeocoding ? 'animate-pulse' : ''}`} />
+              {geoPercentage >= 95 || geocodingCompleted
+                ? 'Geocodificado'
+                : isGeocoding
+                  ? `Geocodificando (${geoPercentage}%)`
+                  : `Parcial (${geoPercentage}%)`}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Métricas em Grid */}
+      <div className="p-6 grid grid-cols-2 gap-4">
+        {/* Card: Clientes */}
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-lg p-4 border border-blue-200">
+          <div className="text-sm font-medium text-blue-700 mb-1">Clientes</div>
+          <div className="text-2xl font-bold text-blue-900">{pesquisa.totalClientes}</div>
+          <div className="text-xs text-blue-600 mt-1">
+            {pesquisa.clientesEnriquecidos} enriquecidos ({enrichmentPercentage}%)
+          </div>
+        </div>
+
+        {/* Card: Leads */}
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-lg p-4 border border-purple-200">
+          <div className="text-sm font-medium text-purple-700 mb-1">Leads</div>
+          <div className="text-2xl font-bold text-purple-900">{pesquisa.leadsCount}</div>
+          <div className="text-xs text-purple-600 mt-1">Oportunidades identificadas</div>
+        </div>
+
+        {/* Card: Mercados */}
+        <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-lg p-4 border border-emerald-200">
+          <div className="text-sm font-medium text-emerald-700 mb-1">Mercados</div>
+          <div className="text-2xl font-bold text-emerald-900">{pesquisa.mercadosCount}</div>
+          <div className="text-xs text-emerald-600 mt-1">Segmentos mapeados</div>
+        </div>
+
+        {/* Card: Produtos */}
+        <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-lg p-4 border border-amber-200">
+          <div className="text-sm font-medium text-amber-700 mb-1">Produtos</div>
+          <div className="text-2xl font-bold text-amber-900">{pesquisa.produtosCount || 0}</div>
+          <div className="text-xs text-amber-600 mt-1">Soluções catalogadas</div>
+        </div>
+      </div>
+
+      {/* Barras de Progresso */}
+      <div className="px-6 pb-6 space-y-3">
         {/* Progresso Geral */}
         <div>
-          <div className="flex justify-between text-sm mb-1">
-            <span className="text-gray-600 font-medium">Progresso Geral</span>
-            <span className="font-bold text-blue-600">{enrichmentPercentage}%</span>
+          <div className="flex justify-between items-center mb-1.5">
+            <span className="text-sm font-medium text-gray-700">Progresso Geral</span>
+            <span className="text-sm font-bold text-blue-600">{enrichmentPercentage}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
             <div
-              className="bg-blue-600 h-2.5 rounded-full transition-all"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500"
               style={{ width: `${enrichmentPercentage}%` }}
             />
           </div>
@@ -240,20 +228,29 @@ export function PesquisaCard({
         {/* Qualidade Média */}
         {qualidadePercentage > 0 && (
           <div>
-            <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-600 font-medium">Qualidade Média</span>
-              <span className={`font-bold ${qualidadeCor}`}>
-                {qualidadePercentage}% {qualidadeEstrelas}
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-sm font-medium text-gray-700">Qualidade Média</span>
+              <span
+                className={`text-sm font-bold ${
+                  qualidadePercentage >= 71
+                    ? 'text-green-600'
+                    : qualidadePercentage >= 41
+                      ? 'text-yellow-600'
+                      : 'text-red-600'
+                }`}
+              >
+                {qualidadePercentage}%{' '}
+                {qualidadePercentage >= 71 ? '⭐⭐⭐' : qualidadePercentage >= 41 ? '⭐⭐' : '⭐'}
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
               <div
-                className={`h-2 rounded-full transition-all ${
+                className={`h-2 rounded-full transition-all duration-500 ${
                   qualidadePercentage >= 71
-                    ? 'bg-green-600'
+                    ? 'bg-gradient-to-r from-green-500 to-green-600'
                     : qualidadePercentage >= 41
-                      ? 'bg-yellow-500'
-                      : 'bg-red-500'
+                      ? 'bg-gradient-to-r from-yellow-500 to-yellow-600'
+                      : 'bg-gradient-to-r from-red-500 to-red-600'
                 }`}
                 style={{ width: `${qualidadePercentage}%` }}
               />
@@ -261,84 +258,32 @@ export function PesquisaCard({
           </div>
         )}
 
-        {/* Enriquecimento Geográfico */}
-        <div>
-          <div className="flex justify-between text-sm mb-1">
-            <span className="text-gray-600 font-medium">Enriquecimento Geográfico</span>
-            <span className="font-bold text-emerald-600">{geoPercentage}%</span>
+        {/* Geocodificação */}
+        {geoPercentage > 0 && (
+          <div>
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-sm font-medium text-gray-700">Geocodificação</span>
+              <span className="text-sm font-bold text-emerald-600">
+                {geoTotal}/{geoTotalEntidades} ({geoPercentage}%)
+              </span>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${geoPercentage}%` }}
+              />
+            </div>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-emerald-600 h-2 rounded-full transition-all"
-              style={{ width: `${geoPercentage}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Detalhamento por componente */}
-        <div className="text-xs space-y-1 text-gray-600">
-          <div className="flex justify-between">
-            <span>• Clientes:</span>
-            <span className="font-medium">
-              {pesquisa.clientesEnriquecidos}/{totalClientes} ({clientesPercentage}%)
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>• Mercados:</span>
-            <span className="font-medium">
-              {pesquisa.mercadosCount}/{metaMercados} ({mercadosPercentage}%)
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>• Produtos:</span>
-            <span className="font-medium">
-              {pesquisa.produtosCount || 0}/{metaProdutos} ({produtosPercentage}%)
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>• Leads:</span>
-            <span className="font-medium">
-              {pesquisa.leadsCount}/{metaLeads} ({leadsPercentage}%)
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>• Concorrentes:</span>
-            <span className="font-medium">
-              {pesquisa.concorrentesCount}/{metaConcorrentes} ({concorrentesPercentage}%)
-            </span>
-          </div>
-          <div className="flex justify-between border-t border-gray-200 pt-1 mt-1">
-            <span>• Enriquecimento Geográfico:</span>
-            <span className="font-medium">
-              {geoTotal}/{geoTotalEntidades} ({geoPercentage}%)
-            </span>
-          </div>
-        </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-3 gap-3 text-sm mb-4">
-        <div className="text-center">
-          <div className="font-bold text-gray-900">{pesquisa.totalClientes}</div>
-          <div className="text-gray-600 text-xs">Clientes</div>
-        </div>
-        <div className="text-center">
-          <div className="font-bold text-gray-900">{pesquisa.leadsCount}</div>
-          <div className="text-gray-600 text-xs">Leads</div>
-        </div>
-        <div className="text-center">
-          <div className="font-bold text-gray-900">{pesquisa.mercadosCount}</div>
-          <div className="text-gray-600 text-xs">Mercados</div>
-        </div>
-      </div>
-
-      {/* Botões de Ação - Duas Linhas */}
-      <div className="space-y-2">
-        {/* Linha 1: Enriquecimento */}
-        <div className="flex gap-2">
+      {/* Botões de Ação */}
+      <div className="p-6 pt-0 space-y-2">
+        {/* Botões Principais */}
+        <div className="grid grid-cols-2 gap-2">
           <button
             onClick={() => onEnrich(pesquisa.projectId, pesquisa.id)}
-            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
-            title="Enriquecer"
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all font-medium shadow-sm hover:shadow"
           >
             <Zap className="w-4 h-4" />
             Enriquecer
@@ -346,16 +291,15 @@ export function PesquisaCard({
           <button
             onClick={() => onGeocode(pesquisa.projectId, pesquisa.id)}
             disabled={isGeocoding}
-            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Geocodificar"
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all font-medium shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <MapPin className={`w-4 h-4 ${isGeocoding ? 'animate-pulse' : ''}`} />
-            {isGeocoding ? 'Geocodificando...' : 'Geocodificar'}
+            {isGeocoding ? 'Processando...' : 'Geocodificar'}
           </button>
         </div>
 
-        {/* Linha 2: Visualização e Exportação */}
-        <div className="flex gap-2">
+        {/* Botões Secundários */}
+        <div className="grid grid-cols-3 gap-2">
           <GenerateReportButton pesquisaId={pesquisa.id} size="sm" />
           <button
             onClick={() => onViewResults(pesquisa.projectId, pesquisa.id)}
@@ -367,7 +311,7 @@ export function PesquisaCard({
           <button
             onClick={() => onExport(pesquisa.projectId, pesquisa.id)}
             className="flex items-center justify-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-            title="Exportar"
+            title="Exportar Excel"
           >
             <Download className="w-4 h-4" />
           </button>
