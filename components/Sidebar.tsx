@@ -26,7 +26,7 @@ const menuItems: MenuItem[] = [
     icon: FolderKanban,
   },
   {
-    name: 'Mapa',
+    name: 'Geoposição',
     href: '/map',
     icon: Map,
   },
