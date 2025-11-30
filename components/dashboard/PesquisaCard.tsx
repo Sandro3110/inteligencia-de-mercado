@@ -15,6 +15,9 @@ interface PesquisaCardProps {
     leadsCount: number;
     mercadosCount: number;
     concorrentesCount: number;
+    clientesQualidadeMedia?: number;
+    leadsQualidadeMedia?: number;
+    concorrentesQualidadeMedia?: number;
   };
   onEnrich: (projectId: number, pesquisaId: number) => void;
   onViewResults: (projectId: number, pesquisaId: number) => void;
@@ -60,6 +63,42 @@ export function PesquisaCard({ pesquisa, onEnrich, onViewResults, onExport }: Pe
 
   const enrichmentPercentage = Math.min(100, overallProgress);
 
+  // ===== CÁLCULO DE QUALIDADE MÉDIA GERAL =====
+  const qualidadeClientes = pesquisa.clientesQualidadeMedia || 0;
+  const qualidadeLeads = pesquisa.leadsQualidadeMedia || 0;
+  const qualidadeConcorrentes = pesquisa.concorrentesQualidadeMedia || 0;
+
+  // Média ponderada de qualidade (apenas entidades que têm score)
+  let qualidadeGeral = 0;
+  let totalPeso = 0;
+
+  if (qualidadeClientes > 0) {
+    qualidadeGeral += qualidadeClientes * 0.5; // 50% peso
+    totalPeso += 0.5;
+  }
+  if (qualidadeLeads > 0) {
+    qualidadeGeral += qualidadeLeads * 0.3; // 30% peso
+    totalPeso += 0.3;
+  }
+  if (qualidadeConcorrentes > 0) {
+    qualidadeGeral += qualidadeConcorrentes * 0.2; // 20% peso
+    totalPeso += 0.2;
+  }
+
+  const qualidadePercentage = totalPeso > 0 ? Math.round(qualidadeGeral / totalPeso) : 0;
+
+  // Classificação de qualidade
+  const qualidadeClassificacao =
+    qualidadePercentage >= 71 ? 'Alta' : qualidadePercentage >= 41 ? 'Média' : 'Baixa';
+  const qualidadeCor =
+    qualidadePercentage >= 71
+      ? 'text-green-600'
+      : qualidadePercentage >= 41
+        ? 'text-yellow-600'
+        : 'text-red-600';
+  const qualidadeEstrelas =
+    qualidadePercentage >= 71 ? '⭐⭐⭐' : qualidadePercentage >= 41 ? '⭐⭐' : '⭐';
+
   return (
     <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
       <h4 className="text-lg font-bold text-gray-900 mb-2">{pesquisa.nome}</h4>
@@ -81,6 +120,30 @@ export function PesquisaCard({ pesquisa, onEnrich, onViewResults, onExport }: Pe
             />
           </div>
         </div>
+
+        {/* Qualidade Média */}
+        {qualidadePercentage > 0 && (
+          <div>
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-gray-600 font-medium">Qualidade Média</span>
+              <span className={`font-bold ${qualidadeCor}`}>
+                {qualidadePercentage}% {qualidadeEstrelas}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className={`h-2 rounded-full transition-all ${
+                  qualidadePercentage >= 71
+                    ? 'bg-green-600'
+                    : qualidadePercentage >= 41
+                      ? 'bg-yellow-500'
+                      : 'bg-red-500'
+                }`}
+                style={{ width: `${qualidadePercentage}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Detalhamento por componente */}
         <div className="text-xs space-y-1 text-gray-600">

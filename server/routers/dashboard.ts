@@ -14,7 +14,7 @@ import {
   clientes,
   concorrentes,
 } from '@/drizzle/schema';
-import { eq, count, desc, and } from 'drizzle-orm';
+import { eq, count, desc, and, sql, avg } from 'drizzle-orm';
 
 export const dashboardRouter = createTRPCRouter({
   /**
@@ -300,10 +300,17 @@ export const dashboardRouter = createTRPCRouter({
           .where(and(eq(pesquisas.projectId, input.projectId), eq(pesquisas.ativo, 1)))
           .orderBy(desc(pesquisas.createdAt));
 
-        // Para cada pesquisa, buscar contagens
+        // Para cada pesquisa, buscar contagens e qualidade média
         const pesquisasWithCounts = await Promise.all(
           pesquisasData.map(async (pesquisa) => {
-            const [leadsResult, mercadosResult, concorrentesResult] = await Promise.all([
+            const [
+              leadsResult,
+              mercadosResult,
+              concorrentesResult,
+              clientesQualidadeResult,
+              leadsQualidadeResult,
+              concorrentesQualidadeResult,
+            ] = await Promise.all([
               db.select({ count: count() }).from(leads).where(eq(leads.pesquisaId, pesquisa.id)),
               db
                 .select({ count: count() })
@@ -313,6 +320,21 @@ export const dashboardRouter = createTRPCRouter({
                 .select({ count: count() })
                 .from(concorrentes)
                 .where(eq(concorrentes.pesquisaId, pesquisa.id)),
+              // Qualidade média de clientes
+              db
+                .select({ avg: sql<number>`AVG(${clientes.qualidadeScore})` })
+                .from(clientes)
+                .where(eq(clientes.pesquisaId, pesquisa.id)),
+              // Qualidade média de leads
+              db
+                .select({ avg: sql<number>`AVG(${leads.qualidadeScore})` })
+                .from(leads)
+                .where(eq(leads.pesquisaId, pesquisa.id)),
+              // Qualidade média de concorrentes
+              db
+                .select({ avg: sql<number>`AVG(${concorrentes.qualidadeScore})` })
+                .from(concorrentes)
+                .where(eq(concorrentes.pesquisaId, pesquisa.id)),
             ]);
 
             return {
@@ -320,6 +342,9 @@ export const dashboardRouter = createTRPCRouter({
               leadsCount: leadsResult[0]?.count || 0,
               mercadosCount: mercadosResult[0]?.count || 0,
               concorrentesCount: concorrentesResult[0]?.count || 0,
+              clientesQualidadeMedia: Math.round(clientesQualidadeResult[0]?.avg || 0),
+              leadsQualidadeMedia: Math.round(leadsQualidadeResult[0]?.avg || 0),
+              concorrentesQualidadeMedia: Math.round(concorrentesQualidadeResult[0]?.avg || 0),
             };
           })
         );
