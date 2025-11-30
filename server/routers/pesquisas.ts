@@ -17,7 +17,7 @@ import {
   enrichmentJobs,
   enrichmentRuns,
 } from '@/drizzle/schema';
-import { eq, and, desc, count, avg, sql } from 'drizzle-orm';
+import { eq, and, desc, count, avg, sql, inArray } from 'drizzle-orm';
 
 export const pesquisasRouter = createTRPCRouter({
   /**
@@ -633,7 +633,7 @@ export const pesquisasRouter = createTRPCRouter({
           .where(
             and(
               eq(enrichmentJobs.pesquisaId, input.pesquisaId),
-              sql`${enrichmentJobs.status} IN ('running', 'paused')`
+              inArray(enrichmentJobs.status, ['running', 'paused'])
             )
           );
         stats.jobsCancelled = jobsResult.rowsAffected || 0;
