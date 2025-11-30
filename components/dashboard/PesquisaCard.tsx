@@ -49,43 +49,20 @@ export function PesquisaCard({
       setIsRefreshing(false);
     }
   };
-  // ===== CÁLCULO DE METAS BASEADO NOS PROMPTS =====
-  // Baseado em openaiLayered.ts:
-  // - 2 mercados por cliente
-  // - 8-10 concorrentes por mercado (~9 média) = 18 por cliente
-  // - 5-8 leads por mercado (~6.5 média) = 13 por cliente
-  // - ~4 produtos por cliente (estimativa)
+  // ===== CÁLCULO DE PROGRESSO =====
+  // Progresso baseado APENAS em clientes enriquecidos (base real)
+  // Mercados, leads e concorrentes são RESULTADOS do enriquecimento, não metas
 
   const totalClientes = pesquisa.totalClientes;
+
+  // Metas estimadas (apenas para exibição de frações, não para cálculo de progresso)
   const metaMercados = totalClientes * 2;
-  const _metaProdutos = totalClientes * 4; // Reservado para uso futuro
   const metaLeads = totalClientes * 13;
   const metaConcorrentes = totalClientes * 18;
 
-  // ===== CÁLCULO DE PROGRESSO INDIVIDUAL =====
-  const clientesPercentage =
+  // PROGRESSO GERAL = Apenas clientes enriquecidos / total de clientes
+  const enrichmentPercentage =
     totalClientes > 0 ? Math.round((pesquisa.clientesEnriquecidos / totalClientes) * 100) : 0;
-
-  const mercadosPercentage =
-    metaMercados > 0 ? Math.min(100, Math.round((pesquisa.mercadosCount / metaMercados) * 100)) : 0;
-
-  const leadsPercentage =
-    metaLeads > 0 ? Math.min(100, Math.round((pesquisa.leadsCount / metaLeads) * 100)) : 0;
-
-  const concorrentesPercentage =
-    metaConcorrentes > 0
-      ? Math.min(100, Math.round((pesquisa.concorrentesCount / metaConcorrentes) * 100))
-      : 0;
-
-  // ===== PROGRESSO GERAL (MÉDIA PONDERADA) =====
-  const overallProgress = Math.round(
-    clientesPercentage * 0.4 +
-      mercadosPercentage * 0.2 +
-      leadsPercentage * 0.3 +
-      concorrentesPercentage * 0.1
-  );
-
-  const enrichmentPercentage = Math.min(100, overallProgress);
 
   // ===== CÁLCULO DE QUALIDADE MÉDIA GERAL =====
   const qualidadeClientes = pesquisa.clientesQualidadeMedia || 0;
