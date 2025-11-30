@@ -35,6 +35,7 @@ export const mapRouter = router({
         .default({})
     )
     .query(async ({ input }) => {
+      console.log('🔍 [getMapData] Input:', JSON.stringify(input, null, 2));
       const db = await getDb();
       if (!db) throw new Error('Database not available');
 
@@ -189,6 +190,7 @@ export const mapRouter = router({
         );
       }
 
+      console.log('🔍 [getMapData] Results count:', results.length);
       return results;
     }),
 
