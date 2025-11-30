@@ -21,9 +21,9 @@ import {
   prompt2b_identificarProdutos,
   prompt4_identificarConcorrentes,
   prompt5_identificarLeads,
-} from './prompts_v2';
-import { geocodificar } from './geocoding';
-import type { ClienteInput } from './types';
+} from '@/lib/enrichment/prompts_v2';
+import { geocodificar } from '@/lib/enrichment/geocoding';
+import type { ClienteInput } from '@/lib/enrichment/types';
 
 interface Cliente {
   id: number;
