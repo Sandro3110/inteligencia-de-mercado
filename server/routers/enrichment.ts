@@ -4,8 +4,42 @@ import { getDb } from '@/server/db';
 import { enrichmentJobs, pesquisas, pesquisas as pesquisasTable } from '@/drizzle/schema';
 import { eq, desc, and } from 'drizzle-orm';
 import { logEnrichmentStarted } from '@/server/utils/auditLog';
+import { validateEnrichmentStart } from '@/server/utils/enrichmentValidation';
+import { notifyEnrichmentStarted } from '@/server/utils/enrichmentNotifications';
 
 export const enrichmentRouter = createTRPCRouter({
+  /**
+   * Validar início de enriquecimento
+   */
+  validate: protectedProcedure
+    .input(z.object({ pesquisaId: z.number() }))
+    .mutation(async ({ input }) => {
+      return await validateEnrichmentStart(input.pesquisaId);
+    }),
+
+  /**
+   * Buscar jobs ativos
+   */
+  getActiveJobs: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new Error('Database connection failed');
+
+    const activeJobs = await db
+      .select({
+        id: enrichmentJobs.id,
+        projectId: enrichmentJobs.projectId,
+        status: enrichmentJobs.status,
+        processedClientes: enrichmentJobs.processedClientes,
+        totalClientes: enrichmentJobs.totalClientes,
+        startedAt: enrichmentJobs.startedAt,
+      })
+      .from(enrichmentJobs)
+      .where(eq(enrichmentJobs.status, 'running'))
+      .orderBy(desc(enrichmentJobs.startedAt));
+
+    return activeJobs;
+  }),
+
   /**
    * Buscar job de enriquecimento por pesquisaId
    */

@@ -17,6 +17,7 @@ import { settingsRouter } from './settings';
 import { resultsRouter } from './results';
 import { mapRouter } from './map';
 import { reportsRouter } from './reports';
+import { reportsEnhancedRouter } from './reports-enhanced';
 
 /**
  * Router raiz da aplicação - SIMPLIFICADO
@@ -39,6 +40,7 @@ export const appRouter = createTRPCRouter({
   results: resultsRouter,
   map: mapRouter,
   reports: reportsRouter,
+  reportsEnhanced: reportsEnhancedRouter,
 });
 
 /**
