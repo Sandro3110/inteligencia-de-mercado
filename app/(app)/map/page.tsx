@@ -10,6 +10,7 @@ import { ExportMapModal, type ExportOptions } from '@/components/map/ExportMapMo
 import html2canvas from 'html2canvas';
 import { toast } from 'sonner';
 import type { ViewMode } from '@/components/map/MapContainer';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Importar MapContainer dinamicamente para evitar SSR
 const MapContainer = dynamic(
@@ -554,21 +555,25 @@ export default function MapPage() {
               </div>
             </div>
           ) : (
-            <MapContainer
-              entities={entities}
-              viewMode={viewMode}
-              onMarkerClick={handleMarkerClick}
-            />
+            <ErrorBoundary>
+              <MapContainer
+                entities={entities}
+                viewMode={viewMode}
+                onMarkerClick={handleMarkerClick}
+              />
+            </ErrorBoundary>
           )}
         </div>
 
         {/* Sidebar */}
-        <MapSidebar
-          entities={entities}
-          selectedEntity={selectedEntity}
-          onEntityClick={handleEntityClick}
-          stats={mapStats || undefined}
-        />
+        <ErrorBoundary>
+          <MapSidebar
+            entities={entities}
+            selectedEntity={selectedEntity}
+            onEntityClick={handleEntityClick}
+            stats={mapStats || undefined}
+          />
+        </ErrorBoundary>
       </div>
 
       {/* Entity Detail Modal */}
