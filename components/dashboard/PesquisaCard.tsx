@@ -35,18 +35,16 @@ export function PesquisaCard({
   onRefresh,
 }: PesquisaCardProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const recalculateMutation = trpc.pesquisas.recalculateMetrics.useMutation();
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      await recalculateMutation.mutateAsync({ pesquisaId: pesquisa.id });
-      // Chamar callback para recarregar dados
+      // Apenas recarregar dados - a query já recalcula tudo
       if (onRefresh) {
-        onRefresh();
+        await onRefresh();
       }
     } catch (error) {
-      console.error('Erro ao recalcular métricas:', error);
+      console.error('Erro ao atualizar métricas:', error);
     } finally {
       setIsRefreshing(false);
     }

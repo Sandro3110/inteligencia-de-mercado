@@ -57,11 +57,14 @@ export default function DashboardPage() {
     { enabled: selectedProjectId === null }
   );
 
-  const { data: pesquisas, isLoading: loadingPesquisas } =
-    trpc.dashboard.getProjectPesquisas.useQuery(
-      { projectId: selectedProjectId! },
-      { enabled: selectedProjectId !== null }
-    );
+  const {
+    data: pesquisas,
+    isLoading: loadingPesquisas,
+    refetch: refetchPesquisas,
+  } = trpc.dashboard.getProjectPesquisas.useQuery(
+    { projectId: selectedProjectId! },
+    { enabled: selectedProjectId !== null }
+  );
 
   const stats = selectedProjectId === null ? globalStats : projectStats;
   const isLoading =
@@ -279,8 +282,7 @@ export default function DashboardPage() {
                   onViewResults={handleViewResults}
                   onExport={handleExport}
                   onRefresh={async () => {
-                    await trpcUtils.dashboard.getProjectPesquisas.invalidate();
-                    await trpcUtils.dashboard.stats.invalidate();
+                    await refetchPesquisas();
                   }}
                 />
               ))}

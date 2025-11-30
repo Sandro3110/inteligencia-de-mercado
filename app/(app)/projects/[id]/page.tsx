@@ -19,8 +19,11 @@ export default function ProjectDetailsPage() {
     id: projectId,
   });
 
-  const { data: pesquisas, isLoading: loadingPesquisas } =
-    trpc.dashboard.getProjectPesquisas.useQuery({ projectId });
+  const {
+    data: pesquisas,
+    isLoading: loadingPesquisas,
+    refetch: refetchPesquisas,
+  } = trpc.dashboard.getProjectPesquisas.useQuery({ projectId });
 
   const isLoading = loadingProject || loadingPesquisas;
 
@@ -362,8 +365,7 @@ export default function ProjectDetailsPage() {
                 onViewResults={handleViewResults}
                 onExport={handleExport}
                 onRefresh={async () => {
-                  await trpcUtils.dashboard.getProjectPesquisas.invalidate();
-                  await trpcUtils.dashboard.stats.invalidate();
+                  await refetchPesquisas();
                 }}
               />
             ))}
