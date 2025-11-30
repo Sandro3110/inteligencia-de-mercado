@@ -5,29 +5,39 @@ import { EnhancedReportData } from './reportData';
  */
 export function buildEnhancedPrompt(data: EnhancedReportData): string {
   // Garantir valores padrão para evitar null/undefined
-  const totalLeads = data.totalLeads || 0;
-  const totalConcorrentes = data.totalConcorrentes || 0;
-  const totalMercados = data.totalMercados || 0;
-  const totalProdutos = data.totalProdutos || 0;
-  const totalClientes = data.totalClientes || 0;
-  const clientesEnriquecidos = data.clientesEnriquecidos || 0;
-  const enrichmentProgress = data.enrichmentProgress || 0;
-  const statusText =
-    data.status === 'in_progress'
-      ? `⚠️ **ATENÇÃO:** Este relatório foi gerado com o enriquecimento ainda em andamento (${enrichmentProgress}% concluído). Os dados apresentados são parciais e podem não representar o panorama completo do mercado.`
-      : `✅ Enriquecimento concluído${data.enrichmentCompletedAt ? ` em ${new Date(data.enrichmentCompletedAt).toLocaleString('pt-BR')}` : ''}`;
+  const metadata = data.metadata ?? {
+    projectId: 0,
+    projectNome: 'Sem nome',
+    pesquisaId: 0,
+    pesquisaNome: 'Sem nome',
+    totalClientes: 0,
+    clientesEnriquecidos: 0,
+    enrichmentProgress: 0,
+  };
+
+  const totalLeads = data.totalLeads ?? 0;
+  const totalConcorrentes = data.totalConcorrentes ?? 0;
+  const totalMercados = data.totalMercados ?? 0;
+  const totalProdutos = data.totalProdutos ?? 0;
+  const totalClientes = metadata.totalClientes ?? 0;
+  const clientesEnriquecidos = metadata.clientesEnriquecidos ?? 0;
+  const enrichmentProgress = metadata.enrichmentProgress ?? 0;
 
   const durationText = data.enrichmentDuration
     ? `Tempo de processamento: ${data.enrichmentDuration}`
     : '';
 
+  const mercados = Array.isArray(data.mercados) ? data.mercados : [];
+  const produtos = Array.isArray(data.produtos) ? data.produtos : [];
+  const clientes = data.clientes ?? { total: 0, porEstado: {}, porCidade: [], topClientes: [] };
+  const leads = data.leads ?? { total: 0, porMercado: {}, porPotencial: {}, topLeads: [] };
+  const concorrentes = data.concorrentes ?? { total: 0, porMercado: {}, topConcorrentes: [] };
+
   return `Você é um analista de inteligência de mercado sênior. Analise os seguintes dados de pesquisa e gere um relatório executivo profissional, detalhado e baseado em dados concretos.
 
-${statusText}
-
 **INFORMAÇÕES DO PROJETO:**
-- Projeto: ${data.projectNome} (ID: ${data.projectId})
-- Pesquisa: ${data.pesquisaNome} (ID: ${data.pesquisaId})
+- Projeto: ${metadata.projectNome} (ID: ${metadata.projectId})
+- Pesquisa: ${metadata.pesquisaNome} (ID: ${metadata.pesquisaId})
 - Data de início: ${data.enrichmentStartedAt ? new Date(data.enrichmentStartedAt).toLocaleString('pt-BR') : 'N/A'}
 - Data de conclusão: ${data.enrichmentCompletedAt ? new Date(data.enrichmentCompletedAt).toLocaleString('pt-BR') : 'Em andamento'}
 ${durationText}
@@ -41,166 +51,153 @@ ${durationText}
   - Concorrentes identificados: ${totalConcorrentes}
   - Leads qualificados: ${totalLeads}
 
-**ANÁLISE DE MERCADOS (${data.mercados?.length || 0} mercados):**
-${(data.mercados || [])
+**ANÁLISE DE MERCADOS (${mercados.length} mercados):**
+${mercados
+  .slice(0, 20)
   .map(
     (m, i) => `
-${i + 1}. ${m.nome}
-   - Categoria: ${m.categoria}
-   - Tamanho Estimado: ${m.tamanhoEstimado}
-   - Potencial: ${m.potencial}
-   - Segmentação: ${m.segmentacao}
-   - Clientes neste mercado: ${m.clientesCount}
-   - Produtos identificados: ${m.produtosCount}
-   - Concorrentes: ${m.concorrentesCount}
-   - Leads qualificados: ${m.leadsCount}
-`
+${i + 1}. ${m.nome ?? 'Sem nome'}
+   - Categoria: ${m.categoria ?? 'N/A'}
+   - Tamanho Estimado: ${m.tamanhoEstimado ?? 'N/A'}
+   - Potencial: ${m.potencial ?? 'N/A'}
+   - Segmentação: ${m.segmentacao ?? 'N/A'}
+   - Clientes neste mercado: ${m.clientesCount ?? 0}
+   - Produtos neste mercado: ${m.produtosCount ?? 0}
+   - Concorrentes: ${m.concorrentesCount ?? 0}
+   - Leads: ${m.leadsCount ?? 0}`
   )
   .join('\n')}
 
-**ANÁLISE DE PRODUTOS (Top 20 produtos):**
-${(data.produtos || [])
+**PRODUTOS MAPEADOS (${produtos.length} produtos):**
+${produtos
   .slice(0, 20)
   .map(
     (p, i) => `
-${i + 1}. ${p.nome}
-   - Categoria: ${p.categoria}
-   - Menções: ${p.count}
-   - Mercados: ${p.mercados.join(', ') || 'Não especificado'}
-`
+${i + 1}. ${p.nome ?? 'Sem nome'}
+   - Mercados: ${Array.isArray(p.mercados) ? p.mercados.join(', ') : 'N/A'}`
   )
   .join('\n')}
 
-**DISTRIBUIÇÃO GEOGRÁFICA DE CLIENTES:**
-- Total de clientes: ${data.clientes?.total || 0}
-- Estados com maior presença:
-${
-  Object.entries(data.clientes?.porEstado ?? {})
-    .sort(([, a], [, b]) => (b as number) - (a as number))
-    .slice(0, 10)
-    .map(
-      ([uf, count], i) =>
-        `  ${i + 1}. ${uf}: ${count} clientes (${data.clientes?.total ? ((Number(count) / data.clientes.total) * 100).toFixed(1) : 0}%)`
-    )
-    .join('\n') || '  Nenhum dado disponível'
-}
+**ANÁLISE DE CLIENTES (${clientes.total} clientes):**
 
-- Principais cidades:
-${(data.clientes?.porCidade || [])
-  .slice(0, 15)
-  .map((c, i) => `  ${i + 1}. ${c.cidade}/${c.uf}: ${c.count} clientes`)
+Distribuição Geográfica por Estado:
+${Object.entries(clientes.porEstado ?? {})
+  .map(([uf, count]) => `- ${uf}: ${count} clientes`)
   .join('\n')}
 
-**TOP 30 CLIENTES:**
-${(data.clientes?.topClientes || [])
-  .slice(0, 30)
+Top Cidades:
+${(clientes.porCidade ?? [])
+  .slice(0, 10)
+  .map((c) => `- ${c.cidade ?? 'N/A'}/${c.uf ?? 'N/A'}: ${c.count ?? 0} clientes`)
+  .join('\n')}
+
+Amostra de Clientes (${(clientes.topClientes ?? []).length} clientes):
+${(clientes.topClientes ?? [])
+  .slice(0, 20)
   .map(
     (c, i) => `
-${i + 1}. ${c.nome} - ${c.cidade}/${c.uf}
-   Mercados de atuação: ${c.mercados.join(', ') || 'Não especificado'}
-`
+${i + 1}. ${c.nome ?? 'Sem nome'} - ${c.cidade ?? 'N/A'}/${c.uf ?? 'N/A'}
+   Mercados: ${Array.isArray(c.mercados) ? c.mercados.join(', ') : 'N/A'}`
   )
   .join('\n')}
 
-**ANÁLISE DE LEADS (${data.leads?.total || 0} leads):**
-- Distribuição por mercado:
-${
-  Object.entries(data.leads?.porMercado ?? {})
-    .sort(([, a], [, b]) => (b as number) - (a as number))
-    .slice(0, 10)
-    .map(([mercado, count], i) => `  ${i + 1}. ${mercado}: ${count} leads`)
-    .join('\n') || '  Nenhum dado disponível'
-}
+**ANÁLISE DE LEADS (${leads.total} leads):**
 
-- Distribuição por potencial:
-${
-  Object.entries(data.leads?.porPotencial ?? {})
-    .map(
-      ([potencial, count]) =>
-        `  • ${potencial}: ${count} leads (${data.leads?.total ? ((Number(count) / data.leads.total) * 100).toFixed(1) : 0}%)`
-    )
-    .join('\n') || '  Nenhum dado disponível'
-}
+Distribuição por Mercado:
+${Object.entries(leads.porMercado ?? {})
+  .slice(0, 10)
+  .map(([mercado, count]) => `- ${mercado}: ${count} leads`)
+  .join('\n')}
 
-**ANÁLISE DE CONCORRENTES (${data.concorrentes?.total || 0} concorrentes):**
-- Distribuição por mercado:
-${
-  Object.entries(data.concorrentes?.porMercado ?? {})
-    .sort(([, a], [, b]) => (b as number) - (a as number))
-    .slice(0, 10)
-    .map(([mercado, count], i) => `  ${i + 1}. ${mercado}: ${count} concorrentes`)
-    .join('\n') || '  Nenhum dado disponível'
-}
+Distribuição por Potencial:
+${Object.entries(leads.porPotencial ?? {})
+  .map(([potencial, count]) => `- ${potencial}: ${count} leads`)
+  .join('\n')}
 
----
+Top Leads:
+${(leads.topLeads ?? [])
+  .slice(0, 15)
+  .map(
+    (l, i) =>
+      `${i + 1}. ${l.nome ?? 'Sem nome'} - ${l.mercado ?? 'N/A'} (Potencial: ${l.potencial ?? 'N/A'})`
+  )
+  .join('\n')}
 
-**GERE UM RELATÓRIO EXECUTIVO PROFISSIONAL COM AS SEGUINTES SEÇÕES:**
+**ANÁLISE DE CONCORRENTES (${concorrentes.total} concorrentes):**
 
-**1. RESUMO EXECUTIVO (3-4 parágrafos)**
-- Visão geral da pesquisa e abrangência
-- Principais descobertas e insights
-- Contexto de mercado e relevância dos dados
-- Destaques quantitativos mais importantes
+Distribuição por Mercado:
+${Object.entries(concorrentes.porMercado ?? {})
+  .slice(0, 10)
+  .map(([mercado, count]) => `- ${mercado}: ${count} concorrentes`)
+  .join('\n')}
 
-**2. ANÁLISE DETALHADA DE MERCADOS (4-5 parágrafos)**
-- Análise dos ${totalMercados} mercados identificados
-- Segmentação e categorização
-- Tamanho de mercado e potencial de crescimento
-- Oportunidades e ameaças por mercado
-- Recomendações de priorização
-
-**3. PERFIL DE CLIENTES E DISTRIBUIÇÃO GEOGRÁFICA (3-4 parágrafos)**
-- Perfil dos ${totalClientes} clientes identificados
-- Análise da distribuição geográfica (estados e cidades)
-- Concentração vs. dispersão geográfica
-- Oportunidades de expansão regional
-- Características dos principais clientes
-
-**4. ANÁLISE DE PRODUTOS E SERVIÇOS (3-4 parágrafos)**
-- Portfólio de ${totalProdutos} produtos identificados
-- Categorização e segmentação de produtos
-- Produtos mais demandados e tendências
-- Oportunidades de cross-selling e upselling
-- Gaps de mercado e produtos potenciais
-
-**5. ANÁLISE DE LEADS E OPORTUNIDADES (2-3 parágrafos)**
-- Perfil dos ${totalLeads} leads qualificados
-- Distribuição por mercado e potencial
-- Taxa de conversão estimada
-- Estratégias de abordagem recomendadas
-- Priorização de leads
-
-**6. PANORAMA COMPETITIVO (3-4 parágrafos)**
-- Análise dos ${totalConcorrentes} concorrentes identificados
-- Distribuição por mercado
-- Nível de competitividade por segmento
-- Estratégias de diferenciação recomendadas
-- Análise de ameaças e oportunidades competitivas
-
-**7. ANÁLISE SWOT DO MERCADO (2-3 parágrafos)**
-- Forças (Strengths) identificadas
-- Fraquezas (Weaknesses) observadas
-- Oportunidades (Opportunities) de mercado
-- Ameaças (Threats) competitivas e de mercado
-
-**8. CONCLUSÕES E RECOMENDAÇÕES ESTRATÉGICAS (4-5 parágrafos)**
-- Insights estratégicos principais
-- Recomendações de curto prazo (0-6 meses)
-- Recomendações de médio prazo (6-18 meses)
-- Recomendações de longo prazo (18+ meses)
-- Próximos passos sugeridos
-- KPIs recomendados para acompanhamento
+Top Concorrentes:
+${(concorrentes.topConcorrentes ?? [])
+  .slice(0, 20)
+  .map(
+    (c, i) =>
+      `${i + 1}. ${c.nome ?? 'Sem nome'} - ${c.mercado ?? 'N/A'} (Porte: ${c.porte ?? 'N/A'})`
+  )
+  .join('\n')}
 
 ---
 
-**DIRETRIZES DE ESCRITA:**
-- Use linguagem profissional, objetiva e baseada em dados
-- Cite números específicos e percentuais sempre que relevante
-- Faça análises comparativas entre mercados, regiões e segmentos
-- Identifique padrões, tendências e insights não óbvios
-- Seja específico em recomendações (não genérico)
-- Use tom consultivo e estratégico
-- Evite jargões excessivos, priorize clareza
-${data.status === 'in_progress' ? '- IMPORTANTE: Deixe claro que a análise é parcial e pode mudar com dados completos' : ''}
-`;
+**INSTRUÇÕES PARA GERAÇÃO DO RELATÓRIO:**
+
+1. **OBRIGATÓRIO:** Cite dados específicos, números exatos, nomes de empresas reais, cidades e estados mencionados acima
+2. **OBRIGATÓRIO:** Use os dados concretos fornecidos, não invente informações
+3. **OBRIGATÓRIO:** Mencione pelo menos 10 empresas/clientes reais pelo nome
+4. **OBRIGATÓRIO:** Cite pelo menos 5 cidades específicas com seus estados
+5. **OBRIGATÓRIO:** Use números exatos (não arredonde demais)
+
+Estruture o relatório em **26 parágrafos** seguindo esta ordem:
+
+**1. Resumo Executivo (3 parágrafos)**
+- Parágrafo 1: Visão geral do projeto e objetivos
+- Parágrafo 2: Principais descobertas e números-chave
+- Parágrafo 3: Recomendações estratégicas de alto nível
+
+**2. Análise de Mercado (5 parágrafos)**
+- Parágrafo 4: Panorama geral dos mercados identificados
+- Parágrafo 5: Mercados de maior potencial (cite nomes específicos)
+- Parágrafo 6: Análise de tamanho e segmentação
+- Parágrafo 7: Tendências e oportunidades
+- Parágrafo 8: Riscos e desafios
+
+**3. Análise de Produtos (3 parágrafos)**
+- Parágrafo 9: Produtos mais relevantes (cite nomes)
+- Parágrafo 10: Distribuição de produtos por mercado
+- Parágrafo 11: Oportunidades de produto
+
+**4. Análise de Clientes (5 parágrafos)**
+- Parágrafo 12: Perfil geral da base de clientes
+- Parágrafo 13: Distribuição geográfica detalhada (cite estados e cidades)
+- Parágrafo 14: Principais clientes (cite pelo menos 5 nomes)
+- Parágrafo 15: Padrões de comportamento
+- Parágrafo 16: Segmentação de clientes
+
+**5. Análise de Leads (4 parágrafos)**
+- Parágrafo 17: Visão geral dos leads qualificados
+- Parágrafo 18: Leads de alto potencial (cite nomes)
+- Parágrafo 19: Distribuição por mercado
+- Parágrafo 20: Estratégias de conversão
+
+**6. Análise Competitiva (3 parágrafos)**
+- Parágrafo 21: Panorama competitivo
+- Parágrafo 22: Principais concorrentes (cite nomes)
+- Parágrafo 23: Posicionamento e diferenciação
+
+**7. Recomendações Estratégicas (3 parágrafos)**
+- Parágrafo 24: Ações de curto prazo
+- Parágrafo 25: Estratégias de médio prazo
+- Parágrafo 26: Visão de longo prazo
+
+**FORMATO:**
+- Use Markdown com títulos (##) e subtítulos (###)
+- Use **negrito** para destacar números e nomes importantes
+- Use listas quando apropriado
+- Mantenha tom profissional e objetivo
+- Seja específico e baseado em dados
+
+Gere o relatório agora:`;
 }
