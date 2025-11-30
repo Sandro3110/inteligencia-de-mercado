@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useSelectedProject } from '@/hooks/useSelectedProject';
+import React, { useState } from 'react';
 import { trpc } from '@/lib/trpc/client';
+import { Package, Filter, X, Download, Building2, Target, Users } from 'lucide-react';
+import { EntityDetailCard } from '@/components/map/EntityDetailCard';
+import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -15,150 +15,389 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Package, TrendingUp, Grid3x3 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-/**
- * Página de Análise de Produtos
- *
- * Duas visões:
- * 1. Ranking de produtos (por clientes)
- * 2. Matriz Produto × Mercado (heatmap)
- */
-export default function ProductsPage() {
-  const searchParams = useSearchParams();
-  const { selectedProject } = useSelectedProject();
+interface ProductEntity {
+  id: number;
+  type: 'cliente' | 'lead' | 'concorrente';
+  nome: string;
+  latitude: number;
+  longitude: number;
+  cidade: string;
+  uf: string;
+  [key: string]: unknown;
+}
 
-  // Prioridade: URL params > projeto selecionado
-  const projectId = searchParams.get('projectId')
-    ? parseInt(searchParams.get('projectId')!)
-    : selectedProject?.id || null;
-  const pesquisaId = searchParams.get('pesquisaId')
-    ? parseInt(searchParams.get('pesquisaId')!)
-    : null;
+type EntityType = 'clientes' | 'leads' | 'concorrentes';
 
+export default function ProdutosPage() {
+  const [activeTab, setActiveTab] = useState<EntityType>('clientes');
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+  const [selectedEntity, setSelectedEntity] = useState<ProductEntity | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    projectId: undefined as number | undefined,
+    pesquisaId: undefined as number | undefined,
+    setor: undefined as string | undefined,
+    porte: undefined as string | undefined,
+    qualidade: undefined as string | undefined,
+  });
 
-  // Buscar lista de projetos
+  // Queries
   const { data: projects } = trpc.projects.list.useQuery();
+  const { data: pesquisas } = trpc.pesquisas.list.useQuery(
+    { projectId: filters.projectId ?? 0 },
+    { enabled: !!filters.projectId }
+  );
+  const { data: availableFilters } = trpc.unifiedMap.getAvailableFilters.useQuery({
+    projectId: filters.projectId,
+    pesquisaId: filters.pesquisaId,
+  });
 
   // Buscar ranking de produtos
-  const { data: rankingData, isLoading: rankingLoading } =
-    trpc.productAnalysis.getProductRanking.useQuery(
-      { projectId: projectId!, pesquisaId },
-      { enabled: !!projectId }
-    );
-
-  // Buscar matriz produto × mercado
-  const { data: matrixData, isLoading: matrixLoading } =
-    trpc.productAnalysis.getProductMarketMatrix.useQuery(
-      { projectId: projectId!, pesquisaId },
-      { enabled: !!projectId }
-    );
-
-  // Buscar distribuição geográfica do produto selecionado
-  const { data: geoData } = trpc.productAnalysis.getProductGeoDistribution.useQuery(
-    { produtoNome: selectedProduct!, projectId: projectId!, pesquisaId },
-    { enabled: !!selectedProduct && !!projectId }
+  const { data: rankingData, isLoading } = trpc.productAnalysis.getProductRanking.useQuery(
+    {
+      projectId: filters.projectId ?? null,
+      pesquisaId: filters.pesquisaId ?? null,
+    },
+    {
+      enabled: !!filters.projectId,
+    }
   );
 
-  if (!projectId) {
-    return (
-      <div className="container mx-auto p-6">
-        <Card className="p-8 max-w-md mx-auto mt-20">
-          <h2 className="text-xl font-bold mb-4">📦 Análise de Produtos</h2>
-          <p className="text-muted-foreground mb-4">
-            Selecione um projeto para visualizar produtos
-          </p>
-          <div>
-            <label className="block text-sm font-medium mb-2">Projeto</label>
-            <select
-              value=""
-              onChange={(e) => {
-                const newProjectId = Number(e.target.value);
-                window.location.href = `/products?projectId=${newProjectId}`;
-              }}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Selecione um projeto...</option>
-              {projects?.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.nome}
-                </option>
-              ))}
-            </select>
-          </div>
-        </Card>
-      </div>
+  // Buscar entidades de um produto específico
+  const { data: productEntities, isLoading: isLoadingEntities } =
+    trpc.mapHierarchical.getCityEntities.useQuery(
+      {
+        cidade: '', // Não filtrar por cidade
+        uf: '', // Não filtrar por UF
+        entityType: 'clientes', // Produtos só existem em clientes
+        projectId: filters.projectId ?? null,
+        pesquisaId: filters.pesquisaId ?? null,
+        page: 1,
+        pageSize: 1000,
+        produto: selectedProduct ?? undefined,
+      },
+      {
+        enabled: !!selectedProduct && !!filters.projectId,
+      }
     );
-  }
 
-  if (rankingLoading || matrixLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  const { products = [] } = rankingData || {};
-  const { matrix = [], markets = [] } = matrixData || {};
-
-  // Função para calcular cor do heatmap
-  const getHeatmapColor = (value: number, max: number) => {
-    if (value === 0) return 'bg-gray-50';
-    const intensity = Math.min((value / max) * 100, 100);
-    if (intensity > 75) return 'bg-green-500 text-white';
-    if (intensity > 50) return 'bg-green-400';
-    if (intensity > 25) return 'bg-green-300';
-    return 'bg-green-200';
+  const handleEntityClick = (entity: any) => {
+    const productEntity: ProductEntity = {
+      id: entity.id,
+      type: 'cliente',
+      nome: entity.nome,
+      latitude: entity.latitude ? Number(entity.latitude) : 0,
+      longitude: entity.longitude ? Number(entity.longitude) : 0,
+      cidade: entity.cidade || '',
+      uf: entity.uf || '',
+      ...entity,
+    };
+    setSelectedEntity(productEntity);
   };
 
-  // Calcular valor máximo para heatmap
-  const maxValue = Math.max(
-    0,
-    ...matrix.flatMap((row) =>
-      markets
-        .filter((m) => m && m.nome) // Filtrar mercados válidos
-        .map((m) => (typeof row[m.nome] === 'number' ? (row[m.nome] as number) : 0))
-    )
-  );
+  const clearFilters = () => {
+    setFilters({
+      projectId: undefined,
+      pesquisaId: undefined,
+      setor: undefined,
+      porte: undefined,
+      qualidade: undefined,
+    });
+    setSelectedProduct(null);
+  };
+
+  const hasActiveFilters =
+    filters.projectId || filters.pesquisaId || filters.setor || filters.porte || filters.qualidade;
+
+  const handleExportExcel = () => {
+    toast.error('Funcionalidade de exportação em desenvolvimento');
+  };
+
+  const handleExportCSV = () => {
+    toast.error('Funcionalidade de exportação em desenvolvimento');
+  };
+
+  const { products = [] } = rankingData || {};
 
   return (
-    <div className="container mx-auto p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">📦 Análise de Produtos</h1>
-        <p className="text-muted-foreground mt-2">Ranking de produtos e distribuição por mercado</p>
-      </div>
-
-      <Tabs defaultValue="ranking" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="ranking">
-            <TrendingUp className="h-4 w-4 mr-2" />
-            Ranking
-          </TabsTrigger>
-          <TabsTrigger value="matrix">
-            <Grid3x3 className="h-4 w-4 mr-2" />
-            Matriz Produto × Mercado
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Aba 1: Ranking de Produtos */}
-        <TabsContent value="ranking">
-          <Card>
-            <div className="p-4 border-b">
-              <h2 className="text-lg font-semibold">Top Produtos por Clientes</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Produtos ordenados por número de clientes
-              </p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto p-6">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+                <Package className="w-8 h-8 text-blue-600" />
+                Análise de Produtos
+              </h1>
+              <p className="text-gray-600 mt-1">Ranking de produtos por número de clientes</p>
             </div>
 
+            <div className="flex items-center gap-4">
+              {/* Filtros Button */}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                  showFilters
+                    ? 'bg-blue-600 text-white'
+                    : hasActiveFilters
+                      ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <Filter className="w-4 h-4" />
+                Filtros
+                {hasActiveFilters && (
+                  <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-xs">•</span>
+                )}
+              </button>
+
+              {/* Export Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleExportExcel}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Excel
+                </button>
+                <button
+                  onClick={handleExportCSV}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  CSV
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Filtros Panel */}
+          {showFilters && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {/* Projeto */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Projeto</label>
+                  <select
+                    value={filters.projectId || ''}
+                    onChange={(e) => {
+                      const value = e.target.value ? Number(e.target.value) : undefined;
+                      setFilters((prev) => ({ ...prev, projectId: value, pesquisaId: undefined }));
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Todos</option>
+                    {projects?.map((project) => (
+                      <option key={project.id} value={project.id}>
+                        {project.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Pesquisa */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Pesquisa</label>
+                  <select
+                    value={filters.pesquisaId || ''}
+                    onChange={(e) => {
+                      const value = e.target.value ? Number(e.target.value) : undefined;
+                      setFilters((prev) => ({ ...prev, pesquisaId: value }));
+                    }}
+                    disabled={!filters.projectId}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  >
+                    <option value="">Todas</option>
+                    {pesquisas?.map((pesquisa) => (
+                      <option key={pesquisa.id} value={pesquisa.id}>
+                        {pesquisa.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Setor */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Setor</label>
+                  <select
+                    value={filters.setor || ''}
+                    onChange={(e) =>
+                      setFilters((prev) => ({ ...prev, setor: e.target.value || undefined }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Todos</option>
+                    {availableFilters?.setores?.map((setor) => (
+                      <option key={setor} value={setor}>
+                        {setor}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Porte */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Porte</label>
+                  <select
+                    value={filters.porte || ''}
+                    onChange={(e) =>
+                      setFilters((prev) => ({ ...prev, porte: e.target.value || undefined }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Todos</option>
+                    {availableFilters?.portes?.map((porte) => (
+                      <option key={porte} value={porte}>
+                        {porte}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Qualidade */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Qualidade</label>
+                  <select
+                    value={filters.qualidade || ''}
+                    onChange={(e) =>
+                      setFilters((prev) => ({ ...prev, qualidade: e.target.value || undefined }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Todas</option>
+                    {availableFilters?.qualidades?.map((qualidade) => (
+                      <option key={qualidade} value={qualidade}>
+                        {qualidade}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Limpar Filtros */}
+              {hasActiveFilters && (
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={clearFilters}
+                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 font-medium"
+                  >
+                    <X className="w-4 h-4" />
+                    Limpar Filtros
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('clientes')}
+            className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 ${
+              activeTab === 'clientes'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <Building2 className="w-4 h-4" />
+            Clientes
+          </button>
+          <button
+            onClick={() => setActiveTab('leads')}
+            disabled
+            className="flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 border-transparent text-gray-400 cursor-not-allowed"
+          >
+            <Target className="w-4 h-4" />
+            Leads
+            <Badge variant="secondary" className="ml-2 text-xs">
+              N/A
+            </Badge>
+          </button>
+          <button
+            onClick={() => setActiveTab('concorrentes')}
+            disabled
+            className="flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 border-transparent text-gray-400 cursor-not-allowed"
+          >
+            <Users className="w-4 h-4" />
+            Concorrentes
+            <Badge variant="secondary" className="ml-2 text-xs">
+              N/A
+            </Badge>
+          </button>
+        </div>
+
+        {/* Content */}
+        {!filters.projectId ? (
+          <Card className="p-8 text-center">
+            <p className="text-gray-600">
+              Selecione um projeto nos filtros para visualizar produtos
+            </p>
+          </Card>
+        ) : isLoading ? (
+          <Card className="p-8 text-center">
+            <p className="text-gray-600">Carregando...</p>
+          </Card>
+        ) : selectedProduct ? (
+          // Lista de clientes do produto selecionado
+          <Card>
+            <div className="p-4 border-b bg-gray-50 flex items-center justify-between">
+              <h3 className="font-semibold">{selectedProduct} - Clientes</h3>
+              <button
+                onClick={() => setSelectedProduct(null)}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4">
+              {isLoadingEntities ? (
+                <p className="text-center text-gray-600">Carregando clientes...</p>
+              ) : productEntities && productEntities.entities.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Cidade</TableHead>
+                      <TableHead>UF</TableHead>
+                      <TableHead>Setor</TableHead>
+                      <TableHead>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {productEntities.entities.map((entity: any) => (
+                      <TableRow key={entity.id}>
+                        <TableCell className="font-medium">{entity.nome}</TableCell>
+                        <TableCell>{entity.cidade}</TableCell>
+                        <TableCell>{entity.uf}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{entity.setor || '-'}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <button
+                            onClick={() => handleEntityClick(entity)}
+                            className="text-blue-600 hover:text-blue-800 font-medium"
+                          >
+                            Ver Detalhes
+                          </button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="text-center text-gray-600">Nenhum cliente encontrado</p>
+              )}
+            </div>
+          </Card>
+        ) : (
+          // Tabela de produtos
+          <Card>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12">#</TableHead>
                   <TableHead>Produto</TableHead>
                   <TableHead>Categoria</TableHead>
                   <TableHead className="text-center">Clientes</TableHead>
@@ -168,42 +407,25 @@ export default function ProductsPage() {
               <TableBody>
                 {products.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={4} className="text-center text-gray-600 py-8">
                       Nenhum produto encontrado
                     </TableCell>
                   </TableRow>
                 ) : (
-                  products.map((product, index) => (
-                    <TableRow
-                      key={product.nome}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => setSelectedProduct(product.nome)}
-                    >
-                      <TableCell className="font-medium">
-                        {index === 0 && '🥇'}
-                        {index === 1 && '🥈'}
-                        {index === 2 && '🥉'}
-                        {index > 2 && index + 1}
-                      </TableCell>
+                  products.map((product: any) => (
+                    <TableRow key={product.nome}>
                       <TableCell className="font-medium">{product.nome}</TableCell>
                       <TableCell>
                         <Badge variant="outline">{product.categoria}</Badge>
                       </TableCell>
+                      <TableCell className="text-center">{product.clientes}</TableCell>
                       <TableCell className="text-center">
-                        <Badge variant="default">{product.clientes}</Badge>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedProduct(product.nome);
-                          }}
+                        <button
+                          onClick={() => setSelectedProduct(product.nome)}
+                          className="text-blue-600 hover:text-blue-800 font-medium"
                         >
-                          <Package className="h-4 w-4 mr-1" />
-                          Ver Distribuição
-                        </Button>
+                          Ver Clientes
+                        </button>
                       </TableCell>
                     </TableRow>
                   ))
@@ -211,151 +433,17 @@ export default function ProductsPage() {
               </TableBody>
             </Table>
           </Card>
-        </TabsContent>
+        )}
+      </div>
 
-        {/* Aba 2: Matriz Produto × Mercado */}
-        <TabsContent value="matrix">
-          <Card>
-            <div className="p-4 border-b">
-              <h2 className="text-lg font-semibold">Matriz: Produtos × Mercados</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Heatmap mostra concentração de clientes por produto e mercado
-              </p>
-            </div>
-
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="sticky left-0 bg-background z-10">Produto</TableHead>
-                    {markets
-                      .filter((market) => market && market.id && market.nome)
-                      .map((market) => (
-                        <TableHead key={market.id} className="text-center min-w-[120px]">
-                          {market.nome}
-                        </TableHead>
-                      ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {matrix.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={markets.length + 1}
-                        className="text-center text-muted-foreground py-8"
-                      >
-                        Nenhum dado encontrado
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    matrix.map((row) => (
-                      <TableRow key={row.produto as string}>
-                        <TableCell className="sticky left-0 bg-background z-10 font-medium">
-                          {row.produto as string}
-                        </TableCell>
-                        {markets
-                          .filter((market) => market && market.id && market.nome)
-                          .map((market) => {
-                            const value = row[market.nome] as number;
-                            return (
-                              <TableCell
-                                key={market.id}
-                                className={`text-center ${getHeatmapColor(value, maxValue)}`}
-                              >
-                                {value > 0 ? value : '-'}
-                              </TableCell>
-                            );
-                          })}
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-
-            {/* Legenda do Heatmap */}
-            <div className="p-4 border-t bg-muted/20">
-              <p className="text-sm font-medium mb-2">Legenda:</p>
-              <div className="flex gap-4 flex-wrap">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-gray-50 border rounded"></div>
-                  <span className="text-sm">Sem clientes</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-green-200 rounded"></div>
-                  <span className="text-sm">Baixa concentração</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-green-400 rounded"></div>
-                  <span className="text-sm">Média concentração</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-green-500 rounded"></div>
-                  <span className="text-sm text-white">Alta concentração</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Modal com Distribuição Geográfica */}
-      <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Distribuição Geográfica: {selectedProduct}</DialogTitle>
-          </DialogHeader>
-
-          {geoData && (
-            <div className="mt-4">
-              <Card>
-                <div className="p-4 border-b">
-                  <p className="text-sm text-muted-foreground">
-                    Total de clientes: <strong>{geoData.totals.total}</strong>
-                  </p>
-                </div>
-
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Região</TableHead>
-                      <TableHead>UF</TableHead>
-                      <TableHead>Cidade</TableHead>
-                      <TableHead className="text-center">Clientes</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {geoData.regions.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                          Nenhum dado geográfico encontrado
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      geoData.regions.flatMap((region) =>
-                        region.cities.map((city, idx) => (
-                          <TableRow key={`${city.uf}-${city.cidade}`}>
-                            {idx === 0 && (
-                              <TableCell rowSpan={region.cities.length} className="font-medium">
-                                {region.regiao}
-                              </TableCell>
-                            )}
-                            <TableCell>{city.uf}</TableCell>
-                            <TableCell>{city.cidade}</TableCell>
-                            <TableCell className="text-center">
-                              <Badge variant="outline">{city.count}</Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )
-                    )}
-                  </TableBody>
-                </Table>
-              </Card>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Entity Detail Modal */}
+      {selectedEntity && (
+        <EntityDetailCard
+          entity={selectedEntity}
+          onClose={() => setSelectedEntity(null)}
+          entityType={selectedEntity.type}
+        />
+      )}
     </div>
   );
 }
