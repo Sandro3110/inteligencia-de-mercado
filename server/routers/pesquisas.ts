@@ -624,20 +624,43 @@ export const pesquisasRouter = createTRPCRouter({
         };
 
         // 1. Cancelar jobs em andamento
-        const jobsResult = await db
-          .update(enrichmentJobs)
-          .set({
-            status: 'cancelled',
-            updatedAt: new Date(),
-          })
-          .where(
-            and(
-              eq(enrichmentJobs.pesquisaId, input.pesquisaId),
-              inArray(enrichmentJobs.status, ['running', 'paused'])
-            )
-          );
-        stats.jobsCancelled = jobsResult.rowsAffected || 0;
-        console.log('[Pesquisas.cleanEnrichment] Jobs cancelados:', stats.jobsCancelled);
+        try {
+          // Primeiro verificar se há jobs para cancelar
+          const jobsToCancel = await db
+            .select({ id: enrichmentJobs.id })
+            .from(enrichmentJobs)
+            .where(
+              and(
+                eq(enrichmentJobs.pesquisaId, input.pesquisaId),
+                inArray(enrichmentJobs.status, ['running', 'paused'])
+              )
+            );
+
+          console.log('[Pesquisas.cleanEnrichment] Jobs para cancelar:', jobsToCancel.length);
+
+          if (jobsToCancel.length > 0) {
+            const jobsResult = await db
+              .update(enrichmentJobs)
+              .set({
+                status: 'cancelled',
+                updatedAt: new Date(),
+              })
+              .where(
+                and(
+                  eq(enrichmentJobs.pesquisaId, input.pesquisaId),
+                  inArray(enrichmentJobs.status, ['running', 'paused'])
+                )
+              );
+            stats.jobsCancelled = jobsResult.rowsAffected || 0;
+          } else {
+            stats.jobsCancelled = 0;
+          }
+          console.log('[Pesquisas.cleanEnrichment] Jobs cancelados:', stats.jobsCancelled);
+        } catch (error) {
+          console.error('[Pesquisas.cleanEnrichment] Erro ao cancelar jobs:', error);
+          // Não lançar erro, apenas logar e continuar
+          stats.jobsCancelled = 0;
+        }
 
         // 2. Limpar enrichment runs
         await db.delete(enrichmentRuns).where(eq(enrichmentRuns.pesquisaId, input.pesquisaId));
