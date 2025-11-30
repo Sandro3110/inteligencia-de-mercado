@@ -136,7 +136,7 @@ export const reportsEnhancedRouter = createTRPCRouter({
         const pdfBuffer = generatePDF(pdfData);
 
         // 7. Retornar PDF como base64
-        const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
+        const pdfBase64 = pdfBuffer.toString('base64');
 
         return {
           success: true,
