@@ -29,7 +29,7 @@ export async function fetchProdutos(db: Database, pesquisaId: number): Promise<P
   // Para cada produto, buscar mercados associados
   const produtosComMercados: ProdutoData[] = [];
 
-  for (const produto of produtosResult) {
+  for (const produto of produtosResult || []) {
     // Buscar mercados deste produto
     const mercadosResult = await db
       .selectDistinct({

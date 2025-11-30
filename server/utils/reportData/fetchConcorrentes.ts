@@ -42,7 +42,7 @@ export async function fetchConcorrentes(
     .orderBy(sql`count(*) DESC`);
 
   const porMercado: Record<string, number> = {};
-  for (const row of porMercadoResult) {
+  for (const row of porMercadoResult || []) {
     if (row.mercado && row.mercado.trim() !== '') {
       porMercado[row.mercado] = Number(row.count);
     }
@@ -60,7 +60,7 @@ export async function fetchConcorrentes(
     .where(eq(mercadosUnicos.pesquisaId, pesquisaId))
     .limit(50);
 
-  const topConcorrentes = topConcorrentesResult.map((row) => ({
+  const topConcorrentes = (topConcorrentesResult || []).map((row) => ({
     nome: row.nome || 'Sem nome',
     mercado: row.mercado || 'Desconhecido',
     porte: row.porte || 'Não especificado',

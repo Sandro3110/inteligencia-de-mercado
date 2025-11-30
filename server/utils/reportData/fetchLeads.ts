@@ -40,7 +40,7 @@ export async function fetchLeads(db: Database, pesquisaId: number): Promise<Lead
     .orderBy(sql`count(*) DESC`);
 
   const porMercado: Record<string, number> = {};
-  for (const row of porMercadoResult) {
+  for (const row of porMercadoResult || []) {
     if (row.mercado && row.mercado.trim() !== '') {
       porMercado[row.mercado] = Number(row.count);
     }
@@ -59,7 +59,7 @@ export async function fetchLeads(db: Database, pesquisaId: number): Promise<Lead
     .orderBy(sql`count(*) DESC`);
 
   const porPotencial: Record<string, number> = {};
-  for (const row of porPotencialResult) {
+  for (const row of porPotencialResult || []) {
     if (row.potencial) {
       porPotencial[row.potencial] = Number(row.count);
     }
@@ -77,7 +77,7 @@ export async function fetchLeads(db: Database, pesquisaId: number): Promise<Lead
     .where(eq(mercadosUnicos.pesquisaId, pesquisaId))
     .limit(30);
 
-  const topLeads = topLeadsResult.map((row) => ({
+  const topLeads = (topLeadsResult || []).map((row) => ({
     nome: row.nome || 'Sem nome',
     mercado: row.mercado || 'Desconhecido',
     potencial: row.potencial || 'Não especificado',

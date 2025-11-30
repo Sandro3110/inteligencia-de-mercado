@@ -41,7 +41,7 @@ export async function fetchMercados(db: Database, pesquisaId: number): Promise<M
   // Para cada mercado, buscar estatísticas
   const mercadosComStats: MercadoData[] = [];
 
-  for (const mercado of mercadosResult) {
+  for (const mercado of mercadosResult || []) {
     // Contar clientes neste mercado
     const clientesCountResult = await db
       .select({ count: sql<number>`count(*)` })

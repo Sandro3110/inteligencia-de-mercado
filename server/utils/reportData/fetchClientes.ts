@@ -39,7 +39,7 @@ export async function fetchClientes(db: Database, pesquisaId: number): Promise<C
     .orderBy(sql`count(*) DESC`);
 
   const porEstado: Record<string, number> = {};
-  for (const row of porEstadoResult) {
+  for (const row of porEstadoResult || []) {
     if (row.uf) {
       porEstado[row.uf] = Number(row.count);
     }
@@ -58,7 +58,7 @@ export async function fetchClientes(db: Database, pesquisaId: number): Promise<C
     .orderBy(sql`count(*) DESC`)
     .limit(30);
 
-  const porCidade = porCidadeResult.map((row) => ({
+  const porCidade = (porCidadeResult || []).map((row) => ({
     cidade: row.cidade || 'Não informado',
     uf: row.uf || '',
     count: Number(row.count),
@@ -79,7 +79,7 @@ export async function fetchClientes(db: Database, pesquisaId: number): Promise<C
   // Para cada cliente, buscar mercados
   const topClientes: ClienteData[] = [];
 
-  for (const cliente of topClientesResult) {
+  for (const cliente of topClientesResult || []) {
     // Buscar mercados do cliente
     const mercadosResult = await db
       .select({
@@ -94,7 +94,7 @@ export async function fetchClientes(db: Database, pesquisaId: number): Promise<C
       nome: cliente.nome,
       cidade: cliente.cidade || 'Não informado',
       uf: cliente.uf || '',
-      mercados: mercadosResult.map((m) => m.mercadoNome),
+      mercados: (mercadosResult || []).map((m) => m.mercadoNome || 'Desconhecido').filter(Boolean),
     });
   }
 
