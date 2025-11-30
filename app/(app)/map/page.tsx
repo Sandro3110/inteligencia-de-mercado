@@ -102,7 +102,18 @@ export default function MapPage() {
     pesquisaId: filters.pesquisaId,
   });
 
-  const entities = (mapData || []) as MapEntity[];
+  // Validar e garantir que entities sempre seja um array válido
+  const entities = React.useMemo(() => {
+    if (!mapData) return [];
+    if (!Array.isArray(mapData)) {
+      console.error('❌ mapData não é um array:', mapData);
+      return [];
+    }
+    // Filtrar entidades inválidas
+    return mapData.filter(
+      (e) => e && typeof e === 'object' && e.id && e.type && e.nome
+    ) as MapEntity[];
+  }, [mapData]);
 
   // DEBUG: Log para entender o problema
   console.log('🔍 MAP DEBUG:', {
@@ -110,6 +121,7 @@ export default function MapPage() {
     entitiesCount: entities.length,
     isLoading,
     hasMapData: !!mapData,
+    mapDataType: Array.isArray(mapData) ? 'array' : typeof mapData,
   });
 
   const handleMarkerClick = (entity: MapEntity) => {
@@ -533,7 +545,7 @@ export default function MapPage() {
           entities={entities}
           selectedEntity={selectedEntity}
           onEntityClick={handleEntityClick}
-          stats={mapStats}
+          stats={mapStats || undefined}
         />
       </div>
 
