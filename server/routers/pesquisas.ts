@@ -742,16 +742,25 @@ export const pesquisasRouter = createTRPCRouter({
         stats.clientesReset = resetResult.rowsAffected || 0;
         console.log('[Pesquisas.cleanEnrichment] Clientes resetados:', stats.clientesReset);
 
-        // 10. Resetar contadores da pesquisa
+        // 10. Resetar TODOS os contadores da pesquisa
         await db
           .update(pesquisas)
           .set({
             clientesEnriquecidos: 0,
+            leadsCount: 0,
+            concorrentesCount: 0,
+            produtosCount: 0,
+            mercadosCount: 0,
+            clientesQualidadeMedia: null,
+            leadsQualidadeMedia: null,
+            concorrentesQualidadeMedia: null,
+            geoEnriquecimentoTotal: 0,
+            geoEnriquecimentoTotalEntidades: 0,
             status: 'rascunho',
             updatedAt: new Date().toISOString(),
           })
           .where(eq(pesquisas.id, input.pesquisaId));
-        console.log('[Pesquisas.cleanEnrichment] Pesquisa resetada');
+        console.log('[Pesquisas.cleanEnrichment] Pesquisa resetada - todos contadores zerados');
 
         console.log('[Pesquisas.cleanEnrichment] Limpeza concluída com sucesso:', stats);
 
