@@ -7,10 +7,23 @@ import {
   mercadosUnicos,
   concorrentes,
   leads,
+  produtos,
   systemSettings,
 } from '@/drizzle/schema';
 import { eq, count } from 'drizzle-orm';
 import { logEnrichmentCompleted, logEnrichmentFailed } from '@/server/utils/auditLog';
+
+// Sistema V2: Importar prompts modulares
+import {
+  prompt1_enriquecerCliente,
+  prompt2_identificarMercado,
+  prompt3_enriquecerMercado,
+  prompt2b_identificarProdutos,
+  prompt4_identificarConcorrentes,
+  prompt5_identificarLeads,
+} from './prompts_v2';
+import { geocodificar } from './geocoding';
+import type { ClienteInput } from './types';
 
 interface Cliente {
   id: number;
@@ -19,6 +32,8 @@ interface Cliente {
   produtoPrincipal?: string | null;
   siteOficial?: string | null;
   cidade?: string | null;
+  uf?: string | null;
+  segmentacaoB2BB2C?: string | null;
 }
 
 /**
@@ -46,13 +61,17 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Processar enriquecimento em background
+ * Processar enriquecimento em background usando Sistema V2
  */
 async function processEnrichment(jobId: number, pesquisaId: number) {
   const db = await getDb();
   if (!db) throw new Error('Database connection failed');
 
+  const startTime = Date.now();
+
   try {
+    console.log(`[Enrichment V2] 🚀 Starting job ${jobId} for pesquisa ${pesquisaId}`);
+
     // 1. Buscar API key do banco
     const [openaiSetting] = await db
       .select()
@@ -87,14 +106,18 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
       .where(eq(clientes.pesquisaId, pesquisaId))
       .limit(job.totalClientes);
 
-    console.log(`[Enrichment] Processing ${clientesToEnrich.length} clientes for job ${jobId}`);
+    console.log(
+      `[Enrichment V2] 📊 Processing ${clientesToEnrich.length} clientes for job ${jobId}`
+    );
 
-    // 5. Processar cada cliente
+    // 5. Processar cada cliente com Sistema V2
     let processedCount = 0;
     let successCount = 0;
     let failedCount = 0;
 
     for (const cliente of clientesToEnrich) {
+      const clienteStartTime = Date.now();
+
       // Check if job is paused
       const [currentJob] = await db
         .select()
@@ -102,75 +125,210 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
         .where(eq(enrichmentJobs.id, jobId));
 
       if (currentJob?.status === 'paused') {
-        console.log(`[Enrichment] Job ${jobId} paused, stopping processing`);
+        console.log(`[Enrichment V2] ⏸️  Job ${jobId} paused, stopping processing`);
         break;
       }
 
       try {
-        // Call OpenAI
-        const enrichmentData = await generateAllDataOptimized(
-          {
-            nome: cliente.nome,
-            cnpj: cliente.cnpj || undefined,
-            produtoPrincipal: cliente.produtoPrincipal || undefined,
-            siteOficial: cliente.siteOficial || undefined,
-            cidade: cliente.cidade || undefined,
-          },
-          apiKey
+        console.log(`\n[Enrichment V2] 🔄 Processing cliente ${cliente.id}: ${cliente.nome}`);
+
+        // ========================================
+        // SISTEMA V2: 13 ETAPAS DE ENRIQUECIMENTO
+        // ========================================
+
+        // ETAPA 1: Enriquecer Cliente
+        console.log(`[Enrichment V2] 📝 Step 1/13: Enriquecer cliente...`);
+        const clienteInput: ClienteInput = {
+          nome: cliente.nome,
+          cnpj: cliente.cnpj,
+          produtoPrincipal: cliente.produtoPrincipal,
+          siteOficial: cliente.siteOficial,
+          cidade: cliente.cidade,
+          uf: cliente.uf,
+          segmentacaoB2BB2C: cliente.segmentacaoB2BB2C,
+        };
+
+        const clienteEnriquecido = await prompt1_enriquecerCliente(clienteInput, apiKey);
+        console.log(
+          `[Enrichment V2] ✅ Cliente enriquecido: ${clienteEnriquecido.cidade}, ${clienteEnriquecido.uf}`
         );
 
-        // 6. Salvar dados enriquecidos
-        // Update cliente
-        await db
-          .update(clientes)
-          .set({
-            ...enrichmentData.clienteEnriquecido,
-            validationStatus: 'approved',
-          })
-          .where(eq(clientes.id, cliente.id));
+        // ETAPA 2: Geocodificar
+        console.log(`[Enrichment V2] 📍 Step 2/13: Geocodificar...`);
+        let latitude: number | undefined;
+        let longitude: number | undefined;
 
-        // Insert mercados, concorrentes, leads
-        for (const mercadoData of enrichmentData.mercados) {
-          // Insert mercado
-          const [mercado] = await db
-            .insert(mercadosUnicos)
-            .values({
-              pesquisaId,
-              projectId: pesquisa.projectId,
-              nome: mercadoData.mercado.nome,
-              categoria: mercadoData.mercado.categoria,
-              segmentacao: mercadoData.mercado.segmentacao,
-              tamanhoEstimado: mercadoData.mercado.tamanhoEstimado,
-              quantidadeClientes: 1,
-            })
-            .returning();
-
-          // Insert concorrentes
-          for (const concorrenteData of mercadoData.concorrentes) {
-            await db.insert(concorrentes).values({
-              pesquisaId,
-              projectId: pesquisa.projectId,
-              mercadoId: mercado.id,
-              ...concorrenteData,
-            });
-          }
-
-          // Insert leads
-          for (const leadData of mercadoData.leads) {
-            await db.insert(leads).values({
-              pesquisaId,
-              projectId: pesquisa.projectId,
-              mercadoId: mercado.id,
-              setor: leadData.segmento,
-              qualidadeClassificacao: leadData.potencial,
-              ...leadData,
-            });
+        if (clienteEnriquecido.cidade && clienteEnriquecido.uf) {
+          const coords = await geocodificar(clienteEnriquecido.cidade, clienteEnriquecido.uf);
+          if (coords) {
+            latitude = coords.lat;
+            longitude = coords.lng;
+            console.log(`[Enrichment V2] ✅ Coordenadas: ${latitude}, ${longitude}`);
+          } else {
+            console.log(`[Enrichment V2] ⚠️  Geocodificação falhou (continuando sem coordenadas)`);
           }
         }
 
+        // ETAPA 3: Gravar Cliente Enriquecido
+        console.log(`[Enrichment V2] 💾 Step 3/13: Gravar cliente...`);
+        await db
+          .update(clientes)
+          .set({
+            nome: clienteEnriquecido.nome,
+            cnpj: clienteEnriquecido.cnpj,
+            siteOficial: clienteEnriquecido.site,
+            cidade: clienteEnriquecido.cidade,
+            uf: clienteEnriquecido.uf,
+            setor: clienteEnriquecido.setor,
+            descricao: clienteEnriquecido.descricao,
+            latitude,
+            longitude,
+            validationStatus: 'approved',
+          })
+          .where(eq(clientes.id, cliente.id));
+        console.log(`[Enrichment V2] ✅ Cliente gravado`);
+
+        // ETAPA 4: Identificar Mercado
+        console.log(`[Enrichment V2] 🌍 Step 4/13: Identificar mercado...`);
+        const mercado = await prompt2_identificarMercado(clienteEnriquecido, apiKey);
+        console.log(`[Enrichment V2] ✅ Mercado identificado: ${mercado.nome}`);
+
+        // ETAPA 5: Gravar Mercado
+        console.log(`[Enrichment V2] 💾 Step 5/13: Gravar mercado...`);
+        const [mercadoInserido] = await db
+          .insert(mercadosUnicos)
+          .values({
+            pesquisaId,
+            projectId: pesquisa.projectId,
+            nome: mercado.nome,
+            categoria: mercado.categoria,
+            segmentacao: mercado.segmentacao,
+            tamanhoMercado: mercado.tamanhoMercado,
+            quantidadeClientes: 1,
+          })
+          .returning();
+        console.log(`[Enrichment V2] ✅ Mercado gravado (ID: ${mercadoInserido.id})`);
+
+        // ETAPA 6: Enriquecer Mercado
+        console.log(`[Enrichment V2] 📈 Step 6/13: Enriquecer mercado...`);
+        const mercadoEnriquecido = await prompt3_enriquecerMercado(mercado, apiKey);
+        console.log(
+          `[Enrichment V2] ✅ Mercado enriquecido: ${mercadoEnriquecido.tendencias.length} tendências, ${mercadoEnriquecido.principaisPlayers.length} players`
+        );
+
+        // ETAPA 7: Atualizar Mercado
+        console.log(`[Enrichment V2] 💾 Step 7/13: Atualizar mercado...`);
+        await db
+          .update(mercadosUnicos)
+          .set({
+            crescimentoAnual: mercadoEnriquecido.crescimentoAnual,
+            tendencias: JSON.stringify(mercadoEnriquecido.tendencias),
+            principaisPlayers: JSON.stringify(mercadoEnriquecido.principaisPlayers),
+          })
+          .where(eq(mercadosUnicos.id, mercadoInserido.id));
+        console.log(`[Enrichment V2] ✅ Mercado atualizado`);
+
+        // ETAPA 8: Identificar Produtos
+        console.log(`[Enrichment V2] 📦 Step 8/13: Identificar produtos...`);
+        const produtosIdentificados = await prompt2b_identificarProdutos(
+          clienteEnriquecido,
+          apiKey
+        );
+        console.log(`[Enrichment V2] ✅ ${produtosIdentificados.length} produtos identificados`);
+
+        // ETAPA 9: Gravar Produtos
+        console.log(`[Enrichment V2] 💾 Step 9/13: Gravar produtos...`);
+        for (const produto of produtosIdentificados) {
+          await db.insert(produtos).values({
+            projectId: pesquisa.projectId,
+            pesquisaId,
+            clienteId: cliente.id,
+            mercadoId: mercadoInserido.id,
+            nome: produto.nome,
+            descricao: produto.descricao,
+            categoria: produto.publicoAlvo,
+            ativo: 1,
+          });
+        }
+        console.log(`[Enrichment V2] ✅ ${produtosIdentificados.length} produtos gravados`);
+
+        // ETAPA 10: Identificar Concorrentes
+        console.log(`[Enrichment V2] 🏢 Step 10/13: Identificar concorrentes...`);
+        const concorrentesIdentificados = await prompt4_identificarConcorrentes(
+          mercadoEnriquecido,
+          clienteEnriquecido,
+          apiKey
+        );
+        console.log(
+          `[Enrichment V2] ✅ ${concorrentesIdentificados.length} concorrentes identificados`
+        );
+
+        // ETAPA 11: Gravar Concorrentes
+        console.log(`[Enrichment V2] 💾 Step 11/13: Gravar concorrentes...`);
+        for (const concorrente of concorrentesIdentificados) {
+          await db.insert(concorrentes).values({
+            pesquisaId,
+            projectId: pesquisa.projectId,
+            mercadoId: mercadoInserido.id,
+            nome: concorrente.nome,
+            cnpj: concorrente.cnpj,
+            site: concorrente.site,
+            cidade: concorrente.cidade,
+            uf: concorrente.uf,
+            produto: concorrente.produtoPrincipal,
+          });
+        }
+        console.log(`[Enrichment V2] ✅ ${concorrentesIdentificados.length} concorrentes gravados`);
+
+        // ETAPA 12: Identificar Leads (COM CICLO FECHADO)
+        console.log(`[Enrichment V2] 🎯 Step 12/13: Identificar leads (ciclo fechado)...`);
+        const leadsIdentificados = await prompt5_identificarLeads(
+          mercadoEnriquecido,
+          clienteEnriquecido,
+          concorrentesIdentificados,
+          produtosIdentificados,
+          apiKey
+        );
+        console.log(`[Enrichment V2] ✅ ${leadsIdentificados.length} leads identificados`);
+
+        // Contar leads de players
+        const leadsDePlayersCount = leadsIdentificados.filter(
+          (l) => l.fonte === 'PLAYER_DO_MERCADO'
+        ).length;
+        console.log(
+          `[Enrichment V2] 🔄 Ciclo fechado: ${leadsDePlayersCount}/${leadsIdentificados.length} leads de players (${Math.round((leadsDePlayersCount / leadsIdentificados.length) * 100)}%)`
+        );
+
+        // ETAPA 13: Gravar Leads
+        console.log(`[Enrichment V2] 💾 Step 13/13: Gravar leads...`);
+        for (const lead of leadsIdentificados) {
+          await db.insert(leads).values({
+            pesquisaId,
+            projectId: pesquisa.projectId,
+            mercadoId: mercadoInserido.id,
+            nome: lead.nome,
+            cnpj: lead.cnpj,
+            site: lead.site,
+            cidade: lead.cidade,
+            uf: lead.uf,
+            regiao: lead.cidade,
+            setor: lead.produtoInteresse,
+          });
+        }
+        console.log(`[Enrichment V2] ✅ ${leadsIdentificados.length} leads gravados`);
+
+        // ========================================
+        // FIM DO PROCESSO V2
+        // ========================================
+
+        const clienteDuration = Math.floor((Date.now() - clienteStartTime) / 1000);
+        console.log(
+          `[Enrichment V2] ✅ Cliente ${cliente.id} processado com sucesso em ${clienteDuration}s`
+        );
+
         successCount++;
       } catch (error) {
-        console.error(`[Enrichment] Error processing cliente ${cliente.id}:`, error);
+        console.error(`[Enrichment V2] ❌ Error processing cliente ${cliente.id}:`, error);
         failedCount++;
       }
 
@@ -217,12 +375,16 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
       .select({ value: count() })
       .from(leads)
       .where(eq(leads.pesquisaId, pesquisaId));
+    const [produtosCount] = await db
+      .select({ value: count() })
+      .from(produtos)
+      .where(eq(produtos.pesquisaId, pesquisaId));
     const [mercadosCount] = await db
       .select({ value: count() })
       .from(mercadosUnicos)
       .where(eq(mercadosUnicos.pesquisaId, pesquisaId));
 
-    const duration = Math.floor((Date.now() - new Date(job.startedAt).getTime()) / 1000);
+    const duration = Math.floor((Date.now() - startTime) / 1000);
 
     // 10. Registrar log de auditoria
     await logEnrichmentCompleted({
@@ -233,93 +395,39 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
       clientesSucesso: successCount,
       clientesFalha: failedCount,
       metricas: {
-        concorrentes: concorrentesCount[0]?.value || 0,
-        leads: leadsCount[0]?.value || 0,
-        produtos: 0,
-        mercados: mercadosCount[0]?.value || 0,
+        concorrentes: concorrentesCount?.value || 0,
+        leads: leadsCount?.value || 0,
+        produtos: produtosCount?.value || 0,
+        mercados: mercadosCount?.value || 0,
       },
     });
 
     console.log(
-      `[Enrichment] Job ${jobId} completed: ${successCount} success, ${failedCount} failed`
+      `[Enrichment V2] 🎉 Job ${jobId} completed: ${successCount} success, ${failedCount} failed in ${duration}s`
+    );
+    console.log(
+      `[Enrichment V2] 📊 Métricas: ${mercadosCount?.value || 0} mercados, ${produtosCount?.value || 0} produtos, ${concorrentesCount?.value || 0} concorrentes, ${leadsCount?.value || 0} leads`
     );
   } catch (error) {
-    console.error(`[Enrichment] Job ${jobId} failed:`, error);
+    console.error(`[Enrichment V2] ❌ Job ${jobId} failed:`, error);
 
     // Mark job as failed
     await db
       .update(enrichmentJobs)
       .set({
         status: 'failed',
-        errorMessage: error instanceof Error ? error.message : 'Unknown error',
         completedAt: new Date().toISOString(),
       })
       .where(eq(enrichmentJobs.id, jobId));
 
-    // Registrar log de falha
+    // Log failure
     const [pesquisa] = await db.select().from(pesquisas).where(eq(pesquisas.id, pesquisaId));
-    if (pesquisa) {
-      await logEnrichmentFailed({
-        pesquisaId,
-        pesquisaNome: pesquisa.nome,
-        error: error instanceof Error ? error.message : 'Unknown error',
-        clientesProcessados: 0,
-      });
-    }
+    await logEnrichmentFailed({
+      pesquisaId,
+      pesquisaNome: pesquisa?.nome || 'Unknown',
+      errorMessage: error instanceof Error ? error.message : String(error),
+    });
+
+    throw error;
   }
-}
-
-/**
- * Gera TODOS os dados de enriquecimento em UMA ÚNICA chamada OpenAI
- * (Simplified version with API key parameter)
- */
-async function generateAllDataOptimized(cliente: Cliente, apiKey: string): Promise<any> {
-  const systemPrompt = `Você é um especialista em pesquisa de mercado B2B brasileiro.
-
-Analise a empresa fornecida e retorne um JSON com:
-1. Dados enriquecidos do cliente
-2. Mercados que atende
-3. Concorrentes principais
-4. Leads potenciais
-
-Retorne APENAS JSON válido, sem markdown.`;
-
-  const userPrompt = `Empresa: ${cliente.nome}
-${cliente.cnpj ? `CNPJ: ${cliente.cnpj}` : ''}
-${cliente.cidade ? `Cidade: ${cliente.cidade}` : ''}
-${cliente.produtoPrincipal ? `Produto: ${cliente.produtoPrincipal}` : ''}
-
-Gere dados de inteligência de mercado para esta empresa.`;
-
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.3,
-      max_tokens: 5000,
-      response_format: { type: 'json_object' },
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`OpenAI error: ${error.error?.message || response.statusText}`);
-  }
-
-  const data = await response.json();
-  const content = data.choices[0]?.message?.content;
-
-  if (!content) {
-    throw new Error('Empty response from OpenAI');
-  }
-
-  return JSON.parse(content);
 }
