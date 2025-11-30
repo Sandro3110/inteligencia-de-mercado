@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { publicProcedure, publicProcedure, router } from '../_core/trpc';
+import { publicProcedure, router } from '../_core/trpc';
 import {
   validatePasswordStrength,
   hashPassword,

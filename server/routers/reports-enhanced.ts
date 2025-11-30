@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createTRPCRouter, publicProcedure, publicProcedure } from '@/lib/trpc/server';
+import { createTRPCRouter, publicProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
 import { validateReportGeneration } from '@/server/utils/reportValidation';
 import { fetchEnhancedReportData } from '@/server/utils/reportData';
