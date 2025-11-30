@@ -32,17 +32,20 @@ export const notificationsRouter = createTRPCRouter({
       const limit = input?.limit || 20;
 
       try {
-        // Se não tiver userId, retorna vazio (sistema sem auth)
-        if (!userId) {
-          return [];
-        }
-
-        const unreadNotifications = await db
-          .select()
-          .from(notifications)
-          .where(and(eq(notifications.userId, userId), eq(notifications.isRead, 0)))
-          .orderBy(desc(notifications.createdAt))
-          .limit(limit);
+        // Sistema sem auth: retorna todas as notificações não lidas ou filtra por userId
+        const unreadNotifications = userId
+          ? await db
+              .select()
+              .from(notifications)
+              .where(and(eq(notifications.userId, userId), eq(notifications.isRead, 0)))
+              .orderBy(desc(notifications.createdAt))
+              .limit(limit)
+          : await db
+              .select()
+              .from(notifications)
+              .where(eq(notifications.isRead, 0))
+              .orderBy(desc(notifications.createdAt))
+              .limit(limit);
 
         return unreadNotifications.map((n) => ({
           id: n.id?.toString() || '',
@@ -82,16 +85,19 @@ export const notificationsRouter = createTRPCRouter({
       const limit = input?.limit || 50;
 
       try {
-        if (!userId) {
-          return [];
-        }
-
-        const allNotifications = await db
-          .select()
-          .from(notifications)
-          .where(eq(notifications.userId, userId))
-          .orderBy(desc(notifications.createdAt))
-          .limit(limit);
+        // Sistema sem auth: retorna todas as notificações ou filtra por userId se fornecido
+        const allNotifications = userId
+          ? await db
+              .select()
+              .from(notifications)
+              .where(eq(notifications.userId, userId))
+              .orderBy(desc(notifications.createdAt))
+              .limit(limit)
+          : await db
+              .select()
+              .from(notifications)
+              .orderBy(desc(notifications.createdAt))
+              .limit(limit);
 
         return allNotifications.map((n) => ({
           id: n.id?.toString() || '',
@@ -143,7 +149,7 @@ export const notificationsRouter = createTRPCRouter({
   markAllAsRead: publicProcedure
     .input(
       z.object({
-        userId: z.string(),
+        userId: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -153,10 +159,15 @@ export const notificationsRouter = createTRPCRouter({
       }
 
       try {
-        await db
-          .update(notifications)
-          .set({ isRead: 1 })
-          .where(and(eq(notifications.userId, input.userId), eq(notifications.isRead, 0)));
+        // Sistema sem auth: marca todas ou filtra por userId
+        if (input.userId) {
+          await db
+            .update(notifications)
+            .set({ isRead: 1 })
+            .where(and(eq(notifications.userId, input.userId), eq(notifications.isRead, 0)));
+        } else {
+          await db.update(notifications).set({ isRead: 1 }).where(eq(notifications.isRead, 0));
+        }
 
         return { success: true };
       } catch (error) {
@@ -171,9 +182,18 @@ export const notificationsRouter = createTRPCRouter({
   create: publicProcedure
     .input(
       z.object({
-        userId: z.string(),
+        userId: z.string().optional().default('system'),
         projectId: z.number().optional(),
-        type: z.enum(['info', 'warning', 'error', 'success']),
+        type: z.enum([
+          'info',
+          'warning',
+          'error',
+          'success',
+          'enrichment_complete',
+          'new_lead',
+          'quality_alert',
+          'system',
+        ]),
         title: z.string(),
         message: z.string(),
         entityType: z.string().optional(),
@@ -215,6 +235,80 @@ export const notificationsRouter = createTRPCRouter({
       } catch (error) {
         console.error('[Notifications] Error creating notification:', error);
         throw new Error('Failed to create notification');
+      }
+    }),
+
+  /**
+   * Criar notificações de exemplo/demonstração
+   */
+  createSampleNotifications: publicProcedure
+    .input(z.object({ projectId: z.number().optional() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new Error('Database connection failed');
+      }
+
+      try {
+        const sampleNotifications = [
+          {
+            userId: 'system',
+            projectId: input.projectId,
+            type: 'enrichment_complete' as const,
+            title: 'Enriquecimento Concluído',
+            message: 'Base Inicial foi enriquecida com sucesso! 405 clientes processados.',
+            entityType: 'pesquisa',
+            entityId: 1,
+            isRead: 0,
+          },
+          {
+            userId: 'system',
+            projectId: input.projectId,
+            type: 'new_lead' as const,
+            title: 'Novos Leads Identificados',
+            message: '2730 leads foram identificados e adicionados ao sistema.',
+            entityType: 'leads',
+            entityId: 1,
+            isRead: 0,
+          },
+          {
+            userId: 'system',
+            projectId: input.projectId,
+            type: 'quality_alert' as const,
+            title: 'Alerta de Qualidade',
+            message: 'Qualidade média dos dados está em 66%. Considere revisar alguns registros.',
+            entityType: 'pesquisa',
+            entityId: 1,
+            isRead: 0,
+          },
+          {
+            userId: 'system',
+            projectId: input.projectId,
+            type: 'system' as const,
+            title: 'Sistema Atualizado',
+            message: 'Nova versão do IntelMarket disponível com melhorias de performance.',
+            entityType: 'system',
+            isRead: 0,
+          },
+        ];
+
+        const created = await db.insert(notifications).values(sampleNotifications).returning();
+
+        return {
+          success: true,
+          count: created.length,
+          notifications: created.map((n) => ({
+            id: n.id?.toString() || '',
+            type: n.type,
+            title: n.title || '',
+            message: n.message || '',
+            timestamp: n.createdAt || new Date().toISOString(),
+            read: false,
+          })),
+        };
+      } catch (error) {
+        console.error('[Notifications] Error creating sample notifications:', error);
+        throw new Error('Failed to create sample notifications');
       }
     }),
 });

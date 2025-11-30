@@ -87,10 +87,7 @@ function UnreadBadge({ count }: UnreadBadgeProps) {
   const formattedCount = useMemo(() => formatUnreadCount(count), [count]);
 
   return (
-    <Badge
-      variant="destructive"
-      className={`${CLASSES.BADGE} ${ICON_SIZES.BADGE}`}
-    >
+    <Badge variant="destructive" className={`${CLASSES.BADGE} ${ICON_SIZES.BADGE}`}>
       {formattedCount}
     </Badge>
   );
@@ -115,10 +112,10 @@ function StatusDot({ isConnected }: StatusDotProps) {
 
 /**
  * NotificationBell
- * 
+ *
  * Botão de notificações com badge de contagem não lida e indicador de conexão.
  * Exibe painel de notificações em dropdown.
- * 
+ *
  * @example
  * ```tsx
  * <NotificationBell />
@@ -138,15 +135,9 @@ function NotificationBell() {
 
   const buttonTitle = useMemo(() => getButtonTitle(isConnected), [isConnected]);
 
-  const bellIconClasses = useMemo(
-    () => getBellIconClasses(isConnected),
-    [isConnected]
-  );
+  const bellIconClasses = useMemo(() => getBellIconClasses(isConnected), [isConnected]);
 
-  const showBadge = useMemo(
-    () => shouldShowBadge(unreadCount),
-    [unreadCount]
-  );
+  const showBadge = useMemo(() => shouldShowBadge(unreadCount), [unreadCount]);
 
   // ============================================================================
   // EVENT HANDLERS
@@ -163,12 +154,7 @@ function NotificationBell() {
   return (
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={CLASSES.BUTTON}
-          title={buttonTitle}
-        >
+        <Button variant="ghost" size="icon" className={CLASSES.BUTTON} title={buttonTitle}>
           <Bell className={bellIconClasses} />
 
           {showBadge && <UnreadBadge count={unreadCount} />}
@@ -177,7 +163,10 @@ function NotificationBell() {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className={`${DIMENSIONS.DROPDOWN_WIDTH} p-0`}>
+      <DropdownMenuContent
+        align="end"
+        className={`${DIMENSIONS.DROPDOWN_WIDTH} p-0 bg-white shadow-lg border`}
+      >
         <NotificationPanel />
       </DropdownMenuContent>
     </DropdownMenu>

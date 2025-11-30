@@ -30,10 +30,7 @@ const NOTIFICATION_TYPES = {
   SYSTEM: 'system',
 } as const;
 
-const ICON_CONFIG: Record<
-  string,
-  { icon: LucideIcon; color: string }
-> = {
+const ICON_CONFIG: Record<string, { icon: LucideIcon; color: string }> = {
   [NOTIFICATION_TYPES.ENRICHMENT_COMPLETE]: {
     icon: Zap,
     color: 'text-green-500',
@@ -57,10 +54,7 @@ const DEFAULT_ICON_CONFIG = {
   color: 'text-gray-500',
 };
 
-const BADGE_CONFIG: Record<
-  string,
-  { label: string; className: string }
-> = {
+const BADGE_CONFIG: Record<string, { label: string; className: string }> = {
   [NOTIFICATION_TYPES.ENRICHMENT_COMPLETE]: {
     label: 'Concluído',
     className: 'bg-green-50 text-green-700 border-green-200',
@@ -143,24 +137,18 @@ function NotificationPanel() {
   const markAsRead = useNotifications((state) => state.markAsRead);
   const markAllAsRead = useNotifications((state) => state.markAllAsRead);
   const clearNotifications = useNotifications((state) => state.clearAll);
-  
+
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   // ============================================================================
   // COMPUTED VALUES
   // ============================================================================
 
-  const hasNotifications = useMemo(
-    () => notifications.length > 0,
-    [notifications.length]
-  );
+  const hasNotifications = useMemo(() => notifications.length > 0, [notifications.length]);
 
   const hasUnread = useMemo(() => unreadCount > 0, [unreadCount]);
 
-  const unreadLabel = useMemo(
-    () => LABELS.UNREAD_COUNT(unreadCount),
-    [unreadCount]
-  );
+  const unreadLabel = useMemo(() => LABELS.UNREAD_COUNT(unreadCount), [unreadCount]);
 
   // ============================================================================
   // EVENT HANDLERS
@@ -193,10 +181,10 @@ function NotificationPanel() {
 
   const renderHeader = useCallback(
     () => (
-      <div className="p-4 border-b">
+      <div className="p-4 border-b bg-white">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-sm">{LABELS.TITLE}</h3>
+            <h3 className="font-semibold text-sm text-gray-900">{LABELS.TITLE}</h3>
             {!isConnected && (
               <Badge variant="outline" className={CSS_CLASSES.DISCONNECTED_BADGE}>
                 {LABELS.DISCONNECTED}
@@ -236,26 +224,15 @@ function NotificationPanel() {
         )}
       </div>
     ),
-    [
-      isConnected,
-      hasUnread,
-      hasNotifications,
-      unreadLabel,
-      markAllAsRead,
-      clearNotifications,
-    ]
+    [isConnected, hasUnread, hasNotifications, unreadLabel, markAllAsRead, clearNotifications]
   );
 
   const renderEmptyState = useCallback(
     () => (
-      <div className="p-8 text-center">
-        <Bell
-          className={`${ICON_SIZES.LARGE} mx-auto mb-3 text-muted-foreground opacity-50`}
-        />
-        <p className="text-sm text-muted-foreground">{LABELS.EMPTY_TITLE}</p>
-        <p className="text-xs text-muted-foreground mt-1">
-          {LABELS.EMPTY_DESCRIPTION}
-        </p>
+      <div className="p-8 text-center bg-white">
+        <Bell className={`${ICON_SIZES.LARGE} mx-auto mb-3 text-gray-400`} />
+        <p className="text-sm font-medium text-gray-700">{LABELS.EMPTY_TITLE}</p>
+        <p className="text-xs text-gray-500 mt-1">{LABELS.EMPTY_DESCRIPTION}</p>
       </div>
     ),
     []
@@ -271,14 +248,12 @@ function NotificationPanel() {
       >
         <div className="flex items-start gap-3">
           {/* Icon */}
-          <div className="mt-0.5">
-            {renderNotificationIcon(notification.type)}
-          </div>
+          <div className="mt-0.5">{renderNotificationIcon(notification.type)}</div>
 
           {/* Content */}
           <div className="flex-1 min-w-0 space-y-1">
             <div className="flex items-start justify-between gap-2">
-              <p className="font-medium text-sm leading-tight">
+              <p className="font-medium text-sm leading-tight text-gray-900">
                 {notification.title}
               </p>
               {!notification.read && (
@@ -294,13 +269,11 @@ function NotificationPanel() {
               )}
             </div>
 
-            <p className="text-xs text-muted-foreground line-clamp-2">
-              {notification.message}
-            </p>
+            <p className="text-xs text-gray-600 line-clamp-2">{notification.message}</p>
 
             <div className="flex items-center gap-2 mt-2">
               {renderNotificationBadge(notification.type)}
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-gray-500">
                 {formatTimestamp(notification.timestamp)}
               </span>
             </div>
@@ -327,10 +300,8 @@ function NotificationPanel() {
   const renderFooter = useCallback(
     () =>
       isConnected ? (
-        <div className="p-2 border-t bg-muted/30">
-          <p className="text-xs text-center text-muted-foreground">
-            {LABELS.CONNECTED}
-          </p>
+        <div className="p-2 border-t bg-white">
+          <p className="text-xs text-center text-gray-600">{LABELS.CONNECTED}</p>
         </div>
       ) : null,
     [isConnected]
@@ -341,7 +312,7 @@ function NotificationPanel() {
   // ============================================================================
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white">
       {renderHeader()}
       {renderNotificationsList()}
       {renderFooter()}
