@@ -15,6 +15,13 @@ const Header = nextDynamic(() => import('@/components/Header'), { ssr: false });
 const GlobalSearch = nextDynamic(() => import('@/components/GlobalSearch'), { ssr: false });
 const GlobalShortcuts = nextDynamic(() => import('@/components/GlobalShortcuts'), { ssr: false });
 const NotificationBell = nextDynamic(() => import('@/components/NotificationBell'), { ssr: false });
+const NotificationsProvider = nextDynamic(
+  () =>
+    import('@/components/NotificationsProvider').then((m) => ({
+      default: m.NotificationsProvider,
+    })),
+  { ssr: false }
+);
 const ErrorBoundary = nextDynamic(() => import('@/components/ErrorBoundary'), { ssr: false });
 const ThemeToggle = nextDynamic(() => import('@/components/ThemeToggle'), { ssr: false });
 const CompactModeToggle = nextDynamic(() => import('@/components/CompactModeToggle'), {
@@ -84,34 +91,36 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <OnboardingProvider>
             <ErrorBoundary>
               <AppProvider>
-                <GlobalShortcuts />
+                <NotificationsProvider>
+                  <GlobalShortcuts />
 
-                <div className="flex h-screen bg-gray-50">
-                  <Sidebar />
+                  <div className="flex h-screen bg-gray-50">
+                    <Sidebar />
 
-                  <div className="flex-1 flex flex-col">
-                    <Header>
-                      <div className="flex items-center gap-4">
-                        <NotificationBell />
-                        <CompactModeToggle />
-                        <ThemeToggle />
-                      </div>
-                    </Header>
+                    <div className="flex-1 flex flex-col">
+                      <Header>
+                        <div className="flex items-center gap-4">
+                          <NotificationBell />
+                          <CompactModeToggle />
+                          <ThemeToggle />
+                        </div>
+                      </Header>
 
-                    <main className="flex-1 overflow-auto">{children}</main>
+                      <main className="flex-1 overflow-auto">{children}</main>
+                    </div>
                   </div>
-                </div>
 
-                {/* Modais e Overlays Globais */}
-                {showGlobalSearch && (
-                  <GlobalSearch
-                    isOpen={showGlobalSearch}
-                    onClose={() => setShowGlobalSearch(false)}
-                  />
-                )}
+                  {/* Modais e Overlays Globais */}
+                  {showGlobalSearch && (
+                    <GlobalSearch
+                      isOpen={showGlobalSearch}
+                      onClose={() => setShowGlobalSearch(false)}
+                    />
+                  )}
 
-                {/* Tours removidos */}
-                <Toaster />
+                  {/* Tours removidos */}
+                  <Toaster />
+                </NotificationsProvider>
               </AppProvider>
             </ErrorBoundary>
           </OnboardingProvider>
