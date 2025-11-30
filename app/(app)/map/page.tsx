@@ -275,7 +275,7 @@ export default function GeoposicaoPage() {
                   <option value="">Todos</option>
                   {projects?.map((project) => (
                     <option key={project.id} value={project.id}>
-                      {project.name}
+                      {project.nome}
                     </option>
                   ))}
                 </select>
