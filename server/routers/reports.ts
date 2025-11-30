@@ -61,14 +61,14 @@ export const reportsRouter = createTRPCRouter({
       const totalEntidades =
         clientesData.length + leadsData.length + concorrentesData.length + mercadosData.length;
 
-      // Top 10 mercados por tamanho estimado
-      const top10Mercados = mercadosData
+      // Top 20 mercados por tamanho estimado
+      const top20Mercados = mercadosData
         .sort((a, b) => {
           const sizeA = parseFloat(a.tamanhoEstimado || '0');
           const sizeB = parseFloat(b.tamanhoEstimado || '0');
           return sizeB - sizeA;
         })
-        .slice(0, 10);
+        .slice(0, 20);
 
       // Top 20 clientes (por ordem alfabética por enquanto)
       const top20Clientes = clientesData.slice(0, 20);
@@ -84,10 +84,14 @@ export const reportsRouter = createTRPCRouter({
           return acc;
         }, {});
 
-      const produtosPrincipais = Object.entries(produtos)
+      const top20Produtos = Object.entries(produtos)
         .sort(([, a], [, b]) => b - a)
-        .slice(0, 10)
-        .map(([nome, count]) => ({ nome, count }));
+        .slice(0, 20)
+        .map(([nome, count]) => ({
+          nome,
+          count,
+          percentual: ((count / clientesData.length) * 100).toFixed(1),
+        }));
 
       // Distribuição geográfica de clientes
       const clientesPorEstado = clientesData
@@ -120,55 +124,121 @@ export const reportsRouter = createTRPCRouter({
         .slice(0, 10)
         .map(([cidade, count]) => ({ cidade, count }));
 
+      // Amostra de 20 clientes reais para análise específica
+      const amostraClientes = clientesData
+        .filter((c) => c.nome && c.produtoPrincipal)
+        .slice(0, 20)
+        .map((c) => ({
+          nome: c.nome,
+          produto: c.produtoPrincipal,
+          cidade: c.cidade || 'N/A',
+          uf: c.uf || 'N/A',
+        }));
+
+      // Distribuição geográfica COMPLETA (todos os estados)
+      const distribuicaoGeografica = Object.entries(clientesPorEstado)
+        .sort(([, a], [, b]) => b - a)
+        .map(([uf, clientesCount]) => {
+          const leadsCount = leadsData.filter((l) => l.uf === uf).length;
+          const concorrentesCount = concorrentesData.filter((c) => c.uf === uf).length;
+          return {
+            uf,
+            clientes: clientesCount,
+            leads: leadsCount,
+            concorrentes: concorrentesCount,
+            percentualClientes: ((clientesCount / clientesData.length) * 100).toFixed(1),
+          };
+        });
+
       // 5. Criar prompt para IA
       const prompt = `
-Você é um analista de inteligência de mercado experiente. Com base nos dados fornecidos, crie um relatório executivo profissional e detalhado.
+Você é um analista de inteligência de mercado experiente. Com base nos dados REAIS fornecidos, crie um relatório executivo profissional e ESPECÍFICO.
 
-**DADOS DO PROJETO:**
+**DADOS CONSOLIDADOS DO PROJETO:**
 - Total de pesquisas: ${pesquisas.length}
 - Total de clientes: ${clientesData.length}
 - Total de leads: ${leadsData.length}
 - Total de concorrentes: ${concorrentesData.length}
 - Total de mercados: ${mercadosData.length}
-- Total de entidades: ${totalEntidades}
 
-**TOP 10 MERCADOS:**
-${top10Mercados.map((m, i) => `${i + 1}. ${m.nome} (Tamanho estimado: ${m.tamanhoEstimado || 'N/A'})`).join('\n')}
+**TOP 20 MERCADOS (com dados completos):**
+${top20Mercados
+  .map(
+    (m, i) => `${i + 1}. ${m.nome}
+   Categoria: ${m.categoria || 'N/A'}
+   Tamanho: ${m.tamanhoEstimado || 'N/A'}
+   Crescimento: ${m.crescimentoAnual || 'N/A'}
+   Tendências: ${m.tendencias || 'N/A'}`
+  )
+  .join('\n\n')}
 
-**TOP 10 PRODUTOS:**
-${produtosPrincipais.map((p, i) => `${i + 1}. ${p.nome} (${p.count} clientes)`).join('\n')}
+**TOP 20 PRODUTOS (com número de clientes e %):**
+${top20Produtos.map((p, i) => `${i + 1}. ${p.nome} - ${p.count} clientes (${p.percentual}%)`).join('\n')}
 
-**TOP 10 ESTADOS:**
-${top10Estados.map((e, i) => `${i + 1}. ${e.uf}: ${e.count} clientes (${e.percentual}%)`).join('\n')}
+**DISTRIBUIÇÃO GEOGRÁFICA COMPLETA:**
+${distribuicaoGeografica.map((d) => `${d.uf}: ${d.clientes} clientes (${d.percentualClientes}%), ${d.leads} leads, ${d.concorrentes} concorrentes`).join('\n')}
 
 **TOP 10 CIDADES:**
 ${top10Cidades.map((c, i) => `${i + 1}. ${c.cidade}: ${c.count} clientes`).join('\n')}
 
-**GERE UM RELATÓRIO EXECUTIVO PROFISSIONAL COM AS SEGUINTES SEÇÕES:**
+**AMOSTRA DE 20 CLIENTES REAIS:**
+${amostraClientes.map((c, i) => `${i + 1}. ${c.nome} - ${c.produto} (${c.cidade}/${c.uf})`).join('\n')}
 
-1. **Resumo Executivo** (2-3 parágrafos): Visão geral consolidada do projeto
+**INSTRUÇÕES OBRIGATÓRIAS:**
 
-2. **Análise de Mercados** (3-4 parágrafos): Análise detalhada dos mercados identificados, potencial e oportunidades
+1. SEMPRE cite nomes REAIS de empresas da amostra de clientes
+2. SEMPRE use os NÚMEROS EXATOS fornecidos (${clientesData.length} clientes, ${leadsData.length} leads, etc)
+3. SEMPRE mencione CIDADES REAIS da lista (ex: ${top10Cidades[0]?.cidade}, ${top10Cidades[1]?.cidade})
+4. SEMPRE cite PRODUTOS ESPECÍFICOS da lista Top 20
+5. SEMPRE mencione MERCADOS ESPECÍFICOS com seus tamanhos e crescimento
+6. NÃO seja genérico - use dados concretos em CADA parágrafo
+7. Cite pelo menos 5 empresas reais da amostra ao longo do relatório
+8. Cite pelo menos 8 produtos específicos da lista Top 20
+9. Mencione pelo menos 5 estados com seus números exatos
 
-3. **Perfil de Clientes e Distribuição Geográfica** (3-4 parágrafos): Análise do perfil dos clientes e distribuição geográfica (estados e cidades)
+**ESTRUTURA DO RELATÓRIO:**
 
-4. **Análise de Produtos e Serviços** (2-3 parágrafos): Principais produtos/serviços identificados
+1. **Resumo Executivo** (3 parágrafos):
+   - Cite os ${clientesData.length} clientes identificados
+   - Mencione empresas específicas como ${amostraClientes[0]?.nome} e ${amostraClientes[1]?.nome}
+   - Use números exatos da distribuição geográfica
 
-5. **Análise de Leads e Oportunidades** (2 parágrafos): Potencial de leads e oportunidades de negócio
+2. **Análise de Mercados** (4 parágrafos):
+   - Analise os ${mercadosData.length} mercados identificados
+   - Cite pelo menos 5 mercados específicos com tamanho e crescimento
+   - Mencione categorias e tendências específicas
 
-6. **Panorama Competitivo** (2-3 parágrafos): Análise dos concorrentes identificados
+3. **Perfil de Clientes e Distribuição Geográfica** (4 parágrafos):
+   - Use a tabela de distribuição geográfica completa
+   - Cite estados específicos com números exatos (ex: ${distribuicaoGeografica[0]?.uf}: ${distribuicaoGeografica[0]?.clientes} clientes)
+   - Mencione cidades específicas da lista Top 10
 
-7. **Análise SWOT do Mercado** (2-3 parágrafos): Forças, Fraquezas, Oportunidades e Ameaças identificadas
+4. **Análise de Produtos e Serviços** (3 parágrafos):
+   - Cite os Top 20 produtos com números de clientes e percentuais
+   - Mencione produtos específicos e suas aplicações
+   - Use dados de clientes reais para exemplificar
 
-8. **Conclusões e Recomendações Estratégicas** (3-4 parágrafos): Conclusões finais e recomendações estratégicas
+5. **Análise de Leads e Oportunidades** (2 parágrafos):
+   - Use o número exato de ${leadsData.length} leads
+   - Relacione com os ${clientesData.length} clientes existentes
 
-**IMPORTANTE:**
-- Use linguagem profissional e técnica
-- Seja específico e baseado nos dados fornecidos
-- Cada parágrafo deve ter 4-6 linhas
-- Total esperado: 20-28 parágrafos
+6. **Panorama Competitivo** (3 parágrafos):
+   - Mencione os ${concorrentesData.length} concorrentes identificados
+   - Use dados da distribuição geográfica para análise competitiva
+
+7. **Análise SWOT** (3 parágrafos):
+   - Baseie SWOT nos dados reais fornecidos
+   - Cite mercados, produtos e números específicos
+
+8. **Conclusões e Recomendações** (4 parágrafos):
+   - Recomendações baseadas em dados concretos
+   - Cite mercados e produtos específicos para expansão
+
+**FORMATO:**
 - Não use markdown, apenas texto puro
-- Separe as seções claramente
+- Cada parágrafo: 4-6 linhas
+- Total: 26 parágrafos
+- Separe seções com linha em branco
 `;
 
       // 6. Chamar OpenAI
