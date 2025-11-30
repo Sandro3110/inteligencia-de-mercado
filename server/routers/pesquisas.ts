@@ -71,6 +71,98 @@ export const pesquisasRouter = createTRPCRouter({
     }),
 
   /**
+   * Buscar pesquisa por ID com contadores completos (mesma estrutura do dashboard)
+   */
+  getByIdWithCounts: publicProcedure.input(z.number()).query(async ({ input: id }) => {
+    const db = await getDb();
+    if (!db) {
+      throw new Error('Database connection failed');
+    }
+
+    try {
+      const [pesquisa] = await db.select().from(pesquisas).where(eq(pesquisas.id, id)).limit(1);
+
+      if (!pesquisa) {
+        return null;
+      }
+
+      // Calcular contadores (mesma lógica do dashboard.getProjects)
+      const [
+        clientesStats,
+        leadsCountResult,
+        mercadosCountResult,
+        produtosCountResult,
+        concorrentesCountResult,
+        clientesQualidadeResult,
+        leadsQualidadeResult,
+        concorrentesQualidadeResult,
+        geoTotalResult,
+      ] = await Promise.all([
+        db
+          .select({
+            total: count(),
+            enriquecidos: sql<number>`COUNT(CASE WHEN ${clientes.enriquecido} = true THEN 1 END)::int`,
+          })
+          .from(clientes)
+          .where(eq(clientes.pesquisaId, id)),
+        db.select({ count: count() }).from(leads).where(eq(leads.pesquisaId, id)),
+        db.select({ count: count() }).from(mercadosUnicos).where(eq(mercadosUnicos.pesquisaId, id)),
+        db.select({ count: count() }).from(produtos).where(eq(produtos.pesquisaId, id)),
+        db.select({ count: count() }).from(concorrentes).where(eq(concorrentes.pesquisaId, id)),
+        db
+          .select({ avg: avg(clientes.qualidadeScore) })
+          .from(clientes)
+          .where(and(eq(clientes.pesquisaId, id), sql`${clientes.qualidadeScore} IS NOT NULL`)),
+        db
+          .select({ avg: avg(leads.qualidadeScore) })
+          .from(leads)
+          .where(and(eq(leads.pesquisaId, id), sql`${leads.qualidadeScore} IS NOT NULL`)),
+        db
+          .select({ avg: avg(concorrentes.qualidadeScore) })
+          .from(concorrentes)
+          .where(
+            and(eq(concorrentes.pesquisaId, id), sql`${concorrentes.qualidadeScore} IS NOT NULL`)
+          ),
+        db
+          .select({
+            total: sql<number>`(
+              COUNT(CASE WHEN ${clientes.latitude} IS NOT NULL AND ${clientes.longitude} IS NOT NULL THEN 1 END) +
+              COUNT(CASE WHEN ${leads.latitude} IS NOT NULL AND ${leads.longitude} IS NOT NULL THEN 1 END) +
+              COUNT(CASE WHEN ${concorrentes.latitude} IS NOT NULL AND ${concorrentes.longitude} IS NOT NULL THEN 1 END)
+            )::int`,
+          })
+          .from(clientes)
+          .leftJoin(leads, eq(leads.pesquisaId, id))
+          .leftJoin(concorrentes, eq(concorrentes.pesquisaId, id))
+          .where(eq(clientes.pesquisaId, id)),
+      ]);
+
+      return {
+        ...pesquisa,
+        totalClientes: clientesStats[0]?.total || 0,
+        clientesEnriquecidos: clientesStats[0]?.enriquecidos || 0,
+        leadsCount: leadsCountResult[0]?.count || 0,
+        mercadosCount: mercadosCountResult[0]?.count || 0,
+        produtosCount: produtosCountResult[0]?.count || 0,
+        concorrentesCount: concorrentesCountResult[0]?.count || 0,
+        clientesQualidadeMedia: clientesQualidadeResult[0]?.avg
+          ? Number(clientesQualidadeResult[0].avg)
+          : null,
+        leadsQualidadeMedia: leadsQualidadeResult[0]?.avg
+          ? Number(leadsQualidadeResult[0].avg)
+          : null,
+        concorrentesQualidadeMedia: concorrentesQualidadeResult[0]?.avg
+          ? Number(concorrentesQualidadeResult[0].avg)
+          : null,
+        geoEnriquecimentoTotal: geoTotalResult[0]?.total || 0,
+      };
+    } catch (error) {
+      console.error('[Pesquisas] Error getting by ID with counts:', error);
+      throw new Error('Failed to get pesquisa');
+    }
+  }),
+
+  /**
    * Buscar pesquisa por ID com estatísticas
    */
   getById: publicProcedure.input(z.number()).query(async ({ input: id }) => {

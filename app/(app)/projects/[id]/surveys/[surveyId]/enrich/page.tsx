@@ -15,22 +15,19 @@ export default function EnrichmentPage() {
 
   const trpcUtils = trpc.useUtils();
 
-  // Query usando dashboard.getProjects para garantir consistência com outras páginas
-  const { data: projectData, isLoading: loadingPesquisa } = trpc.dashboard.getProjects.useQuery(
-    undefined,
+  // Query usando pesquisas.getByIdWithCounts para buscar dados completos
+  const { data: pesquisa, isLoading: loadingPesquisa } = trpc.pesquisas.getByIdWithCounts.useQuery(
+    surveyId,
     {
+      enabled: !!surveyId,
       refetchInterval: 5000, // Atualizar a cada 5s
     }
   );
 
-  // Encontrar a pesquisa específica dentro dos projetos
-  const pesquisa = projectData
-    ?.find((p) => p.id === projectId)
-    ?.pesquisas?.find((s) => s.id === surveyId);
-
   // Mutation para iniciar enriquecimento
   const startMutation = trpc.enrichment.start.useMutation({
     onSuccess: () => {
+      trpcUtils.pesquisas.getByIdWithCounts.invalidate(surveyId);
       trpcUtils.dashboard.getProjects.invalidate();
     },
   });
@@ -195,7 +192,10 @@ export default function EnrichmentPage() {
             onViewEnrichment={() =>
               router.push(`/projects/${projectId}/surveys/${surveyId}/enrich`)
             }
-            onRefresh={() => trpcUtils.dashboard.getProjects.invalidate()}
+            onRefresh={() => {
+              trpcUtils.pesquisas.getByIdWithCounts.invalidate(surveyId);
+              trpcUtils.dashboard.getProjects.invalidate();
+            }}
           />
         )}
       </div>
