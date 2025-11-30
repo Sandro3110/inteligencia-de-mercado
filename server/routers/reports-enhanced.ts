@@ -44,14 +44,28 @@ export const reportsEnhancedRouter = createTRPCRouter({
 
         // 2. Buscar TODOS os dados
         console.log('[Report] Fetching all data...');
-        const reportData = await fetchEnhancedReportData(
-          db,
-          input.pesquisaId,
-          validation.status,
-          validation.enrichmentData?.startedAt,
-          validation.enrichmentData?.completedAt,
-          validation.enrichmentData?.duration
-        );
+        let reportData;
+        try {
+          reportData = await fetchEnhancedReportData(
+            db,
+            input.pesquisaId,
+            validation.status,
+            validation.enrichmentData?.startedAt,
+            validation.enrichmentData?.completedAt,
+            validation.enrichmentData?.duration
+          );
+          console.log('[Report] Data fetched successfully:', {
+            totalClientes: reportData.totalClientes,
+            totalLeads: reportData.totalLeads,
+            totalMercados: reportData.totalMercados,
+            totalProdutos: reportData.totalProdutos,
+          });
+        } catch (err) {
+          console.error('[Report] Error fetching data:', err);
+          throw new Error(
+            `Erro ao buscar dados: ${err instanceof Error ? err.message : String(err)}`
+          );
+        }
 
         // 3. Construir prompt melhorado
         console.log('[Report] Building enhanced prompt...');

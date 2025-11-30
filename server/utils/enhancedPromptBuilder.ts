@@ -4,9 +4,17 @@ import { EnhancedReportData } from './reportData';
  * Constrói prompt melhorado para a IA gerar relatório
  */
 export function buildEnhancedPrompt(data: EnhancedReportData): string {
+  // Garantir valores padrão para evitar null/undefined
+  const totalLeads = data.totalLeads || 0;
+  const totalConcorrentes = data.totalConcorrentes || 0;
+  const totalMercados = data.totalMercados || 0;
+  const totalProdutos = data.totalProdutos || 0;
+  const totalClientes = data.totalClientes || 0;
+  const clientesEnriquecidos = data.clientesEnriquecidos || 0;
+  const enrichmentProgress = data.enrichmentProgress || 0;
   const statusText =
     data.status === 'in_progress'
-      ? `⚠️ **ATENÇÃO:** Este relatório foi gerado com o enriquecimento ainda em andamento (${data.enrichmentProgress}% concluído). Os dados apresentados são parciais e podem não representar o panorama completo do mercado.`
+      ? `⚠️ **ATENÇÃO:** Este relatório foi gerado com o enriquecimento ainda em andamento (${enrichmentProgress}% concluído). Os dados apresentados são parciais e podem não representar o panorama completo do mercado.`
       : `✅ Enriquecimento concluído${data.enrichmentCompletedAt ? ` em ${new Date(data.enrichmentCompletedAt).toLocaleString('pt-BR')}` : ''}`;
 
   const durationText = data.enrichmentDuration
@@ -25,13 +33,13 @@ ${statusText}
 ${durationText}
 
 **ESTATÍSTICAS GERAIS:**
-- Total de clientes: ${data.totalClientes}
-- Clientes enriquecidos: ${data.clientesEnriquecidos} (${data.enrichmentProgress}%)
-- Total de entidades levantadas: ${data.totalLeads + data.totalConcorrentes + data.totalMercados + data.totalProdutos}
-  - Mercados identificados: ${data.totalMercados}
-  - Produtos mapeados: ${data.totalProdutos}
-  - Concorrentes identificados: ${data.totalConcorrentes}
-  - Leads qualificados: ${data.totalLeads}
+- Total de clientes: ${totalClientes}
+- Clientes enriquecidos: ${clientesEnriquecidos} (${enrichmentProgress}%)
+- Total de entidades levantadas: ${totalLeads + totalConcorrentes + totalMercados + totalProdutos}
+  - Mercados identificados: ${totalMercados}
+  - Produtos mapeados: ${totalProdutos}
+  - Concorrentes identificados: ${totalConcorrentes}
+  - Leads qualificados: ${totalLeads}
 
 **ANÁLISE DE MERCADOS (${data.mercados.length} mercados):**
 ${data.mercados
@@ -135,35 +143,35 @@ ${
 - Destaques quantitativos mais importantes
 
 **2. ANÁLISE DETALHADA DE MERCADOS (4-5 parágrafos)**
-- Análise dos ${data.mercados.length} mercados identificados
+- Análise dos ${totalMercados} mercados identificados
 - Segmentação e categorização
 - Tamanho de mercado e potencial de crescimento
 - Oportunidades e ameaças por mercado
 - Recomendações de priorização
 
 **3. PERFIL DE CLIENTES E DISTRIBUIÇÃO GEOGRÁFICA (3-4 parágrafos)**
-- Perfil dos ${data.clientes.total} clientes identificados
+- Perfil dos ${totalClientes} clientes identificados
 - Análise da distribuição geográfica (estados e cidades)
 - Concentração vs. dispersão geográfica
 - Oportunidades de expansão regional
 - Características dos principais clientes
 
 **4. ANÁLISE DE PRODUTOS E SERVIÇOS (3-4 parágrafos)**
-- Portfólio de ${data.totalProdutos} produtos identificados
+- Portfólio de ${totalProdutos} produtos identificados
 - Categorização e segmentação de produtos
 - Produtos mais demandados e tendências
 - Oportunidades de cross-selling e upselling
 - Gaps de mercado e produtos potenciais
 
 **5. ANÁLISE DE LEADS E OPORTUNIDADES (2-3 parágrafos)**
-- Perfil dos ${data.totalLeads} leads qualificados
+- Perfil dos ${totalLeads} leads qualificados
 - Distribuição por mercado e potencial
 - Taxa de conversão estimada
 - Estratégias de abordagem recomendadas
 - Priorização de leads
 
 **6. PANORAMA COMPETITIVO (3-4 parágrafos)**
-- Análise dos ${data.totalConcorrentes} concorrentes identificados
+- Análise dos ${totalConcorrentes} concorrentes identificados
 - Distribuição por mercado
 - Nível de competitividade por segmento
 - Estratégias de diferenciação recomendadas
