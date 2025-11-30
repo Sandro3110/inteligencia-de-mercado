@@ -1,4 +1,4 @@
-import { router, publicProcedure } from '../trpc';
+import { router, publicProcedure } from '../_core/trpc';
 import { getDb } from '../_core/db';
 import { sql } from 'drizzle-orm';
 import * as fs from 'fs';
