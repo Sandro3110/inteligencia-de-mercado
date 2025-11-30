@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { publicProcedure, router } from '../_core/trpc';
 import { getDb } from '../db';
-import { clientes, leads, concorrentes } from '../../drizzle/schema';
-import { and, eq, isNotNull, sql } from 'drizzle-orm';
+import { clientes, leads, concorrentes, pesquisas } from '../../drizzle/schema';
+import { and, eq, isNotNull, sql, inArray } from 'drizzle-orm';
 
 /**
  * Mapeamento de UF para Região (IBGE)
@@ -106,18 +106,111 @@ export const mapHierarchicalRouter = router({
       const porte = input.filters?.porte ?? undefined;
       const qualidade = input.filters?.qualidade ?? undefined;
 
-      // Construir condições de filtro
+      // FASE 2: Buscar pesquisaIds ANTES da query principal (elimina subquery)
+      let pesquisaIds: number[] = [];
+      if (pesquisaId) {
+        pesquisaIds = [pesquisaId];
+      } else if (projectId) {
+        const pesquisasResult = await db
+          .select({ id: pesquisas.id })
+          .from(pesquisas)
+          .where(eq(pesquisas.projectId, projectId));
+        pesquisaIds = pesquisasResult.map((p) => p.id);
+
+        // Se não há pesquisas, retornar vazio imediatamente
+        if (pesquisaIds.length === 0) {
+          return {
+            regions: [],
+            grandTotals: { clientes: 0, leads: 0, concorrentes: 0 },
+          };
+        }
+      }
+
+      // FASE 3: Tentar usar stored procedure (performance para >50k registros)
+      try {
+        // Chamar stored procedure específica baseada no entityType
+        const functionName = `get_geo_hierarchy_${input.entityType}`;
+        const result: any = await db.execute(
+          sql.raw(`SELECT * FROM ${functionName}(ARRAY[${pesquisaIds.join(', ')}])`)
+        );
+
+        // Processar resultado da stored procedure
+        const regionMap = new Map<string, RegionData>();
+
+        for (const row of result.rows) {
+          const regiao = row.regiao as string;
+          const uf = row.uf as string;
+          const cidade = row.cidade as string;
+          const cityCount = row.city_count as number;
+
+          // Criar região se não existir
+          if (!regionMap.has(regiao)) {
+            regionMap.set(regiao, {
+              name: regiao,
+              states: [],
+              totals: { clientes: 0, leads: 0, concorrentes: 0 },
+            });
+          }
+
+          const regionData = regionMap.get(regiao)!;
+
+          // Criar estado se não existir
+          let stateData = regionData.states.find((s) => s.uf === uf);
+          if (!stateData) {
+            stateData = {
+              uf,
+              cities: [],
+              totals: { clientes: 0, leads: 0, concorrentes: 0 },
+            };
+            regionData.states.push(stateData);
+          }
+
+          // Adicionar cidade
+          stateData.cities.push({
+            name: cidade,
+            uf,
+            totals: {
+              clientes: input.entityType === 'clientes' ? cityCount : 0,
+              leads: input.entityType === 'leads' ? cityCount : 0,
+              concorrentes: input.entityType === 'concorrentes' ? cityCount : 0,
+            },
+          });
+
+          // Atualizar totais
+          stateData.totals[input.entityType] += cityCount;
+          regionData.totals[input.entityType] += cityCount;
+        }
+
+        // Converter para array (já vem ordenado do banco)
+        const regions = Array.from(regionMap.values());
+
+        // Calcular totais gerais
+        const grandTotals: EntityCount = {
+          clientes: 0,
+          leads: 0,
+          concorrentes: 0,
+        };
+
+        for (const region of regions) {
+          grandTotals[input.entityType] += region.totals[input.entityType];
+        }
+
+        return {
+          regions,
+          grandTotals,
+        };
+      } catch (error) {
+        // Fallback: Se stored procedure falhar, usar query normal (FASE 2)
+        console.warn('Stored procedure failed, using fallback query:', error);
+      }
+
+      // FALLBACK: Query normal com FASE 2 (sem stored procedure)
       const buildConditions = (table: typeof clientes | typeof leads | typeof concorrentes) => {
         const conditions = [isNotNull(table.uf), isNotNull(table.cidade)];
 
-        // Filtro por projeto/pesquisa
-        if (pesquisaId) {
-          conditions.push(eq(table.pesquisaId, pesquisaId));
-        } else if (projectId) {
-          // Se não tem pesquisaId, buscar todas as pesquisas do projeto
-          conditions.push(
-            sql`${table.pesquisaId} IN (SELECT id FROM pesquisas WHERE "projectId" = ${projectId})`
-          );
+        // Filtro por projeto/pesquisa usando inArray (mais eficiente que subquery)
+        if (pesquisaIds.length > 0) {
+          conditions.push(inArray(table.pesquisaId, pesquisaIds));
         }
 
         // Filtros adicionais
@@ -258,6 +351,29 @@ export const mapHierarchicalRouter = router({
       const projectId = input.projectId ?? undefined;
       const pesquisaId = input.pesquisaId ?? undefined;
 
+      // FASE 2: Buscar pesquisaIds ANTES (elimina subquery)
+      let pesquisaIds: number[] = [];
+      if (pesquisaId) {
+        pesquisaIds = [pesquisaId];
+      } else if (projectId) {
+        const pesquisasResult = await db
+          .select({ id: pesquisas.id })
+          .from(pesquisas)
+          .where(eq(pesquisas.projectId, projectId));
+        pesquisaIds = pesquisasResult.map((p) => p.id);
+
+        // Se não há pesquisas, retornar vazio
+        if (pesquisaIds.length === 0) {
+          return {
+            data: [],
+            total: 0,
+            page: input.page,
+            pageSize: input.pageSize,
+            totalPages: 0,
+          };
+        }
+      }
+
       const table =
         input.entityType === 'clientes'
           ? clientes
@@ -268,12 +384,9 @@ export const mapHierarchicalRouter = router({
       // Construir condições
       const conditions = [eq(table.cidade, input.cidade), eq(table.uf, input.uf)];
 
-      if (pesquisaId) {
-        conditions.push(eq(table.pesquisaId, pesquisaId));
-      } else if (projectId) {
-        conditions.push(
-          sql`${table.pesquisaId} IN (SELECT id FROM pesquisas WHERE "projectId" = ${projectId})`
-        );
+      // Usar inArray ao invés de subquery
+      if (pesquisaIds.length > 0) {
+        conditions.push(inArray(table.pesquisaId, pesquisaIds));
       }
 
       // Buscar entidades
