@@ -1,0 +1,117 @@
+{
+  "pesquisa": {
+    "id": 1,
+    "nome": "Base Inicial"
+  },
+  "projeto": "Intelmarket (Techfilms)",
+  "totalClientes": 10,
+  "dataExtracao": "2024-11-30T07:29:00Z",
+  "clientes": [
+    {
+      "id": 361932,
+      "nome": "ZARELLI SUPERMERCADOS LTDA",
+      "cnpj": "49637127000105",
+      "siteOficial": null,
+      "cidade": null,
+      "uf": null,
+      "produtoPrincipal": "Varejo de alimentos e bebidas, com foco em produtos de mercearia, perecíveis como carnes, laticínios, hortifrúti, e itens essenciais para o consumo doméstico.",
+      "segmentacaoB2BB2C": "B2C"
+    },
+    {
+      "id": 331786,
+      "nome": "FERRAGEM AURORA LTDA",
+      "cnpj": "88888698000174",
+      "siteOficial": null,
+      "cidade": null,
+      "uf": null,
+      "produtoPrincipal": "Comercialização e distribuição de ferragens, vergalhões e materiais de construção pesada para construtoras e empreiteiras.",
+      "segmentacaoB2BB2C": "B2C"
+    },
+    {
+      "id": 331719,
+      "nome": "DIRCE ESTEVES E OUTROS",
+      "cnpj": "34456816000227",
+      "siteOficial": null,
+      "cidade": null,
+      "uf": null,
+      "produtoPrincipal": "Consultoria e assessoria especializada em licitações e contratos administrativos para empresas que desejam fornecer bens e serviços ao setor público.",
+      "segmentacaoB2BB2C": "B2C"
+    },
+    {
+      "id": 331883,
+      "nome": "INDL BLOW PACK EMBAL LTDA",
+      "cnpj": "12698185000139",
+      "siteOficial": null,
+      "cidade": null,
+      "uf": null,
+      "produtoPrincipal": "Fabricação de embalagens plásticas por sopro (blow molding), como garrafas, frascos e galões, destinadas principalmente aos setores de higiene, limpeza e químicos.",
+      "segmentacaoB2BB2C": "B2B"
+    },
+    {
+      "id": 331878,
+      "nome": "IND E COM DE COLCHOES CASTOR LTDA",
+      "cnpj": "53424594000124",
+      "siteOficial": "https://www.castor.ind.br",
+      "cidade": "Ourinhos",
+      "uf": "SP",
+      "produtoPrincipal": "Colchões de molas e espuma de alta performance, focados em conforto e tecnologia ortopédica, oferecendo suporte ergonômico e durabilidade.",
+      "segmentacaoB2BB2C": "B2B2C"
+    },
+    {
+      "id": 301666,
+      "nome": "ARI DONISETE GONCALVES FONTES E OUTROS",
+      "cnpj": "8372585000182",
+      "siteOficial": null,
+      "cidade": null,
+      "uf": null,
+      "produtoPrincipal": "Comércio atacadista de combustíveis e lubrificantes para veículos automotores e máquinas agrícolas.",
+      "segmentacaoB2BB2C": "B2C"
+    },
+    {
+      "id": 361855,
+      "nome": "TECNOGRES REVESTIMENTOS CERAMICOS LTDA",
+      "cnpj": "4390556000192",
+      "siteOficial": null,
+      "cidade": null,
+      "uf": null,
+      "produtoPrincipal": "Porcelanato e revestimentos cerâmicos de alto desempenho para pisos e paredes, focados no mercado de construção civil e arquitetura.",
+      "segmentacaoB2BB2C": "B2B"
+    },
+    {
+      "id": 331848,
+      "nome": "HIDROALL DO BRASIL LTDA",
+      "cnpj": "53877684000170",
+      "siteOficial": null,
+      "cidade": null,
+      "uf": null,
+      "produtoPrincipal": "Fabricação e distribuição de aditivos químicos (sulfato de alumínio, cloreto férrico, etc.) para tratamento de água e efluentes industriais e municipais.",
+      "segmentacaoB2BB2C": "B2B"
+    },
+    {
+      "id": 361739,
+      "nome": "QLC COMERCIO DE ROUPAS EIRELI",
+      "cnpj": "18685296000197",
+      "siteOficial": null,
+      "cidade": null,
+      "uf": null,
+      "produtoPrincipal": "Comércio atacadista e varejista de vestuário, focando em roupas prontas para uso (prêt-à-porter).",
+      "segmentacaoB2BB2C": "B2C"
+    },
+    {
+      "id": 361863,
+      "nome": "TEXTIL CARMEM LTDA",
+      "cnpj": "59466003000168",
+      "siteOficial": null,
+      "cidade": null,
+      "uf": null,
+      "produtoPrincipal": "Produção e comercialização de tecidos planos de algodão e mistos, com foco em sarjas e brim para confecção e uniformes industriais.",
+      "segmentacaoB2BB2C": "B2B"
+    }
+  ],
+  "observacoes": {
+    "localizacao": "90% dos clientes SEM cidade/UF - gap crítico confirmado",
+    "siteOficial": "90% dos clientes SEM site - gap crítico confirmado",
+    "diversidade": "Mix de B2B, B2C e B2B2C - boa diversidade",
+    "setores": "Varejo, Construção, Consultoria, Embalagens, Colchões, Combustíveis, Cerâmica, Química, Vestuário, Têxtil"
+  }
+}

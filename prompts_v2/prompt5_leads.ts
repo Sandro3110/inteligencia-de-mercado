@@ -4,10 +4,13 @@
  * Objetivo: Identificar 5 empresas que COMPRAM os produtos/serviços do cliente
  * Temperatura: 1.0 (máxima criatividade)
  *
+ * NOVO: Aproveita principais players do mercado como fonte de leads
+ *
  * Regras:
  * - EXATAMENTE 5 leads
  * - Empresas que COMPRAM (não vendem) os produtos do cliente
  * - DIFERENTES do cliente e dos concorrentes
+ * - Aproveita players do mercado quando são compradores potenciais
  * - Campos obrigatórios: site, cidade, UF
  * - CNPJ: NULL se não souber (NÃO INVENTE!)
  */
@@ -22,6 +25,14 @@ Você é um especialista em prospecção B2B e geração de leads qualificados.
 - Setor: {{clienteSetor}}
 - Produtos: {{clienteProdutos}}
 - Público-Alvo: {{publicoAlvo}}
+
+**PRINCIPAIS PLAYERS DO MERCADO:**
+{{principaisPlayers}}
+
+**CONCORRENTES JÁ IDENTIFICADOS:**
+{{concorrentes}}
+
+**IMPORTANTE:** Os principais players do mercado podem ser leads se forem COMPRADORES potenciais dos produtos do cliente (não concorrentes).
 
 **DEFINIÇÃO DE LEAD:**
 - Empresa que COMPRA/USA os produtos/serviços do cliente
@@ -47,6 +58,8 @@ Você é um especialista em prospecção B2B e geração de leads qualificados.
    - Empresa que COMPRARIA os produtos do cliente
    - Setor compatível com público-alvo
    - Localização relevante
+   - **PRIORIZE:** Principais players do mercado que são compradores potenciais
+   - **COMPLETE:** Com leads adicionais se necessário
 
 4. **Campos Obrigatórios:**
    - **nome:** Nome da empresa lead
@@ -69,6 +82,15 @@ Se o cliente vende "Sistema ERP para Varejo":
 - ✅ LEAD: Loja de roupas (compra ERP)
 - ❌ NÃO É LEAD: Outra empresa de software (é concorrente)
 - ❌ NÃO É LEAD: Consultoria de TI (não é público-alvo)
+
+**APROVEITAMENTO DE PLAYERS DO MERCADO:**
+
+Se principais players incluem: ["SAP Brasil", "Oracle Brasil", "Pão de Açúcar", "Magazine Luiza", "Riachuelo"]:
+- ❌ SAP Brasil → Concorrente (vende ERP)
+- ❌ Oracle Brasil → Concorrente (vende ERP)
+- ✅ Pão de Açúcar → LEAD (compra ERP para gestão)
+- ✅ Magazine Luiza → LEAD (compra ERP para gestão)
+- ✅ Riachuelo → LEAD (compra ERP para gestão)
 
 **FORMATO DE RESPOSTA (JSON):**
 
