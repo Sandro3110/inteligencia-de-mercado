@@ -13,6 +13,7 @@ import {
   leads,
   clientes,
   concorrentes,
+  produtos,
 } from '@/drizzle/schema';
 import { eq, count, desc, and, sql, avg } from 'drizzle-orm';
 
@@ -307,9 +308,13 @@ export const dashboardRouter = createTRPCRouter({
               leadsResult,
               mercadosResult,
               concorrentesResult,
+              produtosResult,
               clientesQualidadeResult,
               leadsQualidadeResult,
               concorrentesQualidadeResult,
+              clientesComLocalizacaoResult,
+              leadsComLocalizacaoResult,
+              concorrentesComLocalizacaoResult,
             ] = await Promise.all([
               db.select({ count: count() }).from(leads).where(eq(leads.pesquisaId, pesquisa.id)),
               db
@@ -320,6 +325,11 @@ export const dashboardRouter = createTRPCRouter({
                 .select({ count: count() })
                 .from(concorrentes)
                 .where(eq(concorrentes.pesquisaId, pesquisa.id)),
+              // Contar produtos
+              db
+                .select({ count: count() })
+                .from(produtos)
+                .where(eq(produtos.pesquisaId, pesquisa.id)),
               // Qualidade média de clientes
               db
                 .select({ avg: sql<number>`AVG(${clientes.qualidadeScore})` })
@@ -335,16 +345,71 @@ export const dashboardRouter = createTRPCRouter({
                 .select({ avg: sql<number>`AVG(${concorrentes.qualidadeScore})` })
                 .from(concorrentes)
                 .where(eq(concorrentes.pesquisaId, pesquisa.id)),
+              // Enriquecimento geográfico - clientes
+              db
+                .select({ count: count() })
+                .from(clientes)
+                .where(
+                  and(
+                    eq(clientes.pesquisaId, pesquisa.id),
+                    sql`(
+                      ${clientes.cidade} IS NOT NULL AND ${clientes.cidade} != '' OR
+                      ${clientes.estado} IS NOT NULL AND ${clientes.estado} != '' OR
+                      ${clientes.pais} IS NOT NULL AND ${clientes.pais} != ''
+                    )`
+                  )
+                ),
+              // Enriquecimento geográfico - leads
+              db
+                .select({ count: count() })
+                .from(leads)
+                .where(
+                  and(
+                    eq(leads.pesquisaId, pesquisa.id),
+                    sql`(
+                      ${leads.cidade} IS NOT NULL AND ${leads.cidade} != '' OR
+                      ${leads.estado} IS NOT NULL AND ${leads.estado} != '' OR
+                      ${leads.pais} IS NOT NULL AND ${leads.pais} != ''
+                    )`
+                  )
+                ),
+              // Enriquecimento geográfico - concorrentes
+              db
+                .select({ count: count() })
+                .from(concorrentes)
+                .where(
+                  and(
+                    eq(concorrentes.pesquisaId, pesquisa.id),
+                    sql`(
+                      ${concorrentes.cidade} IS NOT NULL AND ${concorrentes.cidade} != '' OR
+                      ${concorrentes.estado} IS NOT NULL AND ${concorrentes.estado} != '' OR
+                      ${concorrentes.pais} IS NOT NULL AND ${concorrentes.pais} != ''
+                    )`
+                  )
+                ),
             ]);
+
+            const geoTotal =
+              (clientesComLocalizacaoResult[0]?.count || 0) +
+              (leadsComLocalizacaoResult[0]?.count || 0) +
+              (concorrentesComLocalizacaoResult[0]?.count || 0);
+
+            const geoTotalEntidades =
+              (pesquisa.totalClientes || 0) +
+              (leadsResult[0]?.count || 0) +
+              (concorrentesResult[0]?.count || 0);
 
             return {
               ...pesquisa,
               leadsCount: leadsResult[0]?.count || 0,
               mercadosCount: mercadosResult[0]?.count || 0,
               concorrentesCount: concorrentesResult[0]?.count || 0,
+              produtosCount: produtosResult[0]?.count || 0,
               clientesQualidadeMedia: Math.round(clientesQualidadeResult[0]?.avg || 0),
               leadsQualidadeMedia: Math.round(leadsQualidadeResult[0]?.avg || 0),
               concorrentesQualidadeMedia: Math.round(concorrentesQualidadeResult[0]?.avg || 0),
+              geoEnriquecimentoTotal: geoTotal,
+              geoEnriquecimentoTotalEntidades: geoTotalEntidades,
             };
           })
         );

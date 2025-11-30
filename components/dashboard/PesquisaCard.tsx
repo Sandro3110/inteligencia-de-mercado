@@ -17,6 +17,9 @@ interface PesquisaCardProps {
     leadsCount: number;
     mercadosCount: number;
     concorrentesCount: number;
+    produtosCount?: number;
+    geoEnriquecimentoTotal?: number;
+    geoEnriquecimentoTotalEntidades?: number;
     clientesQualidadeMedia?: number;
     leadsQualidadeMedia?: number;
     concorrentesQualidadeMedia?: number;
@@ -69,6 +72,7 @@ export function PesquisaCard({
 
   // Metas estimadas (apenas para exibição de frações, não para cálculo de progresso)
   const metaMercados = totalClientes * 2;
+  const metaProdutos = totalClientes * 3; // 3 produtos por cliente
   const metaLeads = totalClientes * 13;
   const metaConcorrentes = totalClientes * 18;
 
@@ -86,6 +90,16 @@ export function PesquisaCard({
     metaConcorrentes > 0
       ? Math.min(100, Math.round((pesquisa.concorrentesCount / metaConcorrentes) * 100))
       : 0;
+  const produtosPercentage =
+    metaProdutos > 0
+      ? Math.min(100, Math.round(((pesquisa.produtosCount || 0) / metaProdutos) * 100))
+      : 0;
+
+  // Enriquecimento geográfico
+  const geoTotal = pesquisa.geoEnriquecimentoTotal || 0;
+  const geoTotalEntidades = pesquisa.geoEnriquecimentoTotalEntidades || 0;
+  const geoPercentage =
+    geoTotalEntidades > 0 ? Math.round((geoTotal / geoTotalEntidades) * 100) : 0;
 
   // ===== CÁLCULO DE QUALIDADE MÉDIA GERAL =====
   const qualidadeClientes = pesquisa.clientesQualidadeMedia || 0;
@@ -226,6 +240,12 @@ export function PesquisaCard({
             </span>
           </div>
           <div className="flex justify-between">
+            <span>• Produtos:</span>
+            <span className="font-medium">
+              {pesquisa.produtosCount || 0}/{metaProdutos} ({produtosPercentage}%)
+            </span>
+          </div>
+          <div className="flex justify-between">
             <span>• Leads:</span>
             <span className="font-medium">
               {pesquisa.leadsCount}/{metaLeads} ({leadsPercentage}%)
@@ -235,6 +255,12 @@ export function PesquisaCard({
             <span>• Concorrentes:</span>
             <span className="font-medium">
               {pesquisa.concorrentesCount}/{metaConcorrentes} ({concorrentesPercentage}%)
+            </span>
+          </div>
+          <div className="flex justify-between border-t border-gray-200 pt-1 mt-1">
+            <span>• Enriquecimento Geográfico:</span>
+            <span className="font-medium">
+              {geoTotal}/{geoTotalEntidades} ({geoPercentage}%)
             </span>
           </div>
         </div>

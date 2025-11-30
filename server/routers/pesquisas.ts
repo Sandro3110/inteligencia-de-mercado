@@ -6,7 +6,14 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
-import { pesquisas, clientes, mercadosUnicos, leads, concorrentes } from '@/drizzle/schema';
+import {
+  pesquisas,
+  clientes,
+  mercadosUnicos,
+  leads,
+  concorrentes,
+  produtos,
+} from '@/drizzle/schema';
 import { eq, and, desc, count, avg, sql } from 'drizzle-orm';
 
 export const pesquisasRouter = createTRPCRouter({
@@ -367,6 +374,12 @@ export const pesquisasRouter = createTRPCRouter({
           .from(concorrentes)
           .where(eq(concorrentes.pesquisaId, input.pesquisaId));
 
+        // 4.5. Contar produtos
+        const [produtosTotal] = await db
+          .select({ value: count() })
+          .from(produtos)
+          .where(eq(produtos.pesquisaId, input.pesquisaId));
+
         // 5. Calcular qualidade média de clientes
         const [clientesQualidade] = await db
           .select({ value: avg(clientes.qualityScore) })
@@ -400,6 +413,58 @@ export const pesquisasRouter = createTRPCRouter({
             )
           );
 
+        // 7.5. Contar enriquecimento geográfico
+        // Total de entidades com localização preenchida
+        const [clientesComLocalizacao] = await db
+          .select({ value: count() })
+          .from(clientes)
+          .where(
+            and(
+              eq(clientes.pesquisaId, input.pesquisaId),
+              sql`(
+                ${clientes.cidade} IS NOT NULL AND ${clientes.cidade} != '' OR
+                ${clientes.estado} IS NOT NULL AND ${clientes.estado} != '' OR
+                ${clientes.pais} IS NOT NULL AND ${clientes.pais} != ''
+              )`
+            )
+          );
+
+        const [leadsComLocalizacao] = await db
+          .select({ value: count() })
+          .from(leads)
+          .where(
+            and(
+              eq(leads.pesquisaId, input.pesquisaId),
+              sql`(
+                ${leads.cidade} IS NOT NULL AND ${leads.cidade} != '' OR
+                ${leads.estado} IS NOT NULL AND ${leads.estado} != '' OR
+                ${leads.pais} IS NOT NULL AND ${leads.pais} != ''
+              )`
+            )
+          );
+
+        const [concorrentesComLocalizacao] = await db
+          .select({ value: count() })
+          .from(concorrentes)
+          .where(
+            and(
+              eq(concorrentes.pesquisaId, input.pesquisaId),
+              sql`(
+                ${concorrentes.cidade} IS NOT NULL AND ${concorrentes.cidade} != '' OR
+                ${concorrentes.estado} IS NOT NULL AND ${concorrentes.estado} != '' OR
+                ${concorrentes.pais} IS NOT NULL AND ${concorrentes.pais} != ''
+              )`
+            )
+          );
+
+        const totalComLocalizacao =
+          (clientesComLocalizacao?.value || 0) +
+          (leadsComLocalizacao?.value || 0) +
+          (concorrentesComLocalizacao?.value || 0);
+
+        const totalEntidades =
+          (clientesTotal?.value || 0) + (leadsTotal?.value || 0) + (concorrentesTotal?.value || 0);
+
         // 8. Atualizar pesquisa com novos valores
         const [updated] = await db
           .update(pesquisas)
@@ -417,9 +482,11 @@ export const pesquisasRouter = createTRPCRouter({
           leadsCount: leadsTotal?.value || 0,
           mercadosCount: mercadosTotal?.value || 0,
           concorrentesCount: concorrentesTotal?.value || 0,
+          produtosCount: produtosTotal?.value || 0,
           clientesQualidadeMedia: clientesQualidade?.value || 0,
           leadsQualidadeMedia: leadsQualidade?.value || 0,
           concorrentesQualidadeMedia: concorrentesQualidade?.value || 0,
+          geoEnriquecimento: `${totalComLocalizacao}/${totalEntidades}`,
         });
 
         return {
@@ -430,9 +497,12 @@ export const pesquisasRouter = createTRPCRouter({
             leadsCount: leadsTotal?.value || 0,
             mercadosCount: mercadosTotal?.value || 0,
             concorrentesCount: concorrentesTotal?.value || 0,
+            produtosCount: produtosTotal?.value || 0,
             clientesQualidadeMedia: Math.round(Number(clientesQualidade?.value || 0)),
             leadsQualidadeMedia: Math.round(Number(leadsQualidade?.value || 0)),
             concorrentesQualidadeMedia: Math.round(Number(concorrentesQualidade?.value || 0)),
+            geoEnriquecimentoTotal: totalComLocalizacao,
+            geoEnriquecimentoTotalEntidades: totalEntidades,
           },
         };
       } catch (error) {
