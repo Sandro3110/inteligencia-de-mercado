@@ -738,7 +738,7 @@ export const pesquisasRouter = createTRPCRouter({
             qualidadeClassificacao: null,
             enriquecido: 0,
             enriquecidoEm: null,
-            updatedAt: new Date(),
+            updatedAt: new Date().toISOString(),
           })
           .where(eq(clientes.pesquisaId, input.pesquisaId));
         stats.clientesReset = resetResult.rowsAffected || 0;
@@ -750,7 +750,7 @@ export const pesquisasRouter = createTRPCRouter({
           .set({
             clientesEnriquecidos: 0,
             status: 'rascunho',
-            updatedAt: new Date(),
+            updatedAt: new Date().toISOString(),
           })
           .where(eq(pesquisas.id, input.pesquisaId));
         console.log('[Pesquisas.cleanEnrichment] Pesquisa resetada');
