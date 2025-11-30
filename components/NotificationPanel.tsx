@@ -1,323 +1,156 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
-import { useNotifications, type Notification } from '@/hooks/useNotifications';
+/**
+ * NotificationPanel - Versão Simplificada
+ * Painel de notificações limpo e funcional
+ */
+
+import { useNotifications } from '@/hooks/useNotifications';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import {
-  CheckCheck,
-  Trash2,
-  Check,
-  Bell,
-  TrendingUp,
-  AlertTriangle,
-  Info,
-  Zap,
-  type LucideIcon,
-} from 'lucide-react';
+import { CheckCheck, Trash2, Bell, Zap, AlertTriangle, Info } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-const NOTIFICATION_TYPES = {
-  ENRICHMENT_COMPLETE: 'enrichment_complete',
-  NEW_LEAD: 'new_lead',
-  QUALITY_ALERT: 'quality_alert',
-  SYSTEM: 'system',
-} as const;
-
-const ICON_CONFIG: Record<string, { icon: LucideIcon; color: string }> = {
-  [NOTIFICATION_TYPES.ENRICHMENT_COMPLETE]: {
-    icon: Zap,
-    color: 'text-green-500',
-  },
-  [NOTIFICATION_TYPES.NEW_LEAD]: {
-    icon: TrendingUp,
-    color: 'text-blue-500',
-  },
-  [NOTIFICATION_TYPES.QUALITY_ALERT]: {
-    icon: AlertTriangle,
-    color: 'text-yellow-500',
-  },
-  [NOTIFICATION_TYPES.SYSTEM]: {
-    icon: Bell,
-    color: 'text-purple-500',
-  },
-};
-
-const DEFAULT_ICON_CONFIG = {
-  icon: Info,
-  color: 'text-gray-500',
-};
-
-const BADGE_CONFIG: Record<string, { label: string; className: string }> = {
-  [NOTIFICATION_TYPES.ENRICHMENT_COMPLETE]: {
-    label: 'Concluído',
-    className: 'bg-green-50 text-green-700 border-green-200',
-  },
-  [NOTIFICATION_TYPES.NEW_LEAD]: {
-    label: 'Novo Lead',
-    className: 'bg-blue-50 text-blue-700 border-blue-200',
-  },
-  [NOTIFICATION_TYPES.QUALITY_ALERT]: {
-    label: 'Alerta',
-    className: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  },
-  [NOTIFICATION_TYPES.SYSTEM]: {
-    label: 'Sistema',
-    className: 'bg-purple-50 text-purple-700 border-purple-200',
-  },
-};
-
-const DEFAULT_BADGE_CONFIG = {
-  label: 'Info',
-  className: '',
-};
-
-const LABELS = {
-  TITLE: 'Notificações',
-  DISCONNECTED: 'Desconectado',
-  UNREAD_COUNT: (count: number) => `${count} ${count === 1 ? 'nova' : 'novas'}`,
-  MARK_ALL_READ: 'Marcar todas como lidas',
-  CLEAR_ALL: 'Limpar tudo',
-  EMPTY_TITLE: 'Nenhuma notificação',
-  EMPTY_DESCRIPTION: 'Você receberá notificações em tempo real aqui',
-  MARK_AS_READ: 'Marcar como lida',
-  CONNECTED: '🟢 Conectado - Notificações em tempo real ativas',
-} as const;
-
-const ICON_SIZES = {
-  LARGE: 'h-12 w-12',
-  MEDIUM: 'h-4 w-4',
-  SMALL: 'h-3 w-3',
-  TINY: 'h-6 w-6',
-} as const;
-
-const DIMENSIONS = {
-  MAX_HEIGHT: 'max-h-[400px]',
-  BUTTON_HEIGHT: 'h-7',
-} as const;
-
-const CSS_CLASSES = {
-  DISCONNECTED_BADGE: 'bg-yellow-50 text-yellow-700 border-yellow-200 text-xs',
-  UNREAD_BACKGROUND: 'bg-primary/5',
-  HOVER_BACKGROUND: 'hover:bg-accent/50',
-} as const;
-
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-function getIconConfig(type: Notification['type']) {
-  return ICON_CONFIG[type] || DEFAULT_ICON_CONFIG;
+interface NotificationPanelProps {
+  projectId?: number;
 }
 
-function getBadgeConfig(type: Notification['type']) {
-  return BADGE_CONFIG[type] || DEFAULT_BADGE_CONFIG;
-}
+export function NotificationPanel({ projectId }: NotificationPanelProps) {
+  const { notifications, isLoading, unreadCount, markAsRead, markAllAsRead, deleteNotification } =
+    useNotifications(projectId);
 
-function formatTimestamp(timestamp: string): string {
-  return formatDistanceToNow(new Date(timestamp), {
-    addSuffix: true,
-    locale: ptBR,
-  });
-}
+  // Ícone por tipo
+  const getIcon = (type: string) => {
+    switch (type) {
+      case 'success':
+        return <Zap className="h-4 w-4 text-green-500" />;
+      case 'warning':
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+      case 'error':
+        return <AlertTriangle className="h-4 w-4 text-red-500" />;
+      default:
+        return <Info className="h-4 w-4 text-blue-500" />;
+    }
+  };
 
-// ============================================================================
-// COMPONENT
-// ============================================================================
+  // Badge por tipo
+  const getBadge = (type: string) => {
+    switch (type) {
+      case 'success':
+        return (
+          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            Sucesso
+          </Badge>
+        );
+      case 'warning':
+        return (
+          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+            Alerta
+          </Badge>
+        );
+      case 'error':
+        return (
+          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+            Erro
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            Info
+          </Badge>
+        );
+    }
+  };
 
-function NotificationPanel() {
-  const notifications = useNotifications((state) => state.notifications);
-  const isConnected = useNotifications((state) => state.isConnected);
-  const markAsRead = useNotifications((state) => state.markAsRead);
-  const markAllAsRead = useNotifications((state) => state.markAllAsRead);
-  const clearNotifications = useNotifications((state) => state.clearAll);
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
-
-  // ============================================================================
-  // COMPUTED VALUES
-  // ============================================================================
-
-  const hasNotifications = useMemo(() => notifications.length > 0, [notifications.length]);
-
-  const hasUnread = useMemo(() => unreadCount > 0, [unreadCount]);
-
-  const unreadLabel = useMemo(() => LABELS.UNREAD_COUNT(unreadCount), [unreadCount]);
-
-  // ============================================================================
-  // EVENT HANDLERS
-  // ============================================================================
-
-  const handleMarkAsRead = useCallback(
-    (id: string) => {
-      markAsRead(id);
-    },
-    [markAsRead]
-  );
-
-  // ============================================================================
-  // RENDER HELPERS
-  // ============================================================================
-
-  const renderNotificationIcon = useCallback((type: Notification['type']) => {
-    const { icon: Icon, color } = getIconConfig(type);
-    return <Icon className={`${ICON_SIZES.MEDIUM} ${color}`} />;
-  }, []);
-
-  const renderNotificationBadge = useCallback((type: Notification['type']) => {
-    const { label, className } = getBadgeConfig(type);
-    return (
-      <Badge variant="outline" className={className}>
-        {label}
-      </Badge>
-    );
-  }, []);
-
-  const renderHeader = useCallback(
-    () => (
-      <div className="p-4 border-b bg-white">
-        <div className="flex items-center justify-between mb-2">
+  return (
+    <div className="w-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-sm text-gray-900">{LABELS.TITLE}</h3>
-            {!isConnected && (
-              <Badge variant="outline" className={CSS_CLASSES.DISCONNECTED_BADGE}>
-                {LABELS.DISCONNECTED}
+            <Bell className="h-5 w-5" />
+            <h3 className="font-semibold">Notificações</h3>
+            {unreadCount > 0 && (
+              <Badge variant="destructive" className="ml-2">
+                {unreadCount}
               </Badge>
             )}
           </div>
-          {hasUnread && (
-            <Badge variant="default" className="text-xs">
-              {unreadLabel}
-            </Badge>
+          {unreadCount > 0 && (
+            <Button variant="ghost" size="sm" onClick={() => markAllAsRead()} className="text-xs">
+              <CheckCheck className="h-3 w-3 mr-1" />
+              Marcar todas como lidas
+            </Button>
           )}
         </div>
+      </div>
 
-        {hasNotifications && (
-          <div className="flex gap-2">
-            {hasUnread && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={markAllAsRead}
-                className={`${DIMENSIONS.BUTTON_HEIGHT} text-xs`}
-              >
-                <CheckCheck className={`${ICON_SIZES.SMALL} mr-1`} />
-                {LABELS.MARK_ALL_READ}
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearNotifications}
-              className={`${DIMENSIONS.BUTTON_HEIGHT} text-xs text-destructive hover:text-destructive`}
-            >
-              <Trash2 className={`${ICON_SIZES.SMALL} mr-1`} />
-              {LABELS.CLEAR_ALL}
-            </Button>
+      {/* Content */}
+      <ScrollArea className="h-96">
+        {isLoading ? (
+          <div className="p-8 text-center text-gray-500">
+            <Bell className="h-12 w-12 mx-auto mb-2 opacity-50" />
+            <p>Carregando notificações...</p>
           </div>
-        )}
-      </div>
-    ),
-    [isConnected, hasUnread, hasNotifications, unreadLabel, markAllAsRead, clearNotifications]
-  );
-
-  const renderEmptyState = useCallback(
-    () => (
-      <div className="p-8 text-center bg-white">
-        <Bell className={`${ICON_SIZES.LARGE} mx-auto mb-3 text-gray-400`} />
-        <p className="text-sm font-medium text-gray-700">{LABELS.EMPTY_TITLE}</p>
-        <p className="text-xs text-gray-500 mt-1">{LABELS.EMPTY_DESCRIPTION}</p>
-      </div>
-    ),
-    []
-  );
-
-  const renderNotification = useCallback(
-    (notification: Notification) => (
-      <div
-        key={notification.id}
-        className={`p-3 ${CSS_CLASSES.HOVER_BACKGROUND} transition-colors ${
-          !notification.read ? CSS_CLASSES.UNREAD_BACKGROUND : ''
-        }`}
-      >
-        <div className="flex items-start gap-3">
-          {/* Icon */}
-          <div className="mt-0.5">{renderNotificationIcon(notification.type)}</div>
-
-          {/* Content */}
-          <div className="flex-1 min-w-0 space-y-1">
-            <div className="flex items-start justify-between gap-2">
-              <p className="font-medium text-sm leading-tight text-gray-900">
-                {notification.title}
-              </p>
-              {!notification.read && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={`${ICON_SIZES.TINY} flex-shrink-0`}
-                  onClick={() => handleMarkAsRead(notification.id)}
-                  title={LABELS.MARK_AS_READ}
-                >
-                  <Check className={ICON_SIZES.SMALL} />
-                </Button>
-              )}
-            </div>
-
-            <p className="text-xs text-gray-600 line-clamp-2">{notification.message}</p>
-
-            <div className="flex items-center gap-2 mt-2">
-              {renderNotificationBadge(notification.type)}
-              <span className="text-xs text-gray-500">
-                {formatTimestamp(notification.timestamp)}
-              </span>
-            </div>
+        ) : notifications.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            <Bell className="h-12 w-12 mx-auto mb-2 opacity-50" />
+            <p className="font-medium">Nenhuma notificação</p>
+            <p className="text-sm mt-1">Você receberá notificações em tempo real aqui</p>
           </div>
-        </div>
-      </div>
-    ),
-    [renderNotificationIcon, renderNotificationBadge, handleMarkAsRead]
-  );
-
-  const renderNotificationsList = useCallback(
-    () => (
-      <ScrollArea className={`flex-1 ${DIMENSIONS.MAX_HEIGHT}`}>
-        {!hasNotifications ? (
-          renderEmptyState()
         ) : (
-          <div className="divide-y">{notifications.map(renderNotification)}</div>
+          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            {notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              >
+                <div className="flex gap-3">
+                  {/* Icon */}
+                  <div className="flex-shrink-0 mt-1">{getIcon(notification.type)}</div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <h4 className="font-medium text-sm">{notification.title}</h4>
+                      {getBadge(notification.type)}
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
+                      {notification.message}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      {formatDistanceToNow(new Date(notification.timestamp), {
+                        addSuffix: true,
+                        locale: ptBR,
+                      })}
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex-shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteNotification(notification.id)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </ScrollArea>
-    ),
-    [hasNotifications, notifications, renderEmptyState, renderNotification]
-  );
 
-  const renderFooter = useCallback(
-    () =>
-      isConnected ? (
-        <div className="p-2 border-t bg-white">
-          <p className="text-xs text-center text-gray-600">{LABELS.CONNECTED}</p>
-        </div>
-      ) : null,
-    [isConnected]
-  );
-
-  // ============================================================================
-  // RENDER
-  // ============================================================================
-
-  return (
-    <div className="flex flex-col h-full bg-white">
-      {renderHeader()}
-      {renderNotificationsList()}
-      {renderFooter()}
+      {/* Footer */}
+      <div className="p-3 border-t border-gray-200 dark:border-gray-700 text-center">
+        <p className="text-xs text-gray-500">🟢 Conectado - Notificações em tempo real ativas</p>
+      </div>
     </div>
   );
 }
-
-export default NotificationPanel;

@@ -1,15 +1,11 @@
-"use client";
+'use client';
 
 /**
- * useNotifications - Hook for managing notifications
- * Provides notifications list, unread count, and actions
+ * useNotifications - Hook Simplificado
+ * Usa apenas tRPC query, sem Zustand duplicado
  */
 
-import { create } from 'zustand';
-
-// ============================================================================
-// TYPES
-// ============================================================================
+import { trpc } from '@/lib/trpc/client';
 
 export interface Notification {
   id: string;
@@ -18,73 +14,71 @@ export interface Notification {
   message: string;
   timestamp: string;
   read: boolean;
+  entityType?: string | null;
+  entityId?: number | null;
 }
 
-interface NotificationsState {
-  notifications: Notification[];
-  isConnected: boolean;
-  
-  // Actions
-  addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
-  deleteNotification: (id: string) => void;
-  clearAll: () => void;
-  setConnected: (connected: boolean) => void;
+/**
+ * Hook para buscar notificações não lidas
+ */
+export function useNotifications(projectId?: number) {
+  // Query de notificações não lidas com refetch automático
+  const {
+    data: notifications = [],
+    isLoading,
+    refetch,
+  } = trpc.notifications.getUnread.useQuery(
+    { projectId, limit: 50 },
+    {
+      refetchInterval: 30000, // Refetch a cada 30 segundos
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+    }
+  );
+
+  // Mutation para marcar como lida
+  const markAsReadMutation = trpc.notifications.markAsRead.useMutation({
+    onSuccess: () => {
+      refetch();
+    },
+  });
+
+  // Mutation para marcar todas como lidas
+  const markAllAsReadMutation = trpc.notifications.markAllAsRead.useMutation({
+    onSuccess: () => {
+      refetch();
+    },
+  });
+
+  // Mutation para deletar
+  const deleteMutation = trpc.notifications.delete.useMutation({
+    onSuccess: () => {
+      refetch();
+    },
+  });
+
+  return {
+    notifications,
+    isLoading,
+    unreadCount: notifications.length,
+    markAsRead: (id: string) => markAsReadMutation.mutate({ id }),
+    markAllAsRead: () => markAllAsReadMutation.mutate({ projectId }),
+    deleteNotification: (id: string) => deleteMutation.mutate({ id }),
+    refetch,
+  };
 }
 
-// ============================================================================
-// STORE
-// ============================================================================
+/**
+ * Hook para contar notificações não lidas
+ */
+export function useUnreadCount(projectId?: number) {
+  const { data: notifications = [] } = trpc.notifications.getUnread.useQuery(
+    { projectId, limit: 50 },
+    {
+      refetchInterval: 30000,
+      refetchOnWindowFocus: true,
+    }
+  );
 
-export const useNotifications = create<NotificationsState>((set) => ({
-  notifications: [],
-  isConnected: false,
-
-  addNotification: (notification) =>
-    set((state) => ({
-      notifications: [
-        {
-          ...notification,
-          id: `notif-${Date.now()}-${Math.random()}`,
-          timestamp: new Date().toISOString(),
-          read: false,
-        },
-        ...state.notifications,
-      ],
-    })),
-
-  markAsRead: (id) =>
-    set((state) => ({
-      notifications: state.notifications.map((n) =>
-        n.id === id ? { ...n, read: true } : n
-      ),
-    })),
-
-  markAllAsRead: () =>
-    set((state) => ({
-      notifications: state.notifications.map((n) => ({ ...n, read: true })),
-    })),
-
-  deleteNotification: (id) =>
-    set((state) => ({
-      notifications: state.notifications.filter((n) => n.id !== id),
-    })),
-
-  clearAll: () => set({ notifications: [] }),
-
-  setConnected: (connected) => set({ isConnected: connected }),
-}));
-
-// ============================================================================
-// SELECTORS
-// ============================================================================
-
-export const useUnreadNotifications = () =>
-  useNotifications((state) => state.notifications.filter((n) => !n.read));
-
-export const useUnreadNotificationsCountFromNotifications = () =>
-  useNotifications((state) => state.notifications.filter((n) => !n.read).length);
-
-export const useNotificationsConnection = () =>
-  useNotifications((state) => state.isConnected);
+  return notifications.length;
+}
