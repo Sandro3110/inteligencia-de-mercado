@@ -314,39 +314,47 @@ export function PesquisaCard({
         </div>
       </div>
 
-      <div className="flex gap-2">
-        <button
-          onClick={() => onEnrich(pesquisa.projectId, pesquisa.id)}
-          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
-          title="Enriquecer"
-        >
-          <Zap className="w-4 h-4" />
-          Enriquecer
-        </button>
-        <button
-          onClick={() => onGeocode(pesquisa.projectId, pesquisa.id)}
-          disabled={isGeocoding}
-          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Geocodificar"
-        >
-          <MapPin className={`w-4 h-4 ${isGeocoding ? 'animate-pulse' : ''}`} />
-          {isGeocoding ? 'Geocodificando...' : 'Geocodificar'}
-        </button>
-        <GenerateReportButton pesquisaId={pesquisa.id} size="sm" />
-        <button
-          onClick={() => onViewResults(pesquisa.projectId, pesquisa.id)}
-          className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-          title="Ver Resultados"
-        >
-          <BarChart3 className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => onExport(pesquisa.projectId, pesquisa.id)}
-          className="flex items-center justify-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-          title="Exportar"
-        >
-          <Download className="w-4 h-4" />
-        </button>
+      {/* Botões de Ação - Duas Linhas */}
+      <div className="space-y-2">
+        {/* Linha 1: Enriquecimento */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => onEnrich(pesquisa.projectId, pesquisa.id)}
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+            title="Enriquecer"
+          >
+            <Zap className="w-4 h-4" />
+            Enriquecer
+          </button>
+          <button
+            onClick={() => onGeocode(pesquisa.projectId, pesquisa.id)}
+            disabled={isGeocoding}
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Geocodificar"
+          >
+            <MapPin className={`w-4 h-4 ${isGeocoding ? 'animate-pulse' : ''}`} />
+            {isGeocoding ? 'Geocodificando...' : 'Geocodificar'}
+          </button>
+        </div>
+
+        {/* Linha 2: Visualização e Exportação */}
+        <div className="flex gap-2">
+          <GenerateReportButton pesquisaId={pesquisa.id} size="sm" />
+          <button
+            onClick={() => onViewResults(pesquisa.projectId, pesquisa.id)}
+            className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            title="Ver Resultados"
+          >
+            <BarChart3 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => onExport(pesquisa.projectId, pesquisa.id)}
+            className="flex items-center justify-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+            title="Exportar"
+          >
+            <Download className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
