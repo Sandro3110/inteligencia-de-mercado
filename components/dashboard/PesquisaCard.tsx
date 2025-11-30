@@ -258,6 +258,20 @@ export function PesquisaCard({
           </div>
         )}
 
+        {/* Enriquecimento Geográfico */}
+        <div>
+          <div className="flex justify-between text-sm mb-1">
+            <span className="text-gray-600 font-medium">Enriquecimento Geográfico</span>
+            <span className="font-bold text-emerald-600">{geoPercentage}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-emerald-600 h-2 rounded-full transition-all"
+              style={{ width: `${geoPercentage}%` }}
+            />
+          </div>
+        </div>
+
         {/* Detalhamento por componente */}
         <div className="text-xs space-y-1 text-gray-600">
           <div className="flex justify-between">
