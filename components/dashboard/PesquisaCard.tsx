@@ -64,6 +64,17 @@ export function PesquisaCard({
   const enrichmentPercentage =
     totalClientes > 0 ? Math.round((pesquisa.clientesEnriquecidos / totalClientes) * 100) : 0;
 
+  // Percentuais individuais (para exibição no detalhamento)
+  const clientesPercentage = enrichmentPercentage;
+  const mercadosPercentage =
+    metaMercados > 0 ? Math.min(100, Math.round((pesquisa.mercadosCount / metaMercados) * 100)) : 0;
+  const leadsPercentage =
+    metaLeads > 0 ? Math.min(100, Math.round((pesquisa.leadsCount / metaLeads) * 100)) : 0;
+  const concorrentesPercentage =
+    metaConcorrentes > 0
+      ? Math.min(100, Math.round((pesquisa.concorrentesCount / metaConcorrentes) * 100))
+      : 0;
+
   // ===== CÁLCULO DE QUALIDADE MÉDIA GERAL =====
   const qualidadeClientes = pesquisa.clientesQualidadeMedia || 0;
   const qualidadeLeads = pesquisa.leadsQualidadeMedia || 0;
