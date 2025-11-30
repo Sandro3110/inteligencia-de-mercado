@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
+import { createTRPCRouter, publicProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
 import {
   pesquisas as pesquisasTable,
@@ -19,7 +19,7 @@ export const reportsRouter = createTRPCRouter({
   /**
    * Gerar relatório PDF analítico de um projeto com IA
    */
-  generateProjectReport: protectedProcedure
+  generateProjectReport: publicProcedure
     .input(z.object({ projectId: z.number() }))
     .mutation(async ({ input }) => {
       const db = await getDb();

@@ -1,11 +1,11 @@
-import { z } from "zod";
-import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
+import { z } from 'zod';
+import { publicProcedure, publicProcedure, router } from '../_core/trpc';
 import {
   validatePasswordStrength,
   hashPassword,
   comparePassword,
   generateToken,
-} from "../utils/auth";
+} from '../utils/auth';
 
 /**
  * Router para autenticação de usuários
@@ -19,27 +19,23 @@ export const authRouter = router({
   login: publicProcedure
     .input(
       z.object({
-        email: z.string().email("Email inválido"),
-        password: z.string().min(1, "Senha é obrigatória"),
+        email: z.string().email('Email inválido'),
+        password: z.string().min(1, 'Senha é obrigatória'),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { getDb } = await import("../db");
+      const { getDb } = await import('../db');
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
-      const { users, loginAttempts } = await import("../../drizzle/schema");
-      const { eq } = await import("drizzle-orm");
+      if (!db) throw new Error('Database not available');
+      const { users, loginAttempts } = await import('../../drizzle/schema');
+      const { eq } = await import('drizzle-orm');
 
       // Buscar usuário por email
-      const [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, input.email))
-        .limit(1);
+      const [user] = await db.select().from(users).where(eq(users.email, input.email)).limit(1);
 
       // Registrar tentativa de login
-      const clientIp = ctx.req?.headers["x-forwarded-for"] || ctx.req?.ip || "unknown";
-      const userAgent = ctx.req?.headers["user-agent"] || "unknown";
+      const clientIp = ctx.req?.headers['x-forwarded-for'] || ctx.req?.ip || 'unknown';
+      const userAgent = ctx.req?.headers['user-agent'] || 'unknown';
 
       if (!user) {
         // Usuário não encontrado
@@ -50,7 +46,7 @@ export const authRouter = router({
           userAgent: userAgent,
         });
 
-        throw new Error("Email ou senha incorretos");
+        throw new Error('Email ou senha incorretos');
       }
 
       // Verificar se usuário tem senha cadastrada
@@ -62,7 +58,7 @@ export const authRouter = router({
           userAgent: userAgent,
         });
 
-        throw new Error("Usuário não possui senha cadastrada. Use o sistema de convites.");
+        throw new Error('Usuário não possui senha cadastrada. Use o sistema de convites.');
       }
 
       // Verificar senha
@@ -77,7 +73,7 @@ export const authRouter = router({
           userAgent: userAgent,
         });
 
-        throw new Error("Email ou senha incorretos");
+        throw new Error('Email ou senha incorretos');
       }
 
       // Verificar se usuário está ativo
@@ -89,7 +85,7 @@ export const authRouter = router({
           userAgent: userAgent,
         });
 
-        throw new Error("Usuário aguardando aprovação do administrador");
+        throw new Error('Usuário aguardando aprovação do administrador');
       }
 
       // Login bem-sucedido
@@ -110,8 +106,8 @@ export const authRouter = router({
       const token = generateToken({
         userId: user.id,
         email: user.email!,
-        role: user.role as "admin" | "visualizador",
-        nome: user.nome || "Usuário",
+        role: user.role as 'admin' | 'visualizador',
+        nome: user.nome || 'Usuário',
       });
 
       return {
@@ -135,25 +131,25 @@ export const authRouter = router({
   register: publicProcedure
     .input(
       z.object({
-        token: z.string().min(1, "Token de convite é obrigatório"),
-        nome: z.string().min(1, "Nome é obrigatório"),
-        empresa: z.string().min(1, "Empresa é obrigatória"),
-        cargo: z.string().min(1, "Cargo é obrigatório"),
-        setor: z.string().min(1, "Setor é obrigatório"),
-        password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres"),
+        token: z.string().min(1, 'Token de convite é obrigatório'),
+        nome: z.string().min(1, 'Nome é obrigatório'),
+        empresa: z.string().min(1, 'Empresa é obrigatória'),
+        cargo: z.string().min(1, 'Cargo é obrigatório'),
+        setor: z.string().min(1, 'Setor é obrigatório'),
+        password: z.string().min(8, 'Senha deve ter no mínimo 8 caracteres'),
       })
     )
     .mutation(async ({ input }) => {
-      const { getDb } = await import("../db");
+      const { getDb } = await import('../db');
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
-      const { users, userInvites } = await import("../../drizzle/schema");
-      const { eq, and } = await import("drizzle-orm");
+      if (!db) throw new Error('Database not available');
+      const { users, userInvites } = await import('../../drizzle/schema');
+      const { eq, and } = await import('drizzle-orm');
 
       // Validar força da senha
       const passwordValidation = validatePasswordStrength(input.password);
       if (!passwordValidation.valid) {
-        throw new Error(passwordValidation.errors.join(", "));
+        throw new Error(passwordValidation.errors.join(', '));
       }
 
       // Buscar convite pelo token
@@ -170,14 +166,14 @@ export const authRouter = router({
         .limit(1);
 
       if (!invite) {
-        throw new Error("Convite inválido ou já utilizado");
+        throw new Error('Convite inválido ou já utilizado');
       }
 
       // Verificar se convite expirou
       const now = new Date();
       const expiresAt = new Date(invite.expiraEm);
       if (now > expiresAt) {
-        throw new Error("Convite expirado");
+        throw new Error('Convite expirado');
       }
 
       // Verificar se email já está cadastrado
@@ -188,14 +184,15 @@ export const authRouter = router({
         .limit(1);
 
       if (existingUser && existingUser.senhaHash) {
-        throw new Error("Email já cadastrado");
+        throw new Error('Email já cadastrado');
       }
 
       // Gerar hash da senha
       const senhaHash = await hashPassword(input.password);
 
       // Criar ou atualizar usuário
-      const userId = existingUser?.id || `user_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      const userId =
+        existingUser?.id || `user_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
       if (existingUser) {
         // Atualizar usuário existente
@@ -237,7 +234,7 @@ export const authRouter = router({
 
       return {
         success: true,
-        message: "Cadastro realizado com sucesso! Aguarde a aprovação do administrador.",
+        message: 'Cadastro realizado com sucesso! Aguarde a aprovação do administrador.',
       };
     }),
 
@@ -245,21 +242,17 @@ export const authRouter = router({
    * Obter dados do usuário autenticado
    * GET /api/auth/me
    */
-  me: protectedProcedure.query(async ({ ctx }) => {
-    const { getDb } = await import("../db");
+  me: publicProcedure.query(async ({ ctx }) => {
+    const { getDb } = await import('../db');
     const db = await getDb();
-    if (!db) throw new Error("Database not available");
-    const { users } = await import("../../drizzle/schema");
-    const { eq } = await import("drizzle-orm");
+    if (!db) throw new Error('Database not available');
+    const { users } = await import('../../drizzle/schema');
+    const { eq } = await import('drizzle-orm');
 
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, ctx.user.id))
-      .limit(1);
+    const [user] = await db.select().from(users).where(eq(users.id, ctx.user.id)).limit(1);
 
     if (!user) {
-      throw new Error("Usuário não encontrado");
+      throw new Error('Usuário não encontrado');
     }
 
     return {
@@ -280,12 +273,12 @@ export const authRouter = router({
    * Logout (invalidar sessão no cliente)
    * POST /api/auth/logout
    */
-  logout: protectedProcedure.mutation(async () => {
+  logout: publicProcedure.mutation(async () => {
     // No sistema JWT stateless, o logout é feito no cliente
     // removendo o token do localStorage/cookies
     return {
       success: true,
-      message: "Logout realizado com sucesso",
+      message: 'Logout realizado com sucesso',
     };
   }),
 });

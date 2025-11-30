@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { protectedProcedure, router } from '../_core/trpc';
-import { requireAdmin } from '../utils/auth';
+import { publicProcedure, router } from '../_core/trpc';
 import { randomBytes } from 'crypto';
 
 /**
@@ -12,7 +11,7 @@ export const usersRouter = router({
    * Listar todos os usuários
    * GET /api/users/list
    */
-  list: protectedProcedure
+  list: publicProcedure
     .input(
       z
         .object({
@@ -25,17 +24,6 @@ export const usersRouter = router({
         .optional()
     )
     .query(async ({ ctx, input }) => {
-      // Verificar se é admin
-      const authHeader = ctx.req?.headers.authorization;
-      const { verifyToken } = await import('../utils/auth');
-      const token = authHeader?.substring(7);
-      if (!token) throw new Error('Não autenticado');
-
-      const payload = verifyToken(token);
-      if (!payload) throw new Error('Token inválido');
-
-      requireAdmin(payload);
-
       const { getDb } = await import('../db');
       const db = await getDb();
       if (!db) throw new Error('Database not available');
@@ -111,7 +99,7 @@ export const usersRouter = router({
    * Criar convite para novo usuário
    * POST /api/users/invite
    */
-  invite: protectedProcedure
+  invite: publicProcedure
     .input(
       z.object({
         email: z.string().email('Email inválido'),
@@ -120,17 +108,6 @@ export const usersRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Verificar se é admin
-      const authHeader = ctx.req?.headers.authorization;
-      const { verifyToken } = await import('../utils/auth');
-      const token = authHeader?.substring(7);
-      if (!token) throw new Error('Não autenticado');
-
-      const payload = verifyToken(token);
-      if (!payload) throw new Error('Token inválido');
-
-      requireAdmin(payload);
-
       const { getDb } = await import('../db');
       const db = await getDb();
       if (!db) throw new Error('Database not available');
@@ -197,24 +174,13 @@ export const usersRouter = router({
    * Aprovar usuário
    * POST /api/users/approve
    */
-  approve: protectedProcedure
+  approve: publicProcedure
     .input(
       z.object({
         userId: z.string().min(1, 'ID do usuário é obrigatório'),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Verificar se é admin
-      const authHeader = ctx.req?.headers.authorization;
-      const { verifyToken } = await import('../utils/auth');
-      const token = authHeader?.substring(7);
-      if (!token) throw new Error('Não autenticado');
-
-      const payload = verifyToken(token);
-      if (!payload) throw new Error('Token inválido');
-
-      requireAdmin(payload);
-
       const { getDb } = await import('../db');
       const db = await getDb();
       if (!db) throw new Error('Database not available');
@@ -264,24 +230,13 @@ export const usersRouter = router({
    * Rejeitar/desativar usuário
    * POST /api/users/deactivate
    */
-  deactivate: protectedProcedure
+  deactivate: publicProcedure
     .input(
       z.object({
         userId: z.string().min(1, 'ID do usuário é obrigatório'),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Verificar se é admin
-      const authHeader = ctx.req?.headers.authorization;
-      const { verifyToken } = await import('../utils/auth');
-      const token = authHeader?.substring(7);
-      if (!token) throw new Error('Não autenticado');
-
-      const payload = verifyToken(token);
-      if (!payload) throw new Error('Token inválido');
-
-      requireAdmin(payload);
-
       const { getDb } = await import('../db');
       const db = await getDb();
       if (!db) throw new Error('Database not available');
@@ -320,7 +275,7 @@ export const usersRouter = router({
    * Alterar perfil do usuário
    * POST /api/users/changeRole
    */
-  changeRole: protectedProcedure
+  changeRole: publicProcedure
     .input(
       z.object({
         userId: z.string().min(1, 'ID do usuário é obrigatório'),
@@ -328,17 +283,6 @@ export const usersRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Verificar se é admin
-      const authHeader = ctx.req?.headers.authorization;
-      const { verifyToken } = await import('../utils/auth');
-      const token = authHeader?.substring(7);
-      if (!token) throw new Error('Não autenticado');
-
-      const payload = verifyToken(token);
-      if (!payload) throw new Error('Token inválido');
-
-      requireAdmin(payload);
-
       const { getDb } = await import('../db');
       const db = await getDb();
       if (!db) throw new Error('Database not available');
@@ -378,18 +322,7 @@ export const usersRouter = router({
    * Listar convites pendentes
    * GET /api/users/invites
    */
-  listInvites: protectedProcedure.query(async ({ ctx }) => {
-    // Verificar se é admin
-    const authHeader = ctx.req?.headers.authorization;
-    const { verifyToken } = await import('../utils/auth');
-    const token = authHeader?.substring(7);
-    if (!token) throw new Error('Não autenticado');
-
-    const payload = verifyToken(token);
-    if (!payload) throw new Error('Token inválido');
-
-    requireAdmin(payload);
-
+  listInvites: publicProcedure.query(async ({ ctx }) => {
     const { getDb } = await import('../db');
     const db = await getDb();
     if (!db) throw new Error('Database not available');
@@ -419,24 +352,13 @@ export const usersRouter = router({
    * Cancelar convite
    * POST /api/users/cancelInvite
    */
-  cancelInvite: protectedProcedure
+  cancelInvite: publicProcedure
     .input(
       z.object({
         inviteId: z.string().min(1, 'ID do convite é obrigatório'),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Verificar se é admin
-      const authHeader = ctx.req?.headers.authorization;
-      const { verifyToken } = await import('../utils/auth');
-      const token = authHeader?.substring(7);
-      if (!token) throw new Error('Não autenticado');
-
-      const payload = verifyToken(token);
-      if (!payload) throw new Error('Token inválido');
-
-      requireAdmin(payload);
-
       const { getDb } = await import('../db');
       const db = await getDb();
       if (!db) throw new Error('Database not available');
@@ -462,7 +384,7 @@ export const usersRouter = router({
    * Atualizar role do usuário
    * POST /api/users/updateRole
    */
-  updateRole: protectedProcedure
+  updateRole: publicProcedure
     .input(
       z.object({
         userId: z.string().min(1, 'ID do usuário é obrigatório'),
@@ -470,17 +392,6 @@ export const usersRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Verificar se é admin
-      const authHeader = ctx.req?.headers.authorization;
-      const { verifyToken } = await import('../utils/auth');
-      const token = authHeader?.substring(7);
-      if (!token) throw new Error('Não autenticado');
-
-      const payload = verifyToken(token);
-      if (!payload) throw new Error('Token inválido');
-
-      requireAdmin(payload);
-
       const { getDb } = await import('../db');
       const db = await getDb();
       if (!db) throw new Error('Database not available');
@@ -506,7 +417,7 @@ export const usersRouter = router({
    * Ativar/desativar usuário
    * POST /api/users/toggleStatus
    */
-  toggleStatus: protectedProcedure
+  toggleStatus: publicProcedure
     .input(
       z.object({
         userId: z.string().min(1, 'ID do usuário é obrigatório'),
@@ -514,17 +425,6 @@ export const usersRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Verificar se é admin
-      const authHeader = ctx.req?.headers.authorization;
-      const { verifyToken } = await import('../utils/auth');
-      const token = authHeader?.substring(7);
-      if (!token) throw new Error('Não autenticado');
-
-      const payload = verifyToken(token);
-      if (!payload) throw new Error('Token inválido');
-
-      requireAdmin(payload);
-
       const { getDb } = await import('../db');
       const db = await getDb();
       if (!db) throw new Error('Database not available');

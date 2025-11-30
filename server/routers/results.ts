@@ -3,7 +3,7 @@
  * Substitui routers separados de clientes, leads, concorrentes e mercados
  */
 
-import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
+import { createTRPCRouter, publicProcedure } from '@/lib/trpc/server';
 import { z } from 'zod';
 import { getDb } from '@/server/db';
 import * as schema from '@/drizzle/schema';
@@ -13,43 +13,41 @@ export const resultsRouter = createTRPCRouter({
   /**
    * Buscar KPIs de uma pesquisa
    */
-  getKPIs: protectedProcedure
-    .input(z.object({ pesquisaId: z.number() }))
-    .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error('Database connection failed');
+  getKPIs: publicProcedure.input(z.object({ pesquisaId: z.number() })).query(async ({ input }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database connection failed');
 
-      const [clientes, concorrentes, leads, mercados] = await Promise.all([
-        db
-          .select({ count: count() })
-          .from(schema.clientes)
-          .where(eq(schema.clientes.pesquisaId, input.pesquisaId)),
-        db
-          .select({ count: count() })
-          .from(schema.concorrentes)
-          .where(eq(schema.concorrentes.pesquisaId, input.pesquisaId)),
-        db
-          .select({ count: count() })
-          .from(schema.leads)
-          .where(eq(schema.leads.pesquisaId, input.pesquisaId)),
-        db
-          .select({ count: count() })
-          .from(schema.mercadosUnicos)
-          .where(eq(schema.mercadosUnicos.pesquisaId, input.pesquisaId)),
-      ]);
+    const [clientes, concorrentes, leads, mercados] = await Promise.all([
+      db
+        .select({ count: count() })
+        .from(schema.clientes)
+        .where(eq(schema.clientes.pesquisaId, input.pesquisaId)),
+      db
+        .select({ count: count() })
+        .from(schema.concorrentes)
+        .where(eq(schema.concorrentes.pesquisaId, input.pesquisaId)),
+      db
+        .select({ count: count() })
+        .from(schema.leads)
+        .where(eq(schema.leads.pesquisaId, input.pesquisaId)),
+      db
+        .select({ count: count() })
+        .from(schema.mercadosUnicos)
+        .where(eq(schema.mercadosUnicos.pesquisaId, input.pesquisaId)),
+    ]);
 
-      return {
-        totalClientes: clientes[0]?.count || 0,
-        totalConcorrentes: concorrentes[0]?.count || 0,
-        totalLeads: leads[0]?.count || 0,
-        totalMercados: mercados[0]?.count || 0,
-      };
-    }),
+    return {
+      totalClientes: clientes[0]?.count || 0,
+      totalConcorrentes: concorrentes[0]?.count || 0,
+      totalLeads: leads[0]?.count || 0,
+      totalMercados: mercados[0]?.count || 0,
+    };
+  }),
 
   /**
    * Buscar clientes com filtros e paginação
    */
-  getClientes: protectedProcedure
+  getClientes: publicProcedure
     .input(
       z.object({
         pesquisaId: z.number(),
@@ -75,47 +73,44 @@ export const resultsRouter = createTRPCRouter({
           throw new Error('Database connection failed');
         }
 
-      const offset = (input.page - 1) * input.pageSize;
+        const offset = (input.page - 1) * input.pageSize;
 
-      const conditions = [eq(schema.clientes.pesquisaId, input.pesquisaId)];
+        const conditions = [eq(schema.clientes.pesquisaId, input.pesquisaId)];
 
-      if (input.filters?.setor) {
-        conditions.push(like(schema.clientes.produtoPrincipal, `%${input.filters.setor}%`));
-      }
-      if (input.filters?.cidade) {
-        conditions.push(eq(schema.clientes.cidade, input.filters.cidade));
-      }
-      if (input.filters?.uf) {
-        conditions.push(eq(schema.clientes.uf, input.filters.uf));
-      }
-      if (input.filters?.validationStatus) {
-        conditions.push(eq(schema.clientes.validationStatus, input.filters.validationStatus));
-      }
-      if (input.searchQuery) {
-        conditions.push(
-          or(
-            like(schema.clientes.nome, `%${input.searchQuery}%`),
-            like(schema.clientes.cnpj, `%${input.searchQuery}%`)
-          )!
-        );
-      }
+        if (input.filters?.setor) {
+          conditions.push(like(schema.clientes.produtoPrincipal, `%${input.filters.setor}%`));
+        }
+        if (input.filters?.cidade) {
+          conditions.push(eq(schema.clientes.cidade, input.filters.cidade));
+        }
+        if (input.filters?.uf) {
+          conditions.push(eq(schema.clientes.uf, input.filters.uf));
+        }
+        if (input.filters?.validationStatus) {
+          conditions.push(eq(schema.clientes.validationStatus, input.filters.validationStatus));
+        }
+        if (input.searchQuery) {
+          conditions.push(
+            or(
+              like(schema.clientes.nome, `%${input.searchQuery}%`),
+              like(schema.clientes.cnpj, `%${input.searchQuery}%`)
+            )!
+          );
+        }
 
-      // Simplificar query para debug
-      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-      
-      const [data, countResult] = await Promise.all([
-        db
-          .select()
-          .from(schema.clientes)
-          .where(whereClause)
-          .limit(input.pageSize)
-          .offset(offset)
-          .orderBy(desc(schema.clientes.createdAt)),
-        db
-          .select({ count: count() })
-          .from(schema.clientes)
-          .where(whereClause),
-      ]);
+        // Simplificar query para debug
+        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+        const [data, countResult] = await Promise.all([
+          db
+            .select()
+            .from(schema.clientes)
+            .where(whereClause)
+            .limit(input.pageSize)
+            .offset(offset)
+            .orderBy(desc(schema.clientes.createdAt)),
+          db.select({ count: count() }).from(schema.clientes).where(whereClause),
+        ]);
 
         console.log(
           '[Results] getClientes found:',
@@ -142,7 +137,7 @@ export const resultsRouter = createTRPCRouter({
   /**
    * Buscar leads com filtros e paginação
    */
-  getLeads: protectedProcedure
+  getLeads: publicProcedure
     .input(
       z.object({
         pesquisaId: z.number(),
@@ -216,7 +211,7 @@ export const resultsRouter = createTRPCRouter({
   /**
    * Buscar concorrentes com filtros e paginação
    */
-  getConcorrentes: protectedProcedure
+  getConcorrentes: publicProcedure
     .input(
       z.object({
         pesquisaId: z.number(),
@@ -284,7 +279,7 @@ export const resultsRouter = createTRPCRouter({
   /**
    * Buscar mercados com paginação
    */
-  getMercados: protectedProcedure
+  getMercados: publicProcedure
     .input(
       z.object({
         pesquisaId: z.number(),
@@ -331,24 +326,22 @@ export const resultsRouter = createTRPCRouter({
   /**
    * Buscar detalhes de um cliente
    */
-  getClienteById: protectedProcedure
-    .input(z.object({ id: z.number() }))
-    .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error('Database connection failed');
+  getClienteById: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database connection failed');
 
-      const [cliente] = await db
-        .select()
-        .from(schema.clientes)
-        .where(eq(schema.clientes.id, input.id));
+    const [cliente] = await db
+      .select()
+      .from(schema.clientes)
+      .where(eq(schema.clientes.id, input.id));
 
-      return cliente || null;
-    }),
+    return cliente || null;
+  }),
 
   /**
    * Buscar detalhes de um lead
    */
-  getLeadById: protectedProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+  getLeadById: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
     const db = await getDb();
     if (!db) throw new Error('Database connection failed');
 

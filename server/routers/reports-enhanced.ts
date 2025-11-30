@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/lib/trpc/server';
+import { createTRPCRouter, publicProcedure, publicProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
 import { validateReportGeneration } from '@/server/utils/reportValidation';
 import { fetchEnhancedReportData } from '@/server/utils/reportData';
@@ -17,7 +17,7 @@ export const reportsEnhancedRouter = createTRPCRouter({
   /**
    * Validar geração de relatório
    */
-  validate: publicProcedure // TODO: Voltar para protectedProcedure após corrigir auth
+  validate: publicProcedure // TODO: Voltar para publicProcedure após corrigir auth
     .input(z.object({ pesquisaId: z.number() }))
     .mutation(async ({ input }) => {
       return await validateReportGeneration(input.pesquisaId);
@@ -26,7 +26,7 @@ export const reportsEnhancedRouter = createTRPCRouter({
   /**
    * Gerar relatório analítico melhorado de uma pesquisa
    */
-  generateEnhancedReport: publicProcedure // TODO: Voltar para protectedProcedure após corrigir auth
+  generateEnhancedReport: publicProcedure // TODO: Voltar para publicProcedure após corrigir auth
     .input(z.object({ pesquisaId: z.number() }))
     .mutation(async ({ input }) => {
       const db = await getDb();

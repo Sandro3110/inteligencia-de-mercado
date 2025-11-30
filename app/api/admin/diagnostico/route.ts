@@ -53,15 +53,12 @@ export async function GET() {
     }
 
     // Verificar permissões
-    const eAdmin = userData.role === 'admin';
     const estaAtivo = userData.ativo === 1;
-    const podeAprovar = eAdmin && estaAtivo;
+    const eAdmin = true; // Todos são admin agora
+    const podeAprovar = estaAtivo;
 
     // Detectar problemas
     const problemas: string[] = [];
-    if (!eAdmin) {
-      problemas.push('Usuário não é administrador (role != "admin")');
-    }
     if (!estaAtivo) {
       problemas.push('Usuário não está ativo (ativo != 1)');
     }
@@ -72,18 +69,9 @@ export async function GET() {
     // Gerar solução
     let solucao = '';
     if (problemas.length === 0) {
-      solucao = 'Tudo OK! Você tem permissão para aprovar usuários.';
+      solucao = 'Tudo OK! Você tem permissão para usar o sistema.';
     } else {
-      if (!eAdmin && !estaAtivo) {
-        solucao =
-          'Você precisa: 1) Ter role "admin" no banco, 2) Estar ativo (ativo=1). Entre em contato com outro administrador.';
-      } else if (!eAdmin) {
-        solucao =
-          'Seu role precisa ser alterado para "admin" no banco de dados. Entre em contato com outro administrador.';
-      } else if (!estaAtivo) {
-        solucao =
-          'Sua conta precisa ser aprovada (ativo=1). Entre em contato com outro administrador.';
-      }
+      solucao = 'Sua conta precisa ser aprovada (ativo=1). Entre em contato com outro usuário.';
     }
 
     return NextResponse.json({

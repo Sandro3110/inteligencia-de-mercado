@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
+import { createTRPCRouter, publicProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
 import {
   clientes,
@@ -45,7 +45,7 @@ export const exportRouter = createTRPCRouter({
   /**
    * Exportar projeto completo para Excel com 5 abas
    */
-  exportProjectExcel: protectedProcedure
+  exportProjectExcel: publicProcedure
     .input(z.object({ projectId: z.number() }))
     .mutation(async ({ input }) => {
       const db = await getDb();

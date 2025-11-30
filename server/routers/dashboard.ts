@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
+import { createTRPCRouter, publicProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
 import {
   projects,
@@ -20,7 +20,7 @@ export const dashboardRouter = createTRPCRouter({
   /**
    * Obter estatísticas gerais ou por projeto
    */
-  stats: protectedProcedure
+  stats: publicProcedure
     .input(
       z
         .object({
@@ -102,7 +102,7 @@ export const dashboardRouter = createTRPCRouter({
   /**
    * Obter atividades recentes
    */
-  recentActivity: protectedProcedure
+  recentActivity: publicProcedure
     .input(
       z
         .object({
@@ -154,7 +154,7 @@ export const dashboardRouter = createTRPCRouter({
   /**
    * Obter resumo do projeto específico
    */
-  projectSummary: protectedProcedure
+  projectSummary: publicProcedure
     .input(
       z.object({
         projectId: z.number(),
@@ -227,7 +227,7 @@ export const dashboardRouter = createTRPCRouter({
   /**
    * Obter lista de projetos com contagens
    */
-  getProjects: protectedProcedure.query(async () => {
+  getProjects: publicProcedure.query(async () => {
     const db = await getDb();
     if (!db) {
       throw new Error('Database connection failed');
@@ -277,7 +277,7 @@ export const dashboardRouter = createTRPCRouter({
   /**
    * Obter pesquisas de um projeto com contagens
    */
-  getProjectPesquisas: protectedProcedure
+  getProjectPesquisas: publicProcedure
     .input(z.object({ projectId: z.number() }))
     .query(async ({ input }) => {
       const db = await getDb();

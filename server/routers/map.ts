@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { protectedProcedure, router } from '../_core/trpc';
+import { publicProcedure, router } from '../_core/trpc';
 import { getDb } from '../db';
 import { clientes, leads, concorrentes, pesquisas } from '../../drizzle/schema';
 import { eq, and, isNotNull, inArray, sql } from 'drizzle-orm';
@@ -12,7 +12,7 @@ export const mapRouter = router({
   /**
    * Buscar todas as entidades com coordenadas geográficas
    */
-  getMapData: protectedProcedure
+  getMapData: publicProcedure
     .input(
       z
         .object({
@@ -194,7 +194,7 @@ export const mapRouter = router({
   /**
    * Buscar detalhes completos de uma entidade
    */
-  getEntityDetails: protectedProcedure
+  getEntityDetails: publicProcedure
     .input(
       z.object({
         id: z.number(),
@@ -234,7 +234,7 @@ export const mapRouter = router({
   /**
    * Análise de densidade por estado
    */
-  getDensityAnalysis: protectedProcedure
+  getDensityAnalysis: publicProcedure
     .input(
       z.object({
         projectId: z.number().optional(),
@@ -327,7 +327,7 @@ export const mapRouter = router({
   /**
    * Buscar filtros disponíveis
    */
-  getAvailableFilters: protectedProcedure
+  getAvailableFilters: publicProcedure
     .input(
       z
         .object({
@@ -415,7 +415,7 @@ export const mapRouter = router({
   /**
    * Buscar estatísticas (totalizadores) independente de coordenadas
    */
-  getMapStats: protectedProcedure
+  getMapStats: publicProcedure
     .input(
       z
         .object({

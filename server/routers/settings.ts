@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
+import { createTRPCRouter, publicProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
 import { systemSettings } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
@@ -11,7 +11,7 @@ export const settingsRouter = createTRPCRouter({
   /**
    * Buscar todas as configurações
    */
-  getAll: protectedProcedure.query(async () => {
+  getAll: publicProcedure.query(async () => {
     const db = await getDb();
     if (!db) throw new Error('Database connection failed');
 
@@ -21,7 +21,7 @@ export const settingsRouter = createTRPCRouter({
   /**
    * Buscar configuração específica
    */
-  get: protectedProcedure.input(z.object({ key: z.string() })).query(async ({ input }) => {
+  get: publicProcedure.input(z.object({ key: z.string() })).query(async ({ input }) => {
     const db = await getDb();
     if (!db) throw new Error('Database connection failed');
 
@@ -37,7 +37,7 @@ export const settingsRouter = createTRPCRouter({
   /**
    * Salvar/atualizar configuração
    */
-  set: protectedProcedure
+  set: publicProcedure
     .input(
       z.object({
         key: z.string(),
@@ -87,7 +87,7 @@ export const settingsRouter = createTRPCRouter({
   /**
    * Deletar configuração
    */
-  delete: protectedProcedure.input(z.object({ key: z.string() })).mutation(async ({ input }) => {
+  delete: publicProcedure.input(z.object({ key: z.string() })).mutation(async ({ input }) => {
     const db = await getDb();
     if (!db) throw new Error('Database connection failed');
 

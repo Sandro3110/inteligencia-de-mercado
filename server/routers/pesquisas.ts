@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server';
+import { createTRPCRouter, publicProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
 import { pesquisas, clientes, mercadosUnicos } from '@/drizzle/schema';
 import { eq, and, desc, count } from 'drizzle-orm';
@@ -13,7 +13,7 @@ export const pesquisasRouter = createTRPCRouter({
   /**
    * Listar todas as pesquisas (com filtro opcional por projeto)
    */
-  list: protectedProcedure
+  list: publicProcedure
     .input(
       z
         .object({
@@ -63,7 +63,7 @@ export const pesquisasRouter = createTRPCRouter({
   /**
    * Buscar pesquisa por ID com estatísticas
    */
-  getById: protectedProcedure.input(z.number()).query(async ({ input: id }) => {
+  getById: publicProcedure.input(z.number()).query(async ({ input: id }) => {
     const db = await getDb();
     if (!db) {
       throw new Error('Database connection failed');
@@ -98,7 +98,7 @@ export const pesquisasRouter = createTRPCRouter({
   /**
    * Criar nova pesquisa com CSV de clientes
    */
-  createWithCSV: protectedProcedure
+  createWithCSV: publicProcedure
     .input(
       z.object({
         projectId: z.number(),
@@ -181,7 +181,7 @@ export const pesquisasRouter = createTRPCRouter({
   /**
    * Criar nova pesquisa (sem CSV)
    */
-  create: protectedProcedure
+  create: publicProcedure
     .input(
       z.object({
         projectId: z.number(),
@@ -226,7 +226,7 @@ export const pesquisasRouter = createTRPCRouter({
   /**
    * Atualizar pesquisa
    */
-  update: protectedProcedure
+  update: publicProcedure
     .input(
       z.object({
         id: z.number(),
@@ -266,7 +266,7 @@ export const pesquisasRouter = createTRPCRouter({
   /**
    * Deletar pesquisa (soft delete)
    */
-  delete: protectedProcedure.input(z.number()).mutation(async ({ input: id }) => {
+  delete: publicProcedure.input(z.number()).mutation(async ({ input: id }) => {
     const db = await getDb();
     if (!db) {
       throw new Error('Database connection failed');
@@ -285,7 +285,7 @@ export const pesquisasRouter = createTRPCRouter({
   /**
    * Atualizar estatísticas da pesquisa
    */
-  updateStats: protectedProcedure
+  updateStats: publicProcedure
     .input(
       z.object({
         id: z.number(),

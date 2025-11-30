@@ -21,15 +21,8 @@ export async function POST(
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    // Verificar se é admin
+    // Buscar usuário atual
     const [currentUser] = await db.select().from(users).where(eq(users.email, user.email)).limit(1);
-
-    if (!currentUser || currentUser.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Acesso negado. Apenas administradores podem rejeitar usuários.' },
-        { status: 403 }
-      );
-    }
 
     // Rejeitar usuário (ativo = -1)
     await db

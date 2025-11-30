@@ -33,19 +33,6 @@ export async function POST(
       .where(eq(users.email, currentUser.email))
       .limit(1);
 
-    console.log('🔵 [API Approve] Dados do usuário atual:', {
-      email: currentUserData?.email,
-      role: currentUserData?.role,
-    });
-
-    if (!currentUserData || currentUserData.role !== 'admin') {
-      console.error('❌ [API Approve] Acesso negado. Role:', currentUserData?.role);
-      return NextResponse.json(
-        { error: 'Acesso negado. Apenas administradores podem aprovar usuários.' },
-        { status: 403 }
-      );
-    }
-
     // Buscar usuário a ser aprovado
     const [userToApprove] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
 
