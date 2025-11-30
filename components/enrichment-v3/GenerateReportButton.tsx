@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trpc } from '@/lib/trpc/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -26,7 +26,6 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
   const [isGenerating, setIsGenerating] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [reportData, setReportData] = useState<any>(null);
-  const { toast } = useToast();
 
   const validateMutation = trpc.reportsEnhanced.validate.useMutation();
   const generateMutation = trpc.reportsEnhanced.generateEnhancedReport.useMutation();
@@ -38,22 +37,14 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
       const validation = await validateMutation.mutateAsync({ pesquisaId });
 
       if (!validation.canGenerate) {
-        toast({
-          title: 'Não é possível gerar relatório',
-          description: validation.warning,
-          variant: 'destructive',
-        });
+        toast.error(validation.warning || 'Não é possível gerar relatório');
         setIsValidating(false);
         return;
       }
 
       // Se tem aviso (em andamento), mostrar
       if (validation.warning) {
-        toast({
-          title: 'Aviso',
-          description: validation.warning,
-          variant: 'default',
-        });
+        toast.warning(validation.warning);
       }
 
       setIsValidating(false);
@@ -66,18 +57,11 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
       setShowModal(true);
       setIsGenerating(false);
 
-      toast({
-        title: 'Relatório gerado com sucesso!',
-        description: `Análise completa disponível (${result.metadata.tokens} tokens)`,
-      });
+      toast.success(`Relatório gerado! ${result.metadata.tokens} tokens`);
     } catch (error: any) {
       setIsValidating(false);
       setIsGenerating(false);
-      toast({
-        title: 'Erro ao gerar relatório',
-        description: error.message || 'Erro desconhecido',
-        variant: 'destructive',
-      });
+      toast.error(error.message || 'Erro ao gerar relatório');
     }
   };
 
