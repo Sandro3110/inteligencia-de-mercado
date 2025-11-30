@@ -10,7 +10,7 @@ import {
   systemSettings,
 } from '@/drizzle/schema';
 import { eq, inArray } from 'drizzle-orm';
-import PDFDocument from 'pdfkit';
+import { generatePDF, PDFData, PDFSection } from '@/server/utils/pdfGenerator';
 
 /**
  * Reports Router - Geração de relatórios analíticos
@@ -108,58 +108,70 @@ export const reportsRouter = createTRPCRouter({
         }));
 
       const clientesPorCidade = clientesData
-        .filter((c) => c.cidade && c.uf)
-        .reduce((acc: { [key: string]: { count: number; uf: string } }, cliente) => {
-          const key = `${cliente.cidade}/${cliente.uf}`;
-          if (!acc[key]) {
-            acc[key] = { count: 0, uf: cliente.uf || '' };
-          }
-          acc[key].count++;
+        .filter((c) => c.cidade)
+        .reduce((acc: { [key: string]: number }, cliente) => {
+          const cidade = cliente.cidade || 'Não especificada';
+          acc[cidade] = (acc[cidade] || 0) + 1;
           return acc;
         }, {});
 
       const top10Cidades = Object.entries(clientesPorCidade)
-        .sort(([, a], [, b]) => b.count - a.count)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 10)
-        .map(([cidade, data]) => ({ cidade, count: data.count }));
+        .map(([cidade, count]) => ({ cidade, count }));
 
-      // 5. Gerar análise dissertativa com IA
-      const prompt = `Você é um analista de inteligência de mercado. Analise os seguintes dados de pesquisa e gere um relatório executivo profissional em português brasileiro.
+      // 5. Criar prompt para IA
+      const prompt = `
+Você é um analista de inteligência de mercado experiente. Com base nos dados fornecidos, crie um relatório executivo profissional e detalhado.
 
-**Dados da Pesquisa:**
+**DADOS DO PROJETO:**
 - Total de pesquisas: ${pesquisas.length}
-- Total de entidades levantadas: ${totalEntidades}
-  - Clientes: ${clientesData.length}
-  - Leads: ${leadsData.length}
-  - Concorrentes: ${concorrentesData.length}
-  - Mercados: ${mercadosData.length}
-
-**Top 10 Mercados:**
-${top10Mercados.map((m, i) => `${i + 1}. ${m.nome} - ${m.tamanhoEstimado || 'N/A'} - ${m.potencial || 'N/A'}`).join('\n')}
-
-**Produtos Principais:**
-${produtosPrincipais.map((p, i) => `${i + 1}. ${p.nome} (${p.count} menções)`).join('\n')}
-
-**Distribuição Geográfica de Clientes:**
 - Total de clientes: ${clientesData.length}
-- Estados com maior presença:
-${top10Estados.map((e, i) => `  ${i + 1}. ${e.uf}: ${e.count} clientes (${e.percentual}%)`).join('\n')}
+- Total de leads: ${leadsData.length}
+- Total de concorrentes: ${concorrentesData.length}
+- Total de mercados: ${mercadosData.length}
+- Total de entidades: ${totalEntidades}
 
-- Principais cidades:
-${top10Cidades.map((c, i) => `  ${i + 1}. ${c.cidade}: ${c.count} clientes`).join('\n')}
+**TOP 10 MERCADOS:**
+${top10Mercados.map((m, i) => `${i + 1}. ${m.nome} (Tamanho estimado: ${m.tamanhoEstimado || 'N/A'})`).join('\n')}
 
-**Gere uma análise dissertativa profissional com:**
-1. **Resumo Executivo** (2-3 parágrafos): Visão geral da pesquisa, abrangência e principais descobertas
-2. **Análise de Mercados** (3-4 parágrafos): Análise dos 10 principais mercados identificados, potencial e oportunidades
-3. **Perfil de Clientes e Distribuição Geográfica** (3-4 parágrafos): Perfil dos clientes, análise da distribuição geográfica (estados e cidades), concentração vs. dispersão, oportunidades de expansão regional
-4. **Análise de Produtos e Serviços** (2-3 parágrafos): Portfólio de produtos identificados, categorização, produtos mais demandados, oportunidades de cross-selling
-5. **Análise de Leads e Oportunidades** (2 parágrafos): Perfil dos leads qualificados, potencial de conversão, estratégias de abordagem
-6. **Panorama Competitivo** (2-3 parágrafos): Análise dos concorrentes identificados, nível de competitividade, estratégias de diferenciação
-7. **Análise SWOT do Mercado** (2-3 parágrafos): Forças (Strengths), Fraquezas (Weaknesses), Oportunidades (Opportunities) e Ameaças (Threats) identificadas
-8. **Conclusões e Recomendações Estratégicas** (3-4 parágrafos): Insights estratégicos principais, recomendações de curto, médio e longo prazo, próximos passos sugeridos
+**TOP 10 PRODUTOS:**
+${produtosPrincipais.map((p, i) => `${i + 1}. ${p.nome} (${p.count} clientes)`).join('\n')}
 
-Use linguagem profissional, objetiva e baseada em dados. Seja específico e cite números quando relevante.`;
+**TOP 10 ESTADOS:**
+${top10Estados.map((e, i) => `${i + 1}. ${e.uf}: ${e.count} clientes (${e.percentual}%)`).join('\n')}
 
+**TOP 10 CIDADES:**
+${top10Cidades.map((c, i) => `${i + 1}. ${c.cidade}: ${c.count} clientes`).join('\n')}
+
+**GERE UM RELATÓRIO EXECUTIVO PROFISSIONAL COM AS SEGUINTES SEÇÕES:**
+
+1. **Resumo Executivo** (2-3 parágrafos): Visão geral consolidada do projeto
+
+2. **Análise de Mercados** (3-4 parágrafos): Análise detalhada dos mercados identificados, potencial e oportunidades
+
+3. **Perfil de Clientes e Distribuição Geográfica** (3-4 parágrafos): Análise do perfil dos clientes e distribuição geográfica (estados e cidades)
+
+4. **Análise de Produtos e Serviços** (2-3 parágrafos): Principais produtos/serviços identificados
+
+5. **Análise de Leads e Oportunidades** (2 parágrafos): Potencial de leads e oportunidades de negócio
+
+6. **Panorama Competitivo** (2-3 parágrafos): Análise dos concorrentes identificados
+
+7. **Análise SWOT do Mercado** (2-3 parágrafos): Forças, Fraquezas, Oportunidades e Ameaças identificadas
+
+8. **Conclusões e Recomendações Estratégicas** (3-4 parágrafos): Conclusões finais e recomendações estratégicas
+
+**IMPORTANTE:**
+- Use linguagem profissional e técnica
+- Seja específico e baseado nos dados fornecidos
+- Cada parágrafo deve ter 4-6 linhas
+- Total esperado: 20-28 parágrafos
+- Não use markdown, apenas texto puro
+- Separe as seções claramente
+`;
+
+      // 6. Chamar OpenAI
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -167,12 +179,12 @@ Use linguagem profissional, objetiva e baseada em dados. Seja específico e cite
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-3.5-turbo',
           messages: [
             {
               role: 'system',
               content:
-                'Você é um analista de inteligência de mercado especializado em gerar relatórios executivos profissionais.',
+                'Você é um analista de inteligência de mercado experiente que cria relatórios executivos profissionais.',
             },
             {
               role: 'user',
@@ -180,137 +192,74 @@ Use linguagem profissional, objetiva e baseada em dados. Seja específico e cite
             },
           ],
           temperature: 0.7,
-          max_tokens: 2000,
+          max_tokens: 4000,
         }),
       });
 
       if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
       }
 
-      const aiResponse = await response.json();
-      const analiseIA = aiResponse.choices[0]?.message?.content || 'Análise não disponível';
+      const data = await response.json();
+      const analise = data.choices[0]?.message?.content || 'Erro ao gerar análise';
 
-      // 6. Gerar PDF
-      const doc = new PDFDocument({ size: 'A4', margin: 50 });
-      const chunks: Buffer[] = [];
+      // 7. Parsear seções do texto
+      const sections: PDFSection[] = [];
+      const sectionTitles = [
+        'Resumo Executivo',
+        'Análise de Mercados',
+        'Perfil de Clientes e Distribuição Geográfica',
+        'Análise de Produtos e Serviços',
+        'Análise de Leads e Oportunidades',
+        'Panorama Competitivo',
+        'Análise SWOT do Mercado',
+        'Conclusões e Recomendações Estratégicas',
+      ];
 
-      doc.on('data', (chunk) => chunks.push(chunk));
+      const currentText = analise;
+      for (const title of sectionTitles) {
+        const regex = new RegExp(`\\*\\*${title}\\*\\*[:\\s]*([\\s\\S]*?)(?=\\*\\*|$)`, 'i');
+        const match = currentText.match(regex);
+        if (match && match[1]) {
+          sections.push({
+            title,
+            content: match[1].trim(),
+          });
+        }
+      }
 
-      // Cabeçalho com fundo azul
-      doc.rect(0, 0, doc.page.width, 120).fillAndStroke('#2563eb', '#2563eb');
-
-      // Título
-      doc
-        .fillColor('#ffffff')
-        .fontSize(26)
-
-        .text('RELATÓRIO DE INTELIGÊNCIA DE MERCADO', 50, 30, {
-          align: 'center',
+      // Se não conseguiu parsear, usar texto completo
+      if (sections.length === 0) {
+        sections.push({
+          title: 'Análise Completa',
+          content: analise,
         });
+      }
 
-      doc
-        .fontSize(14)
+      // 8. Gerar PDF usando função unificada
+      const pdfData: PDFData = {
+        title: 'Relatório de Inteligência de Mercado',
+        subtitle: 'Análise Consolidada do Projeto',
+        projectId: input.projectId,
+        date: new Date().toLocaleDateString('pt-BR'),
+        statistics: [
+          { label: 'Total de Pesquisas', value: pesquisas.length },
+          { label: 'Total de Clientes', value: clientesData.length },
+          { label: 'Total de Leads', value: leadsData.length },
+          { label: 'Total de Mercados', value: mercadosData.length },
+          { label: 'Total de Concorrentes', value: concorrentesData.length },
+        ],
+        sections,
+      };
 
-        .fillColor('#e0e7ff')
-        .text('Análise Consolidada de Mercado', 50, 65, { align: 'center' });
+      const pdfBuffer = generatePDF(pdfData);
 
-      doc
-        .fontSize(11)
-        .fillColor('#ffffff')
-        .text(
-          `Projeto ID: ${input.projectId} | Data: ${new Date().toLocaleDateString('pt-BR')}`,
-          50,
-          90,
-          { align: 'center' }
-        );
-
-      // Resetar cor para preto
-      doc.fillColor('#000000');
-
-      doc.moveDown(3);
-
-      // Estatísticas com caixa
-      doc.rect(50, doc.y, doc.page.width - 100, 120).fillAndStroke('#f0f9ff', '#2563eb');
-      doc
-        .fillColor('#000000')
-        .fontSize(16)
-
-        .text('📊 ESTATÍSTICAS GERAIS', 70, doc.y + 15);
-      const statsY = doc.y + 45;
-      doc.fontSize(11);
-      doc.text(`• Total de Pesquisas: ${pesquisas.length}`, 70, statsY);
-      doc.text(`• Total de Entidades: ${totalEntidades}`, 70, statsY + 20);
-      doc.text(`  - Clientes: ${clientesData.length}`, 90, statsY + 40);
-      doc.text(`  - Leads: ${leadsData.length}`, 90, statsY + 55);
-      doc.text(`  - Concorrentes: ${concorrentesData.length}`, 90, statsY + 70);
-      doc.text(`  - Mercados: ${mercadosData.length}`, 90, statsY + 85);
-      doc.y = statsY + 110;
-
-      doc.moveDown(2);
-
-      // Análise da IA com separador
-      doc
-        .moveTo(50, doc.y)
-        .lineTo(doc.page.width - 50, doc.y)
-        .strokeColor('#2563eb')
-        .lineWidth(2)
-        .stroke();
-      doc.moveDown(1);
-      doc.fontSize(18).fillColor('#2563eb').text('📋 ANÁLISE DETALHADA');
-      doc.fillColor('#000000').moveDown(0.5);
-      doc.fontSize(11).text(analiseIA, {
-        align: 'justify',
-        lineGap: 3,
-      });
-
-      doc.moveDown(2);
-
-      // Top 10 Mercados
-      doc.fontSize(14).text('Top 10 Mercados');
-      doc.moveDown(0.5);
-      doc.fontSize(10);
-      top10Mercados.forEach((mercado, i) => {
-        doc.text(
-          `${i + 1}. ${mercado.nome} - Tamanho: ${mercado.tamanhoEstimado || 'N/A'} - Potencial: ${mercado.potencial || 'N/A'}`
-        );
-      });
-
-      doc.moveDown(1.5);
-
-      // Top 20 Clientes
-      doc.fontSize(14).text('Top 20 Clientes');
-      doc.moveDown(0.5);
-      doc.fontSize(10);
-      top20Clientes.forEach((cliente, i) => {
-        doc.text(`${i + 1}. ${cliente.nome} - ${cliente.cidade || 'N/A'}/${cliente.uf || 'N/A'}`);
-      });
-
-      doc.moveDown(1.5);
-
-      // Produtos Principais
-      doc.fontSize(14).text('Produtos Principais');
-      doc.moveDown(0.5);
-      doc.fontSize(10);
-      produtosPrincipais.forEach((produto, i) => {
-        doc.text(`${i + 1}. ${produto.nome} (${produto.count} menções)`);
-      });
-
-      doc.end();
-
-      // Aguardar finalização do PDF
-      const pdfBuffer = await new Promise<Buffer>((resolve) => {
-        doc.on('end', () => {
-          resolve(Buffer.concat(chunks));
-        });
-      });
-
-      const base64 = pdfBuffer.toString('base64');
-
+      // 9. Retornar PDF como base64
       return {
-        filename: `relatorio_projeto_${input.projectId}_${Date.now()}.pdf`,
-        data: base64,
-        mimeType: 'application/pdf',
+        success: true,
+        pdf: pdfBuffer.toString('base64'),
+        filename: `relatorio-projeto-${input.projectId}-${Date.now()}.pdf`,
       };
     }),
 });

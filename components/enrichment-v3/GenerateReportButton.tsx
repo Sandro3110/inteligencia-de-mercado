@@ -80,14 +80,25 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
       const result = await generateMutation.mutateAsync({ pesquisaId });
       console.log('🔵 [DEBUG] Relatório gerado:', result);
 
-      setReportData(result);
-      setShowModal(true);
       setIsGenerating(false);
+
+      // Baixar PDF
+      const pdfBlob = new Blob([Uint8Array.from(atob(result.pdf), (c) => c.charCodeAt(0))], {
+        type: 'application/pdf',
+      });
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = result.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
 
       setFeedbackType('success');
       setFeedbackTitle('Relatório gerado com sucesso!');
       setFeedbackMessage(
-        `Análise completa gerada com ${result.metadata.tokens} tokens usando ${result.metadata.model}.`
+        `PDF baixado com sucesso! Análise gerada com ${result.metadata.tokens} tokens usando ${result.metadata.model}.`
       );
       setShowFeedback(true);
     } catch (error: any) {

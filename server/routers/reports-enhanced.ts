@@ -4,6 +4,7 @@ import { getDb } from '@/server/db';
 import { validateReportGeneration } from '@/server/utils/reportValidation';
 import { fetchEnhancedReportData } from '@/server/utils/reportData';
 import { buildEnhancedPrompt } from '@/server/utils/enhancedPromptBuilder';
+import { generatePDF, PDFData, PDFSection } from '@/server/utils/pdfGenerator';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
@@ -83,11 +84,62 @@ export const reportsEnhancedRouter = createTRPCRouter({
 
         console.log('[Report] AI analysis generated successfully');
 
-        // 5. Retornar dados completos
+        // 5. Parsear seções do texto
+        const sections: PDFSection[] = [];
+        const sectionTitles = [
+          'Resumo Executivo',
+          'Análise de Mercados',
+          'Perfil de Clientes',
+          'Análise de Produtos',
+          'Análise de Leads',
+          'Panorama Competitivo',
+          'Análise SWOT',
+          'Distribuição Geográfica',
+          'Recomendações Estratégicas',
+        ];
+
+        const currentText = analiseIA;
+        for (const title of sectionTitles) {
+          const regex = new RegExp(`\\*\\*${title}\\*\\*[:\\s]*([\\s\\S]*?)(?=\\*\\*|$)`, 'i');
+          const match = currentText.match(regex);
+          if (match && match[1]) {
+            sections.push({
+              title,
+              content: match[1].trim(),
+            });
+          }
+        }
+
+        // Se não conseguiu parsear, usar texto completo
+        if (sections.length === 0) {
+          sections.push({
+            title: 'Análise Completa',
+            content: analiseIA,
+          });
+        }
+
+        // 6. Gerar PDF usando função unificada
+        const pdfData: PDFData = {
+          title: 'Relatório Analítico de Inteligência de Mercado',
+          subtitle: reportData.metadata.nome,
+          date: new Date().toLocaleDateString('pt-BR'),
+          statistics: [
+            { label: 'Total de Clientes', value: reportData.clientes.total },
+            { label: 'Total de Leads', value: reportData.leads.total },
+            { label: 'Total de Mercados', value: reportData.mercados.total },
+            { label: 'Total de Concorrentes', value: reportData.concorrentes.total },
+            { label: 'Produtos Identificados', value: reportData.produtos.total },
+          ],
+          sections,
+        };
+
+        const pdfBuffer = generatePDF(pdfData);
+
+        // 7. Retornar PDF como base64
         return {
           success: true,
-          reportData,
-          analiseIA,
+          pdf: pdfBuffer.toString('base64'),
+          filename: `relatorio-pesquisa-${input.pesquisaId}-${Date.now()}.pdf`,
           metadata: {
             model: 'gpt-4o',
             tokens: completion.usage?.total_tokens || 0,
