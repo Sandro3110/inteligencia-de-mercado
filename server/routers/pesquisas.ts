@@ -663,7 +663,7 @@ export const pesquisasRouter = createTRPCRouter({
         }
 
         // 2. Limpar enrichment runs
-        await db.delete(enrichmentRuns).where(eq(enrichmentRuns.pesquisaId, input.pesquisaId));
+        await db.delete(enrichmentRuns).where(eq(enrichmentRuns.projectId, pesquisa.projectId));
         console.log('[Pesquisas.cleanEnrichment] Enrichment runs removidos');
 
         // 3. Deletar leads

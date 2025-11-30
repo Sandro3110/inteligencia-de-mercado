@@ -99,7 +99,7 @@ export const geocodingRouter = router({
             clientesProcessed: 0,
             leadsProcessed: 0,
             concorrentesProcessed: 0,
-            startedAt: new Date(),
+            startedAt: new Date().toISOString(),
           })
           .returning();
 
@@ -313,7 +313,7 @@ export const geocodingRouter = router({
             processedEntities: newProcessedTotal,
             currentBatch: newCurrentBatch,
             status: isCompleted ? 'completed' : 'processing',
-            completedAt: isCompleted ? new Date() : null,
+            completedAt: isCompleted ? new Date().toISOString() : null,
           })
           .where(eq(geocodingJobs.id, input.jobId));
 
