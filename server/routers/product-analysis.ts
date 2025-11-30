@@ -33,7 +33,8 @@ export const productAnalysisRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const db = getDb();
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
       const { projectId, pesquisaId } = input;
 
       // Buscar pesquisaIds
@@ -87,7 +88,8 @@ export const productAnalysisRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const db = getDb();
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
       const { projectId, pesquisaId } = input;
 
       // Buscar pesquisaIds
@@ -163,7 +165,8 @@ export const productAnalysisRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const db = getDb();
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
       const { produtoNome, projectId, pesquisaId } = input;
 
       // Buscar pesquisaIds

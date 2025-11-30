@@ -26,7 +26,8 @@ export const sectorAnalysisRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const db = getDb();
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
       const { projectId, pesquisaId } = input;
 
       // Buscar pesquisaIds (reutiliza lógica de Geoposição)
@@ -150,7 +151,8 @@ export const sectorAnalysisRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const db = getDb();
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
       const { setor, entityType, projectId, pesquisaId } = input;
 
       // Buscar pesquisaIds
