@@ -40,6 +40,9 @@ export default function SectorsPage() {
   const [selectedSector, setSelectedSector] = useState<string | null>(null);
   const [entityType, setEntityType] = useState<'clientes' | 'leads' | 'concorrentes'>('clientes');
 
+  // Buscar lista de projetos
+  const { data: projects } = trpc.projects.list.useQuery();
+
   // Buscar resumo de setores
   const { data, isLoading, error } = trpc.sectorAnalysis.getSectorSummary.useQuery(
     {
@@ -53,9 +56,28 @@ export default function SectorsPage() {
 
   if (!projectId) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <Card className="p-6">
-          <p className="text-muted-foreground">Selecione um projeto para visualizar setores</p>
+      <div className="container mx-auto p-6">
+        <Card className="p-8 max-w-md mx-auto mt-20">
+          <h2 className="text-xl font-bold mb-4">🎯 Análise de Setores</h2>
+          <p className="text-muted-foreground mb-4">Selecione um projeto para visualizar setores</p>
+          <div>
+            <label className="block text-sm font-medium mb-2">Projeto</label>
+            <select
+              value=""
+              onChange={(e) => {
+                const newProjectId = Number(e.target.value);
+                window.location.href = `/sectors?projectId=${newProjectId}`;
+              }}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Selecione um projeto...</option>
+              {projects?.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.nome}
+                </option>
+              ))}
+            </select>
+          </div>
         </Card>
       </div>
     );
