@@ -53,11 +53,16 @@ export function PesquisaCard({
     { refetchInterval: 30000 } // Refetch a cada 30s
   );
 
-  // Determinar se está finalizada baseado nos lotes processados
+  // Calcular progresso ANTES de determinar se está completo
+  const totalClientes = pesquisa.totalClientes;
+  const enrichmentPercentage =
+    totalClientes > 0 ? Math.round((pesquisa.clientesEnriquecidos / totalClientes) * 100) : 0;
+
+  // Determinar se está finalizada baseado nos lotes processados OU progresso >= 95%
   const isCompleted = enrichmentJob
     ? enrichmentJob.currentBatch >= enrichmentJob.totalBatches &&
       enrichmentJob.status === 'completed'
-    : false;
+    : enrichmentPercentage >= 95; // Considerar finalizada se >= 95% mesmo sem job
 
   // Determinar status do geocoding
   const isGeocoding = geocodingJob?.status === 'processing';
@@ -80,17 +85,11 @@ export function PesquisaCard({
   // Progresso baseado APENAS em clientes enriquecidos (base real)
   // Mercados, leads e concorrentes são RESULTADOS do enriquecimento, não metas
 
-  const totalClientes = pesquisa.totalClientes;
-
   // Metas estimadas (apenas para exibição de frações, não para cálculo de progresso)
   const metaMercados = totalClientes * 2;
   const metaProdutos = totalClientes * 3; // 3 produtos por cliente
   const metaLeads = totalClientes * 13;
   const metaConcorrentes = totalClientes * 18;
-
-  // PROGRESSO GERAL = Apenas clientes enriquecidos / total de clientes
-  const enrichmentPercentage =
-    totalClientes > 0 ? Math.round((pesquisa.clientesEnriquecidos / totalClientes) * 100) : 0;
 
   // Percentuais individuais (para exibição no detalhamento)
   const clientesPercentage = enrichmentPercentage;
