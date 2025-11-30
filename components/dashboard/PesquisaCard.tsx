@@ -22,29 +22,43 @@ interface PesquisaCardProps {
 }
 
 export function PesquisaCard({ pesquisa, onEnrich, onViewResults, onExport }: PesquisaCardProps) {
-  // Calcular progresso de enriquecimento de clientes
+  // ===== CÁLCULO DE METAS BASEADO NOS PROMPTS =====
+  // Baseado em openaiLayered.ts:
+  // - 2 mercados por cliente
+  // - 8-10 concorrentes por mercado (~9 média) = 18 por cliente
+  // - 5-8 leads por mercado (~6.5 média) = 13 por cliente
+  // - ~4 produtos por cliente (estimativa)
+
+  const totalClientes = pesquisa.totalClientes;
+  const metaMercados = totalClientes * 2;
+  const metaProdutos = totalClientes * 4;
+  const metaLeads = totalClientes * 13;
+  const metaConcorrentes = totalClientes * 18;
+
+  // ===== CÁLCULO DE PROGRESSO INDIVIDUAL =====
   const clientesPercentage =
-    pesquisa.totalClientes > 0
-      ? Math.round((pesquisa.clientesEnriquecidos / pesquisa.totalClientes) * 100)
+    totalClientes > 0 ? Math.round((pesquisa.clientesEnriquecidos / totalClientes) * 100) : 0;
+
+  const mercadosPercentage =
+    metaMercados > 0 ? Math.min(100, Math.round((pesquisa.mercadosCount / metaMercados) * 100)) : 0;
+
+  const leadsPercentage =
+    metaLeads > 0 ? Math.min(100, Math.round((pesquisa.leadsCount / metaLeads) * 100)) : 0;
+
+  const concorrentesPercentage =
+    metaConcorrentes > 0
+      ? Math.min(100, Math.round((pesquisa.concorrentesCount / metaConcorrentes) * 100))
       : 0;
 
-  // Estimativa de progresso geral baseado em todas as entidades
-  // Considera que cada entidade contribui para o progresso total
-  const hasLeads = pesquisa.leadsCount > 0;
-  const hasMercados = pesquisa.mercadosCount > 0;
-  const hasConcorrentes = pesquisa.concorrentesCount > 0;
+  // ===== PROGRESSO GERAL (MÉDIA PONDERADA) =====
+  const overallProgress = Math.round(
+    clientesPercentage * 0.4 +
+      mercadosPercentage * 0.2 +
+      leadsPercentage * 0.3 +
+      concorrentesPercentage * 0.1
+  );
 
-  // Progresso geral: média ponderada
-  // - Clientes: 40% (base principal)
-  // - Leads: 30% (se houver)
-  // - Mercados: 20% (se houver)
-  // - Concorrentes: 10% (se houver)
-  let overallProgress = clientesPercentage * 0.4;
-  if (hasLeads) overallProgress += 30;
-  if (hasMercados) overallProgress += 20;
-  if (hasConcorrentes) overallProgress += 10;
-
-  const enrichmentPercentage = Math.min(100, Math.round(overallProgress));
+  const enrichmentPercentage = Math.min(100, overallProgress);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
@@ -53,22 +67,47 @@ export function PesquisaCard({ pesquisa, onEnrich, onViewResults, onExport }: Pe
         {pesquisa.descricao || 'Sem descrição'}
       </p>
 
-      <div className="mb-4">
-        <div className="flex justify-between text-sm mb-1">
-          <span className="text-gray-600">Progresso Geral</span>
-          <span className="font-semibold text-gray-900">{enrichmentPercentage}%</span>
+      <div className="mb-4 space-y-2">
+        {/* Progresso Geral */}
+        <div>
+          <div className="flex justify-between text-sm mb-1">
+            <span className="text-gray-600 font-medium">Progresso Geral</span>
+            <span className="font-bold text-blue-600">{enrichmentPercentage}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div
+              className="bg-blue-600 h-2.5 rounded-full transition-all"
+              style={{ width: `${enrichmentPercentage}%` }}
+            />
+          </div>
         </div>
-        <div
-          className="w-full bg-gray-200 rounded-full h-2 cursor-help"
-          title={`Clientes: ${pesquisa.clientesEnriquecidos}/${pesquisa.totalClientes} (${clientesPercentage}%) | Leads: ${pesquisa.leadsCount} | Mercados: ${pesquisa.mercadosCount} | Concorrentes: ${pesquisa.concorrentesCount}`}
-        >
-          <div
-            className="bg-blue-600 h-2 rounded-full transition-all"
-            style={{ width: `${enrichmentPercentage}%` }}
-          />
-        </div>
-        <div className="text-xs text-gray-500 mt-1">
-          Clientes: {pesquisa.clientesEnriquecidos}/{pesquisa.totalClientes} ({clientesPercentage}%)
+
+        {/* Detalhamento por componente */}
+        <div className="text-xs space-y-1 text-gray-600">
+          <div className="flex justify-between">
+            <span>• Clientes:</span>
+            <span className="font-medium">
+              {pesquisa.clientesEnriquecidos}/{totalClientes} ({clientesPercentage}%)
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span>• Mercados:</span>
+            <span className="font-medium">
+              {pesquisa.mercadosCount}/{metaMercados} ({mercadosPercentage}%)
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span>• Leads:</span>
+            <span className="font-medium">
+              {pesquisa.leadsCount}/{metaLeads} ({leadsPercentage}%)
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span>• Concorrentes:</span>
+            <span className="font-medium">
+              {pesquisa.concorrentesCount}/{metaConcorrentes} ({concorrentesPercentage}%)
+            </span>
+          </div>
         </div>
       </div>
 
