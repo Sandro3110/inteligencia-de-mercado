@@ -42,6 +42,43 @@ export default function ProjectDetailsPage() {
     router.push(`/projects/${projId}/surveys/${pesquisaId}/results`);
   };
 
+  const handleGeocode = async (_projId: number, pesquisaId: number) => {
+    try {
+      toast.info('Iniciando geocodificação...');
+
+      const result = await trpc.geo.startGeocoding.mutate({
+        pesquisaId,
+        userId: 'system', // TODO: pegar do contexto de autenticação
+      });
+
+      toast.success(result.message);
+
+      // Iniciar processamento em lotes
+      processGeocoding(result.jobId);
+    } catch (error: any) {
+      console.error('Erro ao iniciar geocodificação:', error);
+      toast.error(error.message || 'Erro ao iniciar geocodificação');
+    }
+  };
+
+  const processGeocoding = async (jobId: number) => {
+    try {
+      const result = await trpc.geo.processBatch.mutate({ jobId });
+
+      if (!result.completed) {
+        // Continuar processando próximo lote
+        setTimeout(() => processGeocoding(jobId), 1000);
+      } else {
+        toast.success('Geocodificação concluída!');
+        // Recarregar dados
+        trpcUtils.dashboard.getProjectPesquisas.invalidate();
+      }
+    } catch (error: any) {
+      console.error('Erro ao processar lote:', error);
+      toast.error('Erro durante geocodificação');
+    }
+  };
+
   const handleExport = async (_projId: number, pesquisaId: number) => {
     try {
       toast.info('Gerando arquivo Excel...');
@@ -362,6 +399,7 @@ export default function ProjectDetailsPage() {
                 key={pesquisa.id}
                 pesquisa={pesquisa}
                 onEnrich={handleEnrich}
+                onGeocode={handleGeocode}
                 onViewResults={handleViewResults}
                 onExport={handleExport}
                 onRefresh={async () => {

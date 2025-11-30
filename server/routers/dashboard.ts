@@ -15,7 +15,7 @@ import {
   concorrentes,
   produtos,
 } from '@/drizzle/schema';
-import { eq, count, desc, and, sql, avg } from 'drizzle-orm';
+import { eq, count, desc, and, sql, avg, isNotNull } from 'drizzle-orm';
 
 export const dashboardRouter = createTRPCRouter({
   /**
@@ -352,10 +352,8 @@ export const dashboardRouter = createTRPCRouter({
                 .where(
                   and(
                     eq(clientes.pesquisaId, pesquisa.id),
-                    sql`(
-                      ${clientes.cidade} IS NOT NULL AND ${clientes.cidade} != '' OR
-                      ${clientes.uf} IS NOT NULL AND ${clientes.uf} != ''
-                    )`
+                    isNotNull(clientes.latitude),
+                    isNotNull(clientes.longitude)
                   )
                 ),
               // Enriquecimento geográfico - leads
@@ -365,10 +363,8 @@ export const dashboardRouter = createTRPCRouter({
                 .where(
                   and(
                     eq(leads.pesquisaId, pesquisa.id),
-                    sql`(
-                      ${leads.cidade} IS NOT NULL AND ${leads.cidade} != '' OR
-                      ${leads.uf} IS NOT NULL AND ${leads.uf} != ''
-                    )`
+                    isNotNull(leads.latitude),
+                    isNotNull(leads.longitude)
                   )
                 ),
               // Enriquecimento geográfico - concorrentes
@@ -378,10 +374,8 @@ export const dashboardRouter = createTRPCRouter({
                 .where(
                   and(
                     eq(concorrentes.pesquisaId, pesquisa.id),
-                    sql`(
-                      ${concorrentes.cidade} IS NOT NULL AND ${concorrentes.cidade} != '' OR
-                      ${concorrentes.uf} IS NOT NULL AND ${concorrentes.uf} != ''
-                    )`
+                    isNotNull(concorrentes.latitude),
+                    isNotNull(concorrentes.longitude)
                   )
                 ),
             ]);

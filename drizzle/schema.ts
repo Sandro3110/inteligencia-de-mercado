@@ -344,6 +344,29 @@ export const enrichmentJobs = pgTable('enrichment_jobs', {
   updatedAt: timestamp('updatedAt', { mode: 'string' }).defaultNow(),
 });
 
+export const geocodingJobs = pgTable('geocoding_jobs', {
+  id: serial(),
+  pesquisaId: integer('pesquisaId').notNull(),
+  userId: varchar('userId', { length: 255 }).notNull(),
+  status: varchar({ length: 50 }).default('pending').notNull(),
+  totalEntities: integer('totalEntities').notNull(),
+  processedEntities: integer('processedEntities').default(0).notNull(),
+  totalBatches: integer('totalBatches').notNull(),
+  currentBatch: integer('currentBatch').default(0).notNull(),
+  clientesTotal: integer('clientesTotal').default(0).notNull(),
+  leadsTotal: integer('leadsTotal').default(0).notNull(),
+  concorrentesTotal: integer('concorrentesTotal').default(0).notNull(),
+  clientesProcessed: integer('clientesProcessed').default(0).notNull(),
+  leadsProcessed: integer('leadsProcessed').default(0).notNull(),
+  concorrentesProcessed: integer('concorrentesProcessed').default(0).notNull(),
+  startedAt: timestamp('startedAt', { mode: 'string' }),
+  completedAt: timestamp('completedAt', { mode: 'string' }),
+  error: text('error'),
+  notifiedCompletion: integer('notifiedCompletion').default(0).notNull(),
+  createdAt: timestamp('createdAt', { mode: 'string' }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: 'string' }).defaultNow(),
+});
+
 export const enrichmentQueue = pgTable(
   'enrichment_queue',
   {
@@ -861,6 +884,9 @@ export type InsertEnrichmentConfig = typeof enrichmentConfigs.$inferInsert;
 
 export type EnrichmentJob = typeof enrichmentJobs.$inferSelect;
 export type InsertEnrichmentJob = typeof enrichmentJobs.$inferInsert;
+
+export type GeocodingJob = typeof geocodingJobs.$inferSelect;
+export type InsertGeocodingJob = typeof geocodingJobs.$inferInsert;
 
 export type EnrichmentQueue = typeof enrichmentQueue.$inferSelect;
 export type InsertEnrichmentQueue = typeof enrichmentQueue.$inferInsert;

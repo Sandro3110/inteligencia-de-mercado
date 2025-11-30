@@ -134,10 +134,13 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.lastSignedIn = now();
     }
 
-    await db.insert(users).values(values as any).onConflictDoUpdate({
-      target: users.id,
-      set: updateSet,
-    });
+    await db
+      .insert(users)
+      .values(values as any)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: updateSet,
+      });
   } catch (error) {
     console.error('[Database] Failed to upsert user:', error);
     throw error;
@@ -1556,14 +1559,17 @@ export async function duplicateProject(
     }
 
     // Criar novo projeto
-    const result = await db.insert(projects).values({
-      nome: newName,
-      descricao: originalProject.descricao,
-      cor: originalProject.cor,
-      ativo: 1,
-      status: 'active',
-      lastActivityAt: now(),
-    }).returning({ id: projects.id });
+    const result = await db
+      .insert(projects)
+      .values({
+        nome: newName,
+        descricao: originalProject.descricao,
+        cor: originalProject.cor,
+        ativo: 1,
+        status: 'active',
+        lastActivityAt: now(),
+      })
+      .returning({ id: projects.id });
 
     const newProjectId = Number(result[0].id);
 
@@ -1681,16 +1687,19 @@ export async function createPesquisa(data: {
   if (!db) return null;
 
   try {
-    const result = await db.insert(pesquisas).values({
-      projectId: data.projectId,
-      nome: data.nome,
-      descricao: data.descricao || null,
-      totalClientes: data.totalClientes || 0,
-      status: data.status || 'importado',
-      qtdConcorrentesPorMercado: data.qtdConcorrentesPorMercado || 5,
-      qtdLeadsPorMercado: data.qtdLeadsPorMercado || 10,
-      qtdProdutosPorCliente: data.qtdProdutosPorCliente || 3,
-    }).returning({ id: pesquisas.id });
+    const result = await db
+      .insert(pesquisas)
+      .values({
+        projectId: data.projectId,
+        nome: data.nome,
+        descricao: data.descricao || null,
+        totalClientes: data.totalClientes || 0,
+        status: data.status || 'importado',
+        qtdConcorrentesPorMercado: data.qtdConcorrentesPorMercado || 5,
+        qtdLeadsPorMercado: data.qtdLeadsPorMercado || 10,
+        qtdProdutosPorCliente: data.qtdProdutosPorCliente || 3,
+      })
+      .returning({ id: pesquisas.id });
 
     if (!result[0]?.id) return null;
 
@@ -1829,19 +1838,22 @@ export async function createMercado(data: {
   }
 
   // Criar novo mercado
-  const result = await db.insert(mercadosUnicos).values({
-    projectId: data.projectId,
-    pesquisaId: data.pesquisaId || null,
-    mercadoHash,
-    nome: data.nome,
-    categoria: data.categoria || null,
-    segmentacao: data.segmentacao || null,
-    tamanhoMercado: data.tamanhoMercado || null,
-    crescimentoAnual: data.crescimentoAnual || null,
-    tendencias: data.tendencias || null,
-    principaisPlayers: data.principaisPlayers || null,
-    quantidadeClientes: data.quantidadeClientes || 0,
-  }).returning({ id: mercadosUnicos.id });
+  const result = await db
+    .insert(mercadosUnicos)
+    .values({
+      projectId: data.projectId,
+      pesquisaId: data.pesquisaId || null,
+      mercadoHash,
+      nome: data.nome,
+      categoria: data.categoria || null,
+      segmentacao: data.segmentacao || null,
+      tamanhoMercado: data.tamanhoMercado || null,
+      crescimentoAnual: data.crescimentoAnual || null,
+      tendencias: data.tendencias || null,
+      principaisPlayers: data.principaisPlayers || null,
+      quantidadeClientes: data.quantidadeClientes || 0,
+    })
+    .returning({ id: mercadosUnicos.id });
 
   if (!result[0]?.id) return null;
 
@@ -1996,27 +2008,30 @@ export async function createCliente(data: {
   }
 
   // Criar novo cliente
-  const result = await db.insert(clientes).values({
-    projectId: data.projectId,
-    pesquisaId: data.pesquisaId || null,
-    clienteHash: normalizedHash,
-    nome: data.nome,
-    cnpj: data.cnpj || null,
-    siteOficial: data.siteOficial || null,
-    produtoPrincipal: data.produtoPrincipal || null,
-    segmentacaoB2BB2C: data.segmentacaoB2BB2C || null,
-    email: data.email || null,
-    telefone: data.telefone || null,
-    linkedin: data.linkedin || null,
-    instagram: data.instagram || null,
-    cidade: data.cidade || null,
-    uf: data.uf || null,
-    cnae: data.cnae || null,
-    porte: data.porte || null,
-    qualidadeScore: data.qualidadeScore || 0,
-    qualidadeClassificacao: data.qualidadeClassificacao || 'Ruim',
-    validationStatus: data.validationStatus || 'pending',
-  }).returning({ id: clientes.id });
+  const result = await db
+    .insert(clientes)
+    .values({
+      projectId: data.projectId,
+      pesquisaId: data.pesquisaId || null,
+      clienteHash: normalizedHash,
+      nome: data.nome,
+      cnpj: data.cnpj || null,
+      siteOficial: data.siteOficial || null,
+      produtoPrincipal: data.produtoPrincipal || null,
+      segmentacaoB2BB2C: data.segmentacaoB2BB2C || null,
+      email: data.email || null,
+      telefone: data.telefone || null,
+      linkedin: data.linkedin || null,
+      instagram: data.instagram || null,
+      cidade: data.cidade || null,
+      uf: data.uf || null,
+      cnae: data.cnae || null,
+      porte: data.porte || null,
+      qualidadeScore: data.qualidadeScore || 0,
+      qualidadeClassificacao: data.qualidadeClassificacao || 'Ruim',
+      validationStatus: data.validationStatus || 'pending',
+    })
+    .returning({ id: clientes.id });
 
   if (!result[0]?.id) return null;
 
@@ -2187,21 +2202,24 @@ export async function createConcorrente(data: {
   }
 
   // Criar novo concorrente
-  const result = await db.insert(concorrentes).values({
-    projectId: data.projectId,
-    pesquisaId: data.pesquisaId || null,
-    mercadoId: data.mercadoId,
-    concorrenteHash,
-    nome: data.nome,
-    cnpj: data.cnpj || null,
-    site: data.site || null,
-    produto: data.produto || null,
-    porte: data.porte || null,
-    faturamentoEstimado: data.faturamentoEstimado || null,
-    qualidadeScore: data.qualidadeScore || 0,
-    qualidadeClassificacao: data.qualidadeClassificacao || 'Ruim',
-    validationStatus: data.validationStatus || 'pending',
-  }).returning({ id: concorrentes.id });
+  const result = await db
+    .insert(concorrentes)
+    .values({
+      projectId: data.projectId,
+      pesquisaId: data.pesquisaId || null,
+      mercadoId: data.mercadoId,
+      concorrenteHash,
+      nome: data.nome,
+      cnpj: data.cnpj || null,
+      site: data.site || null,
+      produto: data.produto || null,
+      porte: data.porte || null,
+      faturamentoEstimado: data.faturamentoEstimado || null,
+      qualidadeScore: data.qualidadeScore || 0,
+      qualidadeClassificacao: data.qualidadeClassificacao || 'Ruim',
+      validationStatus: data.validationStatus || 'pending',
+    })
+    .returning({ id: concorrentes.id });
 
   if (!result[0]?.id) return null;
 
@@ -2339,25 +2357,28 @@ export async function createLead(data: {
   }
 
   // Criar novo lead
-  const result = await db.insert(leads).values({
-    projectId: data.projectId,
-    pesquisaId: data.pesquisaId || null,
-    mercadoId: data.mercadoId,
-    leadHash,
-    nome: data.nome,
-    cnpj: data.cnpj || null,
-    site: data.site || null,
-    email: data.email || null,
-    telefone: data.telefone || null,
-    tipo: data.tipo || null,
-    porte: data.porte || null,
-    regiao: data.regiao || null,
-    setor: data.setor || null,
-    qualidadeScore: data.qualidadeScore || 0,
-    qualidadeClassificacao: data.qualidadeClassificacao || 'Ruim',
-    validationStatus: data.validationStatus || 'pending',
-    stage: 'novo',
-  }).returning({ id: leads.id });
+  const result = await db
+    .insert(leads)
+    .values({
+      projectId: data.projectId,
+      pesquisaId: data.pesquisaId || null,
+      mercadoId: data.mercadoId,
+      leadHash,
+      nome: data.nome,
+      cnpj: data.cnpj || null,
+      site: data.site || null,
+      email: data.email || null,
+      telefone: data.telefone || null,
+      tipo: data.tipo || null,
+      porte: data.porte || null,
+      regiao: data.regiao || null,
+      setor: data.setor || null,
+      qualidadeScore: data.qualidadeScore || 0,
+      qualidadeClassificacao: data.qualidadeClassificacao || 'Ruim',
+      validationStatus: data.validationStatus || 'pending',
+      stage: 'novo',
+    })
+    .returning({ id: leads.id });
 
   if (!result[0]?.id) return null;
 
@@ -2447,12 +2468,15 @@ export async function createTemplate(data: {
   const db = await getDb();
   if (!db) return null;
 
-  const result = await db.insert(projectTemplates).values({
-    name: data.name,
-    description: data.description || null,
-    config: data.config,
-    isDefault: data.isDefault || 0,
-  }).returning({ id: projectTemplates.id });
+  const result = await db
+    .insert(projectTemplates)
+    .values({
+      name: data.name,
+      description: data.description || null,
+      config: data.config,
+      isDefault: data.isDefault || 0,
+    })
+    .returning({ id: projectTemplates.id });
 
   if (!result[0]?.id) return null;
 
@@ -2682,6 +2706,7 @@ export async function createNotification(data: {
     | 'market_threshold'
     | 'data_incomplete'
     | 'enrichment'
+    | 'geocoding'
     | 'validation'
     | 'export';
   title: string;
@@ -2692,16 +2717,19 @@ export async function createNotification(data: {
   const db = await getDb();
   if (!db) return null;
 
-  const result = await db.insert(notifications).values({
-    userId: data.userId || null,
-    projectId: data.projectId || null,
-    type: data.type,
-    title: data.title,
-    message: data.message,
-    entityType: data.entityType || null,
-    entityId: data.entityId || null,
-    isRead: 0,
-  }).returning({ id: notifications.id });
+  const result = await db
+    .insert(notifications)
+    .values({
+      userId: data.userId || null,
+      projectId: data.projectId || null,
+      type: data.type,
+      title: data.title,
+      message: data.message,
+      entityType: data.entityType || null,
+      entityId: data.entityId || null,
+      isRead: 0,
+    })
+    .returning({ id: notifications.id });
 
   if (!result[0]?.id) return null;
 
@@ -2953,12 +2981,15 @@ export async function createEnrichmentRun(projectId: number, totalClients: numbe
 
   const { enrichmentRuns } = await import('../drizzle/schema');
 
-  const result = await db.insert(enrichmentRuns).values({
-    projectId,
-    totalClients,
-    processedClients: 0,
-    status: 'running',
-  }).returning({ id: enrichmentRuns.id });
+  const result = await db
+    .insert(enrichmentRuns)
+    .values({
+      projectId,
+      totalClients,
+      processedClients: 0,
+      status: 'running',
+    })
+    .returning({ id: enrichmentRuns.id });
 
   // Retornar o ID inserido
   return Number(result[0].id);
@@ -3048,7 +3079,10 @@ export async function createScheduledEnrichment(data: InsertScheduledEnrichment)
   const db = await getDb();
   if (!db) throw new Error('Database not available');
 
-  const result = await db.insert(scheduledEnrichments).values(data).returning({ id: scheduledEnrichments.id });
+  const result = await db
+    .insert(scheduledEnrichments)
+    .values(data)
+    .returning({ id: scheduledEnrichments.id });
   return result[0].id;
 }
 
@@ -4362,15 +4396,18 @@ export async function sendHibernationWarning(
 
   try {
     // Registrar aviso no banco
-    const result = await db.insert(hibernationWarnings).values({
-      projectId,
-      warningDate: now(),
-      scheduledHibernationDate: toPostgresTimestamp(scheduledHibernationDate),
-      daysInactive: daysSinceActivity,
-      notificationSent: 0, // Será marcado como 1 após envio
-      postponed: 0,
-      hibernated: 0,
-    }).returning({ id: hibernationWarnings.id });
+    const result = await db
+      .insert(hibernationWarnings)
+      .values({
+        projectId,
+        warningDate: now(),
+        scheduledHibernationDate: toPostgresTimestamp(scheduledHibernationDate),
+        daysInactive: daysSinceActivity,
+        notificationSent: 0, // Será marcado como 1 após envio
+        postponed: 0,
+        hibernated: 0,
+      })
+      .returning({ id: hibernationWarnings.id });
 
     const warningId = Number(result[0].id);
 
@@ -4582,12 +4619,15 @@ export async function upsertNotificationPreference(data: {
       };
     } else {
       // Create new
-      const result = await db.insert(notificationPreferences).values({
-        userId: data.userId,
-        type: data.type as any,
-        enabled: data.enabled ? 1 : 0,
-        channels: data.channels || { inApp: true },
-      }).returning({ id: notificationPreferences.id });
+      const result = await db
+        .insert(notificationPreferences)
+        .values({
+          userId: data.userId,
+          type: data.type as any,
+          enabled: data.enabled ? 1 : 0,
+          channels: data.channels || { inApp: true },
+        })
+        .returning({ id: notificationPreferences.id });
 
       return {
         id: Number(result[0].id),
@@ -5398,7 +5438,10 @@ export async function createReportSchedule(data: InsertReportSchedule): Promise<
   if (!db) throw new Error('Database not available');
 
   try {
-    const result = await db.insert(reportSchedules).values(data).returning({ id: reportSchedules.id });
+    const result = await db
+      .insert(reportSchedules)
+      .values(data)
+      .returning({ id: reportSchedules.id });
     const insertId = result[0].id;
 
     const created = await db

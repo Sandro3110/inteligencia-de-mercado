@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Zap, BarChart3, Download, RefreshCw } from 'lucide-react';
+import { Zap, BarChart3, Download, RefreshCw, MapPin } from 'lucide-react';
 import { GenerateReportButton } from '@/components/enrichment-v3/GenerateReportButton';
 import { trpc } from '@/lib/trpc/client';
 
@@ -25,6 +25,7 @@ interface PesquisaCardProps {
     concorrentesQualidadeMedia?: number;
   };
   onEnrich: (projectId: number, pesquisaId: number) => void;
+  onGeocode: (projectId: number, pesquisaId: number) => void;
   onViewResults: (projectId: number, pesquisaId: number) => void;
   onExport: (projectId: number, pesquisaId: number) => void;
   onRefresh?: () => void;
@@ -33,6 +34,7 @@ interface PesquisaCardProps {
 export function PesquisaCard({
   pesquisa,
   onEnrich,
+  onGeocode,
   onViewResults,
   onExport,
   onRefresh,
@@ -45,11 +47,21 @@ export function PesquisaCard({
     { refetchInterval: 30000 } // Refetch a cada 30s
   );
 
+  // Buscar status do geocoding job
+  const { data: geocodingJob } = trpc.geocoding.getLatestJob.useQuery(
+    { pesquisaId: pesquisa.id },
+    { refetchInterval: 30000 } // Refetch a cada 30s
+  );
+
   // Determinar se está finalizada baseado nos lotes processados
   const isCompleted = enrichmentJob
     ? enrichmentJob.currentBatch >= enrichmentJob.totalBatches &&
       enrichmentJob.status === 'completed'
     : false;
+
+  // Determinar status do geocoding
+  const isGeocoding = geocodingJob?.status === 'processing';
+  const geocodingCompleted = geocodingJob?.status === 'completed';
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -173,6 +185,27 @@ export function PesquisaCard({
                   ? 'Em andamento'
                   : 'Não iniciada'}
             </span>
+
+            {/* TAG de Status de Geocodificação */}
+            {geocodingJob && (
+              <span
+                className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full ${
+                  geocodingCompleted
+                    ? 'bg-emerald-100 text-emerald-800'
+                    : isGeocoding
+                      ? 'bg-amber-100 text-amber-800'
+                      : 'bg-gray-100 text-gray-800'
+                }`}
+                title="Status da Geocodificação"
+              >
+                <MapPin className={`w-3 h-3 mr-1 ${isGeocoding ? 'animate-pulse' : ''}`} />
+                {geocodingCompleted
+                  ? 'Geocodificado'
+                  : isGeocoding
+                    ? `Geocodificando ${geocodingJob.currentBatch}/${geocodingJob.totalBatches}`
+                    : 'Geocodificação pendente'}
+              </span>
+            )}
           </div>
 
           {/* Botão Atualizar */}
@@ -289,6 +322,15 @@ export function PesquisaCard({
         >
           <Zap className="w-4 h-4" />
           Enriquecer
+        </button>
+        <button
+          onClick={() => onGeocode(pesquisa.projectId, pesquisa.id)}
+          disabled={isGeocoding}
+          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Geocodificar"
+        >
+          <MapPin className={`w-4 h-4 ${isGeocoding ? 'animate-pulse' : ''}`} />
+          {isGeocoding ? 'Geocodificando...' : 'Geocodificar'}
         </button>
         <GenerateReportButton pesquisaId={pesquisa.id} size="sm" />
         <button
