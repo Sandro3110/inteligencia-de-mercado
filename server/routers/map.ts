@@ -88,12 +88,27 @@ export const mapRouter = router({
 
         const clientesData = await clientesQuery;
         results.push(
-          ...clientesData.map((c) => ({
-            ...c,
-            type: 'cliente' as const,
-            latitude: parseFloat(c.latitude as string),
-            longitude: parseFloat(c.longitude as string),
-          }))
+          ...clientesData
+            .filter((c) => c.latitude && c.longitude) // Garantir que não são null/undefined
+            .map((c) => {
+              const lat = parseFloat(c.latitude as string);
+              const lng = parseFloat(c.longitude as string);
+              // Validar que não são NaN
+              if (isNaN(lat) || isNaN(lng)) {
+                console.warn(`Cliente ${c.id} tem coordenadas inválidas:`, {
+                  lat: c.latitude,
+                  lng: c.longitude,
+                });
+                return null;
+              }
+              return {
+                ...c,
+                type: 'cliente' as const,
+                latitude: lat,
+                longitude: lng,
+              };
+            })
+            .filter((c) => c !== null) // Remover nulls
         );
       }
 
@@ -139,12 +154,26 @@ export const mapRouter = router({
 
         const leadsData = await leadsQuery;
         results.push(
-          ...leadsData.map((l) => ({
-            ...l,
-            type: 'lead' as const,
-            latitude: parseFloat(l.latitude as string),
-            longitude: parseFloat(l.longitude as string),
-          }))
+          ...leadsData
+            .filter((l) => l.latitude && l.longitude)
+            .map((l) => {
+              const lat = parseFloat(l.latitude as string);
+              const lng = parseFloat(l.longitude as string);
+              if (isNaN(lat) || isNaN(lng)) {
+                console.warn(`Lead ${l.id} tem coordenadas inválidas:`, {
+                  lat: l.latitude,
+                  lng: l.longitude,
+                });
+                return null;
+              }
+              return {
+                ...l,
+                type: 'lead' as const,
+                latitude: lat,
+                longitude: lng,
+              };
+            })
+            .filter((l) => l !== null)
         );
       }
 
@@ -181,12 +210,26 @@ export const mapRouter = router({
 
         const concorrentesData = await concorrentesQuery;
         results.push(
-          ...concorrentesData.map((c) => ({
-            ...c,
-            type: 'concorrente' as const,
-            latitude: parseFloat(c.latitude as string),
-            longitude: parseFloat(c.longitude as string),
-          }))
+          ...concorrentesData
+            .filter((c) => c.latitude && c.longitude)
+            .map((c) => {
+              const lat = parseFloat(c.latitude as string);
+              const lng = parseFloat(c.longitude as string);
+              if (isNaN(lat) || isNaN(lng)) {
+                console.warn(`Concorrente ${c.id} tem coordenadas inválidas:`, {
+                  lat: c.latitude,
+                  lng: c.longitude,
+                });
+                return null;
+              }
+              return {
+                ...c,
+                type: 'concorrente' as const,
+                latitude: lat,
+                longitude: lng,
+              };
+            })
+            .filter((c) => c !== null)
         );
       }
 
