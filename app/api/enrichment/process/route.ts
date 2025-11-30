@@ -24,6 +24,11 @@ import {
 } from '@/lib/enrichment/prompts_v2';
 import { geocodificar } from '@/lib/enrichment/geocoding';
 import type { ClienteInput } from '@/lib/enrichment/types';
+import {
+  calcularQualidadeCliente,
+  calcularQualidadeConcorrente,
+  calcularQualidadeLead,
+} from '@/lib/enrichment/quality';
 
 interface Cliente {
   id: number;
@@ -171,6 +176,19 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
 
         // ETAPA 3: Gravar Cliente Enriquecido
         console.log(`[Enrichment V2] 💾 Step 3/13: Gravar cliente...`);
+
+        // Calcular qualidade do cliente
+        const { qualidadeScore: clienteScore, qualidadeClassificacao: clienteClass } =
+          calcularQualidadeCliente({
+            nome: clienteEnriquecido.nome,
+            cnpj: clienteEnriquecido.cnpj,
+            site: clienteEnriquecido.site,
+            cidade: clienteEnriquecido.cidade,
+            uf: clienteEnriquecido.uf,
+            setor: clienteEnriquecido.setor,
+            descricao: clienteEnriquecido.descricao,
+          });
+
         await db
           .update(clientes)
           .set({
@@ -183,10 +201,14 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
             descricao: clienteEnriquecido.descricao,
             latitude,
             longitude,
+            qualidadeScore: clienteScore,
+            qualidadeClassificacao: clienteClass,
             validationStatus: 'approved',
           })
           .where(eq(clientes.id, cliente.id));
-        console.log(`[Enrichment V2] ✅ Cliente gravado`);
+        console.log(
+          `[Enrichment V2] ✅ Cliente gravado (Score: ${clienteScore}% - ${clienteClass})`
+        );
 
         // ETAPA 4: Identificar Mercado
         console.log(`[Enrichment V2] 🌍 Step 4/13: Identificar mercado...`);
@@ -266,6 +288,17 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
         // ETAPA 11: Gravar Concorrentes
         console.log(`[Enrichment V2] 💾 Step 11/13: Gravar concorrentes...`);
         for (const concorrente of concorrentesIdentificados) {
+          // Calcular qualidade do concorrente
+          const { qualidadeScore: concScore, qualidadeClassificacao: concClass } =
+            calcularQualidadeConcorrente({
+              nome: concorrente.nome,
+              cnpj: concorrente.cnpj,
+              site: concorrente.site,
+              cidade: concorrente.cidade,
+              uf: concorrente.uf,
+              produtoPrincipal: concorrente.produtoPrincipal,
+            });
+
           await db.insert(concorrentes).values({
             pesquisaId,
             projectId: pesquisa.projectId,
@@ -276,6 +309,9 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
             cidade: concorrente.cidade,
             uf: concorrente.uf,
             produto: concorrente.produtoPrincipal,
+            qualidadeScore: concScore,
+            qualidadeClassificacao: concClass,
+            validationStatus: 'pending',
           });
         }
         console.log(`[Enrichment V2] ✅ ${concorrentesIdentificados.length} concorrentes gravados`);
@@ -302,6 +338,17 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
         // ETAPA 13: Gravar Leads
         console.log(`[Enrichment V2] 💾 Step 13/13: Gravar leads...`);
         for (const lead of leadsIdentificados) {
+          // Calcular qualidade do lead
+          const { qualidadeScore: leadScore, qualidadeClassificacao: leadClass } =
+            calcularQualidadeLead({
+              nome: lead.nome,
+              cnpj: lead.cnpj,
+              site: lead.site,
+              cidade: lead.cidade,
+              uf: lead.uf,
+              produtoInteresse: lead.produtoInteresse,
+            });
+
           await db.insert(leads).values({
             pesquisaId,
             projectId: pesquisa.projectId,
@@ -313,6 +360,9 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
             uf: lead.uf,
             regiao: lead.cidade,
             setor: lead.produtoInteresse,
+            qualidadeScore: leadScore,
+            qualidadeClassificacao: leadClass,
+            validationStatus: 'pending',
           });
         }
         console.log(`[Enrichment V2] ✅ ${leadsIdentificados.length} leads gravados`);
