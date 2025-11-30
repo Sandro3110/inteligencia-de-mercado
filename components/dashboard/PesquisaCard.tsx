@@ -119,8 +119,37 @@ export function PesquisaCard({
       </p>
 
       <div className="mb-4 space-y-2">
-        {/* Botão Atualizar Métricas */}
-        <div className="flex justify-end mb-2">
+        {/* Status e Botão Atualizar Métricas */}
+        <div className="flex justify-between items-center mb-2">
+          {/* TAG de Status */}
+          <div className="flex items-center gap-2">
+            <span
+              className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full ${
+                enrichmentPercentage >= 97
+                  ? 'bg-green-100 text-green-800'
+                  : enrichmentPercentage > 0
+                    ? 'bg-blue-100 text-blue-800'
+                    : 'bg-gray-100 text-gray-800'
+              }`}
+            >
+              <span
+                className={`w-2 h-2 rounded-full mr-1.5 ${
+                  enrichmentPercentage >= 97
+                    ? 'bg-green-500'
+                    : enrichmentPercentage > 0
+                      ? 'bg-blue-500 animate-pulse'
+                      : 'bg-gray-400'
+                }`}
+              />
+              {enrichmentPercentage >= 97
+                ? 'Finalizada'
+                : enrichmentPercentage > 0
+                  ? 'Em andamento'
+                  : 'Não iniciada'}
+            </span>
+          </div>
+
+          {/* Botão Atualizar */}
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}

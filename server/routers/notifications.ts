@@ -8,6 +8,7 @@ import { createTRPCRouter, publicProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
 import { notifications } from '@/drizzle/schema';
 import { eq, desc, and } from 'drizzle-orm';
+import { checkAndNotifyCompletedJobs } from '@/server/utils/createEnrichmentNotification';
 
 export const notificationsRouter = createTRPCRouter({
   /**
@@ -237,6 +238,24 @@ export const notificationsRouter = createTRPCRouter({
         throw new Error('Failed to create notification');
       }
     }),
+
+  /**
+   * Verificar e criar notificações de jobs completados
+   */
+  checkCompletedJobs: publicProcedure.mutation(async () => {
+    const db = await getDb();
+    if (!db) {
+      throw new Error('Database connection failed');
+    }
+
+    try {
+      await checkAndNotifyCompletedJobs(db);
+      return { success: true };
+    } catch (error) {
+      console.error('[Notifications] Error checking completed jobs:', error);
+      throw new Error('Failed to check completed jobs');
+    }
+  }),
 
   /**
    * Criar notificações de exemplo/demonstração

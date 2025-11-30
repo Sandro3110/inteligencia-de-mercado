@@ -339,6 +339,7 @@ export const enrichmentJobs = pgTable('enrichment_jobs', {
   estimatedTimeRemaining: integer('estimatedTimeRemaining'),
   lastClienteId: integer('lastClienteId'),
   errorMessage: text('errorMessage'),
+  notifiedCompletion: integer('notifiedCompletion').default(0).notNull(),
   createdAt: timestamp('createdAt', { mode: 'string' }).defaultNow(),
   updatedAt: timestamp('updatedAt', { mode: 'string' }).defaultNow(),
 });

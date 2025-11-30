@@ -27,6 +27,9 @@ export function useNotificationsPolling(options: UseNotificationsPollingOptions 
   const setConnected = useNotifications((state) => state.setConnected);
   const setCount = useUnreadNotificationsCount((state) => state.setCount);
 
+  // Mutation para verificar jobs completados
+  const checkCompletedJobs = trpc.notifications.checkCompletedJobs.useMutation();
+
   // Query para buscar notificações não lidas
   const { data: unreadNotifications } = trpc.notifications.getUnread.useQuery(
     { userId, limit: 20 },
@@ -44,6 +47,20 @@ export function useNotificationsPolling(options: UseNotificationsPollingOptions 
       },
     }
   );
+
+  // Verificar jobs completados periodicamente
+  useEffect(() => {
+    if (!enabled || !userId) return;
+
+    const interval = setInterval(() => {
+      checkCompletedJobs.mutate();
+    }, pollingInterval);
+
+    // Verificar imediatamente na primeira vez
+    checkCompletedJobs.mutate();
+
+    return () => clearInterval(interval);
+  }, [enabled, userId, pollingInterval]);
 
   // Atualizar contador quando notificações mudarem
   useEffect(() => {
