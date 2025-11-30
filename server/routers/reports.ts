@@ -89,6 +89,40 @@ export const reportsRouter = createTRPCRouter({
         .slice(0, 10)
         .map(([nome, count]) => ({ nome, count }));
 
+      // Distribuição geográfica de clientes
+      const clientesPorEstado = clientesData
+        .filter((c) => c.uf)
+        .reduce((acc: { [key: string]: number }, cliente) => {
+          const uf = cliente.uf || 'Não especificado';
+          acc[uf] = (acc[uf] || 0) + 1;
+          return acc;
+        }, {});
+
+      const top10Estados = Object.entries(clientesPorEstado)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 10)
+        .map(([uf, count]) => ({
+          uf,
+          count,
+          percentual: ((count / clientesData.length) * 100).toFixed(1),
+        }));
+
+      const clientesPorCidade = clientesData
+        .filter((c) => c.cidade && c.uf)
+        .reduce((acc: { [key: string]: { count: number; uf: string } }, cliente) => {
+          const key = `${cliente.cidade}/${cliente.uf}`;
+          if (!acc[key]) {
+            acc[key] = { count: 0, uf: cliente.uf || '' };
+          }
+          acc[key].count++;
+          return acc;
+        }, {});
+
+      const top10Cidades = Object.entries(clientesPorCidade)
+        .sort(([, a], [, b]) => b.count - a.count)
+        .slice(0, 10)
+        .map(([cidade, data]) => ({ cidade, count: data.count }));
+
       // 5. Gerar análise dissertativa com IA
       const prompt = `Você é um analista de inteligência de mercado. Analise os seguintes dados de pesquisa e gere um relatório executivo profissional em português brasileiro.
 
@@ -106,13 +140,23 @@ ${top10Mercados.map((m, i) => `${i + 1}. ${m.nome} - ${m.tamanhoEstimado || 'N/A
 **Produtos Principais:**
 ${produtosPrincipais.map((p, i) => `${i + 1}. ${p.nome} (${p.count} menções)`).join('\n')}
 
+**Distribuição Geográfica de Clientes:**
+- Total de clientes: ${clientesData.length}
+- Estados com maior presença:
+${top10Estados.map((e, i) => `  ${i + 1}. ${e.uf}: ${e.count} clientes (${e.percentual}%)`).join('\n')}
+
+- Principais cidades:
+${top10Cidades.map((c, i) => `  ${i + 1}. ${c.cidade}: ${c.count} clientes`).join('\n')}
+
 **Gere uma análise dissertativa profissional com:**
 1. **Resumo Executivo** (2-3 parágrafos): Visão geral da pesquisa, abrangência e principais descobertas
-2. **Análise de Mercados** (2-3 parágrafos): Análise dos 10 principais mercados identificados, potencial e oportunidades
-3. **Análise de Clientes e Leads** (2 parágrafos): Perfil dos clientes, distribuição geográfica, potencial de negócios
-4. **Análise Competitiva** (1-2 parágrafos): Panorama dos concorrentes identificados
-5. **Produtos e Serviços** (1-2 parágrafos): Principais produtos/serviços identificados no mercado
-6. **Conclusões e Recomendações** (2-3 parágrafos): Insights estratégicos e próximos passos recomendados
+2. **Análise de Mercados** (3-4 parágrafos): Análise dos 10 principais mercados identificados, potencial e oportunidades
+3. **Perfil de Clientes e Distribuição Geográfica** (3-4 parágrafos): Perfil dos clientes, análise da distribuição geográfica (estados e cidades), concentração vs. dispersão, oportunidades de expansão regional
+4. **Análise de Produtos e Serviços** (2-3 parágrafos): Portfólio de produtos identificados, categorização, produtos mais demandados, oportunidades de cross-selling
+5. **Análise de Leads e Oportunidades** (2 parágrafos): Perfil dos leads qualificados, potencial de conversão, estratégias de abordagem
+6. **Panorama Competitivo** (2-3 parágrafos): Análise dos concorrentes identificados, nível de competitividade, estratégias de diferenciação
+7. **Análise SWOT do Mercado** (2-3 parágrafos): Forças (Strengths), Fraquezas (Weaknesses), Oportunidades (Opportunities) e Ameaças (Threats) identificadas
+8. **Conclusões e Recomendações Estratégicas** (3-4 parágrafos): Insights estratégicos principais, recomendações de curto, médio e longo prazo, próximos passos sugeridos
 
 Use linguagem profissional, objetiva e baseada em dados. Seja específico e cite números quando relevante.`;
 
@@ -153,39 +197,71 @@ Use linguagem profissional, objetiva e baseada em dados. Seja específico e cite
 
       doc.on('data', (chunk) => chunks.push(chunk));
 
+      // Cabeçalho com fundo azul
+      doc.rect(0, 0, doc.page.width, 120).fillAndStroke('#2563eb', '#2563eb');
+
       // Título
-      doc.fontSize(24).font('Helvetica-Bold').text('Relatório de Inteligência de Mercado', {
-        align: 'center',
-      });
-
-      doc.moveDown();
       doc
-        .fontSize(12)
+        .fillColor('#ffffff')
+        .fontSize(26)
+        .font('Helvetica-Bold')
+        .text('RELATÓRIO DE INTELIGÊNCIA DE MERCADO', 50, 30, {
+          align: 'center',
+        });
+
+      doc
+        .fontSize(14)
         .font('Helvetica')
-        .text(`Projeto ID: ${input.projectId}`, { align: 'center' });
-      doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, { align: 'center' });
+        .fillColor('#e0e7ff')
+        .text('Análise Consolidada de Mercado', 50, 65, { align: 'center' });
 
-      doc.moveDown(2);
+      doc
+        .fontSize(11)
+        .fillColor('#ffffff')
+        .text(
+          `Projeto ID: ${input.projectId} | Data: ${new Date().toLocaleDateString('pt-BR')}`,
+          50,
+          90,
+          { align: 'center' }
+        );
 
-      // Estatísticas
-      doc.fontSize(16).font('Helvetica-Bold').text('Estatísticas Gerais');
-      doc.moveDown(0.5);
+      // Resetar cor para preto
+      doc.fillColor('#000000');
+
+      doc.moveDown(3);
+
+      // Estatísticas com caixa
+      doc.rect(50, doc.y, doc.page.width - 100, 120).fillAndStroke('#f0f9ff', '#2563eb');
+      doc
+        .fillColor('#000000')
+        .fontSize(16)
+        .font('Helvetica-Bold')
+        .text('📊 ESTATÍSTICAS GERAIS', 70, doc.y + 15);
+      const statsY = doc.y + 45;
       doc.fontSize(11).font('Helvetica');
-      doc.text(`• Total de Pesquisas: ${pesquisas.length}`);
-      doc.text(`• Total de Entidades: ${totalEntidades}`);
-      doc.text(`  - Clientes: ${clientesData.length}`);
-      doc.text(`  - Leads: ${leadsData.length}`);
-      doc.text(`  - Concorrentes: ${concorrentesData.length}`);
-      doc.text(`  - Mercados: ${mercadosData.length}`);
+      doc.text(`• Total de Pesquisas: ${pesquisas.length}`, 70, statsY);
+      doc.text(`• Total de Entidades: ${totalEntidades}`, 70, statsY + 20);
+      doc.text(`  - Clientes: ${clientesData.length}`, 90, statsY + 40);
+      doc.text(`  - Leads: ${leadsData.length}`, 90, statsY + 55);
+      doc.text(`  - Concorrentes: ${concorrentesData.length}`, 90, statsY + 70);
+      doc.text(`  - Mercados: ${mercadosData.length}`, 90, statsY + 85);
+      doc.y = statsY + 110;
 
       doc.moveDown(2);
 
-      // Análise da IA
-      doc.fontSize(16).font('Helvetica-Bold').text('Análise Detalhada');
-      doc.moveDown(0.5);
+      // Análise da IA com separador
+      doc
+        .moveTo(50, doc.y)
+        .lineTo(doc.page.width - 50, doc.y)
+        .strokeColor('#2563eb')
+        .lineWidth(2)
+        .stroke();
+      doc.moveDown(1);
+      doc.fontSize(18).font('Helvetica-Bold').fillColor('#2563eb').text('📋 ANÁLISE DETALHADA');
+      doc.fillColor('#000000').moveDown(0.5);
       doc.fontSize(11).font('Helvetica').text(analiseIA, {
         align: 'justify',
-        lineGap: 2,
+        lineGap: 3,
       });
 
       doc.moveDown(2);
