@@ -623,42 +623,15 @@ export const pesquisasRouter = createTRPCRouter({
           jobsCancelled: 0,
         };
 
-        // 1. Cancelar jobs em andamento
+        // 1. DELETAR jobs (não apenas cancelar)
         try {
-          // Primeiro verificar se há jobs para cancelar
-          const jobsToCancel = await db
-            .select({ id: enrichmentJobs.id })
-            .from(enrichmentJobs)
-            .where(
-              and(
-                eq(enrichmentJobs.pesquisaId, input.pesquisaId),
-                inArray(enrichmentJobs.status, ['running', 'paused'])
-              )
-            );
-
-          console.log('[Pesquisas.cleanEnrichment] Jobs para cancelar:', jobsToCancel.length);
-
-          if (jobsToCancel.length > 0) {
-            const jobsResult = await db
-              .update(enrichmentJobs)
-              .set({
-                status: 'cancelled',
-                updatedAt: new Date().toISOString(),
-              })
-              .where(
-                and(
-                  eq(enrichmentJobs.pesquisaId, input.pesquisaId),
-                  inArray(enrichmentJobs.status, ['running', 'paused'])
-                )
-              );
-            stats.jobsCancelled = jobsResult.rowsAffected || 0;
-          } else {
-            stats.jobsCancelled = 0;
-          }
-          console.log('[Pesquisas.cleanEnrichment] Jobs cancelados:', stats.jobsCancelled);
+          const jobsResult = await db
+            .delete(enrichmentJobs)
+            .where(eq(enrichmentJobs.pesquisaId, input.pesquisaId));
+          stats.jobsCancelled = jobsResult.rowsAffected || 0;
+          console.log('[Pesquisas.cleanEnrichment] Jobs deletados:', stats.jobsCancelled);
         } catch (error) {
-          console.error('[Pesquisas.cleanEnrichment] Erro ao cancelar jobs:', error);
-          // Não lançar erro, apenas logar e continuar
+          console.error('[Pesquisas.cleanEnrichment] Erro ao deletar jobs:', error);
           stats.jobsCancelled = 0;
         }
 

@@ -1,19 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { trpc } from '@/lib/trpc/client';
-import { ArrowLeft, Play, Pause, RotateCcw, Eye } from 'lucide-react';
-import { ProgressBar } from '@/components/enrichment/ProgressBar';
+import { ArrowLeft, Play } from 'lucide-react';
 import { PesquisaCard } from '@/components/dashboard/PesquisaCard';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-
-interface LogEntry {
-  timestamp: string;
-  message: string;
-  type: 'info' | 'success' | 'error' | 'warning';
-}
 
 export default function EnrichmentPage() {
   const router = useRouter();
@@ -21,104 +13,22 @@ export default function EnrichmentPage() {
   const projectId = parseInt(params.id as string);
   const surveyId = parseInt(params.surveyId as string);
 
-  const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [jobId, setJobId] = useState<number | null>(null);
-
   const trpcUtils = trpc.useUtils();
 
-  // Queries
-  const { data: pesquisa, isLoading: loadingPesquisa } = trpc.pesquisas.getById.useQuery(surveyId);
+  // Query
+  const { data: pesquisa, isLoading: loadingPesquisa } = trpc.pesquisas.getById.useQuery(surveyId, {
+    refetchInterval: 5000, // Atualizar a cada 5s
+  });
 
-  const { data: job, isLoading: loadingJob } = trpc.enrichment.getJob.useQuery(
-    { pesquisaId: surveyId },
-    {
-      enabled: jobId !== null || pesquisa?.status === 'enriquecendo',
-      refetchInterval: (data) => {
-        // Poll every 2s while running
-        if (data?.status === 'running') return 2000;
-        return false;
-      },
-    }
-  );
-
-  // Mutations
+  // Mutation para iniciar enriquecimento
   const startMutation = trpc.enrichment.start.useMutation({
-    onSuccess: (data) => {
-      setJobId(data.id);
-      addLog('Enriquecimento iniciado com sucesso', 'success');
-      trpcUtils.enrichment.getJob.invalidate();
-      trpcUtils.pesquisas.getById.invalidate(surveyId);
-    },
-    onError: (error) => {
-      toast.error(`Erro ao iniciar: ${error.message}`);
-      addLog(`Erro ao iniciar: ${error.message}`, 'error');
-    },
-  });
-
-  const pauseMutation = trpc.enrichment.pause.useMutation({
     onSuccess: () => {
-      addLog('Enriquecimento pausado', 'warning');
-      trpcUtils.enrichment.getJob.invalidate();
       trpcUtils.pesquisas.getById.invalidate(surveyId);
-    },
-    onError: (error) => {
-      toast.error(`Erro ao pausar: ${error.message}`);
     },
   });
 
-  const resumeMutation = trpc.enrichment.resume.useMutation({
-    onSuccess: () => {
-      addLog('Enriquecimento retomado', 'success');
-      trpcUtils.enrichment.getJob.invalidate();
-      trpcUtils.pesquisas.getById.invalidate(surveyId);
-    },
-    onError: (error) => {
-      toast.error(`Erro ao retomar: ${error.message}`);
-    },
-  });
-
-  // Helper to add log
-  const addLog = (message: string, type: LogEntry['type'] = 'info') => {
-    setLogs((prev) => [
-      ...prev,
-      {
-        timestamp: new Date().toISOString(),
-        message,
-        type,
-      },
-    ]);
-  };
-
-  // Update logs based on job status
-  useEffect(() => {
-    if (job) {
-      if (job.status === 'completed') {
-        addLog(`Enriquecimento concluído! ${job.successClientes} clientes processados`, 'success');
-      } else if (job.status === 'failed') {
-        addLog(`Enriquecimento falhou: ${job.errorMessage || 'Erro desconhecido'}`, 'error');
-      }
-    }
-  }, [job?.status]);
-
-  // Handlers
   const handleStart = () => {
-    addLog('Iniciando enriquecimento...', 'info');
     startMutation.mutate({ pesquisaId: surveyId });
-  };
-
-  const handlePause = () => {
-    if (!job) return;
-    pauseMutation.mutate({ jobId: job.id });
-  };
-
-  const handleResume = () => {
-    if (!job) return;
-    addLog('Retomando enriquecimento...', 'info');
-    resumeMutation.mutate({ jobId: job.id });
-  };
-
-  const handleViewResults = () => {
-    router.push(`/projects/${projectId}/surveys/${surveyId}/results`);
   };
 
   if (loadingPesquisa) {
@@ -142,10 +52,10 @@ export default function EnrichmentPage() {
     );
   }
 
-  const isRunning = job?.status === 'running';
-  const isPaused = job?.status === 'paused';
-  const isCompleted = job?.status === 'completed';
-  const isFailed = job?.status === 'failed';
+  const progressPercentage =
+    pesquisa.totalClientes > 0
+      ? Math.round((pesquisa.clientesEnriquecidos / pesquisa.totalClientes) * 100)
+      : 0;
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -194,79 +104,68 @@ export default function EnrichmentPage() {
         </div>
 
         {/* Barra de Progresso */}
-        {job && (
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Progresso</h2>
-            <ProgressBar
-              current={pesquisa.clientesEnriquecidos}
-              total={pesquisa.totalClientes}
-              status={job.status as any}
-            />
-            <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
-              <div>
-                <span className="text-gray-600">Processados:</span>
-                <span className="ml-2 font-semibold text-gray-900">
-                  {pesquisa.clientesEnriquecidos}
-                </span>
-              </div>
-              <div>
-                <span className="text-gray-600">Restantes:</span>
-                <span className="ml-2 font-semibold text-blue-600">
-                  {pesquisa.totalClientes - pesquisa.clientesEnriquecidos}
-                </span>
-              </div>
-              <div>
-                <span className="text-gray-600">Total:</span>
-                <span className="ml-2 font-semibold text-gray-900">{pesquisa.totalClientes}</span>
-              </div>
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Progresso</h2>
+          <div className="mb-2">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-gray-700">
+                {pesquisa.clientesEnriquecidos} / {pesquisa.totalClientes} clientes
+              </span>
+              <span className="text-sm font-bold text-blue-600">{progressPercentage}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500"
+                style={{ width: `${progressPercentage}%` }}
+              />
             </div>
           </div>
-        )}
-
-        {/* Botões de Controle */}
-        <div className="p-6">
-          <div className="flex gap-4">
-            {!job || job.status === 'pending' ? (
-              <Button
-                onClick={handleStart}
-                disabled={startMutation.isPending || pesquisa.totalClientes === 0}
-                className="flex items-center gap-2"
-              >
-                <Play className="w-4 h-4" />
-                Iniciar Enriquecimento
-              </Button>
-            ) : isRunning ? (
-              <Button
-                onClick={handlePause}
-                disabled={pauseMutation.isPending}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Pause className="w-4 h-4" />
-                Pausar
-              </Button>
-            ) : isPaused ? (
-              <Button
-                onClick={handleResume}
-                disabled={resumeMutation.isPending}
-                className="flex items-center gap-2"
-              >
-                <RotateCcw className="w-4 h-4" />
-                Retomar
-              </Button>
-            ) : null}
-
-            {(isCompleted || isFailed) && (
-              <Button
-                onClick={handleViewResults}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Eye className="w-4 h-4" />
-                Ver Resultados
-              </Button>
-            )}
+          <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
+            <div>
+              <span className="text-gray-600">Processados:</span>
+              <span className="ml-2 font-semibold text-gray-900">
+                {pesquisa.clientesEnriquecidos}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-600">Restantes:</span>
+              <span className="ml-2 font-semibold text-blue-600">
+                {pesquisa.totalClientes - pesquisa.clientesEnriquecidos}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-600">Total:</span>
+              <span className="ml-2 font-semibold text-gray-900">{pesquisa.totalClientes}</span>
+            </div>
           </div>
+        </div>
+
+        {/* Botão de Controle */}
+        <div className="p-6">
+          {pesquisa.clientesEnriquecidos === 0 && pesquisa.status !== 'enriquecendo' ? (
+            <Button
+              onClick={handleStart}
+              disabled={startMutation.isPending || pesquisa.totalClientes === 0}
+              className="flex items-center gap-2"
+              size="lg"
+            >
+              <Play className="w-4 h-4" />
+              {startMutation.isPending ? 'Iniciando...' : 'Iniciar Enriquecimento'}
+            </Button>
+          ) : (
+            <div className="text-sm text-gray-600">
+              {pesquisa.status === 'enriquecendo' && (
+                <p className="text-blue-600 font-medium">
+                  ⚡ Enriquecimento em andamento... Atualizando automaticamente.
+                </p>
+              )}
+              {pesquisa.clientesEnriquecidos > 0 && pesquisa.status !== 'enriquecendo' && (
+                <p className="text-green-600 font-medium">
+                  ✓ Enriquecimento concluído! Use o card abaixo para outras ações.
+                </p>
+              )}
+            </div>
+          )}
 
           {pesquisa.totalClientes === 0 && (
             <p className="text-sm text-amber-600 mt-4">
@@ -276,20 +175,22 @@ export default function EnrichmentPage() {
         </div>
       </div>
 
-      {/* PesquisaCard Compacto */}
-      {pesquisa && (
-        <PesquisaCard
-          pesquisa={pesquisa}
-          onEnrich={() => {
-            /* Botão desabilitado - usar o de cima */
-          }}
-          onGeocode={() => router.push(`/projects/${projectId}/surveys/${surveyId}/geocode`)}
-          onViewResults={() => router.push(`/projects/${projectId}/surveys/${surveyId}/results`)}
-          onExport={() => router.push(`/projects/${projectId}/surveys/${surveyId}/export`)}
-          onViewEnrichment={() => router.push(`/projects/${projectId}/surveys/${surveyId}/enrich`)}
-          onRefresh={() => trpcUtils.pesquisas.getById.invalidate(surveyId)}
-        />
-      )}
+      {/* PesquisaCard Compacto - Mesma largura da página de projetos */}
+      <div className="max-w-2xl">
+        {pesquisa && (
+          <PesquisaCard
+            pesquisa={pesquisa}
+            onEnrich={() => router.push(`/projects/${projectId}/surveys/${surveyId}/enrich`)}
+            onGeocode={() => router.push(`/projects/${projectId}/surveys/${surveyId}/geocode`)}
+            onViewResults={() => router.push(`/projects/${projectId}/surveys/${surveyId}/results`)}
+            onExport={() => router.push(`/projects/${projectId}/surveys/${surveyId}/export`)}
+            onViewEnrichment={() =>
+              router.push(`/projects/${projectId}/surveys/${surveyId}/enrich`)
+            }
+            onRefresh={() => trpcUtils.pesquisas.getById.invalidate(surveyId)}
+          />
+        )}
+      </div>
     </div>
   );
 }
