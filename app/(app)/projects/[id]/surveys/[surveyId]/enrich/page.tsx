@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { trpc } from '@/lib/trpc/client';
 import { ArrowLeft, Play, Pause, RotateCcw, Eye } from 'lucide-react';
 import { ProgressBar } from '@/components/enrichment/ProgressBar';
-import { LogViewer } from '@/components/enrichment/LogViewer';
+import { PesquisaCard } from '@/components/dashboard/PesquisaCard';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -248,11 +248,17 @@ export default function EnrichmentPage() {
         )}
       </div>
 
-      {/* Logs */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Logs</h2>
-        <LogViewer logs={logs} />
-      </div>
+      {/* PesquisaCard */}
+      {pesquisa && (
+        <PesquisaCard
+          pesquisa={pesquisa}
+          onEnrich={() => {}}
+          onGeocode={() => router.push(`/projects/${projectId}/surveys/${surveyId}/geocode`)}
+          onViewResults={() => router.push(`/projects/${projectId}/surveys/${surveyId}/results`)}
+          onExport={() => router.push(`/projects/${projectId}/surveys/${surveyId}/export`)}
+          onRefresh={() => trpcUtils.pesquisas.getById.invalidate(surveyId)}
+        />
+      )}
     </div>
   );
 }
