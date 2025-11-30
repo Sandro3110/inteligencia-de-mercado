@@ -12,9 +12,9 @@ import { toast } from 'sonner';
 import type { ViewMode } from '@/components/map/MapContainer';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
-// Importar MapContainer dinamicamente para evitar SSR
-const MapContainer = dynamic(
-  () => import('@/components/map/MapContainer').then((mod) => mod.MapContainer),
+// Importar GoogleMapContainer dinamicamente para evitar SSR
+const GoogleMapContainer = dynamic(
+  () => import('@/components/map/GoogleMapContainer').then((mod) => mod.GoogleMapContainer),
   {
     ssr: false,
     loading: () => (
@@ -559,7 +559,7 @@ export default function MapPage() {
             </div>
           ) : (
             <ErrorBoundary>
-              <MapContainer
+              <GoogleMapContainer
                 entities={entities}
                 viewMode={viewMode}
                 onMarkerClick={handleMarkerClick}
