@@ -18,6 +18,7 @@ interface DataTableProps<T> {
   total: number;
   onPageChange: (page: number) => void;
   isLoading?: boolean;
+  onRowDoubleClick?: (item: T) => void;
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -29,6 +30,7 @@ export function DataTable<T extends Record<string, any>>({
   total,
   onPageChange,
   isLoading,
+  onRowDoubleClick,
 }: DataTableProps<T>) {
   const startIndex = (currentPage - 1) * pageSize + 1;
   const endIndex = Math.min(currentPage * pageSize, total);
@@ -73,7 +75,12 @@ export function DataTable<T extends Record<string, any>>({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {data.map((item, index) => (
-              <tr key={index} className="hover:bg-gray-50">
+              <tr
+                key={index}
+                className="hover:bg-gray-50 cursor-pointer transition-colors"
+                onDoubleClick={() => onRowDoubleClick?.(item)}
+                title="Clique duas vezes para ver detalhes"
+              >
                 {columns.map((column) => (
                   <td
                     key={column.key}

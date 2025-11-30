@@ -6,6 +6,7 @@ import { trpc } from '@/lib/trpc/client';
 import { ArrowLeft, Users, Target, TrendingUp, MapPin, Download } from 'lucide-react';
 import { DataTable } from '@/components/results/DataTable';
 import { FilterBar } from '@/components/results/FilterBar';
+import { DetailModal, type DetailModalType } from '@/components/results/DetailModal';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -21,6 +22,11 @@ export default function ResultsPage() {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<Record<string, string>>({});
+
+  // Modal de detalhes
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<Record<string, unknown> | null>(null);
+  const [modalType, setModalType] = useState<DetailModalType>('cliente');
 
   const pageSize = 20;
 
@@ -99,6 +105,20 @@ export default function ResultsPage() {
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
     setPage(1);
+  };
+
+  const handleRowDoubleClick = (item: Record<string, unknown>) => {
+    setSelectedItem(item);
+    setModalType(
+      activeTab === 'clientes'
+        ? 'cliente'
+        : activeTab === 'leads'
+          ? 'lead'
+          : activeTab === 'concorrentes'
+            ? 'concorrente'
+            : 'mercado'
+    );
+    setIsModalOpen(true);
   };
 
   const handleExport = async () => {
@@ -373,9 +393,20 @@ export default function ResultsPage() {
             total={currentData?.total || 0}
             onPageChange={setPage}
             isLoading={isLoading}
+            onRowDoubleClick={handleRowDoubleClick}
           />
         </div>
       </div>
+
+      {/* Modal de Detalhes */}
+      {selectedItem && (
+        <DetailModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          type={modalType}
+          data={selectedItem}
+        />
+      )}
     </div>
   );
 }
