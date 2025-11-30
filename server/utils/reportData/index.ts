@@ -50,29 +50,63 @@ export async function fetchEnhancedReportData(
   enrichmentCompletedAt?: string,
   enrichmentDuration?: string
 ): Promise<EnhancedReportData> {
-  console.log('[ReportData] Fetching metadata...');
-  const metadata = await fetchMetadata(db, pesquisaId);
-  console.log('[ReportData] Metadata fetched:', metadata);
+  let metadata, mercados, produtos, clientes, leads, concorrentes;
 
-  console.log('[ReportData] Fetching mercados...');
-  const mercados = await fetchMercados(db, pesquisaId);
-  console.log('[ReportData] Mercados fetched:', mercados.length);
+  try {
+    console.log('[ReportData] Fetching metadata...');
+    metadata = await fetchMetadata(db, pesquisaId);
+    console.log('[ReportData] Metadata fetched:', metadata);
+  } catch (err) {
+    console.error('[ReportData] ERROR in fetchMetadata:', err);
+    throw new Error(`fetchMetadata failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
 
-  console.log('[ReportData] Fetching produtos...');
-  const produtos = await fetchProdutos(db, pesquisaId);
-  console.log('[ReportData] Produtos fetched:', produtos.length);
+  try {
+    console.log('[ReportData] Fetching mercados...');
+    mercados = await fetchMercados(db, pesquisaId);
+    console.log('[ReportData] Mercados fetched:', mercados.length);
+  } catch (err) {
+    console.error('[ReportData] ERROR in fetchMercados:', err);
+    throw new Error(`fetchMercados failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
 
-  console.log('[ReportData] Fetching clientes...');
-  const clientes = await fetchClientes(db, pesquisaId);
-  console.log('[ReportData] Clientes fetched:', clientes.total);
+  try {
+    console.log('[ReportData] Fetching produtos...');
+    produtos = await fetchProdutos(db, pesquisaId);
+    console.log('[ReportData] Produtos fetched:', produtos.length);
+  } catch (err) {
+    console.error('[ReportData] ERROR in fetchProdutos:', err);
+    throw new Error(`fetchProdutos failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
 
-  console.log('[ReportData] Fetching leads...');
-  const leads = await fetchLeads(db, pesquisaId);
-  console.log('[ReportData] Leads fetched:', leads.total);
+  try {
+    console.log('[ReportData] Fetching clientes...');
+    clientes = await fetchClientes(db, pesquisaId);
+    console.log('[ReportData] Clientes fetched:', clientes.total);
+  } catch (err) {
+    console.error('[ReportData] ERROR in fetchClientes:', err);
+    throw new Error(`fetchClientes failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
 
-  console.log('[ReportData] Fetching concorrentes...');
-  const concorrentes = await fetchConcorrentes(db, pesquisaId);
-  console.log('[ReportData] Concorrentes fetched:', concorrentes.total);
+  try {
+    console.log('[ReportData] Fetching leads...');
+    leads = await fetchLeads(db, pesquisaId);
+    console.log('[ReportData] Leads fetched:', leads.total);
+  } catch (err) {
+    console.error('[ReportData] ERROR in fetchLeads:', err);
+    throw new Error(`fetchLeads failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  try {
+    console.log('[ReportData] Fetching concorrentes...');
+    concorrentes = await fetchConcorrentes(db, pesquisaId);
+    console.log('[ReportData] Concorrentes fetched:', concorrentes.total);
+  } catch (err) {
+    console.error('[ReportData] ERROR in fetchConcorrentes:', err);
+    throw new Error(
+      `fetchConcorrentes failed: ${err instanceof Error ? err.message : String(err)}`
+    );
+  }
 
   console.log('[ReportData] All data fetched successfully');
 
