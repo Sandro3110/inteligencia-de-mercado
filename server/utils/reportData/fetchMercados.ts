@@ -25,6 +25,9 @@ export interface MercadoData {
  * Busca todos os mercados com estatísticas
  */
 export async function fetchMercados(db: Database, pesquisaId: number): Promise<MercadoData[]> {
+  console.log('[fetchMercados] TEMPORARIAMENTE RETORNANDO ARRAY VAZIO PARA DEBUG');
+  return [];
+
   // Buscar todos os mercados únicos da pesquisa
   const mercadosResult = await db
     .select({
