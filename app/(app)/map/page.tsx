@@ -108,44 +108,57 @@ export default function MapPage() {
 
   // Validar, transformar e garantir que entities sempre seja um array válido
   const entities = React.useMemo(() => {
-    // Validar se mapData existe e é array
-    if (!mapData || !Array.isArray(mapData)) {
-      if (mapData !== undefined) {
-        console.warn('[Map] mapData inválido:', typeof mapData);
+    try {
+      // Validar se mapData existe e é array
+      if (!mapData || !Array.isArray(mapData)) {
+        return [];
       }
+
+      // Transformar e validar cada entidade
+      const validEntities: MapEntity[] = [];
+
+      for (const entity of mapData) {
+        try {
+          // Validar campos obrigatórios
+          if (!entity || typeof entity !== 'object') continue;
+          if (!entity.id || !entity.type || !entity.nome) continue;
+          if (!entity.latitude || !entity.longitude) continue;
+
+          // Converter coordenadas (podem vir como string ou number)
+          const lat =
+            typeof entity.latitude === 'string'
+              ? parseFloat(entity.latitude)
+              : Number(entity.latitude);
+          const lng =
+            typeof entity.longitude === 'string'
+              ? parseFloat(entity.longitude)
+              : Number(entity.longitude);
+
+          // Validar conversão
+          if (isNaN(lat) || isNaN(lng) || !isFinite(lat) || !isFinite(lng)) {
+            continue;
+          }
+
+          validEntities.push({
+            id: entity.id,
+            type: entity.type as 'cliente' | 'lead' | 'concorrente',
+            nome: entity.nome,
+            latitude: lat,
+            longitude: lng,
+            cidade: entity.cidade || '',
+            uf: entity.uf || '',
+          });
+        } catch (err) {
+          // Ignorar entidade com erro
+          continue;
+        }
+      }
+
+      return validEntities;
+    } catch (err) {
+      console.error('[Map] Erro ao processar entities:', err);
       return [];
     }
-
-    // Transformar e validar cada entidade
-    return mapData
-      .filter((entity) => {
-        // Validar campos obrigatórios
-        if (!entity || typeof entity !== 'object') return false;
-        if (!entity.id || !entity.type || !entity.nome) return false;
-        if (!entity.latitude || !entity.longitude) return false;
-
-        return true;
-      })
-      .map((entity) => {
-        // Converter coordenadas (podem vir como string ou number)
-        const lat =
-          typeof entity.latitude === 'string' ? parseFloat(entity.latitude) : entity.latitude;
-        const lng =
-          typeof entity.longitude === 'string' ? parseFloat(entity.longitude) : entity.longitude;
-
-        // Validar conversão
-        if (isNaN(lat) || isNaN(lng) || !isFinite(lat) || !isFinite(lng)) {
-          console.warn(`[Map] Conversão falhou para entidade ${entity.id}`);
-          return null;
-        }
-
-        return {
-          ...entity,
-          latitude: lat,
-          longitude: lng,
-        } as MapEntity;
-      })
-      .filter((entity): entity is MapEntity => entity !== null);
   }, [mapData]);
 
   // Removido log de debug
