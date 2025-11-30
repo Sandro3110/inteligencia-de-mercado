@@ -42,6 +42,12 @@ export async function fetchMercados(db: Database, pesquisaId: number): Promise<M
   const mercadosComStats: MercadoData[] = [];
 
   for (const mercado of mercadosResult || []) {
+    // Verificar se mercado tem ID válido
+    if (!mercado || !mercado.id) {
+      console.warn('[fetchMercados] Mercado sem ID válido, pulando:', mercado);
+      continue;
+    }
+
     // Contar clientes neste mercado
     const clientesCountResult = await db
       .select({ count: sql<number>`count(*)` })
