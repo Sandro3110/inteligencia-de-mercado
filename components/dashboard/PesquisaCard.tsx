@@ -1,9 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { Zap, BarChart3, Download, RefreshCw, MapPin, FileText, Pause, X, Eye } from 'lucide-react';
+import {
+  Zap,
+  BarChart3,
+  Download,
+  RefreshCw,
+  MapPin,
+  FileText,
+  Pause,
+  X,
+  Eye,
+  Trash2,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { GenerateReportButton } from '@/components/enrichment-v3/GenerateReportButton';
+import { CleanEnrichmentModal } from '@/components/pesquisas/CleanEnrichmentModal';
 import { trpc } from '@/lib/trpc/client';
 
 interface PesquisaCardProps {
@@ -43,6 +55,7 @@ export function PesquisaCard({
   onRefresh,
 }: PesquisaCardProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isCleanModalOpen, setIsCleanModalOpen] = useState(false);
 
   // Mutations para pausar/cancelar enriquecimento
   const pauseMutation = trpc.enrichmentBatch.pause.useMutation({
@@ -62,6 +75,19 @@ export function PesquisaCard({
     },
     onError: () => {
       toast.error('Erro ao cancelar enriquecimento');
+    },
+  });
+
+  const cleanMutation = trpc.pesquisas.cleanEnrichment.useMutation({
+    onSuccess: (data) => {
+      toast.success(
+        `Limpeza concluída! Removidos: ${data.stats.leadsRemoved} leads, ${data.stats.concorrentesRemoved} concorrentes, ${data.stats.produtosRemoved} produtos`
+      );
+      setIsCleanModalOpen(false);
+      if (onRefresh) onRefresh();
+    },
+    onError: (error) => {
+      toast.error(`Erro ao limpar: ${error.message}`);
     },
   });
 
@@ -382,7 +408,7 @@ export function PesquisaCard({
         )}
 
         {/* Botões Secundários */}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-5 gap-2">
           <GenerateReportButton pesquisaId={pesquisa.id} size="sm" />
           {onViewEnrichment && (
             <button
@@ -407,8 +433,32 @@ export function PesquisaCard({
           >
             <Download className="w-4 h-4" />
           </button>
+          <button
+            onClick={() => setIsCleanModalOpen(true)}
+            disabled={pesquisa.clientesEnriquecidos === 0}
+            className="flex items-center justify-center gap-2 px-3 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            title={pesquisa.clientesEnriquecidos === 0 ? 'Nenhum dado para limpar' : 'Limpar Tudo'}
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
         </div>
       </div>
+
+      {/* Modal de Confirmação */}
+      <CleanEnrichmentModal
+        isOpen={isCleanModalOpen}
+        onClose={() => setIsCleanModalOpen(false)}
+        onConfirm={() => cleanMutation.mutate({ pesquisaId: pesquisa.id })}
+        isLoading={cleanMutation.isPending}
+        stats={{
+          totalClientes: pesquisa.totalClientes,
+          clientesEnriquecidos: pesquisa.clientesEnriquecidos,
+          leadsCount: pesquisa.leadsCount || 0,
+          concorrentesCount: pesquisa.concorrentesCount || 0,
+          produtosCount: pesquisa.produtosCount || 0,
+          mercadosCount: pesquisa.mercadosCount || 0,
+        }}
+      />
     </div>
   );
 }

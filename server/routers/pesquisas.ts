@@ -13,6 +13,9 @@ import {
   leads,
   concorrentes,
   produtos,
+  clientesMercados,
+  enrichmentJobs,
+  enrichmentRuns,
 } from '@/drizzle/schema';
 import { eq, and, desc, count, avg, sql } from 'drizzle-orm';
 
@@ -553,6 +556,194 @@ export const pesquisasRouter = createTRPCRouter({
       } catch (error) {
         console.error('[Pesquisas] Error fetching enrichment job status:', error);
         return null;
+      }
+    }),
+
+  /**
+   * Limpar todos os dados enriquecidos de uma pesquisa
+   * Permite recomeçar do zero quando houver erros
+   */
+  cleanEnrichment: publicProcedure
+    .input(
+      z.object({
+        pesquisaId: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new Error('Database connection failed');
+      }
+
+      console.log('[Pesquisas.cleanEnrichment] Iniciando limpeza da pesquisa:', input.pesquisaId);
+
+      try {
+        // Verificar se pesquisa existe
+        const [pesquisa] = await db
+          .select()
+          .from(pesquisas)
+          .where(eq(pesquisas.id, input.pesquisaId));
+
+        if (!pesquisa) {
+          throw new Error('Pesquisa não encontrada');
+        }
+
+        // Buscar IDs dos clientes da pesquisa
+        const clientesDaPesquisa = await db
+          .select({ id: clientes.id })
+          .from(clientes)
+          .where(eq(clientes.pesquisaId, input.pesquisaId));
+
+        const clienteIds = clientesDaPesquisa.map((c) => c.id);
+
+        console.log('[Pesquisas.cleanEnrichment] Clientes encontrados:', clienteIds.length);
+
+        if (clienteIds.length === 0) {
+          return {
+            success: true,
+            message: 'Nenhum dado para limpar',
+            stats: {
+              leadsRemoved: 0,
+              concorrentesRemoved: 0,
+              produtosRemoved: 0,
+              mercadosRemoved: 0,
+              clientesReset: 0,
+              jobsCancelled: 0,
+            },
+          };
+        }
+
+        // Iniciar transação
+        const stats = {
+          leadsRemoved: 0,
+          concorrentesRemoved: 0,
+          produtosRemoved: 0,
+          mercadosRemoved: 0,
+          clientesReset: 0,
+          jobsCancelled: 0,
+        };
+
+        // 1. Cancelar jobs em andamento
+        const jobsResult = await db
+          .update(enrichmentJobs)
+          .set({
+            status: 'cancelled',
+            updatedAt: new Date(),
+          })
+          .where(
+            and(
+              eq(enrichmentJobs.pesquisaId, input.pesquisaId),
+              sql`${enrichmentJobs.status} IN ('running', 'paused')`
+            )
+          );
+        stats.jobsCancelled = jobsResult.rowsAffected || 0;
+        console.log('[Pesquisas.cleanEnrichment] Jobs cancelados:', stats.jobsCancelled);
+
+        // 2. Limpar enrichment runs
+        await db.delete(enrichmentRuns).where(eq(enrichmentRuns.pesquisaId, input.pesquisaId));
+        console.log('[Pesquisas.cleanEnrichment] Enrichment runs removidos');
+
+        // 3. Deletar leads
+        for (const clienteId of clienteIds) {
+          const result = await db.delete(leads).where(eq(leads.clienteId, clienteId));
+          stats.leadsRemoved += result.rowsAffected || 0;
+        }
+        console.log('[Pesquisas.cleanEnrichment] Leads removidos:', stats.leadsRemoved);
+
+        // 4. Deletar concorrentes
+        for (const clienteId of clienteIds) {
+          const result = await db.delete(concorrentes).where(eq(concorrentes.clienteId, clienteId));
+          stats.concorrentesRemoved += result.rowsAffected || 0;
+        }
+        console.log(
+          '[Pesquisas.cleanEnrichment] Concorrentes removidos:',
+          stats.concorrentesRemoved
+        );
+
+        // 5. Deletar produtos
+        for (const clienteId of clienteIds) {
+          const result = await db.delete(produtos).where(eq(produtos.clienteId, clienteId));
+          stats.produtosRemoved += result.rowsAffected || 0;
+        }
+        console.log('[Pesquisas.cleanEnrichment] Produtos removidos:', stats.produtosRemoved);
+
+        // 6. Buscar mercados associados
+        const mercadosAssociados = await db
+          .select({ mercadoId: clientesMercados.mercadoId })
+          .from(clientesMercados)
+          .where(sql`${clientesMercados.clienteId} IN (${sql.join(clienteIds, sql`, `)})`)
+          .groupBy(clientesMercados.mercadoId);
+
+        const mercadoIds = mercadosAssociados.map((m) => m.mercadoId);
+        console.log('[Pesquisas.cleanEnrichment] Mercados associados:', mercadoIds.length);
+
+        // 7. Deletar relacionamentos clientes-mercados
+        for (const clienteId of clienteIds) {
+          await db.delete(clientesMercados).where(eq(clientesMercados.clienteId, clienteId));
+        }
+        console.log('[Pesquisas.cleanEnrichment] Relacionamentos clientes-mercados removidos');
+
+        // 8. Deletar mercados órfãos (que não têm outros clientes)
+        for (const mercadoId of mercadoIds) {
+          const [countResult] = await db
+            .select({ count: count() })
+            .from(clientesMercados)
+            .where(eq(clientesMercados.mercadoId, mercadoId));
+
+          if (countResult.count === 0) {
+            await db.delete(mercadosUnicos).where(eq(mercadosUnicos.id, mercadoId));
+            stats.mercadosRemoved++;
+          }
+        }
+        console.log(
+          '[Pesquisas.cleanEnrichment] Mercados órfãos removidos:',
+          stats.mercadosRemoved
+        );
+
+        // 9. Resetar campos enriquecidos dos clientes
+        const resetResult = await db
+          .update(clientes)
+          .set({
+            site: null,
+            cidade: null,
+            uf: null,
+            latitude: null,
+            longitude: null,
+            setor: null,
+            descricao: null,
+            qualidadeScore: null,
+            qualidadeClassificacao: null,
+            enriquecido: 0,
+            enriquecidoEm: null,
+            updatedAt: new Date(),
+          })
+          .where(eq(clientes.pesquisaId, input.pesquisaId));
+        stats.clientesReset = resetResult.rowsAffected || 0;
+        console.log('[Pesquisas.cleanEnrichment] Clientes resetados:', stats.clientesReset);
+
+        // 10. Resetar contadores da pesquisa
+        await db
+          .update(pesquisas)
+          .set({
+            clientesEnriquecidos: 0,
+            status: 'rascunho',
+            updatedAt: new Date(),
+          })
+          .where(eq(pesquisas.id, input.pesquisaId));
+        console.log('[Pesquisas.cleanEnrichment] Pesquisa resetada');
+
+        console.log('[Pesquisas.cleanEnrichment] Limpeza concluída com sucesso:', stats);
+
+        return {
+          success: true,
+          message: 'Limpeza concluída com sucesso!',
+          stats,
+        };
+      } catch (error) {
+        console.error('[Pesquisas.cleanEnrichment] Erro durante limpeza:', error);
+        throw new Error(
+          `Erro ao limpar pesquisa: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
+        );
       }
     }),
 });
