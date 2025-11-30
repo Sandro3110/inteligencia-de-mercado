@@ -1,7 +1,19 @@
 'use client';
 
-import React from 'react';
-import { X, Building2, Target, Users, MapPin, Phone, Mail, Globe, Hash } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  X,
+  Building2,
+  Target,
+  Users,
+  MapPin,
+  Phone,
+  Mail,
+  Globe,
+  Hash,
+  Copy,
+  Check,
+} from 'lucide-react';
 
 interface MapEntity {
   id: number;
@@ -20,6 +32,8 @@ interface EntityDetailCardProps {
 }
 
 export function EntityDetailCard({ entity, onClose }: EntityDetailCardProps) {
+  const [copied, setCopied] = useState(false);
+
   const getEntityIcon = () => {
     switch (entity.type) {
       case 'cliente':
@@ -50,6 +64,35 @@ export function EntityDetailCard({ entity, onClose }: EntityDetailCardProps) {
         return 'Lead';
       case 'concorrente':
         return 'Concorrente';
+    }
+  };
+
+  const copyToClipboard = async () => {
+    const lines: string[] = [
+      `Nome: ${entity.nome}`,
+      `Tipo: ${getEntityLabel()}`,
+      `Cidade: ${entity.cidade || 'N/A'} - ${entity.uf || 'N/A'}`,
+    ];
+
+    if (entity.cnpj) lines.push(`CNPJ: ${entity.cnpj}`);
+    if (entity.setor) lines.push(`Setor: ${entity.setor}`);
+    if (entity.porte) lines.push(`Porte: ${entity.porte}`);
+    if (entity.email) lines.push(`Email: ${entity.email}`);
+    if (entity.telefone) lines.push(`Telefone: ${entity.telefone}`);
+    if (entity.site || entity.siteOficial) lines.push(`Site: ${entity.site || entity.siteOficial}`);
+    if (entity.qualidadeClassificacao) lines.push(`Qualidade: ${entity.qualidadeClassificacao}`);
+    if (entity.latitude && entity.longitude) {
+      lines.push(`Coordenadas: ${entity.latitude}, ${entity.longitude}`);
+    }
+
+    const text = lines.join('\n');
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Erro ao copiar:', err);
     }
   };
 
@@ -212,7 +255,25 @@ export function EntityDetailCard({ entity, onClose }: EntityDetailCardProps) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+          <button
+            onClick={copyToClipboard}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              copied ? 'bg-green-600 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}
+          >
+            {copied ? (
+              <>
+                <Check className="w-4 h-4" />
+                Copiado!
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4" />
+                Copiar
+              </>
+            )}
+          </button>
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors"
