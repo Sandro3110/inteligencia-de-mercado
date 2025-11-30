@@ -14,25 +14,23 @@ export const mapRouter = router({
    */
   getMapData: publicProcedure
     .input(
-      z
-        .object({
-          projectId: z.number().optional(),
-          pesquisaId: z.number().optional(),
-          entityTypes: z
-            .array(z.enum(['clientes', 'leads', 'concorrentes']))
-            .default(['clientes', 'leads', 'concorrentes']),
-          filters: z
-            .object({
-              uf: z.string().optional(),
-              cidade: z.string().optional(),
-              setor: z.string().optional(),
-              porte: z.string().optional(),
-              qualidade: z.string().optional(),
-            })
-            .optional(),
-        })
-        .optional()
-        .default({})
+      z.object({
+        projectId: z.number().nullable().optional(),
+        pesquisaId: z.number().nullable().optional(),
+        entityTypes: z
+          .array(z.enum(['clientes', 'leads', 'concorrentes']))
+          .default(['clientes', 'leads', 'concorrentes']),
+        filters: z
+          .object({
+            uf: z.string().nullable().optional(),
+            cidade: z.string().nullable().optional(),
+            setor: z.string().nullable().optional(),
+            porte: z.string().nullable().optional(),
+            qualidade: z.string().nullable().optional(),
+          })
+          .optional()
+          .default({}),
+      })
     )
     .query(async ({ input }) => {
       console.log('🔍 [getMapData] Input:', JSON.stringify(input, null, 2));
@@ -41,9 +39,18 @@ export const mapRouter = router({
 
       const results: Array<Record<string, unknown>> = [];
 
+      // Tratar null como undefined para facilitar lógica
+      const projectId = input.projectId ?? undefined;
+      const pesquisaId = input.pesquisaId ?? undefined;
+      const uf = input.filters?.uf ?? undefined;
+      const cidade = input.filters?.cidade ?? undefined;
+      const setor = input.filters?.setor ?? undefined;
+      const porte = input.filters?.porte ?? undefined;
+      const qualidade = input.filters?.qualidade ?? undefined;
+
       // Se projectId foi fornecido mas pesquisaId não, buscar todas as pesquisas do projeto
       let pesquisaIds: number[] | undefined;
-      if (input.projectId && !input.pesquisaId) {
+      if (projectId && !pesquisaId) {
         const projectPesquisas = await db
           .select({ id: pesquisas.id })
           .from(pesquisas)

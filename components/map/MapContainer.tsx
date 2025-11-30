@@ -43,10 +43,27 @@ function MapBounds({ entities }: { entities: MapEntity[] }) {
 
   useEffect(() => {
     if (entities.length > 0) {
-      const bounds = L.latLngBounds(
-        entities.map((e) => [e.latitude, e.longitude] as [number, number])
+      // Filtrar entidades com coordenadas válidas
+      const validEntities = entities.filter(
+        (e) =>
+          typeof e.latitude === 'number' &&
+          typeof e.longitude === 'number' &&
+          !isNaN(e.latitude) &&
+          !isNaN(e.longitude) &&
+          isFinite(e.latitude) &&
+          isFinite(e.longitude)
       );
-      map.fitBounds(bounds, { padding: [50, 50] });
+
+      if (validEntities.length > 0) {
+        try {
+          const bounds = L.latLngBounds(
+            validEntities.map((e) => [e.latitude, e.longitude] as [number, number])
+          );
+          map.fitBounds(bounds, { padding: [50, 50] });
+        } catch (error) {
+          console.error('Erro ao ajustar bounds do mapa:', error);
+        }
+      }
     }
   }, [entities, map]);
 

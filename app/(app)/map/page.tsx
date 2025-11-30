@@ -57,18 +57,30 @@ export default function MapPage() {
   });
 
   // Queries
-  const { data: mapData, isLoading } = trpc.map.getMapData.useQuery({
-    entityTypes: filters.entityTypes,
-    projectId: filters.projectId,
-    pesquisaId: filters.pesquisaId,
-    filters: {
-      uf: filters.uf,
-      cidade: filters.cidade,
-      setor: filters.setor,
-      porte: filters.porte,
-      qualidade: filters.qualidade,
+  const {
+    data: mapData,
+    isLoading,
+    error,
+  } = trpc.map.getMapData.useQuery(
+    {
+      entityTypes: filters.entityTypes,
+      projectId: filters.projectId,
+      pesquisaId: filters.pesquisaId,
+      filters: {
+        uf: filters.uf,
+        cidade: filters.cidade,
+        setor: filters.setor,
+        porte: filters.porte,
+        qualidade: filters.qualidade,
+      },
     },
-  });
+    {
+      retry: false, // Não tentar novamente em caso de erro
+      onError: (err) => {
+        console.error('❌ Erro ao carregar dados do mapa:', err);
+      },
+    }
+  );
 
   // Buscar projetos e pesquisas para os dropdowns
   const { data: projects } = trpc.dashboard.getProjects.useQuery();
@@ -474,7 +486,21 @@ export default function MapPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* Map */}
         <div ref={mapContainerRef} className="flex-1 relative">
-          {isLoading ? (
+          {error ? (
+            <div className="w-full h-full flex items-center justify-center bg-gray-100">
+              <div className="text-center">
+                <div className="text-red-500 text-6xl mb-4">⚠️</div>
+                <p className="text-lg font-medium text-gray-700 mb-2">Erro ao carregar dados</p>
+                <p className="text-sm text-gray-500 mb-4">{error.message || 'Erro desconhecido'}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Recarregar Página
+                </button>
+              </div>
+            </div>
+          ) : isLoading ? (
             <div className="w-full h-full flex items-center justify-center bg-gray-100">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
