@@ -204,14 +204,14 @@ Use linguagem profissional, objetiva e baseada em dados. Seja específico e cite
       doc
         .fillColor('#ffffff')
         .fontSize(26)
-        .font('Helvetica-Bold')
+
         .text('RELATÓRIO DE INTELIGÊNCIA DE MERCADO', 50, 30, {
           align: 'center',
         });
 
       doc
         .fontSize(14)
-        .font('Helvetica')
+
         .fillColor('#e0e7ff')
         .text('Análise Consolidada de Mercado', 50, 65, { align: 'center' });
 
@@ -235,10 +235,10 @@ Use linguagem profissional, objetiva e baseada em dados. Seja específico e cite
       doc
         .fillColor('#000000')
         .fontSize(16)
-        .font('Helvetica-Bold')
+
         .text('📊 ESTATÍSTICAS GERAIS', 70, doc.y + 15);
       const statsY = doc.y + 45;
-      doc.fontSize(11).font('Helvetica');
+      doc.fontSize(11);
       doc.text(`• Total de Pesquisas: ${pesquisas.length}`, 70, statsY);
       doc.text(`• Total de Entidades: ${totalEntidades}`, 70, statsY + 20);
       doc.text(`  - Clientes: ${clientesData.length}`, 90, statsY + 40);
@@ -257,9 +257,9 @@ Use linguagem profissional, objetiva e baseada em dados. Seja específico e cite
         .lineWidth(2)
         .stroke();
       doc.moveDown(1);
-      doc.fontSize(18).font('Helvetica-Bold').fillColor('#2563eb').text('📋 ANÁLISE DETALHADA');
+      doc.fontSize(18).fillColor('#2563eb').text('📋 ANÁLISE DETALHADA');
       doc.fillColor('#000000').moveDown(0.5);
-      doc.fontSize(11).font('Helvetica').text(analiseIA, {
+      doc.fontSize(11).text(analiseIA, {
         align: 'justify',
         lineGap: 3,
       });
@@ -267,9 +267,9 @@ Use linguagem profissional, objetiva e baseada em dados. Seja específico e cite
       doc.moveDown(2);
 
       // Top 10 Mercados
-      doc.fontSize(14).font('Helvetica-Bold').text('Top 10 Mercados');
+      doc.fontSize(14).text('Top 10 Mercados');
       doc.moveDown(0.5);
-      doc.fontSize(10).font('Helvetica');
+      doc.fontSize(10);
       top10Mercados.forEach((mercado, i) => {
         doc.text(
           `${i + 1}. ${mercado.nome} - Tamanho: ${mercado.tamanhoEstimado || 'N/A'} - Potencial: ${mercado.potencial || 'N/A'}`
@@ -279,9 +279,9 @@ Use linguagem profissional, objetiva e baseada em dados. Seja específico e cite
       doc.moveDown(1.5);
 
       // Top 20 Clientes
-      doc.fontSize(14).font('Helvetica-Bold').text('Top 20 Clientes');
+      doc.fontSize(14).text('Top 20 Clientes');
       doc.moveDown(0.5);
-      doc.fontSize(10).font('Helvetica');
+      doc.fontSize(10);
       top20Clientes.forEach((cliente, i) => {
         doc.text(`${i + 1}. ${cliente.nome} - ${cliente.cidade || 'N/A'}/${cliente.uf || 'N/A'}`);
       });
@@ -289,9 +289,9 @@ Use linguagem profissional, objetiva e baseada em dados. Seja específico e cite
       doc.moveDown(1.5);
 
       // Produtos Principais
-      doc.fontSize(14).font('Helvetica-Bold').text('Produtos Principais');
+      doc.fontSize(14).text('Produtos Principais');
       doc.moveDown(0.5);
-      doc.fontSize(10).font('Helvetica');
+      doc.fontSize(10);
       produtosPrincipais.forEach((produto, i) => {
         doc.text(`${i + 1}. ${produto.nome} (${produto.count} menções)`);
       });

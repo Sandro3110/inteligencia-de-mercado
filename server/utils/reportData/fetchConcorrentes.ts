@@ -43,7 +43,9 @@ export async function fetchConcorrentes(
 
   const porMercado: Record<string, number> = {};
   for (const row of porMercadoResult) {
-    porMercado[row.mercado] = Number(row.count);
+    if (row.mercado && row.mercado.trim() !== '') {
+      porMercado[row.mercado] = Number(row.count);
+    }
   }
 
   // Top 50 concorrentes

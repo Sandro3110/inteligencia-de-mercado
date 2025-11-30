@@ -41,7 +41,9 @@ export async function fetchLeads(db: Database, pesquisaId: number): Promise<Lead
 
   const porMercado: Record<string, number> = {};
   for (const row of porMercadoResult) {
-    porMercado[row.mercado] = Number(row.count);
+    if (row.mercado && row.mercado.trim() !== '') {
+      porMercado[row.mercado] = Number(row.count);
+    }
   }
 
   // Distribuição por potencial
