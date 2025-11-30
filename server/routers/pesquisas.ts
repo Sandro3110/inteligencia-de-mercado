@@ -667,17 +667,15 @@ export const pesquisasRouter = createTRPCRouter({
         console.log('[Pesquisas.cleanEnrichment] Enrichment runs removidos');
 
         // 3. Deletar leads
-        for (const clienteId of clienteIds) {
-          const result = await db.delete(leads).where(eq(leads.clienteId, clienteId));
-          stats.leadsRemoved += result.rowsAffected || 0;
-        }
+        const leadsResult = await db.delete(leads).where(eq(leads.pesquisaId, input.pesquisaId));
+        stats.leadsRemoved = leadsResult.rowsAffected || 0;
         console.log('[Pesquisas.cleanEnrichment] Leads removidos:', stats.leadsRemoved);
 
         // 4. Deletar concorrentes
-        for (const clienteId of clienteIds) {
-          const result = await db.delete(concorrentes).where(eq(concorrentes.clienteId, clienteId));
-          stats.concorrentesRemoved += result.rowsAffected || 0;
-        }
+        const concorrentesResult = await db
+          .delete(concorrentes)
+          .where(eq(concorrentes.pesquisaId, input.pesquisaId));
+        stats.concorrentesRemoved = concorrentesResult.rowsAffected || 0;
         console.log(
           '[Pesquisas.cleanEnrichment] Concorrentes removidos:',
           stats.concorrentesRemoved
