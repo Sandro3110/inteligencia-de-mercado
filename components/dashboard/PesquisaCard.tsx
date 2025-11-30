@@ -87,7 +87,27 @@ export function PesquisaCard({
       if (onRefresh) onRefresh();
     },
     onError: (error) => {
-      toast.error(`Erro ao limpar: ${error.message}`);
+      // Extrair mensagem mais amigável do erro
+      let errorMessage = 'Não foi possível limpar os dados';
+      let errorDescription = 'Tente novamente em alguns instantes.';
+
+      if (error.message.includes('enrichment_jobs')) {
+        errorMessage = 'Erro ao cancelar enriquecimento';
+        errorDescription =
+          'Não foi possível cancelar os jobs em andamento. Aguarde alguns segundos e tente novamente.';
+      } else if (error.message.includes('Database')) {
+        errorMessage = 'Erro de conexão';
+        errorDescription =
+          'Não foi possível conectar ao banco de dados. Verifique sua conexão com a internet.';
+      } else if (error.message.includes('permission') || error.message.includes('denied')) {
+        errorMessage = 'Sem permissão';
+        errorDescription = 'Você não tem permissão para realizar esta operação.';
+      }
+
+      toast.error(errorMessage, {
+        duration: 5000,
+        description: errorDescription,
+      });
     },
   });
 
