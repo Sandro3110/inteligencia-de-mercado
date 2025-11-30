@@ -31,12 +31,17 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
   const generateMutation = trpc.reportsEnhanced.generateEnhancedReport.useMutation();
 
   const handleClick = async () => {
+    console.log('🔵 [DEBUG] Botão clicado! pesquisaId:', pesquisaId);
     setIsValidating(true);
+    console.log('🔵 [DEBUG] Estado isValidating definido como true');
 
     try {
+      console.log('🔵 [DEBUG] Chamando validateMutation.mutateAsync...');
       const validation = await validateMutation.mutateAsync({ pesquisaId });
+      console.log('🔵 [DEBUG] Validação recebida:', validation);
 
       if (!validation.canGenerate) {
+        console.log('⚠️ [DEBUG] Validação falhou! canGenerate=false');
         toast.error(validation.warning || 'Não é possível gerar relatório');
         setIsValidating(false);
         return;
@@ -51,7 +56,9 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
       setIsGenerating(true);
 
       // Gerar relatório
+      console.log('🔵 [DEBUG] Chamando generateMutation.mutateAsync...');
       const result = await generateMutation.mutateAsync({ pesquisaId });
+      console.log('🔵 [DEBUG] Relatório gerado:', result);
 
       setReportData(result);
       setShowModal(true);
@@ -59,6 +66,8 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
 
       toast.success(`Relatório gerado! ${result.metadata.tokens} tokens`);
     } catch (error: any) {
+      console.error('❌ [DEBUG] Erro capturado:', error);
+      console.error('❌ [DEBUG] Stack trace:', error.stack);
       setIsValidating(false);
       setIsGenerating(false);
       toast.error(error.message || 'Erro ao gerar relatório');
