@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Zap, BarChart3, Download, RefreshCw, MapPin, FileText } from 'lucide-react';
+import { Zap, BarChart3, Download, RefreshCw, MapPin, FileText, Pause, X } from 'lucide-react';
+import { toast } from 'sonner';
 import { GenerateReportButton } from '@/components/enrichment-v3/GenerateReportButton';
 import { trpc } from '@/lib/trpc/client';
 
@@ -41,6 +42,27 @@ export function PesquisaCard({
 }: PesquisaCardProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Mutations para pausar/cancelar enriquecimento
+  const pauseMutation = trpc.enrichmentBatch.pause.useMutation({
+    onSuccess: () => {
+      toast.success('Enriquecimento pausado');
+      if (onRefresh) onRefresh();
+    },
+    onError: () => {
+      toast.error('Erro ao pausar enriquecimento');
+    },
+  });
+
+  const cancelMutation = trpc.enrichmentBatch.cancel.useMutation({
+    onSuccess: () => {
+      toast.success('Enriquecimento cancelado');
+      if (onRefresh) onRefresh();
+    },
+    onError: () => {
+      toast.error('Erro ao cancelar enriquecimento');
+    },
+  });
+
   // Buscar status do enrichment job
   const { data: enrichmentJob } = trpc.pesquisas.getEnrichmentJobStatus.useQuery(
     { pesquisaId: pesquisa.id },
@@ -65,6 +87,9 @@ export function PesquisaCard({
 
   const isGeocoding = geocodingJob?.status === 'processing';
   const geocodingCompleted = geocodingJob?.status === 'completed';
+
+  // Verificar se está enriquecendo
+  const isEnriching = enrichmentJob?.status === 'processing' && enrichmentPercentage < 95;
 
   const geoTotal = pesquisa.geoEnriquecimentoTotal || 0;
   const geoTotalEntidades = pesquisa.geoEnriquecimentoTotalEntidades || 0;
@@ -280,23 +305,57 @@ export function PesquisaCard({
       {/* Botões de Ação */}
       <div className="p-6 pt-0 space-y-2">
         {/* Botões Principais */}
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={() => onEnrich(pesquisa.projectId, pesquisa.id)}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all font-medium shadow-sm hover:shadow"
-          >
-            <Zap className="w-4 h-4" />
-            Enriquecer
-          </button>
-          <button
-            onClick={() => onGeocode(pesquisa.projectId, pesquisa.id)}
-            disabled={isGeocoding}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all font-medium shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <MapPin className={`w-4 h-4 ${isGeocoding ? 'animate-pulse' : ''}`} />
-            {isGeocoding ? 'Processando...' : 'Geocodificar'}
-          </button>
-        </div>
+        {isEnriching ? (
+          /* Enriquecimento em andamento: mostrar Pausar e Cancelar */
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              onClick={() => pauseMutation.mutate()}
+              disabled={pauseMutation.isPending}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all font-medium shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Pause className="w-4 h-4" />
+              {pauseMutation.isPending ? 'Pausando...' : 'Pausar'}
+            </button>
+            <button
+              onClick={() => {
+                if (confirm('Tem certeza que deseja cancelar o enriquecimento?')) {
+                  cancelMutation.mutate();
+                }
+              }}
+              disabled={cancelMutation.isPending}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all font-medium shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <X className="w-4 h-4" />
+              {cancelMutation.isPending ? 'Cancelando...' : 'Cancelar'}
+            </button>
+            <button
+              onClick={() => onGeocode(pesquisa.projectId, pesquisa.id)}
+              disabled={isGeocoding}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all font-medium shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <MapPin className={`w-4 h-4 ${isGeocoding ? 'animate-pulse' : ''}`} />
+            </button>
+          </div>
+        ) : (
+          /* Enriquecimento não iniciado: mostrar Enriquecer e Geocodificar */
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => onEnrich(pesquisa.projectId, pesquisa.id)}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all font-medium shadow-sm hover:shadow"
+            >
+              <Zap className="w-4 h-4" />
+              Enriquecer
+            </button>
+            <button
+              onClick={() => onGeocode(pesquisa.projectId, pesquisa.id)}
+              disabled={isGeocoding}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all font-medium shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <MapPin className={`w-4 h-4 ${isGeocoding ? 'animate-pulse' : ''}`} />
+              {isGeocoding ? 'Processando...' : 'Geocodificar'}
+            </button>
+          </div>
+        )}
 
         {/* Botões Secundários */}
         <div className="grid grid-cols-3 gap-2">
