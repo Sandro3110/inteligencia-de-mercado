@@ -299,6 +299,17 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
               produtoPrincipal: concorrente.produtoPrincipal,
             });
 
+          // Geocodificar concorrente
+          let concLat: number | undefined;
+          let concLng: number | undefined;
+          if (concorrente.cidade && concorrente.uf) {
+            const coords = await geocodificar(concorrente.cidade, concorrente.uf);
+            if (coords) {
+              concLat = coords.lat;
+              concLng = coords.lng;
+            }
+          }
+
           await db.insert(concorrentes).values({
             pesquisaId,
             projectId: pesquisa.projectId,
@@ -308,6 +319,8 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
             site: concorrente.site,
             cidade: concorrente.cidade,
             uf: concorrente.uf,
+            latitude: concLat,
+            longitude: concLng,
             produto: concorrente.produtoPrincipal,
             qualidadeScore: concScore,
             qualidadeClassificacao: concClass,
@@ -349,6 +362,17 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
               produtoInteresse: lead.produtoInteresse,
             });
 
+          // Geocodificar lead
+          let leadLat: number | undefined;
+          let leadLng: number | undefined;
+          if (lead.cidade && lead.uf) {
+            const coords = await geocodificar(lead.cidade, lead.uf);
+            if (coords) {
+              leadLat = coords.lat;
+              leadLng = coords.lng;
+            }
+          }
+
           await db.insert(leads).values({
             pesquisaId,
             projectId: pesquisa.projectId,
@@ -358,6 +382,8 @@ async function processEnrichment(jobId: number, pesquisaId: number) {
             site: lead.site,
             cidade: lead.cidade,
             uf: lead.uf,
+            latitude: leadLat,
+            longitude: leadLng,
             regiao: lead.cidade,
             setor: lead.produtoInteresse,
             qualidadeScore: leadScore,
