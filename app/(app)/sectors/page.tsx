@@ -41,10 +41,25 @@ export default function SectorsPage() {
   const [entityType, setEntityType] = useState<'clientes' | 'leads' | 'concorrentes'>('clientes');
 
   // Buscar resumo de setores
-  const { data, isLoading, error } = trpc.sectorAnalysis.getSectorSummary.useQuery({
-    projectId,
-    pesquisaId,
-  });
+  const { data, isLoading, error } = trpc.sectorAnalysis.getSectorSummary.useQuery(
+    {
+      projectId,
+      pesquisaId,
+    },
+    {
+      enabled: !!projectId, // Só executa se projectId existir
+    }
+  );
+
+  if (!projectId) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Card className="p-6">
+          <p className="text-muted-foreground">Selecione um projeto para visualizar setores</p>
+        </Card>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
