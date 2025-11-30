@@ -34,15 +34,17 @@ export async function fetchMetadata(db: Database, pesquisaId: number): Promise<R
     throw new Error('Projeto não encontrado');
   }
 
-  const progress = Math.round((pesquisa.clientesEnriquecidos / pesquisa.totalClientes) * 100);
+  const clientesEnriquecidos = pesquisa.clientesEnriquecidos || 0;
+  const totalClientes = pesquisa.totalClientes || 0;
+  const progress = totalClientes > 0 ? Math.round((clientesEnriquecidos / totalClientes) * 100) : 0;
 
   return {
     projectId: project.id,
     projectNome: project.nome,
     pesquisaId: pesquisa.id,
     pesquisaNome: pesquisa.nome,
-    totalClientes: pesquisa.totalClientes,
-    clientesEnriquecidos: pesquisa.clientesEnriquecidos,
+    totalClientes,
+    clientesEnriquecidos,
     enrichmentProgress: progress,
   };
 }
