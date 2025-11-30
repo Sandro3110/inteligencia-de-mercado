@@ -260,7 +260,8 @@ ${top10Cidades.map((c, i) => `${i + 1}. ${c.cidade}: ${c.count} clientes`).join(
 
       return {
         success: true,
-        pdf: pdfBase64,
+        data: pdfBase64,
+        mimeType: 'application/pdf',
         filename: `relatorio-projeto-${input.projectId}-${Date.now()}.pdf`,
       };
     }),

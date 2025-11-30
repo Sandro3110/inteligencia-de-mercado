@@ -278,9 +278,9 @@ export default function DashboardPage() {
                   onEnrich={handleEnrich}
                   onViewResults={handleViewResults}
                   onExport={handleExport}
-                  onRefresh={() => {
-                    trpcUtils.dashboard.getProjectPesquisas.invalidate();
-                    trpcUtils.dashboard.stats.invalidate();
+                  onRefresh={async () => {
+                    await trpcUtils.dashboard.getProjectPesquisas.invalidate();
+                    await trpcUtils.dashboard.stats.invalidate();
                   }}
                 />
               ))}

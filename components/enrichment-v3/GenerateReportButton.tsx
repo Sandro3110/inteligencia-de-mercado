@@ -83,7 +83,24 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
       setIsGenerating(false);
 
       // Baixar PDF
-      const pdfBlob = new Blob([Uint8Array.from(atob(result.pdf), (c) => c.charCodeAt(0))], {
+      console.log('🔵 [DEBUG] Tipo de result.pdf:', typeof result.pdf);
+      console.log('🔵 [DEBUG] Primeiros 100 chars:', result.pdf?.substring?.(0, 100));
+
+      // Validar que result.pdf é uma string
+      if (typeof result.pdf !== 'string') {
+        throw new Error('PDF inválido: esperado string Base64, recebido ' + typeof result.pdf);
+      }
+
+      // Tentar decodificar Base64
+      let pdfBinary;
+      try {
+        pdfBinary = atob(result.pdf);
+      } catch (e) {
+        console.error('❌ [DEBUG] Erro ao decodificar Base64:', e);
+        throw new Error('Erro ao decodificar PDF: string Base64 inválida');
+      }
+
+      const pdfBlob = new Blob([Uint8Array.from(pdfBinary, (c) => c.charCodeAt(0))], {
         type: 'application/pdf',
       });
       const url = URL.createObjectURL(pdfBlob);

@@ -127,7 +127,17 @@ export default function ProjectDetailsPage() {
 
   // Helper para converter base64 em blob
   const base64ToBlob = (base64: string, mimeType: string) => {
-    const byteCharacters = atob(base64);
+    if (!base64 || typeof base64 !== 'string') {
+      throw new Error('Base64 inválido: esperado string, recebido ' + typeof base64);
+    }
+
+    let byteCharacters;
+    try {
+      byteCharacters = atob(base64);
+    } catch (e) {
+      console.error('Erro ao decodificar Base64:', e);
+      throw new Error('Erro ao decodificar PDF: string Base64 inválida');
+    }
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
@@ -351,9 +361,9 @@ export default function ProjectDetailsPage() {
                 onEnrich={handleEnrich}
                 onViewResults={handleViewResults}
                 onExport={handleExport}
-                onRefresh={() => {
-                  trpcUtils.dashboard.getProjectPesquisas.invalidate();
-                  trpcUtils.dashboard.stats.invalidate();
+                onRefresh={async () => {
+                  await trpcUtils.dashboard.getProjectPesquisas.invalidate();
+                  await trpcUtils.dashboard.stats.invalidate();
                 }}
               />
             ))}
