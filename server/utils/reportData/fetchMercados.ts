@@ -49,34 +49,56 @@ export async function fetchMercados(db: Database, pesquisaId: number): Promise<M
     }
 
     // Contar clientes neste mercado
-    const clientesCountResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(clientesMercados)
-      .innerJoin(clientes, eq(clientesMercados.clienteId, clientes.id))
-      .where(and(eq(clientesMercados.mercadoId, mercado.id), eq(clientes.pesquisaId, pesquisaId)));
-    const clientesCount = Number(clientesCountResult[0]?.count || 0);
+    let clientesCount = 0;
+    try {
+      const clientesCountResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(clientesMercados)
+        .innerJoin(clientes, eq(clientesMercados.clienteId, clientes.id))
+        .where(
+          and(eq(clientesMercados.mercadoId, mercado.id), eq(clientes.pesquisaId, pesquisaId))
+        );
+      clientesCount = Number(clientesCountResult[0]?.count || 0);
+    } catch (err) {
+      console.error('[fetchMercados] Error counting clientes for mercado', mercado.id, err);
+    }
 
     // Contar produtos neste mercado
-    const produtosCountResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(produtos)
-      .innerJoin(clientes, eq(produtos.clienteId, clientes.id))
-      .where(and(eq(produtos.mercadoId, mercado.id), eq(clientes.pesquisaId, pesquisaId)));
-    const produtosCount = Number(produtosCountResult[0]?.count || 0);
+    let produtosCount = 0;
+    try {
+      const produtosCountResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(produtos)
+        .innerJoin(clientes, eq(produtos.clienteId, clientes.id))
+        .where(and(eq(produtos.mercadoId, mercado.id), eq(clientes.pesquisaId, pesquisaId)));
+      produtosCount = Number(produtosCountResult[0]?.count || 0);
+    } catch (err) {
+      console.error('[fetchMercados] Error counting produtos for mercado', mercado.id, err);
+    }
 
     // Contar concorrentes neste mercado
-    const concorrentesCountResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(concorrentes)
-      .where(eq(concorrentes.mercadoId, mercado.id));
-    const concorrentesCount = Number(concorrentesCountResult[0]?.count || 0);
+    let concorrentesCount = 0;
+    try {
+      const concorrentesCountResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(concorrentes)
+        .where(eq(concorrentes.mercadoId, mercado.id));
+      concorrentesCount = Number(concorrentesCountResult[0]?.count || 0);
+    } catch (err) {
+      console.error('[fetchMercados] Error counting concorrentes for mercado', mercado.id, err);
+    }
 
     // Contar leads neste mercado
-    const leadsCountResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(leads)
-      .where(eq(leads.mercadoId, mercado.id));
-    const leadsCount = Number(leadsCountResult[0]?.count || 0);
+    let leadsCount = 0;
+    try {
+      const leadsCountResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(leads)
+        .where(eq(leads.mercadoId, mercado.id));
+      leadsCount = Number(leadsCountResult[0]?.count || 0);
+    } catch (err) {
+      console.error('[fetchMercados] Error counting leads for mercado', mercado.id, err);
+    }
 
     mercadosComStats.push({
       nome: mercado.nome,
