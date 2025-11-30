@@ -6,8 +6,8 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '@/lib/trpc/server';
 import { getDb } from '@/server/db';
-import { pesquisas, clientes, mercadosUnicos } from '@/drizzle/schema';
-import { eq, and, desc, count } from 'drizzle-orm';
+import { pesquisas, clientes, mercadosUnicos, leads, concorrentes } from '@/drizzle/schema';
+import { eq, and, desc, count, avg, sql } from 'drizzle-orm';
 
 export const pesquisasRouter = createTRPCRouter({
   /**
@@ -315,6 +315,129 @@ export const pesquisasRouter = createTRPCRouter({
       } catch (error) {
         console.error('[Pesquisas] Error updating stats:', error);
         throw new Error('Failed to update stats');
+      }
+    }),
+
+  /**
+   * Recalcular métricas da pesquisa
+   * Atualiza contadores de clientes, leads, mercados, concorrentes e qualidade média
+   */
+  recalculateMetrics: publicProcedure
+    .input(z.object({ pesquisaId: z.number() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new Error('Database connection failed');
+      }
+
+      try {
+        console.log('[Pesquisas] Recalculando métricas para pesquisa:', input.pesquisaId);
+
+        // 1. Contar clientes total e enriquecidos
+        const [clientesTotal] = await db
+          .select({ value: count() })
+          .from(clientes)
+          .where(eq(clientes.pesquisaId, input.pesquisaId));
+
+        const [clientesEnriquecidos] = await db
+          .select({ value: count() })
+          .from(clientes)
+          .where(
+            and(
+              eq(clientes.pesquisaId, input.pesquisaId),
+              sql`${clientes.qualityScore} IS NOT NULL AND ${clientes.qualityScore} > 0`
+            )
+          );
+
+        // 2. Contar leads
+        const [leadsTotal] = await db
+          .select({ value: count() })
+          .from(leads)
+          .where(eq(leads.pesquisaId, input.pesquisaId));
+
+        // 3. Contar mercados
+        const [mercadosTotal] = await db
+          .select({ value: count() })
+          .from(mercadosUnicos)
+          .where(eq(mercadosUnicos.pesquisaId, input.pesquisaId));
+
+        // 4. Contar concorrentes
+        const [concorrentesTotal] = await db
+          .select({ value: count() })
+          .from(concorrentes)
+          .where(eq(concorrentes.pesquisaId, input.pesquisaId));
+
+        // 5. Calcular qualidade média de clientes
+        const [clientesQualidade] = await db
+          .select({ value: avg(clientes.qualityScore) })
+          .from(clientes)
+          .where(
+            and(
+              eq(clientes.pesquisaId, input.pesquisaId),
+              sql`${clientes.qualityScore} IS NOT NULL AND ${clientes.qualityScore} > 0`
+            )
+          );
+
+        // 6. Calcular qualidade média de leads
+        const [leadsQualidade] = await db
+          .select({ value: avg(leads.qualityScore) })
+          .from(leads)
+          .where(
+            and(
+              eq(leads.pesquisaId, input.pesquisaId),
+              sql`${leads.qualityScore} IS NOT NULL AND ${leads.qualityScore} > 0`
+            )
+          );
+
+        // 7. Calcular qualidade média de concorrentes
+        const [concorrentesQualidade] = await db
+          .select({ value: avg(concorrentes.qualityScore) })
+          .from(concorrentes)
+          .where(
+            and(
+              eq(concorrentes.pesquisaId, input.pesquisaId),
+              sql`${concorrentes.qualityScore} IS NOT NULL AND ${concorrentes.qualityScore} > 0`
+            )
+          );
+
+        // 8. Atualizar pesquisa com novos valores
+        const [updated] = await db
+          .update(pesquisas)
+          .set({
+            totalClientes: clientesTotal?.value || 0,
+            clientesEnriquecidos: clientesEnriquecidos?.value || 0,
+            updatedAt: new Date().toISOString(),
+          })
+          .where(eq(pesquisas.id, input.pesquisaId))
+          .returning();
+
+        console.log('[Pesquisas] Métricas recalculadas com sucesso:', {
+          totalClientes: clientesTotal?.value || 0,
+          clientesEnriquecidos: clientesEnriquecidos?.value || 0,
+          leadsCount: leadsTotal?.value || 0,
+          mercadosCount: mercadosTotal?.value || 0,
+          concorrentesCount: concorrentesTotal?.value || 0,
+          clientesQualidadeMedia: clientesQualidade?.value || 0,
+          leadsQualidadeMedia: leadsQualidade?.value || 0,
+          concorrentesQualidadeMedia: concorrentesQualidade?.value || 0,
+        });
+
+        return {
+          success: true,
+          metrics: {
+            totalClientes: clientesTotal?.value || 0,
+            clientesEnriquecidos: clientesEnriquecidos?.value || 0,
+            leadsCount: leadsTotal?.value || 0,
+            mercadosCount: mercadosTotal?.value || 0,
+            concorrentesCount: concorrentesTotal?.value || 0,
+            clientesQualidadeMedia: Math.round(Number(clientesQualidade?.value || 0)),
+            leadsQualidadeMedia: Math.round(Number(leadsQualidade?.value || 0)),
+            concorrentesQualidadeMedia: Math.round(Number(concorrentesQualidade?.value || 0)),
+          },
+        };
+      } catch (error) {
+        console.error('[Pesquisas] Error recalculating metrics:', error);
+        throw new Error('Failed to recalculate metrics');
       }
     }),
 });

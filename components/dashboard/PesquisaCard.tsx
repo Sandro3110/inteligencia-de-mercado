@@ -1,7 +1,9 @@
 'use client';
 
-import { Zap, BarChart3, Download, FileText } from 'lucide-react';
+import { useState } from 'react';
+import { Zap, BarChart3, Download, RefreshCw } from 'lucide-react';
 import { GenerateReportButton } from '@/components/enrichment-v3/GenerateReportButton';
+import { trpc } from '@/lib/trpc/client';
 
 interface PesquisaCardProps {
   pesquisa: {
@@ -22,9 +24,33 @@ interface PesquisaCardProps {
   onEnrich: (projectId: number, pesquisaId: number) => void;
   onViewResults: (projectId: number, pesquisaId: number) => void;
   onExport: (projectId: number, pesquisaId: number) => void;
+  onRefresh?: () => void;
 }
 
-export function PesquisaCard({ pesquisa, onEnrich, onViewResults, onExport }: PesquisaCardProps) {
+export function PesquisaCard({
+  pesquisa,
+  onEnrich,
+  onViewResults,
+  onExport,
+  onRefresh,
+}: PesquisaCardProps) {
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const recalculateMutation = trpc.pesquisas.recalculateMetrics.useMutation();
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await recalculateMutation.mutateAsync({ pesquisaId: pesquisa.id });
+      // Chamar callback para recarregar dados
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      console.error('Erro ao recalcular métricas:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
   // ===== CÁLCULO DE METAS BASEADO NOS PROMPTS =====
   // Baseado em openaiLayered.ts:
   // - 2 mercados por cliente
@@ -34,7 +60,7 @@ export function PesquisaCard({ pesquisa, onEnrich, onViewResults, onExport }: Pe
 
   const totalClientes = pesquisa.totalClientes;
   const metaMercados = totalClientes * 2;
-  const metaProdutos = totalClientes * 4;
+  const _metaProdutos = totalClientes * 4; // Reservado para uso futuro
   const metaLeads = totalClientes * 13;
   const metaConcorrentes = totalClientes * 18;
 
@@ -87,8 +113,8 @@ export function PesquisaCard({ pesquisa, onEnrich, onViewResults, onExport }: Pe
 
   const qualidadePercentage = totalPeso > 0 ? Math.round(qualidadeGeral / totalPeso) : 0;
 
-  // Classificação de qualidade
-  const qualidadeClassificacao =
+  // Classificação de qualidade (reservado para uso futuro)
+  const _qualidadeClassificacao =
     qualidadePercentage >= 71 ? 'Alta' : qualidadePercentage >= 41 ? 'Média' : 'Baixa';
   const qualidadeCor =
     qualidadePercentage >= 71
@@ -107,6 +133,19 @@ export function PesquisaCard({ pesquisa, onEnrich, onViewResults, onExport }: Pe
       </p>
 
       <div className="mb-4 space-y-2">
+        {/* Botão Atualizar Métricas */}
+        <div className="flex justify-end mb-2">
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Recalcular métricas"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Atualizando...' : 'Atualizar'}
+          </button>
+        </div>
+
         {/* Progresso Geral */}
         <div>
           <div className="flex justify-between text-sm mb-1">

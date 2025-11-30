@@ -88,7 +88,11 @@ export default function ProjectDetailsPage() {
     setIsCreatePesquisaModalOpen(true);
   };
 
-  const handleCreatePesquisa = (data: { nome: string; descricao: string; csvData: string[][] }) => {
+  const _handleCreatePesquisa = (data: {
+    nome: string;
+    descricao: string;
+    csvData: string[][];
+  }) => {
     createPesquisaMutation.mutate({
       projectId,
       ...data,
@@ -347,6 +351,10 @@ export default function ProjectDetailsPage() {
                 onEnrich={handleEnrich}
                 onViewResults={handleViewResults}
                 onExport={handleExport}
+                onRefresh={() => {
+                  trpcUtils.dashboard.getProjectPesquisas.invalidate();
+                  trpcUtils.dashboard.stats.invalidate();
+                }}
               />
             ))}
           </div>

@@ -93,7 +93,7 @@ export default function DashboardPage() {
     router.push(`/projects/${projectId}`);
   };
 
-  const handleEditProject = (projectId: number) => {
+  const handleEditProject = (_projectId: number) => {
     // TODO: Abrir modal de edição
     toast.info('Modal de edição em desenvolvimento');
   };
@@ -119,13 +119,13 @@ export default function DashboardPage() {
   const handleExport = async (_projectId: number, pesquisaId: number) => {
     try {
       toast.info('Gerando arquivo Excel...');
-      
+
       const response = await fetch(`/api/export/excel?pesquisaId=${pesquisaId}`);
-      
+
       if (!response.ok) {
         throw new Error('Erro ao gerar Excel');
       }
-      
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -135,7 +135,7 @@ export default function DashboardPage() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       toast.success('Excel exportado com sucesso!');
     } catch (error) {
       console.error('Erro ao exportar:', error);
@@ -278,6 +278,10 @@ export default function DashboardPage() {
                   onEnrich={handleEnrich}
                   onViewResults={handleViewResults}
                   onExport={handleExport}
+                  onRefresh={() => {
+                    trpcUtils.dashboard.getProjectPesquisas.invalidate();
+                    trpcUtils.dashboard.stats.invalidate();
+                  }}
                 />
               ))}
             </div>
