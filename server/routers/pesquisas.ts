@@ -423,8 +423,7 @@ export const pesquisasRouter = createTRPCRouter({
               eq(clientes.pesquisaId, input.pesquisaId),
               sql`(
                 ${clientes.cidade} IS NOT NULL AND ${clientes.cidade} != '' OR
-                ${clientes.estado} IS NOT NULL AND ${clientes.estado} != '' OR
-                ${clientes.pais} IS NOT NULL AND ${clientes.pais} != ''
+                ${clientes.uf} IS NOT NULL AND ${clientes.uf} != ''
               )`
             )
           );
@@ -437,8 +436,7 @@ export const pesquisasRouter = createTRPCRouter({
               eq(leads.pesquisaId, input.pesquisaId),
               sql`(
                 ${leads.cidade} IS NOT NULL AND ${leads.cidade} != '' OR
-                ${leads.estado} IS NOT NULL AND ${leads.estado} != '' OR
-                ${leads.pais} IS NOT NULL AND ${leads.pais} != ''
+                ${leads.uf} IS NOT NULL AND ${leads.uf} != ''
               )`
             )
           );
@@ -451,8 +449,7 @@ export const pesquisasRouter = createTRPCRouter({
               eq(concorrentes.pesquisaId, input.pesquisaId),
               sql`(
                 ${concorrentes.cidade} IS NOT NULL AND ${concorrentes.cidade} != '' OR
-                ${concorrentes.estado} IS NOT NULL AND ${concorrentes.estado} != '' OR
-                ${concorrentes.pais} IS NOT NULL AND ${concorrentes.pais} != ''
+                ${concorrentes.uf} IS NOT NULL AND ${concorrentes.uf} != ''
               )`
             )
           );
