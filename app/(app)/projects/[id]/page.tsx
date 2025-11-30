@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { trpc } from '@/lib/trpc/client';
 import { ArrowLeft, Plus, FileText, Zap, BarChart3, Download } from 'lucide-react';
 import { PesquisaCard } from '@/components/dashboard/PesquisaCard';
-import { toast } from 'sonner';
+import { FeedbackModal, FeedbackType } from '@/components/ui/FeedbackModal';
 import { PesquisaModal } from '@/components/pesquisas/PesquisaModal';
 import { EnrichAllModal } from '@/components/enrichment/EnrichAllModal';
 
@@ -24,6 +24,12 @@ export default function ProjectDetailsPage() {
 
   const isLoading = loadingProject || loadingPesquisas;
 
+  // Estado do FeedbackModal
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<FeedbackType>('info');
+  const [feedbackTitle, setFeedbackTitle] = useState('');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+
   // Handlers
   const handleEnrich = (projId: number, pesquisaId: number) => {
     router.push(`/projects/${projId}/surveys/${pesquisaId}/enrich`);
@@ -36,14 +42,14 @@ export default function ProjectDetailsPage() {
   const handleExport = async (_projId: number, pesquisaId: number) => {
     try {
       toast.info('Gerando arquivo Excel...');
-      
+
       const response = await fetch(`/api/export/excel?pesquisaId=${pesquisaId}`);
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Erro ao gerar Excel');
       }
-      
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -53,7 +59,7 @@ export default function ProjectDetailsPage() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       toast.success('Excel exportado com sucesso!');
     } catch (error) {
       console.error('Erro ao exportar:', error);
@@ -175,19 +181,34 @@ export default function ProjectDetailsPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      toast.success('Relatório gerado com sucesso!');
+
+      setFeedbackType('success');
+      setFeedbackTitle('Relatório gerado com sucesso!');
+      setFeedbackMessage(`O arquivo ${data.filename} foi baixado para seu computador.`);
+      setShowFeedback(true);
     },
     onError: (error) => {
-      toast.error(`Erro ao gerar relatório: ${error.message}`);
+      setFeedbackType('error');
+      setFeedbackTitle('Erro ao gerar relatório');
+      setFeedbackMessage(error.message || 'Ocorreu um erro inesperado. Tente novamente.');
+      setShowFeedback(true);
     },
   });
 
   const handleViewReport = () => {
     if (!pesquisas || pesquisas.length === 0) {
-      toast.error('Não há dados para gerar relatório');
+      setFeedbackType('error');
+      setFeedbackTitle('Não há dados');
+      setFeedbackMessage('Crie pelo menos uma pesquisa antes de gerar o relatório.');
+      setShowFeedback(true);
       return;
     }
-    toast.loading('Gerando relatório analítico com IA...');
+
+    setFeedbackType('info');
+    setFeedbackTitle('Gerando relatório...');
+    setFeedbackMessage('Aguarde enquanto geramos o relatório analítico com IA.');
+    setShowFeedback(true);
+
     generateReportMutation.mutate({ projectId });
   };
 
@@ -347,6 +368,14 @@ export default function ProjectDetailsPage() {
       </div>
 
       {/* Modals */}
+      <FeedbackModal
+        open={showFeedback}
+        onClose={() => setShowFeedback(false)}
+        type={feedbackType}
+        title={feedbackTitle}
+        message={feedbackMessage}
+      />
+
       <PesquisaModal
         isOpen={isCreatePesquisaModalOpen}
         onClose={() => setIsCreatePesquisaModalOpen(false)}

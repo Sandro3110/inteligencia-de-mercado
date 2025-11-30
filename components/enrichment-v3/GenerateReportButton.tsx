@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trpc } from '@/lib/trpc/client';
-import { toast } from 'sonner';
+import { FeedbackModal, FeedbackType } from '@/components/ui/FeedbackModal';
 import {
   Dialog,
   DialogContent,
@@ -28,6 +28,12 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
   const [showModal, setShowModal] = useState(false);
   const [reportData, setReportData] = useState<any>(null);
 
+  // Estado do FeedbackModal
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<FeedbackType>('info');
+  const [feedbackTitle, setFeedbackTitle] = useState('');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+
   const validateMutation = trpc.reportsEnhanced.validate.useMutation();
   const generateMutation = trpc.reportsEnhanced.generateEnhancedReport.useMutation();
 
@@ -48,14 +54,22 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
 
       if (!validation.canGenerate) {
         console.log('⚠️ [DEBUG] Validação falhou! canGenerate=false');
-        toast.error(validation.warning || 'Não é possível gerar relatório');
+        setFeedbackType('error');
+        setFeedbackTitle('Não é possível gerar relatório');
+        setFeedbackMessage(
+          validation.warning || 'Verifique se há dados suficientes para gerar o relatório.'
+        );
+        setShowFeedback(true);
         setIsValidating(false);
         return;
       }
 
       // Se tem aviso (em andamento), mostrar
       if (validation.warning) {
-        toast.warning(validation.warning);
+        setFeedbackType('warning');
+        setFeedbackTitle('Enriquecimento em andamento');
+        setFeedbackMessage(validation.warning);
+        setShowFeedback(true);
       }
 
       setIsValidating(false);
@@ -70,13 +84,21 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
       setShowModal(true);
       setIsGenerating(false);
 
-      toast.success(`Relatório gerado! ${result.metadata.tokens} tokens`);
+      setFeedbackType('success');
+      setFeedbackTitle('Relatório gerado com sucesso!');
+      setFeedbackMessage(
+        `Análise completa gerada com ${result.metadata.tokens} tokens usando ${result.metadata.model}.`
+      );
+      setShowFeedback(true);
     } catch (error: any) {
       console.error('❌ [DEBUG] Erro capturado:', error);
       console.error('❌ [DEBUG] Stack trace:', error.stack);
       setIsValidating(false);
       setIsGenerating(false);
-      toast.error(error.message || 'Erro ao gerar relatório');
+      setFeedbackType('error');
+      setFeedbackTitle('Erro ao gerar relatório');
+      setFeedbackMessage(error.message || 'Ocorreu um erro inesperado. Tente novamente.');
+      setShowFeedback(true);
     }
   };
 
@@ -103,6 +125,15 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
           </>
         )}
       </Button>
+
+      {/* Modal de Feedback */}
+      <FeedbackModal
+        open={showFeedback}
+        onClose={() => setShowFeedback(false)}
+        type={feedbackType}
+        title={feedbackTitle}
+        message={feedbackMessage}
+      />
 
       {/* Modal com relatório */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
