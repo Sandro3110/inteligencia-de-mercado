@@ -643,7 +643,7 @@ export const pesquisasRouter = createTRPCRouter({
               .update(enrichmentJobs)
               .set({
                 status: 'cancelled',
-                updatedAt: new Date(),
+                updatedAt: new Date().toISOString(),
               })
               .where(
                 and(
