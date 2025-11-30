@@ -73,11 +73,12 @@ export const mapRouter = router({
             and(
               isNotNull(clientes.latitude),
               isNotNull(clientes.longitude),
+              // Filtro de pesquisa: se fornecido pesquisaId, filtra; se fornecido projectId, filtra por pesquisas do projeto; senão, busca TODAS
               input.pesquisaId
                 ? eq(clientes.pesquisaId, input.pesquisaId)
                 : pesquisaIds && pesquisaIds.length > 0
                   ? inArray(clientes.pesquisaId, pesquisaIds)
-                  : undefined,
+                  : sql`1=1`, // Buscar TODAS as entidades quando não houver filtro
               input.filters?.uf ? eq(clientes.uf, input.filters.uf) : undefined,
               input.filters?.cidade ? eq(clientes.cidade, input.filters.cidade) : undefined,
               input.filters?.setor ? eq(clientes.setor, input.filters.setor) : undefined
@@ -124,7 +125,7 @@ export const mapRouter = router({
                 ? eq(leads.pesquisaId, input.pesquisaId)
                 : pesquisaIds && pesquisaIds.length > 0
                   ? inArray(leads.pesquisaId, pesquisaIds)
-                  : undefined,
+                  : sql`1=1`, // Buscar TODAS as entidades quando não houver filtro
               input.filters?.uf ? eq(leads.uf, input.filters.uf) : undefined,
               input.filters?.cidade ? eq(leads.cidade, input.filters.cidade) : undefined,
               input.filters?.setor ? eq(leads.setor, input.filters.setor) : undefined,
@@ -170,7 +171,7 @@ export const mapRouter = router({
                 ? eq(concorrentes.pesquisaId, input.pesquisaId)
                 : pesquisaIds && pesquisaIds.length > 0
                   ? inArray(concorrentes.pesquisaId, pesquisaIds)
-                  : undefined,
+                  : sql`1=1`, // Buscar TODAS as entidades quando não houver filtro
               input.filters?.uf ? eq(concorrentes.uf, input.filters.uf) : undefined,
               input.filters?.cidade ? eq(concorrentes.cidade, input.filters.cidade) : undefined,
               input.filters?.porte ? eq(concorrentes.porte, input.filters.porte) : undefined
