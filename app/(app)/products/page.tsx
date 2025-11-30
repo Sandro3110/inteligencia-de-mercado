@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useSelectedProject } from '@/hooks/useSelectedProject';
 import { trpc } from '@/lib/trpc/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,7 +28,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
  */
 export default function ProductsPage() {
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : null;
+  const { selectedProject } = useSelectedProject();
+
+  // Prioridade: URL params > projeto selecionado
+  const projectId = searchParams.get('projectId')
+    ? parseInt(searchParams.get('projectId')!)
+    : selectedProject?.id || null;
   const pesquisaId = searchParams.get('pesquisaId')
     ? parseInt(searchParams.get('pesquisaId')!)
     : null;
@@ -87,6 +93,7 @@ export default function ProductsPage() {
 
   // Calcular valor máximo para heatmap
   const maxValue = Math.max(
+    0,
     ...matrix.flatMap((row) =>
       markets.map((m) => (typeof row[m.nome] === 'number' ? (row[m.nome] as number) : 0))
     )

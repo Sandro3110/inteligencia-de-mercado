@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useSelectedProject } from '@/hooks/useSelectedProject';
 import { trpc } from '@/lib/trpc/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,7 +27,12 @@ import { GeoTable } from '@/components/map/GeoTable';
  */
 export default function SectorsPage() {
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : null;
+  const { selectedProject } = useSelectedProject();
+
+  // Prioridade: URL params > projeto selecionado
+  const projectId = searchParams.get('projectId')
+    ? parseInt(searchParams.get('projectId')!)
+    : selectedProject?.id || null;
   const pesquisaId = searchParams.get('pesquisaId')
     ? parseInt(searchParams.get('pesquisaId')!)
     : null;

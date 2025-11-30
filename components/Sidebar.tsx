@@ -4,7 +4,15 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
 import { useSidebar } from '@/lib/contexts/SidebarContext';
-import { LayoutDashboard, FolderKanban, Users, Settings, Map } from 'lucide-react';
+import {
+  LayoutDashboard,
+  FolderKanban,
+  Users,
+  Settings,
+  Map,
+  BarChart3,
+  Package,
+} from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 
 interface MenuItem {
@@ -13,7 +21,7 @@ interface MenuItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-// Menu simplificado - apenas 5 itens essenciais
+// Menu completo - 7 itens
 const menuItems: MenuItem[] = [
   {
     name: 'Dashboard',
@@ -29,6 +37,16 @@ const menuItems: MenuItem[] = [
     name: 'Geoposição',
     href: '/map',
     icon: Map,
+  },
+  {
+    name: 'Setores',
+    href: '/sectors',
+    icon: BarChart3,
+  },
+  {
+    name: 'Produtos',
+    href: '/products',
+    icon: Package,
   },
   {
     name: 'Usuários',
