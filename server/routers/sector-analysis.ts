@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { eq, inArray, and, isNotNull, sql } from 'drizzle-orm';
-import { publicProcedure, router } from '../trpc';
+import { publicProcedure, router } from '../_core/trpc';
 import { getDb } from '../db';
 import { clientes, leads, concorrentes, pesquisas } from '../../drizzle/schema';
 
