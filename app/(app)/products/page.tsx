@@ -95,7 +95,9 @@ export default function ProductsPage() {
   const maxValue = Math.max(
     0,
     ...matrix.flatMap((row) =>
-      markets.map((m) => (typeof row[m.nome] === 'number' ? (row[m.nome] as number) : 0))
+      markets
+        .filter((m) => m && m.nome) // Filtrar mercados válidos
+        .map((m) => (typeof row[m.nome] === 'number' ? (row[m.nome] as number) : 0))
     )
   );
 
@@ -202,11 +204,13 @@ export default function ProductsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="sticky left-0 bg-background z-10">Produto</TableHead>
-                    {markets.map((market) => (
-                      <TableHead key={market.id} className="text-center min-w-[120px]">
-                        {market.nome}
-                      </TableHead>
-                    ))}
+                    {markets
+                      .filter((market) => market && market.id && market.nome)
+                      .map((market) => (
+                        <TableHead key={market.id} className="text-center min-w-[120px]">
+                          {market.nome}
+                        </TableHead>
+                      ))}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -225,17 +229,19 @@ export default function ProductsPage() {
                         <TableCell className="sticky left-0 bg-background z-10 font-medium">
                           {row.produto as string}
                         </TableCell>
-                        {markets.map((market) => {
-                          const value = row[market.nome] as number;
-                          return (
-                            <TableCell
-                              key={market.id}
-                              className={`text-center ${getHeatmapColor(value, maxValue)}`}
-                            >
-                              {value > 0 ? value : '-'}
-                            </TableCell>
-                          );
-                        })}
+                        {markets
+                          .filter((market) => market && market.id && market.nome)
+                          .map((market) => {
+                            const value = row[market.nome] as number;
+                            return (
+                              <TableCell
+                                key={market.id}
+                                className={`text-center ${getHeatmapColor(value, maxValue)}`}
+                              >
+                                {value > 0 ? value : '-'}
+                              </TableCell>
+                            );
+                          })}
                       </TableRow>
                     ))
                   )}
