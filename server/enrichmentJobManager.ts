@@ -11,6 +11,7 @@ import { enrichClienteOptimized } from './enrichmentOptimized';
 import { clientes } from '../drizzle/schema';
 import { notifyOwner } from './_core/notification';
 import { toPostgresTimestamp, toPostgresTimestampOrNull, now } from './dateUtils';
+import { createEnrichmentCompletionNotification } from './utils/createEnrichmentNotification';
 
 export interface JobProgress {
   jobId: number;
@@ -363,6 +364,14 @@ async function processJob(jobId: number): Promise<void> {
 
   logger.debug(`[Job ${jobId}] Concluído em ${Math.round(totalDuration / 1000 / 60)} minutos`);
 
+  // Criar notificação no banco de dados
+  try {
+    await createEnrichmentCompletionNotification(db, job.projectId, jobId);
+  } catch (error) {
+    logger.error(`[Job ${jobId}] Erro ao criar notificação:`, error);
+  }
+
+  // Notificar owner (Manus)
   await notifyOwner({
     title: `✅ Enriquecimento Concluído - Job ${jobId}`,
     content: `Total: ${job.totalClientes} clientes em ${Math.round(totalDuration / 1000 / 60)} minutos\nSucesso: ${job.successClientes} (${Math.round((job.successClientes / job.totalClientes) * 100)}%)\nFalhas: ${job.failedClientes}`,
