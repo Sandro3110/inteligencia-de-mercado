@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
 
+  // Turbopack config (vazio para silenciar warning)
+  turbopack: {},
+
   // Otimização de imagens
   images: {
     formats: ['image/avif', 'image/webp'],

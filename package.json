@@ -111,6 +111,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
+    "@tailwindcss/postcss": "^4.1.17",
     "@testing-library/jest-dom": "^6.9.1",
     "@types/bcryptjs": "^3.0.0",
     "@types/cors": "^2.8.19",
