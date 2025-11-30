@@ -8,6 +8,7 @@ import { geocodingRouter } from './routers/geocodingRouter';
 import { territorialRouter } from './routers/territorialRouter';
 import { reportsRouter } from './routers/reportsRouter';
 import { unifiedMapRouter } from './routers/unifiedMapRouter';
+import { mapHierarchicalRouter } from './routers/map-hierarchical';
 import { authRouter } from './routers/authRouter';
 import { usersRouter } from './routers/usersRouter';
 import { emailConfigRouter } from './routers/emailConfigRouter';
@@ -19,6 +20,7 @@ export const appRouter = router({
   territorial: territorialRouter,
   reports: reportsRouter,
   unifiedMap: unifiedMapRouter,
+  mapHierarchical: mapHierarchicalRouter,
 
   settings: router({
     getGoogleMapsApiKey: protectedProcedure.query(async () => {
