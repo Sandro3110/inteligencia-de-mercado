@@ -256,9 +256,11 @@ ${top10Cidades.map((c, i) => `${i + 1}. ${c.cidade}: ${c.count} clientes`).join(
       const pdfBuffer = generatePDF(pdfData);
 
       // 9. Retornar PDF como base64
+      const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
+
       return {
         success: true,
-        pdf: pdfBuffer.toString('base64'),
+        pdf: pdfBase64,
         filename: `relatorio-projeto-${input.projectId}-${Date.now()}.pdf`,
       };
     }),
