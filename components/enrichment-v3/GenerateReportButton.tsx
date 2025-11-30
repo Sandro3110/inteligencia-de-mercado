@@ -82,8 +82,17 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
 
       setIsGenerating(false);
 
+      // Validar result completo
+      if (!result) {
+        throw new Error('Resposta vazia do servidor');
+      }
+
+      console.log('🔵 [DEBUG] Tipo de result:', typeof result);
+      console.log('🔵 [DEBUG] Keys de result:', Object.keys(result));
+
       // Baixar PDF
       console.log('🔵 [DEBUG] Tipo de result.pdf:', typeof result.pdf);
+      console.log('🔵 [DEBUG] result.pdf existe?', !!result.pdf);
       console.log('🔵 [DEBUG] Primeiros 100 chars:', result.pdf?.substring?.(0, 100));
 
       // Validar que result.pdf é uma string
@@ -114,8 +123,13 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
 
       setFeedbackType('success');
       setFeedbackTitle('Relatório gerado com sucesso!');
+
+      // Validar metadata antes de usar
+      const tokens = result.metadata?.tokens || 0;
+      const model = result.metadata?.model || 'desconhecido';
+
       setFeedbackMessage(
-        `PDF baixado com sucesso! Análise gerada com ${result.metadata.tokens} tokens usando ${result.metadata.model}.`
+        `PDF baixado com sucesso! Análise gerada com ${tokens} tokens usando ${model}.`
       );
       setShowFeedback(true);
     } catch (error: any) {
