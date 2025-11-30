@@ -16,6 +16,7 @@ export { mercadosRouter } from './mercados';
 export { pesquisasRouter } from './pesquisas';
 export { projectsRouter } from './projects';
 export { reportsRouter } from './reports';
+export { reportsEnhancedRouter } from './reports-enhanced';
 export { territorialRouter } from './territorial';
 export { unifiedMapRouter } from './unifiedMap';
 export { usersRouter } from './users';

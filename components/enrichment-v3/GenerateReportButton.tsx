@@ -22,6 +22,7 @@ interface GenerateReportButtonProps {
  * Botão para gerar relatório PDF com validação
  */
 export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReportButtonProps) {
+  console.log('🔵 [DEBUG] GenerateReportButton renderizado com pesquisaId:', pesquisaId);
   const [isValidating, setIsValidating] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -29,6 +30,11 @@ export function GenerateReportButton({ pesquisaId, size = 'md' }: GenerateReport
 
   const validateMutation = trpc.reportsEnhanced.validate.useMutation();
   const generateMutation = trpc.reportsEnhanced.generateEnhancedReport.useMutation();
+
+  console.log('🔵 [DEBUG] Mutations definidas:', {
+    validateMutation: !!validateMutation,
+    generateMutation: !!generateMutation,
+  });
 
   const handleClick = async () => {
     console.log('🔵 [DEBUG] Botão clicado! pesquisaId:', pesquisaId);
