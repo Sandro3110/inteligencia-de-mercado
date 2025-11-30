@@ -38,6 +38,10 @@ export default function ProjectDetailsPage() {
     router.push(`/projects/${projId}/surveys/${pesquisaId}/enrich`);
   };
 
+  const handleViewEnrichment = (projId: number, pesquisaId: number) => {
+    router.push(`/projects/${projId}/surveys/${pesquisaId}/enrich`);
+  };
+
   const handleViewResults = (projId: number, pesquisaId: number) => {
     router.push(`/projects/${projId}/surveys/${pesquisaId}/results`);
   };
@@ -402,6 +406,7 @@ export default function ProjectDetailsPage() {
                 onGeocode={handleGeocode}
                 onViewResults={handleViewResults}
                 onExport={handleExport}
+                onViewEnrichment={handleViewEnrichment}
                 onRefresh={async () => {
                   await refetchPesquisas();
                 }}

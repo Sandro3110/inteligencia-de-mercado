@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Zap, BarChart3, Download, RefreshCw, MapPin, FileText, Pause, X } from 'lucide-react';
+import { Zap, BarChart3, Download, RefreshCw, MapPin, FileText, Pause, X, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { GenerateReportButton } from '@/components/enrichment-v3/GenerateReportButton';
 import { trpc } from '@/lib/trpc/client';
@@ -29,6 +29,7 @@ interface PesquisaCardProps {
   onGeocode: (projectId: number, pesquisaId: number) => void;
   onViewResults: (projectId: number, pesquisaId: number) => void;
   onExport: (projectId: number, pesquisaId: number) => void;
+  onViewEnrichment?: (projectId: number, pesquisaId: number) => void;
   onRefresh?: () => void;
 }
 
@@ -38,6 +39,7 @@ export function PesquisaCard({
   onGeocode,
   onViewResults,
   onExport,
+  onViewEnrichment,
   onRefresh,
 }: PesquisaCardProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -155,30 +157,52 @@ export function PesquisaCard({
 
         {/* Status Badges */}
         <div className="flex flex-wrap gap-2">
-          <span
-            className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${
-              isCompleted
-                ? 'bg-green-50 text-green-700 border border-green-200'
-                : enrichmentPercentage > 0
-                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                  : 'bg-gray-50 text-gray-600 border border-gray-200'
-            }`}
-          >
-            <span
-              className={`w-1.5 h-1.5 rounded-full mr-2 ${
+          {enrichmentPercentage > 0 && onViewEnrichment ? (
+            /* Badge clicável quando em andamento */
+            <button
+              onClick={() => onViewEnrichment(pesquisa.projectId, pesquisa.id)}
+              className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full transition-all ${
                 isCompleted
-                  ? 'bg-green-500'
-                  : enrichmentPercentage > 0
-                    ? 'bg-blue-500 animate-pulse'
-                    : 'bg-gray-400'
+                  ? 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
+                  : 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 cursor-pointer'
               }`}
-            />
-            {isCompleted
-              ? 'Finalizada'
-              : enrichmentPercentage > 0
-                ? 'Em andamento'
-                : 'Não iniciada'}
-          </span>
+              title="Clique para ver detalhes do enriquecimento"
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full mr-2 ${
+                  isCompleted ? 'bg-green-500' : 'bg-blue-500 animate-pulse'
+                }`}
+              />
+              {isCompleted ? 'Finalizada' : 'Em andamento'}
+              <Eye className="w-3 h-3 ml-1.5" />
+            </button>
+          ) : (
+            /* Badge não clicável quando não iniciada */
+            <span
+              className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${
+                isCompleted
+                  ? 'bg-green-50 text-green-700 border border-green-200'
+                  : enrichmentPercentage > 0
+                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                    : 'bg-gray-50 text-gray-600 border border-gray-200'
+              }`}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full mr-2 ${
+                  isCompleted
+                    ? 'bg-green-500'
+                    : enrichmentPercentage > 0
+                      ? 'bg-blue-500 animate-pulse'
+                      : 'bg-gray-400'
+                }`}
+              />
+              {isCompleted
+                ? 'Finalizada'
+                : enrichmentPercentage > 0
+                  ? 'Em andamento'
+                  : 'Não iniciada'}
+            </span>
+          )}
 
           {(geoPercentage > 0 || geocodingJob) && (
             <span
@@ -358,8 +382,17 @@ export function PesquisaCard({
         )}
 
         {/* Botões Secundários */}
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           <GenerateReportButton pesquisaId={pesquisa.id} size="sm" />
+          {onViewEnrichment && (
+            <button
+              onClick={() => onViewEnrichment(pesquisa.projectId, pesquisa.id)}
+              className="flex items-center justify-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+              title="Ver Enriquecimento"
+            >
+              <Eye className="w-4 h-4" />
+            </button>
+          )}
           <button
             onClick={() => onViewResults(pesquisa.projectId, pesquisa.id)}
             className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
