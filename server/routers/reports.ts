@@ -20,7 +20,12 @@ export const reportsRouter = createTRPCRouter({
    * Gerar relatório PDF analítico de um projeto com IA
    */
   generateProjectReport: publicProcedure
-    .input(z.object({ projectId: z.number() }))
+    .input(
+      z.object({
+        projectId: z.number(),
+        pesquisaIds: z.array(z.number()).optional(), // Filtro opcional de pesquisas
+      })
+    )
     .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error('Database connection failed');
@@ -37,11 +42,15 @@ export const reportsRouter = createTRPCRouter({
 
       const apiKey = openaiSetting.settingValue;
 
-      // 2. Buscar todas as pesquisas do projeto
+      // 2. Buscar pesquisas do projeto (todas ou filtradas)
       const pesquisas = await db
         .select()
         .from(pesquisasTable)
-        .where(eq(pesquisasTable.projectId, input.projectId));
+        .where(
+          input.pesquisaIds && input.pesquisaIds.length > 0
+            ? inArray(pesquisasTable.id, input.pesquisaIds)
+            : eq(pesquisasTable.projectId, input.projectId)
+        );
 
       if (pesquisas.length === 0) {
         throw new Error('Projeto não possui pesquisas');
