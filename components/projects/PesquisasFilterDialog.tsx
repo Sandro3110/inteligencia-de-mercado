@@ -28,7 +28,7 @@ interface PesquisasFilterDialogProps {
 export function PesquisasFilterDialog({
   isOpen,
   onClose,
-  projectId,
+  projectId: _projectId,
   pesquisas,
   mode,
   onConfirm,
@@ -59,7 +59,7 @@ export function PesquisasFilterDialog({
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [isOpen]); // Remover pesquisas da dependência
+  }, [isOpen, pesquisas]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleToggle = (id: number) => {
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
@@ -79,7 +79,7 @@ export function PesquisasFilterDialog({
   };
 
   const isOverLimit = mode === 'report' && totalRecords > 10000;
-  const canConfirm = selectedIds.length > 0 && !isOverLimit && !isLoading;
+  const canConfirm = selectedIds.length > 0 && !isLoading; // Permitir mesmo com > 10k (backend gera múltiplos PDFs)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -103,11 +103,11 @@ export function PesquisasFilterDialog({
         <div className="flex-1 overflow-y-auto space-y-4">
           {/* Resumo */}
           <div
-            className={`p-4 rounded-lg border ${isOverLimit ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'}`}
+            className={`p-4 rounded-lg border ${isOverLimit ? 'bg-amber-50 border-amber-200' : 'bg-blue-50 border-blue-200'}`}
           >
             <div className="flex items-start gap-3">
               {isOverLimit ? (
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               ) : (
                 <CheckCircle2 className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               )}
@@ -122,11 +122,11 @@ export function PesquisasFilterDialog({
                 {mode === 'report' && (
                   <div className="text-xs text-gray-600 mt-1">
                     {isOverLimit ? (
-                      <span className="text-red-600 font-medium">
-                        ⚠️ Excede o limite de 10.000 registros. Desmarque algumas pesquisas.
+                      <span className="text-amber-600 font-medium">
+                        ℹ️ Serão gerados múltiplos PDFs em um arquivo ZIP (1 PDF por pesquisa).
                       </span>
                     ) : (
-                      <span>Limite: 10.000 registros</span>
+                      <span className="text-green-600">✓ Será gerado 1 PDF consolidado.</span>
                     )}
                   </div>
                 )}

@@ -114,9 +114,35 @@ export const reportsRouter = createTRPCRouter({
             mercadosPesquisa.length;
 
           // Criar PDF simples sem IA (para economizar tokens)
+          // Calcular estatísticas básicas
+          const leadsPorQualidade = leadsPesquisa.reduce((acc: { [key: string]: number }, lead) => {
+            const qualidade = lead.qualidade || 'Não classificado';
+            acc[qualidade] = (acc[qualidade] || 0) + 1;
+            return acc;
+          }, {});
+
+          const clientesPorSetor = clientesPesquisa.reduce(
+            (acc: { [key: string]: number }, cliente) => {
+              const setor = cliente.setor || 'Não especificado';
+              acc[setor] = (acc[setor] || 0) + 1;
+              return acc;
+            },
+            {}
+          );
+
+          const top5Setores = Object.entries(clientesPorSetor)
+            .sort(([, a], [, b]) => (b as number) - (a as number))
+            .slice(0, 5)
+            .map(([setor, count]) => `${setor}: ${count}`)
+            .join(', ');
+
+          const distribuicaoQualidade = Object.entries(leadsPorQualidade)
+            .map(([qualidade, count]) => `${qualidade}: ${count}`)
+            .join(', ');
+
           const pdfData: PDFData = {
             title: `Relatório: ${pesquisa.nome}`,
-            subtitle: 'Dados Consolidados',
+            subtitle: 'Dados Consolidados (Parte de Relatório Múltiplo)',
             projectId: input.projectId,
             date: new Date().toLocaleDateString('pt-BR'),
             statistics: [
@@ -129,7 +155,19 @@ export const reportsRouter = createTRPCRouter({
             sections: [
               {
                 title: 'Resumo',
-                content: `Esta pesquisa contém ${totalPesquisa} registros distribuídos em ${clientesPesquisa.length} clientes, ${leadsPesquisa.length} leads, ${mercadosPesquisa.length} mercados e ${concorrentesPesquisa.length} concorrentes.`,
+                content: `Esta pesquisa contém ${totalPesquisa} registros distribuídos em ${clientesPesquisa.length} clientes, ${leadsPesquisa.length} leads, ${mercadosPesquisa.length} mercados e ${concorrentesPesquisa.length} concorrentes.\n\nEste PDF faz parte de um relatório múltiplo gerado porque o projeto excede 10.000 registros. Cada pesquisa foi exportada em um PDF separado.`,
+              },
+              {
+                title: 'Distribuição de Leads por Qualidade',
+                content: distribuicaoQualidade || 'Nenhum lead classificado.',
+              },
+              {
+                title: 'Top 5 Setores',
+                content: top5Setores || 'Nenhum setor identificado.',
+              },
+              {
+                title: 'Distribuição Geográfica',
+                content: `Clientes distribuídos em ${new Set(clientesPesquisa.map((c) => c.uf)).size} estados e ${new Set(clientesPesquisa.map((c) => c.cidade)).size} cidades.`,
               },
             ],
           };
