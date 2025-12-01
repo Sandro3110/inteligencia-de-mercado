@@ -1,7 +1,6 @@
 'use client';
 
 import { useDrillDown } from '@/hooks/useDrillDown';
-import { useSelectedProject } from '@/hooks/useSelectedProject';
 import { trpc } from '@/lib/trpc/client';
 import { ProductCategoriesView } from './ProductCategoriesView';
 import { ProductsView } from './ProductsView';
@@ -9,17 +8,29 @@ import { ProductDetailsView } from './ProductDetailsView';
 import { Card, CardContent } from '@/components/ui/card';
 import { AlertCircle } from 'lucide-react';
 
+interface ProductDrillDownStandaloneProps {
+  projectId?: number;
+  pesquisaId?: number;
+  filters?: {
+    setor?: string;
+    porte?: string;
+    qualidade?: string;
+  };
+}
+
 /**
  * Componente standalone de drill-down de produtos
- * Funciona sem parâmetros de rota (usa projeto selecionado)
+ * Aceita filtros externos via props
  */
-export function ProductDrillDownStandalone() {
-  const { selectedProject } = useSelectedProject();
-
+export function ProductDrillDownStandalone({
+  projectId,
+  pesquisaId,
+  filters,
+}: ProductDrillDownStandaloneProps) {
   // Buscar pesquisas do projeto selecionado
   const { data: pesquisas } = trpc.pesquisas.list.useQuery(
-    { projectId: selectedProject?.id ?? 0 },
-    { enabled: !!selectedProject }
+    { projectId: projectId ?? 0 },
+    { enabled: !!projectId }
   );
 
   const basePath = '/products';
@@ -36,7 +47,7 @@ export function ProductDrillDownStandalone() {
   } = useDrillDown({ basePath });
 
   // Validações
-  if (!selectedProject) {
+  if (!projectId) {
     return (
       <Card>
         <CardContent className="flex items-center justify-center h-64">
@@ -44,7 +55,7 @@ export function ProductDrillDownStandalone() {
             <AlertCircle className="h-12 w-12 mx-auto text-amber-500 mb-4" />
             <h3 className="text-lg font-semibold mb-2">Nenhum projeto selecionado</h3>
             <p className="text-muted-foreground">
-              Selecione um projeto no menu lateral para visualizar produtos
+              Selecione um projeto nos filtros acima para visualizar produtos
             </p>
           </div>
         </CardContent>
@@ -66,12 +77,18 @@ export function ProductDrillDownStandalone() {
     );
   }
 
-  // Usar todas as pesquisas do projeto
-  const pesquisaIds = pesquisas.map((p) => p.id);
+  // Usar pesquisa específica ou todas as pesquisas do projeto
+  const pesquisaIds = pesquisaId ? [pesquisaId] : pesquisas.map((p) => p.id);
 
   // NÍVEL 1: Categorias
   if (level === 1) {
-    return <ProductCategoriesView pesquisaIds={pesquisaIds} onDrillDown={navigateToLevel2} />;
+    return (
+      <ProductCategoriesView
+        pesquisaIds={pesquisaIds}
+        filters={filters}
+        onDrillDown={navigateToLevel2}
+      />
+    );
   }
 
   // NÍVEL 2: Produtos
@@ -80,6 +97,7 @@ export function ProductDrillDownStandalone() {
       <ProductsView
         categoria={categoria}
         pesquisaIds={pesquisaIds}
+        filters={filters}
         onBack={goBack}
         onDrillDown={navigateToLevel3}
       />
@@ -94,6 +112,7 @@ export function ProductDrillDownStandalone() {
         categoria={categoria}
         tipo={tipo as 'clientes' | 'leads' | 'concorrentes'}
         pesquisaIds={pesquisaIds}
+        filters={filters}
         onBack={goBack}
         onBackToCategories={navigateToLevel1}
       />
