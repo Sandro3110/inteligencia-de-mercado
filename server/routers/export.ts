@@ -9,6 +9,7 @@ import {
   pesquisas as pesquisasTable,
 } from '@/drizzle/schema';
 import { eq, inArray, count } from 'drizzle-orm';
+import { createZipBase64, ZipFile } from '@/server/utils/zipGenerator';
 
 /**
  * Helper para gerar CSV
@@ -108,15 +109,158 @@ export const exportRouter = createTRPCRouter({
 
       // Limite de segurança: 50.000 registros
       const LIMITE_REGISTROS = 50000;
+
+      // Se exceder limite, gerar múltiplos Excels (1 por pesquisa) em ZIP
       if (totalRegistros > LIMITE_REGISTROS) {
-        throw new Error(
-          `Projeto possui ${totalRegistros.toLocaleString('pt-BR')} registros, ` +
-            `excedendo o limite de ${LIMITE_REGISTROS.toLocaleString('pt-BR')} para exportação. ` +
-            `Por favor, filtre os dados por pesquisa ou entre em contato com o suporte.`
+        console.log(
+          `[Export] Total de ${totalRegistros} registros excede limite de ${LIMITE_REGISTROS}. ` +
+            `Gerando múltiplos Excels (1 por pesquisa)...`
         );
+
+        // Buscar informações das pesquisas
+        const pesquisasInfo = await db
+          .select()
+          .from(pesquisasTable)
+          .where(inArray(pesquisasTable.id, pesquisaIds));
+
+        const excelFiles: ZipFile[] = [];
+
+        // Gerar 1 Excel por pesquisa
+        for (const pesquisa of pesquisasInfo) {
+          console.log(
+            `[Export] Gerando Excel para pesquisa: ${pesquisa.nome} (ID: ${pesquisa.id})`
+          );
+
+          const workbookPesquisa = new ExcelJS.Workbook();
+
+          // Buscar dados apenas desta pesquisa
+          const [mercadosPesquisa, clientesPesquisa, concorrentesPesquisa, leadsPesquisa] =
+            await Promise.all([
+              db.select().from(mercadosUnicos).where(eq(mercadosUnicos.pesquisaId, pesquisa.id)),
+              db.select().from(clientes).where(eq(clientes.pesquisaId, pesquisa.id)),
+              db.select().from(concorrentes).where(eq(concorrentes.pesquisaId, pesquisa.id)),
+              db.select().from(leads).where(eq(leads.pesquisaId, pesquisa.id)),
+            ]);
+
+          // Aba Mercados
+          const mercadosSheet = workbookPesquisa.addWorksheet('Mercados');
+          mercadosSheet.columns = [
+            { header: 'ID', key: 'id', width: 10 },
+            { header: 'Nome', key: 'nome', width: 30 },
+            { header: 'Descrição', key: 'descricao', width: 50 },
+            { header: 'Tamanho Estimado', key: 'tamanhoEstimado', width: 20 },
+            { header: 'Potencial', key: 'potencial', width: 15 },
+            { header: 'Cidade', key: 'cidade', width: 20 },
+            { header: 'UF', key: 'uf', width: 10 },
+          ];
+          mercadosSheet.addRows(mercadosPesquisa);
+          mercadosSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+          mercadosSheet.getRow(1).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FF4472C4' },
+          };
+
+          // Aba Clientes
+          const clientesSheet = workbookPesquisa.addWorksheet('Clientes');
+          clientesSheet.columns = [
+            { header: 'ID', key: 'id', width: 10 },
+            { header: 'Nome', key: 'nome', width: 30 },
+            { header: 'CNPJ', key: 'cnpj', width: 20 },
+            { header: 'Cidade', key: 'cidade', width: 20 },
+            { header: 'UF', key: 'uf', width: 10 },
+            { header: 'Setor', key: 'setor', width: 20 },
+            { header: 'Produto Principal', key: 'produtoPrincipal', width: 30 },
+            { header: 'Telefone', key: 'telefone', width: 15 },
+            { header: 'Email', key: 'email', width: 30 },
+            { header: 'Site', key: 'siteOficial', width: 30 },
+            { header: 'Status', key: 'validationStatus', width: 15 },
+          ];
+          clientesSheet.addRows(clientesPesquisa);
+          clientesSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+          clientesSheet.getRow(1).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FF4472C4' },
+          };
+
+          // Aba Concorrentes
+          const concorrentesSheet = workbookPesquisa.addWorksheet('Concorrentes');
+          concorrentesSheet.columns = [
+            { header: 'ID', key: 'id', width: 10 },
+            { header: 'Nome', key: 'nome', width: 30 },
+            { header: 'Cidade', key: 'cidade', width: 20 },
+            { header: 'UF', key: 'uf', width: 10 },
+            { header: 'Porte', key: 'porte', width: 15 },
+            { header: 'Descrição', key: 'descricao', width: 50 },
+            { header: 'Posicionamento', key: 'posicionamento', width: 30 },
+            { header: 'Diferenciais', key: 'diferenciais', width: 30 },
+            { header: 'Telefone', key: 'telefone', width: 15 },
+            { header: 'Email', key: 'email', width: 30 },
+            { header: 'Site', key: 'siteOficial', width: 30 },
+          ];
+          concorrentesSheet.addRows(concorrentesPesquisa);
+          concorrentesSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+          concorrentesSheet.getRow(1).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FF4472C4' },
+          };
+
+          // Aba Leads
+          const leadsSheet = workbookPesquisa.addWorksheet('Leads');
+          leadsSheet.columns = [
+            { header: 'ID', key: 'id', width: 10 },
+            { header: 'Nome', key: 'nome', width: 30 },
+            { header: 'Cidade', key: 'cidade', width: 20 },
+            { header: 'UF', key: 'uf', width: 10 },
+            { header: 'Segmento', key: 'segmento', width: 20 },
+            { header: 'Porte', key: 'porte', width: 15 },
+            { header: 'Qualidade', key: 'qualidade', width: 15 },
+            { header: 'Potencial', key: 'potencial', width: 15 },
+            { header: 'Score', key: 'score', width: 10 },
+            { header: 'Stage', key: 'stage', width: 15 },
+            { header: 'Justificativa', key: 'justificativa', width: 50 },
+            { header: 'Telefone', key: 'telefone', width: 15 },
+            { header: 'Email', key: 'email', width: 30 },
+            { header: 'Site', key: 'siteOficial', width: 30 },
+          ];
+          leadsSheet.addRows(leadsPesquisa);
+          leadsSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+          leadsSheet.getRow(1).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FF4472C4' },
+          };
+
+          // Gerar buffer do Excel
+          const buffer = await workbookPesquisa.xlsx.writeBuffer();
+          const base64 = buffer.toString('base64');
+
+          excelFiles.push({
+            filename: `exportacao-${pesquisa.nome.replace(/[^a-zA-Z0-9]/g, '-')}.xlsx`,
+            data: base64,
+            encoding: 'base64',
+          });
+
+          console.log(`[Export] Excel gerado para pesquisa: ${pesquisa.nome}`);
+        }
+
+        // Criar ZIP com todos os Excels
+        console.log(`[Export] Criando ZIP com ${excelFiles.length} Excels...`);
+        const zipBase64 = await createZipBase64(
+          excelFiles,
+          `exportacao-projeto-${input.projectId}.zip`
+        );
+
+        return {
+          filename: `exportacao-projeto-${input.projectId}-${Date.now()}.zip`,
+          data: zipBase64,
+          mimeType: 'application/zip',
+        };
       }
 
-      console.log(`[Export] Exportando ${totalRegistros} registros para Excel`);
+      console.log(`[Export] Exportando ${totalRegistros} registros em Excel único`);
 
       // 1. Aba Mercados
       const mercadosData = await db

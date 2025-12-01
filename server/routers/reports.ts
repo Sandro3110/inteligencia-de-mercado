@@ -11,6 +11,7 @@ import {
 } from '@/drizzle/schema';
 import { eq, inArray, count } from 'drizzle-orm';
 import { generatePDF, PDFData, PDFSection } from '@/server/utils/pdfGenerator';
+import { createZipBase64, ZipFile } from '@/server/utils/zipGenerator';
 
 /**
  * Reports Router - Geração de relatórios analíticos
@@ -83,15 +84,84 @@ export const reportsRouter = createTRPCRouter({
 
       // Limite de segurança: 10.000 registros
       const LIMITE_REGISTROS = 10000;
+
+      // Se exceder limite, gerar múltiplos PDFs (1 por pesquisa) em ZIP
       if (totalRegistros > LIMITE_REGISTROS) {
-        throw new Error(
-          `Projeto possui ${totalRegistros.toLocaleString('pt-BR')} registros, ` +
-            `excedendo o limite de ${LIMITE_REGISTROS.toLocaleString('pt-BR')} para geração de relatórios. ` +
-            `Por favor, filtre os dados ou entre em contato com o suporte.`
+        console.log(
+          `[Reports] Total de ${totalRegistros} registros excede limite de ${LIMITE_REGISTROS}. ` +
+            `Gerando múltiplos PDFs (1 por pesquisa)...`
         );
+
+        const pdfFiles: ZipFile[] = [];
+
+        // Gerar 1 PDF por pesquisa
+        for (const pesquisa of pesquisas) {
+          console.log(`[Reports] Gerando PDF para pesquisa: ${pesquisa.nome} (ID: ${pesquisa.id})`);
+
+          // Buscar dados apenas desta pesquisa
+          const [clientesPesquisa, leadsPesquisa, concorrentesPesquisa, mercadosPesquisa] =
+            await Promise.all([
+              db.select().from(clientes).where(eq(clientes.pesquisaId, pesquisa.id)),
+              db.select().from(leads).where(eq(leads.pesquisaId, pesquisa.id)),
+              db.select().from(concorrentes).where(eq(concorrentes.pesquisaId, pesquisa.id)),
+              db.select().from(mercadosUnicos).where(eq(mercadosUnicos.pesquisaId, pesquisa.id)),
+            ]);
+
+          const totalPesquisa =
+            clientesPesquisa.length +
+            leadsPesquisa.length +
+            concorrentesPesquisa.length +
+            mercadosPesquisa.length;
+
+          // Criar PDF simples sem IA (para economizar tokens)
+          const pdfData: PDFData = {
+            title: `Relatório: ${pesquisa.nome}`,
+            subtitle: 'Dados Consolidados',
+            projectId: input.projectId,
+            date: new Date().toLocaleDateString('pt-BR'),
+            statistics: [
+              { label: 'Clientes', value: clientesPesquisa.length },
+              { label: 'Leads', value: leadsPesquisa.length },
+              { label: 'Mercados', value: mercadosPesquisa.length },
+              { label: 'Concorrentes', value: concorrentesPesquisa.length },
+              { label: 'Total', value: totalPesquisa },
+            ],
+            sections: [
+              {
+                title: 'Resumo',
+                content: `Esta pesquisa contém ${totalPesquisa} registros distribuídos em ${clientesPesquisa.length} clientes, ${leadsPesquisa.length} leads, ${mercadosPesquisa.length} mercados e ${concorrentesPesquisa.length} concorrentes.`,
+              },
+            ],
+          };
+
+          const pdfBuffer = generatePDF(pdfData);
+          const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
+
+          pdfFiles.push({
+            filename: `relatorio-${pesquisa.nome.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`,
+            data: pdfBase64,
+            encoding: 'base64',
+          });
+
+          console.log(`[Reports] PDF gerado para pesquisa: ${pesquisa.nome}`);
+        }
+
+        // Criar ZIP com todos os PDFs
+        console.log(`[Reports] Criando ZIP com ${pdfFiles.length} PDFs...`);
+        const zipBase64 = await createZipBase64(
+          pdfFiles,
+          `relatorios-projeto-${input.projectId}.zip`
+        );
+
+        return {
+          success: true,
+          data: zipBase64,
+          mimeType: 'application/zip',
+          filename: `relatorios-projeto-${input.projectId}-${Date.now()}.zip`,
+        };
       }
 
-      console.log(`[Reports] Gerando relatório para ${totalRegistros} registros`);
+      console.log(`[Reports] Gerando relatório único para ${totalRegistros} registros`);
 
       // 4. Buscar todos os dados (com limite implícito validado)
       const [clientesData, leadsData, concorrentesData, mercadosData] = await Promise.all([
