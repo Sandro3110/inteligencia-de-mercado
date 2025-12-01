@@ -5,6 +5,7 @@ import { trpc } from '@/lib/trpc/client';
 import { Package, Filter, X, Download, Building2, Target, Users } from 'lucide-react';
 import { EntityDetailCard } from '@/components/map/EntityDetailCard';
 import { toast } from 'sonner';
+import * as XLSX from 'xlsx';
 import { Card } from '@/components/ui/card';
 import {
   Table,
@@ -111,11 +112,52 @@ export default function ProdutosPage() {
     filters.projectId || filters.pesquisaId || filters.setor || filters.porte || filters.qualidade;
 
   const handleExportExcel = () => {
-    toast.error('Funcionalidade de exportação em desenvolvimento');
+    if (!rankingData || products.length === 0) {
+      toast.error('Nenhum dado para exportar');
+      return;
+    }
+
+    try {
+      const exportData = products.map((product: any) => ({
+        Produto: product.nome,
+        Categoria: product.categoria,
+        Clientes: product.clientes,
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Produtos');
+      XLSX.writeFile(wb, `produtos_${new Date().toISOString().split('T')[0]}.xlsx`);
+      toast.success('Arquivo Excel exportado com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao exportar arquivo Excel');
+    }
   };
 
   const handleExportCSV = () => {
-    toast.error('Funcionalidade de exportação em desenvolvimento');
+    if (!rankingData || products.length === 0) {
+      toast.error('Nenhum dado para exportar');
+      return;
+    }
+
+    try {
+      const exportData = products.map((product: any) => ({
+        Produto: product.nome,
+        Categoria: product.categoria,
+        Clientes: product.clientes,
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const csv = XLSX.utils.sheet_to_csv(ws);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `produtos_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+      toast.success('Arquivo CSV exportado com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao exportar arquivo CSV');
+    }
   };
 
   const { products = [] } = rankingData || {};
