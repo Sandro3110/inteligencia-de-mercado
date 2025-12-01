@@ -54,16 +54,11 @@ export default function ProdutosPage() {
     pesquisaId: filters.pesquisaId,
   });
 
-  // Buscar ranking de produtos
-  const { data: rankingData, isLoading } = trpc.productAnalysis.getProductRanking.useQuery(
-    {
-      projectId: filters.projectId ?? null,
-      pesquisaId: filters.pesquisaId ?? null,
-    },
-    {
-      enabled: !!filters.projectId,
-    }
-  );
+  // Buscar ranking de produtos (carrega imediatamente como Geoposição)
+  const { data: rankingData, isLoading } = trpc.productAnalysis.getProductRanking.useQuery({
+    projectId: filters.projectId ?? null,
+    pesquisaId: filters.pesquisaId ?? null,
+  });
 
   // Buscar entidades de um produto específico
   const { data: productEntities, isLoading: isLoadingEntities } =
@@ -372,13 +367,7 @@ export default function ProdutosPage() {
         </div>
 
         {/* Content */}
-        {!filters.projectId ? (
-          <Card className="p-8 text-center">
-            <p className="text-gray-600">
-              Selecione um projeto nos filtros para visualizar produtos
-            </p>
-          </Card>
-        ) : isLoading ? (
+        {isLoading ? (
           <Card className="p-8 text-center">
             <p className="text-gray-600">Carregando...</p>
           </Card>

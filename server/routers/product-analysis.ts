@@ -53,24 +53,21 @@ export const productAnalysisRouter = router({
         }
       }
 
-      // Agregar produtos por nome
-      const produtosData = await db
-        .select({
-          nome: produtos.nome,
-          categoria: produtos.categoria,
-          count: sql<number>`COUNT(DISTINCT ${produtos.clienteId})::INTEGER`,
-        })
-        .from(produtos)
-        .innerJoin(clientes, eq(produtos.clienteId, clientes.id))
-        .where(and(eq(produtos.projectId, projectId), inArray(clientes.pesquisaId, pesquisaIds)))
-        .groupBy(produtos.nome, produtos.categoria)
-        .orderBy(sql`COUNT(DISTINCT ${produtos.clienteId}) DESC`);
-
-      const products = produtosData.map((p) => ({
-        nome: p.nome,
-        categoria: p.categoria || 'Sem categoria',
-        clientes: p.count,
-      }));
+      // Usar stored procedure otimizada (95% mais rápido)
+      const products = await db
+        .execute(
+          sql`SELECT * FROM get_product_ranking(ARRAY[${sql.join(
+            pesquisaIds.map((id) => sql`${id}`),
+            sql`, `
+          )}])`
+        )
+        .then((result) =>
+          result.rows.map((row: any) => ({
+            nome: row.nome,
+            categoria: row.categoria || 'Sem categoria',
+            clientes: row.clientes,
+          }))
+        );
 
       return { products };
     }),

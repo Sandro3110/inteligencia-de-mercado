@@ -54,16 +54,11 @@ export default function SetoresPage() {
     pesquisaId: filters.pesquisaId,
   });
 
-  // Buscar resumo de setores
-  const { data: sectorsData, isLoading } = trpc.sectorAnalysis.getSectorSummary.useQuery(
-    {
-      projectId: filters.projectId ?? null,
-      pesquisaId: filters.pesquisaId ?? null,
-    },
-    {
-      enabled: !!filters.projectId,
-    }
-  );
+  // Buscar resumo de setores (carrega imediatamente como Geoposição)
+  const { data: sectorsData, isLoading } = trpc.sectorAnalysis.getSectorSummary.useQuery({
+    projectId: filters.projectId ?? null,
+    pesquisaId: filters.pesquisaId ?? null,
+  });
 
   // Buscar entidades de um setor específico
   const { data: sectorEntities, isLoading: isLoadingEntities } =
@@ -394,13 +389,7 @@ export default function SetoresPage() {
         </div>
 
         {/* Content */}
-        {!filters.projectId ? (
-          <Card className="p-8 text-center">
-            <p className="text-gray-600">
-              Selecione um projeto nos filtros para visualizar setores
-            </p>
-          </Card>
-        ) : isLoading ? (
+        {isLoading ? (
           <Card className="p-8 text-center">
             <p className="text-gray-600">Carregando...</p>
           </Card>
