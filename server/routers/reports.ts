@@ -9,7 +9,7 @@ import {
   mercadosUnicos,
   systemSettings,
 } from '@/drizzle/schema';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, count } from 'drizzle-orm';
 import { generatePDF, PDFData, PDFSection } from '@/server/utils/pdfGenerator';
 
 /**
