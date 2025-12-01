@@ -18,7 +18,7 @@ export default function SetoresPage() {
     { projectId: filters.projectId ?? 0 },
     { enabled: !!filters.projectId }
   );
-  const { data: availableFilters } = trpc.unifiedMap.getAvailableFilters.useQuery({
+  const { data: availableFilters } = trpc.map.getAvailableFilters.useQuery({
     projectId: filters.projectId,
     pesquisaId: filters.pesquisaId,
   });

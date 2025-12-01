@@ -39,34 +39,31 @@ export const sectorDrillDownRouter = router({
       // Por enquanto, retornar categoria única "Setores"
       // TODO: Implementar categorização inteligente (Indústria, Comércio, Serviços, etc.)
 
-      const [clientesCount, leadsCount, concorrentesCount] = await Promise.all([
-        // Contar clientes com setores
+      // Buscar registros e contar no JavaScript (mais robusto)
+      const [clientesResult, leadsResult, concorrentesResult] = await Promise.all([
+        // Buscar clientes com setores
         db
-          .select({
-            count: sql<number>`COUNT(DISTINCT ${clientes.id})::INTEGER`,
-          })
+          .select({ id: clientes.id })
           .from(clientes)
-          .where(and(inArray(clientes.pesquisaId, pesquisaIds), isNotNull(clientes.setor)))
-          .then((result) => result[0]?.count || 0),
+          .where(and(inArray(clientes.pesquisaId, pesquisaIds), isNotNull(clientes.setor))),
 
-        // Contar leads com setores
+        // Buscar leads com setores
         db
-          .select({
-            count: sql<number>`COUNT(DISTINCT ${leads.id})::INTEGER`,
-          })
+          .select({ id: leads.id })
           .from(leads)
-          .where(and(inArray(leads.pesquisaId, pesquisaIds), isNotNull(leads.setor)))
-          .then((result) => result[0]?.count || 0),
+          .where(and(inArray(leads.pesquisaId, pesquisaIds), isNotNull(leads.setor))),
 
-        // Contar concorrentes com setores
+        // Buscar concorrentes com setores
         db
-          .select({
-            count: sql<number>`COUNT(DISTINCT ${concorrentes.id})::INTEGER`,
-          })
+          .select({ id: concorrentes.id })
           .from(concorrentes)
-          .where(and(inArray(concorrentes.pesquisaId, pesquisaIds), isNotNull(concorrentes.setor)))
-          .then((result) => result[0]?.count || 0),
+          .where(and(inArray(concorrentes.pesquisaId, pesquisaIds), isNotNull(concorrentes.setor))),
       ]);
+
+      // Contar no JavaScript (mais confiável que SQL)
+      const clientesCount = clientesResult.length;
+      const leadsCount = leadsResult.length;
+      const concorrentesCount = concorrentesResult.length;
 
       const categories = [
         {

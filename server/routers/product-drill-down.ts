@@ -41,30 +41,27 @@ export const productDrillDownRouter = router({
       // Por enquanto, retornar categoria única "Produtos"
       // TODO: Implementar categorização inteligente baseada em palavras-chave
 
-      const [clientesCount, leadsCount, concorrentesCount] = await Promise.all([
-        // Contar clientes com produtos
+      // Buscar registros e contar no JavaScript (mais robusto)
+      const [clientesResult, concorrentesResult] = await Promise.all([
+        // Buscar clientes com produtos
         db
-          .select({
-            count: sql<number>`COUNT(DISTINCT ${clientes.id})::INTEGER`,
-          })
+          .select({ id: clientes.id })
           .from(clientes)
-          .where(and(inArray(clientes.pesquisaId, pesquisaIds), isNotNull(clientes.produto)))
-          .then((result) => result[0]?.count || 0),
+          .where(and(inArray(clientes.pesquisaId, pesquisaIds), isNotNull(clientes.produto))),
 
-        // Leads não têm campo produto no schema atual
-        Promise.resolve(0),
-
-        // Contar concorrentes com produtos
+        // Buscar concorrentes com produtos
         db
-          .select({
-            count: sql<number>`COUNT(DISTINCT ${concorrentes.id})::INTEGER`,
-          })
+          .select({ id: concorrentes.id })
           .from(concorrentes)
           .where(
             and(inArray(concorrentes.pesquisaId, pesquisaIds), isNotNull(concorrentes.produto))
-          )
-          .then((result) => result[0]?.count || 0),
+          ),
       ]);
+
+      // Contar no JavaScript (mais confiável que SQL)
+      const clientesCount = clientesResult.length;
+      const leadsCount = 0; // Leads não têm campo produto no schema atual
+      const concorrentesCount = concorrentesResult.length;
 
       const categories = [
         {
