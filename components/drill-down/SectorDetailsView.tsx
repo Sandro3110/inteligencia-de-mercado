@@ -5,7 +5,7 @@ import { ArrowLeft, Users, UserPlus, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { trpc } from '@/lib/trpc';
+import { trpc } from '@/lib/trpc/client';
 import { DrillDownBreadcrumb } from './DrillDownBreadcrumb';
 import { DrillDownTable, type DrillDownColumn } from './DrillDownTable';
 import { DataActionsBar } from '../export-actions/DataActionsBar';

@@ -27,7 +27,3 @@ export { SectorDetailsView } from './SectorDetailsView';
 // Componentes standalone (sem parâmetros de rota)
 export { ProductDrillDownStandalone } from './ProductDrillDownStandalone';
 export { SectorDrillDownStandalone } from './SectorDrillDownStandalone';
-
-// Componentes standalone (sem parâmetros de rota)
-export { ProductDrillDownStandalone } from './ProductDrillDownStandalone';
-export { SectorDrillDownStandalone } from './SectorDrillDownStandalone';
