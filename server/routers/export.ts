@@ -46,7 +46,12 @@ export const exportRouter = createTRPCRouter({
    * Exportar projeto completo para Excel com 5 abas
    */
   exportProjectExcel: publicProcedure
-    .input(z.object({ projectId: z.number() }))
+    .input(
+      z.object({
+        projectId: z.number(),
+        pesquisaIds: z.array(z.number()).optional(), // Filtro incremental por pesquisas
+      })
+    )
     .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error('Database connection failed');
@@ -54,17 +59,29 @@ export const exportRouter = createTRPCRouter({
       const ExcelJS = (await import('exceljs')).default;
       const workbook = new ExcelJS.Workbook();
 
-      // Buscar todas as pesquisas do projeto
-      const pesquisas = await db
-        .select()
-        .from(pesquisasTable)
-        .where(eq(pesquisasTable.projectId, input.projectId));
+      // Buscar pesquisas (todas ou filtradas)
+      let pesquisaIds: number[];
 
-      if (pesquisas.length === 0) {
-        throw new Error('Projeto não possui pesquisas');
+      if (input.pesquisaIds && input.pesquisaIds.length > 0) {
+        // EXPORTAÇÃO INCREMENTAL: Apenas pesquisas selecionadas
+        pesquisaIds = input.pesquisaIds;
+        console.log(
+          `[Export] Exportação incremental: ${pesquisaIds.length} pesquisas selecionadas`
+        );
+      } else {
+        // EXPORTAÇÃO COMPLETA: Todas as pesquisas do projeto
+        const pesquisas = await db
+          .select()
+          .from(pesquisasTable)
+          .where(eq(pesquisasTable.projectId, input.projectId));
+
+        if (pesquisas.length === 0) {
+          throw new Error('Projeto não possui pesquisas');
+        }
+
+        pesquisaIds = pesquisas.map((p) => p.id);
+        console.log(`[Export] Exportação completa: ${pesquisaIds.length} pesquisas`);
       }
-
-      const pesquisaIds = pesquisas.map((p) => p.id);
 
       // Verificar tamanho dos dados antes de exportar
       const [mercadosCount, clientesCount, leadsCount, concorrentesCount] = await Promise.all([

@@ -13,6 +13,7 @@ export { exportRouter } from './export';
 export { geocodingRouter } from './geocoding';
 export { leadsRouter } from './leads';
 export { mercadosRouter } from './mercados';
+export { metricsRouter } from './metrics';
 export { pesquisasRouter } from './pesquisas';
 export { projectsRouter } from './projects';
 export { reportsRouter } from './reports';
