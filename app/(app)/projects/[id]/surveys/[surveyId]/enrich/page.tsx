@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { trpc } from '@/lib/trpc/client';
 import { ArrowLeft, Play } from 'lucide-react';
@@ -16,13 +15,20 @@ export default function EnrichmentPage() {
   const trpcUtils = trpc.useUtils();
 
   // Query usando pesquisas.getByIdWithCounts para buscar dados completos
-  const { data: pesquisa, isLoading: loadingPesquisa } = trpc.pesquisas.getByIdWithCounts.useQuery(
-    surveyId,
-    {
-      enabled: !!surveyId,
-      refetchInterval: 5000, // Atualizar a cada 5s
-    }
-  );
+  const {
+    data: pesquisa,
+    isLoading: loadingPesquisa,
+    error: pesquisaError,
+  } = trpc.pesquisas.getByIdWithCounts.useQuery(surveyId, {
+    enabled: !!surveyId,
+    refetchInterval: 5000, // Atualizar a cada 5s
+  });
+
+  // Debug logs
+  console.log('[EnrichmentPage] projectId:', projectId);
+  console.log('[EnrichmentPage] surveyId:', surveyId);
+  console.log('[EnrichmentPage] pesquisa:', pesquisa);
+  console.log('[EnrichmentPage] error:', pesquisaError);
 
   // Mutation para iniciar enriquecimento
   const startMutation = trpc.enrichment.start.useMutation({
@@ -51,7 +57,25 @@ export default function EnrichmentPage() {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="bg-white rounded-lg shadow p-12 text-center">
-          <p className="text-lg font-medium text-gray-700">Pesquisa não encontrada</p>
+          <p className="text-lg font-medium text-gray-700 mb-4">Pesquisa não encontrada</p>
+          <div className="text-sm text-gray-500 space-y-2">
+            <p>Project ID: {projectId}</p>
+            <p>Survey ID: {surveyId}</p>
+            {pesquisaError && (
+              <div className="mt-4 p-4 bg-red-50 rounded-lg text-left">
+                <p className="font-medium text-red-700 mb-2">Erro:</p>
+                <pre className="text-xs text-red-600 whitespace-pre-wrap">
+                  {JSON.stringify(pesquisaError, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => router.push(`/projects/${projectId}`)}
+            className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Voltar para Projeto
+          </button>
         </div>
       </div>
     );
