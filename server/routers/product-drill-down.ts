@@ -42,6 +42,8 @@ export const productDrillDownRouter = router({
       // TODO: Implementar categorização inteligente baseada em palavras-chave
 
       // Buscar registros e contar no JavaScript (mais robusto)
+      console.log('🔍 [DEBUG] getCategories (produtos) - pesquisaIds:', pesquisaIds);
+
       const [clientesResult, concorrentesResult] = await Promise.all([
         // Buscar clientes com produtos
         db
@@ -59,6 +61,11 @@ export const productDrillDownRouter = router({
       ]);
 
       // Contar no JavaScript (mais confiável que SQL)
+      console.log('📊 [DEBUG] Resultados (produtos):', {
+        clientesCount: clientesResult.length,
+        concorrentesCount: concorrentesResult.length,
+      });
+
       const clientesCount = clientesResult.length;
       const leadsCount = 0; // Leads não têm campo produto no schema atual
       const concorrentesCount = concorrentesResult.length;
