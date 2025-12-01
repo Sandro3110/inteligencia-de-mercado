@@ -99,7 +99,9 @@ export const pesquisasRouter = createTRPCRouter({
         clientesQualidadeResult,
         leadsQualidadeResult,
         concorrentesQualidadeResult,
-        geoTotalResult,
+        clientesGeoResult,
+        leadsGeoResult,
+        concorrentesGeoResult,
       ] = await Promise.all([
         db
           .select({
@@ -127,40 +129,33 @@ export const pesquisasRouter = createTRPCRouter({
             and(eq(concorrentes.pesquisaId, id), sql`${concorrentes.qualidadeScore} IS NOT NULL`)
           ),
         // Geocodificação: contar separadamente para evitar produto cartesiano
-        Promise.all([
-          db
-            .select({ count: count() })
-            .from(clientes)
-            .where(
-              and(
-                eq(clientes.pesquisaId, id),
-                sql`${clientes.latitude} IS NOT NULL AND ${clientes.longitude} IS NOT NULL`
-              )
-            ),
-          db
-            .select({ count: count() })
-            .from(leads)
-            .where(
-              and(
-                eq(leads.pesquisaId, id),
-                sql`${leads.latitude} IS NOT NULL AND ${leads.longitude} IS NOT NULL`
-              )
-            ),
-          db
-            .select({ count: count() })
-            .from(concorrentes)
-            .where(
-              and(
-                eq(concorrentes.pesquisaId, id),
-                sql`${concorrentes.latitude} IS NOT NULL AND ${concorrentes.longitude} IS NOT NULL`
-              )
-            ),
-        ]).then(([clientesGeo, leadsGeo, concorrentesGeo]) => ({
-          total:
-            (clientesGeo[0]?.count || 0) +
-            (leadsGeo[0]?.count || 0) +
-            (concorrentesGeo[0]?.count || 0),
-        })),
+        db
+          .select({ count: count() })
+          .from(clientes)
+          .where(
+            and(
+              eq(clientes.pesquisaId, id),
+              sql`${clientes.latitude} IS NOT NULL AND ${clientes.longitude} IS NOT NULL`
+            )
+          ),
+        db
+          .select({ count: count() })
+          .from(leads)
+          .where(
+            and(
+              eq(leads.pesquisaId, id),
+              sql`${leads.latitude} IS NOT NULL AND ${leads.longitude} IS NOT NULL`
+            )
+          ),
+        db
+          .select({ count: count() })
+          .from(concorrentes)
+          .where(
+            and(
+              eq(concorrentes.pesquisaId, id),
+              sql`${concorrentes.latitude} IS NOT NULL AND ${concorrentes.longitude} IS NOT NULL`
+            )
+          ),
       ]);
 
       return {
@@ -180,7 +175,10 @@ export const pesquisasRouter = createTRPCRouter({
         concorrentesQualidadeMedia: concorrentesQualidadeResult[0]?.avg
           ? Number(concorrentesQualidadeResult[0].avg)
           : null,
-        geoEnriquecimentoTotal: geoTotalResult[0]?.total || 0,
+        geoEnriquecimentoTotal:
+          (clientesGeoResult[0]?.count || 0) +
+          (leadsGeoResult[0]?.count || 0) +
+          (concorrentesGeoResult[0]?.count || 0),
       };
     } catch (error) {
       console.error('[Pesquisas] Error getting by ID with counts:', error);
