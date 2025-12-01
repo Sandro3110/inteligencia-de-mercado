@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { publicProcedure, router } from '../_core/trpc';
+import { requireAdminProcedure } from '../../lib/trpc/server';
 import { randomBytes } from 'crypto';
 
 /**
@@ -8,10 +9,48 @@ import { randomBytes } from 'crypto';
  */
 export const usersRouter = router({
   /**
+   * Obter estatísticas de usuários
+   * GET /api/users/stats
+   */
+  getStats: requireAdminProcedure.query(async ({ ctx }) => {
+    const { getDb } = await import('../db');
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+
+    const { users } = await import('../../drizzle/schema');
+    const { eq, count } = await import('drizzle-orm');
+
+    // Contar usuários por status
+    const [pendingCount] = await db
+      .select({ count: count() })
+      .from(users)
+      .where(eq(users.ativo, 0));
+
+    const [approvedCount] = await db
+      .select({ count: count() })
+      .from(users)
+      .where(eq(users.ativo, 1));
+
+    const [rejectedCount] = await db
+      .select({ count: count() })
+      .from(users)
+      .where(eq(users.ativo, -1));
+
+    const [totalCount] = await db.select({ count: count() }).from(users);
+
+    return {
+      pending: pendingCount.count || 0,
+      approved: approvedCount.count || 0,
+      rejected: rejectedCount.count || 0,
+      total: totalCount.count || 0,
+    };
+  }),
+
+  /**
    * Listar todos os usuários
    * GET /api/users/list
    */
-  list: publicProcedure
+  list: requireAdminProcedure
     .input(
       z
         .object({
@@ -443,6 +482,152 @@ export const usersRouter = router({
       return {
         success: true,
         message: input.active ? 'Usuário ativado' : 'Usuário desativado',
+      };
+    }),
+
+  /**
+   * Aprovar usuário pendente
+   * POST /api/users/approve
+   */
+  approve: requireAdminProcedure
+    .input(
+      z.object({
+        userId: z.string().min(1, 'ID do usuário é obrigatório'),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { getDb } = await import('../db');
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
+      const { users } = await import('../../drizzle/schema');
+      const { eq } = await import('drizzle-orm');
+
+      // Buscar usuário
+      const [user] = await db.select().from(users).where(eq(users.id, input.userId)).limit(1);
+
+      if (!user) {
+        throw new Error('Usuário não encontrado');
+      }
+
+      if (user.ativo !== 0) {
+        throw new Error('Apenas usuários pendentes podem ser aprovados');
+      }
+
+      // Atualizar usuário
+      await db
+        .update(users)
+        .set({
+          ativo: 1,
+          liberadoPor: ctx.user.id,
+          liberadoEm: new Date().toISOString(),
+        })
+        .where(eq(users.id, input.userId));
+
+      // Enviar email de aprovação
+      try {
+        const { sendUserApprovedEmail } = await import('../services/email/userNotifications');
+        await sendUserApprovedEmail(user.email, user.nome);
+      } catch (emailError) {
+        console.error('[users.approve] Erro ao enviar email:', emailError);
+        // Não falhar a aprovação se o email falhar
+      }
+
+      // Registrar log de auditoria
+      try {
+        const { logUserActivity } = await import('../services/userActivityLog');
+        await logUserActivity({
+          userId: input.userId,
+          adminId: ctx.user.id,
+          action: 'approved',
+          details: {
+            email: user.email,
+            nome: user.nome,
+          },
+        });
+      } catch (logError) {
+        console.error('[users.approve] Erro ao registrar log:', logError);
+      }
+
+      return {
+        success: true,
+        message: 'Usuário aprovado com sucesso',
+        user: {
+          id: user.id,
+          email: user.email,
+          nome: user.nome,
+          ativo: 1,
+        },
+      };
+    }),
+
+  /**
+   * Rejeitar usuário pendente
+   * POST /api/users/reject
+   */
+  reject: requireAdminProcedure
+    .input(
+      z.object({
+        userId: z.string().min(1, 'ID do usuário é obrigatório'),
+        motivo: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { getDb } = await import('../db');
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
+      const { users } = await import('../../drizzle/schema');
+      const { eq } = await import('drizzle-orm');
+
+      // Buscar usuário
+      const [user] = await db.select().from(users).where(eq(users.id, input.userId)).limit(1);
+
+      if (!user) {
+        throw new Error('Usuário não encontrado');
+      }
+
+      if (user.ativo !== 0) {
+        throw new Error('Apenas usuários pendentes podem ser rejeitados');
+      }
+
+      // Atualizar usuário
+      await db
+        .update(users)
+        .set({
+          ativo: -1,
+        })
+        .where(eq(users.id, input.userId));
+
+      // Enviar email de rejeição
+      try {
+        const { sendUserRejectedEmail } = await import('../services/email/userNotifications');
+        await sendUserRejectedEmail(user.email, user.nome, input.motivo);
+      } catch (emailError) {
+        console.error('[users.reject] Erro ao enviar email:', emailError);
+        // Não falhar a rejeição se o email falhar
+      }
+
+      // Registrar log de auditoria
+      try {
+        const { logUserActivity } = await import('../services/userActivityLog');
+        await logUserActivity({
+          userId: input.userId,
+          adminId: ctx.user.id,
+          action: 'rejected',
+          details: {
+            email: user.email,
+            nome: user.nome,
+            motivo: input.motivo,
+          },
+        });
+      } catch (logError) {
+        console.error('[users.reject] Erro ao registrar log:', logError);
+      }
+
+      return {
+        success: true,
+        message: 'Usuário rejeitado com sucesso',
       };
     }),
 });

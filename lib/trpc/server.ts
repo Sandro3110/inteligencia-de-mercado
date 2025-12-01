@@ -130,6 +130,25 @@ const metricsMiddleware = t.middleware(async ({ path, type, next, input }) => {
 });
 
 /**
+ * Procedure que requer permissão de admin
+ */
+export const requireAdminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  if (ctx.user.role !== 'admin') {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Você não tem permissão para acessar este recurso',
+    });
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      user: ctx.user,
+    },
+  });
+});
+
+/**
  * Procedure com logging
  */
 export const loggedProcedure = t.procedure.use(loggerMiddleware);

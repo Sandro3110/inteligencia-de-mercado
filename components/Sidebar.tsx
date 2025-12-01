@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
 import { useSidebar } from '@/lib/contexts/SidebarContext';
+import { useUser } from '@/lib/auth/supabase';
 import {
   LayoutDashboard,
   FolderKanban,
@@ -20,6 +21,7 @@ interface MenuItem {
   name: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
+  adminOnly?: boolean;
 }
 
 // Menu completo - 8 itens
@@ -53,11 +55,13 @@ const menuItems: MenuItem[] = [
     name: 'Métricas',
     href: '/admin/metrics',
     icon: Activity,
+    adminOnly: true,
   },
   {
     name: 'Usuários',
     href: '/admin/users',
     icon: Users,
+    adminOnly: true,
   },
   {
     name: 'Configurações',
@@ -70,6 +74,14 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { selectedProject } = useSelectedProject();
   const { isCollapsed, collapseSidebar } = useSidebar();
+  const { user } = useUser();
+  const isAdmin = user?.role === 'admin';
+
+  // Filtrar itens de menu baseado em permissões
+  const visibleMenuItems = menuItems.filter((item) => {
+    if (item.adminOnly && !isAdmin) return false;
+    return true;
+  });
 
   return (
     <Tooltip.Provider delayDuration={300}>
@@ -108,7 +120,7 @@ export default function Sidebar() {
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto p-4">
             <ul className="space-y-1">
-              {menuItems.map((item) => {
+              {visibleMenuItems.map((item) => {
                 const isActive = pathname === item.href || pathname.startsWith(item.href);
                 const Icon = item.icon;
 
