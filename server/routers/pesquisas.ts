@@ -126,18 +126,41 @@ export const pesquisasRouter = createTRPCRouter({
           .where(
             and(eq(concorrentes.pesquisaId, id), sql`${concorrentes.qualidadeScore} IS NOT NULL`)
           ),
-        db
-          .select({
-            total: sql<number>`(
-              COUNT(CASE WHEN ${clientes.latitude} IS NOT NULL AND ${clientes.longitude} IS NOT NULL THEN 1 END) +
-              COUNT(CASE WHEN ${leads.latitude} IS NOT NULL AND ${leads.longitude} IS NOT NULL THEN 1 END) +
-              COUNT(CASE WHEN ${concorrentes.latitude} IS NOT NULL AND ${concorrentes.longitude} IS NOT NULL THEN 1 END)
-            )::int`,
-          })
-          .from(clientes)
-          .leftJoin(leads, eq(leads.pesquisaId, id))
-          .leftJoin(concorrentes, eq(concorrentes.pesquisaId, id))
-          .where(eq(clientes.pesquisaId, id)),
+        // Geocodificação: contar separadamente para evitar produto cartesiano
+        Promise.all([
+          db
+            .select({ count: count() })
+            .from(clientes)
+            .where(
+              and(
+                eq(clientes.pesquisaId, id),
+                sql`${clientes.latitude} IS NOT NULL AND ${clientes.longitude} IS NOT NULL`
+              )
+            ),
+          db
+            .select({ count: count() })
+            .from(leads)
+            .where(
+              and(
+                eq(leads.pesquisaId, id),
+                sql`${leads.latitude} IS NOT NULL AND ${leads.longitude} IS NOT NULL`
+              )
+            ),
+          db
+            .select({ count: count() })
+            .from(concorrentes)
+            .where(
+              and(
+                eq(concorrentes.pesquisaId, id),
+                sql`${concorrentes.latitude} IS NOT NULL AND ${concorrentes.longitude} IS NOT NULL`
+              )
+            ),
+        ]).then(([clientesGeo, leadsGeo, concorrentesGeo]) => ({
+          total:
+            (clientesGeo[0]?.count || 0) +
+            (leadsGeo[0]?.count || 0) +
+            (concorrentesGeo[0]?.count || 0),
+        })),
       ]);
 
       return {
