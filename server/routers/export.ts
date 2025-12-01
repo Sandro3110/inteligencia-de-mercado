@@ -8,7 +8,7 @@ import {
   mercadosUnicos,
   pesquisas as pesquisasTable,
 } from '@/drizzle/schema';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, count } from 'drizzle-orm';
 
 /**
  * Helper para gerar CSV
@@ -65,6 +65,41 @@ export const exportRouter = createTRPCRouter({
       }
 
       const pesquisaIds = pesquisas.map((p) => p.id);
+
+      // Verificar tamanho dos dados antes de exportar
+      const [mercadosCount, clientesCount, leadsCount, concorrentesCount] = await Promise.all([
+        db
+          .select({ count: count() })
+          .from(mercadosUnicos)
+          .where(inArray(mercadosUnicos.pesquisaId, pesquisaIds)),
+        db
+          .select({ count: count() })
+          .from(clientes)
+          .where(inArray(clientes.pesquisaId, pesquisaIds)),
+        db.select({ count: count() }).from(leads).where(inArray(leads.pesquisaId, pesquisaIds)),
+        db
+          .select({ count: count() })
+          .from(concorrentes)
+          .where(inArray(concorrentes.pesquisaId, pesquisaIds)),
+      ]);
+
+      const totalMercados = mercadosCount[0]?.count || 0;
+      const totalClientes = clientesCount[0]?.count || 0;
+      const totalLeads = leadsCount[0]?.count || 0;
+      const totalConcorrentes = concorrentesCount[0]?.count || 0;
+      const totalRegistros = totalMercados + totalClientes + totalLeads + totalConcorrentes;
+
+      // Limite de segurança: 50.000 registros
+      const LIMITE_REGISTROS = 50000;
+      if (totalRegistros > LIMITE_REGISTROS) {
+        throw new Error(
+          `Projeto possui ${totalRegistros.toLocaleString('pt-BR')} registros, ` +
+            `excedendo o limite de ${LIMITE_REGISTROS.toLocaleString('pt-BR')} para exportação. ` +
+            `Por favor, filtre os dados por pesquisa ou entre em contato com o suporte.`
+        );
+      }
+
+      console.log(`[Export] Exportando ${totalRegistros} registros para Excel`);
 
       // 1. Aba Mercados
       const mercadosData = await db

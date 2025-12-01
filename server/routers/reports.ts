@@ -49,7 +49,42 @@ export const reportsRouter = createTRPCRouter({
 
       const pesquisaIds = pesquisas.map((p) => p.id);
 
-      // 3. Buscar todos os dados
+      // 3. Verificar tamanho dos dados antes de buscar
+      const [clientesCount, leadsCount, concorrentesCount, mercadosCount] = await Promise.all([
+        db
+          .select({ count: count() })
+          .from(clientes)
+          .where(inArray(clientes.pesquisaId, pesquisaIds)),
+        db.select({ count: count() }).from(leads).where(inArray(leads.pesquisaId, pesquisaIds)),
+        db
+          .select({ count: count() })
+          .from(concorrentes)
+          .where(inArray(concorrentes.pesquisaId, pesquisaIds)),
+        db
+          .select({ count: count() })
+          .from(mercadosUnicos)
+          .where(inArray(mercadosUnicos.pesquisaId, pesquisaIds)),
+      ]);
+
+      const totalClientes = clientesCount[0]?.count || 0;
+      const totalLeads = leadsCount[0]?.count || 0;
+      const totalConcorrentes = concorrentesCount[0]?.count || 0;
+      const totalMercados = mercadosCount[0]?.count || 0;
+      const totalRegistros = totalClientes + totalLeads + totalConcorrentes + totalMercados;
+
+      // Limite de segurança: 10.000 registros
+      const LIMITE_REGISTROS = 10000;
+      if (totalRegistros > LIMITE_REGISTROS) {
+        throw new Error(
+          `Projeto possui ${totalRegistros.toLocaleString('pt-BR')} registros, ` +
+            `excedendo o limite de ${LIMITE_REGISTROS.toLocaleString('pt-BR')} para geração de relatórios. ` +
+            `Por favor, filtre os dados ou entre em contato com o suporte.`
+        );
+      }
+
+      console.log(`[Reports] Gerando relatório para ${totalRegistros} registros`);
+
+      // 4. Buscar todos os dados (com limite implícito validado)
       const [clientesData, leadsData, concorrentesData, mercadosData] = await Promise.all([
         db.select().from(clientes).where(inArray(clientes.pesquisaId, pesquisaIds)),
         db.select().from(leads).where(inArray(leads.pesquisaId, pesquisaIds)),
