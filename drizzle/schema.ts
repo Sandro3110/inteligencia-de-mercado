@@ -194,6 +194,8 @@ export const clientes = pgTable(
   (table) => [
     index('idx_clientes_projectId').on(table.projectId),
     index('unique_cliente_hash').on(table.clienteHash),
+    index('idx_clientes_pesquisaId').on(table.pesquisaId),
+    index('idx_clientes_cnae').on(table.cnae),
   ]
 );
 
@@ -256,6 +258,8 @@ export const concorrentes = pgTable(
     index('idx_concorrentes_projectId').on(table.projectId),
     index('unique_concorrente_hash').on(table.concorrenteHash),
     index('idx_concorrente_hash').on(table.concorrenteHash),
+    index('idx_concorrentes_pesquisaId').on(table.pesquisaId),
+    index('idx_concorrentes_setor').on(table.setor),
   ]
 );
 
@@ -515,6 +519,8 @@ export const leads = pgTable(
     index('idx_leads_projectId').on(table.projectId),
     index('unique_lead_hash').on(table.leadHash),
     index('idx_lead_hash').on(table.leadHash),
+    index('idx_leads_pesquisaId').on(table.pesquisaId),
+    index('idx_leads_setor').on(table.setor),
   ]
 );
 

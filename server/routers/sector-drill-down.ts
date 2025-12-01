@@ -40,8 +40,6 @@ export const sectorDrillDownRouter = router({
       // TODO: Implementar categorização inteligente (Indústria, Comércio, Serviços, etc.)
 
       // Buscar registros e contar no JavaScript (mais robusto)
-      console.log('🔍 [DEBUG] getCategories - pesquisaIds:', pesquisaIds);
-
       const [clientesResult, leadsResult, concorrentesResult] = await Promise.all([
         // Buscar clientes com setores
         db
@@ -63,12 +61,6 @@ export const sectorDrillDownRouter = router({
       ]);
 
       // Contar no JavaScript (mais confiável que SQL)
-      console.log('📊 [DEBUG] Resultados:', {
-        clientesCount: clientesResult.length,
-        leadsCount: leadsResult.length,
-        concorrentesCount: concorrentesResult.length,
-      });
-
       const clientesCount = clientesResult.length;
       const leadsCount = leadsResult.length;
       const concorrentesCount = concorrentesResult.length;
