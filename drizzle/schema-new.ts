@@ -185,6 +185,14 @@ export const fatoEntidades = pgTable(
     index('idx_fato_entidades_geografia_mercado').on(table.geografia_id, table.mercado_id),
     index('idx_fato_entidades_status_qualificacao').on(table.status_qualificacao),
     index('idx_fato_entidades_tipo_status').on(table.tipo_entidade, table.status_qualificacao),
+    index('idx_fato_entidades_pesquisa_status').on(table.pesquisa_id, table.status_qualificacao),
+    index('idx_fato_entidades_mercado_status').on(table.mercado_id, table.status_qualificacao),
+    index('idx_fato_entidades_geografia_status').on(table.geografia_id, table.status_qualificacao),
+    index('idx_fato_entidades_tipo_pesquisa_status').on(
+      table.tipo_entidade,
+      table.pesquisa_id,
+      table.status_qualificacao
+    ),
     check('fato_entidades_tipo_check', sql`tipo_entidade IN ('cliente', 'lead', 'concorrente')`),
     check('fato_entidades_qualidade_check', sql`qualidade_score >= 0 AND qualidade_score <= 100`),
     check(
