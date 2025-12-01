@@ -24,6 +24,8 @@ import { mapHierarchicalRouter } from './map-hierarchical';
 import { sectorAnalysisRouter } from './sector-analysis';
 import { productAnalysisRouter } from './product-analysis';
 import { metricsRouter } from './metrics';
+import { productDrillDownRouter } from './product-drill-down';
+import { sectorDrillDownRouter } from './sector-drill-down';
 
 /**
  * Router raiz da aplicação - SIMPLIFICADO
@@ -53,6 +55,8 @@ export const appRouter = createTRPCRouter({
   sectorAnalysis: sectorAnalysisRouter,
   productAnalysis: productAnalysisRouter,
   metrics: metricsRouter,
+  productDrillDown: productDrillDownRouter,
+  sectorDrillDown: sectorDrillDownRouter,
 });
 
 /**
