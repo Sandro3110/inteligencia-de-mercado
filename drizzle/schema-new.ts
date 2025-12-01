@@ -151,6 +151,9 @@ export const fatoEntidades = pgTable(
     qualidade_score: integer('qualidade_score'),
     qualidade_classificacao: varchar('qualidade_classificacao', { length: 50 }),
 
+    // Status de qualificação (ativo, inativo, prospect, lead_qualificado, lead_desqualificado)
+    status_qualificacao: varchar('status_qualificacao', { length: 50 }).default('prospect'),
+
     // Validação padronizada
     validation_status: varchar('validation_status', { length: 50 }).default('pending'),
     validation_notes: text('validation_notes'),
@@ -180,8 +183,14 @@ export const fatoEntidades = pgTable(
     index('idx_fato_entidades_tipo_mercado').on(table.tipo_entidade, table.mercado_id),
     index('idx_fato_entidades_cliente_origem').on(table.cliente_origem_id),
     index('idx_fato_entidades_geografia_mercado').on(table.geografia_id, table.mercado_id),
+    index('idx_fato_entidades_status_qualificacao').on(table.status_qualificacao),
+    index('idx_fato_entidades_tipo_status').on(table.tipo_entidade, table.status_qualificacao),
     check('fato_entidades_tipo_check', sql`tipo_entidade IN ('cliente', 'lead', 'concorrente')`),
     check('fato_entidades_qualidade_check', sql`qualidade_score >= 0 AND qualidade_score <= 100`),
+    check(
+      'fato_entidades_status_qualificacao_check',
+      sql`status_qualificacao IN ('ativo', 'inativo', 'prospect', 'lead_qualificado', 'lead_desqualificado')`
+    ),
   ]
 );
 
