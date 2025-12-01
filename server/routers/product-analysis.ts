@@ -2,14 +2,7 @@ import { z } from 'zod';
 import { eq, inArray, and, isNotNull, sql } from 'drizzle-orm';
 import { publicProcedure, router } from '../_core/trpc';
 import { getDb } from '../db';
-import {
-  produtos,
-  clientes,
-  leads,
-  concorrentes,
-  mercadosUnicos,
-  pesquisas,
-} from '../../drizzle/schema';
+import { produtos, clientes, mercadosUnicos, pesquisas } from '../../drizzle/schema';
 
 /**
  * Router para Análise de Produtos
@@ -53,21 +46,53 @@ export const productAnalysisRouter = router({
         }
       }
 
-      // Usar stored procedure otimizada (95% mais rápido)
-      const products = await db
-        .execute(
-          sql`SELECT * FROM get_product_ranking(ARRAY[${sql.join(
-            pesquisaIds.map((id) => sql`${id}`),
-            sql`, `
-          )}])`
-        )
-        .then((result) =>
-          result.rows.map((row: any) => ({
-            nome: row.nome,
-            categoria: row.categoria || 'Sem categoria',
-            clientes: row.clientes,
-          }))
-        );
+      // Tentar stored procedure primeiro, fallback para TypeScript
+      let products: Array<{
+        nome: string;
+        categoria: string;
+        clientes: number;
+      }> = [];
+
+      try {
+        // Tentar SP otimizada (95% mais rápido)
+        products = await db
+          .execute(
+            sql`SELECT * FROM get_product_ranking(ARRAY[${sql.join(
+              pesquisaIds.map((id) => sql`${id}`),
+              sql`, `
+            )}])`
+          )
+          .then((result) =>
+            result.rows.map((row: any) => ({
+              nome: row.nome,
+              categoria: row.categoria || 'Sem categoria',
+              clientes: row.clientes,
+            }))
+          );
+      } catch (spError) {
+        console.log('[ProductAnalysis] SP failed, using TypeScript fallback:', spError);
+
+        // Fallback: Query TypeScript (funciona sempre)
+        const produtosCount = await db
+          .select({
+            nome: produtos.nome,
+            categoria: produtos.categoria,
+            clientes: sql<number>`COUNT(DISTINCT ${produtos.clienteId})::INTEGER`,
+          })
+          .from(produtos)
+          .innerJoin(clientes, eq(produtos.clienteId, clientes.id))
+          .where(inArray(clientes.pesquisaId, pesquisaIds))
+          .groupBy(produtos.nome, produtos.categoria);
+
+        products = produtosCount.map((row) => ({
+          nome: row.nome,
+          categoria: row.categoria || 'Sem categoria',
+          clientes: row.clientes,
+        }));
+
+        // Ordenar por clientes DESC
+        products.sort((a, b) => b.clientes - a.clientes);
+      }
 
       return { products };
     }),

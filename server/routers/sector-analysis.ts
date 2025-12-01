@@ -46,23 +46,108 @@ export const sectorAnalysisRouter = router({
         }
       }
 
-      // Usar stored procedure otimizada (95% mais rápido)
-      const sectors = await db
-        .execute(
-          sql`SELECT * FROM get_sector_summary(ARRAY[${sql.join(
-            pesquisaIds.map((id) => sql`${id}`),
-            sql`, `
-          )}])`
-        )
-        .then((result) =>
-          result.rows.map((row: any) => ({
-            setor: row.setor,
-            clientes: row.clientes,
-            leads: row.leads,
-            concorrentes: row.concorrentes,
-            score: parseFloat(row.score),
-          }))
-        );
+      // Tentar stored procedure primeiro, fallback para TypeScript
+      let sectors: Array<{
+        setor: string;
+        clientes: number;
+        leads: number;
+        concorrentes: number;
+        score: number;
+      }> = [];
+
+      try {
+        // Tentar SP otimizada (95% mais rápido)
+        sectors = await db
+          .execute(
+            sql`SELECT * FROM get_sector_summary(ARRAY[${sql.join(
+              pesquisaIds.map((id) => sql`${id}`),
+              sql`, `
+            )}])`
+          )
+          .then((result) =>
+            result.rows.map((row: any) => ({
+              setor: row.setor,
+              clientes: row.clientes,
+              leads: row.leads,
+              concorrentes: row.concorrentes,
+              score: parseFloat(row.score),
+            }))
+          );
+      } catch (spError) {
+        console.log('[SectorAnalysis] SP failed, using TypeScript fallback:', spError);
+
+        // Fallback: Query TypeScript (funciona sempre)
+        const [clientesCount, leadsCount, concorrentesCount] = await Promise.all([
+          db
+            .select({
+              setor: clientes.setor,
+              count: sql<number>`COUNT(*)::INTEGER`,
+            })
+            .from(clientes)
+            .where(and(isNotNull(clientes.setor), inArray(clientes.pesquisaId, pesquisaIds)))
+            .groupBy(clientes.setor),
+          db
+            .select({
+              setor: leads.setor,
+              count: sql<number>`COUNT(*)::INTEGER`,
+            })
+            .from(leads)
+            .where(and(isNotNull(leads.setor), inArray(leads.pesquisaId, pesquisaIds)))
+            .groupBy(leads.setor),
+          db
+            .select({
+              setor: concorrentes.setor,
+              count: sql<number>`COUNT(*)::INTEGER`,
+            })
+            .from(concorrentes)
+            .where(
+              and(isNotNull(concorrentes.setor), inArray(concorrentes.pesquisaId, pesquisaIds))
+            )
+            .groupBy(concorrentes.setor),
+        ]);
+
+        // Merge results
+        const setoresMap = new Map<
+          string,
+          { clientes: number; leads: number; concorrentes: number }
+        >();
+
+        clientesCount.forEach((row) => {
+          if (!setoresMap.has(row.setor!)) {
+            setoresMap.set(row.setor!, { clientes: 0, leads: 0, concorrentes: 0 });
+          }
+          setoresMap.get(row.setor!)!.clientes = row.count;
+        });
+
+        leadsCount.forEach((row) => {
+          if (!setoresMap.has(row.setor!)) {
+            setoresMap.set(row.setor!, { clientes: 0, leads: 0, concorrentes: 0 });
+          }
+          setoresMap.get(row.setor!)!.leads = row.count;
+        });
+
+        concorrentesCount.forEach((row) => {
+          if (!setoresMap.has(row.setor!)) {
+            setoresMap.set(row.setor!, { clientes: 0, leads: 0, concorrentes: 0 });
+          }
+          setoresMap.get(row.setor!)!.concorrentes = row.count;
+        });
+
+        // Calcular score e criar array
+        sectors = Array.from(setoresMap.entries()).map(([setor, counts]) => ({
+          setor,
+          clientes: counts.clientes,
+          leads: counts.leads,
+          concorrentes: counts.concorrentes,
+          score: parseFloat(((counts.leads / Math.max(counts.concorrentes, 1)) * 10).toFixed(2)),
+        }));
+
+        // Ordenar por score DESC, leads DESC
+        sectors.sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          return b.leads - a.leads;
+        });
+      }
 
       // Calcular totais
       const totals = {
