@@ -156,6 +156,10 @@ export default function DashboardPage() {
     router.push(`/projects/${projectId}/surveys/${pesquisaId}/results`);
   };
 
+  const handleViewEnrichment = (projectId: number, pesquisaId: number) => {
+    router.push(`/projects/${projectId}/surveys/${pesquisaId}/enrich`);
+  };
+
   const handleExport = async (_projectId: number, pesquisaId: number) => {
     try {
       toast.info('Gerando arquivo Excel...');
@@ -319,6 +323,7 @@ export default function DashboardPage() {
                   onGeocode={handleGeocode}
                   onViewResults={handleViewResults}
                   onExport={handleExport}
+                  onViewEnrichment={handleViewEnrichment}
                   onRefresh={async () => {
                     await refetchPesquisas();
                   }}

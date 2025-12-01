@@ -1,18 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Zap,
-  BarChart3,
-  Download,
-  RefreshCw,
-  MapPin,
-  FileText,
-  Pause,
-  X,
-  Eye,
-  Trash2,
-} from 'lucide-react';
+import { Zap, BarChart3, Download, RefreshCw, MapPin, Pause, X, Eye, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { GenerateReportButton } from '@/components/enrichment-v3/GenerateReportButton';
 import { CleanEnrichmentModal } from '@/components/pesquisas/CleanEnrichmentModal';
@@ -178,9 +167,11 @@ export function PesquisaCard({
     try {
       if (onRefresh) {
         await onRefresh();
+        toast.success('Métricas atualizadas!');
       }
     } catch (error) {
       console.error('Erro ao atualizar métricas:', error);
+      toast.error('Erro ao atualizar métricas');
     } finally {
       setIsRefreshing(false);
     }
@@ -278,7 +269,7 @@ export function PesquisaCard({
       </div>
 
       {/* Métricas em Grid */}
-      <div className="p-6 grid grid-cols-2 gap-4">
+      <div className="p-6 grid grid-cols-2 sm:grid-cols-3 gap-4">
         {/* Card: Clientes */}
         <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-lg p-4 border border-blue-200">
           <div className="text-sm font-medium text-blue-700 mb-1">Clientes</div>
@@ -307,6 +298,13 @@ export function PesquisaCard({
           <div className="text-sm font-medium text-amber-700 mb-1">Produtos</div>
           <div className="text-2xl font-bold text-amber-900">{pesquisa.produtosCount || 0}</div>
           <div className="text-xs text-amber-600 mt-1">Soluções catalogadas</div>
+        </div>
+
+        {/* Card: Concorrentes */}
+        <div className="bg-gradient-to-br from-red-50 to-red-100/50 rounded-lg p-4 border border-red-200">
+          <div className="text-sm font-medium text-red-700 mb-1">Concorrentes</div>
+          <div className="text-2xl font-bold text-red-900">{pesquisa.concorrentesCount || 0}</div>
+          <div className="text-xs text-red-600 mt-1">Competidores mapeados</div>
         </div>
       </div>
 
@@ -434,38 +432,42 @@ export function PesquisaCard({
         )}
 
         {/* Botões Secundários */}
-        <div className="grid grid-cols-5 gap-2">
+        <div className="flex flex-wrap gap-2">
           <GenerateReportButton pesquisaId={pesquisa.id} size="sm" />
           {onViewEnrichment && (
             <button
               onClick={() => onViewEnrichment(pesquisa.projectId, pesquisa.id)}
-              className="flex items-center justify-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+              className="flex items-center justify-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm font-medium"
               title="Ver Enriquecimento"
             >
               <Eye className="w-4 h-4" />
+              <span className="hidden sm:inline">Ver</span>
             </button>
           )}
           <button
             onClick={() => onViewResults(pesquisa.projectId, pesquisa.id)}
-            className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
             title="Ver Resultados"
           >
             <BarChart3 className="w-4 h-4" />
+            <span className="hidden sm:inline">Resultados</span>
           </button>
           <button
             onClick={() => onExport(pesquisa.projectId, pesquisa.id)}
-            className="flex items-center justify-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+            className="flex items-center justify-center gap-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium"
             title="Exportar Excel"
           >
             <Download className="w-4 h-4" />
+            <span className="hidden sm:inline">Exportar</span>
           </button>
           <button
             onClick={() => setIsCleanModalOpen(true)}
             disabled={pesquisa.clientesEnriquecidos === 0}
-            className="flex items-center justify-center gap-2 px-3 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             title={pesquisa.clientesEnriquecidos === 0 ? 'Nenhum dado para limpar' : 'Limpar Tudo'}
           >
             <Trash2 className="w-4 h-4" />
+            <span className="hidden sm:inline">Limpar</span>
           </button>
         </div>
       </div>
