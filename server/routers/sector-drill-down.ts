@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { eq, inArray, and, isNotNull, sql, desc } from 'drizzle-orm';
+import { eq, inArray, and, isNotNull, sql, desc, ne } from 'drizzle-orm';
 import { publicProcedure, router } from '../_core/trpc';
 import { getDb } from '../db';
 import { clientes, leads, concorrentes } from '../../drizzle/schema';
@@ -45,19 +45,19 @@ export const sectorDrillDownRouter = router({
         db
           .select({ id: clientes.id })
           .from(clientes)
-          .where(and(inArray(clientes.pesquisaId, pesquisaIds), isNotNull(clientes.setor))),
+          .where(and(inArray(clientes.pesquisaId, pesquisaIds), ne(clientes.cnae, null))),
 
         // Buscar leads com setores
         db
           .select({ id: leads.id })
           .from(leads)
-          .where(and(inArray(leads.pesquisaId, pesquisaIds), isNotNull(leads.setor))),
+          .where(and(inArray(leads.pesquisaId, pesquisaIds), ne(leads.setor, null))),
 
         // Buscar concorrentes com setores
         db
           .select({ id: concorrentes.id })
           .from(concorrentes)
-          .where(and(inArray(concorrentes.pesquisaId, pesquisaIds), isNotNull(concorrentes.setor))),
+          .where(and(inArray(concorrentes.pesquisaId, pesquisaIds), ne(concorrentes.setor, null))),
       ]);
 
       // Contar no JavaScript (mais confiável que SQL)

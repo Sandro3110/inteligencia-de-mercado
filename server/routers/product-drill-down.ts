@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { eq, inArray, and, isNotNull, sql, desc } from 'drizzle-orm';
+import { eq, inArray, and, isNotNull, sql, desc, ne } from 'drizzle-orm';
 import { publicProcedure, router } from '../_core/trpc';
 import { getDb } from '../db';
 import { clientes, leads, concorrentes } from '../../drizzle/schema';
@@ -47,14 +47,14 @@ export const productDrillDownRouter = router({
         db
           .select({ id: clientes.id })
           .from(clientes)
-          .where(and(inArray(clientes.pesquisaId, pesquisaIds), isNotNull(clientes.produto))),
+          .where(and(inArray(clientes.pesquisaId, pesquisaIds), ne(clientes.produto, null))),
 
         // Buscar concorrentes com produtos
         db
           .select({ id: concorrentes.id })
           .from(concorrentes)
           .where(
-            and(inArray(concorrentes.pesquisaId, pesquisaIds), isNotNull(concorrentes.produto))
+            and(inArray(concorrentes.pesquisaId, pesquisaIds), ne(concorrentes.produto, null))
           ),
       ]);
 
