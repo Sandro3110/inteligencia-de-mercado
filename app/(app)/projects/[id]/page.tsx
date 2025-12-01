@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { trpc } from '@/lib/trpc/client';
+import { toast } from 'sonner';
 import { ArrowLeft, Plus, FileText, Zap, BarChart3, Download } from 'lucide-react';
 import { PesquisaCard } from '@/components/dashboard/PesquisaCard';
 import { FeedbackModal, FeedbackType } from '@/components/ui/FeedbackModal';
 import { PesquisaModal } from '@/components/pesquisas/PesquisaModal';
 import { EnrichAllModal } from '@/components/enrichment/EnrichAllModal';
+import { PesquisasFilterDialog } from '@/components/projects/PesquisasFilterDialog';
 
 export default function ProjectDetailsPage() {
   const router = useRouter();
@@ -113,6 +115,8 @@ export default function ProjectDetailsPage() {
 
   const [isCreatePesquisaModalOpen, setIsCreatePesquisaModalOpen] = useState(false);
   const [isEnrichAllModalOpen, setIsEnrichAllModalOpen] = useState(false);
+  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+  const [filterMode, setFilterMode] = useState<'report' | 'export'>('report');
 
   const trpcUtils = trpc.useUtils();
 
@@ -195,8 +199,16 @@ export default function ProjectDetailsPage() {
       toast.error('Não há pesquisas para exportar');
       return;
     }
+
+    // Abrir dialog de filtro
+    setFilterMode('export');
+    setIsFilterDialogOpen(true);
+  };
+
+  const handleConfirmExport = (pesquisaIds: number[]) => {
+    setIsFilterDialogOpen(false);
     toast.loading('Exportando projeto...');
-    exportProjectMutation.mutate({ projectId });
+    exportProjectMutation.mutate({ projectId, pesquisaIds });
   };
 
   // Mutation para enriquecer todas as pesquisas
@@ -262,12 +274,19 @@ export default function ProjectDetailsPage() {
       return;
     }
 
+    // Abrir dialog de filtro
+    setFilterMode('report');
+    setIsFilterDialogOpen(true);
+  };
+
+  const handleConfirmReport = (pesquisaIds: number[]) => {
+    setIsFilterDialogOpen(false);
     setFeedbackType('info');
     setFeedbackTitle('Gerando relatório...');
     setFeedbackMessage('Aguarde enquanto geramos o relatório analítico com IA.');
     setShowFeedback(true);
 
-    generateReportMutation.mutate({ projectId });
+    generateReportMutation.mutate({ projectId, pesquisaIds });
   };
 
   if (isLoading) {
@@ -452,6 +471,20 @@ export default function ProjectDetailsPage() {
         onConfirm={handleConfirmEnrichAll}
         pesquisas={pesquisas || []}
         isLoading={enrichAllMutation.isPending}
+      />
+
+      <PesquisasFilterDialog
+        isOpen={isFilterDialogOpen}
+        onClose={() => setIsFilterDialogOpen(false)}
+        projectId={projectId}
+        pesquisas={pesquisas || []}
+        mode={filterMode}
+        onConfirm={filterMode === 'report' ? handleConfirmReport : handleConfirmExport}
+        isLoading={
+          filterMode === 'report'
+            ? generateReportMutation.isPending
+            : exportProjectMutation.isPending
+        }
       />
     </div>
   );
