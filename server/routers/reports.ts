@@ -172,7 +172,7 @@ export const reportsRouter = createTRPCRouter({
       ]);
 
       // 4. Preparar dados para análise da IA
-      const totalEntidades =
+      const _totalEntidades =
         clientesData.length + leadsData.length + concorrentesData.length + mercadosData.length;
 
       // Top 20 mercados por tamanho estimado
@@ -185,7 +185,7 @@ export const reportsRouter = createTRPCRouter({
         .slice(0, 20);
 
       // Top 20 clientes (por ordem alfabética por enquanto)
-      const top20Clientes = clientesData.slice(0, 20);
+      const _top20Clientes = clientesData.slice(0, 20);
 
       // Produtos principais (extrair de clientes)
       const produtos = clientesData
@@ -216,7 +216,7 @@ export const reportsRouter = createTRPCRouter({
           return acc;
         }, {});
 
-      const top10Estados = Object.entries(clientesPorEstado)
+      const _top10Estados = Object.entries(clientesPorEstado)
         .sort(([, a], [, b]) => b - a)
         .slice(0, 10)
         .map(([uf, count]) => ({
@@ -264,6 +264,220 @@ export const reportsRouter = createTRPCRouter({
           };
         });
 
+      // ===== MELHORIAS: ANÁLISES CRÍTICAS E AVANÇADAS =====
+
+      // 1. Análise de Qualidade de Leads
+      const leadsPorQualidade = leadsData.reduce((acc: { [key: string]: number }, lead) => {
+        const qualidade = lead.qualidade || 'Não classificado';
+        acc[qualidade] = (acc[qualidade] || 0) + 1;
+        return acc;
+      }, {});
+
+      const leadsAlta = leadsData.filter((l) => l.qualidade === 'alta');
+      const leadsMedia = leadsData.filter((l) => l.qualidade === 'media');
+      const leadsBaixa = leadsData.filter((l) => l.qualidade === 'baixa');
+
+      const scoresMedios = {
+        alta:
+          leadsAlta.length > 0
+            ? (leadsAlta.reduce((sum, l) => sum + (l.score || 0), 0) / leadsAlta.length).toFixed(1)
+            : '0.0',
+        media:
+          leadsMedia.length > 0
+            ? (leadsMedia.reduce((sum, l) => sum + (l.score || 0), 0) / leadsMedia.length).toFixed(
+                1
+              )
+            : '0.0',
+        baixa:
+          leadsBaixa.length > 0
+            ? (leadsBaixa.reduce((sum, l) => sum + (l.score || 0), 0) / leadsBaixa.length).toFixed(
+                1
+              )
+            : '0.0',
+      };
+
+      const leadsPorStage = leadsData.reduce((acc: { [key: string]: number }, lead) => {
+        const stage = lead.stage || 'Não classificado';
+        acc[stage] = (acc[stage] || 0) + 1;
+        return acc;
+      }, {});
+
+      const distribuicaoQualidade = Object.entries(leadsPorQualidade)
+        .sort(([, a], [, b]) => (b as number) - (a as number))
+        .map(([qualidade, count]) => ({
+          qualidade,
+          count,
+          percentual: (((count as number) / leadsData.length) * 100).toFixed(1),
+        }));
+
+      const distribuicaoStage = Object.entries(leadsPorStage)
+        .sort(([, a], [, b]) => (b as number) - (a as number))
+        .map(([stage, count]) => ({
+          stage,
+          count,
+          percentual: (((count as number) / leadsData.length) * 100).toFixed(1),
+        }));
+
+      // 2. Análise de Setores
+      const clientesPorSetor = clientesData
+        .filter((c) => c.setor)
+        .reduce((acc: { [key: string]: number }, cliente) => {
+          const setor = cliente.setor || 'Não especificado';
+          acc[setor] = (acc[setor] || 0) + 1;
+          return acc;
+        }, {});
+
+      const top10Setores = Object.entries(clientesPorSetor)
+        .sort(([, a], [, b]) => (b as number) - (a as number))
+        .slice(0, 10)
+        .map(([setor, count]) => ({
+          setor,
+          count,
+          percentual: (((count as number) / clientesData.length) * 100).toFixed(1),
+        }));
+
+      // 3. Análise de Porte de Concorrentes
+      const concorrentesPorPorte = concorrentesData
+        .filter((c) => c.porte)
+        .reduce((acc: { [key: string]: number }, concorrente) => {
+          const porte = concorrente.porte || 'Não especificado';
+          acc[porte] = (acc[porte] || 0) + 1;
+          return acc;
+        }, {});
+
+      const distribuicaoPorteConcorrentes = Object.entries(concorrentesPorPorte)
+        .sort(([, a], [, b]) => (b as number) - (a as number))
+        .map(([porte, count]) => ({
+          porte,
+          count,
+          percentual: (((count as number) / concorrentesData.length) * 100).toFixed(1),
+        }));
+
+      // 4. Análise de Completude de Dados
+      const clientesComTelefone = clientesData.filter((c) => c.telefone).length;
+      const clientesComEmail = clientesData.filter((c) => c.email).length;
+      const clientesComSite = clientesData.filter((c) => c.siteOficial).length;
+      const clientesComCNPJ = clientesData.filter((c) => c.cnpj).length;
+
+      const completudeClientes = {
+        telefone: ((clientesComTelefone / clientesData.length) * 100).toFixed(1),
+        email: ((clientesComEmail / clientesData.length) * 100).toFixed(1),
+        site: ((clientesComSite / clientesData.length) * 100).toFixed(1),
+        cnpj: ((clientesComCNPJ / clientesData.length) * 100).toFixed(1),
+      };
+
+      const leadsComTelefone = leadsData.filter((l) => l.telefone).length;
+      const leadsComEmail = leadsData.filter((l) => l.email).length;
+      const leadsComSite = leadsData.filter((l) => l.siteOficial).length;
+
+      const completudeLeads = {
+        telefone: ((leadsComTelefone / leadsData.length) * 100).toFixed(1),
+        email: ((leadsComEmail / leadsData.length) * 100).toFixed(1),
+        site: ((leadsComSite / leadsData.length) * 100).toFixed(1),
+      };
+
+      // 5. Análise de Concentração de Mercado (HHI)
+      const clientesPorMercado = mercadosData.map((mercado) => {
+        const clientesMercado = clientesData.filter(
+          (c) =>
+            c.produtoPrincipal &&
+            mercado.nome &&
+            c.produtoPrincipal.toLowerCase().includes(mercado.nome.toLowerCase())
+        ).length;
+
+        return {
+          mercado: mercado.nome,
+          clientes: clientesMercado,
+          participacao: (clientesMercado / clientesData.length) * 100,
+        };
+      });
+
+      const hhi = clientesPorMercado.reduce((sum, m) => sum + Math.pow(m.participacao, 2), 0);
+
+      const classificacaoHHI =
+        hhi < 1500
+          ? 'Mercado competitivo (baixa concentração)'
+          : hhi < 2500
+            ? 'Concentração moderada'
+            : 'Alta concentração (oligopólio)';
+
+      const mercadosMaisConcentrados = clientesPorMercado
+        .filter((m) => m.clientes > 0)
+        .sort((a, b) => b.participacao - a.participacao)
+        .slice(0, 5);
+
+      const mercadosMaisFragmentados = clientesPorMercado
+        .filter((m) => m.clientes > 0)
+        .sort((a, b) => a.participacao - b.participacao)
+        .slice(0, 5);
+
+      // 6. Benchmarking entre Pesquisas
+      const comparacaoPesquisas = pesquisas.map((pesquisa) => {
+        const clientesPesquisa = clientesData.filter((c) => c.pesquisaId === pesquisa.id);
+        const leadsPesquisa = leadsData.filter((l) => l.pesquisaId === pesquisa.id);
+        const mercadosPesquisa = mercadosData.filter((m) => m.pesquisaId === pesquisa.id);
+
+        const taxaConversao =
+          clientesPesquisa.length > 0
+            ? ((leadsPesquisa.length / clientesPesquisa.length) * 100).toFixed(1)
+            : '0.0';
+
+        const qualidadeMedia =
+          leadsPesquisa.length > 0
+            ? (
+                leadsPesquisa.reduce((sum, l) => sum + (l.score || 0), 0) / leadsPesquisa.length
+              ).toFixed(1)
+            : '0.0';
+
+        return {
+          nome: pesquisa.nome,
+          clientes: clientesPesquisa.length,
+          leads: leadsPesquisa.length,
+          mercados: mercadosPesquisa.length,
+          taxaConversao,
+          qualidadeMedia,
+        };
+      });
+
+      const pesquisaMelhor = comparacaoPesquisas.reduce((melhor, atual) => {
+        const taxaMelhor = parseFloat(melhor.taxaConversao);
+        const taxaAtual = parseFloat(atual.taxaConversao);
+        return taxaAtual > taxaMelhor ? atual : melhor;
+      }, comparacaoPesquisas[0]);
+
+      // 7. Análise de Correlação Setor vs Qualidade
+      const qualidadePorSetor: { [key: string]: number } = {};
+      const countPorSetor: { [key: string]: number } = {};
+
+      clientesData.forEach((cliente) => {
+        if (cliente.setor) {
+          const leadsSetor = leadsData.filter(
+            (l) => l.segmento && l.segmento.toLowerCase().includes(cliente.setor!.toLowerCase())
+          );
+
+          if (leadsSetor.length > 0) {
+            const qualidadeMedia =
+              leadsSetor.reduce((sum, l) => sum + (l.score || 0), 0) / leadsSetor.length;
+
+            if (!qualidadePorSetor[cliente.setor]) {
+              qualidadePorSetor[cliente.setor] = 0;
+              countPorSetor[cliente.setor] = 0;
+            }
+
+            qualidadePorSetor[cliente.setor] += qualidadeMedia;
+            countPorSetor[cliente.setor]++;
+          }
+        }
+      });
+
+      const setoresComMaiorQualidade = Object.entries(qualidadePorSetor)
+        .map(([setor, soma]) => ({
+          setor,
+          qualidadeMedia: (soma / countPorSetor[setor]).toFixed(1),
+        }))
+        .sort((a, b) => parseFloat(b.qualidadeMedia) - parseFloat(a.qualidadeMedia))
+        .slice(0, 5);
+
       // 5. Criar prompt para IA
       const prompt = `
 Você é um analista de inteligência de mercado experiente. Com base nos dados REAIS fornecidos, crie um relatório executivo profissional e ESPECÍFICO.
@@ -297,6 +511,52 @@ ${top10Cidades.map((c, i) => `${i + 1}. ${c.cidade}: ${c.count} clientes`).join(
 
 **AMOSTRA DE 20 CLIENTES REAIS:**
 ${amostraClientes.map((c, i) => `${i + 1}. ${c.nome} - ${c.produto} (${c.cidade}/${c.uf})`).join('\n')}
+
+
+
+**DISTRIBUIÇÃO DE QUALIDADE DE LEADS:**
+${distribuicaoQualidade.map((q) => `- ${q.qualidade}: ${q.count} leads (${q.percentual}%) - Score médio: ${scoresMedios[q.qualidade.toLowerCase()] || 'N/A'}`).join('\n')}
+
+**DISTRIBUIÇÃO POR ESTÁGIO (FUNIL):**
+${distribuicaoStage.map((s) => `- ${s.stage}: ${s.count} leads (${s.percentual}%)`).join('\n')}
+
+**TOP 10 SETORES:**
+${top10Setores.map((s, i) => `${i + 1}. ${s.setor}: ${s.count} clientes (${s.percentual}%)`).join('\n')}
+
+**DISTRIBUIÇÃO DE CONCORRENTES POR PORTE:**
+${distribuicaoPorteConcorrentes.map((p) => `- ${p.porte}: ${p.count} concorrentes (${p.percentual}%)`).join('\n')}
+
+**QUALIDADE DOS DADOS COLETADOS:**
+Clientes:
+- Telefone: ${completudeClientes.telefone}% (${clientesComTelefone}/${clientesData.length})
+- Email: ${completudeClientes.email}% (${clientesComEmail}/${clientesData.length})
+- Site: ${completudeClientes.site}% (${clientesComSite}/${clientesData.length})
+- CNPJ: ${completudeClientes.cnpj}% (${clientesComCNPJ}/${clientesData.length})
+
+Leads:
+- Telefone: ${completudeLeads.telefone}% (${leadsComTelefone}/${leadsData.length})
+- Email: ${completudeLeads.email}% (${leadsComEmail}/${leadsData.length})
+- Site: ${completudeLeads.site}% (${leadsComSite}/${leadsData.length})
+
+**ANÁLISE DE CONCENTRAÇÃO DE MERCADO:**
+- Índice HHI: ${hhi.toFixed(0)}
+- Classificação: ${classificacaoHHI}
+- Mercados mais concentrados: ${mercadosMaisConcentrados.map((m) => `${m.mercado} (${m.participacao.toFixed(1)}%)`).join(', ')}
+- Mercados mais fragmentados: ${mercadosMaisFragmentados.map((m) => `${m.mercado} (${m.participacao.toFixed(1)}%)`).join(', ')}
+
+**BENCHMARKING ENTRE PESQUISAS:**
+${comparacaoPesquisas
+  .map(
+    (p, i) => `${i + 1}. ${p.nome}
+   - Clientes: ${p.clientes} | Leads: ${p.leads} | Mercados: ${p.mercados}
+   - Taxa de conversão: ${p.taxaConversao}x | Qualidade média: ${p.qualidadeMedia}/10`
+  )
+  .join('\n')}
+
+Melhor performance: ${pesquisaMelhor.nome} (taxa ${pesquisaMelhor.taxaConversao}x, qualidade ${pesquisaMelhor.qualidadeMedia}/10)
+
+**SETORES COM MAIOR QUALIDADE DE LEADS:**
+${setoresComMaiorQualidade.map((s, i) => `${i + 1}. ${s.setor}: qualidade média ${s.qualidadeMedia}/10`).join('\n')}
 
 **INSTRUÇÕES OBRIGATÓRIAS:**
 
@@ -397,7 +657,9 @@ ${amostraClientes.map((c, i) => `${i + 1}. ${c.nome} - ${c.produto} (${c.cidade}
         'Análise de Produtos e Serviços',
         'Análise de Leads e Oportunidades',
         'Panorama Competitivo',
-        'Análise SWOT do Mercado',
+        'Análise de Setores e Segmentos',
+        'Qualidade e Completude dos Dados',
+        'Análise SWOT',
         'Conclusões e Recomendações Estratégicas',
       ];
 
