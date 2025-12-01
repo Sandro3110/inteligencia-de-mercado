@@ -80,118 +80,85 @@ export const pesquisasRouter = createTRPCRouter({
     }
 
     try {
-      // CAMINHO PRINCIPAL: Stored Procedure (otimizado)
-      try {
-        const result = await db.execute(sql`SELECT * FROM get_pesquisa_details(${id})`);
+      // Usar queries TypeScript diretas (mais confiável em todos os ambientes)
+      console.log('[Pesquisas] Using TypeScript queries for pesquisa', id);
 
-        if (!result.rows || result.rows.length === 0) {
-          return null;
-        }
+      const [pesquisa] = await db.select().from(pesquisas).where(eq(pesquisas.id, id)).limit(1);
 
-        const row = result.rows[0] as any;
-        console.log('[Pesquisas] ✅ Using stored procedure');
-
-        return {
-          id: row.pesquisa_id,
-          projectId: row.project_id,
-          nome: row.pesquisa_nome,
-          descricao: row.pesquisa_descricao,
-          status: row.pesquisa_status,
-          totalClientes: row.total_clientes,
-          clientesEnriquecidos: row.clientes_enriquecidos,
-          leadsCount: row.leads_count,
-          mercadosCount: row.mercados_count,
-          produtosCount: row.produtos_count,
-          concorrentesCount: row.concorrentes_count,
-          clientesQualidadeMedia: row.clientes_qualidade_media,
-          leadsQualidadeMedia: row.leads_qualidade_media,
-          concorrentesQualidadeMedia: row.concorrentes_qualidade_media,
-          geoEnriquecimentoTotal: row.geo_total,
-        };
-      } catch (spError) {
-        // FALLBACK: Queries TypeScript originais
-        console.warn('[Pesquisas] ⚠️ SP failed, using TypeScript fallback:', spError);
-
-        const [pesquisa] = await db.select().from(pesquisas).where(eq(pesquisas.id, id)).limit(1);
-
-        if (!pesquisa) {
-          return null;
-        }
-
-        // Calcular contadores (mesma lógica do dashboard.getProjects)
-        const [
-          clientesStats,
-          leadsCountResult,
-          mercadosCountResult,
-          produtosCountResult,
-          concorrentesCountResult,
-          clientesQualidadeResult,
-          leadsQualidadeResult,
-          concorrentesQualidadeResult,
-          geoTotalResult,
-        ] = await Promise.all([
-          db
-            .select({
-              total: count(),
-              enriquecidos: sql<number>`COUNT(CASE WHEN ${clientes.enriquecido} = true THEN 1 END)::int`,
-            })
-            .from(clientes)
-            .where(eq(clientes.pesquisaId, id)),
-          db.select({ count: count() }).from(leads).where(eq(leads.pesquisaId, id)),
-          db
-            .select({ count: count() })
-            .from(mercadosUnicos)
-            .where(eq(mercadosUnicos.pesquisaId, id)),
-          db.select({ count: count() }).from(produtos).where(eq(produtos.pesquisaId, id)),
-          db.select({ count: count() }).from(concorrentes).where(eq(concorrentes.pesquisaId, id)),
-          db
-            .select({ avg: avg(clientes.qualidadeScore) })
-            .from(clientes)
-            .where(and(eq(clientes.pesquisaId, id), sql`${clientes.qualidadeScore} IS NOT NULL`)),
-          db
-            .select({ avg: avg(leads.qualidadeScore) })
-            .from(leads)
-            .where(and(eq(leads.pesquisaId, id), sql`${leads.qualidadeScore} IS NOT NULL`)),
-          db
-            .select({ avg: avg(concorrentes.qualidadeScore) })
-            .from(concorrentes)
-            .where(
-              and(eq(concorrentes.pesquisaId, id), sql`${concorrentes.qualidadeScore} IS NOT NULL`)
-            ),
-          db
-            .select({
-              total: sql<number>`(
-                COUNT(CASE WHEN ${clientes.latitude} IS NOT NULL AND ${clientes.longitude} IS NOT NULL THEN 1 END) +
-                COUNT(CASE WHEN ${leads.latitude} IS NOT NULL AND ${leads.longitude} IS NOT NULL THEN 1 END) +
-                COUNT(CASE WHEN ${concorrentes.latitude} IS NOT NULL AND ${concorrentes.longitude} IS NOT NULL THEN 1 END)
-              )::int`,
-            })
-            .from(clientes)
-            .leftJoin(leads, eq(leads.pesquisaId, id))
-            .leftJoin(concorrentes, eq(concorrentes.pesquisaId, id))
-            .where(eq(clientes.pesquisaId, id)),
-        ]);
-
-        return {
-          ...pesquisa,
-          totalClientes: clientesStats[0]?.total || 0,
-          clientesEnriquecidos: clientesStats[0]?.enriquecidos || 0,
-          leadsCount: leadsCountResult[0]?.count || 0,
-          mercadosCount: mercadosCountResult[0]?.count || 0,
-          produtosCount: produtosCountResult[0]?.count || 0,
-          concorrentesCount: concorrentesCountResult[0]?.count || 0,
-          clientesQualidadeMedia: clientesQualidadeResult[0]?.avg
-            ? Number(clientesQualidadeResult[0].avg)
-            : null,
-          leadsQualidadeMedia: leadsQualidadeResult[0]?.avg
-            ? Number(leadsQualidadeResult[0].avg)
-            : null,
-          concorrentesQualidadeMedia: concorrentesQualidadeResult[0]?.avg
-            ? Number(concorrentesQualidadeResult[0].avg)
-            : null,
-          geoEnriquecimentoTotal: geoTotalResult[0]?.total || 0,
-        };
+      if (!pesquisa) {
+        return null;
       }
+
+      // Calcular contadores (mesma lógica do dashboard.getProjects)
+      const [
+        clientesStats,
+        leadsCountResult,
+        mercadosCountResult,
+        produtosCountResult,
+        concorrentesCountResult,
+        clientesQualidadeResult,
+        leadsQualidadeResult,
+        concorrentesQualidadeResult,
+        geoTotalResult,
+      ] = await Promise.all([
+        db
+          .select({
+            total: count(),
+            enriquecidos: sql<number>`COUNT(CASE WHEN ${clientes.enriquecido} = true THEN 1 END)::int`,
+          })
+          .from(clientes)
+          .where(eq(clientes.pesquisaId, id)),
+        db.select({ count: count() }).from(leads).where(eq(leads.pesquisaId, id)),
+        db.select({ count: count() }).from(mercadosUnicos).where(eq(mercadosUnicos.pesquisaId, id)),
+        db.select({ count: count() }).from(produtos).where(eq(produtos.pesquisaId, id)),
+        db.select({ count: count() }).from(concorrentes).where(eq(concorrentes.pesquisaId, id)),
+        db
+          .select({ avg: avg(clientes.qualidadeScore) })
+          .from(clientes)
+          .where(and(eq(clientes.pesquisaId, id), sql`${clientes.qualidadeScore} IS NOT NULL`)),
+        db
+          .select({ avg: avg(leads.qualidadeScore) })
+          .from(leads)
+          .where(and(eq(leads.pesquisaId, id), sql`${leads.qualidadeScore} IS NOT NULL`)),
+        db
+          .select({ avg: avg(concorrentes.qualidadeScore) })
+          .from(concorrentes)
+          .where(
+            and(eq(concorrentes.pesquisaId, id), sql`${concorrentes.qualidadeScore} IS NOT NULL`)
+          ),
+        db
+          .select({
+            total: sql<number>`(
+              COUNT(CASE WHEN ${clientes.latitude} IS NOT NULL AND ${clientes.longitude} IS NOT NULL THEN 1 END) +
+              COUNT(CASE WHEN ${leads.latitude} IS NOT NULL AND ${leads.longitude} IS NOT NULL THEN 1 END) +
+              COUNT(CASE WHEN ${concorrentes.latitude} IS NOT NULL AND ${concorrentes.longitude} IS NOT NULL THEN 1 END)
+            )::int`,
+          })
+          .from(clientes)
+          .leftJoin(leads, eq(leads.pesquisaId, id))
+          .leftJoin(concorrentes, eq(concorrentes.pesquisaId, id))
+          .where(eq(clientes.pesquisaId, id)),
+      ]);
+
+      return {
+        ...pesquisa,
+        totalClientes: clientesStats[0]?.total || 0,
+        clientesEnriquecidos: clientesStats[0]?.enriquecidos || 0,
+        leadsCount: leadsCountResult[0]?.count || 0,
+        mercadosCount: mercadosCountResult[0]?.count || 0,
+        produtosCount: produtosCountResult[0]?.count || 0,
+        concorrentesCount: concorrentesCountResult[0]?.count || 0,
+        clientesQualidadeMedia: clientesQualidadeResult[0]?.avg
+          ? Number(clientesQualidadeResult[0].avg)
+          : null,
+        leadsQualidadeMedia: leadsQualidadeResult[0]?.avg
+          ? Number(leadsQualidadeResult[0].avg)
+          : null,
+        concorrentesQualidadeMedia: concorrentesQualidadeResult[0]?.avg
+          ? Number(concorrentesQualidadeResult[0].avg)
+          : null,
+        geoEnriquecimentoTotal: geoTotalResult[0]?.total || 0,
+      };
     } catch (error) {
       console.error('[Pesquisas] Error getting by ID with counts:', error);
       throw new Error('Failed to get pesquisa');
