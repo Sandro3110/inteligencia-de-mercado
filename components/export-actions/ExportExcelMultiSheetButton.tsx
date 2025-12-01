@@ -10,7 +10,7 @@ import {
   createSummaryStats,
   type SheetData,
 } from '@/lib/excel-multi-sheet';
-import { trpc } from '@/lib/trpc';
+import { trpc } from '@/lib/trpc/client';
 import type { ExcelColumn } from '@/lib/excel-exporter';
 
 interface ExportExcelMultiSheetButtonProps {
