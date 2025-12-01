@@ -91,7 +91,7 @@ export const pesquisasRouter = createTRPCRouter({
 
       // Calcular contadores (mesma lógica do dashboard.getProjects)
       const [
-        clientesStats,
+        clientesCountResult,
         leadsCountResult,
         mercadosCountResult,
         produtosCountResult,
@@ -103,13 +103,7 @@ export const pesquisasRouter = createTRPCRouter({
         leadsGeoResult,
         concorrentesGeoResult,
       ] = await Promise.all([
-        db
-          .select({
-            total: count(),
-            enriquecidos: sql<number>`COUNT(CASE WHEN ${clientes.enriquecido} = true THEN 1 END)::int`,
-          })
-          .from(clientes)
-          .where(eq(clientes.pesquisaId, id)),
+        db.select({ count: count() }).from(clientes).where(eq(clientes.pesquisaId, id)),
         db.select({ count: count() }).from(leads).where(eq(leads.pesquisaId, id)),
         db.select({ count: count() }).from(mercadosUnicos).where(eq(mercadosUnicos.pesquisaId, id)),
         db.select({ count: count() }).from(produtos).where(eq(produtos.pesquisaId, id)),
@@ -157,8 +151,8 @@ export const pesquisasRouter = createTRPCRouter({
 
       return {
         ...pesquisa,
-        totalClientes: clientesStats[0]?.total || 0,
-        clientesEnriquecidos: clientesStats[0]?.enriquecidos || 0,
+        totalClientes: clientesCountResult[0]?.count || 0,
+        clientesEnriquecidos: pesquisa.clientesEnriquecidos || 0,
         leadsCount: leadsCountResult[0]?.count || 0,
         mercadosCount: mercadosCountResult[0]?.count || 0,
         produtosCount: produtosCountResult[0]?.count || 0,
