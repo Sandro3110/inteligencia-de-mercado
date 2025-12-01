@@ -17,7 +17,7 @@ import {
   enrichmentJobs,
   enrichmentRuns,
 } from '@/drizzle/schema';
-import { eq, and, desc, count, avg, sql, inArray } from 'drizzle-orm';
+import { eq, and, desc, count, avg, sql, inArray, isNotNull } from 'drizzle-orm';
 
 export const pesquisasRouter = createTRPCRouter({
   /**
@@ -115,19 +115,17 @@ export const pesquisasRouter = createTRPCRouter({
         db.select({ count: count() }).from(produtos).where(eq(produtos.pesquisaId, id)),
         db.select({ count: count() }).from(concorrentes).where(eq(concorrentes.pesquisaId, id)),
         db
-          .select({ avg: avg(clientes.qualidadeScore) })
+          .select({ avg: sql<number>`AVG(${clientes.qualidadeScore})` })
           .from(clientes)
-          .where(and(eq(clientes.pesquisaId, id), sql`${clientes.qualidadeScore} IS NOT NULL`)),
+          .where(eq(clientes.pesquisaId, id)),
         db
-          .select({ avg: avg(leads.qualidadeScore) })
+          .select({ avg: sql<number>`AVG(${leads.qualidadeScore})` })
           .from(leads)
-          .where(and(eq(leads.pesquisaId, id), sql`${leads.qualidadeScore} IS NOT NULL`)),
+          .where(eq(leads.pesquisaId, id)),
         db
-          .select({ avg: avg(concorrentes.qualidadeScore) })
+          .select({ avg: sql<number>`AVG(${concorrentes.qualidadeScore})` })
           .from(concorrentes)
-          .where(
-            and(eq(concorrentes.pesquisaId, id), sql`${concorrentes.qualidadeScore} IS NOT NULL`)
-          ),
+          .where(eq(concorrentes.pesquisaId, id)),
         // Geocodificação: contar separadamente para evitar produto cartesiano
         db
           .select({ count: count() })
@@ -135,17 +133,15 @@ export const pesquisasRouter = createTRPCRouter({
           .where(
             and(
               eq(clientes.pesquisaId, id),
-              sql`${clientes.latitude} IS NOT NULL AND ${clientes.longitude} IS NOT NULL`
+              isNotNull(clientes.latitude),
+              isNotNull(clientes.longitude)
             )
           ),
         db
           .select({ count: count() })
           .from(leads)
           .where(
-            and(
-              eq(leads.pesquisaId, id),
-              sql`${leads.latitude} IS NOT NULL AND ${leads.longitude} IS NOT NULL`
-            )
+            and(eq(leads.pesquisaId, id), isNotNull(leads.latitude), isNotNull(leads.longitude))
           ),
         db
           .select({ count: count() })
@@ -153,7 +149,8 @@ export const pesquisasRouter = createTRPCRouter({
           .where(
             and(
               eq(concorrentes.pesquisaId, id),
-              sql`${concorrentes.latitude} IS NOT NULL AND ${concorrentes.longitude} IS NOT NULL`
+              isNotNull(concorrentes.latitude),
+              isNotNull(concorrentes.longitude)
             )
           ),
       ]);
