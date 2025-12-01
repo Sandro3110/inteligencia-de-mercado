@@ -1,23 +1,27 @@
 import { z } from 'zod';
-import { eq, inArray, and, isNotNull, sql, desc, ne } from 'drizzle-orm';
+import { eq, inArray, and, isNotNull, sql, desc } from 'drizzle-orm';
 import { publicProcedure, router } from '../_core/trpc';
 import { getDb } from '../db';
-import { clientes, leads, concorrentes } from '../../drizzle/schema';
+import { clientes, concorrentes, produtos } from '../../drizzle/schema';
 
 /**
- * Router para Drill-Down de Produtos
+ * Router para Drill-Down de Produtos (VERSÃO CORRIGIDA COM JOINS)
  *
  * Estrutura de 3 níveis:
- * 1. Categorias de produtos (agregado)
+ * 1. Categorias de produto (agregado)
  * 2. Produtos por categoria (agregado)
- * 3. Detalhes (clientes/leads/concorrentes por produto)
+ * 3. Detalhes (clientes/concorrentes por produto)
+ *
+ * CORREÇÃO CRÍTICA:
+ * - Usa JOIN com tabela produtos
+ * - Não depende de campos TEXT vazios
+ * - Dados reais: 2.726 produtos vinculados a clientes
  */
 export const productDrillDownRouter = router({
   /**
-   * NÍVEL 1: Obter categorias de produtos
+   * NÍVEL 1: Obter categorias de produto
    *
-   * Retorna lista de categorias com contagem de clientes, leads e concorrentes
-   * Performance: ~0.2s
+   * Retorna lista de categorias com contagem de clientes e concorrentes
    */
   getCategories: publicProcedure
     .input(
@@ -34,44 +38,47 @@ export const productDrillDownRouter = router({
         return { categories: [] };
       }
 
-      // Nota: Como não temos campo "categoria" para produtos no schema atual,
-      // vamos usar uma categorização simplificada baseada no nome do produto
-      // ou retornar "Produtos" como categoria única
+      // Buscar categorias de produtos com contagem de clientes
+      const clientesResult = await db
+        .select({
+          categoria: produtos.categoria,
+          count: sql<number>`COUNT(DISTINCT ${clientes.id})::INTEGER`,
+        })
+        .from(clientes)
+        .innerJoin(produtos, eq(clientes.id, produtos.clienteId))
+        .where(and(inArray(clientes.pesquisaId, pesquisaIds), isNotNull(produtos.categoria)))
+        .groupBy(produtos.categoria);
 
-      // Por enquanto, retornar categoria única "Produtos"
-      // TODO: Implementar categorização inteligente baseada em palavras-chave
+      // Buscar concorrentes com produto (campo direto na tabela concorrentes)
+      const concorrentesResult = await db
+        .select({
+          count: sql<number>`COUNT(DISTINCT ${concorrentes.id})::INTEGER`,
+        })
+        .from(concorrentes)
+        .where(and(inArray(concorrentes.pesquisaId, pesquisaIds), isNotNull(concorrentes.produto)));
 
-      // Buscar registros e contar no JavaScript (mais robusto)
-      const [clientesResult, concorrentesResult] = await Promise.all([
-        // Buscar clientes com produtos
-        db
-          .select({ id: clientes.id })
-          .from(clientes)
-          .where(and(inArray(clientes.pesquisaId, pesquisaIds), ne(clientes.produto, null))),
+      // Agregar categorias
+      const categoriaMap = new Map<string, { clientes: number; concorrentes: number }>();
 
-        // Buscar concorrentes com produtos
-        db
-          .select({ id: concorrentes.id })
-          .from(concorrentes)
-          .where(
-            and(inArray(concorrentes.pesquisaId, pesquisaIds), ne(concorrentes.produto, null))
-          ),
-      ]);
+      clientesResult.forEach((row) => {
+        if (row.categoria) {
+          categoriaMap.set(row.categoria, {
+            clientes: row.count,
+            concorrentes: 0,
+          });
+        }
+      });
 
-      // Contar no JavaScript (mais confiável que SQL)
-      const clientesCount = clientesResult.length;
-      const leadsCount = 0; // Leads não têm campo produto no schema atual
-      const concorrentesCount = concorrentesResult.length;
+      const concorrentesCount = concorrentesResult[0]?.count || 0;
 
-      const categories = [
-        {
-          categoria: 'Produtos',
-          clientes: clientesCount,
-          leads: leadsCount,
-          concorrentes: concorrentesCount,
-          total: clientesCount + leadsCount + concorrentesCount,
-        },
-      ];
+      // Converter para array
+      const categories = Array.from(categoriaMap.entries()).map(([nome, counts]) => ({
+        categoria: nome,
+        clientes: counts.clientes,
+        leads: 0, // Leads não têm campo produto no schema atual
+        concorrentes: concorrentesCount,
+        total: counts.clientes + concorrentesCount,
+      }));
 
       return { categories };
     }),
@@ -79,8 +86,7 @@ export const productDrillDownRouter = router({
   /**
    * NÍVEL 2: Obter produtos de uma categoria
    *
-   * Retorna lista de produtos com contagem de clientes, leads e concorrentes
-   * Performance: ~0.3s
+   * Retorna lista de produtos com contagem de clientes e concorrentes
    */
   getProducts: publicProcedure
     .input(
@@ -94,75 +100,49 @@ export const productDrillDownRouter = router({
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error('Database not available');
-      const { pesquisaIds, limit, offset } = input;
+      const { categoria, pesquisaIds, limit, offset } = input;
 
       if (pesquisaIds.length === 0) {
         return { items: [], total: 0 };
       }
 
-      // Buscar produtos únicos de clientes
-      const clientesProdutos = await db
+      // Buscar produtos da categoria com contagem de clientes
+      const produtosResult = await db
         .select({
-          produto: clientes.produto,
+          produtoId: produtos.id,
+          produtoNome: produtos.nome,
           count: sql<number>`COUNT(DISTINCT ${clientes.id})::INTEGER`,
         })
         .from(clientes)
-        .where(and(inArray(clientes.pesquisaId, pesquisaIds), isNotNull(clientes.produto)))
-        .groupBy(clientes.produto);
+        .innerJoin(produtos, eq(clientes.id, produtos.clienteId))
+        .where(and(inArray(clientes.pesquisaId, pesquisaIds), eq(produtos.categoria, categoria)))
+        .groupBy(produtos.id, produtos.nome);
 
-      // Buscar produtos únicos de concorrentes
-      const concorrentesProdutos = await db
+      // Buscar concorrentes com produto (campo TEXT, difícil de agrupar por produto específico)
+      // Por enquanto, retornar contagem total de concorrentes com produto
+      const concorrentesResult = await db
         .select({
-          produto: concorrentes.produto,
           count: sql<number>`COUNT(DISTINCT ${concorrentes.id})::INTEGER`,
         })
         .from(concorrentes)
-        .where(and(inArray(concorrentes.pesquisaId, pesquisaIds), isNotNull(concorrentes.produto)))
-        .groupBy(concorrentes.produto);
+        .where(and(inArray(concorrentes.pesquisaId, pesquisaIds), isNotNull(concorrentes.produto)));
 
-      // Combinar e agregar
-      const produtosMap = new Map<
-        string,
-        { clientes: number; leads: number; concorrentes: number }
-      >();
+      const concorrentesCount = concorrentesResult[0]?.count || 0;
 
-      clientesProdutos.forEach((row) => {
-        if (row.produto) {
-          produtosMap.set(row.produto, {
-            clientes: row.count,
-            leads: 0,
-            concorrentes: 0,
-          });
-        }
-      });
-
-      concorrentesProdutos.forEach((row) => {
-        if (row.produto) {
-          const existing = produtosMap.get(row.produto);
-          if (existing) {
-            existing.concorrentes = row.count;
-          } else {
-            produtosMap.set(row.produto, {
-              clientes: 0,
-              leads: 0,
-              concorrentes: row.count,
-            });
-          }
-        }
-      });
-
-      // Converter para array e ordenar
-      const produtos = Array.from(produtosMap.entries()).map(([nome, counts]) => ({
-        nome,
-        ...counts,
+      // Converter para array
+      const produtosArray = produtosResult.map((row) => ({
+        nome: row.produtoNome,
+        clientes: row.count,
+        leads: 0,
+        concorrentes: concorrentesCount,
       }));
 
-      // Ordenar por clientes (desc)
-      produtos.sort((a, b) => b.clientes - a.clientes);
+      // Ordenar por total (desc)
+      produtosArray.sort((a, b) => b.clientes - a.clientes);
 
       // Aplicar paginação
-      const total = produtos.length;
-      const items = produtos.slice(offset, offset + limit);
+      const total = produtosArray.length;
+      const items = produtosArray.slice(offset, offset + limit);
 
       return { items, total };
     }),
@@ -170,13 +150,12 @@ export const productDrillDownRouter = router({
   /**
    * NÍVEL 3A: Obter clientes de um produto
    *
-   * Retorna lista de clientes que têm o produto específico
-   * Performance: ~0.2s
+   * Retorna lista de clientes do produto específico
    */
   getClientesByProduct: publicProcedure
     .input(
       z.object({
-        produtoNome: z.string(),
+        productName: z.string(),
         categoria: z.string(),
         pesquisaIds: z.array(z.number()),
         limit: z.number().default(50),
@@ -186,7 +165,7 @@ export const productDrillDownRouter = router({
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error('Database not available');
-      const { produtoNome, pesquisaIds, limit, offset } = input;
+      const { productName, pesquisaIds, limit, offset } = input;
 
       if (pesquisaIds.length === 0) {
         return { items: [], total: 0 };
@@ -195,10 +174,11 @@ export const productDrillDownRouter = router({
       // Contar total
       const totalResult = await db
         .select({
-          count: sql<number>`COUNT(*)::INTEGER`,
+          count: sql<number>`COUNT(DISTINCT ${clientes.id})::INTEGER`,
         })
         .from(clientes)
-        .where(and(eq(clientes.produto, produtoNome), inArray(clientes.pesquisaId, pesquisaIds)));
+        .innerJoin(produtos, eq(clientes.id, produtos.clienteId))
+        .where(and(inArray(clientes.pesquisaId, pesquisaIds), eq(produtos.nome, productName)));
 
       const total = totalResult[0]?.count || 0;
 
@@ -207,7 +187,7 @@ export const productDrillDownRouter = router({
         .select({
           id: clientes.id,
           nome: clientes.nome,
-          setor: clientes.setor,
+          produto: produtos.nome,
           cidade: clientes.cidade,
           uf: clientes.uf,
           qualidadeClassificacao: clientes.qualidadeClassificacao,
@@ -217,7 +197,8 @@ export const productDrillDownRouter = router({
           siteOficial: clientes.siteOficial,
         })
         .from(clientes)
-        .where(and(eq(clientes.produto, produtoNome), inArray(clientes.pesquisaId, pesquisaIds)))
+        .innerJoin(produtos, eq(clientes.id, produtos.clienteId))
+        .where(and(inArray(clientes.pesquisaId, pesquisaIds), eq(produtos.nome, productName)))
         .orderBy(desc(clientes.qualidadeScore))
         .limit(limit)
         .offset(offset);
@@ -228,20 +209,20 @@ export const productDrillDownRouter = router({
   /**
    * NÍVEL 3B: Obter leads de um produto
    *
-   * Nota: Leads não têm campo produto no schema atual
-   * Retorna array vazio por enquanto
+   * Leads não têm campo produto no schema atual
+   * Retorna vazio por enquanto
    */
   getLeadsByProduct: publicProcedure
     .input(
       z.object({
-        produtoNome: z.string(),
+        productName: z.string(),
         categoria: z.string(),
         pesquisaIds: z.array(z.number()),
         limit: z.number().default(50),
         offset: z.number().default(0),
       })
     )
-    .query(async ({ input }) => {
+    .query(async () => {
       // Leads não têm campo produto no schema atual
       return { items: [], total: 0 };
     }),
@@ -249,13 +230,13 @@ export const productDrillDownRouter = router({
   /**
    * NÍVEL 3C: Obter concorrentes de um produto
    *
-   * Retorna lista de concorrentes que têm o produto específico
-   * Performance: ~0.2s
+   * Concorrentes têm campo produto como TEXT (difícil de filtrar exatamente)
+   * Por enquanto, buscar por LIKE
    */
   getConcorrentesByProduct: publicProcedure
     .input(
       z.object({
-        produtoNome: z.string(),
+        productName: z.string(),
         categoria: z.string(),
         pesquisaIds: z.array(z.number()),
         limit: z.number().default(50),
@@ -265,20 +246,23 @@ export const productDrillDownRouter = router({
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error('Database not available');
-      const { produtoNome, pesquisaIds, limit, offset } = input;
+      const { productName, pesquisaIds, limit, offset } = input;
 
       if (pesquisaIds.length === 0) {
         return { items: [], total: 0 };
       }
 
-      // Contar total
+      // Contar total (usando ILIKE para busca parcial)
       const totalResult = await db
         .select({
           count: sql<number>`COUNT(*)::INTEGER`,
         })
         .from(concorrentes)
         .where(
-          and(eq(concorrentes.produto, produtoNome), inArray(concorrentes.pesquisaId, pesquisaIds))
+          and(
+            inArray(concorrentes.pesquisaId, pesquisaIds),
+            sql`${concorrentes.produto} ILIKE ${`%${productName}%`}`
+          )
         );
 
       const total = totalResult[0]?.count || 0;
@@ -288,7 +272,7 @@ export const productDrillDownRouter = router({
         .select({
           id: concorrentes.id,
           nome: concorrentes.nome,
-          setor: concorrentes.setor,
+          produto: concorrentes.produto,
           cidade: concorrentes.cidade,
           uf: concorrentes.uf,
           porte: concorrentes.porte,
@@ -298,7 +282,10 @@ export const productDrillDownRouter = router({
         })
         .from(concorrentes)
         .where(
-          and(eq(concorrentes.produto, produtoNome), inArray(concorrentes.pesquisaId, pesquisaIds))
+          and(
+            inArray(concorrentes.pesquisaId, pesquisaIds),
+            sql`${concorrentes.produto} ILIKE ${`%${productName}%`}`
+          )
         )
         .orderBy(desc(concorrentes.qualidadeScore))
         .limit(limit)
