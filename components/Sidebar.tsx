@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useSelectedProject } from '@/hooks/useSelectedProject';
 import { useSidebar } from '@/lib/contexts/SidebarContext';
-import { useUser } from '@/lib/auth/supabase';
+import { useUser } from '@/hooks/useUser';
 import {
   LayoutDashboard,
   FolderKanban,
