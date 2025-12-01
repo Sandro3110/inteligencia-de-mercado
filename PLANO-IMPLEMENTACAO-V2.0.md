@@ -301,6 +301,422 @@ pnpm test
 
 ---
 
+### 2.5. **DEFINIÇÃO DO CORE - Processo de Importação e Enriquecimento** ⭐
+
+**Objetivo:** Definir claramente O QUÊ / POR QUÊ / QUANDO / COMO funciona o core do sistema
+
+**IMPORTÂNCIA CRÍTICA:**
+Esta é a fase mais importante do projeto! O processo de importação e enriquecimento é o **coração do IntelMarket**. Qualquer erro aqui impacta toda a qualidade dos dados.
+
+---
+
+#### 2.5.1. DISCUSSÃO: O QUÊ Importar?
+
+**Objetivo:** Definir claramente o que entra no sistema
+
+**Questões a Responder:**
+
+1. **Quais são as fontes de dados?**
+   - [ ] CSV de clientes?
+   - [ ] CSV de leads?
+   - [ ] CSV de concorrentes?
+   - [ ] API externa?
+   - [ ] Web scraping?
+   - [ ] Importação manual?
+
+2. **Qual o formato esperado?**
+   - [ ] Campos obrigatórios mínimos?
+   - [ ] Campos opcionais?
+   - [ ] Formato de cada campo (CNPJ, telefone, etc)?
+   - [ ] Encoding (UTF-8, ISO-8859-1)?
+   - [ ] Separador (vírgula, ponto-e-vírgula)?
+
+3. **Qual o volume esperado?**
+   - [ ] Importação inicial: quantos registros?
+   - [ ] Importações incrementais: quantos por vez?
+   - [ ] Frequência de importação?
+
+4. **Como lidar com duplicatas?**
+   - [ ] Ignorar?
+   - [ ] Atualizar?
+   - [ ] Mesclar?
+   - [ ] Criar versão?
+
+**Exemplo de Definição:**
+
+```markdown
+### FONTE: CSV de Clientes
+
+**Campos Obrigatórios:**
+
+- nome (string, máx 255 caracteres)
+- cidade (string, deve existir em dim_geografia)
+- uf (string, 2 caracteres)
+
+**Campos Opcionais:**
+
+- cnpj (string, formato: 00.000.000/0000-00)
+- email (string, validar formato)
+- telefone (string, formato: (00) 0000-0000 ou (00) 00000-0000)
+- site (string, URL válida)
+
+**Volume:**
+
+- Inicial: 500-5.000 registros
+- Incremental: 100-500 registros
+- Frequência: semanal
+
+**Duplicatas:**
+
+- Critério: CNPJ (se preenchido) ou nome+cidade+uf
+- Ação: Atualizar registro existente
+```
+
+---
+
+#### 2.5.2. DISCUSSÃO: POR QUÊ Enriquecer?
+
+**Objetivo:** Definir o valor agregado do enriquecimento
+
+**Questões a Responder:**
+
+1. **Quais dados faltam na importação?**
+   - [ ] Mercado/Setor?
+   - [ ] Produtos?
+   - [ ] Faturamento?
+   - [ ] Concorrentes?
+   - [ ] Contatos (email, telefone, redes sociais)?
+
+2. **Qual o valor de cada dado enriquecido?**
+   - [ ] Mercado: permite segmentação e drill-down
+   - [ ] Produtos: identifica oportunidades de venda
+   - [ ] Faturamento: qualifica o lead (porte)
+   - [ ] Concorrentes: análise competitiva
+   - [ ] Contatos: facilita abordagem comercial
+
+3. **Qual o custo de cada enriquecimento?**
+   - [ ] Custo de API (LLM, Receita Federal, etc)
+   - [ ] Tempo de processamento
+   - [ ] Taxa de sucesso esperada
+
+4. **Qual a prioridade de enriquecimento?**
+   - [ ] Crítico: sem isso o sistema não funciona
+   - [ ] Importante: agrega muito valor
+   - [ ] Opcional: nice to have
+
+**Exemplo de Definição:**
+
+```markdown
+### ENRIQUECIMENTO: Mercado
+
+**Por quê?**
+
+- Permite drill-down por setor
+- Essencial para segmentação
+- Base para identificação de concorrentes
+
+**Custo:**
+
+- API LLM: R$ 0,02 por registro
+- Tempo: 2-3s por registro
+- Taxa de sucesso: 95%+
+
+**Prioridade:** 🔴 CRÍTICO
+
+**Quando enriquecer:**
+
+- Após importação (se não vier no CSV)
+- Ao criar novo registro manual
+- Ao detectar mercado inválido/desatualizado
+```
+
+---
+
+#### 2.5.3. DISCUSSÃO: QUANDO Enriquecer?
+
+**Objetivo:** Definir o momento ideal para cada tipo de enriquecimento
+
+**Questões a Responder:**
+
+1. **Enriquecimento Síncrono vs Assíncrono?**
+   - [ ] Síncrono: durante a importação (usuário espera)
+   - [ ] Assíncrono: em background (job queue)
+   - [ ] Híbrido: críticos síncronos, opcionais assíncronos
+
+2. **Enriquecimento Incremental vs Completo?**
+   - [ ] Incremental: apenas novos registros
+   - [ ] Completo: re-enriquecer tudo periodicamente
+   - [ ] Seletivo: apenas registros com baixa qualidade
+
+3. **Quando re-enriquecer?**
+   - [ ] Nunca (dados imutáveis)
+   - [ ] Sob demanda (usuário solicita)
+   - [ ] Periódico (a cada X dias)
+   - [ ] Gatilho (quando qualidade < threshold)
+
+4. **Ordem de enriquecimento?**
+   - [ ] Sequencial: um campo por vez
+   - [ ] Paralelo: todos ao mesmo tempo
+   - [ ] Em camadas: básico → avançado
+
+**Exemplo de Definição:**
+
+```markdown
+### ESTRATÉGIA: Enriquecimento em Camadas Assíncronas
+
+**Fluxo:**
+
+1. Importação (síncrona): validar campos obrigatórios
+2. Camada 1 (assíncrona, 5min): Geografia + Mercado
+3. Camada 2 (assíncrona, 1h): Produtos + Contatos
+4. Camada 3 (assíncrona, 24h): Concorrentes + Financeiro
+
+**Re-enriquecimento:**
+
+- Automático: registros com qualidade < 60% (a cada 30 dias)
+- Sob demanda: botão "Re-enriquecer" na UI
+- Completo: nunca (muito caro)
+
+**Ordem:**
+
+- Sequencial dentro da mesma camada (evita rate limit)
+- Paralelo entre camadas (otimiza tempo total)
+```
+
+---
+
+#### 2.5.4. DISCUSSÃO: COMO Enriquecer?
+
+**Objetivo:** Definir a implementação técnica do enriquecimento
+
+**Questões a Responder:**
+
+1. **Quais fontes de enriquecimento?**
+   - [ ] LLM (GPT, Claude, Gemini)?
+   - [ ] APIs públicas (Receita Federal, Google Places)?
+   - [ ] Web scraping (site da empresa)?
+   - [ ] Bases de dados internas (cache)?
+
+2. **Como garantir qualidade?**
+   - [ ] Validação cruzada (múltiplas fontes)?
+   - [ ] Regras de negócio (porte vs faturamento)?
+   - [ ] Revisão manual (aprovação humana)?
+   - [ ] Score de confiança (0-100)?
+
+3. **Como lidar com falhas?**
+   - [ ] Retry automático (quantas vezes)?
+   - [ ] Fallback (fonte alternativa)?
+   - [ ] Marcar como "enriquecimento falhou"?
+   - [ ] Notificar usuário?
+
+4. **Como otimizar custo?**
+   - [ ] Cache por hash (evitar re-enriquecimento)?
+   - [ ] Rate limiting (evitar ban)?
+   - [ ] Batch processing (agrupar requests)?
+   - [ ] Escolher LLM mais barato para tarefas simples?
+
+**Exemplo de Definição:**
+
+```markdown
+### IMPLEMENTAÇÃO: Enriquecimento de Mercado
+
+**Fontes (em ordem de preferência):**
+
+1. Cache (dim_mercados): buscar por hash
+2. LLM (GPT-4o-mini): prompt estruturado
+3. Fallback manual: marcar para revisão
+
+**Prompt LLM:**
+```
+
+Analise a empresa "{nome}" (CNPJ: {cnpj}, Cidade: {cidade}/{uf}).
+
+Retorne APENAS JSON válido:
+{
+"mercado": {
+"nome": "Nome específico do mercado",
+"categoria": "B2B | B2C | B2B2C",
+"segmentacao": "Segmento detalhado"
+},
+"confianca": 0-100
+}
+
+```
+
+**Validação:**
+- Se confiança < 70: marcar para revisão manual
+- Se categoria inválida: usar "B2B" como padrão
+- Se nome vazio: usar "Mercado Não Identificado"
+
+**Falhas:**
+- Retry: 3 tentativas com backoff exponencial
+- Fallback: marcar qualidade_score = 40
+- Notificação: email para admin se > 10% falhas
+
+**Custo:**
+- Cache hit: R$ 0,00 (60% dos casos)
+- LLM: R$ 0,02 por registro (40% dos casos)
+- Custo médio: R$ 0,008 por registro
+```
+
+---
+
+#### 2.5.5. DISCUSSÃO: Fluxo Completo End-to-End
+
+**Objetivo:** Mapear o fluxo completo desde importação até visualização
+
+**Fluxo Proposto:**
+
+```mermaid
+graph TD
+    A[Usuário faz upload CSV] --> B[Validação de formato]
+    B -->|Erro| C[Retorna erros ao usuário]
+    B -->|OK| D[Criar Projeto + Pesquisa]
+    D --> E[Inserir registros em fato_entidades]
+    E --> F[Buscar/Criar geografia_id]
+    F --> G[Gerar entidade_hash]
+    G --> H[Verificar duplicatas]
+    H -->|Duplicata| I[Atualizar registro existente]
+    H -->|Novo| J[Inserir novo registro]
+    I --> K[Enfileirar job de enriquecimento]
+    J --> K
+    K --> L[Job: Enriquecimento Camada 1]
+    L --> M[Buscar/Enriquecer Mercado]
+    M --> N[Vincular mercado_id]
+    N --> O[Calcular qualidade_score]
+    O --> P[Job: Enriquecimento Camada 2]
+    P --> Q[Buscar/Enriquecer Produtos]
+    Q --> R[Vincular via entidade_produtos]
+    R --> S[Atualizar qualidade_score]
+    S --> T[Job: Enriquecimento Camada 3]
+    T --> U[Identificar Concorrentes]
+    U --> V[Vincular via entidade_competidores]
+    V --> W[Atualizar qualidade_score final]
+    W --> X[Notificar usuário: Enriquecimento completo]
+    X --> Y[Usuário visualiza dados no dashboard]
+```
+
+**Tempos Estimados:**
+
+- Importação (síncrona): 1-2s por registro
+- Camada 1 (assíncrona): 5-10min para 100 registros
+- Camada 2 (assíncrona): 30-60min para 100 registros
+- Camada 3 (assíncrona): 2-4h para 100 registros
+
+**Feedback ao Usuário:**
+
+- Importação: barra de progresso em tempo real
+- Enriquecimento: notificação quando cada camada completa
+- Dashboard: mostrar % de registros enriquecidos
+
+---
+
+#### 2.5.6. DISCUSSÃO: Casos Especiais
+
+**Objetivo:** Definir como lidar com situações não triviais
+
+**Questões a Responder:**
+
+1. **E se a cidade não existir em dim_geografia?**
+   - [ ] Rejeitar registro?
+   - [ ] Criar cidade nova?
+   - [ ] Usar cidade mais próxima?
+   - [ ] Marcar para revisão manual?
+
+2. **E se o CNPJ for inválido?**
+   - [ ] Rejeitar registro?
+   - [ ] Aceitar sem CNPJ?
+   - [ ] Tentar corrigir automaticamente?
+   - [ ] Marcar para revisão manual?
+
+3. **E se o mercado mudar?**
+   - [ ] Criar novo mercado?
+   - [ ] Atualizar mercado existente?
+   - [ ] Manter histórico de mercados?
+   - [ ] Notificar usuário da mudança?
+
+4. **E se houver conflito de dados?**
+   - [ ] Fonte A diz faturamento = 1M, Fonte B diz 2M
+   - [ ] Usar média?
+   - [ ] Usar fonte mais confiável?
+   - [ ] Marcar como "dado conflitante"?
+
+5. **E se o enriquecimento demorar muito?**
+   - [ ] Timeout após quanto tempo?
+   - [ ] Cancelar job?
+   - [ ] Continuar em background?
+   - [ ] Notificar usuário?
+
+**Exemplo de Definição:**
+
+```markdown
+### CASO ESPECIAL: Cidade Não Existe
+
+**Situação:**
+CSV contém cidade="São Paolo" (erro de digitação)
+
+**Estratégia:**
+
+1. Buscar em dim_geografia: não encontrado
+2. Buscar similar (Levenshtein distance < 2): encontra "São Paulo"
+3. Sugerir correção ao usuário
+4. Se usuário confirmar: usar "São Paulo"
+5. Se usuário rejeitar: marcar para revisão manual
+
+**Alternativa (automática):**
+
+- Se confiança da sugestão > 90%: corrigir automaticamente
+- Registrar correção em audit log
+- Notificar usuário das correções feitas
+```
+
+---
+
+#### 2.5.7. DOCUMENTO FINAL: Especificação do Core
+
+**Objetivo:** Consolidar todas as decisões em um documento único
+
+**Tarefas:**
+
+- [ ] Criar `CORE-IMPORTACAO-ENRIQUECIMENTO.md`
+- [ ] Documentar todas as decisões tomadas
+- [ ] Criar diagramas de fluxo
+- [ ] Definir contratos de dados (schemas JSON)
+- [ ] Listar todos os prompts de enriquecimento
+- [ ] Definir métricas de sucesso
+- [ ] Criar checklist de validação
+
+**Conteúdo do Documento:**
+
+1. Visão Geral
+2. Fontes de Dados
+3. Formato de Importação
+4. Fluxo de Enriquecimento
+5. Prompts Detalhados
+6. Tratamento de Erros
+7. Métricas e KPIs
+8. Casos Especiais
+9. Roadmap de Melhorias
+
+**Validação:**
+
+- [ ] Revisar com stakeholders
+- [ ] Validar com dados reais de teste
+- [ ] Ajustar baseado em feedback
+- [ ] Aprovar versão final
+
+**Critério de Sucesso:**
+
+- ✅ Documento completo e aprovado
+- ✅ Todos os casos de uso cobertos
+- ✅ Prompts testados e validados
+- ✅ Métricas definidas
+- ✅ Equipe alinhada
+
+**Tempo Estimado:** 4-6h (discussão + documentação)
+
+---
+
 ## **FASE 3: CAMADA DE API (API Layer)**
 
 ### 3.1. Refatorar Routers TRPC
