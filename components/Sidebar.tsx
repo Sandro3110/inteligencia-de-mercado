@@ -12,6 +12,7 @@ import {
   Map,
   BarChart3,
   Package,
+  Activity,
 } from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 
@@ -21,7 +22,7 @@ interface MenuItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-// Menu completo - 7 itens
+// Menu completo - 8 itens
 const menuItems: MenuItem[] = [
   {
     name: 'Dashboard',
@@ -47,6 +48,11 @@ const menuItems: MenuItem[] = [
     name: 'Produtos',
     href: '/products',
     icon: Package,
+  },
+  {
+    name: 'Métricas',
+    href: '/admin/metrics',
+    icon: Activity,
   },
   {
     name: 'Usuários',

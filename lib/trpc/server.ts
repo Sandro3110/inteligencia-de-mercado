@@ -77,6 +77,59 @@ const loggerMiddleware = t.middleware(async ({ path, type, next }) => {
 });
 
 /**
+ * Middleware para coleta automática de métricas
+ */
+const metricsMiddleware = t.middleware(async ({ path, type, next, input }) => {
+  const startTime = Date.now();
+  const metricName = path;
+  const metricType = type === 'query' ? 'query' : 'api';
+
+  let success = true;
+  let errorMessage: string | undefined;
+  let result: unknown;
+
+  try {
+    result = await next();
+    return result;
+  } catch (error) {
+    success = false;
+    errorMessage = error instanceof Error ? error.message : String(error);
+    throw error;
+  } finally {
+    const executionTimeMs = Date.now() - startTime;
+
+    // Extrair contagem de registros do resultado
+    let recordCount: number | undefined;
+    if (Array.isArray(result)) {
+      recordCount = result.length;
+    } else if (result && typeof result === 'object' && 'length' in result) {
+      recordCount = (result as { length: number }).length;
+    }
+
+    // Registrar métrica de forma assíncrona (não bloqueia)
+    import('@/server/utils/performanceMetrics')
+      .then(({ recordMetric }) => {
+        return recordMetric({
+          metricName,
+          metricType,
+          executionTimeMs,
+          recordCount,
+          success,
+          errorMessage,
+          metadata: {
+            type,
+            hasInput: !!input,
+          },
+        });
+      })
+      .catch((err) => {
+        // Silenciosamente ignorar erros de métrica
+        console.error('[MetricsMiddleware] Failed to record metric:', err);
+      });
+  }
+});
+
+/**
  * Procedure com logging
  */
 export const loggedProcedure = t.procedure.use(loggerMiddleware);

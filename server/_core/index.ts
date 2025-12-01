@@ -101,6 +101,16 @@ async function startServer() {
       .catch((err) => {
         console.error('[Server] Erro ao inicializar cron jobs:', err);
       });
+
+    // Inicializar monitor de métricas
+    import('../jobs/metricsMonitor')
+      .then(({ startMetricsMonitor }) => {
+        startMetricsMonitor();
+        logger.debug('[Server] Metrics monitor started');
+      })
+      .catch((err) => {
+        console.error('[Server] Erro ao inicializar metrics monitor:', err);
+      });
   });
 }
 
