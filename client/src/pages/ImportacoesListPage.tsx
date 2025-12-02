@@ -1,26 +1,52 @@
-import { useState } from 'react';
-import { trpc } from '../lib/trpc';
+import { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 
+interface Importacao {
+  id: number;
+  projetoId: number;
+  projetoNome: string;
+  pesquisaId: number;
+  pesquisaNome: string;
+  nomeArquivo: string;
+  tipoArquivo: string;
+  totalLinhas: number;
+  linhasProcessadas: number;
+  linhasSucesso: number;
+  linhasErro: number;
+  linhasDuplicadas: number;
+  status: string;
+  startedAt: string | null;
+  completedAt: string | null;
+  durationSeconds: number | null;
+  createdAt: string;
+  createdBy: number;
+}
+
 export default function ImportacoesListPage() {
-  const [projetoId, setProjetoId] = useState<number | undefined>();
-  const [status, setStatus] = useState<string | undefined>();
+  const [importacoes, setImportacoes] = useState<Importacao[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const projetos = trpc.projetos.list.useQuery({ limit: 100 });
-  const importacoes = trpc.importacao.list.useQuery({
-    projetoId,
-    status,
-    limit: 50,
-  });
+  useEffect(() => {
+    async function fetchImportacoes() {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/trpc/importacao.list');
+        const data = await response.json();
+        
+        if (data.result && data.result.data) {
+          setImportacoes(data.result.data);
+        }
+      } catch (err) {
+        setError('Erro ao carregar importações');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
 
-  // Debug
-  console.log('Importacoes query:', {
-    isLoading: importacoes.isLoading,
-    isError: importacoes.isError,
-    data: importacoes.data,
-    dataType: typeof importacoes.data,
-    dataLength: Array.isArray(importacoes.data) ? importacoes.data.length : 'not array'
-  });
+    fetchImportacoes();
+  }, []);
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -45,10 +71,18 @@ export default function ImportacoesListPage() {
     return `${mins}m ${secs}s`;
   };
 
+  const getTaxaSucesso = (imp: Importacao) => {
+    if (imp.totalLinhas === 0) return 0;
+    return Math.round((imp.linhasSucesso / imp.totalLinhas) * 100);
+  };
+
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Importações</h1>
+        <div>
+          <h1 className="text-3xl font-bold">Histórico de Importações</h1>
+          <p className="text-gray-600 mt-1">Visualize todas as importações de dados realizadas</p>
+        </div>
         <Link href="/importacao">
           <a className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
             + Nova Importação
@@ -56,39 +90,22 @@ export default function ImportacoesListPage() {
         </Link>
       </div>
 
-      {/* Filtros */}
-      <div className="flex gap-4 mb-6">
-        <select
-          value={projetoId || ''}
-          onChange={(e) => setProjetoId(e.target.value ? Number(e.target.value) : undefined)}
-          className="border rounded px-3 py-2"
-        >
-          <option value="">Todos os projetos</option>
-          {projetos.data?.map((p: any) => (
-            <option key={p.id} value={p.id}>
-              {p.nome}
-            </option>
-          ))}
-        </select>
+      {/* Loading */}
+      {isLoading && (
+        <div className="text-center py-12">
+          <p className="text-gray-500">Carregando importações...</p>
+        </div>
+      )}
 
-        <select
-          value={status || ''}
-          onChange={(e) => setStatus(e.target.value || undefined)}
-          className="border rounded px-3 py-2"
-        >
-          <option value="">Todos os status</option>
-          <option value="pendente">Pendente</option>
-          <option value="processando">Processando</option>
-          <option value="concluido">Concluído</option>
-          <option value="falhou">Falhou</option>
-          <option value="cancelado">Cancelado</option>
-        </select>
-      </div>
+      {/* Error */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
 
-      {/* Lista */}
-      {importacoes.isLoading && <p>Carregando...</p>}
-
-      {importacoes.data && importacoes.data.length === 0 && (
+      {/* Empty State */}
+      {!isLoading && !error && importacoes.length === 0 && (
         <div className="text-center py-12 text-gray-500">
           <p className="text-lg mb-2">Nenhuma importação encontrada</p>
           <Link href="/importacao">
@@ -97,55 +114,84 @@ export default function ImportacoesListPage() {
         </div>
       )}
 
-      {importacoes.data && importacoes.data.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full border">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border px-4 py-2 text-left">Arquivo</th>
-                <th className="border px-4 py-2 text-left">Projeto</th>
-                <th className="border px-4 py-2 text-left">Status</th>
-                <th className="border px-4 py-2 text-right">Total</th>
-                <th className="border px-4 py-2 text-right">Sucesso</th>
-                <th className="border px-4 py-2 text-right">Erros</th>
-                <th className="border px-4 py-2 text-right">Duplicadas</th>
-                <th className="border px-4 py-2 text-left">Duração</th>
-                <th className="border px-4 py-2 text-left">Data</th>
-              </tr>
-            </thead>
-            <tbody>
-              {importacoes.data.map((imp: any) => (
-                <tr key={imp.id} className="hover:bg-gray-50">
-                  <td className="border px-4 py-2">
-                    <div className="font-medium">{imp.nomeArquivo}</div>
-                    <div className="text-xs text-gray-500">ID: {imp.id}</div>
-                  </td>
-                  <td className="border px-4 py-2 text-sm">{imp.projetoId}</td>
-                  <td className="border px-4 py-2">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(imp.status)}`}>
+      {/* Lista de Importações */}
+      {!isLoading && !error && importacoes.length > 0 && (
+        <div className="grid gap-4">
+          {importacoes.map((imp) => (
+            <div key={imp.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow bg-white">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-lg font-semibold">{imp.nomeArquivo}</h3>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(imp.status)}`}>
                       {imp.status}
                     </span>
-                  </td>
-                  <td className="border px-4 py-2 text-right">{imp.totalLinhas}</td>
-                  <td className="border px-4 py-2 text-right text-green-600">
-                    {imp.linhasSucesso || 0}
-                  </td>
-                  <td className="border px-4 py-2 text-right text-red-600">
-                    {imp.linhasErro || 0}
-                  </td>
-                  <td className="border px-4 py-2 text-right text-yellow-600">
-                    {imp.linhasDuplicadas || 0}
-                  </td>
-                  <td className="border px-4 py-2 text-sm">
-                    {formatDuration(imp.durationSeconds)}
-                  </td>
-                  <td className="border px-4 py-2 text-sm">
-                    {formatDate(imp.createdAt)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                  <div className="text-sm text-gray-600 space-y-1">
+                    <p>
+                      <span className="font-medium">Projeto:</span> {imp.projetoNome || `ID ${imp.projetoId}`}
+                    </p>
+                    <p>
+                      <span className="font-medium">Pesquisa:</span> {imp.pesquisaNome || `ID ${imp.pesquisaId}`}
+                    </p>
+                    <p>
+                      <span className="font-medium">Data:</span> {formatDate(imp.createdAt)}
+                    </p>
+                    {imp.durationSeconds && (
+                      <p>
+                        <span className="font-medium">Duração:</span> {formatDuration(imp.durationSeconds)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Estatísticas */}
+                <div className="flex gap-6 text-center">
+                  <div>
+                    <div className="text-2xl font-bold text-gray-900">{imp.totalLinhas}</div>
+                    <div className="text-xs text-gray-500">Total</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-green-600">{imp.linhasSucesso}</div>
+                    <div className="text-xs text-gray-500">Sucesso</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-red-600">{imp.linhasErro}</div>
+                    <div className="text-xs text-gray-500">Erros</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-yellow-600">{imp.linhasDuplicadas}</div>
+                    <div className="text-xs text-gray-500">Duplicadas</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Barra de Progresso */}
+              <div className="mt-4">
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-600">Taxa de Sucesso</span>
+                  <span className="font-semibold">{getTaxaSucesso(imp)}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-green-600 h-2 rounded-full transition-all"
+                    style={{ width: `${getTaxaSucesso(imp)}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Indicador de Erros */}
+              {imp.linhasErro > 0 && (
+                <div className="mt-4 bg-red-50 border border-red-200 rounded p-3">
+                  <p className="text-sm text-red-800">
+                    ⚠️ <span className="font-medium">{imp.linhasErro} linhas com erro</span>
+                    {' - '}
+                    Verifique os detalhes da importação para mais informações
+                  </p>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>
