@@ -1,47 +1,52 @@
-import { Database, Building2, MapPin, Tag, Star, Users } from 'lucide-react';
+import { useState } from 'react';
+import { Database, Search, Filter, Plus, Building2, Mail, Phone, Globe } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { trpc } from '@/lib/trpc';
+import { Link } from 'wouter';
 
 export default function EntidadesPage() {
-  const features = [
-    {
-      icon: Database,
-      title: 'Base Completa',
-      description: 'Visualize todas as entidades cadastradas no sistema',
-      color: 'text-primary'
-    },
-    {
-      icon: Building2,
-      title: 'Busca Avançada',
-      description: 'Filtre por CNPJ, nome, cidade, mercado e muito mais',
-      color: 'text-secondary'
-    },
-    {
-      icon: Star,
-      title: 'Score de Qualidade',
-      description: 'Veja o score de qualidade dos dados de cada entidade',
-      color: 'text-warning'
-    },
-    {
-      icon: MapPin,
-      title: 'Localização',
-      description: 'Visualize entidades no mapa com hierarquia geográfica',
-      color: 'text-success'
-    },
-    {
-      icon: Tag,
-      title: 'Produtos e Mercados',
-      description: 'Gerencie produtos fornecidos e mercados de atuação',
-      color: 'text-info'
-    },
-    {
-      icon: Users,
-      title: 'Relacionamentos',
-      description: 'Visualize clientes, concorrentes e leads relacionados',
-      color: 'text-destructive'
+  const [busca, setBusca] = useState('');
+  const [tipoFiltro, setTipoFiltro] = useState<'cliente' | 'lead' | 'concorrente' | undefined>();
+  const [page, setPage] = useState(0);
+  const limit = 20;
+
+  // Query para listar entidades
+  const entidades = trpc.entidades.list.useQuery({
+    busca: busca || undefined,
+    tipo: tipoFiltro,
+    limit,
+    offset: page * limit,
+  });
+
+  const getBadgeVariant = (tipo: string) => {
+    switch (tipo) {
+      case 'cliente':
+        return 'default';
+      case 'lead':
+        return 'secondary';
+      case 'concorrente':
+        return 'destructive';
+      default:
+        return 'outline';
     }
-  ];
+  };
+
+  const formatTipo = (tipo: string) => {
+    switch (tipo) {
+      case 'cliente':
+        return 'Cliente';
+      case 'lead':
+        return 'Lead';
+      case 'concorrente':
+        return 'Concorrente';
+      default:
+        return tipo;
+    }
+  };
 
   return (
     <div className="animate-fade-in">
@@ -53,125 +58,222 @@ export default function EntidadesPage() {
           { label: 'Dashboard', path: '/' },
           { label: 'Base de Entidades' }
         ]}
+        actions={
+          <Button asChild>
+            <Link href="/entidades/nova">
+              <Plus className="h-4 w-4 mr-2" />
+              Nova Entidade
+            </Link>
+          </Button>
+        }
       />
 
-      {/* Status Badge */}
-      <div className="mb-8">
-        <Badge variant="default" className="bg-info hover:bg-info/90 text-info-foreground">
-          🚧 Em Desenvolvimento - FASE 4
-        </Badge>
-      </div>
-
-      {/* Main Content */}
-      <Card className="p-12 text-center mb-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mx-auto mb-6">
-            <Database className="h-10 w-10 text-primary" />
+      {/* Filtros */}
+      <Card className="p-6 mb-6">
+        <div className="flex flex-col md:flex-row gap-4">
+          {/* Busca */}
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nome, CNPJ, email..."
+                value={busca}
+                onChange={(e) => {
+                  setBusca(e.target.value);
+                  setPage(0);
+                }}
+                className="pl-10"
+              />
+            </div>
           </div>
-          
-          <h2 className="text-2xl font-bold mb-3">
-            Base Centralizada de Entidades
-          </h2>
-          
-          <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
-            Esta funcionalidade será implementada na <strong>FASE 4</strong> do projeto. 
-            Gerencie todas as entidades do sistema em um único lugar!
-          </p>
 
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card key={index} className="p-6 text-left hover-lift">
-                  <div className={`h-12 w-12 rounded-xl bg-gradient-to-br from-${feature.color}/10 to-${feature.color}/5 flex items-center justify-center mb-4`}>
-                    <Icon className={`h-6 w-6 ${feature.color}`} />
-                  </div>
-                  <h3 className="font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {feature.description}
-                  </p>
-                </Card>
-              );
-            })}
+          {/* Filtro por tipo */}
+          <div className="flex gap-2">
+            <Button
+              variant={tipoFiltro === undefined ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setTipoFiltro(undefined);
+                setPage(0);
+              }}
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Todos
+            </Button>
+            <Button
+              variant={tipoFiltro === 'cliente' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setTipoFiltro('cliente');
+                setPage(0);
+              }}
+            >
+              Clientes
+            </Button>
+            <Button
+              variant={tipoFiltro === 'lead' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setTipoFiltro('lead');
+                setPage(0);
+              }}
+            >
+              Leads
+            </Button>
+            <Button
+              variant={tipoFiltro === 'concorrente' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setTipoFiltro('concorrente');
+                setPage(0);
+              }}
+            >
+              Concorrentes
+            </Button>
           </div>
         </div>
       </Card>
 
-      {/* Technical Details */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6">
-          <h3 className="font-semibold mb-3 flex items-center gap-2">
-            <Database className="h-5 w-5 text-primary" />
-            Estrutura de Dados
-          </h3>
-          <p className="text-sm text-muted-foreground mb-3">
-            Star Schema dimensional com 29 tabelas e 477 campos
-          </p>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">dim_entidade:</span>
-              <span className="font-medium">Tabela principal</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">dim_geografia:</span>
-              <span className="font-medium">5.570 cidades</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">dim_mercado:</span>
-              <span className="font-medium">Hierarquias</span>
-            </div>
+      {/* Tabela */}
+      <Card className="overflow-hidden">
+        {entidades.isLoading ? (
+          <div className="p-12 text-center">
+            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Carregando entidades...</p>
           </div>
-        </Card>
+        ) : entidades.isError ? (
+          <div className="p-12 text-center">
+            <p className="text-destructive mb-2">Erro ao carregar entidades</p>
+            <p className="text-sm text-muted-foreground">{entidades.error.message}</p>
+          </div>
+        ) : !entidades.data || entidades.data.length === 0 ? (
+          <div className="p-12 text-center">
+            <Database className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Nenhuma entidade encontrada</h3>
+            <p className="text-muted-foreground mb-6">
+              {busca || tipoFiltro
+                ? 'Tente ajustar os filtros de busca'
+                : 'Comece importando dados ou criando uma nova entidade'}
+            </p>
+            <Button asChild>
+              <Link href="/importacao">
+                <Plus className="h-4 w-4 mr-2" />
+                Importar Dados
+              </Link>
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-muted/50 border-b">
+                  <tr>
+                    <th className="text-left p-4 font-medium">Nome</th>
+                    <th className="text-left p-4 font-medium">Tipo</th>
+                    <th className="text-left p-4 font-medium">CNPJ</th>
+                    <th className="text-left p-4 font-medium">Contato</th>
+                    <th className="text-left p-4 font-medium">Origem</th>
+                    <th className="text-left p-4 font-medium">Data</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {entidades.data.map((entidade: any) => (
+                    <tr
+                      key={entidade.id}
+                      className="border-b hover:bg-muted/30 transition-colors cursor-pointer"
+                      onClick={() => window.location.href = `/entidades/${entidade.id}`}
+                    >
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <Building2 className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <div className="font-medium">{entidade.nome}</div>
+                            {entidade.nome_fantasia && (
+                              <div className="text-sm text-muted-foreground">
+                                {entidade.nome_fantasia}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <Badge variant={getBadgeVariant(entidade.tipo_entidade)}>
+                          {formatTipo(entidade.tipo_entidade)}
+                        </Badge>
+                      </td>
+                      <td className="p-4">
+                        <span className="text-sm text-muted-foreground">
+                          {entidade.cnpj || '—'}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-col gap-1 text-sm">
+                          {entidade.email && (
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Mail className="h-3 w-3" />
+                              {entidade.email}
+                            </div>
+                          )}
+                          {entidade.telefone && (
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Phone className="h-3 w-3" />
+                              {entidade.telefone}
+                            </div>
+                          )}
+                          {entidade.site && (
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Globe className="h-3 w-3" />
+                              {entidade.site}
+                            </div>
+                          )}
+                          {!entidade.email && !entidade.telefone && !entidade.site && '—'}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <Badge variant="outline">
+                          {entidade.origem_tipo}
+                        </Badge>
+                      </td>
+                      <td className="p-4">
+                        <span className="text-sm text-muted-foreground">
+                          {new Date(entidade.created_at).toLocaleDateString('pt-BR')}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-        <Card className="p-6">
-          <h3 className="font-semibold mb-3 flex items-center gap-2">
-            <Tag className="h-5 w-5 text-secondary" />
-            Tipos de Entidade
-          </h3>
-          <p className="text-sm text-muted-foreground mb-3">
-            Classificação automática por tipo e relacionamento
-          </p>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Clientes:</span>
-              <span className="font-medium">45 campos IA</span>
+            {/* Paginação */}
+            <div className="p-4 border-t flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                Página {page + 1}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(Math.max(0, page - 1))}
+                  disabled={page === 0}
+                >
+                  Anterior
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(page + 1)}
+                  disabled={!entidades.data || entidades.data.length < limit}
+                >
+                  Próxima
+                </Button>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Concorrentes:</span>
-              <span className="font-medium">38 campos IA</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Leads:</span>
-              <span className="font-medium">76 campos IA</span>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="font-semibold mb-3 flex items-center gap-2">
-            <Star className="h-5 w-5 text-warning" />
-            Qualidade de Dados
-          </h3>
-          <p className="text-sm text-muted-foreground mb-3">
-            Score automático de completude e confiabilidade
-          </p>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Score 0-100:</span>
-              <span className="font-medium">Automático</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Campos:</span>
-              <span className="font-medium">477 validados</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Auditoria:</span>
-              <span className="font-medium">Completa</span>
-            </div>
-          </div>
-        </Card>
-      </div>
+          </>
+        )}
+      </Card>
     </div>
   );
 }
