@@ -11,10 +11,7 @@
     }
   },
   "rewrites": [
-    {
-      "source": "/api/trpc/:path*",
-      "destination": "/api/trpc/:path*"
-    },
+
     {
       "source": "/api/:path*",
       "destination": "/api/:path*"
