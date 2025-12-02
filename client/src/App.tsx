@@ -1,60 +1,42 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Route, Switch } from 'wouter';
+import { trpc, trpcClient } from './lib/trpc';
+import { useState } from 'react';
+import { Toaster } from 'sonner';
+import Layout from './components/Layout';
+
+// Pages
+import HomePage from './pages/HomePage';
+import ProjetosPage from './pages/projetos/ProjetosPage';
+import ProjetoNovoPage from './pages/projetos/ProjetoNovoPage';
+import PesquisasPage from './pages/pesquisas/PesquisasPage';
+import PesquisaNovaPage from './pages/pesquisas/PesquisaNovaPage';
+import EntidadesPage from './pages/EntidadesPage';
+import ImportacaoPage from './pages/ImportacaoPage';
+import EnriquecimentoPage from './pages/EnriquecimentoPage';
 
 function App() {
-  return (
-    <div className="min-h-screen bg-background">
-      <Switch>
-        <Route path="/">
-          <HomePage />
-        </Route>
-        <Route>
-          <NotFound />
-        </Route>
-      </Switch>
-    </div>
-  );
-}
+  const [queryClient] = useState(() => new QueryClient());
 
-function HomePage() {
   return (
-    <div className="container mx-auto px-4 py-16">
-      <div className="max-w-4xl mx-auto text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl mb-6">
-          Intelmarket
-        </h1>
-        <p className="text-lg text-muted-foreground mb-8">
-          Sistema de Gestão e Enriquecimento de Inteligência de Mercado com IA
-        </p>
-        <div className="rounded-lg border bg-card p-8">
-          <h2 className="text-2xl font-semibold mb-4">🚀 Projeto Recriado com Sucesso!</h2>
-          <p className="text-muted-foreground">
-            O projeto foi recriado do zero preservando:
-          </p>
-          <ul className="mt-4 space-y-2 text-left max-w-md mx-auto">
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span>
-              <span>Banco de dados Supabase (5.570 cidades)</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span>
-              <span>Schema dimensional v3.0</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span>
-              <span>DAL completo (10 tabelas)</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span>
-              <span>Variáveis de ambiente (32)</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span>
-              <span>Domínio intelmarket.app</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <Layout>
+          <Switch>
+            <Route path="/" component={HomePage} />
+            <Route path="/projetos" component={ProjetosPage} />
+            <Route path="/projetos/novo" component={ProjetoNovoPage} />
+            <Route path="/pesquisas" component={PesquisasPage} />
+            <Route path="/pesquisas/novo" component={PesquisaNovaPage} />
+            <Route path="/entidades" component={EntidadesPage} />
+            <Route path="/importacao" component={ImportacaoPage} />
+            <Route path="/enriquecimento" component={EnriquecimentoPage} />
+            <Route component={NotFound} />
+          </Switch>
+        </Layout>
+        <Toaster />
+      </QueryClientProvider>
+    </trpc.Provider>
   );
 }
 
