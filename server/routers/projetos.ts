@@ -16,8 +16,10 @@ export const projetosRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      // TODO: Pegar ownerId do ctx.user quando autenticação estiver implementada
-      const ownerId = 'temp-owner-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const ownerId = ctx.userId;
 
       const result = await DAL.Projeto.getProjetos({
         ownerId,
@@ -56,8 +58,10 @@ export const projetosRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // TODO: Pegar ownerId do ctx.user
-      const ownerId = 'temp-owner-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const ownerId = ctx.userId;
 
       const projeto = await DAL.Projeto.createProjeto({
         nome: input.nome,
@@ -85,8 +89,10 @@ export const projetosRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // TODO: Pegar userId do ctx.user
-      const userId = 'temp-user-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const userId = ctx.userId;
 
       const projeto = await DAL.Projeto.updateProjeto(
         input.id,
@@ -107,8 +113,10 @@ export const projetosRouter = router({
   archive: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      // TODO: Pegar userId do ctx.user
-      const userId = 'temp-user-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const userId = ctx.userId;
 
       const projeto = await DAL.Projeto.arquivarProjeto(input.id, userId);
       return projeto;
@@ -118,8 +126,10 @@ export const projetosRouter = router({
   activate: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      // TODO: Pegar userId do ctx.user
-      const userId = 'temp-user-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const userId = ctx.userId;
 
       const projeto = await DAL.Projeto.ativarProjeto(input.id, userId);
       return projeto;
@@ -129,8 +139,10 @@ export const projetosRouter = router({
   deactivate: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      // TODO: Pegar userId do ctx.user
-      const userId = 'temp-user-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const userId = ctx.userId;
 
       const projeto = await DAL.Projeto.inativarProjeto(input.id, userId);
       return projeto;
@@ -140,8 +152,10 @@ export const projetosRouter = router({
   delete: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      // TODO: Pegar userId do ctx.user
-      const userId = 'temp-user-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const userId = ctx.userId;
 
       await DAL.Projeto.deleteProjeto(input.id, userId);
       return { success: true };

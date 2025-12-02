@@ -62,8 +62,10 @@ export const pesquisasRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // TODO: Pegar userId do ctx.user
-      const userId = 'temp-user-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const userId = ctx.userId;
 
       const pesquisa = await DAL.Pesquisa.createPesquisa({
         projeto_id: input.projetoId,
@@ -87,8 +89,10 @@ export const pesquisasRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // TODO: Pegar userId do ctx.user
-      const userId = 'temp-user-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const userId = ctx.userId;
 
       const pesquisa = await DAL.Pesquisa.updatePesquisa(
         input.id,
@@ -107,8 +111,10 @@ export const pesquisasRouter = router({
   start: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      // TODO: Pegar userId do ctx.user
-      const userId = 'temp-user-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const userId = ctx.userId;
 
       const pesquisa = await DAL.Pesquisa.iniciarPesquisa(input.id, userId);
       return pesquisa;
@@ -126,8 +132,10 @@ export const pesquisasRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // TODO: Pegar userId do ctx.user
-      const userId = 'temp-user-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const userId = ctx.userId;
 
       const pesquisa = await DAL.Pesquisa.concluirPesquisa(
         input.id,
@@ -147,8 +155,10 @@ export const pesquisasRouter = router({
   cancel: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      // TODO: Pegar userId do ctx.user
-      const userId = 'temp-user-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const userId = ctx.userId;
 
       const pesquisa = await DAL.Pesquisa.cancelarPesquisa(input.id, userId);
       return pesquisa;
@@ -158,8 +168,10 @@ export const pesquisasRouter = router({
   delete: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      // TODO: Pegar userId do ctx.user
-      const userId = 'temp-user-id';
+      if (!ctx.userId) {
+        throw new Error('É necessário estar autenticado');
+      }
+      const userId = ctx.userId;
 
       await DAL.Pesquisa.deletePesquisa(input.id, userId);
       return { success: true };
