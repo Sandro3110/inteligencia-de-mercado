@@ -13,6 +13,7 @@ import PesquisasPage from './pages/pesquisas/PesquisasPage';
 import PesquisaNovaPage from './pages/pesquisas/PesquisaNovaPage';
 import EntidadesPage from './pages/EntidadesPage';
 import ImportacaoPage from './pages/ImportacaoPage';
+import ImportacoesListPage from './pages/ImportacoesListPage';
 import EnriquecimentoPage from './pages/EnriquecimentoPage';
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
             <Route path="/pesquisas/novo" component={PesquisaNovaPage} />
             <Route path="/entidades" component={EntidadesPage} />
             <Route path="/importacao" component={ImportacaoPage} />
+            <Route path="/importacoes" component={ImportacoesListPage} />
             <Route path="/enriquecimento" component={EnriquecimentoPage} />
             <Route component={NotFound} />
           </Switch>
