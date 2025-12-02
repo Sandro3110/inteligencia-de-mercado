@@ -353,7 +353,6 @@ export default async function handler(req, res) {
           UPDATE dim_pesquisa
           SET status = 'em_progresso',
               started_at = NOW(),
-              started_by = 1,
               updated_at = NOW()
           WHERE id = ${id}
           RETURNING *
@@ -420,7 +419,6 @@ export default async function handler(req, res) {
         const [deleted] = await client`
           UPDATE dim_pesquisa
           SET deleted_at = NOW(),
-              deleted_by = 1,
               updated_at = NOW()
           WHERE id = ${id}
           RETURNING *
