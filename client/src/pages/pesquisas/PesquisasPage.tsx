@@ -217,7 +217,11 @@ export default function PesquisasPage() {
                     className="border-b last:border-0 hover:bg-accent/50 transition-colors"
                   >
                     <td className="p-4">
-                      <div className="font-medium">{pesquisa.nome}</div>
+                      <Link href={`/pesquisas/${pesquisa.id}`}>
+                        <a className="font-medium hover:text-primary hover:underline cursor-pointer">
+                          {pesquisa.nome}
+                        </a>
+                      </Link>
                       {pesquisa.descricao && (
                         <div className="text-sm text-muted-foreground mt-1">
                           {pesquisa.descricao}

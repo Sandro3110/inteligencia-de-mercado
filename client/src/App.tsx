@@ -17,6 +17,7 @@ import ProjetosPage from './pages/projetos/ProjetosPage';
 const ProjetoNovoPage = lazy(() => import('./pages/projetos/ProjetoNovoPage'));
 const PesquisasPage = lazy(() => import('./pages/pesquisas/PesquisasPage'));
 const PesquisaNovaPage = lazy(() => import('./pages/pesquisas/PesquisaNovaPage'));
+const PesquisaDetalhesPage = lazy(() => import('./pages/pesquisas/PesquisaDetalhesPage'));
 const EntidadesPage = lazy(() => import('./pages/EntidadesPage'));
 const ImportacaoPage = lazy(() => import('./pages/ImportacaoPage'));
 const ImportacoesListPage = lazy(() => import('./pages/ImportacoesListPage'));
@@ -68,6 +69,7 @@ function App() {
             <Route path="/projetos/novo" component={ProjetoNovoPage} />
             <Route path="/pesquisas" component={PesquisasPage} />
             <Route path="/pesquisas/novo" component={PesquisaNovaPage} />
+            <Route path="/pesquisas/:id" component={PesquisaDetalhesPage} />
             <Route path="/entidades" component={EntidadesPage} />
             <Route path="/importacao" component={ImportacaoPage} />
             <Route path="/importacoes" component={ImportacoesListPage} />
