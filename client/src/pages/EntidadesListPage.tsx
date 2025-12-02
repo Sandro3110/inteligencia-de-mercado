@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { CardSkeleton } from '@/components/CardSkeleton';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { trpc } from '../lib/trpc';
 import { Building2, Search as SearchIcon } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
@@ -11,15 +13,25 @@ import { Badge } from '@/components/ui/badge';
 
 export default function EntidadesListPage() {
   const [busca, setBusca] = useState('');
+  const debouncedBusca = useDebouncedValue(busca, 500);
   const { data: entidades, isLoading, error, refetch } = trpc.entidades.list.useQuery({ 
-    busca: busca || undefined, 
+    busca: debouncedBusca || undefined, 
     limit: 50 
   });
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <LoadingSpinner size="lg" text="Carregando entidades..." />
+      <div className="animate-fade-in">
+        <PageHeader
+          title="Lista de Entidades"
+          description="Visualize e gerencie todas as entidades cadastradas"
+          icon={Building2}
+          breadcrumbs={[
+            { label: 'Dashboard', path: '/' },
+            { label: 'Lista de Entidades' }
+          ]}
+        />
+        <CardSkeleton count={8} variant="list" />
       </div>
     );
   }

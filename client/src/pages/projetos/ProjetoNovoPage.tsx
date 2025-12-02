@@ -1,6 +1,5 @@
 import { useLocation } from 'wouter';
 import { trpc } from '../../lib/trpc';
-import { useState, FormEvent } from 'react';
 import { toast } from 'sonner';
 import { FolderKanban, Save, X } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
@@ -9,15 +8,27 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { projetoSchema, type ProjetoFormData } from '@/schemas/projeto.schema';
 
 export default function ProjetoNovoPage() {
   const [, setLocation] = useLocation();
-  const [nome, setNome] = useState('');
-  const [codigo, setCodigo] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [centroCusto, setCentroCusto] = useState('');
-  const [unidadeNegocio, setUnidadeNegocio] = useState('');
-  const [orcamento, setOrcamento] = useState('');
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ProjetoFormData>({
+    resolver: zodResolver(projetoSchema),
+    defaultValues: {
+      nome: '',
+      codigo: '',
+      descricao: '',
+      centro_custo: '',
+      status: 'ativo',
+    },
+  });
 
   const createMutation = trpc.projetos.create.useMutation({
     onSuccess: () => {
@@ -33,31 +44,13 @@ export default function ProjetoNovoPage() {
     },
   });
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!nome.trim()) {
-      toast.error('Nome é obrigatório', {
-        description: 'Por favor, preencha o nome do projeto.'
-      });
-      return;
-    }
-
-    if (nome.trim().length < 3) {
-      toast.error('Nome muito curto', {
-        description: 'O nome deve ter pelo menos 3 caracteres.'
-      });
-      return;
-    }
-
+  const onSubmit = (data: ProjetoFormData) => {
     toast.promise(
       createMutation.mutateAsync({
-        nome: nome.trim(),
-        codigo: codigo.trim() || undefined,
-        descricao: descricao.trim() || undefined,
-        centroCusto: centroCusto.trim() || undefined,
-        unidadeNegocio: unidadeNegocio.trim() || undefined,
-        orcamento: orcamento ? parseFloat(orcamento) : undefined,
+        nome: data.nome,
+        codigo: data.codigo || undefined,
+        descricao: data.descricao || undefined,
+        centroCusto: data.centro_custo || undefined,
       }),
       {
         loading: 'Criando projeto...',
@@ -80,140 +73,98 @@ export default function ProjetoNovoPage() {
         ]}
       />
 
-      <form onSubmit={handleSubmit} className="max-w-3xl">
-        <Card className="p-8">
-          <div className="space-y-6">
-            {/* Nome */}
-            <div className="space-y-2">
-              <Label htmlFor="nome">
-                Nome do Projeto <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="nome"
-                type="text"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                placeholder="Ex: Análise de Mercado Q1 2025"
-                required
-                maxLength={100}
-              />
-              <p className="text-xs text-muted-foreground">
-                Mínimo 3 caracteres, máximo 100
-              </p>
-            </div>
-
-            {/* Código */}
-            <div className="space-y-2">
-              <Label htmlFor="codigo">Código (opcional)</Label>
-              <Input
-                id="codigo"
-                type="text"
-                value={codigo}
-                onChange={(e) => setCodigo(e.target.value)}
-                placeholder="Ex: PROJ-2025-001"
-                maxLength={20}
-              />
-              <p className="text-xs text-muted-foreground">
-                Identificador único do projeto
-              </p>
-            </div>
-
-            {/* Descrição */}
-            <div className="space-y-2">
-              <Label htmlFor="descricao">Descrição (opcional)</Label>
-              <Textarea
-                id="descricao"
-                value={descricao}
-                onChange={(e) => setDescricao(e.target.value)}
-                placeholder="Descreva os objetivos e escopo do projeto..."
-                rows={4}
-                maxLength={500}
-              />
-              <p className="text-xs text-muted-foreground">
-                Máximo 500 caracteres ({descricao.length}/500)
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Centro de Custo */}
-              <div className="space-y-2">
-                <Label htmlFor="centroCusto">Centro de Custo (opcional)</Label>
-                <Input
-                  id="centroCusto"
-                  type="text"
-                  value={centroCusto}
-                  onChange={(e) => setCentroCusto(e.target.value)}
-                  placeholder="Ex: CC-1234"
-                  maxLength={50}
-                />
-              </div>
-
-              {/* Unidade de Negócio */}
-              <div className="space-y-2">
-                <Label htmlFor="unidadeNegocio">Unidade de Negócio (opcional)</Label>
-                <Input
-                  id="unidadeNegocio"
-                  type="text"
-                  value={unidadeNegocio}
-                  onChange={(e) => setUnidadeNegocio(e.target.value)}
-                  placeholder="Ex: Comercial"
-                  maxLength={100}
-                />
-              </div>
-            </div>
-
-            {/* Orçamento */}
-            <div className="space-y-2">
-              <Label htmlFor="orcamento">Orçamento (opcional)</Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  R$
-                </span>
-                <Input
-                  id="orcamento"
-                  type="number"
-                  value={orcamento}
-                  onChange={(e) => setOrcamento(e.target.value)}
-                  placeholder="0,00"
-                  step="0.01"
-                  min="0"
-                  className="pl-10"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Orçamento estimado para o projeto
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        {/* Actions */}
-        <div className="flex gap-4 mt-6">
-          <Button
-            type="submit"
-            disabled={createMutation.isPending}
-            className="min-w-32"
-          >
-            {createMutation.isPending ? (
-              <>Criando...</>
-            ) : (
-              <>
-                <Save className="h-4 w-4 mr-2" />
-                Criar Projeto
-              </>
+      <Card className="p-6 max-w-3xl">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Nome */}
+          <div className="space-y-2">
+            <Label htmlFor="nome" className="required">
+              Nome do Projeto
+            </Label>
+            <Input
+              id="nome"
+              {...register('nome')}
+              placeholder="Ex: Análise de Mercado Q4 2024"
+              className={errors.nome ? 'border-destructive' : ''}
+            />
+            {errors.nome && (
+              <p className="text-sm text-destructive">{errors.nome.message}</p>
             )}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setLocation('/projetos')}
-            disabled={createMutation.isPending}
-          >
-            <X className="h-4 w-4 mr-2" />
-            Cancelar
-          </Button>
-        </div>
-      </form>
+          </div>
+
+          {/* Código */}
+          <div className="space-y-2">
+            <Label htmlFor="codigo">
+              Código (opcional)
+            </Label>
+            <Input
+              id="codigo"
+              {...register('codigo')}
+              placeholder="Ex: PROJ-2024-001"
+              className={errors.codigo ? 'border-destructive' : ''}
+            />
+            {errors.codigo && (
+              <p className="text-sm text-destructive">{errors.codigo.message}</p>
+            )}
+            <p className="text-sm text-muted-foreground">
+              Apenas letras maiúsculas, números e hífen
+            </p>
+          </div>
+
+          {/* Descrição */}
+          <div className="space-y-2">
+            <Label htmlFor="descricao">
+              Descrição (opcional)
+            </Label>
+            <Textarea
+              id="descricao"
+              {...register('descricao')}
+              placeholder="Descreva os objetivos e escopo do projeto..."
+              rows={4}
+              className={errors.descricao ? 'border-destructive' : ''}
+            />
+            {errors.descricao && (
+              <p className="text-sm text-destructive">{errors.descricao.message}</p>
+            )}
+          </div>
+
+          {/* Centro de Custo */}
+          <div className="space-y-2">
+            <Label htmlFor="centro_custo">
+              Centro de Custo (opcional)
+            </Label>
+            <Input
+              id="centro_custo"
+              {...register('centro_custo')}
+              placeholder="Ex: Marketing"
+              className={errors.centro_custo ? 'border-destructive' : ''}
+            />
+            {errors.centro_custo && (
+              <p className="text-sm text-destructive">{errors.centro_custo.message}</p>
+            )}
+          </div>
+
+          {/* Ações */}
+          <div className="flex items-center gap-3 pt-4 border-t">
+            <Button
+              type="submit"
+              disabled={isSubmitting || createMutation.isPending}
+              className="min-w-32"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {isSubmitting || createMutation.isPending ? 'Criando...' : 'Criar Projeto'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setLocation('/projetos')}
+              disabled={isSubmitting || createMutation.isPending}
+            >
+              <X className="h-4 w-4 mr-2" />
+              Cancelar
+            </Button>
+          </div>
+        </form>
+      </Card>
     </div>
   );
 }

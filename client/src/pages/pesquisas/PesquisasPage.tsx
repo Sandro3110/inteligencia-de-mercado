@@ -1,6 +1,8 @@
 import { Link } from 'wouter';
 import { trpc } from '../../lib/trpc';
 import { useState } from 'react';
+import { TableSkeleton } from '@/components/TableSkeleton';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { toast } from 'sonner';
 import { Search as SearchIcon, Plus, Play, X as XIcon, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
@@ -24,12 +26,13 @@ type PesquisaStatus = 'pendente' | 'em_progresso' | 'concluida' | 'falhou' | 'ca
 export default function PesquisasPage() {
   const [page, setPage] = useState(1);
   const [busca, setBusca] = useState('');
+  const debouncedBusca = useDebouncedValue(busca, 500);
   const [status, setStatus] = useState<PesquisaStatus | undefined>();
 
   const { data, isLoading, error, refetch } = trpc.pesquisas.list.useQuery({
     page,
     limit: 20,
-    busca: busca || undefined,
+    busca: debouncedBusca || undefined,
     status,
     orderBy: 'created_at',
     orderDirection: 'desc',
@@ -103,8 +106,17 @@ export default function PesquisasPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <LoadingSpinner size="lg" text="Carregando pesquisas..." />
+      <div className="animate-fade-in">
+        <PageHeader
+          title="Pesquisas"
+          description="Gerencie suas pesquisas de inteligência de mercado"
+          icon={SearchIcon}
+          breadcrumbs={[
+            { label: 'Dashboard', path: '/' },
+            { label: 'Pesquisas' }
+          ]}
+        />
+        <TableSkeleton rows={6} columns={6} />
       </div>
     );
   }

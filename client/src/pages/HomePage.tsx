@@ -9,6 +9,7 @@ import {
   Activity
 } from 'lucide-react';
 import { trpc } from '../lib/trpc';
+import { CardSkeleton } from '@/components/CardSkeleton';
 import { PageHeader } from '@/components/PageHeader';
 import { StatCard } from '@/components/StatCard';
 import { Card } from '@/components/ui/card';
@@ -25,8 +26,16 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <LoadingSpinner size="lg" text="Carregando dashboard..." />
+      <div className="animate-fade-in">
+        <PageHeader
+          title="Dashboard"
+          description="Visão geral do sistema de inteligência de mercado"
+          icon={Activity}
+        />
+        <CardSkeleton count={3} variant="stat" />
+        <div className="mt-6">
+          <CardSkeleton count={4} variant="default" />
+        </div>
       </div>
     );
   }
