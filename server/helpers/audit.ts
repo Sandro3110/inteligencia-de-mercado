@@ -6,7 +6,7 @@
  */
 
 import { db } from '../db';
-import { auditLogs } from '@/drizzle/audit_logs.schema';
+import { auditLogs } from '../../drizzle/audit_logs.schema';
 
 /**
  * Tipos de ação auditáveis

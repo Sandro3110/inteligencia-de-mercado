@@ -1,12 +1,12 @@
 import { requirePermission } from "../middleware/auth";
-import { Permission } from "@/shared/types/permissions";
+import { Permission } from "@shared/types/permissions";
 /**
  * Mercado Router - Análises de mercado e hierarquias
  * 100% Funcional
  */
 
 import { z } from 'zod';
-import { router, requirePermission } from '../trpc';
+import { router, publicProcedure } from './index';
 import { db } from '../db';
 import { dimMercado, dimEntidade, fatoEntidadeContexto, fatoEntidadeCompetidor } from '../../drizzle/schema';
 import { eq, and, sql } from 'drizzle-orm';

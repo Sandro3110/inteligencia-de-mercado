@@ -1,12 +1,12 @@
 import { requirePermission } from "../middleware/auth";
-import { Permission } from "@/shared/types/permissions";
+import { Permission } from "@shared/types/permissions";
 /**
  * Entidade Router - Detalhes 360° de entidades
  * 100% Funcional
  */
 
 import { z } from 'zod';
-import { router } from '../trpc';
+import { router } from './index';
 import { db } from '../db';
 import {
   dimEntidade,

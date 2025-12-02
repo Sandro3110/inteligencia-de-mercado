@@ -1,12 +1,12 @@
-import { requirePermission } from "../middleware/auth";
-import { Permission } from "@/shared/types/permissions";
 /**
  * Geografia Router - Análises geográficas e mapas interativos
  * 100% Funcional
  */
 
 import { z } from 'zod';
-import { router, requirePermission } from '../trpc';
+import { router, publicProcedure } from './index';
+import { requirePermission } from "../middleware/auth";
+import { Permission } from "@shared/types/permissions";
 import { db } from '../db';
 import { dimGeografia, dimEntidade, fatoEntidadeContexto } from '../../drizzle/schema';
 import { eq, and, sql, inArray } from 'drizzle-orm';

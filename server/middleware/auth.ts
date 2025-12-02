@@ -5,10 +5,10 @@
 
 import { TRPCError } from '@trpc/server';
 import { publicProcedure } from '../routers/index';
-import { Permission, Role } from '@/shared/types/permissions';
+import { Permission, Role } from '@shared/types/permissions';
 import { hasPermission, hasAnyPermission } from '../helpers/permissions';
 import { db } from '../db';
-import { users } from '@/drizzle/schema';
+import { users } from '../../drizzle/schema';
 import { eq } from 'drizzle-orm';
 
 /**

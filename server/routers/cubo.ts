@@ -1,12 +1,12 @@
 import { requirePermission } from "../middleware/auth";
-import { Permission } from "@/shared/types/permissions";
+import { Permission } from "@shared/types/permissions";
 /**
  * Cubo Router - Busca semântica e consultas dimensionais
  * 100% Funcional
  */
 
 import { z } from 'zod';
-import { router, requirePermission } from '../trpc';
+import { router, publicProcedure } from './index';
 import { interpretarBuscaSemantica } from '../helpers/busca-semantica';
 import { exportar } from '../helpers/exportacao';
 import { copiar } from '../helpers/copia';

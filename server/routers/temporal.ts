@@ -1,12 +1,12 @@
 import { requirePermission } from "../middleware/auth";
-import { Permission } from "@/shared/types/permissions";
+import { Permission } from "@shared/types/permissions";
 /**
  * Temporal Router - Análises temporais e tendências
  * 100% Funcional
  */
 
 import { z } from 'zod';
-import { router, requirePermission } from '../trpc';
+import { router, publicProcedure } from './index';
 import { db } from '../db';
 import { dimTempo, fatoEntidadeContexto } from '../../drizzle/schema';
 import { eq, and, gte, lte, sql } from 'drizzle-orm';

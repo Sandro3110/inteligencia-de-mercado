@@ -13,7 +13,7 @@ import {
   canManageUsers,
   canExport
 } from './permissions';
-import { Role, Permission } from '@/shared/types/permissions';
+import { Role, Permission } from '@shared/types/permissions';
 
 describe('RBAC - Sistema de Permissões', () => {
   describe('hasPermission', () => {

@@ -5,7 +5,7 @@
  * FASE 1 - Sessão 1.2
  */
 
-import { Role, Permission, ROLE_PERMISSIONS } from '@/shared/types/permissions';
+import { Role, Permission, ROLE_PERMISSIONS } from '@shared/types/permissions';
 
 /**
  * Verifica se um papel tem uma permissão específica
