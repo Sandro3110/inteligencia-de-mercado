@@ -325,6 +325,108 @@ export default async function handler(req, res) {
         }
 
         data = pesquisa;
+      } else if (procedure === 'start') {
+        // Iniciar pesquisa
+        if (!input || !input.id) {
+          throw new Error('ID da pesquisa é obrigatório');
+        }
+
+        const { id } = input;
+
+        // Verificar se pesquisa existe e está pendente
+        const [pesquisa] = await client`
+          SELECT * FROM dim_pesquisa
+          WHERE id = ${id}
+          AND deleted_at IS NULL
+        `;
+
+        if (!pesquisa) {
+          throw new Error('Pesquisa não encontrada');
+        }
+
+        if (pesquisa.status !== 'pendente') {
+          throw new Error(`Pesquisa não pode ser iniciada. Status atual: ${pesquisa.status}`);
+        }
+
+        // Atualizar status para em_progresso
+        const [updated] = await client`
+          UPDATE dim_pesquisa
+          SET status = 'em_progresso',
+              started_at = NOW(),
+              started_by = 1,
+              updated_at = NOW()
+          WHERE id = ${id}
+          RETURNING *
+        `;
+
+        data = updated;
+      } else if (procedure === 'cancel') {
+        // Cancelar pesquisa
+        if (!input || !input.id) {
+          throw new Error('ID da pesquisa é obrigatório');
+        }
+
+        const { id } = input;
+
+        // Verificar se pesquisa existe e está em progresso
+        const [pesquisa] = await client`
+          SELECT * FROM dim_pesquisa
+          WHERE id = ${id}
+          AND deleted_at IS NULL
+        `;
+
+        if (!pesquisa) {
+          throw new Error('Pesquisa não encontrada');
+        }
+
+        if (pesquisa.status !== 'em_progresso') {
+          throw new Error(`Pesquisa não pode ser cancelada. Status atual: ${pesquisa.status}`);
+        }
+
+        // Atualizar status para cancelada
+        const [updated] = await client`
+          UPDATE dim_pesquisa
+          SET status = 'cancelada',
+              updated_at = NOW()
+          WHERE id = ${id}
+          RETURNING *
+        `;
+
+        data = updated;
+      } else if (procedure === 'delete') {
+        // Deletar pesquisa (soft delete)
+        if (!input || !input.id) {
+          throw new Error('ID da pesquisa é obrigatório');
+        }
+
+        const { id } = input;
+
+        // Verificar se pesquisa existe
+        const [pesquisa] = await client`
+          SELECT * FROM dim_pesquisa
+          WHERE id = ${id}
+          AND deleted_at IS NULL
+        `;
+
+        if (!pesquisa) {
+          throw new Error('Pesquisa não encontrada');
+        }
+
+        if (pesquisa.status === 'em_progresso') {
+          throw new Error('Não é possível deletar uma pesquisa em progresso. Cancele-a primeiro.');
+        }
+
+        // Soft delete
+        const [deleted] = await client`
+          UPDATE dim_pesquisa
+          SET deleted_at = NOW(),
+              deleted_by = 1,
+              updated_at = NOW()
+          WHERE id = ${id}
+          RETURNING *
+        `;
+
+        data = { success: true, id: deleted.id };
       }
     }
 
