@@ -429,6 +429,54 @@ export const ESTILOS_MAPA = {
 };
 
 // ============================================================================
+// LIMPEZA DE ELEMENTOS
+// ============================================================================
+
+/**
+ * Limpar marcadores do mapa
+ */
+export function limparMarcadores(marcadores: google.maps.Marker[]): void {
+  marcadores.forEach(marcador => {
+    marcador.setMap(null);
+  });
+}
+
+/**
+ * Limpar cluster do mapa
+ */
+export function limparCluster(cluster: any): void {
+  if (cluster && cluster.clearMarkers) {
+    cluster.clearMarkers();
+  }
+}
+
+/**
+ * Limpar heatmap do mapa
+ */
+export function limparHeatmap(heatmap: google.maps.visualization.HeatmapLayer): void {
+  heatmap.setMap(null);
+}
+
+/**
+ * Limpar todos os elementos do mapa
+ */
+export function limparMapa(elementos: {
+  marcadores?: google.maps.Marker[];
+  clusters?: any[];
+  heatmaps?: google.maps.visualization.HeatmapLayer[];
+}): void {
+  if (elementos.marcadores) {
+    limparMarcadores(elementos.marcadores);
+  }
+  if (elementos.clusters) {
+    elementos.clusters.forEach(cluster => limparCluster(cluster));
+  }
+  if (elementos.heatmaps) {
+    elementos.heatmaps.forEach(heatmap => limparHeatmap(heatmap));
+  }
+}
+
+// ============================================================================
 // CORES PARA MARCADORES
 // ============================================================================
 

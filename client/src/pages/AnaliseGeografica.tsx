@@ -19,7 +19,14 @@ import { ExportButton } from '@/components/dimensional/ExportButton';
 import { LoadingState } from '@/components/dimensional/LoadingState';
 
 // Google Maps
-import { initGoogleMaps, createMap, addMarkers, createHeatmap, createClusters } from '@/lib/dimensional/google-maps';
+import { 
+  initGoogleMaps, 
+  createMap, 
+  addMarkers, 
+  createHeatmap, 
+  createClusters,
+  limparMapa 
+} from '@/lib/dimensional/google-maps';
 
 export function AnaliseGeografica() {
   const [filtroGeo, setFiltroGeo] = useState<FiltroGeo>({});
@@ -27,6 +34,11 @@ export function AnaliseGeografica() {
   const [nivelDrillDown, setNivelDrillDown] = useState<'pais' | 'regiao' | 'estado' | 'cidade'>('pais');
   const [loading, setLoading] = useState(false);
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
+  const [elementosMapa, setElementosMapa] = useState<{
+    marcadores: google.maps.Marker[];
+    clusters: any[];
+    heatmaps: google.maps.visualization.HeatmapLayer[];
+  }>({ marcadores: [], clusters: [], heatmaps: [] });
 
   // Mock de dados geográficos
   const dadosGeo = [
@@ -64,8 +76,8 @@ export function AnaliseGeografica() {
   useEffect(() => {
     if (!mapInstance) return;
 
-    // Limpar marcadores anteriores
-    // TODO: Implementar limpeza de marcadores
+    // Limpar elementos anteriores do mapa
+    limparMapa(elementosMapa);
 
     const markers = dadosGeo.map(local => ({
       position: { lat: local.lat, lng: local.lng },
