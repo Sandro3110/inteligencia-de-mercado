@@ -106,8 +106,12 @@ export async function createPesquisa(input: CreatePesquisaInput) {
   const [novaPesquisa] = await db
     .insert(dimPesquisa)
     .values({
-      ...input,
+      projetoId: input.projetoId,
+      nome: input.nome,
+      descricao: input.descricao,
+      objetivo: input.objetivo,
       status: input.status || 'pendente',
+      createdBy: input.createdBy,
       totalEntidades: 0,
       entidadesEnriquecidas: 0,
       entidadesFalhadas: 0,
