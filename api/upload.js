@@ -88,7 +88,7 @@ export default async function handler(req, res) {
         0,
         0,
         0,
-        'processando',
+        'pendente',
         1,
         NOW(),
         NOW()
@@ -98,6 +98,13 @@ export default async function handler(req, res) {
 
     const importacaoId = importacao[0].id;
     console.log('[Upload] Importação criada:', importacaoId);
+
+    // Atualizar status para processando
+    await client`
+      UPDATE dim_importacao
+      SET status = 'processando', started_at = NOW(), updated_at = NOW()
+      WHERE id = ${importacaoId}
+    `;
 
     // 2. Processar cada linha do CSV
     let sucesso = 0;
@@ -237,7 +244,7 @@ export default async function handler(req, res) {
         linhas_sucesso = ${sucesso},
         linhas_erro = ${erro},
         linhas_duplicadas = ${duplicadas},
-        status = ${erro > 0 ? 'concluida_com_erros' : 'concluida'},
+        status = ${erro > 0 ? 'falhou' : 'concluido'},
         completed_at = NOW(),
         updated_at = NOW()
       WHERE id = ${importacaoId}
