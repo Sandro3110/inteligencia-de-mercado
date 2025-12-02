@@ -6,7 +6,7 @@ import { Permission } from "@/shared/types/permissions";
  */
 
 import { z } from 'zod';
-import { router, requirePermission(Permission.ANALISE_READ) } from '../trpc';
+import { router, requirePermission } from '../trpc';
 import { interpretarBuscaSemantica } from '../helpers/busca-semantica';
 import { exportar } from '../helpers/exportacao';
 import { copiar } from '../helpers/copia';

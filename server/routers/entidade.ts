@@ -6,7 +6,7 @@ import { Permission } from "@/shared/types/permissions";
  */
 
 import { z } from 'zod';
-import { router, requirePermission(Permission.ANALISE_READ) } from '../trpc';
+import { router } from '../trpc';
 import { db } from '../db';
 import {
   dimEntidade,

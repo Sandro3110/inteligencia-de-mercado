@@ -6,7 +6,7 @@ import { Permission } from "@/shared/types/permissions";
  */
 
 import { z } from 'zod';
-import { router, requirePermission(Permission.ANALISE_READ) } from '../trpc';
+import { router, requirePermission } from '../trpc';
 import { db } from '../db';
 import { dimTempo, fatoEntidadeContexto } from '../../drizzle/schema';
 import { eq, and, gte, lte, sql } from 'drizzle-orm';

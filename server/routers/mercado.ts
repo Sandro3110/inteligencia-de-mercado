@@ -6,7 +6,7 @@ import { Permission } from "@/shared/types/permissions";
  */
 
 import { z } from 'zod';
-import { router, requirePermission(Permission.ANALISE_READ) } from '../trpc';
+import { router, requirePermission } from '../trpc';
 import { db } from '../db';
 import { dimMercado, dimEntidade, fatoEntidadeContexto, fatoEntidadeCompetidor } from '../../drizzle/schema';
 import { eq, and, sql } from 'drizzle-orm';
@@ -131,7 +131,7 @@ export const mercadoRouter = router({
   /**
    * Análise de concorrência por mercado
    */
-  analise Concorrencia: requirePermission(Permission.ANALISE_READ)
+  analiseConcorrencia: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       mercadoId: z.number(),
       incluirMetricas: z.boolean().optional()
