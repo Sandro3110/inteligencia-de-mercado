@@ -179,12 +179,114 @@ export default async function handler(req, res) {
         `;
         data = result;
       } else if (procedure === 'list') {
-        const result = await client`
+        // Parse query params (mesmo padrão de projetos)
+        const url = new URL(req.url, 'https://dummy.com');
+        const inputParam = url.searchParams.get('input');
+        let queryInput = {};
+        
+        if (inputParam) {
+          try {
+            queryInput = JSON.parse(inputParam);
+          } catch (e) {
+            console.log('[tRPC] Failed to parse input param:', e);
+          }
+        }
+        
+        const { page = 1, limit = 20, busca, status, orderBy = 'created_at', orderDirection = 'desc' } = queryInput;
+        const offset = (page - 1) * limit;
+        
+        // Build WHERE clause
+        let whereClause = 'deleted_at IS NULL';
+        const params = [];
+        
+        if (status) {
+          whereClause += ' AND status = $' + (params.length + 1);
+          params.push(status);
+        }
+        
+        if (busca) {
+          whereClause += ' AND nome ILIKE $' + (params.length + 1);
+          params.push(`%${busca}%`);
+        }
+        
+        // Build ORDER BY
+        const validOrderBy = ['created_at', 'updated_at', 'nome'];
+        const orderByColumn = validOrderBy.includes(orderBy) ? orderBy : 'created_at';
+        const orderDir = orderDirection === 'asc' ? 'ASC' : 'DESC';
+        
+        // Execute query
+        const query = `
           SELECT * FROM dim_pesquisa 
-          WHERE deleted_at IS NULL
-          LIMIT 100
+          WHERE ${whereClause}
+          ORDER BY ${orderByColumn} ${orderDir}
+          LIMIT $${params.length + 1} OFFSET $${params.length + 2}
         `;
-        data = result;
+        
+        params.push(limit, offset);
+        
+        const result = await client.unsafe(query, params);
+        
+        // Contar total
+        const countQuery = `
+          SELECT COUNT(*) as total FROM dim_pesquisa 
+          WHERE ${whereClause}
+        `;
+        const countResult = await client.unsafe(countQuery, params.slice(0, -2));
+        const total = parseInt(countResult[0]?.total || '0');
+        
+        // Retornar no formato esperado
+        data = {
+          pesquisas: result,
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit)
+        };
+      } else if (procedure === 'create') {
+        // Criar nova pesquisa
+        if (!input) {
+          throw new Error('Input obrigatório para criar pesquisa');
+        }
+
+        const { projetoId, nome, descricao, tipo, limiteResultados } = input;
+
+        if (!nome) {
+          throw new Error('Nome da pesquisa é obrigatório');
+        }
+        
+        if (!tipo) {
+          throw new Error('Tipo da pesquisa é obrigatório');
+        }
+
+        // Inserir pesquisa
+        const [pesquisa] = await client`
+          INSERT INTO dim_pesquisa (
+            projeto_id,
+            nome,
+            descricao,
+            tipo,
+            status,
+            limite_resultados,
+            owner_id,
+            created_by,
+            created_at,
+            updated_at
+          ) VALUES (
+            ${projetoId || null},
+            ${nome},
+            ${descricao || null},
+            ${tipo},
+            'em_progresso',
+            ${limiteResultados || 1000},
+            1,
+            1,
+            NOW(),
+            NOW()
+          )
+          RETURNING *
+        `;
+
+        data = pesquisa;
       }
     }
 
