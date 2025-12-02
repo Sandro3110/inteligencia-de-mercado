@@ -285,6 +285,27 @@ export default async function handler(req, res) {
         `;
 
         data = pesquisa;
+      } else if (procedure === 'getById') {
+        // Buscar pesquisa por ID
+        if (!input || !input.id) {
+          throw new Error('ID da pesquisa é obrigatório');
+        }
+
+        const [pesquisa] = await client`
+          SELECT p.*, 
+                 proj.nome as projeto_nome,
+                 proj.codigo as projeto_codigo
+          FROM dim_pesquisa p
+          LEFT JOIN dim_projeto proj ON p.projeto_id = proj.id
+          WHERE p.id = ${input.id}
+          AND p.deleted_at IS NULL
+        `;
+
+        if (!pesquisa) {
+          throw new Error('Pesquisa não encontrada');
+        }
+
+        data = pesquisa;
       }
     }
 
