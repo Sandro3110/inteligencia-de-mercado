@@ -56,6 +56,72 @@ export default async function handler(req, res) {
 
     let data = null;
 
+    // IA SETUP
+    if (router === 'ia' && procedure === 'setup') {
+      const { secret } = input || {};
+      
+      if (secret !== 'setup-intelmarket-2025') {
+        return res.status(403).json({
+          error: { message: 'Acesso negado', code: 'FORBIDDEN' }
+        });
+      }
+
+      // 1. Criar tabela de configuração
+      await client`
+        CREATE TABLE IF NOT EXISTS public.ia_config (
+          id SERIAL PRIMARY KEY,
+          plataforma VARCHAR(50) NOT NULL DEFAULT 'openai',
+          modelo VARCHAR(100) NOT NULL DEFAULT 'gpt-4o-mini',
+          budget_mensal DECIMAL(10, 2) DEFAULT 150.00,
+          ativo BOOLEAN DEFAULT TRUE,
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          updated_at TIMESTAMPTZ DEFAULT NOW()
+        )
+      `;
+
+      // 2. Inserir configuração padrão
+      await client`
+        INSERT INTO public.ia_config (plataforma, modelo, budget_mensal)
+        VALUES ('openai', 'gpt-4o-mini', 150.00)
+        ON CONFLICT DO NOTHING
+      `;
+
+      // 3. Criar tabela de uso
+      await client`
+        CREATE TABLE IF NOT EXISTS public.ia_usage (
+          id SERIAL PRIMARY KEY,
+          user_id VARCHAR(255) NOT NULL,
+          processo VARCHAR(100) NOT NULL,
+          plataforma VARCHAR(50) NOT NULL,
+          modelo VARCHAR(100) NOT NULL,
+          input_tokens INTEGER NOT NULL,
+          output_tokens INTEGER NOT NULL,
+          total_tokens INTEGER NOT NULL,
+          custo DECIMAL(10, 6) NOT NULL,
+          duracao_ms INTEGER NOT NULL,
+          entidade_id INTEGER,
+          projeto_id INTEGER,
+          sucesso BOOLEAN DEFAULT TRUE,
+          erro TEXT,
+          created_at TIMESTAMPTZ DEFAULT NOW()
+        )
+      `;
+
+      // 4. Criar índices
+      await client`CREATE INDEX IF NOT EXISTS idx_ia_usage_user ON public.ia_usage(user_id)`;
+      await client`CREATE INDEX IF NOT EXISTS idx_ia_usage_processo ON public.ia_usage(processo)`;
+      await client`CREATE INDEX IF NOT EXISTS idx_ia_usage_created ON public.ia_usage(created_at DESC)`;
+
+      return res.json({
+        result: {
+          data: {
+            success: true,
+            message: 'Setup de IA concluído!',
+          }
+        }
+      });
+    }
+
     // AUTH SETUP
     if (router === 'auth' && procedure === 'setup') {
       const { secret } = input || {};
