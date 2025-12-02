@@ -3,6 +3,7 @@ import { router } from './index';
 import { requirePermission } from '../middleware/auth';
 import { Permission } from '@/shared/types/permissions';
 import * as DAL from '../dal';
+import { logCreate, logUpdate, logDelete, AuditResource } from '../helpers/audit';
 
 /**
  * Router de Projetos
@@ -72,6 +73,15 @@ export const projetosRouter = router({
         owner_id: ownerId,
       });
 
+      // Auditoria
+      await logCreate(
+        ctx.userId,
+        AuditResource.PROJETO,
+        novoProjeto.id.toString(),
+        novoProjeto.nome,
+        { status: novoProjeto.status }
+      );
+
       return novoProjeto;
     }),
 
@@ -87,7 +97,10 @@ export const projetosRouter = router({
         status: z.enum(['ativo', 'inativo', 'arquivado']).optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      // Buscar projeto antes da atualização
+      const projetoAntes = await DAL.Projeto.getProjetoById(input.id);
+      
       const projetoAtualizado = await DAL.Projeto.updateProjeto(input.id, {
         nome: input.nome,
         descricao: input.descricao,
@@ -99,6 +112,14 @@ export const projetosRouter = router({
         throw new Error('Projeto não encontrado');
       }
 
+      // Auditoria
+      await logUpdate(
+        ctx.userId,
+        AuditResource.PROJETO,
+        input.id.toString(),
+        { before: projetoAntes, after: projetoAtualizado }
+      );
+
       return projetoAtualizado;
     }),
 
@@ -106,11 +127,23 @@ export const projetosRouter = router({
   // Permissão: PROJETO_DELETE
   delete: requirePermission(Permission.PROJETO_DELETE)
     .input(z.object({ id: z.number() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      // Buscar projeto antes de deletar
+      const projeto = await DAL.Projeto.getProjetoById(input.id);
+      
       const deletado = await DAL.Projeto.deleteProjeto(input.id);
       if (!deletado) {
         throw new Error('Projeto não encontrado');
       }
+
+      // Auditoria
+      await logDelete(
+        ctx.userId,
+        AuditResource.PROJETO,
+        input.id.toString(),
+        projeto?.nome
+      );
+
       return { success: true };
     }),
 });
