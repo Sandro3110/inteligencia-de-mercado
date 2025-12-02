@@ -3,7 +3,7 @@ import { Route, Switch } from 'wouter';
 import { trpc, trpcClient } from './lib/trpc';
 import { useState, lazy, Suspense, useEffect } from 'react';
 import { Toaster } from 'sonner';
-import Layout from './components/Layout';
+import { ProtectedLayout } from './components/ProtectedLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { useLocation } from 'wouter';
@@ -63,7 +63,7 @@ function App() {
       <AuthProvider>
         <trpc.Provider client={trpcClient} queryClient={queryClient}>
           <QueryClientProvider client={queryClient}>
-          <Layout>
+          <ProtectedLayout>
             <Suspense fallback={
               <div className="flex items-center justify-center min-h-[60vh]">
                 <LoadingSpinner size="lg" text="Carregando página..." />
@@ -137,7 +137,7 @@ function App() {
             <Route component={NotFound} />
           </Switch>
             </Suspense>
-        </Layout>
+        </ProtectedLayout>
           </QueryClientProvider>
         </trpc.Provider>
       </AuthProvider>
