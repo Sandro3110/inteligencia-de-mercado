@@ -27,6 +27,7 @@ const EnriquecimentoPage = lazy(() => import('./pages/EnriquecimentoPage'));
 const ProcessamentoIA = lazy(() => import('./pages/ProcessamentoIA'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const GestaoUsuarios = lazy(() => import('./pages/GestaoUsuarios'));
+const GestaoIA = lazy(() => import('./pages/GestaoIA'));
 
 // Páginas Dimensionais - Lazy loading
 const CuboExplorador = lazy(() => import('./pages/CuboExplorador'));
@@ -110,10 +111,15 @@ function App() {
               <PrivateRoute><ProcessamentoIA /></PrivateRoute>
             </Route>
             
-            {/* Rota Admin */}
+            {/* Rotas Admin */}
             <Route path="/usuarios">
               <PrivateRoute requiredRole={['administrador']}>
                 <GestaoUsuarios />
+              </PrivateRoute>
+            </Route>
+            <Route path="/gestao-ia">
+              <PrivateRoute requiredRole={['administrador']}>
+                <GestaoIA />
               </PrivateRoute>
             </Route>
             

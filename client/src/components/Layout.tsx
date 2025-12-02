@@ -155,6 +155,12 @@ const menuSections = [
         label: 'Gestão de Usuários',
         path: '/usuarios',
         color: 'text-purple-600'
+      },
+      {
+        icon: Sparkles,
+        label: 'Gestão de IA',
+        path: '/gestao-ia',
+        color: 'text-purple-600'
       }
     ]
   }
