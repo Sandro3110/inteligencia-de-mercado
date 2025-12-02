@@ -7,6 +7,7 @@ import {
   timestamp,
   decimal,
   boolean,
+  date,
   unique,
   check,
   foreignKey,
@@ -22,6 +23,47 @@ export const users = pgTable('users', {
   email: varchar('email', { length: 255 }),
   role: varchar('role', { length: 50 }).notNull(),
   created_at: timestamp('created_at').defaultNow(),
+});
+
+// ============================================================================
+// DIMENSÃO: Tempo (Temporal)
+// ============================================================================
+export const dimTempo = pgTable('dim_tempo', {
+  id: serial('id').primaryKey(),
+  data: date('data').unique().notNull(),
+  ano: integer('ano').notNull(),
+  trimestre: integer('trimestre').notNull(),
+  mes: integer('mes').notNull(),
+  semana: integer('semana').notNull(),
+  diaMes: integer('dia_mes').notNull(),
+  diaAno: integer('dia_ano').notNull(),
+  diaSemana: integer('dia_semana').notNull(),
+  nomeMes: varchar('nome_mes', { length: 20 }).notNull(),
+  nomeMesCurto: varchar('nome_mes_curto', { length: 3 }).notNull(),
+  nomeDiaSemana: varchar('nome_dia_semana', { length: 20 }).notNull(),
+  nomeDiaSemanaCurto: varchar('nome_dia_semana_curto', { length: 3 }).notNull(),
+  ehFeriado: boolean('eh_feriado').default(false),
+  ehFimSemana: boolean('eh_fim_semana').default(false),
+  ehDiaUtil: boolean('eh_dia_util').default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+// ============================================================================
+// DIMENSÃO: Canal
+// ============================================================================
+export const dimCanal = pgTable('dim_canal', {
+  id: serial('id').primaryKey(),
+  codigo: varchar('codigo', { length: 50 }).unique().notNull(),
+  nome: varchar('nome', { length: 100 }).notNull(),
+  tipo: varchar('tipo', { length: 50 }).notNull(),
+  descricao: text('descricao'),
+  custoMedio: decimal('custo_medio', { precision: 12, scale: 2 }),
+  taxaConversaoMedia: decimal('taxa_conversao_media', { precision: 5, scale: 2 }),
+  ativo: boolean('ativo').default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdBy: integer('created_by'),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  updatedBy: integer('updated_by'),
 });
 
 // ============================================================================
@@ -133,6 +175,11 @@ export const dimGeografia = pgTable(
     codigoIbge: varchar('codigo_ibge', { length: 10 }),
     populacao: integer('populacao'),
     pibPerCapita: decimal('pib_per_capita', { precision: 12, scale: 2 }),
+    // Hierarquia Geográfica
+    pais: varchar('pais', { length: 50 }).default('Brasil'),
+    macrorregiao: varchar('macrorregiao', { length: 50 }),
+    mesorregiao: varchar('mesorregiao', { length: 100 }),
+    microrregiao: varchar('microrregiao', { length: 100 }),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     createdBy: integer('created_by'),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -159,6 +206,10 @@ export const dimMercado = pgTable('dim_mercado', {
   enriquecido: boolean('enriquecido').default(false),
   enriquecidoEm: timestamp('enriquecido_em'),
   enriquecidoPor: varchar('enriquecido_por', { length: 50 }),
+  // Hierarquia de Mercado
+  setor: varchar('setor', { length: 100 }),
+  subsetor: varchar('subsetor', { length: 100 }),
+  nicho: varchar('nicho', { length: 100 }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   createdBy: integer('created_by'),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -233,6 +284,32 @@ export const fatoEntidadeContexto = pgTable(
     qualidadeScore: integer('qualidade_score'),
     qualidadeClassificacao: varchar('qualidade_classificacao', { length: 10 }),
     observacoes: text('observacoes'),
+    // Campos Temporais
+    tempoId: integer('tempo_id').references(() => dimTempo.id),
+    dataQualificacao: date('data_qualificacao').notNull().defaultNow(),
+    // Métricas Financeiras
+    receitaPotencialAnual: decimal('receita_potencial_anual', { precision: 15, scale: 2 }),
+    ticketMedioEstimado: decimal('ticket_medio_estimado', { precision: 12, scale: 2 }),
+    ltvEstimado: decimal('ltv_estimado', { precision: 15, scale: 2 }),
+    cacEstimado: decimal('cac_estimado', { precision: 12, scale: 2 }),
+    // Scores e Probabilidades
+    scoreFit: integer('score_fit'),
+    probabilidadeConversao: decimal('probabilidade_conversao', { precision: 5, scale: 2 }),
+    scorePriorizacao: integer('score_priorizacao'),
+    // Ciclo de Venda
+    cicloVendaEstimadoDias: integer('ciclo_venda_estimado_dias'),
+    // Segmentação
+    segmentoRfm: varchar('segmento_rfm', { length: 3 }),
+    segmentoAbc: varchar('segmento_abc', { length: 1 }),
+    ehClienteIdeal: boolean('eh_cliente_ideal').default(false),
+    // Flags de Conversão
+    convertidoEmCliente: boolean('convertido_em_cliente').default(false),
+    dataConversao: date('data_conversao'),
+    // Observações Enriquecidas
+    justificativaScore: text('justificativa_score'),
+    recomendacoes: text('recomendacoes'),
+    // Canal
+    canalId: integer('canal_id').references(() => dimCanal.id),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     createdBy: integer('created_by'),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -261,6 +338,11 @@ export const fatoEntidadeProduto = pgTable(
     tipoRelacao: varchar('tipo_relacao', { length: 50 }),
     volumeEstimado: varchar('volume_estimado', { length: 100 }),
     observacoes: text('observacoes'),
+    // Métricas de Produto
+    volumeVendasEstimado: decimal('volume_vendas_estimado', { precision: 15, scale: 2 }),
+    margemEstimada: decimal('margem_estimada', { precision: 5, scale: 2 }),
+    penetracaoMercado: decimal('penetracao_mercado', { precision: 5, scale: 2 }),
+    ehProdutoPrincipal: boolean('eh_produto_principal').default(false),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     createdBy: integer('created_by'),
   },
@@ -285,6 +367,10 @@ export const fatoEntidadeCompetidor = pgTable(
     nivelCompeticao: varchar('nivel_competicao', { length: 20 }),
     diferencial: text('diferencial'),
     observacoes: text('observacoes'),
+    // Métricas de Concorrência
+    shareOfVoice: decimal('share_of_voice', { precision: 5, scale: 2 }),
+    vantagemCompetitivaScore: integer('vantagem_competitiva_score'),
+    ameacaNivel: varchar('ameaca_nivel', { length: 20 }),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     createdBy: integer('created_by'),
   },
@@ -391,6 +477,14 @@ export const fatoEntidadeContextoRelations = relations(fatoEntidadeContexto, ({ 
   statusQualificacao: one(dimStatusQualificacao, {
     fields: [fatoEntidadeContexto.statusQualificacaoId],
     references: [dimStatusQualificacao.id],
+  }),
+  tempo: one(dimTempo, {
+    fields: [fatoEntidadeContexto.tempoId],
+    references: [dimTempo.id],
+  }),
+  canal: one(dimCanal, {
+    fields: [fatoEntidadeContexto.canalId],
+    references: [dimCanal.id],
   }),
   produtos: many(fatoEntidadeProduto),
   competidores: many(fatoEntidadeCompetidor),

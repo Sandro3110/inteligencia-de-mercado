@@ -39,6 +39,32 @@ export interface CreateContextoInput {
   qualidadeScore?: number;
   qualidadeClassificacao?: string;
   observacoes?: string;
+  // Novos campos temporais
+  tempoId?: number;
+  dataQualificacao?: Date;
+  // Novas métricas financeiras
+  receitaPotencialAnual?: number;
+  ticketMedioEstimado?: number;
+  ltvEstimado?: number;
+  cacEstimado?: number;
+  // Scores e probabilidades
+  scoreFit?: number;
+  probabilidadeConversao?: number;
+  scorePriorizacao?: number;
+  // Ciclo de venda
+  cicloVendaEstimadoDias?: number;
+  // Segmentação
+  segmentoRfm?: string;
+  segmentoAbc?: string;
+  ehClienteIdeal?: boolean;
+  // Flags de conversão
+  convertidoEmCliente?: boolean;
+  dataConversao?: Date;
+  // Observações enriquecidas
+  justificativaScore?: string;
+  recomendacoes?: string;
+  // Canal
+  canalId?: number;
   createdBy?: string;
 }
 
@@ -53,6 +79,32 @@ export interface UpdateContextoInput {
   qualidadeScore?: number;
   qualidadeClassificacao?: string;
   observacoes?: string;
+  // Novos campos temporais
+  tempoId?: number;
+  dataQualificacao?: Date;
+  // Novas métricas financeiras
+  receitaPotencialAnual?: number;
+  ticketMedioEstimado?: number;
+  ltvEstimado?: number;
+  cacEstimado?: number;
+  // Scores e probabilidades
+  scoreFit?: number;
+  probabilidadeConversao?: number;
+  scorePriorizacao?: number;
+  // Ciclo de venda
+  cicloVendaEstimadoDias?: number;
+  // Segmentação
+  segmentoRfm?: string;
+  segmentoAbc?: string;
+  ehClienteIdeal?: boolean;
+  // Flags de conversão
+  convertidoEmCliente?: boolean;
+  dataConversao?: Date;
+  // Observações enriquecidas
+  justificativaScore?: string;
+  recomendacoes?: string;
+  // Canal
+  canalId?: number;
   updatedBy?: string;
 }
 
