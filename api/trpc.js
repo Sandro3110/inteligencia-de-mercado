@@ -1,15 +1,9 @@
 /**
  * Vercel Serverless Function - tRPC Handler
- * Conecta ao banco Supabase e retorna dados reais
+ * Conecta ao banco Supabase e retorna dados reais usando SQL puro
  */
 
-import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { count, eq } from 'drizzle-orm';
-
-// Schema imports (usando require para compatibilidade)
-const schema = await import('../drizzle/schema.ts');
-const { dimProjeto, dimPesquisa, dimEntidade } = schema;
 
 export default async function handler(req, res) {
   // CORS
@@ -24,6 +18,8 @@ export default async function handler(req, res) {
     return;
   }
 
+  let client = null;
+
   try {
     // Conectar ao banco
     const connectionString = process.env.DATABASE_URL;
@@ -31,8 +27,7 @@ export default async function handler(req, res) {
       throw new Error('DATABASE_URL não configurada');
     }
 
-    const client = postgres(connectionString);
-    const db = drizzle(client, { schema });
+    client = postgres(connectionString);
 
     // Extrair path e input da URL
     const url = new URL(req.url, `https://${req.headers.host}`);
@@ -47,17 +42,19 @@ export default async function handler(req, res) {
     // PROJETOS
     if (router === 'projetos') {
       if (procedure === 'listAtivos') {
-        const result = await db
-          .select()
-          .from(dimProjeto)
-          .where(eq(dimProjeto.status, 'ativo'))
-          .limit(100);
+        const result = await client`
+          SELECT * FROM dim_projeto 
+          WHERE status = 'ativo' 
+          AND deleted_at IS NULL
+          LIMIT 100
+        `;
         data = result;
       } else if (procedure === 'list') {
-        const result = await db
-          .select()
-          .from(dimProjeto)
-          .limit(100);
+        const result = await client`
+          SELECT * FROM dim_projeto 
+          WHERE deleted_at IS NULL
+          LIMIT 100
+        `;
         data = result;
       }
     }
@@ -65,17 +62,19 @@ export default async function handler(req, res) {
     // PESQUISAS
     else if (router === 'pesquisas') {
       if (procedure === 'listEmProgresso') {
-        const result = await db
-          .select()
-          .from(dimPesquisa)
-          .where(eq(dimPesquisa.status, 'em_progresso'))
-          .limit(100);
+        const result = await client`
+          SELECT * FROM dim_pesquisa 
+          WHERE status = 'em_progresso'
+          AND deleted_at IS NULL
+          LIMIT 100
+        `;
         data = result;
       } else if (procedure === 'list') {
-        const result = await db
-          .select()
-          .from(dimPesquisa)
-          .limit(100);
+        const result = await client`
+          SELECT * FROM dim_pesquisa 
+          WHERE deleted_at IS NULL
+          LIMIT 100
+        `;
         data = result;
       }
     }
@@ -83,10 +82,10 @@ export default async function handler(req, res) {
     // ENTIDADES
     else if (router === 'entidades') {
       if (procedure === 'list') {
-        const result = await db
-          .select()
-          .from(dimEntidade)
-          .limit(100);
+        const result = await client`
+          SELECT * FROM dim_entidade 
+          LIMIT 100
+        `;
         data = result;
       }
     }
@@ -95,21 +94,21 @@ export default async function handler(req, res) {
     else if (router === 'dashboard') {
       if (procedure === 'getDashboardData') {
         // Contar projetos ativos
-        const [{ value: totalProjetos }] = await db
-          .select({ value: count() })
-          .from(dimProjeto)
-          .where(eq(dimProjeto.status, 'ativo'));
+        const [{ count: totalProjetos }] = await client`
+          SELECT COUNT(*)::int as count FROM dim_projeto 
+          WHERE status = 'ativo' AND deleted_at IS NULL
+        `;
 
         // Contar pesquisas em progresso
-        const [{ value: totalPesquisas }] = await db
-          .select({ value: count() })
-          .from(dimPesquisa)
-          .where(eq(dimPesquisa.status, 'em_progresso'));
+        const [{ count: totalPesquisas }] = await client`
+          SELECT COUNT(*)::int as count FROM dim_pesquisa 
+          WHERE status = 'em_progresso' AND deleted_at IS NULL
+        `;
 
         // Contar entidades
-        const [{ value: totalEntidades }] = await db
-          .select({ value: count() })
-          .from(dimEntidade);
+        const [{ count: totalEntidades }] = await client`
+          SELECT COUNT(*)::int as count FROM dim_entidade
+        `;
 
         data = {
           kpis: {
@@ -135,9 +134,6 @@ export default async function handler(req, res) {
       }
     }
 
-    // Fechar conexão
-    await client.end();
-
     // Resposta no formato tRPC
     res.status(200).json({
       result: {
@@ -150,8 +146,13 @@ export default async function handler(req, res) {
     res.status(500).json({
       error: {
         message: error.message || 'Internal Server Error',
-        code: 'INTERNAL_SERVER_ERROR'
+        code: 'INTERNAL_SERVER_ERROR',
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
       }
     });
+  } finally {
+    if (client) {
+      await client.end();
+    }
   }
 }
