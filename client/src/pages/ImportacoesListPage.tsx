@@ -13,6 +13,15 @@ export default function ImportacoesListPage() {
     limit: 50,
   });
 
+  // Debug
+  console.log('Importacoes query:', {
+    isLoading: importacoes.isLoading,
+    isError: importacoes.isError,
+    data: importacoes.data,
+    dataType: typeof importacoes.data,
+    dataLength: Array.isArray(importacoes.data) ? importacoes.data.length : 'not array'
+  });
+
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       pendente: 'bg-gray-100 text-gray-800',
