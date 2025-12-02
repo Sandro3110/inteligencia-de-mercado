@@ -483,6 +483,29 @@ export default async function handler(req, res) {
       }
     }
 
+    // IMPORTACAO - GET ERROS
+    else if (router === 'importacao' && procedure === 'getErros') {
+      const importacaoId = input.importacaoId || input;
+      const limit = input.limit || 100;
+      
+      const result = await client`
+        SELECT 
+          id,
+          importacao_id as "importacaoId",
+          linha_numero as "linhaNumero",
+          dados_linha as "dadosLinha",
+          tipo_erro as "tipoErro",
+          mensagem_erro as "mensagemErro",
+          created_at as "createdAt"
+        FROM importacao_erros
+        WHERE importacao_id = ${importacaoId}
+        ORDER BY linha_numero ASC
+        LIMIT ${limit}
+      `;
+      
+      data = result;
+    }
+
     // ENTIDADES
     else if (router === 'entidades') {
       if (procedure === 'list') {

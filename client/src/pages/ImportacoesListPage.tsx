@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'wouter';
+import ModalErrosImportacao from '../components/ModalErrosImportacao';
 
 interface Importacao {
   id: number;
@@ -40,6 +41,10 @@ export default function ImportacoesListPage() {
   // Paginação
   const [paginaAtual, setPaginaAtual] = useState(1);
   const itensPorPagina = 10;
+  
+  // Modal de erros
+  const [modalErrosAberto, setModalErrosAberto] = useState(false);
+  const [importacaoSelecionada, setImportacaoSelecionada] = useState<Importacao | null>(null);
 
   // Carregar projetos
   useEffect(() => {
@@ -300,12 +305,21 @@ export default function ImportacoesListPage() {
 
                 {/* Indicador de Erros */}
                 {imp.linhasErro > 0 && (
-                  <div className="mt-4 bg-red-50 border border-red-200 rounded p-3">
+                  <div className="mt-4 bg-red-50 border border-red-200 rounded p-3 flex justify-between items-center">
                     <p className="text-sm text-red-800">
                       ⚠️ <span className="font-medium">{imp.linhasErro} linhas com erro</span>
                       {' - '}
-                      Verifique os detalhes da importação para mais informações
+                      Clique para ver detalhes
                     </p>
+                    <button
+                      onClick={() => {
+                        setImportacaoSelecionada(imp);
+                        setModalErrosAberto(true);
+                      }}
+                      className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                    >
+                      Ver Erros
+                    </button>
                   </div>
                 )}
               </div>
@@ -354,6 +368,18 @@ export default function ImportacoesListPage() {
             Mostrando {indiceInicio + 1} a {Math.min(indiceFim, importacoesFiltradas.length)} de {importacoesFiltradas.length} importações
           </div>
         </>
+      )}
+      
+      {/* Modal de Erros */}
+      {modalErrosAberto && importacaoSelecionada && (
+        <ModalErrosImportacao
+          importacaoId={importacaoSelecionada.id}
+          nomeArquivo={importacaoSelecionada.nomeArquivo}
+          onClose={() => {
+            setModalErrosAberto(false);
+            setImportacaoSelecionada(null);
+          }}
+        />
       )}
     </div>
   );
