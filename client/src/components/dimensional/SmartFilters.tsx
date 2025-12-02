@@ -7,7 +7,7 @@ import { AlertTriangle, Lightbulb, TrendingUp } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import type { AlertaPerformance, FiltroInteligente, CombinacaoRecomendada } from '@/shared/types/dimensional';
+import type { AlertaPerformance, FiltroInteligente, CombinacaoRecomendada } from '@shared/types/dimensional';
 
 // ============================================================================
 // PERFORMANCE ALERT
@@ -231,6 +231,56 @@ export function FilterSuggestions({
           </ul>
         </div>
       </div>
+    </div>
+  );
+}
+
+
+// ============================================================================
+// SMART FILTERS WRAPPER
+// ============================================================================
+
+interface SmartFiltersProps {
+  alerta?: AlertaPerformance;
+  sugestoes?: FiltroInteligente[];
+  combinacoes?: CombinacaoRecomendada[];
+  onAplicarSugestao?: (filtro: FiltroInteligente) => void;
+  onAplicarCombinacao?: (combinacao: CombinacaoRecomendada) => void;
+  className?: string;
+}
+
+export function SmartFilters({
+  alerta,
+  sugestoes,
+  combinacoes,
+  onAplicarSugestao,
+  onAplicarCombinacao,
+  className,
+}: SmartFiltersProps) {
+  return (
+    <div className={className}>
+      {alerta && (
+        <PerformanceAlert
+          alerta={alerta}
+          onAplicarSugestao={onAplicarSugestao}
+          className="mb-4"
+        />
+      )}
+      
+      {sugestoes && sugestoes.length > 0 && (
+        <FilterSuggestions
+          sugestoes={sugestoes}
+          onAplicar={onAplicarSugestao}
+          className="mb-4"
+        />
+      )}
+      
+      {combinacoes && combinacoes.length > 0 && (
+        <RecommendedCombinations
+          combinacoes={combinacoes}
+          onAplicar={onAplicarCombinacao}
+        />
+      )}
     </div>
   );
 }

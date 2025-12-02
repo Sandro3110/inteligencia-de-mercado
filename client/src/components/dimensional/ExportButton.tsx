@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
-import type { FormatoExportacao } from '@/shared/types/dimensional';
+import type { FormatoExportacao } from '@shared/types/dimensional';
 
 interface ExportButtonProps {
   dados: any[];

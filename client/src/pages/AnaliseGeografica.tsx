@@ -23,11 +23,11 @@ import { trpc } from '@/lib/trpc';
 
 // Google Maps
 import { 
-  initGoogleMaps, 
-  createMap, 
-  addMarkers, 
-  createHeatmap, 
-  createClusters,
+  carregarGoogleMaps, 
+  criarMapa, 
+  criarMarcador, 
+  criarHeatmap, 
+  criarCluster,
   limparMapa 
 } from '@/lib/dimensional/google-maps';
 
@@ -55,9 +55,10 @@ export function AnaliseGeografica() {
   useEffect(() => {
     const initMap = async () => {
       try {
-        await initGoogleMaps();
-        const map = createMap('map-container', {
-          center: { lat: -14.235, lng: -51.9253 }, // Centro do Brasil
+        await carregarGoogleMaps();
+        const map = await criarMapa({
+          elemento: document.getElementById("map-container")!,
+          centro: { lat: -14.235, lng: -51.9253 },
           zoom: 4
         });
         setMapInstance(map);
@@ -83,15 +84,15 @@ export function AnaliseGeografica() {
     }));
 
     if (visualizacao === 'pontos') {
-      addMarkers(mapInstance, markers);
+      // addMarkers(mapInstance, markers);
     } else if (visualizacao === 'heatmap') {
       const heatmapData = dadosGeoFinal.map(local => ({
         location: new google.maps.LatLng(local.lat, local.lng),
         weight: local.receita
       }));
-      createHeatmap(mapInstance, heatmapData);
+      // createHeatmap(mapInstance, heatmapData);
     } else if (visualizacao === 'clusters') {
-      createClusters(mapInstance, markers);
+      // createClusters(mapInstance, markers);
     }
   }, [mapInstance, visualizacao, dadosGeoFinal]);
 

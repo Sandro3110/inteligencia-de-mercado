@@ -257,3 +257,18 @@ export function PermissionError({
     </div>
   );
 }
+
+// ============================================================================
+// ERROR STATE WRAPPER
+// ============================================================================
+
+export const ErrorState = {
+  Alert: ErrorAlert,
+  Empty: EmptyState,
+  Boundary: ErrorBoundaryFallback,
+  NoResults,
+  Connection: ConnectionError,
+  Permission: PermissionError,
+};
+
+export default ErrorState;

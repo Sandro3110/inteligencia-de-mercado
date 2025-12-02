@@ -13,7 +13,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import type { Filtro } from '@/shared/types/dimensional';
+import type { Filtro } from '@shared/types/dimensional';
 
 // ============================================================================
 // FILTER PANEL

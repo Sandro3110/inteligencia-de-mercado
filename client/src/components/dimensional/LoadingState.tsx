@@ -214,3 +214,21 @@ export function InlineLoading({ text, className }: InlineLoadingProps) {
     </div>
   );
 }
+
+// ============================================================================
+// LOADING STATE WRAPPER
+// ============================================================================
+
+export const LoadingState = {
+  Spinner: LoadingSpinner,
+  Progress: LoadingProgress,
+  SkeletonCard,
+  SkeletonTable,
+  SkeletonKPIGrid,
+  SkeletonMap,
+  SkeletonChart,
+  FullPage: FullPageLoading,
+  Inline: InlineLoading,
+};
+
+export default LoadingState;

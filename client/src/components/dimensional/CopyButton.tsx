@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
-import type { FormatoCopia } from '@/shared/types/dimensional';
+import type { FormatoCopia } from '@shared/types/dimensional';
 
 interface CopyButtonProps {
   dados: any;

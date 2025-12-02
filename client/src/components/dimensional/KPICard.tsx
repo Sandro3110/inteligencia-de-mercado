@@ -6,8 +6,8 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CopyButton } from './CopyButton';
-import { formatarMoeda, formatarNumero, formatarPercentual } from '@/shared/helpers/formatacao';
-import type { KPI } from '@/shared/types/dimensional';
+import { formatarMoeda, formatarNumero, formatarPercentual } from '@shared/helpers/formatacao';
+import type { KPI } from '@shared/types/dimensional';
 
 interface KPICardProps {
   kpi: KPI;
