@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Email e senha são obrigatórios' });
   }
 
-  const connectionString = process.env.POSTGRES_URL;
+  const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
   if (!connectionString) {
     return res.status(500).json({ error: 'Database não configurado' });
   }
