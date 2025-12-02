@@ -516,6 +516,48 @@ export default async function handler(req, res) {
         data = result;
       }
     }
+    
+    // ENTIDADE (singular) - Detalhes
+    else if (router === 'entidade') {
+      if (procedure === 'detalhes') {
+        const id = input.id || input;
+        const result = await client`
+          SELECT * FROM dim_entidade 
+          WHERE id = ${id}
+        `;
+        data = result[0] || null;
+      }
+      else if (procedure === 'similares') {
+        const id = input.id || input;
+        // Buscar entidades similares (mesmo mercado/setor)
+        const result = await client`
+          SELECT e.* FROM dim_entidade e
+          WHERE e.id != ${id}
+          AND (e.mercado_id = (SELECT mercado_id FROM dim_entidade WHERE id = ${id})
+               OR e.setor = (SELECT setor FROM dim_entidade WHERE id = ${id}))
+          LIMIT 10
+        `;
+        data = result;
+      }
+      else if (procedure === 'recomendacoes') {
+        const id = input.id || input;
+        // Retornar recomendações mockadas por enquanto
+        data = [
+          {
+            tipo: 'acao',
+            titulo: 'Agendar reuni\u00e3o de apresenta\u00e7\u00e3o',
+            descricao: 'Empresa com alto score de fit. Recomendamos contato imediato.',
+            prioridade: 'alta'
+          },
+          {
+            tipo: 'insight',
+            titulo: 'Oportunidade de cross-sell',
+            descricao: 'Empresa j\u00e1 utiliza produtos similares aos nossos.',
+            prioridade: 'media'
+          }
+        ];
+      }
+    }
 
     // DASHBOARD (agregações)
     else if (router === 'dashboard') {
