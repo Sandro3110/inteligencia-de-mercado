@@ -114,7 +114,7 @@ export default function PesquisaDetalhesPage() {
       <PageHeader
         title={pesquisa.nome}
         description={pesquisa.descricao || 'Detalhes da pesquisa'}
-        action={
+        actions={
           <div className="flex items-center gap-2">
             <Link href="/pesquisas">
               <Button variant="outline" size="sm">
