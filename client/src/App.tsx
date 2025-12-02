@@ -16,6 +16,13 @@ import ImportacaoPage from './pages/ImportacaoPage';
 import ImportacoesListPage from './pages/ImportacoesListPage';
 import EnriquecimentoPage from './pages/EnriquecimentoPage';
 
+// Páginas Dimensionais
+import { CuboExplorador } from './pages/CuboExplorador';
+import { AnaliseTemporal } from './pages/AnaliseTemporal';
+import { AnaliseGeografica } from './pages/AnaliseGeografica';
+import { AnaliseMercado } from './pages/AnaliseMercado';
+import { DetalhesEntidade } from './pages/DetalhesEntidade';
+
 function App() {
   const [queryClient] = useState(() => new QueryClient());
 
@@ -33,6 +40,13 @@ function App() {
             <Route path="/importacao" component={ImportacaoPage} />
             <Route path="/importacoes" component={ImportacoesListPage} />
             <Route path="/enriquecimento" component={EnriquecimentoPage} />
+            
+            {/* Rotas Dimensionais */}
+            <Route path="/cubo" component={CuboExplorador} />
+            <Route path="/analise/temporal" component={AnaliseTemporal} />
+            <Route path="/analise/geografica" component={AnaliseGeografica} />
+            <Route path="/analise/mercado" component={AnaliseMercado} />
+            <Route path="/entidade/:id" component={DetalhesEntidade} />
             <Route component={NotFound} />
           </Switch>
         </Layout>
