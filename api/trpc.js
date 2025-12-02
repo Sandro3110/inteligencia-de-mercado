@@ -113,7 +113,23 @@ export default async function handler(req, res) {
         params.push(limit, offset);
         
         const result = await client.unsafe(query, params);
-        data = result;
+        
+        // Contar total de registros
+        const countQuery = `
+          SELECT COUNT(*) as total FROM dim_projeto 
+          WHERE ${whereClause}
+        `;
+        const countResult = await client.unsafe(countQuery, params.slice(0, -2)); // Remove limit e offset
+        const total = parseInt(countResult[0]?.total || '0');
+        
+        // Retornar no formato esperado pelo frontend
+        data = {
+          projetos: result,
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit)
+        };
       } else if (procedure === 'create') {
         // Criar novo projeto
         if (!input) {
