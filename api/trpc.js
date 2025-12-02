@@ -35,7 +35,13 @@ export default async function handler(req, res) {
     const router = pathParts[0];
     const procedure = pathParts[1];
     
-    console.log(`[tRPC] ${router}.${procedure}`);
+    // Parse body para mutations (POST)
+    let input = null;
+    if (req.method === 'POST' && req.body) {
+      input = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    }
+    
+    console.log(`[tRPC] ${req.method} ${router}.${procedure}`, input ? '(with input)' : '');
 
     let data = null;
 
@@ -56,6 +62,41 @@ export default async function handler(req, res) {
           LIMIT 100
         `;
         data = result;
+      } else if (procedure === 'create') {
+        // Criar novo projeto
+        if (!input) {
+          throw new Error('Input obrigatório para criar projeto');
+        }
+
+        const { nome, codigo, descricao, centroCusto } = input;
+
+        if (!nome) {
+          throw new Error('Nome do projeto é obrigatório');
+        }
+
+        // Inserir projeto
+        const [projeto] = await client`
+          INSERT INTO dim_projeto (
+            nome, 
+            codigo, 
+            descricao, 
+            centro_custo,
+            status,
+            owner_id,
+            created_by
+          ) VALUES (
+            ${nome},
+            ${codigo || null},
+            ${descricao || null},
+            ${centroCusto || null},
+            'ativo',
+            1,
+            1
+          )
+          RETURNING *
+        `;
+
+        data = projeto;
       }
     }
 
