@@ -74,20 +74,24 @@ export default async function handler(req, res) {
           throw new Error('Nome do projeto é obrigatório');
         }
 
-        // Inserir projeto
+        // Inserir projeto (owner_id=0 = sistema)
         const [projeto] = await client`
           INSERT INTO dim_projeto (
             nome, 
             codigo, 
             descricao, 
             centro_custo,
-            status
+            status,
+            owner_id,
+            created_by
           ) VALUES (
             ${nome},
             ${codigo || null},
             ${descricao || null},
             ${centroCusto || null},
-            'ativo'
+            'ativo',
+            0,
+            0
           )
           RETURNING *
         `;
