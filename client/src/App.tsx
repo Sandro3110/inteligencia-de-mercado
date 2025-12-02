@@ -1,35 +1,63 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Route, Switch } from 'wouter';
 import { trpc, trpcClient } from './lib/trpc';
-import { useState } from 'react';
+import { useState, lazy, Suspense, useEffect } from 'react';
 import { Toaster } from 'sonner';
 import Layout from './components/Layout';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { LoadingSpinner } from './components/LoadingSpinner';
+import { useLocation } from 'wouter';
+import { analytics } from './lib/analytics';
 
-// Pages
+// Pages - Eager loading (páginas principais)
 import HomePage from './pages/HomePage';
 import ProjetosPage from './pages/projetos/ProjetosPage';
-import ProjetoNovoPage from './pages/projetos/ProjetoNovoPage';
-import PesquisasPage from './pages/pesquisas/PesquisasPage';
-import PesquisaNovaPage from './pages/pesquisas/PesquisaNovaPage';
-import EntidadesPage from './pages/EntidadesPage';
-import ImportacaoPage from './pages/ImportacaoPage';
-import ImportacoesListPage from './pages/ImportacoesListPage';
-import EnriquecimentoPage from './pages/EnriquecimentoPage';
 
-// Páginas Dimensionais
-import { CuboExplorador } from './pages/CuboExplorador';
-import { AnaliseTemporal } from './pages/AnaliseTemporal';
-import { AnaliseGeografica } from './pages/AnaliseGeografica';
-import { AnaliseMercado } from './pages/AnaliseMercado';
-import { DetalhesEntidade } from './pages/DetalhesEntidade';
+// Pages - Lazy loading (páginas secundárias)
+const ProjetoNovoPage = lazy(() => import('./pages/projetos/ProjetoNovoPage'));
+const PesquisasPage = lazy(() => import('./pages/pesquisas/PesquisasPage'));
+const PesquisaNovaPage = lazy(() => import('./pages/pesquisas/PesquisaNovaPage'));
+const EntidadesPage = lazy(() => import('./pages/EntidadesPage'));
+const ImportacaoPage = lazy(() => import('./pages/ImportacaoPage'));
+const ImportacoesListPage = lazy(() => import('./pages/ImportacoesListPage'));
+const EnriquecimentoPage = lazy(() => import('./pages/EnriquecimentoPage'));
+
+// Páginas Dimensionais - Lazy loading
+const CuboExplorador = lazy(() => import('./pages/CuboExplorador'));
+const AnaliseTemporal = lazy(() => import('./pages/AnaliseTemporal'));
+const AnaliseGeografica = lazy(() => import('./pages/AnaliseGeografica'));
+const AnaliseMercado = lazy(() => import('./pages/AnaliseMercado'));
+const DetalhesEntidade = lazy(() => import('./pages/DetalhesEntidade'));
 
 function App() {
-  const [queryClient] = useState(() => new QueryClient());
+  const [location] = useLocation();
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 5 * 60 * 1000, // 5 minutos - dados considerados "frescos"
+        cacheTime: 10 * 60 * 1000, // 10 minutos - tempo em cache
+        refetchOnWindowFocus: false, // Não refetch ao focar janela
+        retry: 3, // 3 tentativas em caso de erro
+        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+      },
+    },
+  }));
+
+  // Track pageviews
+  useEffect(() => {
+    analytics.page(location);
+  }, [location]);
 
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        <Layout>
+    <ErrorBoundary>
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          <Layout>
+            <Suspense fallback={
+              <div className="flex items-center justify-center min-h-[60vh]">
+                <LoadingSpinner size="lg" text="Carregando página..." />
+              </div>
+            }>
           <Switch>
             <Route path="/" component={HomePage} />
             <Route path="/projetos" component={ProjetosPage} />
@@ -49,10 +77,11 @@ function App() {
             <Route path="/entidade/:id" component={DetalhesEntidade} />
             <Route component={NotFound} />
           </Switch>
+            </Suspense>
         </Layout>
-        <Toaster />
       </QueryClientProvider>
     </trpc.Provider>
+    </ErrorBoundary>
   );
 }
 

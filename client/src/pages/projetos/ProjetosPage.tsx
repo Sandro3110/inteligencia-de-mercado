@@ -1,6 +1,8 @@
 import { Link } from 'wouter';
 import { trpc } from '../../lib/trpc';
 import { useState } from 'react';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { TableSkeleton } from '@/components/TableSkeleton';
 import { toast } from 'sonner';
 import { FolderKanban, Plus, Archive, Check, Trash2, Search as SearchIcon } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
@@ -22,12 +24,13 @@ import {
 export default function ProjetosPage() {
   const [page, setPage] = useState(1);
   const [busca, setBusca] = useState('');
+  const debouncedBusca = useDebouncedValue(busca, 500);
   const [status, setStatus] = useState<'ativo' | 'inativo' | 'arquivado' | undefined>();
 
   const { data, isLoading, error, refetch } = trpc.projetos.list.useQuery({
     page,
     limit: 20,
-    busca: busca || undefined,
+    busca: debouncedBusca || undefined,
     status,
     orderBy: 'created_at',
     orderDirection: 'desc',
@@ -84,8 +87,17 @@ export default function ProjetosPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <LoadingSpinner size="lg" text="Carregando projetos..." />
+      <div className="animate-fade-in">
+        <PageHeader
+          title="Projetos"
+          description="Gerencie seus projetos de inteligência de mercado"
+          icon={FolderKanban}
+          breadcrumbs={[
+            { label: 'Dashboard', path: '/' },
+            { label: 'Projetos' }
+          ]}
+        />
+        <TableSkeleton rows={8} columns={6} />
       </div>
     );
   }
