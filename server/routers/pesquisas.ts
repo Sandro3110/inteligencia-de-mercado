@@ -68,20 +68,28 @@ export const pesquisasRouter = router({
         projetoId: z.number(),
         nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres').max(100),
         descricao: z.string().max(500).optional(),
-        fontes: z.array(z.string()).min(1, 'Pelo menos uma fonte é obrigatória'),
-        palavras_chave: z.array(z.string()).min(1, 'Pelo menos uma palavra-chave é obrigatória'),
-        filtros: z.record(z.any()).optional(),
+        tipo: z.enum(['clientes', 'concorrentes', 'leads', 'fornecedores', 'outros']).optional(),
+        limiteResultados: z.number().min(1).max(10000).optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      // Construir objetivo com tipo e limite
+      const objetivoParts = [];
+      if (input.tipo) {
+        objetivoParts.push(`Tipo: ${input.tipo}`);
+      }
+      if (input.limiteResultados) {
+        objetivoParts.push(`Limite: ${input.limiteResultados} resultados`);
+      }
+      const objetivo = objetivoParts.length > 0 ? objetivoParts.join(' | ') : undefined;
+
       const novaPesquisa = await DAL.Pesquisa.createPesquisa({
-        projeto_id: input.projetoId,
+        projetoId: input.projetoId,
         nome: input.nome,
         descricao: input.descricao,
-        fontes: input.fontes,
-        palavras_chave: input.palavras_chave,
-        filtros: input.filtros,
+        objetivo,
         status: 'pendente',
+        createdBy: ctx.user.id,
       });
 
       return novaPesquisa;
