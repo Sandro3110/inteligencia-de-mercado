@@ -8,6 +8,8 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { useLocation } from 'wouter';
 import { analytics } from './lib/analytics';
+import { AuthProvider } from './contexts/AuthContext';
+import { PrivateRoute } from './components/PrivateRoute';
 
 // Pages - Eager loading (páginas principais)
 import HomePage from './pages/HomePage';
@@ -58,8 +60,9 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <trpc.Provider client={trpcClient} queryClient={queryClient}>
-        <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <trpc.Provider client={trpcClient} queryClient={queryClient}>
+          <QueryClientProvider client={queryClient}>
           <Layout>
             <Suspense fallback={
               <div className="flex items-center justify-center min-h-[60vh]">
@@ -67,37 +70,77 @@ function App() {
               </div>
             }>
           <Switch>
-            <Route path="/" component={HomePage} />
-            <Route path="/projetos" component={ProjetosPage} />
-            <Route path="/projetos/novo" component={ProjetoNovoPage} />
-            <Route path="/pesquisas" component={PesquisasPage} />
-            <Route path="/pesquisas/novo" component={PesquisaNovaPage} />
-            <Route path="/pesquisas/:id" component={PesquisaDetalhesPage} />
-            <Route path="/entidades" component={EntidadesPage} />
-            <Route path="/importacao" component={ImportacaoPage} />
-            <Route path="/importacoes" component={ImportacoesListPage} />
-            <Route path="/enriquecimento" component={EnriquecimentoPage} />
-            <Route path="/processamento-ia" component={ProcessamentoIA} />
+            {/* Rotas Públicas */}
             <Route path="/login" component={LoginPage} />
-            <Route path="/usuarios" component={GestaoUsuarios} />
-            
-            {/* Rotas Dimensionais */}
-            <Route path="/cubo" component={CuboExplorador} />
-            <Route path="/analise/temporal" component={AnaliseTemporal} />
-            <Route path="/analise/geografica" component={AnaliseGeografica} />
-            <Route path="/analise/mercado" component={AnaliseMercado} />
-            <Route path="/entidade/:id" component={DetalhesEntidade} />
-            
-            {/* Rotas Legais */}
             <Route path="/privacidade" component={PrivacidadePage} />
             <Route path="/termos" component={TermosPage} />
+            
+            {/* Rotas Protegidas */}
+            <Route path="/">
+              <PrivateRoute><HomePage /></PrivateRoute>
+            </Route>
+            <Route path="/projetos">
+              <PrivateRoute><ProjetosPage /></PrivateRoute>
+            </Route>
+            <Route path="/projetos/novo">
+              <PrivateRoute><ProjetoNovoPage /></PrivateRoute>
+            </Route>
+            <Route path="/pesquisas">
+              <PrivateRoute><PesquisasPage /></PrivateRoute>
+            </Route>
+            <Route path="/pesquisas/novo">
+              <PrivateRoute><PesquisaNovaPage /></PrivateRoute>
+            </Route>
+            <Route path="/pesquisas/:id">
+              <PrivateRoute><PesquisaDetalhesPage /></PrivateRoute>
+            </Route>
+            <Route path="/entidades">
+              <PrivateRoute><EntidadesPage /></PrivateRoute>
+            </Route>
+            <Route path="/importacao">
+              <PrivateRoute><ImportacaoPage /></PrivateRoute>
+            </Route>
+            <Route path="/importacoes">
+              <PrivateRoute><ImportacoesListPage /></PrivateRoute>
+            </Route>
+            <Route path="/enriquecimento">
+              <PrivateRoute><EnriquecimentoPage /></PrivateRoute>
+            </Route>
+            <Route path="/processamento-ia">
+              <PrivateRoute><ProcessamentoIA /></PrivateRoute>
+            </Route>
+            
+            {/* Rota Admin */}
+            <Route path="/usuarios">
+              <PrivateRoute requiredRole={['administrador']}>
+                <GestaoUsuarios />
+              </PrivateRoute>
+            </Route>
+            
+            {/* Rotas Dimensionais */}
+            <Route path="/cubo">
+              <PrivateRoute><CuboExplorador /></PrivateRoute>
+            </Route>
+            <Route path="/analise/temporal">
+              <PrivateRoute><AnaliseTemporal /></PrivateRoute>
+            </Route>
+            <Route path="/analise/geografica">
+              <PrivateRoute><AnaliseGeografica /></PrivateRoute>
+            </Route>
+            <Route path="/analise/mercado">
+              <PrivateRoute><AnaliseMercado /></PrivateRoute>
+            </Route>
+            <Route path="/entidade/:id">
+              <PrivateRoute><DetalhesEntidade /></PrivateRoute>
+            </Route>
             
             <Route component={NotFound} />
           </Switch>
             </Suspense>
         </Layout>
-      </QueryClientProvider>
-    </trpc.Provider>
+          </QueryClientProvider>
+        </trpc.Provider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }
