@@ -11,20 +11,15 @@ INSERT INTO users (
   email,
   name,
   role,
-  created_at,
-  updated_at
+  created_at
 ) VALUES (
-  1,
+  '1',
   'sistema@intelmarket.app',
   'Sistema',
   'admin',
-  NOW(),
   NOW()
 )
 ON CONFLICT (id) DO NOTHING;
 
--- Resetar sequence para começar do ID 2 (usuários reais)
-SELECT setval('users_id_seq', 1, true);
-
 -- Verificação
-SELECT id, email, name, role FROM users WHERE id = 1;
+SELECT id, email, name, role FROM users WHERE id = '1';
