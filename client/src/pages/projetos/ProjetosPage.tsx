@@ -2,13 +2,29 @@ import { Link } from 'wouter';
 import { trpc } from '../../lib/trpc';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { FolderKanban, Plus, Archive, Check, Trash2, Search as SearchIcon } from 'lucide-react';
+import { PageHeader } from '@/components/PageHeader';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { EmptyState } from '@/components/EmptyState';
+import { ErrorState } from '@/components/ErrorState';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function ProjetosPage() {
   const [page, setPage] = useState(1);
   const [busca, setBusca] = useState('');
   const [status, setStatus] = useState<'ativo' | 'inativo' | 'arquivado' | undefined>();
 
-  const { data, isLoading, refetch } = trpc.projetos.list.useQuery({
+  const { data, isLoading, error, refetch } = trpc.projetos.list.useQuery({
     page,
     limit: 20,
     busca: busca || undefined,
@@ -23,217 +39,261 @@ export default function ProjetosPage() {
       refetch();
     },
     onError: (error) => {
-      toast.error(`Erro ao deletar: ${error.message}`);
+      toast.error('Erro ao deletar projeto', {
+        description: error.message
+      });
     },
   });
 
   const archiveMutation = trpc.projetos.archive.useMutation({
     onSuccess: () => {
-      toast.success('Projeto arquivado!');
+      toast.success('Projeto arquivado com sucesso!');
       refetch();
+    },
+    onError: (error) => {
+      toast.error('Erro ao arquivar projeto', {
+        description: error.message
+      });
     },
   });
 
   const activateMutation = trpc.projetos.activate.useMutation({
     onSuccess: () => {
-      toast.success('Projeto ativado!');
+      toast.success('Projeto ativado com sucesso!');
       refetch();
+    },
+    onError: (error) => {
+      toast.error('Erro ao ativar projeto', {
+        description: error.message
+      });
     },
   });
 
-  return (
-    <div className="p-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Projetos</h1>
-          <p className="text-muted-foreground">
-            Gerencie seus projetos de inteligência de mercado
-          </p>
-        </div>
-        <Link href="/projetos/novo">
-          <a className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Novo Projeto
-          </a>
-        </Link>
+  const handleDelete = (id: number, nome: string) => {
+    if (confirm(`Tem certeza que deseja deletar o projeto "${nome}"? Esta ação não pode ser desfeita.`)) {
+      toast.promise(
+        deleteMutation.mutateAsync({ id }),
+        {
+          loading: 'Deletando projeto...',
+          success: 'Projeto deletado!',
+          error: 'Erro ao deletar'
+        }
+      );
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <LoadingSpinner size="lg" text="Carregando projetos..." />
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorState
+        title="Erro ao carregar projetos"
+        message={error.message}
+        onRetry={refetch}
+      />
+    );
+  }
+
+  return (
+    <div className="animate-fade-in">
+      <PageHeader
+        title="Projetos"
+        description="Gerencie seus projetos de inteligência de mercado"
+        icon={FolderKanban}
+        breadcrumbs={[
+          { label: 'Dashboard', path: '/' },
+          { label: 'Projetos' }
+        ]}
+        actions={
+          <Link href="/projetos/novo">
+            <a>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Novo Projeto
+              </Button>
+            </a>
+          </Link>
+        }
+      />
 
       {/* Filters */}
-      <div className="flex gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Buscar projetos..."
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          className="flex-1 px-4 py-2 border rounded-lg bg-background"
-        />
-        <select
-          value={status || ''}
-          onChange={(e) =>
-            setStatus(e.target.value as 'ativo' | 'inativo' | 'arquivado' | undefined)
-          }
-          className="px-4 py-2 border rounded-lg bg-background"
-        >
-          <option value="">Todos os status</option>
-          <option value="ativo">Ativo</option>
-          <option value="inativo">Inativo</option>
-          <option value="arquivado">Arquivado</option>
-        </select>
-      </div>
+      <Card className="p-6 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1 relative">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Buscar projetos por nome ou código..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select
+            value={status || 'all'}
+            onValueChange={(value) => setStatus(value === 'all' ? undefined : value as any)}
+          >
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue placeholder="Filtrar por status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os status</SelectItem>
+              <SelectItem value="ativo">Ativo</SelectItem>
+              <SelectItem value="inativo">Inativo</SelectItem>
+              <SelectItem value="arquivado">Arquivado</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </Card>
 
       {/* Table */}
-      <div className="rounded-lg border bg-card">
-        {isLoading ? (
-          <div className="p-8 text-center text-muted-foreground">Carregando...</div>
-        ) : !data?.projetos || data.projetos.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-muted-foreground mb-4">Nenhum projeto encontrado</p>
-            <Link href="/projetos/novo">
-              <a className="text-primary hover:underline">Criar primeiro projeto</a>
-            </Link>
-          </div>
+      <Card className="overflow-hidden">
+        {!data?.projetos || data.projetos.length === 0 ? (
+          <EmptyState
+            icon={FolderKanban}
+            title="Nenhum projeto encontrado"
+            description="Comece criando seu primeiro projeto para organizar suas análises de mercado."
+            action={{
+              label: 'Criar Primeiro Projeto',
+              onClick: () => window.location.href = '/projetos/novo'
+            }}
+          />
         ) : (
-          <table className="w-full">
-            <thead className="border-b">
-              <tr>
-                <th className="text-left p-4 font-medium">Nome</th>
-                <th className="text-left p-4 font-medium">Código</th>
-                <th className="text-left p-4 font-medium">Status</th>
-                <th className="text-left p-4 font-medium">Centro de Custo</th>
-                <th className="text-left p-4 font-medium">Criado em</th>
-                <th className="text-right p-4 font-medium">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.projetos.map((projeto) => (
-                <tr key={projeto.id} className="border-b last:border-0 hover:bg-accent/50">
-                  <td className="p-4 font-medium">{projeto.nome}</td>
-                  <td className="p-4 text-muted-foreground">{projeto.codigo || '-'}</td>
-                  <td className="p-4">
-                    <span
-                      className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        projeto.status === 'ativo'
-                          ? 'bg-green-500/10 text-green-500'
-                          : projeto.status === 'inativo'
-                          ? 'bg-gray-500/10 text-gray-500'
-                          : 'bg-orange-500/10 text-orange-500'
-                      }`}
-                    >
-                      {projeto.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-muted-foreground">
-                    {projeto.centro_custo || '-'}
-                  </td>
-                  <td className="p-4 text-muted-foreground">
-                    {new Date(projeto.created_at!).toLocaleDateString('pt-BR')}
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center justify-end gap-2">
-                      {projeto.status === 'ativo' && (
-                        <button
-                          onClick={() => archiveMutation.mutate({ id: projeto.id })}
-                          className="p-2 hover:bg-accent rounded"
-                          title="Arquivar"
-                        >
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-                            />
-                          </svg>
-                        </button>
-                      )}
-                      {projeto.status !== 'ativo' && (
-                        <button
-                          onClick={() => activateMutation.mutate({ id: projeto.id })}
-                          className="p-2 hover:bg-accent rounded"
-                          title="Ativar"
-                        >
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                        </button>
-                      )}
-                      <button
-                        onClick={() => {
-                          if (confirm('Tem certeza que deseja deletar este projeto?')) {
-                            deleteMutation.mutate({ id: projeto.id });
-                          }
-                        }}
-                        className="p-2 hover:bg-destructive/10 text-destructive rounded"
-                        title="Deletar"
-                      >
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="border-b bg-muted/50">
+                <tr>
+                  <th className="text-left p-4 font-semibold text-sm">Nome</th>
+                  <th className="text-left p-4 font-semibold text-sm">Código</th>
+                  <th className="text-left p-4 font-semibold text-sm">Status</th>
+                  <th className="text-left p-4 font-semibold text-sm">Centro de Custo</th>
+                  <th className="text-left p-4 font-semibold text-sm">Criado em</th>
+                  <th className="text-right p-4 font-semibold text-sm">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.projetos.map((projeto) => (
+                  <tr 
+                    key={projeto.id} 
+                    className="border-b last:border-0 hover:bg-accent/50 transition-colors"
+                  >
+                    <td className="p-4">
+                      <div className="font-medium">{projeto.nome}</div>
+                      {projeto.descricao && (
+                        <div className="text-sm text-muted-foreground mt-1">
+                          {projeto.descricao}
+                        </div>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      <code className="text-sm bg-muted px-2 py-1 rounded">
+                        {projeto.codigo || '-'}
+                      </code>
+                    </td>
+                    <td className="p-4">
+                      <Badge
+                        variant={
+                          projeto.status === 'ativo' 
+                            ? 'default' 
+                            : projeto.status === 'inativo'
+                            ? 'secondary'
+                            : 'outline'
+                        }
+                        className={
+                          projeto.status === 'ativo'
+                            ? 'bg-success hover:bg-success/90'
+                            : projeto.status === 'arquivado'
+                            ? 'bg-warning hover:bg-warning/90'
+                            : ''
+                        }
+                      >
+                        {projeto.status}
+                      </Badge>
+                    </td>
+                    <td className="p-4 text-muted-foreground">
+                      {projeto.centro_custo || '-'}
+                    </td>
+                    <td className="p-4 text-muted-foreground text-sm">
+                      {new Date(projeto.created_at!).toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center justify-end gap-2">
+                        {projeto.status === 'ativo' && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => archiveMutation.mutate({ id: projeto.id })}
+                            title="Arquivar projeto"
+                            disabled={archiveMutation.isPending}
+                          >
+                            <Archive className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {projeto.status !== 'ativo' && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => activateMutation.mutate({ id: projeto.id })}
+                            title="Ativar projeto"
+                            disabled={activateMutation.isPending}
+                            className="text-success hover:text-success hover:bg-success/10"
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(projeto.id, projeto.nome)}
+                          title="Deletar projeto"
+                          disabled={deleteMutation.isPending}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
-      </div>
+      </Card>
 
       {/* Pagination */}
       {data && data.total > 20 && (
         <div className="flex items-center justify-between mt-6">
           <p className="text-sm text-muted-foreground">
-            Mostrando {(page - 1) * 20 + 1} a {Math.min(page * 20, data.total)} de {data.total}{' '}
-            projetos
+            Mostrando <span className="font-medium">{(page - 1) * 20 + 1}</span> a{' '}
+            <span className="font-medium">{Math.min(page * 20, data.total)}</span> de{' '}
+            <span className="font-medium">{data.total}</span> projetos
           </p>
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="outline"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-4 py-2 border rounded-lg disabled:opacity-50"
             >
               Anterior
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => setPage((p) => p + 1)}
               disabled={page * 20 >= data.total}
-              className="px-4 py-2 border rounded-lg disabled:opacity-50"
             >
               Próxima
-            </button>
+            </Button>
           </div>
         </div>
       )}
