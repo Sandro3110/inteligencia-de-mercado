@@ -264,20 +264,22 @@ export default async function handler(req, res) {
         }
         const objetivo = objetivoParts.length > 0 ? objetivoParts.join(' | ') : null;
 
-        // Inserir pesquisa (created_by=NULL pois não temos mapeamento de user UUID para integer)
+        // Inserir pesquisa (created_by=1 = usuário sistema)
         const [pesquisa] = await client`
           INSERT INTO dim_pesquisa (
             projeto_id,
             nome,
             descricao,
             objetivo,
-            status
+            status,
+            created_by
           ) VALUES (
             ${projetoId || null},
             ${nome},
             ${descricao || null},
             ${objetivo},
-            'pendente'
+            'pendente',
+            1
           )
           RETURNING *
         `;
