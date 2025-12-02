@@ -3,13 +3,7 @@
   "outputDirectory": "dist/client",
   "installCommand": "pnpm install",
   "framework": null,
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "nodejs22.x",
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  },
+
   "rewrites": [
 
     {
