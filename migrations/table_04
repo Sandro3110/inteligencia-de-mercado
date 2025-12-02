@@ -1,0 +1,29 @@
+CREATE TABLE dim_geografia (
+  id SERIAL PRIMARY KEY,
+  cidade VARCHAR(100) NOT NULL,
+  uf VARCHAR(2) NOT NULL,
+  regiao VARCHAR(20),
+  latitude DECIMAL(10,8),
+  longitude DECIMAL(11,8),
+  codigo_ibge VARCHAR(10),
+  populacao INTEGER,
+  pib_per_capita DECIMAL(12,2),
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  created_by INTEGER,
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_by INTEGER,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL,
+  UNIQUE (cidade, uf)
+);
+
+CREATE INDEX idx_geografia_uf ON dim_geografia(uf);
+CREATE INDEX idx_geografia_regiao ON dim_geografia(regiao);
+CREATE INDEX idx_geografia_codigo_ibge ON dim_geografia(codigo_ibge) WHERE codigo_ibge IS NOT NULL;
+CREATE INDEX idx_geografia_cidade_uf ON dim_geografia(cidade, uf);
+CREATE INDEX idx_geografia_cidade_trgm ON dim_geografia USING gin(cidade gin_trgm_ops);
+
+-- ============================================================================
+-- 5. dim_mercado
+-- ============================================================================
+

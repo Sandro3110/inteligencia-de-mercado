@@ -1,0 +1,22 @@
+CREATE TABLE dim_status_qualificacao (
+  id SERIAL PRIMARY KEY,
+  codigo VARCHAR(50) UNIQUE NOT NULL,
+  nome VARCHAR(100) NOT NULL,
+  descricao TEXT,
+  cor VARCHAR(7),
+  ordem INTEGER,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  created_by INTEGER,
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_by INTEGER,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_status_codigo ON dim_status_qualificacao(codigo);
+CREATE INDEX idx_status_ordem ON dim_status_qualificacao(ordem);
+
+-- ============================================================================
+-- 8. fato_entidade_contexto
+-- ============================================================================
+
