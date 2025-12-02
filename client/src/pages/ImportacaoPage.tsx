@@ -164,7 +164,7 @@ export default function ImportacaoPage() {
               className="w-full border rounded px-3 py-2"
             >
               <option value={0}>Selecione um projeto</option>
-              {Array.isArray(projetos.data) && projetos.data.map((p: any) => (
+              {Array.isArray(projetos.data?.projetos) && projetos.data.projetos.map((p: any) => (
                 <option key={p.id} value={p.id}>
                   {p.nome}
                 </option>
@@ -181,7 +181,7 @@ export default function ImportacaoPage() {
                 className="w-full border rounded px-3 py-2"
               >
                 <option value={0}>Selecione uma pesquisa</option>
-                {Array.isArray(pesquisas.data) && pesquisas.data.map((p: any) => (
+                {Array.isArray(pesquisas.data?.pesquisas) && pesquisas.data.pesquisas.map((p: any) => (
                   <option key={p.id} value={p.id}>
                     {p.nome}
                   </option>
