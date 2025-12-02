@@ -1,59 +1,79 @@
 /**
  * Data Access Layer (DAL) para Entidades
- * Camada de abstração para acesso unificado a fato_entidades
+ * Camada de abstração para acesso unificado a fato_entidade_contexto
+ * 
+ * VERSÃO CORRIGIDA - Usando nomes corretos do schema
  */
 
 import { db } from '../db';
 import {
-  fatoEntidades,
-  dimGeografia,
-  dimMercados,
-  dimProdutos,
-  entidadeProdutos,
-  entidadeCompetidores,
+  fatoEntidadeContexto,    // ✅ CORRETO (era fatoEntidades)
+  dimEntidade,             // ✅ CORRETO
+  dimGeografia,            // ✅ CORRETO (sem maiúscula)
+  dimMercado,              // ✅ CORRETO (singular, era dimMercados)
+  dimProduto,              // ✅ CORRETO (singular, era dimProdutos)
+  dimStatusQualificacao,   // ✅ CORRETO
+  fatoEntidadeProduto,     // ✅ CORRETO (era entidadeProdutos)
+  fatoEntidadeCompetidor,  // ✅ CORRETO (era entidadeCompetidores)
 } from '../../drizzle/schema';
 import { eq, and, or, inArray, gte, lte, like, sql, desc, asc, count } from 'drizzle-orm';
-import type {
-  FatoEntidade,
-  Cliente,
-  Lead,
-  Concorrente,
-  FiltrosEntidade,
-  ResultadoPaginado,
-  CriarEntidadeInput,
-  AtualizarEntidadeInput,
-  EntidadeCompleta,
-  EstatisticasEntidades,
-  TipoEntidade,
-} from '../../shared/types/entidades';
-import { createHash } from 'crypto';
+
+// ============================================================================
+// TIPOS
+// ============================================================================
+
+export type TipoEntidade = 'cliente' | 'lead' | 'concorrente';
+
+export interface FiltrosEntidade {
+  tipo_entidade?: TipoEntidade | TipoEntidade[];
+  pesquisa_id?: number;
+  projeto_id?: number;
+  status_qualificacao_id?: number;
+  geografia_id?: number;
+  mercado_id?: number;
+  regiao?: string;
+  uf?: string;
+  cidade?: string;
+  qualidade_min?: number;
+  qualidade_max?: number;
+  qualidade_classificacao?: string | string[];
+  busca?: string;
+  orderBy?: string;
+  orderDirection?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+}
+
+export interface ResultadoPaginado<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
 
 // ============================================================================
 // FUNÇÕES DE QUERY UNIFICADAS
 // ============================================================================
 
 /**
- * Buscar entidades com filtros e paginação
+ * Buscar contextos de entidades com filtros e paginação
  */
-export async function getEntidades(
+export async function getContextosEntidades(
   filtros: FiltrosEntidade = {}
-): Promise<ResultadoPaginado<FatoEntidade>> {
+): Promise<ResultadoPaginado<any>> {
   const {
     tipo_entidade,
     pesquisa_id,
-    project_id,
-    status_qualificacao,
+    projeto_id,
+    status_qualificacao_id,
     geografia_id,
     mercado_id,
-    regiao,
-    uf,
-    cidade,
-    categoria_mercado,
     qualidade_min,
     qualidade_max,
     qualidade_classificacao,
-    validation_status,
-    lead_stage,
     busca,
     orderBy = 'created_at',
     orderDirection = 'desc',
@@ -66,97 +86,70 @@ export async function getEntidades(
 
   if (tipo_entidade) {
     if (Array.isArray(tipo_entidade)) {
-      conditions.push(inArray(fatoEntidades.tipo_entidade, tipo_entidade));
+      conditions.push(inArray(fatoEntidadeContexto.tipoEntidade, tipo_entidade));
     } else {
-      conditions.push(eq(fatoEntidades.tipo_entidade, tipo_entidade));
+      conditions.push(eq(fatoEntidadeContexto.tipoEntidade, tipo_entidade));
     }
   }
 
   if (pesquisa_id) {
-    conditions.push(eq(fatoEntidades.pesquisa_id, pesquisa_id));
+    conditions.push(eq(fatoEntidadeContexto.pesquisaId, pesquisa_id));
   }
 
-  if (project_id) {
-    conditions.push(eq(fatoEntidades.project_id, project_id));
+  if (projeto_id) {
+    conditions.push(eq(fatoEntidadeContexto.projetoId, projeto_id));
   }
 
-  if (status_qualificacao) {
-    if (Array.isArray(status_qualificacao)) {
-      conditions.push(inArray(fatoEntidades.status_qualificacao, status_qualificacao));
-    } else {
-      conditions.push(eq(fatoEntidades.status_qualificacao, status_qualificacao));
-    }
+  if (status_qualificacao_id) {
+    conditions.push(eq(fatoEntidadeContexto.statusQualificacaoId, status_qualificacao_id));
   }
 
   if (geografia_id) {
-    conditions.push(eq(fatoEntidades.geografia_id, geografia_id));
+    conditions.push(eq(fatoEntidadeContexto.geografiaId, geografia_id));
   }
 
   if (mercado_id) {
-    conditions.push(eq(fatoEntidades.mercado_id, mercado_id));
+    conditions.push(eq(fatoEntidadeContexto.mercadoId, mercado_id));
   }
 
   if (qualidade_min !== undefined) {
-    conditions.push(gte(fatoEntidades.qualidade_score, qualidade_min));
+    conditions.push(gte(fatoEntidadeContexto.qualidadeScore, qualidade_min));
   }
 
   if (qualidade_max !== undefined) {
-    conditions.push(lte(fatoEntidades.qualidade_score, qualidade_max));
+    conditions.push(lte(fatoEntidadeContexto.qualidadeScore, qualidade_max));
   }
 
   if (qualidade_classificacao) {
     if (Array.isArray(qualidade_classificacao)) {
-      conditions.push(inArray(fatoEntidades.qualidade_classificacao, qualidade_classificacao));
+      conditions.push(inArray(fatoEntidadeContexto.qualidadeClassificacao, qualidade_classificacao));
     } else {
-      conditions.push(eq(fatoEntidades.qualidade_classificacao, qualidade_classificacao));
+      conditions.push(eq(fatoEntidadeContexto.qualidadeClassificacao, qualidade_classificacao));
     }
   }
 
-  if (validation_status) {
-    if (Array.isArray(validation_status)) {
-      conditions.push(inArray(fatoEntidades.validation_status, validation_status));
-    } else {
-      conditions.push(eq(fatoEntidades.validation_status, validation_status));
-    }
-  }
-
-  if (lead_stage) {
-    if (Array.isArray(lead_stage)) {
-      conditions.push(inArray(fatoEntidades.lead_stage, lead_stage));
-    } else {
-      conditions.push(eq(fatoEntidades.lead_stage, lead_stage));
-    }
-  }
-
+  // Busca textual (precisa JOIN com dim_entidade)
   if (busca) {
-    conditions.push(
-      or(
-        like(fatoEntidades.nome, `%${busca}%`),
-        like(fatoEntidades.cnpj, `%${busca}%`),
-        like(fatoEntidades.email, `%${busca}%`)
-      )
-    );
-  }
-
-  // Filtros que requerem JOIN
-  if (regiao || uf || cidade || categoria_mercado) {
-    // TODO: Implementar JOINs para esses filtros
-    // Por enquanto, vamos buscar sem esses filtros
+    // TODO: Implementar JOIN com dim_entidade para buscar por nome/cnpj
+    // Por enquanto, vamos buscar apenas no contexto
   }
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
   // Contar total
-  const [{ total }] = await db.select({ total: count() }).from(fatoEntidades).where(whereClause);
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(fatoEntidadeContexto)
+    .where(whereClause);
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = fatoEntidades[orderBy] || fatoEntidades.created_at;
+  const orderColumn = (fatoEntidadeContexto as any)[orderBy] || fatoEntidadeContexto.createdAt;
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db
     .select()
-    .from(fatoEntidades)
+    .from(fatoEntidadeContexto)
     .where(whereClause)
     .orderBy(orderFn(orderColumn))
     .limit(limit)
@@ -165,7 +158,7 @@ export async function getEntidades(
   const totalPages = Math.ceil(total / limit);
 
   return {
-    data: data as FatoEntidade[],
+    data,
     total,
     page,
     limit,
@@ -184,16 +177,11 @@ export async function getEntidades(
  */
 export async function getClientes(
   filtros: Omit<FiltrosEntidade, 'tipo_entidade'> = {}
-): Promise<ResultadoPaginado<Cliente>> {
-  const resultado = await getEntidades({
+): Promise<ResultadoPaginado<any>> {
+  return getContextosEntidades({
     ...filtros,
     tipo_entidade: 'cliente',
   });
-
-  return {
-    ...resultado,
-    data: resultado.data as Cliente[],
-  };
 }
 
 /**
@@ -201,16 +189,11 @@ export async function getClientes(
  */
 export async function getLeads(
   filtros: Omit<FiltrosEntidade, 'tipo_entidade'> = {}
-): Promise<ResultadoPaginado<Lead>> {
-  const resultado = await getEntidades({
+): Promise<ResultadoPaginado<any>> {
+  return getContextosEntidades({
     ...filtros,
     tipo_entidade: 'lead',
   });
-
-  return {
-    ...resultado,
-    data: resultado.data as Lead[],
-  };
 }
 
 /**
@@ -218,16 +201,11 @@ export async function getLeads(
  */
 export async function getConcorrentes(
   filtros: Omit<FiltrosEntidade, 'tipo_entidade'> = {}
-): Promise<ResultadoPaginado<Concorrente>> {
-  const resultado = await getEntidades({
+): Promise<ResultadoPaginado<any>> {
+  return getContextosEntidades({
     ...filtros,
     tipo_entidade: 'concorrente',
   });
-
-  return {
-    ...resultado,
-    data: resultado.data as Concorrente[],
-  };
 }
 
 // ============================================================================
@@ -235,62 +213,97 @@ export async function getConcorrentes(
 // ============================================================================
 
 /**
- * Buscar entidade por ID
+ * Buscar contexto por ID
  */
-export async function getEntidadeById(id: number): Promise<FatoEntidade | null> {
-  const [entidade] = await db.select().from(fatoEntidades).where(eq(fatoEntidades.id, id)).limit(1);
+export async function getContextoById(id: number): Promise<any | null> {
+  const [contexto] = await db
+    .select()
+    .from(fatoEntidadeContexto)
+    .where(eq(fatoEntidadeContexto.id, id))
+    .limit(1);
 
-  return (entidade as FatoEntidade) || null;
+  return contexto || null;
 }
 
 /**
- * Buscar entidade completa (com todas as dimensões e relacionamentos)
+ * Buscar contexto completo (com todas as dimensões e relacionamentos)
  */
-export async function getEntidadeCompleta(id: number): Promise<EntidadeCompleta | null> {
-  const entidade = await getEntidadeById(id);
-  if (!entidade) return null;
+export async function getContextoCompleto(id: number): Promise<any | null> {
+  const contexto = await getContextoById(id);
+  if (!contexto) return null;
+
+  // Buscar entidade
+  const [entidade] = await db
+    .select()
+    .from(dimEntidade)
+    .where(eq(dimEntidade.id, contexto.entidadeId))
+    .limit(1);
 
   // Buscar geografia
-  const [geografia] = await db
-    .select()
-    .from(dimGeografia)
-    .where(eq(dimGeografia.id, entidade.geografia_id))
-    .limit(1);
+  const [geografia] = contexto.geografiaId
+    ? await db
+        .select()
+        .from(dimGeografia)
+        .where(eq(dimGeografia.id, contexto.geografiaId))
+        .limit(1)
+    : [null];
 
   // Buscar mercado
-  const [mercado] = await db
-    .select()
-    .from(dimMercados)
-    .where(eq(dimMercados.id, entidade.mercado_id))
-    .limit(1);
+  const [mercado] = contexto.mercadoId
+    ? await db
+        .select()
+        .from(dimMercado)
+        .where(eq(dimMercado.id, contexto.mercadoId))
+        .limit(1)
+    : [null];
 
-  // Buscar produtos
+  // Buscar status qualificação
+  const [statusQualificacao] = contexto.statusQualificacaoId
+    ? await db
+        .select()
+        .from(dimStatusQualificacao)
+        .where(eq(dimStatusQualificacao.id, contexto.statusQualificacaoId))
+        .limit(1)
+    : [null];
+
+  // Buscar produtos relacionados
   const produtosRelacionados = await db
     .select({
-      ...dimProdutos,
-      tipo_relacao: entidadeProdutos.tipo_relacao,
+      produto: dimProduto,
+      relacao: fatoEntidadeProduto,
     })
-    .from(entidadeProdutos)
-    .innerJoin(dimProdutos, eq(dimProdutos.id, entidadeProdutos.produto_id))
-    .where(eq(entidadeProdutos.entidade_id, id));
+    .from(fatoEntidadeProduto)
+    .innerJoin(dimProduto, eq(dimProduto.id, fatoEntidadeProduto.produtoId))
+    .where(eq(fatoEntidadeProduto.contextoId, id));
 
-  // Buscar concorrentes
+  // Buscar concorrentes relacionados
   const concorrentesRelacionados = await db
     .select({
-      ...fatoEntidades,
-      nivel_competicao: entidadeCompetidores.nivel_competicao,
+      entidade: dimEntidade,
+      relacao: fatoEntidadeCompetidor,
     })
-    .from(entidadeCompetidores)
-    .innerJoin(fatoEntidades, eq(fatoEntidades.id, entidadeCompetidores.competidor_id))
-    .where(eq(entidadeCompetidores.entidade_id, id));
+    .from(fatoEntidadeCompetidor)
+    .innerJoin(dimEntidade, eq(dimEntidade.id, fatoEntidadeCompetidor.competidorEntidadeId))
+    .where(eq(fatoEntidadeCompetidor.contextoId, id));
 
   return {
-    ...entidade,
+    ...contexto,
+    entidade,
     geografia,
     mercado,
-    produtos: produtosRelacionados,
-    concorrentes: concorrentesRelacionados,
-  } as EntidadeCompleta;
+    statusQualificacao,
+    produtos: produtosRelacionados.map((p) => ({
+      ...p.produto,
+      tipoRelacao: p.relacao.tipoRelacao,
+      volumeEstimado: p.relacao.volumeEstimado,
+      observacoes: p.relacao.observacoes,
+    })),
+    concorrentes: concorrentesRelacionados.map((c) => ({
+      ...c.entidade,
+      nivelCompeticao: c.relacao.nivelCompeticao,
+      observacoes: c.relacao.observacoes,
+    })),
+  };
 }
 
 // ============================================================================
@@ -298,59 +311,44 @@ export async function getEntidadeCompleta(id: number): Promise<EntidadeCompleta 
 // ============================================================================
 
 /**
- * Gerar hash único para entidade
+ * Criar novo contexto de entidade
  */
-function gerarEntidadeHash(input: CriarEntidadeInput): string {
-  const chave = input.cnpj ? input.cnpj : `${input.nome}-${input.geografia_id}-${input.mercado_id}`;
-
-  return createHash('md5').update(chave).digest('hex');
-}
-
-/**
- * Criar nova entidade
- */
-export async function criarEntidade(input: CriarEntidadeInput): Promise<FatoEntidade> {
-  const entidade_hash = input.entidade_hash || gerarEntidadeHash(input);
-
-  const [novaEntidade] = await db
-    .insert(fatoEntidades)
+export async function criarContexto(input: any): Promise<any> {
+  const [novoContexto] = await db
+    .insert(fatoEntidadeContexto)
     .values({
       ...input,
-      entidade_hash,
-      status_qualificacao: input.status_qualificacao || 'prospect',
-      created_at: new Date(),
-      updated_at: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     })
     .returning();
 
-  return novaEntidade as FatoEntidade;
+  return novoContexto;
 }
 
 /**
- * Atualizar entidade existente
+ * Atualizar contexto existente
  */
-export async function atualizarEntidade(
-  id: number,
-  input: AtualizarEntidadeInput
-): Promise<FatoEntidade | null> {
-  const [entidadeAtualizada] = await db
-    .update(fatoEntidades)
+export async function atualizarContexto(id: number, input: any): Promise<any | null> {
+  const [contextoAtualizado] = await db
+    .update(fatoEntidadeContexto)
     .set({
       ...input,
-      updated_at: new Date(),
+      updatedAt: new Date(),
     })
-    .where(eq(fatoEntidades.id, id))
+    .where(eq(fatoEntidadeContexto.id, id))
     .returning();
 
-  return (entidadeAtualizada as FatoEntidade) || null;
+  return contextoAtualizado || null;
 }
 
 /**
- * Deletar entidade (soft delete - marcar como inativo)
+ * Deletar contexto (soft delete)
  */
-export async function deletarEntidade(id: number): Promise<boolean> {
-  const resultado = await atualizarEntidade(id, {
-    status_qualificacao: 'inativo',
+export async function deletarContexto(id: number, deletedBy?: number): Promise<boolean> {
+  const resultado = await atualizarContexto(id, {
+    deletedAt: new Date(),
+    deletedBy,
   });
 
   return resultado !== null;
@@ -361,30 +359,26 @@ export async function deletarEntidade(id: number): Promise<boolean> {
 // ============================================================================
 
 /**
- * Obter estatísticas gerais de entidades
+ * Obter estatísticas gerais de contextos
  */
-export async function getEstatisticasEntidades(
-  pesquisa_id?: number
-): Promise<EstatisticasEntidades> {
-  const whereClause = pesquisa_id ? eq(fatoEntidades.pesquisa_id, pesquisa_id) : undefined;
+export async function getEstatisticasContextos(pesquisa_id?: number): Promise<any> {
+  const whereClause = pesquisa_id
+    ? eq(fatoEntidadeContexto.pesquisaId, pesquisa_id)
+    : undefined;
 
   const [stats] = await db
     .select({
       total: count(),
-      clientes: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidades.tipo_entidade} = 'cliente')`,
-      leads: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidades.tipo_entidade} = 'lead')`,
-      concorrentes: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidades.tipo_entidade} = 'concorrente')`,
-      ativos: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidades.status_qualificacao} = 'ativo')`,
-      inativos: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidades.status_qualificacao} = 'inativo')`,
-      prospects: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidades.status_qualificacao} = 'prospect')`,
-      qualidade_a: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidades.qualidade_classificacao} = 'A')`,
-      qualidade_b: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidades.qualidade_classificacao} = 'B')`,
-      qualidade_c: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidades.qualidade_classificacao} = 'C')`,
-      qualidade_d: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidades.qualidade_classificacao} = 'D')`,
-      qualidade_media: sql<number>`AVG(${fatoEntidades.qualidade_score})`,
-      validados: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidades.validation_status} = 'approved')`,
+      clientes: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.tipoEntidade} = 'cliente')`,
+      leads: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.tipoEntidade} = 'lead')`,
+      concorrentes: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.tipoEntidade} = 'concorrente')`,
+      qualidade_a: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.qualidadeClassificacao} = 'A')`,
+      qualidade_b: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.qualidadeClassificacao} = 'B')`,
+      qualidade_c: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.qualidadeClassificacao} = 'C')`,
+      qualidade_d: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.qualidadeClassificacao} = 'D')`,
+      qualidade_media: sql<number>`AVG(${fatoEntidadeContexto.qualidadeScore})`,
     })
-    .from(fatoEntidades)
+    .from(fatoEntidadeContexto)
     .where(whereClause);
 
   return {
@@ -394,13 +388,6 @@ export async function getEstatisticasEntidades(
       lead: stats.leads,
       concorrente: stats.concorrentes,
     },
-    por_status: {
-      ativo: stats.ativos,
-      inativo: stats.inativos,
-      prospect: stats.prospects,
-      lead_qualificado: 0, // TODO: adicionar
-      lead_desqualificado: 0, // TODO: adicionar
-    },
     por_qualidade: {
       A: stats.qualidade_a,
       B: stats.qualidade_b,
@@ -408,10 +395,6 @@ export async function getEstatisticasEntidades(
       D: stats.qualidade_d,
     },
     qualidade_media: Math.round(stats.qualidade_media || 0),
-    com_mercado: stats.total, // Todos têm mercado (obrigatório)
-    com_produtos: 0, // TODO: contar via JOIN
-    com_concorrentes: 0, // TODO: contar via JOIN
-    validados: stats.validados,
   };
 }
 
@@ -420,31 +403,31 @@ export async function getEstatisticasEntidades(
 // ============================================================================
 
 /**
- * Verificar se entidade existe por hash
+ * Buscar entidade por CNPJ
  */
-export async function entidadeExistePorHash(hash: string): Promise<FatoEntidade | null> {
+export async function buscarEntidadePorCNPJ(cnpj: string): Promise<any | null> {
   const [entidade] = await db
     .select()
-    .from(fatoEntidades)
-    .where(eq(fatoEntidades.entidade_hash, hash))
+    .from(dimEntidade)
+    .where(eq(dimEntidade.cnpj, cnpj))
     .limit(1);
 
-  return (entidade as FatoEntidade) || null;
+  return entidade || null;
 }
 
 /**
- * Buscar ou criar entidade (upsert)
+ * Buscar ou criar entidade
  */
-export async function buscarOuCriarEntidade(
-  input: CriarEntidadeInput
-): Promise<{ entidade: FatoEntidade; criada: boolean }> {
-  const hash = gerarEntidadeHash(input);
-  const existente = await entidadeExistePorHash(hash);
-
-  if (existente) {
-    return { entidade: existente, criada: false };
+export async function buscarOuCriarEntidade(input: any): Promise<{ entidade: any; criada: boolean }> {
+  // Se tem CNPJ, buscar por CNPJ
+  if (input.cnpj) {
+    const existente = await buscarEntidadePorCNPJ(input.cnpj);
+    if (existente) {
+      return { entidade: existente, criada: false };
+    }
   }
 
-  const nova = await criarEntidade({ ...input, entidade_hash: hash });
+  // Se não encontrou, criar nova
+  const [nova] = await db.insert(dimEntidade).values(input).returning();
   return { entidade: nova, criada: true };
 }

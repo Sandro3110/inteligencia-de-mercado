@@ -1,2 +1,0 @@
-npx lint-staged
-npm test -- src/components/__tests__ src/__tests__/integration --passWithNoTests

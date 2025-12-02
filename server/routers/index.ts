@@ -1,23 +1,15 @@
-/**
- * Routers Index - Export all routers
- */
+import { initTRPC } from '@trpc/server';
+import { Context } from '../context';
 
-export { appRouter, type AppRouter } from './_app';
-export { alertsRouter } from './alerts';
-export { analyticsRouter } from './analytics';
-export { authRouter } from './auth';
-export { dashboardRouter } from './dashboard';
-export { emailConfigRouter } from './emailConfig';
-export { enrichmentRouter } from './enrichment';
-export { exportRouter } from './export';
-export { geocodingRouter } from './geocoding';
-export { leadsRouter } from './leads';
-export { mercadosRouter } from './mercados';
-export { metricsRouter } from './metrics';
-export { pesquisasRouter } from './pesquisas';
-export { projectsRouter } from './projects';
-export { reportsRouter } from './reports';
-export { reportsEnhancedRouter } from './reports-enhanced';
-export { territorialRouter } from './territorial';
-export { unifiedMapRouter } from './unifiedMap';
-export { usersRouter } from './users';
+const t = initTRPC.context<Context>().create();
+
+export const router = t.router;
+export const publicProcedure = t.procedure;
+
+export const appRouter = router({
+  health: publicProcedure.query(() => {
+    return { status: 'ok', timestamp: new Date().toISOString() };
+  }),
+});
+
+export type AppRouter = typeof appRouter;
