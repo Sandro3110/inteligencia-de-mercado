@@ -29,6 +29,10 @@ const AnaliseGeografica = lazy(() => import('./pages/AnaliseGeografica'));
 const AnaliseMercado = lazy(() => import('./pages/AnaliseMercado'));
 const DetalhesEntidade = lazy(() => import('./pages/DetalhesEntidade'));
 
+// Páginas Legais - Lazy loading
+const PrivacidadePage = lazy(() => import('./pages/PrivacidadePage'));
+const TermosPage = lazy(() => import('./pages/TermosPage'));
+
 function App() {
   const [location] = useLocation();
   const [queryClient] = useState(() => new QueryClient({
@@ -75,6 +79,11 @@ function App() {
             <Route path="/analise/geografica" component={AnaliseGeografica} />
             <Route path="/analise/mercado" component={AnaliseMercado} />
             <Route path="/entidade/:id" component={DetalhesEntidade} />
+            
+            {/* Rotas Legais */}
+            <Route path="/privacidade" component={PrivacidadePage} />
+            <Route path="/termos" component={TermosPage} />
+            
             <Route component={NotFound} />
           </Switch>
             </Suspense>

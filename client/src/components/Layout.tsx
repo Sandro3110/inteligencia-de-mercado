@@ -247,13 +247,75 @@ export default function Layout({ children }: LayoutProps) {
       {/* Main Content */}
       <main
         className={cn(
-          'flex-1 overflow-y-auto transition-all duration-300',
+          'flex-1 overflow-y-auto transition-all duration-300 flex flex-col',
           isCollapsed ? 'ml-16' : 'ml-64'
         )}
       >
-        <div className="container mx-auto p-6 max-w-7xl">
+        <div className="container mx-auto p-6 max-w-7xl flex-1">
           {children}
         </div>
+        
+        {/* Footer */}
+        <footer className="border-t bg-muted/30 mt-auto">
+          <div className="container mx-auto px-6 py-8 max-w-7xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Sobre */}
+              <div>
+                <h3 className="font-semibold text-lg mb-3">Inteligência de Mercado</h3>
+                <p className="text-sm text-muted-foreground">
+                  Plataforma de análise dimensional de empresas e inteligência de mercado B2B.
+                </p>
+              </div>
+
+              {/* Links Legais */}
+              <div>
+                <h3 className="font-semibold text-lg mb-3">Legal</h3>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <a href="/privacidade" className="text-muted-foreground hover:text-primary transition-colors">
+                      Política de Privacidade
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/termos" className="text-muted-foreground hover:text-primary transition-colors">
+                      Termos de Uso
+                    </a>
+                  </li>
+                  <li className="text-muted-foreground">
+                    Conforme LGPD (Lei 13.709/2018)
+                  </li>
+                </ul>
+              </div>
+
+              {/* DPO */}
+              <div>
+                <h3 className="font-semibold text-lg mb-3">Proteção de Dados</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Encarregado de Dados (DPO)
+                </p>
+                <a 
+                  href="mailto:dpo@inteligenciademercado.com" 
+                  className="text-sm text-primary hover:underline"
+                >
+                  dpo@inteligenciademercado.com
+                </a>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Resposta em até 15 dias úteis
+                </p>
+              </div>
+            </div>
+
+            {/* Copyright */}
+            <div className="border-t mt-8 pt-6 text-center text-sm text-muted-foreground">
+              <p>
+                © {new Date().getFullYear()} Inteligência de Mercado. Todos os direitos reservados.
+              </p>
+              <p className="mt-1 text-xs">
+                Dados públicos de empresas coletados de fontes legítimas (Receita Federal, portais governamentais).
+              </p>
+            </div>
+          </div>
+        </footer>
       </main>
     </div>
   );
