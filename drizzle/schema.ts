@@ -1,301 +1,366 @@
 import {
   pgTable,
-  index,
   serial,
-  integer,
   varchar,
   text,
-  jsonb,
+  integer,
   timestamp,
-  numeric,
-  uniqueIndex,
-  check,
+  decimal,
   boolean,
+  unique,
+  check,
+  foreignKey,
 } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
+import { relations } from 'drizzle-orm';
 
 // ============================================================================
-// NOVA ESTRUTURA PADRONIZADA
+// TABELA: users (já existe no banco)
 // ============================================================================
+export const users = pgTable('users', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  name: text('name'),
+  email: varchar('email', { length: 255 }),
+  role: varchar('role', { length: 50 }).notNull(),
+  created_at: timestamp('created_at').defaultNow(),
+});
 
 // ============================================================================
-// DIMENSÃO: GEOGRAFIA (Normalizada)
+// DIMENSÃO: Projeto
 // ============================================================================
+export const dimProjeto = pgTable(
+  'dim_projeto',
+  {
+    id: serial('id').primaryKey(),
+    codigo: varchar('codigo', { length: 50 }).unique(),
+    nome: varchar('nome', { length: 255 }).notNull(),
+    descricao: text('descricao'),
+    status: varchar('status', { length: 20 }).notNull().default('ativo'),
+    ownerId: integer('owner_id').notNull(),
+    unidadeNegocio: varchar('unidade_negocio', { length: 100 }),
+    centroCusto: varchar('centro_custo', { length: 50 }),
+    orcamentoTotal: decimal('orcamento_total', { precision: 15, scale: 2 }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    createdBy: integer('created_by').notNull(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+    updatedBy: integer('updated_by'),
+    deletedAt: timestamp('deleted_at'),
+    deletedBy: integer('deleted_by'),
+  },
+  (table) => ({
+    uniqueNomeOwner: unique().on(table.nome, table.ownerId),
+  })
+);
 
+// ============================================================================
+// DIMENSÃO: Pesquisa
+// ============================================================================
+export const dimPesquisa = pgTable(
+  'dim_pesquisa',
+  {
+    id: serial('id').primaryKey(),
+    projetoId: integer('projeto_id')
+      .notNull()
+      .references(() => dimProjeto.id, { onDelete: 'cascade' }),
+    nome: varchar('nome', { length: 255 }).notNull(),
+    descricao: text('descricao'),
+    objetivo: text('objetivo'),
+    status: varchar('status', { length: 20 }).notNull().default('pendente'),
+    totalEntidades: integer('total_entidades').default(0),
+    entidadesEnriquecidas: integer('entidades_enriquecidas').default(0),
+    entidadesFalhadas: integer('entidades_falhadas').default(0),
+    qualidadeMedia: decimal('qualidade_media', { precision: 5, scale: 2 }),
+    startedAt: timestamp('started_at'),
+    startedBy: integer('started_by'),
+    completedAt: timestamp('completed_at'),
+    durationSeconds: integer('duration_seconds'),
+    errorMessage: text('error_message'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    createdBy: integer('created_by').notNull(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+    updatedBy: integer('updated_by'),
+    deletedAt: timestamp('deleted_at'),
+    deletedBy: integer('deleted_by'),
+  },
+  (table) => ({
+    uniqueNomeProjeto: unique().on(table.nome, table.projetoId),
+  })
+);
+
+// ============================================================================
+// DIMENSÃO: Entidade
+// ============================================================================
+export const dimEntidade = pgTable('dim_entidade', {
+  id: serial('id').primaryKey(),
+  entidadeHash: varchar('entidade_hash', { length: 64 }).unique().notNull(),
+  tipoEntidade: varchar('tipo_entidade', { length: 20 }).notNull(),
+  nome: varchar('nome', { length: 255 }).notNull(),
+  nomeFantasia: varchar('nome_fantasia', { length: 255 }),
+  cnpj: varchar('cnpj', { length: 18 }).unique(),
+  email: varchar('email', { length: 255 }),
+  telefone: varchar('telefone', { length: 20 }),
+  site: varchar('site', { length: 255 }),
+  numFiliais: integer('num_filiais').default(0),
+  numLojas: integer('num_lojas').default(0),
+  numFuncionarios: integer('num_funcionarios'),
+  origemTipo: varchar('origem_tipo', { length: 20 }).notNull(),
+  origemArquivo: varchar('origem_arquivo', { length: 255 }),
+  origemProcesso: varchar('origem_processo', { length: 100 }),
+  origemPrompt: text('origem_prompt'),
+  origemConfianca: integer('origem_confianca'),
+  origemData: timestamp('origem_data').notNull().defaultNow(),
+  origemUsuarioId: integer('origem_usuario_id'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdBy: integer('created_by'),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  updatedBy: integer('updated_by'),
+  deletedAt: timestamp('deleted_at'),
+  deletedBy: integer('deleted_by'),
+});
+
+// ============================================================================
+// DIMENSÃO: Geografia
+// ============================================================================
 export const dimGeografia = pgTable(
   'dim_geografia',
   {
     id: serial('id').primaryKey(),
-    cidade: varchar('cidade', { length: 255 }).notNull(),
+    cidade: varchar('cidade', { length: 100 }).notNull(),
     uf: varchar('uf', { length: 2 }).notNull(),
-    regiao: varchar('regiao', { length: 50 }).notNull(),
-    latitude: numeric('latitude', { precision: 10, scale: 7 }),
-    longitude: numeric('longitude', { precision: 10, scale: 7 }),
-    created_at: timestamp('created_at', { mode: 'string' }).defaultNow(),
-    updated_at: timestamp('updated_at', { mode: 'string' }).defaultNow(),
+    regiao: varchar('regiao', { length: 20 }),
+    latitude: decimal('latitude', { precision: 10, scale: 8 }),
+    longitude: decimal('longitude', { precision: 11, scale: 8 }),
+    codigoIbge: varchar('codigo_ibge', { length: 10 }),
+    populacao: integer('populacao'),
+    pibPerCapita: decimal('pib_per_capita', { precision: 12, scale: 2 }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    createdBy: integer('created_by'),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+    updatedBy: integer('updated_by'),
   },
-  (table) => [
-    uniqueIndex('dim_geografia_cidade_uf_unique').on(table.cidade, table.uf),
-    index('idx_dim_geografia_uf').on(table.uf),
-    index('idx_dim_geografia_regiao').on(table.regiao),
-    index('idx_dim_geografia_cidade_uf').on(table.cidade, table.uf),
-  ]
+  (table) => ({
+    uniqueCidadeUf: unique().on(table.cidade, table.uf),
+  })
 );
 
 // ============================================================================
-// DIMENSÃO: MERCADOS (Setores)
+// DIMENSÃO: Mercado
 // ============================================================================
+export const dimMercado = pgTable('dim_mercado', {
+  id: serial('id').primaryKey(),
+  mercadoHash: varchar('mercado_hash', { length: 64 }).unique().notNull(),
+  nome: varchar('nome', { length: 255 }).notNull(),
+  categoria: varchar('categoria', { length: 100 }),
+  segmentacao: varchar('segmentacao', { length: 255 }),
+  tamanhoMercadoBr: decimal('tamanho_mercado_br', { precision: 15, scale: 2 }),
+  crescimentoAnualPct: decimal('crescimento_anual_pct', { precision: 5, scale: 2 }),
+  tendencias: text('tendencias').array(),
+  principaisPlayers: text('principais_players').array(),
+  enriquecido: boolean('enriquecido').default(false),
+  enriquecidoEm: timestamp('enriquecido_em'),
+  enriquecidoPor: varchar('enriquecido_por', { length: 50 }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdBy: integer('created_by'),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  updatedBy: integer('updated_by'),
+});
 
-export const dimMercados = pgTable(
-  'dim_mercados',
+// ============================================================================
+// DIMENSÃO: Produto
+// ============================================================================
+export const dimProduto = pgTable('dim_produto', {
+  id: serial('id').primaryKey(),
+  produtoHash: varchar('produto_hash', { length: 64 }).unique().notNull(),
+  nome: varchar('nome', { length: 255 }).notNull(),
+  categoria: varchar('categoria', { length: 100 }),
+  descricao: text('descricao'),
+  precoMedio: decimal('preco_medio', { precision: 12, scale: 2 }),
+  unidade: varchar('unidade', { length: 20 }),
+  ncm: varchar('ncm', { length: 10 }),
+  enriquecido: boolean('enriquecido').default(false),
+  enriquecidoEm: timestamp('enriquecido_em'),
+  enriquecidoPor: varchar('enriquecido_por', { length: 50 }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdBy: integer('created_by'),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  updatedBy: integer('updated_by'),
+});
+
+// ============================================================================
+// DIMENSÃO: Status Qualificação
+// ============================================================================
+export const dimStatusQualificacao = pgTable('dim_status_qualificacao', {
+  id: serial('id').primaryKey(),
+  codigo: varchar('codigo', { length: 50 }).unique().notNull(),
+  nome: varchar('nome', { length: 100 }).notNull(),
+  descricao: text('descricao'),
+  cor: varchar('cor', { length: 7 }),
+  ordem: integer('ordem'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdBy: integer('created_by'),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  updatedBy: integer('updated_by'),
+});
+
+// ============================================================================
+// FATO: Entidade Contexto
+// ============================================================================
+export const fatoEntidadeContexto = pgTable(
+  'fato_entidade_contexto',
   {
     id: serial('id').primaryKey(),
-    mercado_hash: varchar('mercado_hash', { length: 255 }),
-    nome: varchar('nome', { length: 255 }).notNull(),
-    categoria: varchar('categoria', { length: 100 }).notNull(),
-    segmentacao: varchar('segmentacao', { length: 50 }),
-    tamanho_mercado: text('tamanho_mercado'),
-    crescimento_anual: text('crescimento_anual'),
-    tendencias: text('tendencias'),
-    principais_players: text('principais_players'),
-    pesquisa_id: integer('pesquisa_id').notNull(),
-    project_id: integer('project_id').notNull(),
-    created_at: timestamp('created_at', { mode: 'string' }).defaultNow(),
-    updated_at: timestamp('updated_at', { mode: 'string' }).defaultNow(),
-  },
-  (table) => [
-    uniqueIndex('dim_mercados_hash_unique').on(table.mercado_hash),
-    index('idx_dim_mercados_pesquisa').on(table.pesquisa_id),
-    index('idx_dim_mercados_project').on(table.project_id),
-    index('idx_dim_mercados_categoria').on(table.categoria),
-    index('idx_dim_mercados_hash').on(table.mercado_hash),
-    index('idx_dim_mercados_pesquisa_categoria').on(table.pesquisa_id, table.categoria),
-  ]
-);
-
-// ============================================================================
-// DIMENSÃO: PRODUTOS
-// ============================================================================
-
-export const dimProdutos = pgTable(
-  'dim_produtos',
-  {
-    id: serial('id').primaryKey(),
-    produto_hash: varchar('produto_hash', { length: 255 }),
-    nome: varchar('nome', { length: 255 }).notNull(),
-    categoria: varchar('categoria', { length: 100 }).notNull(),
-    descricao: text('descricao'),
-    preco: text('preco'),
-    unidade: varchar('unidade', { length: 50 }),
-    ativo: boolean('ativo').default(true),
-    mercado_id: integer('mercado_id'),
-    pesquisa_id: integer('pesquisa_id').notNull(),
-    project_id: integer('project_id').notNull(),
-    created_at: timestamp('created_at', { mode: 'string' }).defaultNow(),
-    updated_at: timestamp('updated_at', { mode: 'string' }).defaultNow(),
-  },
-  (table) => [
-    uniqueIndex('dim_produtos_hash_unique').on(table.produto_hash),
-    index('idx_dim_produtos_pesquisa').on(table.pesquisa_id),
-    index('idx_dim_produtos_project').on(table.project_id),
-    index('idx_dim_produtos_categoria').on(table.categoria),
-    index('idx_dim_produtos_mercado').on(table.mercado_id),
-    index('idx_dim_produtos_hash').on(table.produto_hash),
-    index('idx_dim_produtos_pesquisa_categoria').on(table.pesquisa_id, table.categoria),
-  ]
-);
-
-// ============================================================================
-// TABELA FATO: ENTIDADES (Clientes + Leads + Concorrentes UNIFICADOS)
-// ============================================================================
-
-export const fatoEntidades = pgTable(
-  'fato_entidades',
-  {
-    id: serial('id').primaryKey(),
-
-    // Tipo de entidade padronizado
-    tipo_entidade: varchar('tipo_entidade', { length: 20 }).notNull(),
-
-    // Hash único padronizado
-    entidade_hash: varchar('entidade_hash', { length: 255 }),
-
-    // Identificação padronizada
-    nome: varchar('nome', { length: 255 }).notNull(),
-    cnpj: varchar('cnpj', { length: 20 }),
-
-    // Relacionamentos obrigatórios padronizados
-    pesquisa_id: integer('pesquisa_id').notNull(),
-    project_id: integer('project_id').notNull(),
-    geografia_id: integer('geografia_id').notNull(),
-    mercado_id: integer('mercado_id').notNull(),
-
-    // Contato padronizado
-    email: varchar('email', { length: 500 }),
-    telefone: varchar('telefone', { length: 50 }),
-    site_oficial: varchar('site_oficial', { length: 500 }),
-    linkedin: varchar('linkedin', { length: 500 }),
-    instagram: varchar('instagram', { length: 500 }),
-
-    // Classificação padronizada
-    cnae: varchar('cnae', { length: 20 }),
-    porte: varchar('porte', { length: 50 }),
-    segmentacao_b2b_b2c: varchar('segmentacao_b2b_b2c', { length: 10 }),
-
-    // Financeiro padronizado
-    faturamento_declarado: text('faturamento_declarado'),
-    faturamento_estimado: text('faturamento_estimado'),
-    numero_estabelecimentos: text('numero_estabelecimentos'),
-
-    // Qualidade padronizada
-    qualidade_score: integer('qualidade_score'),
-    qualidade_classificacao: varchar('qualidade_classificacao', { length: 50 }),
-
-    // Status de qualificação (ativo, inativo, prospect, lead_qualificado, lead_desqualificado)
-    status_qualificacao: varchar('status_qualificacao', { length: 50 }).default('prospect'),
-
-    // Validação padronizada
-    validation_status: varchar('validation_status', { length: 50 }).default('pending'),
-    validation_notes: text('validation_notes'),
-    validated_by: varchar('validated_by', { length: 64 }),
-    validated_at: timestamp('validated_at', { mode: 'string' }),
-
-    // Campos específicos de leads
-    lead_stage: varchar('lead_stage', { length: 50 }),
-    stage_updated_at: timestamp('stage_updated_at', { mode: 'string' }),
-    cliente_origem_id: integer('cliente_origem_id'),
-
-    // Metadados padronizados
-    created_at: timestamp('created_at', { mode: 'string' }).defaultNow(),
-    updated_at: timestamp('updated_at', { mode: 'string' }).defaultNow(),
-  },
-  (table) => [
-    uniqueIndex('fato_entidades_hash_unique').on(table.entidade_hash),
-    index('idx_fato_entidades_tipo').on(table.tipo_entidade),
-    index('idx_fato_entidades_pesquisa').on(table.pesquisa_id),
-    index('idx_fato_entidades_project').on(table.project_id),
-    index('idx_fato_entidades_geografia').on(table.geografia_id),
-    index('idx_fato_entidades_mercado').on(table.mercado_id),
-    index('idx_fato_entidades_hash').on(table.entidade_hash),
-    index('idx_fato_entidades_qualidade').on(table.qualidade_score),
-    index('idx_fato_entidades_cnpj').on(table.cnpj),
-    index('idx_fato_entidades_tipo_pesquisa').on(table.tipo_entidade, table.pesquisa_id),
-    index('idx_fato_entidades_tipo_mercado').on(table.tipo_entidade, table.mercado_id),
-    index('idx_fato_entidades_cliente_origem').on(table.cliente_origem_id),
-    index('idx_fato_entidades_geografia_mercado').on(table.geografia_id, table.mercado_id),
-    index('idx_fato_entidades_status_qualificacao').on(table.status_qualificacao),
-    index('idx_fato_entidades_tipo_status').on(table.tipo_entidade, table.status_qualificacao),
-    index('idx_fato_entidades_pesquisa_status').on(table.pesquisa_id, table.status_qualificacao),
-    index('idx_fato_entidades_mercado_status').on(table.mercado_id, table.status_qualificacao),
-    index('idx_fato_entidades_geografia_status').on(table.geografia_id, table.status_qualificacao),
-    index('idx_fato_entidades_tipo_pesquisa_status').on(
-      table.tipo_entidade,
-      table.pesquisa_id,
-      table.status_qualificacao
+    entidadeId: integer('entidade_id')
+      .notNull()
+      .references(() => dimEntidade.id, { onDelete: 'cascade' }),
+    projetoId: integer('projeto_id')
+      .notNull()
+      .references(() => dimProjeto.id, { onDelete: 'cascade' }),
+    pesquisaId: integer('pesquisa_id')
+      .notNull()
+      .references(() => dimPesquisa.id, { onDelete: 'cascade' }),
+    geografiaId: integer('geografia_id').references(() => dimGeografia.id, {
+      onDelete: 'set null',
+    }),
+    mercadoId: integer('mercado_id').references(() => dimMercado.id, { onDelete: 'set null' }),
+    statusQualificacaoId: integer('status_qualificacao_id').references(
+      () => dimStatusQualificacao.id,
+      { onDelete: 'set null' }
     ),
-    check('fato_entidades_tipo_check', sql`tipo_entidade IN ('cliente', 'lead', 'concorrente')`),
-    check('fato_entidades_qualidade_check', sql`qualidade_score >= 0 AND qualidade_score <= 100`),
-    check(
-      'fato_entidades_status_qualificacao_check',
-      sql`status_qualificacao IN ('ativo', 'inativo', 'prospect', 'lead_qualificado', 'lead_desqualificado')`
-    ),
-  ]
+    cnae: varchar('cnae', { length: 10 }),
+    porte: varchar('porte', { length: 20 }),
+    faturamentoEstimado: decimal('faturamento_estimado', { precision: 15, scale: 2 }),
+    numFuncionarios: integer('num_funcionarios'),
+    qualidadeScore: integer('qualidade_score'),
+    qualidadeClassificacao: varchar('qualidade_classificacao', { length: 10 }),
+    observacoes: text('observacoes'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    createdBy: integer('created_by'),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+    updatedBy: integer('updated_by'),
+    deletedAt: timestamp('deleted_at'),
+    deletedBy: integer('deleted_by'),
+  },
+  (table) => ({
+    uniqueEntidadeProjetoPesquisa: unique().on(table.entidadeId, table.projetoId, table.pesquisaId),
+  })
 );
 
 // ============================================================================
-// RELACIONAMENTO N:N: ENTIDADE ↔ PRODUTOS
+// FATO: Entidade Produto (N:N)
 // ============================================================================
-
-export const entidadeProdutos = pgTable(
-  'entidade_produtos',
+export const fatoEntidadeProduto = pgTable(
+  'fato_entidade_produto',
   {
     id: serial('id').primaryKey(),
-    entidade_id: integer('entidade_id').notNull(),
-    produto_id: integer('produto_id').notNull(),
-    tipo_relacao: varchar('tipo_relacao', { length: 50 }),
-    created_at: timestamp('created_at', { mode: 'string' }).defaultNow(),
+    contextoId: integer('contexto_id')
+      .notNull()
+      .references(() => fatoEntidadeContexto.id, { onDelete: 'cascade' }),
+    produtoId: integer('produto_id')
+      .notNull()
+      .references(() => dimProduto.id, { onDelete: 'cascade' }),
+    tipoRelacao: varchar('tipo_relacao', { length: 50 }),
+    volumeEstimado: varchar('volume_estimado', { length: 100 }),
+    observacoes: text('observacoes'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    createdBy: integer('created_by'),
   },
-  (table) => [
-    uniqueIndex('entidade_produtos_unique').on(table.entidade_id, table.produto_id),
-    index('idx_entidade_produtos_entidade').on(table.entidade_id),
-    index('idx_entidade_produtos_produto').on(table.produto_id),
-    index('idx_entidade_produtos_tipo').on(table.tipo_relacao),
-  ]
+  (table) => ({
+    uniqueContextoProduto: unique().on(table.contextoId, table.produtoId),
+  })
 );
 
 // ============================================================================
-// RELACIONAMENTO N:N: ENTIDADE ↔ COMPETIDORES (Análise Competitiva)
+// FATO: Entidade Competidor (N:N)
 // ============================================================================
-
-export const entidadeCompetidores = pgTable(
-  'entidade_competidores',
+export const fatoEntidadeCompetidor = pgTable(
+  'fato_entidade_competidor',
   {
     id: serial('id').primaryKey(),
-    entidade_id: integer('entidade_id').notNull(),
-    competidor_id: integer('competidor_id').notNull(),
-    mercado_id: integer('mercado_id').notNull(),
-    nivel_competicao: varchar('nivel_competicao', { length: 50 }),
-    created_at: timestamp('created_at', { mode: 'string' }).defaultNow(),
+    contextoId: integer('contexto_id')
+      .notNull()
+      .references(() => fatoEntidadeContexto.id, { onDelete: 'cascade' }),
+    competidorEntidadeId: integer('competidor_entidade_id')
+      .notNull()
+      .references(() => dimEntidade.id, { onDelete: 'cascade' }),
+    nivelCompeticao: varchar('nivel_competicao', { length: 20 }),
+    diferencial: text('diferencial'),
+    observacoes: text('observacoes'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    createdBy: integer('created_by'),
   },
-  (table) => [
-    uniqueIndex('entidade_competidores_unique').on(
-      table.entidade_id,
-      table.competidor_id,
-      table.mercado_id
-    ),
-    index('idx_entidade_competidores_entidade').on(table.entidade_id),
-    index('idx_entidade_competidores_competidor').on(table.competidor_id),
-    index('idx_entidade_competidores_mercado').on(table.mercado_id),
-    check('entidade_competidores_check', sql`entidade_id != competidor_id`),
-  ]
+  (table) => ({
+    uniqueContextoCompetidor: unique().on(table.contextoId, table.competidorEntidadeId),
+  })
 );
 
 // ============================================================================
-// HISTÓRICO: AUDITORIA DE ENTIDADES
+// RELATIONS (Drizzle ORM)
 // ============================================================================
 
-export const fatoEntidadesHistory = pgTable(
-  'fato_entidades_history',
-  {
-    id: serial('id').primaryKey(),
-    entidade_id: integer('entidade_id').notNull(),
-    data_snapshot: jsonb('data_snapshot').notNull(),
-    change_type: varchar('change_type', { length: 50 }).notNull(),
-    changed_by: varchar('changed_by', { length: 64 }),
-    changed_at: timestamp('changed_at', { mode: 'string' }).defaultNow(),
-  },
-  (table) => [
-    index('idx_fato_entidades_history_entidade').on(table.entidade_id),
-    index('idx_fato_entidades_history_changed_at').on(table.changed_at),
-    index('idx_fato_entidades_history_change_type').on(table.change_type),
-    check(
-      'fato_entidades_history_type_check',
-      sql`change_type IN ('created', 'updated', 'deleted')`
-    ),
-  ]
-);
+export const dimProjetoRelations = relations(dimProjeto, ({ many }) => ({
+  pesquisas: many(dimPesquisa),
+  contextos: many(fatoEntidadeContexto),
+}));
 
-// ============================================================================
-// TIPOS PARA TYPESCRIPT
-// ============================================================================
+export const dimPesquisaRelations = relations(dimPesquisa, ({ one, many }) => ({
+  projeto: one(dimProjeto, {
+    fields: [dimPesquisa.projetoId],
+    references: [dimProjeto.id],
+  }),
+  contextos: many(fatoEntidadeContexto),
+}));
 
-export type DimGeografia = typeof dimGeografia.$inferSelect;
-export type NewDimGeografia = typeof dimGeografia.$inferInsert;
+export const dimEntidadeRelations = relations(dimEntidade, ({ many }) => ({
+  contextos: many(fatoEntidadeContexto),
+  competidores: many(fatoEntidadeCompetidor),
+}));
 
-export type DimMercados = typeof dimMercados.$inferSelect;
-export type NewDimMercados = typeof dimMercados.$inferInsert;
+export const fatoEntidadeContextoRelations = relations(fatoEntidadeContexto, ({ one, many }) => ({
+  entidade: one(dimEntidade, {
+    fields: [fatoEntidadeContexto.entidadeId],
+    references: [dimEntidade.id],
+  }),
+  projeto: one(dimProjeto, {
+    fields: [fatoEntidadeContexto.projetoId],
+    references: [dimProjeto.id],
+  }),
+  pesquisa: one(dimPesquisa, {
+    fields: [fatoEntidadeContexto.pesquisaId],
+    references: [dimPesquisa.id],
+  }),
+  geografia: one(dimGeografia, {
+    fields: [fatoEntidadeContexto.geografiaId],
+    references: [dimGeografia.id],
+  }),
+  mercado: one(dimMercado, {
+    fields: [fatoEntidadeContexto.mercadoId],
+    references: [dimMercado.id],
+  }),
+  statusQualificacao: one(dimStatusQualificacao, {
+    fields: [fatoEntidadeContexto.statusQualificacaoId],
+    references: [dimStatusQualificacao.id],
+  }),
+  produtos: many(fatoEntidadeProduto),
+  competidores: many(fatoEntidadeCompetidor),
+}));
 
-export type DimProdutos = typeof dimProdutos.$inferSelect;
-export type NewDimProdutos = typeof dimProdutos.$inferInsert;
+export const fatoEntidadeProdutoRelations = relations(fatoEntidadeProduto, ({ one }) => ({
+  contexto: one(fatoEntidadeContexto, {
+    fields: [fatoEntidadeProduto.contextoId],
+    references: [fatoEntidadeContexto.id],
+  }),
+  produto: one(dimProduto, {
+    fields: [fatoEntidadeProduto.produtoId],
+    references: [dimProduto.id],
+  }),
+}));
 
-export type FatoEntidades = typeof fatoEntidades.$inferSelect;
-export type NewFatoEntidades = typeof fatoEntidades.$inferInsert;
-
-export type EntidadeProdutos = typeof entidadeProdutos.$inferSelect;
-export type NewEntidadeProdutos = typeof entidadeProdutos.$inferInsert;
-
-export type EntidadeCompetidores = typeof entidadeCompetidores.$inferSelect;
-export type NewEntidadeCompetidores = typeof entidadeCompetidores.$inferInsert;
-
-export type FatoEntidadesHistory = typeof fatoEntidadesHistory.$inferSelect;
-export type NewFatoEntidadesHistory = typeof fatoEntidadesHistory.$inferInsert;
+export const fatoEntidadeCompetidorRelations = relations(fatoEntidadeCompetidor, ({ one }) => ({
+  contexto: one(fatoEntidadeContexto, {
+    fields: [fatoEntidadeCompetidor.contextoId],
+    references: [fatoEntidadeContexto.id],
+  }),
+  competidor: one(dimEntidade, {
+    fields: [fatoEntidadeCompetidor.competidorEntidadeId],
+    references: [dimEntidade.id],
+  }),
+}));
