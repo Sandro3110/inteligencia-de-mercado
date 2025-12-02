@@ -89,7 +89,7 @@ export const pesquisasRouter = router({
         descricao: input.descricao,
         objetivo,
         status: 'pendente',
-        createdBy: ctx.user.id,
+        createdBy: 1, // TODO: Implementar mapeamento de user UUID para integer ID
       });
 
       return novaPesquisa;
