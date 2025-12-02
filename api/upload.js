@@ -183,7 +183,7 @@ export default async function handler(req, res) {
           )
           VALUES (
             ${entidadeHash},
-            ${linha.tipo_entidade || 'cliente'},
+            ${(linha.tipo_entidade || linha.tipo || 'cliente').toLowerCase()},
             ${linha.nome},
             ${linha.nome_fantasia || null},
             ${linha.cnpj || null},
