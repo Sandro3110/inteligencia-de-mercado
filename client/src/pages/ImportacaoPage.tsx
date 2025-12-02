@@ -27,6 +27,7 @@ export default function ImportacaoPage() {
   const [importacaoId, setImportacaoId] = useState<number | null>(null);
 
   const projetos = trpc.projetos.list.useQuery({ limit: 100 });
+  console.log('DEBUG projetos:', projetos.data);
   const pesquisas = trpc.pesquisas.list.useQuery(
     { projetoId, limit: 100 },
     { enabled: projetoId > 0 }
