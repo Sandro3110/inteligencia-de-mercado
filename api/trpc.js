@@ -287,7 +287,26 @@ export default async function handler(req, res) {
         data = pesquisa;
       } else if (procedure === 'getById') {
         // Buscar pesquisa por ID
-        if (!input || !input.id) {
+        // Parse query params para GET
+        const url = new URL(req.url, 'https://dummy.com');
+        const inputParam = url.searchParams.get('input');
+        let queryInput = {};
+        
+        if (inputParam) {
+          try {
+            queryInput = JSON.parse(inputParam);
+            // tRPC client pode enviar em formato batch: {"0": {data}}
+            if (queryInput['0']) {
+              queryInput = queryInput['0'];
+            }
+          } catch (e) {
+            console.log('[tRPC] Failed to parse input param:', e);
+          }
+        }
+        
+        const { id } = queryInput;
+        
+        if (!id) {
           throw new Error('ID da pesquisa é obrigatório');
         }
 
@@ -297,7 +316,7 @@ export default async function handler(req, res) {
                  proj.codigo as projeto_codigo
           FROM dim_pesquisa p
           LEFT JOIN dim_projeto proj ON p.projeto_id = proj.id
-          WHERE p.id = ${input.id}
+          WHERE p.id = ${id}
           AND p.deleted_at IS NULL
         `;
 
