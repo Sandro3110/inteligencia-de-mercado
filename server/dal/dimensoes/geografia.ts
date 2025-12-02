@@ -313,3 +313,100 @@ export function validarUF(uf: string): boolean {
 
   return ufsValidas.includes(uf.toUpperCase());
 }
+
+// ============================================================================
+// FUZZY MATCH (para importação)
+// ============================================================================
+
+/**
+ * Buscar geografia por cidade e UF com fuzzy match (Levenshtein)
+ * Retorna a melhor correspondência se similaridade > threshold
+ */
+export async function buscarGeografiaFuzzy(
+  cidade: string,
+  uf: string,
+  threshold = 0.8
+): Promise<{ geografia: any; similaridade: number } | null> {
+  // Normalizar inputs
+  const cidadeNorm = normalizarCidade(cidade);
+  const ufNorm = uf.toUpperCase().trim();
+
+  // Buscar exata primeiro
+  const exata = await buscarGeografia(cidade, uf);
+  if (exata) {
+    return { geografia: exata, similaridade: 1.0 };
+  }
+
+  // Buscar todas as cidades da UF
+  const cidadesDaUF = await db
+    .select()
+    .from(dimGeografia)
+    .where(eq(dimGeografia.uf, ufNorm));
+
+  if (cidadesDaUF.length === 0) {
+    return null;
+  }
+
+  // Calcular similaridade com cada cidade
+  const resultados = cidadesDaUF.map((geo) => {
+    const cidadeGeoNorm = normalizarCidade(geo.cidade);
+    const similaridade = calcularSimilaridade(cidadeNorm, cidadeGeoNorm);
+    return { geografia: geo, similaridade };
+  });
+
+  // Ordenar por similaridade (maior primeiro)
+  resultados.sort((a, b) => b.similaridade - a.similaridade);
+
+  // Retornar melhor resultado se > threshold
+  const melhor = resultados[0];
+  if (melhor && melhor.similaridade >= threshold) {
+    return melhor;
+  }
+
+  return null;
+}
+
+/**
+ * Calcular similaridade entre duas strings (Levenshtein normalizado)
+ * Retorna valor entre 0 (totalmente diferente) e 1 (idêntico)
+ */
+function calcularSimilaridade(str1: string, str2: string): number {
+  const distance = levenshteinDistance(str1, str2);
+  const maxLength = Math.max(str1.length, str2.length);
+  if (maxLength === 0) return 1.0;
+  return 1 - distance / maxLength;
+}
+
+/**
+ * Calcular distância de Levenshtein entre duas strings
+ */
+function levenshteinDistance(str1: string, str2: string): number {
+  const m = str1.length;
+  const n = str2.length;
+
+  // Criar matriz
+  const dp: number[][] = Array(m + 1)
+    .fill(null)
+    .map(() => Array(n + 1).fill(0));
+
+  // Inicializar primeira linha e coluna
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+  // Preencher matriz
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (str1[i - 1] === str2[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1];
+      } else {
+        dp[i][j] = Math.min(
+          dp[i - 1][j] + 1, // deletar
+          dp[i][j - 1] + 1, // inserir
+          dp[i - 1][j - 1] + 1 // substituir
+        );
+      }
+    }
+  }
+
+  return dp[m][n];
+}

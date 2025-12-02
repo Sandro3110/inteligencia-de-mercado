@@ -39,6 +39,7 @@ export interface CreateEntidadeInput {
   origemPrompt?: string;
   origemConfianca?: number;
   origemUsuarioId?: string;
+  importacaoId?: number;
   createdBy?: string;
 }
 

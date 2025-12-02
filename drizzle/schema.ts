@@ -102,6 +102,7 @@ export const dimEntidade = pgTable('dim_entidade', {
   numFiliais: integer('num_filiais').default(0),
   numLojas: integer('num_lojas').default(0),
   numFuncionarios: integer('num_funcionarios'),
+  importacaoId: integer('importacao_id'),
   origemTipo: varchar('origem_tipo', { length: 20 }).notNull(),
   origemArquivo: varchar('origem_arquivo', { length: 255 }),
   origemProcesso: varchar('origem_processo', { length: 100 }),
@@ -291,6 +292,58 @@ export const fatoEntidadeCompetidor = pgTable(
     uniqueContextoCompetidor: unique().on(table.contextoId, table.competidorEntidadeId),
   })
 );
+
+// ============================================================================
+// TABELA: Importação
+// ============================================================================
+export const dimImportacao = pgTable('dim_importacao', {
+  id: serial('id').primaryKey(),
+  projetoId: integer('projeto_id')
+    .notNull()
+    .references(() => dimProjeto.id, { onDelete: 'cascade' }),
+  pesquisaId: integer('pesquisa_id')
+    .notNull()
+    .references(() => dimPesquisa.id, { onDelete: 'cascade' }),
+  nomeArquivo: varchar('nome_arquivo', { length: 255 }).notNull(),
+  tipoArquivo: varchar('tipo_arquivo', { length: 10 }).notNull(),
+  tamanhoBytes: integer('tamanho_bytes'),
+  caminhoS3: varchar('caminho_s3', { length: 500 }),
+  totalLinhas: integer('total_linhas').notNull(),
+  linhasProcessadas: integer('linhas_processadas').default(0),
+  linhasSucesso: integer('linhas_sucesso').default(0),
+  linhasErro: integer('linhas_erro').default(0),
+  linhasDuplicadas: integer('linhas_duplicadas').default(0),
+  linhasGeografiaFuzzy: integer('linhas_geografia_fuzzy').default(0),
+  status: varchar('status', { length: 20 }).notNull().default('pendente'),
+  erroMensagem: text('erro_mensagem'),
+  progressoPercentual: integer('progresso_percentual').default(0),
+  mapeamentoColunas: text('mapeamento_colunas'), // JSONB como text
+  opcoes: text('opcoes'), // JSONB como text
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+  durationSeconds: integer('duration_seconds'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdBy: varchar('created_by', { length: 255 }).notNull(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  updatedBy: varchar('updated_by', { length: 255 }),
+});
+
+// ============================================================================
+// TABELA: Erros de Importação
+// ============================================================================
+export const importacaoErros = pgTable('importacao_erros', {
+  id: serial('id').primaryKey(),
+  importacaoId: integer('importacao_id')
+    .notNull()
+    .references(() => dimImportacao.id, { onDelete: 'cascade' }),
+  linhaNumero: integer('linha_numero').notNull(),
+  linhaDados: text('linha_dados').notNull(), // JSONB como text
+  campoErro: varchar('campo_erro', { length: 100 }),
+  tipoErro: varchar('tipo_erro', { length: 50 }).notNull(),
+  mensagemErro: text('mensagem_erro').notNull(),
+  sugestaoCorrecao: text('sugestao_correcao'), // JSONB como text
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
 
 // ============================================================================
 // RELATIONS (Drizzle ORM)
