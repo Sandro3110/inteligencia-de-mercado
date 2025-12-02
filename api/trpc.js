@@ -254,9 +254,15 @@ export default async function handler(req, res) {
           throw new Error('Nome da pesquisa é obrigatório');
         }
         
-        if (!tipo) {
-          throw new Error('Tipo da pesquisa é obrigatório');
+        // Construir objetivo a partir de tipo e limite
+        const objetivoParts = [];
+        if (tipo) {
+          objetivoParts.push(`Tipo: ${tipo}`);
         }
+        if (limiteResultados) {
+          objetivoParts.push(`Limite: ${limiteResultados} resultados`);
+        }
+        const objetivo = objetivoParts.length > 0 ? objetivoParts.join(' | ') : null;
 
         // Inserir pesquisa
         const [pesquisa] = await client`
@@ -264,24 +270,16 @@ export default async function handler(req, res) {
             projeto_id,
             nome,
             descricao,
-            tipo,
+            objetivo,
             status,
-            limite_resultados,
-            owner_id,
-            created_by,
-            created_at,
-            updated_at
+            created_by
           ) VALUES (
             ${projetoId || null},
             ${nome},
             ${descricao || null},
-            ${tipo},
-            'em_progresso',
-            ${limiteResultados || 1000},
-            1,
-            1,
-            NOW(),
-            NOW()
+            ${objetivo},
+            'pendente',
+            1
           )
           RETURNING *
         `;
