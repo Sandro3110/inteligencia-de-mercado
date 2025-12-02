@@ -74,6 +74,7 @@ export default async function handler(req, res) {
         linhas_erro,
         linhas_duplicadas,
         status,
+        created_by,
         created_at,
         updated_at
       )
@@ -88,6 +89,7 @@ export default async function handler(req, res) {
         0,
         0,
         'processando',
+        1,
         NOW(),
         NOW()
       )
