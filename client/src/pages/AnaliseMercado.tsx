@@ -24,6 +24,9 @@ import {
   Tooltip
 } from 'recharts';
 
+// tRPC
+import { trpc } from '@/lib/trpc';
+
 // Componentes dimensionais
 import { KPIGrid } from '@/components/dimensional/KPICard';
 import { DataTable } from '@/components/dimensional/DataTable';
@@ -33,8 +36,20 @@ export function AnaliseMercado() {
   const [nivelAtual, setNivelAtual] = useState<'setor' | 'subsetor' | 'nicho'>('setor');
   const [selecionado, setSelecionado] = useState<string | null>(null);
 
-  // Mock de dados hierárquicos
-  const hierarquia = {
+  // Buscar dados via tRPC
+  const { data: hierarquia, isLoading: loadingHierarquia } = trpc.mercado.hierarquia.useQuery({
+    nivel: nivelAtual,
+    selecionado
+  });
+
+  const { data: concorrentes, isLoading: loadingConcorrentes } = trpc.mercado.concorrencia.useQuery({});
+
+  const { data: oportunidades, isLoading: loadingOportunidades } = trpc.mercado.oportunidades.useQuery({});
+
+  const loading = loadingHierarquia || loadingConcorrentes || loadingOportunidades;
+
+  // Dados padrão enquanto carrega
+  const hierarquiaFinal = hierarquia || {
     setores: [
       {
         nome: 'Tecnologia',
@@ -115,41 +130,11 @@ export function AnaliseMercado() {
     ]
   };
 
-  // Mock de concorrentes
-  const concorrentes = [
-    { id: 1, nome: 'SAP', share_of_voice: 35, vantagem_score: 85, ameaca: 'alta' },
-    { id: 2, nome: 'Oracle', share_of_voice: 28, vantagem_score: 78, ameaca: 'alta' },
-    { id: 3, nome: 'Salesforce', share_of_voice: 22, vantagem_score: 72, ameaca: 'média' },
-    { id: 4, nome: 'Microsoft', share_of_voice: 15, vantagem_score: 68, ameaca: 'média' }
-  ];
+  const concorrentesFinal = concorrentes || [];
+  const oportunidadesFinal = oportunidades || [];
 
-  // Mock de oportunidades
-  const oportunidades = [
-    {
-      mercado: 'ERP - Tecnologia',
-      total_leads: 120,
-      receita_potencial: 45000000,
-      score_medio: 82,
-      concorrentes: 5
-    },
-    {
-      mercado: 'CRM - Tecnologia',
-      total_leads: 90,
-      receita_potencial: 28000000,
-      score_medio: 78,
-      concorrentes: 4
-    },
-    {
-      mercado: 'E-commerce - Varejo',
-      total_leads: 220,
-      receita_potencial: 58000000,
-      score_medio: 75,
-      concorrentes: 8
-    }
-  ];
-
-  const totalEntidades = hierarquia.setores.reduce((sum, s) => sum + s.total_entidades, 0);
-  const receitaTotal = hierarquia.setores.reduce((sum, s) => sum + s.receita_total, 0);
+  const totalEntidades = hierarquiaFinal.setores.reduce((sum, s) => sum + s.total_entidades, 0);
+  const receitaTotal = hierarquiaFinal.setores.reduce((sum, s) => sum + s.receita_total, 0);
 
   return (
     <div className="container mx-auto py-6 space-y-6">

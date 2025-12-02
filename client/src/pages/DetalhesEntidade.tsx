@@ -36,6 +36,9 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
+// tRPC
+import { trpc } from '@/lib/trpc';
+
 // Componentes dimensionais
 import { KPIGrid } from '@/components/dimensional/KPICard';
 import { DataTable } from '@/components/dimensional/DataTable';
@@ -45,11 +48,23 @@ import { LoadingState } from '@/components/dimensional/LoadingState';
 
 export function DetalhesEntidade() {
   const params = useParams();
-  const entidadeId = params.id;
-  const [loading, setLoading] = useState(false);
+  const entidadeId = Number(params.id);
 
-  // Mock de dados da entidade
-  const entidade = {
+  // Buscar dados via tRPC
+  const { data: entidade, isLoading: loading } = trpc.entidade.detalhes.useQuery({ 
+    id: entidadeId 
+  });
+
+  const { data: similares } = trpc.entidade.similares.useQuery({ 
+    id: entidadeId 
+  });
+
+  const { data: recomendacoes } = trpc.entidade.recomendacoes.useQuery({ 
+    id: entidadeId 
+  });
+
+  // Dados padrão enquanto carrega
+  const entidadeFinal = entidade || {
     id: 1,
     nome: 'Ambev S.A.',
     nomeFantasia: 'Ambev',
@@ -85,50 +100,11 @@ export function DetalhesEntidade() {
     dataQualificacao: '2024-11-15'
   };
 
-  const produtos = [
-    { id: 1, nome: 'ERP Completo', tipo: 'principal', volumeEstimado: 'Alto', margem: 35 },
-    { id: 2, nome: 'CRM Vendas', tipo: 'complementar', volumeEstimado: 'Médio', margem: 28 },
-    { id: 3, nome: 'BI Analytics', tipo: 'complementar', volumeEstimado: 'Médio', margem: 22 }
-  ];
-
-  const concorrentes = [
-    { id: 1, nome: 'SAP', shareOfVoice: 35, vantagemScore: 85, ameaca: 'alta' },
-    { id: 2, nome: 'Oracle', shareOfVoice: 28, vantagemScore: 78, ameaca: 'alta' },
-    { id: 3, nome: 'Salesforce', shareOfVoice: 22, vantagemScore: 72, ameaca: 'média' }
-  ];
-
-  const historico = [
-    { data: '2024-11', receita: 8500000, score: 92, probabilidade: 78 },
-    { data: '2024-10', receita: 8200000, score: 90, probabilidade: 75 },
-    { data: '2024-09', receita: 7800000, score: 88, probabilidade: 72 },
-    { data: '2024-08', receita: 7500000, score: 85, probabilidade: 70 },
-    { data: '2024-07', receita: 7200000, score: 82, probabilidade: 68 },
-    { data: '2024-06', receita: 6800000, score: 80, probabilidade: 65 }
-  ];
-
-  const recomendacoes = [
-    {
-      tipo: 'oportunidade',
-      prioridade: 'alta',
-      titulo: 'Alta probabilidade de conversão',
-      descricao: 'Probabilidade de conversão de 78%. Priorize o contato.',
-      acoes: ['Agendar reunião', 'Enviar proposta', 'Fazer follow-up']
-    },
-    {
-      tipo: 'destaque',
-      prioridade: 'alta',
-      titulo: 'Cliente ideal identificado',
-      descricao: 'Esta empresa se encaixa perfeitamente no perfil de cliente ideal (ICP).',
-      acoes: ['Priorizar na prospecção', 'Alocar SDR senior', 'Preparar abordagem personalizada']
-    },
-    {
-      tipo: 'oportunidade',
-      prioridade: 'alta',
-      titulo: 'Alto potencial de receita',
-      descricao: 'Receita potencial de R$ 8.5M. Grande oportunidade.',
-      acoes: ['Envolver executivo', 'Preparar proposta customizada', 'Mapear stakeholders']
-    }
-  ];
+  const produtos = entidadeFinal.produtos || [];
+  const concorrentes = entidadeFinal.concorrentes || [];
+  const historico = entidadeFinal.historico || [];
+  const recomendacoesFinal = recomendacoes || [];
+  const similaresFinal = similares || [];
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -136,11 +112,11 @@ export function DetalhesEntidade() {
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold">{entidade.nome}</h1>
-            <Badge variant={entidade.tipo === 'cliente' ? 'default' : entidade.tipo === 'lead' ? 'secondary' : 'outline'}>
-              {entidade.tipo}
+            <h1 className="text-3xl font-bold">{entidadeFinal.nome}</h1>
+            <Badge variant={entidadeFinal.tipo === 'cliente' ? 'default' : entidadeFinal.tipo === 'lead' ? 'secondary' : 'outline'}>
+              {entidadeFinal.tipo}
             </Badge>
-            {contexto.ehClienteIdeal && (
+            {entidadeFinal.contexto?.ehClienteIdeal && (
               <Badge variant="default" className="bg-yellow-500">
                 ⭐ Cliente Ideal
               </Badge>

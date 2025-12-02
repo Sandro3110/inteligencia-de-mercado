@@ -4,6 +4,11 @@ import { projetosRouter } from './projetos';
 import { pesquisasRouter } from './pesquisas';
 import { entidadesRouter } from './entidades';
 import { importacaoRouter } from './importacao';
+import { cuboRouter } from './cubo';
+import { temporalRouter } from './temporal';
+import { geografiaRouter } from './geografia';
+import { mercadoRouter } from './mercado';
+import { entidadeRouter } from './entidade';
 
 const t = initTRPC.context<Context>().create();
 
@@ -18,6 +23,11 @@ export const appRouter = router({
   pesquisas: pesquisasRouter,
   entidades: entidadesRouter,
   importacao: importacaoRouter,
+  cubo: cuboRouter,
+  temporal: temporalRouter,
+  geografia: geografiaRouter,
+  mercado: mercadoRouter,
+  entidade: entidadeRouter,
 });
 
 export type AppRouter = typeof appRouter;

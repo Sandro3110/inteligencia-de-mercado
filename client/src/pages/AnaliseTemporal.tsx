@@ -26,6 +26,9 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
+// tRPC
+import { trpc } from '@/lib/trpc';
+
 // Componentes dimensionais
 import { SazonalidadeChart } from '@/components/dimensional/SazonalidadeChart';
 import { KPIGrid } from '@/components/dimensional/KPICard';
@@ -35,10 +38,27 @@ import { LoadingState } from '@/components/dimensional/LoadingState';
 export function AnaliseTemporal() {
   const [metrica, setMetrica] = useState('receita_potencial_anual');
   const [granularidade, setGranularidade] = useState('mes');
-  const [loading, setLoading] = useState(false);
 
-  // Mock de dados
-  const dadosEvolucao = [
+  // Buscar dados via tRPC
+  const { data: dadosEvolucao, isLoading: loadingEvolucao } = trpc.temporal.evolucao.useQuery({
+    metrica,
+    granularidade
+  });
+
+  const { data: dadosSazonalidade, isLoading: loadingSazonalidade } = trpc.temporal.sazonalidade.useQuery({
+    metrica,
+    tipo: 'mensal'
+  });
+
+  const { data: dadosComparacao, isLoading: loadingComparacao } = trpc.temporal.comparacao.useQuery({
+    metrica,
+    periodos: ['2023-Q1', '2023-Q2', '2023-Q3', '2023-Q4', '2024-Q1', '2024-Q2', '2024-Q3', '2024-Q4']
+  });
+
+  const loading = loadingEvolucao || loadingSazonalidade || loadingComparacao;
+
+  // Dados padrão enquanto carrega
+  const dadosEvolucaoFinal = dadosEvolucao || [
     { periodo: 'Jan', valor: 4500000, meta: 5000000 },
     { periodo: 'Fev', valor: 5200000, meta: 5000000 },
     { periodo: 'Mar', valor: 4800000, meta: 5000000 },
@@ -53,7 +73,7 @@ export function AnaliseTemporal() {
     { periodo: 'Dez', valor: 8500000, meta: 5000000 }
   ];
 
-  const dadosSazonalidade = {
+  const dadosSazonalidadeFinal = dadosSazonalidade || {
     mensal: [
       { periodo: 1, valor: 5200000, ocorrencias: 12 },
       { periodo: 2, valor: 4800000, ocorrencias: 12 },
@@ -79,7 +99,7 @@ export function AnaliseTemporal() {
     ]
   };
 
-  const dadosComparacao = [
+  const dadosComparacaoFinal = dadosComparacao || [
     { periodo: 'Q1 2023', valor: 14500000 },
     { periodo: 'Q2 2023', valor: 18500000 },
     { periodo: 'Q3 2023', valor: 21500000 },
@@ -92,7 +112,7 @@ export function AnaliseTemporal() {
 
   // Calcular tendência
   const calcularTendencia = () => {
-    const valores = dadosEvolucao.map(d => d.valor);
+    const valores = dadosEvolucaoFinal.map(d => d.valor);
     const crescimento = ((valores[valores.length - 1] - valores[0]) / valores[0]) * 100;
     const media = valores.reduce((a, b) => a + b, 0) / valores.length;
     

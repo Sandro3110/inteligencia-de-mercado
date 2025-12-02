@@ -25,6 +25,9 @@ import { ErrorState } from '@/components/dimensional/ErrorState';
 // Types
 import type { Filtro, ResultadoConsulta } from '@/types/dimensional';
 
+// tRPC
+import { trpc } from '@/lib/trpc';
+
 export function CuboExplorador() {
   const [buscaSemantica, setBuscaSemantica] = useState('');
   const [filtros, setFiltros] = useState<Filtro[]>([]);
@@ -40,47 +43,12 @@ export function CuboExplorador() {
     setErro(null);
 
     try {
-      // TODO: Chamar tRPC cuboRouter.buscaSemantica
-      // const resultado = await trpc.cubo.buscaSemantica.query({ query: buscaSemantica });
-      
-      // Mock temporário
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const mockResultado: ResultadoConsulta = {
-        dados: [
-          {
-            id: 1,
-            nome: 'Ambev S.A.',
-            tipo: 'lead',
-            receita_potencial: 8500000,
-            score_fit: 92,
-            cidade: 'São Paulo',
-            estado: 'SP'
-          },
-          {
-            id: 2,
-            nome: 'Magazine Luiza',
-            tipo: 'lead',
-            receita_potencial: 6200000,
-            score_fit: 88,
-            cidade: 'São Paulo',
-            estado: 'SP'
-          }
-        ],
-        total: 2,
-        filtrosAplicados: [],
-        sugestoes: [
-          {
-            tipo: 'filtro',
-            titulo: 'Adicionar filtro de segmento',
-            descricao: 'Filtre por Segmento A para focar em leads de alto valor',
-            acao: 'adicionar_filtro',
-            parametros: { campo: 'segmento_abc', operador: '=', valor: 'A' }
-          }
-        ]
-      };
+      // Chamar tRPC cuboRouter.buscaSemantica
+      const resultado = await trpc.cubo.buscaSemantica.mutate({ 
+        query: buscaSemantica 
+      });
 
-      setResultado(mockResultado);
+      setResultado(resultado);
     } catch (err) {
       setErro(err instanceof Error ? err.message : 'Erro ao buscar dados');
     } finally {
@@ -94,18 +62,10 @@ export function CuboExplorador() {
     setErro(null);
 
     try {
-      // TODO: Chamar tRPC cuboRouter.consultar
-      // const resultado = await trpc.cubo.consultar.query({ filtros });
+      // Chamar tRPC cuboRouter.consultar
+      const resultado = await trpc.cubo.consultar.query({ filtros });
       
-      // Mock temporário
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setResultado({
-        dados: [],
-        total: 0,
-        filtrosAplicados: filtros,
-        sugestoes: []
-      });
+      setResultado(resultado);
     } catch (err) {
       setErro(err instanceof Error ? err.message : 'Erro ao consultar dados');
     } finally {
