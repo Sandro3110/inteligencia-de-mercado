@@ -139,10 +139,10 @@ export default async function handler(req, res) {
           
           // Registrar erro de duplicação
           await client`
-            INSERT INTO dim_importacao_erro (
+            INSERT INTO importacao_erros (
               importacao_id,
-              linha,
-              dados_linha,
+              linha_numero,
+              linha_dados,
               tipo_erro,
               mensagem_erro,
               created_at
@@ -151,7 +151,7 @@ export default async function handler(req, res) {
               ${importacaoId},
               ${linhaNum},
               ${JSON.stringify(linha)},
-              'duplicada',
+              'duplicata',
               'Entidade já existe no banco',
               NOW()
             )
@@ -216,10 +216,10 @@ export default async function handler(req, res) {
 
         // Registrar erro no banco
         await client`
-          INSERT INTO dim_importacao_erro (
+          INSERT INTO importacao_erros (
             importacao_id,
-            linha,
-            dados_linha,
+            linha_numero,
+            linha_dados,
             tipo_erro,
             mensagem_erro,
             created_at
