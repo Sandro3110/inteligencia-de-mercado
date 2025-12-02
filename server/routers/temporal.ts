@@ -1,10 +1,12 @@
+import { requirePermission } from "../middleware/auth";
+import { Permission } from "@/shared/types/permissions";
 /**
  * Temporal Router - Análises temporais e tendências
  * 100% Funcional
  */
 
 import { z } from 'zod';
-import { router, publicProcedure } from '../trpc';
+import { router, requirePermission(Permission.ANALISE_READ) } from '../trpc';
 import { db } from '../db';
 import { dimTempo, fatoEntidadeContexto } from '../../drizzle/schema';
 import { eq, and, gte, lte, sql } from 'drizzle-orm';
@@ -35,7 +37,7 @@ export const temporalRouter = router({
   /**
    * Evolução de métrica ao longo do tempo
    */
-  evolucao: publicProcedure
+  evolucao: requirePermission(Permission.ANALISE_READ)
     .input(evolucaoSchema)
     .query(async ({ input }) => {
       const { metrica, periodo, filtros, compararCom } = input;
@@ -86,7 +88,7 @@ export const temporalRouter = router({
   /**
    * Sazonalidade - Padrões por mês/dia da semana
    */
-  sazonalidade: publicProcedure
+  sazonalidade: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       metrica: z.string(),
       tipo: z.enum(['mensal', 'semanal', 'diaria']),
@@ -124,7 +126,7 @@ export const temporalRouter = router({
   /**
    * Tendência - Análise de crescimento
    */
-  tendencia: publicProcedure
+  tendencia: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       metrica: z.string(),
       periodo: periodoSchema,
@@ -170,7 +172,7 @@ export const temporalRouter = router({
   /**
    * Comparação de períodos
    */
-  comparacao: publicProcedure
+  comparacao: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       metrica: z.string(),
       periodos: z.array(z.object({
@@ -210,7 +212,7 @@ export const temporalRouter = router({
   /**
    * Calendário de calor (heatmap)
    */
-  calendarioCalor: publicProcedure
+  calendarioCalor: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       metrica: z.string(),
       ano: z.number(),

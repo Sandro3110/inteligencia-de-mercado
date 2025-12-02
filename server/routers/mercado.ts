@@ -1,10 +1,12 @@
+import { requirePermission } from "../middleware/auth";
+import { Permission } from "@/shared/types/permissions";
 /**
  * Mercado Router - Análises de mercado e hierarquias
  * 100% Funcional
  */
 
 import { z } from 'zod';
-import { router, publicProcedure } from '../trpc';
+import { router, requirePermission(Permission.ANALISE_READ) } from '../trpc';
 import { db } from '../db';
 import { dimMercado, dimEntidade, fatoEntidadeContexto, fatoEntidadeCompetidor } from '../../drizzle/schema';
 import { eq, and, sql } from 'drizzle-orm';
@@ -26,7 +28,7 @@ export const mercadoRouter = router({
   /**
    * Hierarquia completa de mercados
    */
-  hierarquia: publicProcedure
+  hierarquia: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       tipo: z.enum(['arvore', 'sunburst', 'treemap']).optional(),
       metrica: z.string().optional()
@@ -67,7 +69,7 @@ export const mercadoRouter = router({
   /**
    * Drill-down por nível
    */
-  drillDown: publicProcedure
+  drillDown: requirePermission(Permission.ANALISE_READ)
     .input(hierarquiaSchema)
     .query(async ({ input }) => {
       const { nivel, valor } = input;
@@ -129,7 +131,7 @@ export const mercadoRouter = router({
   /**
    * Análise de concorrência por mercado
    */
-  analise Concorrencia: publicProcedure
+  analise Concorrencia: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       mercadoId: z.number(),
       incluirMetricas: z.boolean().optional()
@@ -200,7 +202,7 @@ export const mercadoRouter = router({
   /**
    * Oportunidades por mercado
    */
-  oportunidades: publicProcedure
+  oportunidades: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       limite: z.number().min(1).max(100).optional(),
       filtroScore: z.number().min(0).max(100).optional()
@@ -237,7 +239,7 @@ export const mercadoRouter = router({
   /**
    * Comparação entre mercados
    */
-  comparar: publicProcedure
+  comparar: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       mercadoIds: z.array(z.number()),
       metricas: z.array(z.string()).optional()
@@ -283,7 +285,7 @@ export const mercadoRouter = router({
   /**
    * Tendências de mercado
    */
-  tendencias: publicProcedure
+  tendencias: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       mercadoId: z.number().optional(),
       periodo: z.object({

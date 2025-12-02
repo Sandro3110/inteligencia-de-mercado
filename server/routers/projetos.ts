@@ -1,10 +1,17 @@
 import { z } from 'zod';
-import { router, publicProcedure } from './index';
+import { router } from './index';
+import { requirePermission } from '../middleware/auth';
+import { Permission } from '@/shared/types/permissions';
 import * as DAL from '../dal';
 
+/**
+ * Router de Projetos
+ * FASE 1 - Sessão 1.3: RBAC aplicado
+ */
 export const projetosRouter = router({
   // Listar projetos do usuário
-  list: publicProcedure
+  // Permissão: PROJETO_READ
+  list: requirePermission(Permission.PROJETO_READ)
     .input(
       z.object({
         page: z.number().min(1).default(1),
@@ -16,9 +23,6 @@ export const projetosRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
-      }
       const ownerId = ctx.userId;
 
       const result = await DAL.Projeto.getProjetos({
@@ -35,7 +39,8 @@ export const projetosRouter = router({
     }),
 
   // Buscar projeto por ID
-  getById: publicProcedure
+  // Permissão: PROJETO_READ
+  getById: requirePermission(Permission.PROJETO_READ)
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
       const projeto = await DAL.Projeto.getProjetoById(input.id);
@@ -46,127 +51,66 @@ export const projetosRouter = router({
     }),
 
   // Criar projeto
-  create: publicProcedure
+  // Permissão: PROJETO_CREATE
+  create: requirePermission(Permission.PROJETO_CREATE)
     .input(
       z.object({
-        nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres').max(100),
-        codigo: z.string().min(2).max(20).optional(),
-        descricao: z.string().max(500).optional(),
-        centroCusto: z.string().max(50).optional(),
-        unidadeNegocio: z.string().max(100).optional(),
-        orcamento: z.number().positive().optional(),
+        nome: z.string().min(1, 'Nome é obrigatório'),
+        descricao: z.string().optional(),
+        objetivo: z.string().optional(),
+        status: z.enum(['ativo', 'inativo', 'arquivado']).default('ativo'),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
-      }
       const ownerId = ctx.userId;
 
-      const projeto = await DAL.Projeto.createProjeto({
+      const novoProjeto = await DAL.Projeto.createProjeto({
         nome: input.nome,
-        codigo: input.codigo,
         descricao: input.descricao,
-        centro_custo: input.centroCusto,
-        unidade_negocio: input.unidadeNegocio,
-        orcamento: input.orcamento,
+        objetivo: input.objetivo,
+        status: input.status,
         owner_id: ownerId,
       });
 
-      return projeto;
+      return novoProjeto;
     }),
 
   // Atualizar projeto
-  update: publicProcedure
+  // Permissão: PROJETO_UPDATE
+  update: requirePermission(Permission.PROJETO_UPDATE)
     .input(
       z.object({
         id: z.number(),
-        nome: z.string().min(3).max(100).optional(),
-        descricao: z.string().max(500).optional(),
-        centroCusto: z.string().max(50).optional(),
-        unidadeNegocio: z.string().max(100).optional(),
-        orcamento: z.number().positive().optional(),
+        nome: z.string().min(1).optional(),
+        descricao: z.string().optional(),
+        objetivo: z.string().optional(),
+        status: z.enum(['ativo', 'inativo', 'arquivado']).optional(),
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
+    .mutation(async ({ input }) => {
+      const projetoAtualizado = await DAL.Projeto.updateProjeto(input.id, {
+        nome: input.nome,
+        descricao: input.descricao,
+        objetivo: input.objetivo,
+        status: input.status,
+      });
+
+      if (!projetoAtualizado) {
+        throw new Error('Projeto não encontrado');
       }
-      const userId = ctx.userId;
 
-      const projeto = await DAL.Projeto.updateProjeto(
-        input.id,
-        {
-          nome: input.nome,
-          descricao: input.descricao,
-          centro_custo: input.centroCusto,
-          unidade_negocio: input.unidadeNegocio,
-          orcamento: input.orcamento,
-        },
-        userId
-      );
-
-      return projeto;
+      return projetoAtualizado;
     }),
 
-  // Arquivar projeto
-  archive: publicProcedure
+  // Deletar projeto
+  // Permissão: PROJETO_DELETE
+  delete: requirePermission(Permission.PROJETO_DELETE)
     .input(z.object({ id: z.number() }))
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
+    .mutation(async ({ input }) => {
+      const deletado = await DAL.Projeto.deleteProjeto(input.id);
+      if (!deletado) {
+        throw new Error('Projeto não encontrado');
       }
-      const userId = ctx.userId;
-
-      const projeto = await DAL.Projeto.arquivarProjeto(input.id, userId);
-      return projeto;
-    }),
-
-  // Ativar projeto
-  activate: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
-      }
-      const userId = ctx.userId;
-
-      const projeto = await DAL.Projeto.ativarProjeto(input.id, userId);
-      return projeto;
-    }),
-
-  // Inativar projeto
-  deactivate: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
-      }
-      const userId = ctx.userId;
-
-      const projeto = await DAL.Projeto.inativarProjeto(input.id, userId);
-      return projeto;
-    }),
-
-  // Deletar projeto (soft delete)
-  delete: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
-      }
-      const userId = ctx.userId;
-
-      await DAL.Projeto.deleteProjeto(input.id, userId);
       return { success: true };
     }),
-
-  // Listar projetos ativos
-  listAtivos: publicProcedure.query(async ({ ctx }) => {
-    // TODO: Pegar ownerId do ctx.user
-    const ownerId = 'temp-owner-id';
-
-    const projetos = await DAL.Projeto.getProjetosAtivos(ownerId);
-    return projetos;
-  }),
 });

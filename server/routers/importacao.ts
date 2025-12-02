@@ -1,10 +1,17 @@
 import { z } from 'zod';
-import { router, publicProcedure } from '../trpc';
+import { router } from './index';
+import { requirePermission } from '../middleware/auth';
+import { Permission } from '@/shared/types/permissions';
 import * as importacaoDAL from '../dal/importacao';
 
+/**
+ * Router de Importação
+ * FASE 1 - Sessão 1.3: RBAC aplicado
+ */
 export const importacaoRouter = router({
   // Criar importação
-  create: publicProcedure
+  // Permissão: IMPORTACAO_CREATE
+  create: requirePermission(Permission.IMPORTACAO_CREATE)
     .input(
       z.object({
         projetoId: z.number(),
@@ -18,12 +25,13 @@ export const importacaoRouter = router({
     .mutation(async ({ input, ctx }) => {
       return await importacaoDAL.createImportacao({
         ...input,
-        createdBy: ctx.userId || 'sistema',
+        createdBy: ctx.userId,
       });
     }),
 
   // Listar importações
-  list: publicProcedure
+  // Permissão: IMPORTACAO_READ
+  list: requirePermission(Permission.IMPORTACAO_READ)
     .input(
       z.object({
         projetoId: z.number().optional(),
@@ -38,17 +46,24 @@ export const importacaoRouter = router({
     }),
 
   // Buscar por ID
-  getById: publicProcedure.input(z.number()).query(async ({ input }) => {
-    return await importacaoDAL.getImportacaoById(input);
-  }),
+  // Permissão: IMPORTACAO_READ
+  getById: requirePermission(Permission.IMPORTACAO_READ)
+    .input(z.number())
+    .query(async ({ input }) => {
+      return await importacaoDAL.getImportacaoById(input);
+    }),
 
   // Iniciar processamento
-  start: publicProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
-    return await importacaoDAL.iniciarImportacao(input, ctx.userId || 'sistema');
-  }),
+  // Permissão: IMPORTACAO_CREATE
+  start: requirePermission(Permission.IMPORTACAO_CREATE)
+    .input(z.number())
+    .mutation(async ({ input, ctx }) => {
+      return await importacaoDAL.iniciarImportacao(input, ctx.userId);
+    }),
 
   // Atualizar progresso
-  updateProgress: publicProcedure
+  // Permissão: IMPORTACAO_CREATE (sistema interno)
+  updateProgress: requirePermission(Permission.IMPORTACAO_CREATE)
     .input(
       z.object({
         id: z.number(),
@@ -70,36 +85,48 @@ export const importacaoRouter = router({
     }),
 
   // Concluir
-  complete: publicProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
-    return await importacaoDAL.concluirImportacao(input, ctx.userId || 'sistema');
-  }),
+  // Permissão: IMPORTACAO_CREATE
+  complete: requirePermission(Permission.IMPORTACAO_CREATE)
+    .input(z.number())
+    .mutation(async ({ input, ctx }) => {
+      return await importacaoDAL.concluirImportacao(input, ctx.userId);
+    }),
 
   // Falhar
-  fail: publicProcedure
+  // Permissão: IMPORTACAO_CREATE
+  fail: requirePermission(Permission.IMPORTACAO_CREATE)
     .input(z.object({ id: z.number(), erro: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      return await importacaoDAL.falharImportacao(input.id, input.erro, ctx.userId || 'sistema');
+      return await importacaoDAL.falharImportacao(input.id, input.erro, ctx.userId);
     }),
 
   // Cancelar
-  cancel: publicProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
-    return await importacaoDAL.cancelarImportacao(input, ctx.userId || 'sistema');
-  }),
+  // Permissão: IMPORTACAO_DELETE
+  cancel: requirePermission(Permission.IMPORTACAO_DELETE)
+    .input(z.number())
+    .mutation(async ({ input, ctx }) => {
+      return await importacaoDAL.cancelarImportacao(input, ctx.userId);
+    }),
 
   // Buscar erros
-  getErros: publicProcedure
+  // Permissão: IMPORTACAO_READ
+  getErros: requirePermission(Permission.IMPORTACAO_READ)
     .input(z.object({ importacaoId: z.number(), limit: z.number().default(100) }))
     .query(async ({ input }) => {
       return await importacaoDAL.getErrosByImportacao(input.importacaoId, input.limit);
     }),
 
   // Estatísticas
-  getEstatisticas: publicProcedure.input(z.number()).query(async ({ input }) => {
-    return await importacaoDAL.getEstatisticasImportacao(input);
-  }),
+  // Permissão: IMPORTACAO_READ
+  getEstatisticas: requirePermission(Permission.IMPORTACAO_READ)
+    .input(z.number())
+    .query(async ({ input }) => {
+      return await importacaoDAL.getEstatisticasImportacao(input);
+    }),
 
   // Entidades da importação
-  getEntidades: publicProcedure
+  // Permissão: IMPORTACAO_READ
+  getEntidades: requirePermission(Permission.IMPORTACAO_READ)
     .input(z.object({ importacaoId: z.number(), limit: z.number().default(100) }))
     .query(async ({ input }) => {
       return await importacaoDAL.getEntidadesByImportacao(input.importacaoId, input.limit);

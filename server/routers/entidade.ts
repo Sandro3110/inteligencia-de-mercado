@@ -1,10 +1,12 @@
+import { requirePermission } from "../middleware/auth";
+import { Permission } from "@/shared/types/permissions";
 /**
  * Entidade Router - Detalhes 360° de entidades
  * 100% Funcional
  */
 
 import { z } from 'zod';
-import { router, publicProcedure } from '../trpc';
+import { router, requirePermission(Permission.ANALISE_READ) } from '../trpc';
 import { db } from '../db';
 import {
   dimEntidade,
@@ -25,7 +27,7 @@ export const entidadeRouter = router({
   /**
    * Detalhes completos 360° de uma entidade
    */
-  detalhes360: publicProcedure
+  detalhes360: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       entidadeId: z.number()
     }))
@@ -136,7 +138,7 @@ export const entidadeRouter = router({
   /**
    * Listar entidades com filtros e paginação
    */
-  listar: publicProcedure
+  listar: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       tipo: z.enum(['cliente', 'concorrente', 'lead']).optional(),
       mercadoId: z.number().optional(),
@@ -240,7 +242,7 @@ export const entidadeRouter = router({
   /**
    * Buscar entidades similares
    */
-  similares: publicProcedure
+  similares: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       entidadeId: z.number(),
       limite: z.number().min(1).max(50).optional()
@@ -303,7 +305,7 @@ export const entidadeRouter = router({
   /**
    * Recomendações acionáveis
    */
-  recomendacoes: publicProcedure
+  recomendacoes: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       entidadeId: z.number()
     }))
@@ -402,7 +404,7 @@ export const entidadeRouter = router({
   /**
    * Rastreabilidade - Origem dos dados
    */
-  rastreabilidade: publicProcedure
+  rastreabilidade: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       entidadeId: z.number()
     }))

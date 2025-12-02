@@ -1,10 +1,17 @@
 import { z } from 'zod';
-import { router, publicProcedure } from '../trpc';
+import { router } from './index';
+import { requirePermission } from '../middleware/auth';
+import { Permission } from '@/shared/types/permissions';
 import * as entidadeDAL from '../dal/dimensoes/entidade';
 
+/**
+ * Router de Entidades (Lista)
+ * FASE 1 - Sessão 1.3: RBAC aplicado
+ */
 export const entidadesRouter = router({
   // Listar entidades
-  list: publicProcedure
+  // Permissão: ENTIDADE_READ
+  list: requirePermission(Permission.ENTIDADE_READ)
     .input(
       z.object({
         busca: z.string().optional(),
@@ -23,17 +30,24 @@ export const entidadesRouter = router({
     }),
 
   // Buscar por ID
-  getById: publicProcedure.input(z.number()).query(async ({ input }) => {
-    return await entidadeDAL.getEntidadeById(input);
-  }),
+  // Permissão: ENTIDADE_READ
+  getById: requirePermission(Permission.ENTIDADE_READ)
+    .input(z.number())
+    .query(async ({ input }) => {
+      return await entidadeDAL.getEntidadeById(input);
+    }),
 
   // Buscar por CNPJ
-  getByCNPJ: publicProcedure.input(z.string()).query(async ({ input }) => {
-    return await entidadeDAL.getEntidadeByCNPJ(input);
-  }),
+  // Permissão: ENTIDADE_READ
+  getByCNPJ: requirePermission(Permission.ENTIDADE_READ)
+    .input(z.string())
+    .query(async ({ input }) => {
+      return await entidadeDAL.getEntidadeByCNPJ(input);
+    }),
 
   // Criar entidade
-  create: publicProcedure
+  // Permissão: ENTIDADE_UPDATE (criar = editar)
+  create: requirePermission(Permission.ENTIDADE_UPDATE)
     .input(
       z.object({
         nome: z.string().min(1),
@@ -49,12 +63,13 @@ export const entidadesRouter = router({
       return await entidadeDAL.createEntidade({
         ...input,
         origemTipo: 'manual',
-        createdBy: ctx.userId || 'sistema',
+        createdBy: ctx.userId,
       });
     }),
 
   // Atualizar entidade
-  update: publicProcedure
+  // Permissão: ENTIDADE_UPDATE
+  update: requirePermission(Permission.ENTIDADE_UPDATE)
     .input(
       z.object({
         id: z.number(),
@@ -69,15 +84,21 @@ export const entidadesRouter = router({
     }),
 
   // Deletar entidade
-  delete: publicProcedure.input(z.number()).mutation(async ({ input }) => {
-    await entidadeDAL.deleteEntidade(input);
-    return { success: true };
-  }),
+  // Permissão: ENTIDADE_DELETE
+  delete: requirePermission(Permission.ENTIDADE_DELETE)
+    .input(z.number())
+    .mutation(async ({ input }) => {
+      await entidadeDAL.deleteEntidade(input);
+      return { success: true };
+    }),
 
   // Sugerir merge (deduplicação)
-  suggestMerge: publicProcedure.input(z.number()).query(async ({ input }) => {
-    const entidade = await entidadeDAL.getEntidadeById(input);
-    if (!entidade) throw new Error('Entidade não encontrada');
-    return await entidadeDAL.sugerirMerge(entidade);
-  }),
+  // Permissão: ENTIDADE_READ
+  suggestMerge: requirePermission(Permission.ENTIDADE_READ)
+    .input(z.number())
+    .query(async ({ input }) => {
+      const entidade = await entidadeDAL.getEntidadeById(input);
+      if (!entidade) throw new Error('Entidade não encontrada');
+      return await entidadeDAL.sugerirMerge(entidade);
+    }),
 });

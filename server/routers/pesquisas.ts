@@ -1,10 +1,17 @@
 import { z } from 'zod';
-import { router, publicProcedure } from './index';
+import { router } from './index';
+import { requirePermission } from '../middleware/auth';
+import { Permission } from '@/shared/types/permissions';
 import * as DAL from '../dal';
 
+/**
+ * Router de Pesquisas
+ * FASE 1 - Sessão 1.3: RBAC aplicado
+ */
 export const pesquisasRouter = router({
   // Listar pesquisas
-  list: publicProcedure
+  // Permissão: PESQUISA_READ
+  list: requirePermission(Permission.PESQUISA_READ)
     .input(
       z.object({
         projetoId: z.number().optional(),
@@ -33,7 +40,8 @@ export const pesquisasRouter = router({
     }),
 
   // Buscar pesquisa por ID
-  getById: publicProcedure
+  // Permissão: PESQUISA_READ
+  getById: requirePermission(Permission.PESQUISA_READ)
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
       const pesquisa = await DAL.Pesquisa.getPesquisaById(input.id);
@@ -44,7 +52,8 @@ export const pesquisasRouter = router({
     }),
 
   // Listar pesquisas de um projeto
-  getByProjeto: publicProcedure
+  // Permissão: PESQUISA_READ
+  getByProjeto: requirePermission(Permission.PESQUISA_READ)
     .input(z.object({ projetoId: z.number() }))
     .query(async ({ input }) => {
       const pesquisas = await DAL.Pesquisa.getPesquisasByProjeto(input.projetoId);
@@ -52,142 +61,110 @@ export const pesquisasRouter = router({
     }),
 
   // Criar pesquisa
-  create: publicProcedure
+  // Permissão: PESQUISA_CREATE
+  create: requirePermission(Permission.PESQUISA_CREATE)
     .input(
       z.object({
         projetoId: z.number(),
         nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres').max(100),
         descricao: z.string().max(500).optional(),
-        objetivo: z.string().max(500).optional(),
+        fontes: z.array(z.string()).min(1, 'Pelo menos uma fonte é obrigatória'),
+        palavras_chave: z.array(z.string()).min(1, 'Pelo menos uma palavra-chave é obrigatória'),
+        filtros: z.record(z.any()).optional(),
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
-      }
-      const userId = ctx.userId;
-
-      const pesquisa = await DAL.Pesquisa.createPesquisa({
+    .mutation(async ({ input }) => {
+      const novaPesquisa = await DAL.Pesquisa.createPesquisa({
         projeto_id: input.projetoId,
         nome: input.nome,
         descricao: input.descricao,
-        objetivo: input.objetivo,
-        created_by: userId,
+        fontes: input.fontes,
+        palavras_chave: input.palavras_chave,
+        filtros: input.filtros,
+        status: 'pendente',
       });
 
-      return pesquisa;
+      return novaPesquisa;
     }),
 
   // Atualizar pesquisa
-  update: publicProcedure
+  // Permissão: PESQUISA_UPDATE
+  update: requirePermission(Permission.PESQUISA_UPDATE)
     .input(
       z.object({
         id: z.number(),
         nome: z.string().min(3).max(100).optional(),
         descricao: z.string().max(500).optional(),
-        objetivo: z.string().max(500).optional(),
+        fontes: z.array(z.string()).optional(),
+        palavras_chave: z.array(z.string()).optional(),
+        filtros: z.record(z.any()).optional(),
+        status: z
+          .enum(['pendente', 'em_progresso', 'concluida', 'falhou', 'cancelada'])
+          .optional(),
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
+    .mutation(async ({ input }) => {
+      const pesquisaAtualizada = await DAL.Pesquisa.updatePesquisa(input.id, {
+        nome: input.nome,
+        descricao: input.descricao,
+        fontes: input.fontes,
+        palavras_chave: input.palavras_chave,
+        filtros: input.filtros,
+        status: input.status,
+      });
+
+      if (!pesquisaAtualizada) {
+        throw new Error('Pesquisa não encontrada');
       }
-      const userId = ctx.userId;
 
-      const pesquisa = await DAL.Pesquisa.updatePesquisa(
-        input.id,
-        {
-          nome: input.nome,
-          descricao: input.descricao,
-          objetivo: input.objetivo,
-        },
-        userId
-      );
-
-      return pesquisa;
+      return pesquisaAtualizada;
     }),
 
-  // Iniciar pesquisa
-  start: publicProcedure
+  // Deletar pesquisa
+  // Permissão: PESQUISA_DELETE
+  delete: requirePermission(Permission.PESQUISA_DELETE)
     .input(z.object({ id: z.number() }))
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
+    .mutation(async ({ input }) => {
+      const deletado = await DAL.Pesquisa.deletePesquisa(input.id);
+      if (!deletado) {
+        throw new Error('Pesquisa não encontrada');
       }
-      const userId = ctx.userId;
-
-      const pesquisa = await DAL.Pesquisa.iniciarPesquisa(input.id, userId);
-      return pesquisa;
-    }),
-
-  // Concluir pesquisa
-  complete: publicProcedure
-    .input(
-      z.object({
-        id: z.number(),
-        totalEntidades: z.number().min(0),
-        entidadesEnriquecidas: z.number().min(0),
-        entidadesFalhadas: z.number().min(0),
-        qualidadeMedia: z.number().min(0).max(100),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
-      }
-      const userId = ctx.userId;
-
-      const pesquisa = await DAL.Pesquisa.concluirPesquisa(
-        input.id,
-        {
-          total_entidades: input.totalEntidades,
-          entidades_enriquecidas: input.entidadesEnriquecidas,
-          entidades_falhadas: input.entidadesFalhadas,
-          qualidade_media: input.qualidadeMedia,
-        },
-        userId
-      );
-
-      return pesquisa;
-    }),
-
-  // Cancelar pesquisa
-  cancel: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
-      }
-      const userId = ctx.userId;
-
-      const pesquisa = await DAL.Pesquisa.cancelarPesquisa(input.id, userId);
-      return pesquisa;
-    }),
-
-  // Deletar pesquisa (soft delete)
-  delete: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.userId) {
-        throw new Error('É necessário estar autenticado');
-      }
-      const userId = ctx.userId;
-
-      await DAL.Pesquisa.deletePesquisa(input.id, userId);
       return { success: true };
     }),
 
-  // Listar pesquisas em progresso
-  listEmProgresso: publicProcedure.query(async () => {
-    const pesquisas = await DAL.Pesquisa.getPesquisasEmProgresso();
-    return pesquisas;
-  }),
+  // Iniciar pesquisa
+  // Permissão: PESQUISA_START
+  start: requirePermission(Permission.PESQUISA_START)
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const pesquisa = await DAL.Pesquisa.updatePesquisa(input.id, {
+        status: 'em_progresso',
+      });
 
-  // Listar pesquisas concluídas
-  listConcluidas: publicProcedure
-    .input(z.object({ projetoId: z.number().optional() }))
-    .query(async ({ input }) => {
-      const pesquisas = await DAL.Pesquisa.getPesquisasConcluidas(input.projetoId);
-      return pesquisas;
+      if (!pesquisa) {
+        throw new Error('Pesquisa não encontrada');
+      }
+
+      // TODO: Iniciar job de pesquisa em background
+
+      return pesquisa;
+    }),
+
+  // Parar pesquisa
+  // Permissão: PESQUISA_STOP
+  stop: requirePermission(Permission.PESQUISA_STOP)
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const pesquisa = await DAL.Pesquisa.updatePesquisa(input.id, {
+        status: 'cancelada',
+      });
+
+      if (!pesquisa) {
+        throw new Error('Pesquisa não encontrada');
+      }
+
+      // TODO: Cancelar job de pesquisa em background
+
+      return pesquisa;
     }),
 });

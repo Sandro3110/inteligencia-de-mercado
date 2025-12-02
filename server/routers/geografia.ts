@@ -1,10 +1,12 @@
+import { requirePermission } from "../middleware/auth";
+import { Permission } from "@/shared/types/permissions";
 /**
  * Geografia Router - Análises geográficas e mapas interativos
  * 100% Funcional
  */
 
 import { z } from 'zod';
-import { router, publicProcedure } from '../trpc';
+import { router, requirePermission(Permission.ANALISE_READ) } from '../trpc';
 import { db } from '../db';
 import { dimGeografia, dimEntidade, fatoEntidadeContexto } from '../../drizzle/schema';
 import { eq, and, sql, inArray } from 'drizzle-orm';
@@ -33,7 +35,7 @@ export const geografiaRouter = router({
   /**
    * Dados para mapa (pontos, clusters, heatmap)
    */
-  dadosMapa: publicProcedure
+  dadosMapa: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       bbox: bboxSchema.optional(),
       filtros: z.array(z.any()).optional(),
@@ -87,7 +89,7 @@ export const geografiaRouter = router({
   /**
    * Heatmap de densidade
    */
-  heatmap: publicProcedure
+  heatmap: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       metrica: z.string(),
       granularidade: z.enum(['cidade', 'estado', 'regiao', 'pais']).optional()
@@ -142,7 +144,7 @@ export const geografiaRouter = router({
   /**
    * Drill-down hierárquico
    */
-  drillDown: publicProcedure
+  drillDown: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       nivel: z.enum(['pais', 'macrorregiao', 'mesorregiao', 'microrregiao', 'estado', 'cidade']),
       valor: z.string(),
@@ -211,7 +213,7 @@ export const geografiaRouter = router({
   /**
    * Top N por região
    */
-  topPorRegiao: publicProcedure
+  topPorRegiao: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       nivel: z.enum(['pais', 'estado', 'cidade']),
       metrica: z.string(),
@@ -248,7 +250,7 @@ export const geografiaRouter = router({
   /**
    * Comparação entre regiões
    */
-  compararRegioes: publicProcedure
+  compararRegioes: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       regioes: z.array(z.object({
         nivel: z.enum(['pais', 'estado', 'cidade']),
@@ -291,7 +293,7 @@ export const geografiaRouter = router({
   /**
    * Geocoding reverso - Obter geografia por coordenadas
    */
-  geocodingReverso: publicProcedure
+  geocodingReverso: requirePermission(Permission.ANALISE_READ)
     .input(coordenadasSchema)
     .query(async ({ input }) => {
       const { latitude, longitude } = input;

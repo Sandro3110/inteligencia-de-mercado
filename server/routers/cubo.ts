@@ -1,10 +1,12 @@
+import { requirePermission } from "../middleware/auth";
+import { Permission } from "@/shared/types/permissions";
 /**
  * Cubo Router - Busca semântica e consultas dimensionais
  * 100% Funcional
  */
 
 import { z } from 'zod';
-import { router, publicProcedure } from '../trpc';
+import { router, requirePermission(Permission.ANALISE_READ) } from '../trpc';
 import { interpretarBuscaSemantica } from '../helpers/busca-semantica';
 import { exportar } from '../helpers/exportacao';
 import { copiar } from '../helpers/copia';
@@ -61,7 +63,7 @@ export const cuboRouter = router({
   /**
    * Busca semântica com IA
    */
-  buscaSemantica: publicProcedure
+  buscaSemantica: requirePermission(Permission.ANALISE_READ)
     .input(buscaSemanticaSchema)
     .mutation(async ({ input }) => {
       const resultado = await interpretarBuscaSemantica(input);
@@ -71,7 +73,7 @@ export const cuboRouter = router({
   /**
    * Consulta dimensional com alertas de performance
    */
-  consultar: publicProcedure
+  consultar: requirePermission(Permission.ANALISE_READ)
     .input(consultaDimensionalSchema)
     .query(async ({ input }) => {
       const inicio = Date.now();
@@ -118,7 +120,7 @@ export const cuboRouter = router({
   /**
    * Exportar dados
    */
-  exportar: publicProcedure
+  exportar: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       formato: z.enum(['excel', 'csv', 'json', 'markdown']),
       filtros: z.array(filtroSchema),
@@ -157,7 +159,7 @@ export const cuboRouter = router({
   /**
    * Copiar dados
    */
-  copiar: publicProcedure
+  copiar: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       dados: z.any(),
       formato: z.enum(['texto', 'markdown', 'json', 'csv'])
@@ -169,7 +171,7 @@ export const cuboRouter = router({
   /**
    * Obter combinações recomendadas
    */
-  combinacoesRecomendadas: publicProcedure
+  combinacoesRecomendadas: requirePermission(Permission.ANALISE_READ)
     .query(async () => {
       // Buscar combinações baseadas em histórico de sucesso
       const combinacoes: CombinacaoRecomendada[] = [
