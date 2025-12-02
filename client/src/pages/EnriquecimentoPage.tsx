@@ -1,61 +1,176 @@
+import { Sparkles, Brain, Search, Network, Target, Zap } from 'lucide-react';
+import { PageHeader } from '@/components/PageHeader';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+
 export default function EnriquecimentoPage() {
+  const features = [
+    {
+      icon: Brain,
+      title: 'Enriquecimento via IA',
+      description: 'Utilize OpenAI GPT-4o para enriquecer dados automaticamente',
+      color: 'text-primary'
+    },
+    {
+      icon: Search,
+      title: 'Busca Web Automática',
+      description: 'Encontre informações relevantes na web para cada entidade',
+      color: 'text-secondary'
+    },
+    {
+      icon: Network,
+      title: 'Classificação Inteligente',
+      description: 'Classifique entidades por mercado, produtos e segmentos',
+      color: 'text-success'
+    },
+    {
+      icon: Target,
+      title: 'Identificação de Concorrentes',
+      description: 'Detecte concorrentes automaticamente usando IA',
+      color: 'text-warning'
+    },
+    {
+      icon: Zap,
+      title: 'Score de Qualidade',
+      description: 'Calcule automaticamente a qualidade dos dados enriquecidos',
+      color: 'text-info'
+    },
+    {
+      icon: Sparkles,
+      title: 'Processamento em Lote',
+      description: 'Processe milhares de entidades em paralelo com filas',
+      color: 'text-destructive'
+    }
+  ];
+
   return (
-    <div className="p-8">
+    <div className="animate-fade-in">
+      <PageHeader
+        title="Processar com IA"
+        description="Enriqueça dados de entidades usando inteligência artificial avançada"
+        icon={Sparkles}
+        breadcrumbs={[
+          { label: 'Dashboard', path: '/' },
+          { label: 'Processar com IA' }
+        ]}
+      />
+
+      {/* Status Badge */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Enriquecimento com IA</h1>
-        <p className="text-muted-foreground">
-          Enriqueça dados de entidades usando inteligência artificial
-        </p>
+        <Badge variant="default" className="bg-warning hover:bg-warning/90 text-warning-foreground">
+          🚧 Em Desenvolvimento - FASE 5
+        </Badge>
       </div>
 
-      <div className="rounded-lg border bg-card p-12 text-center">
-        <div className="max-w-md mx-auto">
-          <div className="h-16 w-16 rounded-full bg-orange-500/10 flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="h-8 w-8 text-orange-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-              />
-            </svg>
+      {/* Main Content */}
+      <Card className="p-12 text-center mb-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-warning/10 to-warning/5 flex items-center justify-center mx-auto mb-6">
+            <Sparkles className="h-10 w-10 text-warning" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">Em Desenvolvimento</h2>
-          <p className="text-muted-foreground mb-6">
-            Esta funcionalidade será implementada na FASE 5 do projeto. Aqui você poderá:
+          
+          <h2 className="text-2xl font-bold mb-3">
+            Enriquecimento Inteligente de Dados
+          </h2>
+          
+          <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
+            Esta funcionalidade será implementada na <strong>FASE 5</strong> do projeto. 
+            Prepare-se para revolucionar a forma como você enriquece dados de mercado!
           </p>
-          <ul className="text-left space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-start gap-2">
-              <span className="text-orange-500 mt-0.5">•</span>
-              <span>Enriquecer dados via IA (OpenAI, Anthropic)</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-orange-500 mt-0.5">•</span>
-              <span>Buscar informações na web automaticamente</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-orange-500 mt-0.5">•</span>
-              <span>Classificar entidades por mercado e produtos</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-orange-500 mt-0.5">•</span>
-              <span>Identificar concorrentes automaticamente</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-orange-500 mt-0.5">•</span>
-              <span>Calcular score de qualidade dos dados</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-orange-500 mt-0.5">•</span>
-              <span>Acompanhar jobs de enriquecimento em tempo real</span>
-            </li>
-          </ul>
+
+          {/* Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <Card key={index} className="p-6 text-left hover-lift">
+                  <div className={`h-12 w-12 rounded-xl bg-gradient-to-br from-${feature.color}/10 to-${feature.color}/5 flex items-center justify-center mb-4`}>
+                    <Icon className={`h-6 w-6 ${feature.color}`} />
+                  </div>
+                  <h3 className="font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {feature.description}
+                  </p>
+                </Card>
+              );
+            })}
+          </div>
         </div>
+      </Card>
+
+      {/* Technical Details */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="p-6">
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <Brain className="h-5 w-5 text-primary" />
+            Modelo de IA
+          </h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            Temperatura 1.0 para máxima qualidade e criatividade
+          </p>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">GPT-4o:</span>
+              <span className="font-medium">Análise complexa</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">GPT-4o-mini:</span>
+              <span className="font-medium">Listagens</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Custo:</span>
+              <span className="font-medium text-success">$0.006/cliente</span>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <Zap className="h-5 w-5 text-warning" />
+            Performance
+          </h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            Processamento em lote com filas BullMQ + Redis
+          </p>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Concorrência:</span>
+              <span className="font-medium">10 workers</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Retry:</span>
+              <span className="font-medium">3 tentativas</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Timeout:</span>
+              <span className="font-medium">30 segundos</span>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <Target className="h-5 w-5 text-success" />
+            Dados Enriquecidos
+          </h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            159 campos preenchidos automaticamente por entidade
+          </p>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Clientes:</span>
+              <span className="font-medium">45 campos</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Concorrentes:</span>
+              <span className="font-medium">38 campos</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Leads:</span>
+              <span className="font-medium">76 campos</span>
+            </div>
+          </div>
+        </Card>
       </div>
     </div>
   );

@@ -1,297 +1,248 @@
 /**
  * Tela: Cubo Explorador
  * Busca semântica + Filtros inteligentes + Consultas dimensionais
- * 100% Funcional
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { Search, Sparkles, Database, TrendingUp } from 'lucide-react';
+import { PageHeader } from '@/components/PageHeader';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Filter, Download, Copy, AlertCircle, Lightbulb } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 
-// Componentes dimensionais
-import { SmartFilters } from '@/components/dimensional/SmartFilters';
-import { DataTable } from '@/components/dimensional/DataTable';
-import { KPIGrid } from '@/components/dimensional/KPICard';
-import { ExportButton } from '@/components/dimensional/ExportButton';
-import { CopyButton } from '@/components/dimensional/CopyButton';
-import { LoadingState } from '@/components/dimensional/LoadingState';
-import { ErrorState } from '@/components/dimensional/ErrorState';
-
-// Types
-import type { Filtro, ResultadoConsulta } from '@/types/dimensional';
-
-// tRPC
-import { trpc } from '@/lib/trpc';
-
 export function CuboExplorador() {
-  const [buscaSemantica, setBuscaSemantica] = useState('');
-  const [filtros, setFiltros] = useState<Filtro[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [resultado, setResultado] = useState<ResultadoConsulta | null>(null);
-  const [erro, setErro] = useState<string | null>(null);
-
-  // Busca semântica com IA
-  const handleBuscaSemantica = async () => {
-    if (!buscaSemantica.trim()) return;
-
-    setLoading(true);
-    setErro(null);
-
-    try {
-      // Chamar tRPC cuboRouter.buscaSemantica
-      const resultado = await trpc.cubo.buscaSemantica.mutate({ 
-        query: buscaSemantica 
-      });
-
-      setResultado(resultado);
-    } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao buscar dados');
-    } finally {
-      setLoading(false);
+  const features = [
+    {
+      icon: Sparkles,
+      title: 'Busca Semântica com IA',
+      description: 'Faça perguntas em linguagem natural e receba insights automáticos',
+      color: 'text-primary',
+      example: '"Quais clientes de SP compraram mais de R$100k?"'
+    },
+    {
+      icon: Database,
+      title: 'Filtros Dimensionais',
+      description: 'Combine múltiplas dimensões para análises complexas',
+      color: 'text-secondary',
+      example: 'Geografia × Mercado × Produto × Tempo'
+    },
+    {
+      icon: TrendingUp,
+      title: 'KPIs Automáticos',
+      description: 'Visualize métricas calculadas automaticamente',
+      color: 'text-success',
+      example: 'Total, Média, Crescimento, Participação'
+    },
+    {
+      icon: Search,
+      title: 'Drill-Down Inteligente',
+      description: 'Navegue entre níveis de hierarquia com um clique',
+      color: 'text-warning',
+      example: 'País → Estado → Cidade → Bairro'
     }
-  };
+  ];
 
-  // Consulta dimensional com filtros
-  const handleConsultar = async () => {
-    setLoading(true);
-    setErro(null);
-
-    try {
-      // Chamar tRPC cuboRouter.consultar
-      const resultado = await trpc.cubo.consultar.query({ filtros });
-      
-      setResultado(resultado);
-    } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao consultar dados');
-    } finally {
-      setLoading(false);
+  const exampleQueries = [
+    {
+      query: 'Clientes de São Paulo que compraram mais de R$100.000',
+      dimensions: ['Geografia', 'Valor'],
+      metrics: ['Total Clientes', 'Valor Total']
+    },
+    {
+      query: 'Concorrentes no mercado de Tecnologia por estado',
+      dimensions: ['Mercado', 'Geografia'],
+      metrics: ['Total Concorrentes', 'Participação']
+    },
+    {
+      query: 'Leads qualificados com score > 80 por cidade',
+      dimensions: ['Tipo', 'Geografia', 'Score'],
+      metrics: ['Total Leads', 'Taxa Conversão']
+    },
+    {
+      query: 'Evolução mensal de vendas por produto',
+      dimensions: ['Tempo', 'Produto'],
+      metrics: ['Vendas', 'Crescimento %']
     }
-  };
+  ];
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Cubo Explorador</h1>
-          <p className="text-muted-foreground mt-1">
-            Explore dados dimensionais com busca semântica e filtros inteligentes
-          </p>
-        </div>
+    <div className="animate-fade-in">
+      <PageHeader
+        title="Explorador Inteligente"
+        description="Análise dimensional com busca semântica e filtros inteligentes"
+        icon={Sparkles}
+        breadcrumbs={[
+          { label: 'Dashboard', path: '/' },
+          { label: 'Análise' },
+          { label: 'Explorador Inteligente' }
+        ]}
+      />
+
+      {/* Status Badge */}
+      <div className="mb-8">
+        <Badge variant="default" className="bg-primary hover:bg-primary/90">
+          🚀 Em Desenvolvimento - FASE 6
+        </Badge>
       </div>
 
-      {/* Busca Semântica */}
-      <Card className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Search className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold">Busca Inteligente</h2>
-          <Badge variant="secondary" className="ml-2">IA</Badge>
-        </div>
+      {/* Main Content */}
+      <Card className="p-12 text-center mb-8">
+        <div className="max-w-3xl mx-auto">
+          <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mx-auto mb-6">
+            <Sparkles className="h-10 w-10 text-primary" />
+          </div>
+          
+          <h2 className="text-2xl font-bold mb-3">
+            Análise Dimensional Inteligente
+          </h2>
+          
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Esta funcionalidade será implementada na <strong>FASE 6</strong> do projeto. 
+            Explore seus dados com busca semântica e análise multidimensional!
+          </p>
 
-        <div className="flex gap-2">
-          <Input
-            placeholder="Ex: Encontre empresas de tecnologia no sul com alto potencial de receita..."
-            value={buscaSemantica}
-            onChange={(e) => setBuscaSemantica(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleBuscaSemantica()}
-            className="flex-1"
-          />
-          <Button onClick={handleBuscaSemantica} disabled={loading || !buscaSemantica.trim()}>
-            <Search className="h-4 w-4 mr-2" />
-            Buscar
-          </Button>
-        </div>
-
-        <div className="mt-3 text-sm text-muted-foreground">
-          💡 Use linguagem natural para buscar. A IA interpretará sua intenção e aplicará os filtros automaticamente.
+          {/* Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <Card key={index} className="p-6 text-left hover-lift">
+                  <div className="flex items-start gap-4">
+                    <div className={`h-12 w-12 rounded-xl bg-gradient-to-br from-${feature.color}/10 to-${feature.color}/5 flex items-center justify-center flex-shrink-0`}>
+                      <Icon className={`h-6 w-6 ${feature.color}`} />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold mb-2">{feature.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {feature.description}
+                      </p>
+                      <code className="text-xs bg-muted px-2 py-1 rounded">
+                        {feature.example}
+                      </code>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
         </div>
       </Card>
 
-      {/* Filtros Inteligentes */}
-      <SmartFilters
-        filtros={filtros}
-        onChange={setFiltros}
-        onConsultar={handleConsultar}
-      />
-
-      {/* Resultados */}
-      <Tabs defaultValue="tabela" className="w-full">
-        <div className="flex items-center justify-between mb-4">
-          <TabsList>
-            <TabsTrigger value="tabela">Tabela</TabsTrigger>
-            <TabsTrigger value="cards">Cards</TabsTrigger>
-            <TabsTrigger value="kpis">KPIs</TabsTrigger>
-          </TabsList>
-
-          {resultado && resultado.dados.length > 0 && (
-            <div className="flex gap-2">
-              <CopyButton
-                data={resultado.dados}
-                formato="texto"
-                label="Copiar"
-              />
-              <ExportButton
-                data={resultado.dados}
-                nomeArquivo="cubo-explorador"
-                formato="excel"
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Loading */}
-        {loading && (
-          <LoadingState variant="table" mensagem="Processando consulta..." />
-        )}
-
-        {/* Erro */}
-        {erro && !loading && (
-          <ErrorState
-            variant="alert"
-            titulo="Erro na consulta"
-            mensagem={erro}
-            onTentarNovamente={handleConsultar}
-          />
-        )}
-
-        {/* Alertas e Sugestões */}
-        {resultado && !loading && !erro && (
-          <>
-            {/* Alert de Performance */}
-            {resultado.total > 10000 && (
-              <Alert className="mb-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>⚠️ Sua consulta retornará {resultado.total.toLocaleString()} registros</strong>
-                  <br />
-                  Isso pode levar 8-12 segundos para carregar. Considere adicionar mais filtros.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {/* Sugestões */}
-            {resultado.sugestoes && resultado.sugestoes.length > 0 && (
-              <Card className="p-4 mb-4 bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
-                <div className="flex items-start gap-2">
-                  <Lightbulb className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                      Sugestões para melhorar sua análise:
-                    </h3>
-                    <div className="space-y-2">
-                      {resultado.sugestoes.map((sugestao, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <span className="text-blue-600 dark:text-blue-400">⭐</span>
-                          <div className="flex-1">
-                            <div className="font-medium text-sm text-blue-900 dark:text-blue-100">
-                              {sugestao.titulo}
-                            </div>
-                            <div className="text-sm text-blue-700 dark:text-blue-300">
-                              {sugestao.descricao}
-                            </div>
-                          </div>
-                          <Button size="sm" variant="outline" className="text-xs">
-                            Aplicar
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
+      {/* Example Queries */}
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Search className="h-5 w-5 text-primary" />
+          Exemplos de Consultas
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {exampleQueries.map((example, index) => (
+            <Card key={index} className="p-6 hover-lift">
+              <div className="mb-4">
+                <Badge variant="outline" className="mb-2">Exemplo {index + 1}</Badge>
+                <p className="font-medium text-sm">{example.query}</p>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Dimensões:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {example.dimensions.map((dim, i) => (
+                      <Badge key={i} variant="secondary" className="text-xs">
+                        {dim}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
-              </Card>
-            )}
-
-            {/* Tabs de Visualização */}
-            <TabsContent value="tabela">
-              <DataTable
-                dados={resultado.dados}
-                colunas={[
-                  { key: 'nome', label: 'Nome', sortable: true },
-                  { key: 'tipo', label: 'Tipo', sortable: true },
-                  { key: 'receita_potencial', label: 'Receita Potencial', sortable: true, format: 'currency' },
-                  { key: 'score_fit', label: 'Score Fit', sortable: true },
-                  { key: 'cidade', label: 'Cidade', sortable: true },
-                  { key: 'estado', label: 'Estado', sortable: true }
-                ]}
-                onRowClick={(row) => console.log('Navegar para detalhes:', row.id)}
-              />
-            </TabsContent>
-
-            <TabsContent value="cards">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {resultado.dados.map((item: any) => (
-                  <Card key={item.id} className="p-4 hover:shadow-lg transition-shadow cursor-pointer">
-                    <h3 className="font-semibold text-lg mb-2">{item.nome}</h3>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Tipo:</span>
-                        <Badge>{item.tipo}</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Receita:</span>
-                        <span className="font-medium">
-                          R$ {(item.receita_potencial / 1000000).toFixed(1)}M
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Score:</span>
-                        <span className="font-medium">{item.score_fit}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Localização:</span>
-                        <span>{item.cidade}/{item.estado}</span>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Métricas:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {example.metrics.map((metric, i) => (
+                      <Badge key={i} variant="default" className="text-xs bg-success hover:bg-success/90">
+                        {metric}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </TabsContent>
+            </Card>
+          ))}
+        </div>
+      </div>
 
-            <TabsContent value="kpis">
-              <KPIGrid
-                kpis={[
-                  {
-                    titulo: 'Total de Entidades',
-                    valor: resultado.total,
-                    formato: 'numero',
-                    icone: 'users'
-                  },
-                  {
-                    titulo: 'Receita Total',
-                    valor: resultado.dados.reduce((sum: number, item: any) => sum + (item.receita_potencial || 0), 0),
-                    formato: 'moeda',
-                    icone: 'dollar-sign'
-                  },
-                  {
-                    titulo: 'Score Médio',
-                    valor: resultado.dados.reduce((sum: number, item: any) => sum + (item.score_fit || 0), 0) / resultado.dados.length,
-                    formato: 'numero',
-                    icone: 'trending-up'
-                  }
-                ]}
-              />
-            </TabsContent>
-          </>
-        )}
-
-        {/* Empty State */}
-        {!resultado && !loading && !erro && (
-          <Card className="p-12">
-            <div className="text-center">
-              <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Nenhuma consulta realizada</h3>
-              <p className="text-muted-foreground">
-                Use a busca semântica ou configure filtros para explorar os dados
-              </p>
+      {/* Technical Details */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="p-6">
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            IA Semântica
+          </h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            GPT-4o converte perguntas em SQL otimizado
+          </p>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Modelo:</span>
+              <span className="font-medium">GPT-4o</span>
             </div>
-          </Card>
-        )}
-      </Tabs>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Latência:</span>
+              <span className="font-medium">~2s</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Precisão:</span>
+              <span className="font-medium text-success">95%+</span>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <Database className="h-5 w-5 text-secondary" />
+            Star Schema
+          </h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            Modelo dimensional otimizado para análise
+          </p>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Dimensões:</span>
+              <span className="font-medium">8 tabelas</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Fatos:</span>
+              <span className="font-medium">3 tabelas</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Campos:</span>
+              <span className="font-medium">477 total</span>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-success" />
+            Performance
+          </h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            Consultas otimizadas com índices e cache
+          </p>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Cache:</span>
+              <span className="font-medium">Redis</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Índices:</span>
+              <span className="font-medium">15 otimizados</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Tempo médio:</span>
+              <span className="font-medium text-success">&lt;500ms</span>
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
+
+export default CuboExplorador;
