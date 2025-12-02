@@ -81,17 +81,13 @@ export default async function handler(req, res) {
             codigo, 
             descricao, 
             centro_custo,
-            status,
-            owner_id,
-            created_by
+            status
           ) VALUES (
             ${nome},
             ${codigo || null},
             ${descricao || null},
             ${centroCusto || null},
-            'ativo',
-            1,
-            1
+            'ativo'
           )
           RETURNING *
         `;
