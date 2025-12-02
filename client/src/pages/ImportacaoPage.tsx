@@ -119,34 +119,86 @@ export default function ImportacaoPage() {
     setProgress(0);
 
     try {
-      const result = await createImportacao.mutateAsync({
-        projetoId,
-        pesquisaId,
-        nomeArquivo: file.name,
-        tipoArquivo: file.name.endsWith('.csv') ? 'csv' : 'xlsx',
-        totalLinhas: previewData?.totalRows || 0,
-        mapeamentoColunas: mapping,
+      // 1. Ler arquivo completo
+      const csvData = await readFullFile(file);
+      
+      // 2. Aplicar mapeamento de colunas
+      const mappedData = csvData.map((row: any) => ({
+        nome: row[mapping.nome] || '',
+        tipo_entidade: row[mapping.status] || 'cliente',
+        cnpj: row[mapping.cnpj] || '',
+        email: row[mapping.email] || '',
+        telefone: row[mapping.telefone] || '',
+        site: row[mapping.site] || '',
+        nome_fantasia: row[mapping.nome_fantasia] || '',
+        num_filiais: row[mapping.num_filiais] || 0,
+        num_lojas: row[mapping.num_lojas] || 0,
+        num_funcionarios: row[mapping.num_funcionarios] || null,
+      }));
+
+      setProgress(20);
+
+      // 3. Enviar para API de upload
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          projetoId,
+          pesquisaId,
+          csvData: mappedData,
+          nomeArquivo: file.name,
+        }),
       });
 
-      setImportacaoId(result.id);
+      setProgress(80);
 
-      await startImportacao.mutateAsync(result.id);
+      const result = await response.json();
 
-      // Simular progresso (TODO: implementar WebSocket real)
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            setStep('complete');
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 500);
-    } catch (error) {
+      if (!result.success) {
+        throw new Error(result.error || 'Erro ao processar arquivo');
+      }
+
+      setImportacaoId(result.importacaoId);
+      setProgress(100);
+      setStep('complete');
+
+      console.log('Importação concluída:', result);
+    } catch (error: any) {
       console.error('Erro na importação:', error);
-      alert('Erro ao importar arquivo');
+      alert(`Erro ao importar arquivo: ${error.message}`);
+      setStep('preview');
     }
+  };
+
+  // Ler arquivo completo
+  const readFullFile = (file: File): Promise<any[]> => {
+    return new Promise((resolve, reject) => {
+      const extension = file.name.split('.').pop()?.toLowerCase();
+
+      if (extension === 'csv') {
+        Papa.parse(file, {
+          header: true,
+          complete: (results) => {
+            resolve(results.data);
+          },
+          error: (error) => {
+            reject(error);
+          },
+        });
+      } else if (extension === 'xlsx') {
+        file.arrayBuffer().then((buffer) => {
+          const workbook = XLSX.read(buffer);
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const data = XLSX.utils.sheet_to_json(sheet);
+          resolve(data);
+        }).catch(reject);
+      } else {
+        reject(new Error('Formato de arquivo não suportado'));
+      }
+    });
   };
 
   // Renderizar steps
