@@ -17,7 +17,9 @@ import {
   ChevronRight,
   Moon,
   Sun,
-  Plus
+  Plus,
+  Users,
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -142,6 +144,17 @@ const menuSections = [
         label: 'Visão 360°',
         path: '/entidade/:id',
         color: 'text-success'
+      }
+    ]
+  },
+  {
+    title: 'Administração',
+    items: [
+      {
+        icon: Users,
+        label: 'Gestão de Usuários',
+        path: '/usuarios',
+        color: 'text-purple-600'
       }
     ]
   }

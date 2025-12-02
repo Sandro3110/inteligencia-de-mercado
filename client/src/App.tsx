@@ -23,6 +23,8 @@ const ImportacaoPage = lazy(() => import('./pages/ImportacaoPage'));
 const ImportacoesListPage = lazy(() => import('./pages/ImportacoesListPage'));
 const EnriquecimentoPage = lazy(() => import('./pages/EnriquecimentoPage'));
 const ProcessamentoIA = lazy(() => import('./pages/ProcessamentoIA'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const GestaoUsuarios = lazy(() => import('./pages/GestaoUsuarios'));
 
 // Páginas Dimensionais - Lazy loading
 const CuboExplorador = lazy(() => import('./pages/CuboExplorador'));
@@ -76,6 +78,8 @@ function App() {
             <Route path="/importacoes" component={ImportacoesListPage} />
             <Route path="/enriquecimento" component={EnriquecimentoPage} />
             <Route path="/processamento-ia" component={ProcessamentoIA} />
+            <Route path="/login" component={LoginPage} />
+            <Route path="/usuarios" component={GestaoUsuarios} />
             
             {/* Rotas Dimensionais */}
             <Route path="/cubo" component={CuboExplorador} />
