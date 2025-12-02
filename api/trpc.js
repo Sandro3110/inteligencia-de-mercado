@@ -39,7 +39,16 @@ export default async function handler(req, res) {
     let input = null;
     if (req.method === 'POST') {
       // Vercel já faz parse automático do body
-      input = req.body || {};
+      let body = req.body || {};
+      
+      // tRPC client pode enviar em formato batch: {"0": {data}}
+      if (body['0']) {
+        input = body['0'];
+        console.log('[tRPC] Batch format detected, using body[0]');
+      } else {
+        input = body;
+      }
+      
       console.log('[tRPC] POST body:', JSON.stringify(input));
     }
     
