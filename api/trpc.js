@@ -428,6 +428,61 @@ export default async function handler(req, res) {
       }
     }
 
+    // IMPORTAÇÕES
+    else if (router === 'importacao') {
+      if (procedure === 'list') {
+        // Buscar todas as importações com JOINs
+        const result = await client`
+          SELECT 
+            i.id,
+            i.projeto_id,
+            i.pesquisa_id,
+            i.nome_arquivo,
+            i.tipo_arquivo,
+            i.total_linhas,
+            i.linhas_processadas,
+            i.linhas_sucesso,
+            i.linhas_erro,
+            i.linhas_duplicadas,
+            i.status,
+            i.started_at,
+            i.completed_at,
+            i.duration_seconds,
+            i.created_at,
+            i.created_by,
+            p.nome as projeto_nome,
+            ps.nome as pesquisa_nome
+          FROM dim_importacao i
+          LEFT JOIN dim_projeto p ON i.projeto_id = p.id
+          LEFT JOIN dim_pesquisa ps ON i.pesquisa_id = ps.id
+          ORDER BY i.created_at DESC
+          LIMIT 100
+        `;
+        
+        // Mapear para camelCase
+        data = result.map(row => ({
+          id: row.id,
+          projetoId: row.projeto_id,
+          projetoNome: row.projeto_nome,
+          pesquisaId: row.pesquisa_id,
+          pesquisaNome: row.pesquisa_nome,
+          nomeArquivo: row.nome_arquivo,
+          tipoArquivo: row.tipo_arquivo,
+          totalLinhas: row.total_linhas,
+          linhasProcessadas: row.linhas_processadas,
+          linhasSucesso: row.linhas_sucesso,
+          linhasErro: row.linhas_erro,
+          linhasDuplicadas: row.linhas_duplicadas,
+          status: row.status,
+          startedAt: row.started_at,
+          completedAt: row.completed_at,
+          durationSeconds: row.duration_seconds,
+          createdAt: row.created_at,
+          createdBy: row.created_by
+        }));
+      }
+    }
+
     // ENTIDADES
     else if (router === 'entidades') {
       if (procedure === 'list') {
