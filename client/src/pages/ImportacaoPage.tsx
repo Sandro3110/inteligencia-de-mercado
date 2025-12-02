@@ -1,61 +1,91 @@
+import { useState } from 'react';
+import { trpc } from '../lib/trpc';
+
 export default function ImportacaoPage() {
+  const [file, setFile] = useState<File | null>(null);
+  const [projetoId, setProjetoId] = useState<number>(0);
+  const [pesquisaId, setPesquisaId] = useState<number>(0);
+
+  const projetos = trpc.projetos.list.useQuery({ limit: 100 });
+  const pesquisas = trpc.pesquisas.list.useQuery({ projetoId, limit: 100 }, { enabled: projetoId > 0 });
+  const createImportacao = trpc.importacao.create.useMutation();
+
+  const handleUpload = async () => {
+    if (!file || !projetoId || !pesquisaId) {
+      alert('Selecione projeto, pesquisa e arquivo');
+      return;
+    }
+
+    // TODO: Implementar upload e processamento
+    console.log('Upload:', { file, projetoId, pesquisaId });
+  };
+
   return (
     <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Importação de Dados</h1>
-        <p className="text-muted-foreground">
-          Importe entidades em massa via CSV ou Excel
-        </p>
+      <h1 className="text-3xl font-bold mb-6">Importar Entidades</h1>
+
+      <div className="space-y-4 max-w-2xl">
+        {/* Projeto */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Projeto</label>
+          <select
+            value={projetoId}
+            onChange={(e) => setProjetoId(Number(e.target.value))}
+            className="w-full border rounded px-3 py-2"
+          >
+            <option value={0}>Selecione um projeto</option>
+            {projetos.data?.map((p: any) => (
+              <option key={p.id} value={p.id}>
+                {p.nome}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Pesquisa */}
+        {projetoId > 0 && (
+          <div>
+            <label className="block text-sm font-medium mb-2">Pesquisa</label>
+            <select
+              value={pesquisaId}
+              onChange={(e) => setPesquisaId(Number(e.target.value))}
+              className="w-full border rounded px-3 py-2"
+            >
+              <option value={0}>Selecione uma pesquisa</option>
+              {pesquisas.data?.map((p: any) => (
+                <option key={p.id} value={p.id}>
+                  {p.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Upload */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Arquivo (CSV ou Excel)</label>
+          <input
+            type="file"
+            accept=".csv,.xlsx"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+            className="w-full border rounded px-3 py-2"
+          />
+        </div>
+
+        {/* Botão */}
+        <button
+          onClick={handleUpload}
+          disabled={!file || !projetoId || !pesquisaId}
+          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+        >
+          Importar
+        </button>
       </div>
 
-      <div className="rounded-lg border bg-card p-12 text-center">
-        <div className="max-w-md mx-auto">
-          <div className="h-16 w-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="h-8 w-8 text-green-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-              />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold mb-2">Em Desenvolvimento</h2>
-          <p className="text-muted-foreground mb-6">
-            Esta funcionalidade será implementada na FASE 4 do projeto. Aqui você poderá:
-          </p>
-          <ul className="text-left space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-start gap-2">
-              <span className="text-green-500 mt-0.5">•</span>
-              <span>Fazer upload de arquivos CSV ou Excel</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-500 mt-0.5">•</span>
-              <span>Mapear colunas do arquivo para campos do sistema</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-500 mt-0.5">•</span>
-              <span>Validar dados antes da importação</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-500 mt-0.5">•</span>
-              <span>Detectar e prevenir duplicatas (CNPJ)</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-500 mt-0.5">•</span>
-              <span>Acompanhar progresso da importação</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-500 mt-0.5">•</span>
-              <span>Baixar template de exemplo</span>
-            </li>
-          </ul>
-        </div>
+      {/* Lista de importações */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold mb-4">Importações Recentes</h2>
+        <p className="text-gray-500">Em desenvolvimento...</p>
       </div>
     </div>
   );
