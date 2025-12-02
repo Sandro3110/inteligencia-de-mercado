@@ -37,8 +37,10 @@ export default async function handler(req, res) {
     
     // Parse body para mutations (POST)
     let input = null;
-    if (req.method === 'POST' && req.body) {
-      input = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    if (req.method === 'POST') {
+      // Vercel já faz parse automático do body
+      input = req.body || {};
+      console.log('[tRPC] POST body:', JSON.stringify(input));
     }
     
     console.log(`[tRPC] ${req.method} ${router}.${procedure}`, input ? '(with input)' : '');
