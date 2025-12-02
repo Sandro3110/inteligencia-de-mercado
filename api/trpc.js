@@ -56,6 +56,105 @@ export default async function handler(req, res) {
 
     let data = null;
 
+    // AUTH SETUP
+    if (router === 'auth' && procedure === 'setup') {
+      const { secret } = input || {};
+      
+      if (secret !== 'setup-intelmarket-2025') {
+        return res.status(403).json({
+          error: { message: 'Acesso negado', code: 'FORBIDDEN' }
+        });
+      }
+
+      const bcrypt = await import('bcryptjs');
+      const { randomUUID } = await import('crypto');
+
+      // 1. Criar tabela de roles
+      await client`
+        CREATE TABLE IF NOT EXISTS public.roles (
+          id SERIAL PRIMARY KEY,
+          nome VARCHAR(50) UNIQUE NOT NULL,
+          descricao TEXT,
+          created_at TIMESTAMP DEFAULT NOW()
+        )
+      `;
+
+      // 2. Inserir roles
+      await client`
+        INSERT INTO public.roles (nome, descricao) VALUES
+          ('administrador', 'Administrador com acesso total'),
+          ('gerente', 'Gerente com acesso a projetos'),
+          ('analista', 'Analista com acesso a dados'),
+          ('visualizador', 'Visualizador somente leitura')
+        ON CONFLICT (nome) DO NOTHING
+      `;
+
+      // 3. Criar tabela de usuários
+      await client`
+        CREATE TABLE IF NOT EXISTS public.user_profiles (
+          id VARCHAR(255) PRIMARY KEY,
+          nome VARCHAR(255) NOT NULL,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          senha_hash TEXT NOT NULL,
+          role_id INTEGER NOT NULL REFERENCES public.roles(id) DEFAULT 4,
+          ativo BOOLEAN DEFAULT TRUE,
+          ultimo_acesso TIMESTAMP,
+          created_at TIMESTAMP DEFAULT NOW()
+        )
+      `;
+
+      // 4. Criar índices
+      await client`CREATE INDEX IF NOT EXISTS idx_user_profiles_email ON public.user_profiles(email)`;
+      await client`CREATE INDEX IF NOT EXISTS idx_user_profiles_role ON public.user_profiles(role_id)`;
+
+      // 5. Buscar ID do role administrador
+      const [adminRole] = await client`SELECT id FROM public.roles WHERE nome = 'administrador'`;
+      const adminRoleId = adminRole.id;
+
+      // 6. Criar usuários administradores
+      const user1Id = randomUUID();
+      const user1Hash = await bcrypt.default.hash('Ss311000!', 10);
+
+      await client`
+        INSERT INTO public.user_profiles (id, nome, email, senha_hash, role_id)
+        VALUES (${user1Id}, 'Sandro Direto', 'sandrodireto@gmail.com', ${user1Hash}, ${adminRoleId})
+        ON CONFLICT (email) DO UPDATE SET senha_hash = ${user1Hash}, role_id = ${adminRoleId}
+      `;
+
+      const user2Id = randomUUID();
+      const user2Hash = await bcrypt.default.hash('123456!', 10);
+
+      await client`
+        INSERT INTO public.user_profiles (id, nome, email, senha_hash, role_id)
+        VALUES (${user2Id}, 'CM Busso', 'cmbusso@gmail.com', ${user2Hash}, ${adminRoleId})
+        ON CONFLICT (email) DO UPDATE SET senha_hash = ${user2Hash}, role_id = ${adminRoleId}
+      `;
+
+      // 7. Estatísticas
+      const [stats] = await client`
+        SELECT 
+          (SELECT COUNT(*) FROM public.roles) AS total_roles,
+          (SELECT COUNT(*) FROM public.user_profiles) AS total_users
+      `;
+
+      return res.status(200).json({
+        result: {
+          data: {
+            success: true,
+            message: 'Setup de autenticação concluído!',
+            stats: {
+              roles: parseInt(stats.total_roles),
+              users: parseInt(stats.total_users),
+            },
+            usuarios_criados: [
+              { email: 'sandrodireto@gmail.com', senha: 'Ss311000!', papel: 'Administrador' },
+              { email: 'cmbusso@gmail.com', senha: '123456!', papel: 'Administrador' },
+            ],
+          }
+        }
+      });
+    }
+
     // PROJETOS
     if (router === 'projetos') {
       if (procedure === 'listAtivos') {
