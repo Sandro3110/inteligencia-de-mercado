@@ -37,7 +37,9 @@ export default async function handler(req, res) {
 
     // 2. Tabela de auditoria
     await client.unsafe(`
-      CREATE TABLE IF NOT EXISTS audit_logs (
+      DROP TABLE IF EXISTS audit_logs CASCADE;
+      
+      CREATE TABLE audit_logs (
         id SERIAL PRIMARY KEY,
         user_id VARCHAR(255) NOT NULL,
         action VARCHAR(100) NOT NULL,
