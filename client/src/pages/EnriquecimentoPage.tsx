@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { EnrichmentProgressModal } from '@/components/EnrichmentProgressModal';
 import {
   Table,
   TableBody,
@@ -38,6 +39,10 @@ export default function EnriquecimentoPage() {
   const [loading, setLoading] = useState(true);
   const [processando, setProcessando] = useState(false);
   const [resultados, setResultados] = useState<Map<number, EnriquecimentoResult>>(new Map());
+  
+  // Estados para modal de progresso
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [showProgress, setShowProgress] = useState(false);
 
   useEffect(() => {
     carregarEntidades();
@@ -88,6 +93,12 @@ export default function EnriquecimentoPage() {
       }
 
       const data = await response.json();
+      
+      // Se retornou jobId, abrir modal de progresso
+      if (data.jobId) {
+        setJobId(data.jobId);
+        setShowProgress(true);
+      }
 
       setResultados(prev => new Map(prev).set(entidade.id, {
         ...novoResultado,
@@ -413,6 +424,18 @@ export default function EnriquecimentoPage() {
           </div>
         </Card>
       </div>
+      
+      {/* Modal de Progresso */}
+      <EnrichmentProgressModal
+        jobId={jobId}
+        isOpen={showProgress}
+        onClose={() => {
+          setShowProgress(false);
+          setJobId(null);
+          // Recarregar entidades após conclusão
+          carregarEntidades();
+        }}
+      />
     </div>
   );
 }
