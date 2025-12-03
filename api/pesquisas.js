@@ -1,38 +1,74 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
+import postgres from 'postgres';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  // CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Método não permitido' });
+  }
+
+  const { projeto_id, projetoId } = req.query;
+  const id = projeto_id || projetoId;
+
+  const client = postgres(process.env.DATABASE_URL);
+
   try {
-    const { projetoId } = req.query;
+    let pesquisas;
     
-    let query = supabase
-      .from('dim_pesquisa')
-      .select('id, nome, status, created_at')
-      .order('id', { ascending: false })
-      .limit(100);
-    
-    if (projetoId) {
-      query = query.eq('projeto_id', projetoId);
+    if (id) {
+      pesquisas = await client`
+        SELECT 
+          id, 
+          projeto_id,
+          nome, 
+          descricao, 
+          status, 
+          created_at
+        FROM dim_pesquisa
+        WHERE projeto_id = ${id}
+        ORDER BY created_at DESC
+      `;
+    } else {
+      pesquisas = await client`
+        SELECT 
+          id, 
+          projeto_id,
+          nome, 
+          descricao, 
+          status, 
+          created_at
+        FROM dim_pesquisa
+        ORDER BY created_at DESC
+        LIMIT 100
+      `;
     }
 
-    const { data: pesquisas, error } = await query;
+    await client.end();
 
-    if (error) throw error;
-
-    res.status(200).json({ 
+    return res.json({
+      success: true,
       pesquisas: pesquisas || [],
       total: pesquisas?.length || 0
     });
   } catch (error) {
-    console.error('Erro ao buscar pesquisas:', error);
-    res.status(500).json({ error: 'Erro ao buscar pesquisas' });
+    console.error('[API Pesquisas] Erro:', error);
+    
+    try {
+      await client.end();
+    } catch (e) {
+      // Ignorar erro ao fechar conexão
+    }
+
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
   }
 }

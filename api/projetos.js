@@ -1,30 +1,55 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
+import postgres from 'postgres';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  // CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Método não permitido' });
+  }
+
+  const client = postgres(process.env.DATABASE_URL);
+
   try {
-    const { data: projetos, error } = await supabase
-      .from('dim_projeto')
-      .select('id, nome, codigo, status')
-      .order('id', { ascending: false })
-      .limit(100);
+    const projetos = await client`
+      SELECT 
+        id, 
+        codigo, 
+        nome, 
+        descricao, 
+        status, 
+        centro_custo, 
+        created_at
+      FROM dim_projeto
+      WHERE status = 'ativo'
+      ORDER BY created_at DESC
+    `;
 
-    if (error) throw error;
+    await client.end();
 
-    res.status(200).json({ 
+    return res.json({
+      success: true,
       projetos: projetos || [],
       total: projetos?.length || 0
     });
   } catch (error) {
-    console.error('Erro ao buscar projetos:', error);
-    res.status(500).json({ error: 'Erro ao buscar projetos' });
+    console.error('[API Projetos] Erro:', error);
+    
+    try {
+      await client.end();
+    } catch (e) {
+      // Ignorar erro ao fechar conexão
+    }
+
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
   }
 }

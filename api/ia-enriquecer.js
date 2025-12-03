@@ -213,6 +213,77 @@ Retorne APENAS JSON válido:
     const totalTokens = inputTokens + outputTokens;
     const custo = calculateCost('gpt-4o-mini', inputTokens, outputTokens);
 
+    // ========================================================================
+    // PERSISTIR DADOS NO BANCO
+    // ========================================================================
+
+    // 1. Atualizar dim_entidade com dados enriquecidos
+    await client`
+      UPDATE dim_entidade
+      SET 
+        cnpj = COALESCE(${dadosCliente.cnpj}, cnpj),
+        email = ${dadosCliente.email},
+        telefone = ${dadosCliente.telefone},
+        site = ${dadosCliente.site},
+        cidade = ${dadosCliente.cidade},
+        uf = ${dadosCliente.uf},
+        porte = ${dadosCliente.porte},
+        setor = ${dadosCliente.setor},
+        produto_principal = ${dadosCliente.produtoPrincipal},
+        segmentacao_b2b_b2c = ${dadosCliente.segmentacaoB2bB2c},
+        score_qualidade = 85,
+        enriquecido_em = NOW(),
+        enriquecido_por = ${userId},
+        updated_at = NOW(),
+        updated_by = ${userId}
+      WHERE id = ${entidadeId}
+    `;
+
+    // 2. Salvar mercado (INSERT ou UPDATE)
+    await client`
+      INSERT INTO dim_mercado (
+        entidade_id, nome, categoria, segmentacao,
+        tamanho_mercado, crescimento_anual, tendencias,
+        principais_players, created_by, updated_by
+      ) VALUES (
+        ${entidadeId}, ${dadosMercado.nome}, ${dadosMercado.categoria},
+        ${dadosMercado.segmentacao}, ${dadosMercado.tamanhoMercado},
+        ${dadosMercado.crescimentoAnual}, ${dadosMercado.tendencias},
+        ${dadosMercado.principaisPlayers}, ${userId}, ${userId}
+      )
+      ON CONFLICT (entidade_id) DO UPDATE SET
+        nome = EXCLUDED.nome,
+        categoria = EXCLUDED.categoria,
+        segmentacao = EXCLUDED.segmentacao,
+        tamanho_mercado = EXCLUDED.tamanho_mercado,
+        crescimento_anual = EXCLUDED.crescimento_anual,
+        tendencias = EXCLUDED.tendencias,
+        principais_players = EXCLUDED.principais_players,
+        updated_at = NOW(),
+        updated_by = ${userId}
+    `;
+
+    // 3. Salvar produtos (deletar antigos e inserir novos)
+    await client`DELETE FROM dim_produto WHERE entidade_id = ${entidadeId}`;
+
+    if (dadosProdutos.produtos && Array.isArray(dadosProdutos.produtos)) {
+      for (let i = 0; i < dadosProdutos.produtos.length; i++) {
+        const produto = dadosProdutos.produtos[i];
+        await client`
+          INSERT INTO dim_produto (
+            entidade_id, nome, descricao, categoria, ordem, created_by
+          ) VALUES (
+            ${entidadeId}, ${produto.nome}, ${produto.descricao},
+            ${produto.categoria}, ${i + 1}, ${userId}
+          )
+        `;
+      }
+    }
+
+    // ========================================================================
+    // REGISTRAR USO DE IA
+    // ========================================================================
+
     // Registrar uso
     await client`
       INSERT INTO ia_usage (

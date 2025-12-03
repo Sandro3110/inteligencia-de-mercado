@@ -125,10 +125,87 @@ Retorne APENAS JSON válido com 5 leads DIFERENTES:
 
     const data = JSON.parse(response.choices[0].message.content || '{}');
 
-    // Validar que tem exatamente 5 leads
+    // ========================================================================
+    // VALIDAÇÕES CRÍTICAS
+    // ========================================================================
+
+    // 1. Validar quantidade exata (5 leads)
     if (!data.leads || data.leads.length !== 5) {
       throw new Error(`Esperado 5 leads, recebeu ${data.leads?.length || 0}`);
     }
+
+    // 2. Validar e limpar CNPJs genéricos
+    const cnpjGenerico = /^00\.000\.000\/\d{4}-\d{2}$/;
+    data.leads = data.leads.map(lead => ({
+      ...lead,
+      cnpj: (lead.cnpj && cnpjGenerico.test(lead.cnpj)) ? null : lead.cnpj
+    }));
+
+    // 3. Validar que não incluiu o próprio cliente
+    const nomeCliente = nome.toLowerCase();
+    const incluiCliente = data.leads.some(lead => {
+      const nomeLead = lead.nome.toLowerCase();
+      return nomeLead.includes(nomeCliente) || nomeCliente.includes(nomeLead);
+    });
+    if (incluiCliente) {
+      throw new Error('ERRO: Lead não pode incluir o próprio cliente');
+    }
+
+    // 4. Validar que não incluiu concorrentes (se fornecidos)
+    if (concorrentes && Array.isArray(concorrentes)) {
+      const concorrentesNomes = concorrentes.map(c => (typeof c === 'string' ? c : c.nome).toLowerCase());
+      const incluiConcorrente = data.leads.some(lead => {
+        const nomeLead = lead.nome.toLowerCase();
+        return concorrentesNomes.some(nomeConc => 
+          nomeLead.includes(nomeConc) || nomeConc.includes(nomeLead)
+        );
+      });
+      if (incluiConcorrente) {
+        throw new Error('ERRO: Lead não pode incluir concorrentes');
+      }
+    }
+
+    // 5. Validar cidade e UF obrigatórios
+    const semLocalizacao = data.leads.some(lead => !lead.cidade || !lead.uf);
+    if (semLocalizacao) {
+      throw new Error('ERRO: Todos os leads devem ter cidade e UF');
+    }
+
+    // 6. Validar que todos têm produto de interesse
+    const semProduto = data.leads.some(lead => !lead.produtoInteresse);
+    if (semProduto) {
+      throw new Error('ERRO: Todos os leads devem ter produto de interesse');
+    }
+
+    // ========================================================================
+    // PERSISTIR LEADS NO BANCO
+    // ========================================================================
+
+    // Deletar leads antigos
+    await client`DELETE FROM dim_lead WHERE entidade_id = ${entidadeId}`;
+
+    // Inserir novos leads
+    for (let i = 0; i < data.leads.length; i++) {
+      const lead = data.leads[i];
+      await client`
+        INSERT INTO dim_lead (
+          entidade_id, nome, cnpj, cidade, uf,
+          produto_interesse, setor, site, porte,
+          score_qualificacao, prioridade, status,
+          ordem, created_by, updated_by
+        ) VALUES (
+          ${entidadeId}, ${lead.nome}, ${lead.cnpj}, ${lead.cidade},
+          ${lead.uf}, ${lead.produtoInteresse}, ${lead.setor},
+          ${lead.site}, ${lead.porte},
+          ${lead.scoreQualificacao || 70}, ${lead.prioridade || 'Média'}, 'novo',
+          ${i + 1}, ${userId}, ${userId}
+        )
+      `;
+    }
+
+    // ========================================================================
+    // REGISTRAR USO DE IA
+    // ========================================================================
 
     // Registrar uso
     await client`

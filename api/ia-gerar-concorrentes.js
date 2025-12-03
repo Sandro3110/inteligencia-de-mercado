@@ -116,10 +116,69 @@ Retorne APENAS JSON válido com 5 concorrentes:
 
     const data = JSON.parse(response.choices[0].message.content || '{}');
 
-    // Validar que tem exatamente 5 concorrentes
+    // ========================================================================
+    // VALIDAÇÕES CRÍTICAS
+    // ========================================================================
+
+    // 1. Validar quantidade exata (5 concorrentes)
     if (!data.concorrentes || data.concorrentes.length !== 5) {
       throw new Error(`Esperado 5 concorrentes, recebeu ${data.concorrentes?.length || 0}`);
     }
+
+    // 2. Validar e limpar CNPJs genéricos
+    const cnpjGenerico = /^00\.000\.000\/\d{4}-\d{2}$/;
+    data.concorrentes = data.concorrentes.map(conc => ({
+      ...conc,
+      cnpj: (conc.cnpj && cnpjGenerico.test(conc.cnpj)) ? null : conc.cnpj
+    }));
+
+    // 3. Validar que não incluiu o próprio cliente
+    const nomeCliente = nome.toLowerCase();
+    const incluiCliente = data.concorrentes.some(conc => {
+      const nomeConc = conc.nome.toLowerCase();
+      return nomeConc.includes(nomeCliente) || nomeCliente.includes(nomeConc);
+    });
+    if (incluiCliente) {
+      throw new Error('ERRO: Concorrente não pode incluir o próprio cliente');
+    }
+
+    // 4. Validar cidade e UF obrigatórios
+    const semLocalizacao = data.concorrentes.some(conc => !conc.cidade || !conc.uf);
+    if (semLocalizacao) {
+      throw new Error('ERRO: Todos os concorrentes devem ter cidade e UF');
+    }
+
+    // 5. Validar que todos têm produto principal
+    const semProduto = data.concorrentes.some(conc => !conc.produtoPrincipal);
+    if (semProduto) {
+      throw new Error('ERRO: Todos os concorrentes devem ter produto principal');
+    }
+
+    // ========================================================================
+    // PERSISTIR CONCORRENTES NO BANCO
+    // ========================================================================
+
+    // Deletar concorrentes antigos
+    await client`DELETE FROM dim_concorrente WHERE entidade_id = ${entidadeId}`;
+
+    // Inserir novos concorrentes
+    for (let i = 0; i < data.concorrentes.length; i++) {
+      const conc = data.concorrentes[i];
+      await client`
+        INSERT INTO dim_concorrente (
+          entidade_id, nome, cnpj, cidade, uf,
+          produto_principal, site, porte, ordem, created_by
+        ) VALUES (
+          ${entidadeId}, ${conc.nome}, ${conc.cnpj}, ${conc.cidade},
+          ${conc.uf}, ${conc.produtoPrincipal}, ${conc.site},
+          ${conc.porte}, ${i + 1}, ${userId}
+        )
+      `;
+    }
+
+    // ========================================================================
+    // REGISTRAR USO DE IA
+    // ========================================================================
 
     // Registrar uso
     await client`
