@@ -122,20 +122,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Informações de teste */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center mb-3">
-              Usuários de teste:
-            </p>
-            <div className="space-y-2 text-xs text-gray-600">
-              <div className="bg-gray-50 p-2 rounded">
-                <strong>Admin 1:</strong> sandrodireto@gmail.com | Ss311000!
-              </div>
-              <div className="bg-gray-50 p-2 rounded">
-                <strong>Admin 2:</strong> cmbusso@gmail.com | 123456!
-              </div>
-            </div>
-          </div>
+
         </div>
 
         {/* Footer */}
