@@ -25,15 +25,24 @@ import { ErrorState } from '@/components/ErrorState';
 
 export default function HomePage() {
   const [, setLocation] = useLocation();
+  // Queries diretas para cada tipo de dado
   const { data: projetos, isLoading: loadingProjetos, error: errorProjetos, refetch: refetchProjetos } = trpc.projetos.listAtivos.useQuery();
   const { data: pesquisasEmProgresso, isLoading: loadingPesquisas, error: errorPesquisas } = trpc.pesquisas.listEmProgresso.useQuery();
-  const { data: dashboardData, isLoading: loadingDashboard } = trpc.dashboard.getDashboardData.useQuery();
+  
+  // Queries de entidades por tipo
+  const { data: clientesData } = trpc.entidades.list.useQuery({ tipo: 'cliente', limit: 1000 });
+  const { data: leadsData } = trpc.entidades.list.useQuery({ tipo: 'lead', limit: 1000 });
+  const { data: concorrentesData } = trpc.entidades.list.useQuery({ tipo: 'concorrente', limit: 1000 });
+  
+  // Queries de produtos e mercados
+  const { data: produtosData } = trpc.produto.list.useQuery({ limit: 1000 });
+  const { data: mercadosData } = trpc.mercado.list.useQuery({ limit: 1000 });
 
   const navegarParaEntidades = (tipo: string) => {
     setLocation(`/entidades?tipo=${tipo}`);
   };
 
-  const isLoading = loadingProjetos || loadingPesquisas || loadingDashboard;
+  const isLoading = loadingProjetos || loadingPesquisas;
   const hasError = errorProjetos || errorPesquisas;
 
   if (isLoading) {
@@ -70,13 +79,14 @@ export default function HomePage() {
         icon={Activity}
       />
 
-      {/* DEBUG: Mostrar dados brutos */}
-      <div className="bg-yellow-100 border-2 border-yellow-500 p-4 mb-4 rounded">
-        <h3 className="font-bold text-lg mb-2">🐛 DEBUG - Dados do Dashboard:</h3>
-        <pre className="text-xs overflow-auto">{JSON.stringify(dashboardData?.kpis, null, 2)}</pre>
-        <p className="mt-2">Loading: {loadingDashboard ? 'SIM' : 'NÃO'}</p>
-        <p>Total Clientes: {dashboardData?.kpis?.totalClientes || 'undefined'}</p>
-        <p>Total Mercados: {dashboardData?.kpis?.totalMercados || 'undefined'}</p>
+      {/* DEBUG: Mostrar dados das queries diretas */}
+      <div className="bg-green-100 border-2 border-green-500 p-4 mb-4 rounded">
+        <h3 className="font-bold text-lg mb-2">✅ DEBUG - Queries Diretas:</h3>
+        <p>Clientes: {clientesData?.total || 0} (de {clientesData?.data?.length || 0} carregados)</p>
+        <p>Leads: {leadsData?.total || 0} (de {leadsData?.data?.length || 0} carregados)</p>
+        <p>Concorrentes: {concorrentesData?.total || 0} (de {concorrentesData?.data?.length || 0} carregados)</p>
+        <p>Produtos: {produtosData?.total || 0} (de {produtosData?.data?.length || 0} carregados)</p>
+        <p>Mercados: {mercadosData?.total || 0} (de {mercadosData?.data?.length || 0} carregados)</p>
       </div>
 
       {/* Stats Grid */}
@@ -103,7 +113,7 @@ export default function HomePage() {
 
         <StatCard
           title="Clientes"
-          value={dashboardData?.kpis?.totalClientes || 0}
+          value={clientesData?.total || 0}
           icon={UserCheck}
           color="success"
           onClick={() => navegarParaEntidades('cliente')}
@@ -111,7 +121,7 @@ export default function HomePage() {
 
         <StatCard
           title="Leads"
-          value={dashboardData?.kpis?.totalLeads || 0}
+          value={leadsData?.total || 0}
           icon={UserPlus}
           color="info"
           onClick={() => navegarParaEntidades('lead')}
@@ -119,7 +129,7 @@ export default function HomePage() {
 
         <StatCard
           title="Concorrentes"
-          value={dashboardData?.kpis?.totalConcorrentes || 0}
+          value={concorrentesData?.total || 0}
           icon={Building2}
           color="warning"
           onClick={() => navegarParaEntidades('concorrente')}
@@ -127,7 +137,7 @@ export default function HomePage() {
 
         <StatCard
           title="Produtos"
-          value={dashboardData?.kpis?.totalProdutos || 0}
+          value={produtosData?.total || 0}
           icon={Package}
           color="info"
           onClick={() => setLocation('/produtos')}
@@ -135,7 +145,7 @@ export default function HomePage() {
 
         <StatCard
           title="Mercados"
-          value={dashboardData?.kpis?.totalMercados || 0}
+          value={mercadosData?.total || 0}
           icon={Target}
           color="warning"
           onClick={() => setLocation('/mercados')}
