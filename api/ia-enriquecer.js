@@ -44,6 +44,18 @@ export default async function handler(req, res) {
     }
 
     const startTime = Date.now();
+    
+    // Gerar jobId único
+    const jobId = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Criar job inicial
+    await client`
+      INSERT INTO ia_jobs (
+        id, user_id, entidade_id, tipo, status, progresso, etapa_atual
+      ) VALUES (
+        ${jobId}, ${userId}, ${entidadeId}, 'enriquecimento_completo', 'processing', 0, 'cliente'
+      )
+    `;
 
     // Buscar name do usuário (tentar por ID, depois por email)
     let [user] = await client`SELECT name, email FROM users WHERE id = ${userId}`;
@@ -113,6 +125,16 @@ Retorne APENAS JSON válido:
     });
 
     const dadosCliente = JSON.parse(responseCliente.choices[0].message.content || '{}');
+    
+    // Atualizar progresso: Cliente completo (20%)
+    await client`
+      UPDATE ia_jobs
+      SET progresso = 20,
+          etapa_atual = 'mercado',
+          etapas_completas = '["cliente"]',
+          dados_parciais = ${JSON.stringify({ cliente: { fields: Object.keys(dadosCliente).length, total: 10 } })}
+      WHERE id = ${jobId}
+    `;
 
     // ETAPA 2: ANÁLISE COMPLETA DE MERCADO (Temperatura 0.5)
     const promptMercado = `Você é um analista de mercado especializado em inteligência competitiva do Brasil.
@@ -192,6 +214,19 @@ Retorne APENAS JSON válido:
     });
 
     const dadosMercado = JSON.parse(responseMercado.choices[0].message.content || '{}');
+    
+    // Atualizar progresso: Mercado completo (40%)
+    await client`
+      UPDATE ia_jobs
+      SET progresso = 40,
+          etapa_atual = 'produtos',
+          etapas_completas = '["cliente", "mercado"]',
+          dados_parciais = ${JSON.stringify({
+            cliente: { fields: Object.keys(dadosCliente).length, total: 10 },
+            mercado: { score: dadosMercado.scoreAtratividade, sentimento: dadosMercado.sentimento }
+          })}
+      WHERE id = ${jobId}
+    `;
 
     // ETAPA 3: PRODUTOS/SERVIÇOS DETALHADOS (Temperatura 0.7)
     const promptProdutos = `Você é um especialista em análise de produtos B2B.
@@ -251,6 +286,20 @@ Retorne APENAS JSON válido:
     });
 
     const dadosProdutos = JSON.parse(responseProdutos.choices[0].message.content || '{}');
+    
+    // Atualizar progresso: Produtos completo (60%)
+    await client`
+      UPDATE ia_jobs
+      SET progresso = 60,
+          etapa_atual = 'concorrentes',
+          etapas_completas = '["cliente", "mercado", "produtos"]',
+          dados_parciais = ${JSON.stringify({
+            cliente: { fields: Object.keys(dadosCliente).length, total: 10 },
+            mercado: { score: dadosMercado.scoreAtratividade, sentimento: dadosMercado.sentimento },
+            produtos: { count: dadosProdutos.produtos?.length || 0, status: 'completed' }
+          })}
+      WHERE id = ${jobId}
+    `;
 
     // Calcular métricas totais
     const duration = Date.now() - startTime;
@@ -380,11 +429,25 @@ Retorne APENAS JSON válido:
         ${custo}, ${duration}, ${entidadeId}, true
       )
     `;
+    
+    // Atualizar job: Completo (100%)
+    await client`
+      UPDATE ia_jobs
+      SET progresso = 100,
+          status = 'completed',
+          etapa_atual = 'leads',
+          etapas_completas = '["cliente", "mercado", "produtos", "concorrentes", "leads"]',
+          tempo_fim = NOW(),
+          duracao_ms = ${duration},
+          custo = ${custo}
+      WHERE id = ${jobId}
+    `;
 
     await client.end();
 
     return res.json({
       success: true,
+      jobId,
       data: {
         cliente: dadosCliente,
         mercado: dadosMercado,
