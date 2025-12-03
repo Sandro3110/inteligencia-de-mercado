@@ -676,6 +676,8 @@ export default async function handler(req, res) {
       if (procedure === 'list') {
         const { busca, tipo, limit = 100, offset = 0 } = input || {};
         
+        console.log('[entidades.list] Input recebido:', { busca, tipo, limit, offset });
+        
         let whereConditions = [];
         let params = [];
         
@@ -709,7 +711,13 @@ export default async function handler(req, res) {
         
         params.push(limit, offset);
         
+        console.log('[entidades.list] Query:', query);
+        console.log('[entidades.list] Params:', params);
+        
         const result = await client.unsafe(query, params);
+        
+        console.log('[entidades.list] Resultado:', result.length, 'registros');
+        
         data = result;
       }
     }
