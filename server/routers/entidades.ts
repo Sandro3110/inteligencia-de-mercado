@@ -21,11 +21,13 @@ export const entidadesRouter = router({
       })
     )
     .query(async ({ input }) => {
+      // Converter offset para page (page começa em 1)
+      const page = Math.floor(input.offset / input.limit) + 1;
       return await entidadeDAL.getEntidades({
         busca: input.busca,
         tipoEntidade: input.tipo,
         limit: input.limit,
-        offset: input.offset,
+        page: page,
       });
     }),
 
