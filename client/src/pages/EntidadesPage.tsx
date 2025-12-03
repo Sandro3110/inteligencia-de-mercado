@@ -11,8 +11,12 @@ import { Link } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 
 export default function EntidadesPage() {
+  // Ler parâmetro tipo da URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const tipoUrl = urlParams.get('tipo') as 'cliente' | 'lead' | 'concorrente' | null;
+  
   const [busca, setBusca] = useState('');
-  const [tipoFiltro, setTipoFiltro] = useState<'cliente' | 'lead' | 'concorrente' | undefined>();
+  const [tipoFiltro, setTipoFiltro] = useState<'cliente' | 'lead' | 'concorrente' | undefined>(tipoUrl || undefined);
   const [page, setPage] = useState(0);
   const [entidadeSelecionada, setEntidadeSelecionada] = useState<any>(null);
   const [modalAberto, setModalAberto] = useState(false);

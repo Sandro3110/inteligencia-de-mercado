@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { 
   FolderKanban, 
   Search, 
@@ -8,6 +8,9 @@ import {
   Database,
   Activity,
   Users,
+  UserCheck,
+  UserPlus,
+  Building2,
   Package,
   Target
 } from 'lucide-react';
@@ -21,9 +24,14 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { ErrorState } from '@/components/ErrorState';
 
 export default function HomePage() {
+  const [, setLocation] = useLocation();
   const { data: projetos, isLoading: loadingProjetos, error: errorProjetos, refetch: refetchProjetos } = trpc.projetos.listAtivos.useQuery();
   const { data: pesquisasEmProgresso, isLoading: loadingPesquisas, error: errorPesquisas } = trpc.pesquisas.listEmProgresso.useQuery();
   const { data: dashboardData, isLoading: loadingDashboard } = trpc.dashboard.getDashboardData.useQuery();
+
+  const navegarParaEntidades = (tipo: string) => {
+    setLocation(`/entidades?tipo=${tipo}`);
+  };
 
   const isLoading = loadingProjetos || loadingPesquisas || loadingDashboard;
   const hasError = errorProjetos || errorPesquisas;
@@ -63,7 +71,7 @@ export default function HomePage() {
       />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4 mb-8">
         <StatCard
           title="Projetos Ativos"
           value={projetos?.length || 0}
@@ -83,11 +91,27 @@ export default function HomePage() {
         />
 
         <StatCard
-          title="Clientes, Leads e Concorrentes"
-          value={(dashboardData?.kpis?.totalClientes || 0) + (dashboardData?.kpis?.totalLeads || 0) + (dashboardData?.kpis?.totalConcorrentes || 0)}
-          icon={Users}
+          title="Clientes"
+          value={dashboardData?.kpis?.totalClientes || 0}
+          icon={UserCheck}
           color="success"
-          subtitle={`${dashboardData?.kpis?.totalClientes || 0} clientes · ${dashboardData?.kpis?.totalLeads || 0} leads · ${dashboardData?.kpis?.totalConcorrentes || 0} concorrentes`}
+          onClick={() => navegarParaEntidades('cliente')}
+        />
+
+        <StatCard
+          title="Leads"
+          value={dashboardData?.kpis?.totalLeads || 0}
+          icon={UserPlus}
+          color="info"
+          onClick={() => navegarParaEntidades('lead')}
+        />
+
+        <StatCard
+          title="Concorrentes"
+          value={dashboardData?.kpis?.totalConcorrentes || 0}
+          icon={Building2}
+          color="warning"
+          onClick={() => navegarParaEntidades('concorrente')}
         />
 
         <StatCard

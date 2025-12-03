@@ -11,6 +11,8 @@ interface StatCardProps {
   trend?: "up" | "down" | "neutral";
   color?: "primary" | "secondary" | "success" | "warning" | "destructive" | "info";
   className?: string;
+  subtitle?: string;
+  onClick?: () => void;
 }
 
 const colorClasses = {
@@ -47,12 +49,21 @@ export function StatCard({
   icon: Icon,
   trend = "neutral",
   color = "primary",
-  className
+  className,
+  subtitle,
+  onClick
 }: StatCardProps) {
   const colors = colorClasses[color];
 
   return (
-    <Card className={cn("p-6 hover-lift", className)}>
+    <Card 
+      className={cn(
+        "p-6 hover-lift",
+        onClick && "cursor-pointer transition-all hover:scale-105",
+        className
+      )}
+      onDoubleClick={onClick}
+    >
       <div className="flex items-center justify-between mb-4">
         <div className={cn(
           "h-12 w-12 rounded-xl bg-gradient-to-br flex items-center justify-center",
@@ -84,6 +95,12 @@ export function StatCard({
       <div className="text-sm text-muted-foreground">
         {title}
       </div>
+
+      {subtitle && (
+        <div className="text-xs text-muted-foreground mt-1">
+          {subtitle}
+        </div>
+      )}
     </Card>
   );
 }
