@@ -220,12 +220,12 @@ export default function Layout({ children }: LayoutProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen transition-all duration-300 border-r border-border bg-card',
+          'fixed left-0 top-0 z-40 h-screen flex flex-col transition-all duration-300 border-r border-border bg-card',
           isCollapsed ? 'w-16' : 'w-64'
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 border-b border-border">
           {!isCollapsed && (
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
@@ -327,7 +327,7 @@ export default function Layout({ children }: LayoutProps) {
         </nav>
 
         {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-card">
+        <div className="flex-shrink-0 p-4 border-t border-border bg-card">
           <Button
             variant="ghost"
             size={isCollapsed ? "icon" : "default"}

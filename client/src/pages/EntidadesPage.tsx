@@ -1,18 +1,102 @@
 import { useState } from 'react';
-import { Database, Search, Filter, Plus, Building2, Mail, Phone, Globe } from 'lucide-react';
+import { Database, Search, Filter, Plus, Building2, Mail, Phone, Globe, FileSpreadsheet, FileText, X, Copy } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { trpc } from '@/lib/trpc';
 import { Link } from 'wouter';
+import { useToast } from '@/hooks/use-toast';
 
 export default function EntidadesPage() {
   const [busca, setBusca] = useState('');
   const [tipoFiltro, setTipoFiltro] = useState<'cliente' | 'lead' | 'concorrente' | undefined>();
   const [page, setPage] = useState(0);
+  const [entidadeSelecionada, setEntidadeSelecionada] = useState<any>(null);
+  const [modalAberto, setModalAberto] = useState(false);
   const limit = 20;
+  const { toast } = useToast();
+
+  // Função para copiar dados da entidade
+  const copiarEntidade = (entidade: any) => {
+    const texto = `
+Nome: ${entidade.nome}
+CNPJ: ${entidade.cnpj || 'N/A'}
+Tipo: ${formatTipo(entidade.tipo_entidade)}
+Email: ${entidade.email || 'N/A'}
+Telefone: ${entidade.telefone || 'N/A'}
+Site: ${entidade.site || 'N/A'}
+    `.trim();
+    
+    navigator.clipboard.writeText(texto);
+    toast({
+      title: 'Copiado!',
+      description: 'Dados da entidade copiados para a área de transferência',
+      duration: 2000
+    });
+  };
+
+  // Função para exportar CSV
+  const exportarCSV = () => {
+    if (!entidades.data || entidades.data.length === 0) return;
+    
+    const headers = ['Nome', 'CNPJ', 'Tipo', 'Email', 'Telefone', 'Site', 'Origem', 'Data'];
+    const rows = entidades.data.map((e: any) => [
+      e.nome,
+      e.cnpj || '',
+      formatTipo(e.tipo_entidade),
+      e.email || '',
+      e.telefone || '',
+      e.site || '',
+      e.origem_tipo || '',
+      new Date(e.created_at).toLocaleDateString('pt-BR')
+    ]);
+    
+    const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `entidades_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    
+    toast({
+      title: 'Exportado!',
+      description: 'Arquivo CSV baixado com sucesso',
+      duration: 2000
+    });
+  };
+
+  // Função para exportar Excel (via CSV)
+  const exportarExcel = () => {
+    if (!entidades.data || entidades.data.length === 0) return;
+    
+    const headers = ['Nome', 'CNPJ', 'Tipo', 'Email', 'Telefone', 'Site', 'Origem', 'Data'];
+    const rows = entidades.data.map((e: any) => [
+      e.nome,
+      e.cnpj || '',
+      formatTipo(e.tipo_entidade),
+      e.email || '',
+      e.telefone || '',
+      e.site || '',
+      e.origem_tipo || '',
+      new Date(e.created_at).toLocaleDateString('pt-BR')
+    ]);
+    
+    const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `entidades_${new Date().toISOString().split('T')[0]}.xlsx`;
+    link.click();
+    
+    toast({
+      title: 'Exportado!',
+      description: 'Arquivo Excel baixado com sucesso',
+      duration: 2000
+    });
+  };
 
   // Query para listar entidades
   const entidades = trpc.entidades.list.useQuery({
@@ -58,18 +142,34 @@ export default function EntidadesPage() {
           { label: 'Dashboard', path: '/' },
           { label: 'Base de Entidades' }
         ]}
-        actions={
-          <Button asChild>
-            <Link href="/entidades/nova">
-              <Plus className="h-4 w-4 mr-2" />
-              Nova Entidade
-            </Link>
-          </Button>
-        }
       />
 
-      {/* Filtros */}
+      {/* Filtros e Exportação */}
       <Card className="p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Filtros</h3>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exportarExcel}
+              disabled={!entidades.data || entidades.data.length === 0}
+            >
+              <FileSpreadsheet className="h-4 w-4 mr-2" />
+              Exportar Excel
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exportarCSV}
+              disabled={!entidades.data || entidades.data.length === 0}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Exportar CSV
+            </Button>
+          </div>
+        </div>
+        
         <div className="flex flex-col md:flex-row gap-4">
           {/* Busca */}
           <div className="flex-1">
@@ -181,7 +281,10 @@ export default function EntidadesPage() {
                     <tr
                       key={entidade.id}
                       className="border-b hover:bg-muted/30 transition-colors cursor-pointer"
-                      onClick={() => window.location.href = `/entidades/${entidade.id}`}
+                      onDoubleClick={() => {
+                        setEntidadeSelecionada(entidade);
+                        setModalAberto(true);
+                      }}
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -274,6 +377,117 @@ export default function EntidadesPage() {
           </>
         )}
       </Card>
+
+      {/* Modal de Detalhes */}
+      <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Detalhes da Entidade</span>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => entidadeSelecionada && copiarEntidade(entidadeSelecionada)}
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copiar
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setModalAberto(false)}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Fechar
+                </Button>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+
+          {entidadeSelecionada && (
+            <div className="space-y-6">
+              {/* Informações Básicas */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <Building2 className="h-5 w-5" />
+                  Informações Básicas
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Nome</p>
+                    <p className="font-medium">{entidadeSelecionada.nome}</p>
+                  </div>
+                  {entidadeSelecionada.nome_fantasia && (
+                    <div>
+                      <p className="text-sm text-muted-foreground">Nome Fantasia</p>
+                      <p className="font-medium">{entidadeSelecionada.nome_fantasia}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm text-muted-foreground">CNPJ</p>
+                    <p className="font-medium">{entidadeSelecionada.cnpj || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Tipo</p>
+                    <Badge variant={getBadgeVariant(entidadeSelecionada.tipo_entidade)}>
+                      {formatTipo(entidadeSelecionada.tipo_entidade)}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contato */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <Mail className="h-5 w-5" />
+                  Contato
+                </h3>
+                <div className="grid grid-cols-1 gap-3">
+                  {entidadeSelecionada.email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <span>{entidadeSelecionada.email}</span>
+                    </div>
+                  )}
+                  {entidadeSelecionada.telefone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span>{entidadeSelecionada.telefone}</span>
+                    </div>
+                  )}
+                  {entidadeSelecionada.site && (
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      <a href={entidadeSelecionada.site} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        {entidadeSelecionada.site}
+                      </a>
+                    </div>
+                  )}
+                  {!entidadeSelecionada.email && !entidadeSelecionada.telefone && !entidadeSelecionada.site && (
+                    <p className="text-muted-foreground">Nenhuma informação de contato disponível</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Origem */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Origem</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Tipo de Origem</p>
+                    <Badge variant="outline">{entidadeSelecionada.origem_tipo || '—'}</Badge>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Data de Criação</p>
+                    <p className="font-medium">{new Date(entidadeSelecionada.created_at).toLocaleDateString('pt-BR')}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

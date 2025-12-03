@@ -674,10 +674,42 @@ export default async function handler(req, res) {
     // ENTIDADES
     else if (router === 'entidades') {
       if (procedure === 'list') {
-        const result = await client`
+        const { busca, tipo, limit = 100, offset = 0 } = input || {};
+        
+        let whereConditions = [];
+        let params = [];
+        
+        // Filtro de busca
+        if (busca) {
+          whereConditions.push(`(
+            nome ILIKE '%' || $${params.length + 1} || '%' OR 
+            cnpj ILIKE '%' || $${params.length + 1} || '%' OR 
+            email ILIKE '%' || $${params.length + 1} || '%'
+          )`);
+          params.push(busca);
+        }
+        
+        // Filtro de tipo
+        if (tipo) {
+          whereConditions.push(`tipo_entidade = $${params.length + 1}`);
+          params.push(tipo);
+        }
+        
+        const whereClause = whereConditions.length > 0 
+          ? 'WHERE ' + whereConditions.join(' AND ')
+          : '';
+        
+        const query = `
           SELECT * FROM dim_entidade 
-          LIMIT 100
+          ${whereClause}
+          ORDER BY created_at DESC 
+          LIMIT $${params.length + 1} 
+          OFFSET $${params.length + 2}
         `;
+        
+        params.push(limit, offset);
+        
+        const result = await client.unsafe(query, params);
         data = result;
       }
     }
@@ -744,14 +776,41 @@ export default async function handler(req, res) {
           SELECT COUNT(*)::int as count FROM dim_entidade
         `;
 
+        // Contar clientes
+        const [{ count: totalClientes }] = await client`
+          SELECT COUNT(*)::int as count FROM dim_entidade WHERE tipo_entidade = 'cliente'
+        `;
+
+        // Contar leads
+        const [{ count: totalLeads }] = await client`
+          SELECT COUNT(*)::int as count FROM dim_entidade WHERE tipo_entidade = 'lead'
+        `;
+
+        // Contar concorrentes
+        const [{ count: totalConcorrentes }] = await client`
+          SELECT COUNT(*)::int as count FROM dim_entidade WHERE tipo_entidade = 'concorrente'
+        `;
+
+        // Contar produtos
+        const [{ count: totalProdutos }] = await client`
+          SELECT COUNT(*)::int as count FROM dim_produto
+        `;
+
+        // Contar mercados
+        const [{ count: totalMercados }] = await client`
+          SELECT COUNT(*)::int as count FROM dim_mercado
+        `;
+
         data = {
           kpis: {
             totalProjetos: totalProjetos || 0,
             totalPesquisas: totalPesquisas || 0,
             totalEntidades: totalEntidades || 0,
-            totalClientes: 0,
-            totalLeads: 0,
-            totalConcorrentes: 0,
+            totalClientes: totalClientes || 0,
+            totalLeads: totalLeads || 0,
+            totalConcorrentes: totalConcorrentes || 0,
+            totalProdutos: totalProdutos || 0,
+            totalMercados: totalMercados || 0,
             receitaPotencial: 0,
             scoreMedioFit: 0,
             taxaConversao: 0,

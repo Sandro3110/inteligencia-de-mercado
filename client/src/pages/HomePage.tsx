@@ -6,7 +6,10 @@ import {
   Sparkles,
   TrendingUp,
   Database,
-  Activity
+  Activity,
+  Users,
+  Package,
+  Target
 } from 'lucide-react';
 import { trpc } from '../lib/trpc';
 import { CardSkeleton } from '@/components/CardSkeleton';
@@ -20,8 +23,9 @@ import { ErrorState } from '@/components/ErrorState';
 export default function HomePage() {
   const { data: projetos, isLoading: loadingProjetos, error: errorProjetos, refetch: refetchProjetos } = trpc.projetos.listAtivos.useQuery();
   const { data: pesquisasEmProgresso, isLoading: loadingPesquisas, error: errorPesquisas } = trpc.pesquisas.listEmProgresso.useQuery();
+  const { data: dashboardData, isLoading: loadingDashboard } = trpc.dashboard.getDashboardData.useQuery();
 
-  const isLoading = loadingProjetos || loadingPesquisas;
+  const isLoading = loadingProjetos || loadingPesquisas || loadingDashboard;
   const hasError = errorProjetos || errorPesquisas;
 
   if (isLoading) {
@@ -59,7 +63,7 @@ export default function HomePage() {
       />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <StatCard
           title="Projetos Ativos"
           value={projetos?.length || 0}
@@ -79,10 +83,25 @@ export default function HomePage() {
         />
 
         <StatCard
-          title="Cidades no Banco"
-          value="5.570"
-          icon={Database}
+          title="Clientes, Leads e Concorrentes"
+          value={(dashboardData?.kpis?.totalClientes || 0) + (dashboardData?.kpis?.totalLeads || 0) + (dashboardData?.kpis?.totalConcorrentes || 0)}
+          icon={Users}
           color="success"
+          subtitle={`${dashboardData?.kpis?.totalClientes || 0} clientes · ${dashboardData?.kpis?.totalLeads || 0} leads · ${dashboardData?.kpis?.totalConcorrentes || 0} concorrentes`}
+        />
+
+        <StatCard
+          title="Produtos"
+          value={dashboardData?.kpis?.totalProdutos || 0}
+          icon={Package}
+          color="info"
+        />
+
+        <StatCard
+          title="Mercados"
+          value={dashboardData?.kpis?.totalMercados || 0}
+          icon={Target}
+          color="warning"
         />
       </div>
 
@@ -96,10 +115,10 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link href="/projetos/novo">
             <a className="group">
-              <Card className="p-6 hover-lift cursor-pointer transition-all border-2 hover:border-primary">
-                <div className="flex flex-col items-center text-center gap-4">
-                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <FolderKanban className="h-7 w-7 text-primary" />
+              <Card className="p-4 hover-lift cursor-pointer transition-all border-2 hover:border-primary">
+                <div className="flex flex-col items-center text-center gap-3">
+                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <FolderKanban className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <p className="font-semibold mb-1">Novo Projeto</p>
@@ -112,10 +131,10 @@ export default function HomePage() {
 
           <Link href="/pesquisas/novo">
             <a className="group">
-              <Card className="p-6 hover-lift cursor-pointer transition-all border-2 hover:border-secondary">
-                <div className="flex flex-col items-center text-center gap-4">
-                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-secondary/10 to-secondary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Search className="h-7 w-7 text-secondary" />
+              <Card className="p-4 hover-lift cursor-pointer transition-all border-2 hover:border-secondary">
+                <div className="flex flex-col items-center text-center gap-3">
+                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-secondary/10 to-secondary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Search className="h-6 w-6 text-secondary" />
                   </div>
                   <div>
                     <p className="font-semibold mb-1">Nova Pesquisa</p>
@@ -128,10 +147,10 @@ export default function HomePage() {
 
           <Link href="/importacao">
             <a className="group">
-              <Card className="p-6 hover-lift cursor-pointer transition-all border-2 hover:border-info">
-                <div className="flex flex-col items-center text-center gap-4">
-                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-info/10 to-info/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Upload className="h-7 w-7 text-info" />
+              <Card className="p-4 hover-lift cursor-pointer transition-all border-2 hover:border-info">
+                <div className="flex flex-col items-center text-center gap-3">
+                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-info/10 to-info/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Upload className="h-6 w-6 text-info" />
                   </div>
                   <div>
                     <p className="font-semibold mb-1">Importar Dados</p>
@@ -144,10 +163,10 @@ export default function HomePage() {
 
           <Link href="/enriquecimento">
             <a className="group">
-              <Card className="p-6 hover-lift cursor-pointer transition-all border-2 hover:border-warning">
-                <div className="flex flex-col items-center text-center gap-4">
-                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-warning/10 to-warning/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Sparkles className="h-7 w-7 text-warning" />
+              <Card className="p-4 hover-lift cursor-pointer transition-all border-2 hover:border-warning">
+                <div className="flex flex-col items-center text-center gap-3">
+                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-warning/10 to-warning/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Sparkles className="h-6 w-6 text-warning" />
                   </div>
                   <div>
                     <p className="font-semibold mb-1">Processar com IA</p>
