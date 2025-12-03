@@ -1,5 +1,6 @@
-// api/ia-enriquecer-batch.js - Enriquecimento em lote com proteções de qualidade
+// api/ia-enriquecer-batch.js - Batch processing com proteções de qualidade
 import postgres from 'postgres';
+import { verificarSeguranca, registrarAuditoria } from './lib/security.js';gres';
 
 // Processar em lotes com pausa
 async function processarEmLotes(empresas, batchSize = 3) {
@@ -88,7 +89,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
+  const client = postgres(process.env.DATABASE_URL);
+  const startTime = Date.now();
+  let user;
+
   try {
+    // 🔒 MIDDLEWARE DE SEGURANÇA
+    user = await verificarSeguranca(req, client, {
+      rateLimit: 3,   // 3 chamadas (muito restritivo - batch)
+      janela: 60      // por minuto
+    });
     const { empresas } = req.body;
 
     if (!empresas || !Array.isArray(empresas) || empresas.length === 0) {
@@ -113,6 +123,22 @@ export default async function handler(req, res) {
     const sucessos = resultados.filter(r => r.status === 'fulfilled').length;
     const falhas = resultados.filter(r => r.status === 'rejected').length;
 
+    // ✅ REGISTRAR AUDITORIA DE SUCESSO
+    await registrarAuditoria({
+      userId: user.userId,
+      action: 'enriquecer_batch',
+      endpoint: req.url,
+      metodo: 'POST',
+      parametros: { total: empresas.length },
+      resultado: 'sucesso',
+      duracao: Date.now() - startTime,
+      custo: 0,
+      ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+      user_agent: req.headers['user-agent']
+    }, client);
+    
+    await client.end();
+
     return res.json({
       success: true,
       summary: {
@@ -133,6 +159,40 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('[Batch] Erro:', error);
+    
+    // ❌ REGISTRAR AUDITORIA DE ERRO
+    try {
+      await registrarAuditoria({
+        userId: user?.userId || 'unknown',
+        action: 'enriquecer_batch',
+        endpoint: req.url,
+        metodo: 'POST',
+        resultado: error.message.includes('Rate limit') ? 'bloqueado' : 'erro',
+        erro: error.message,
+        duracao: Date.now() - startTime,
+        custo: 0,
+        ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+        user_agent: req.headers['user-agent']
+      }, client);
+    } catch (e) {
+      console.error('[Batch] Erro ao registrar auditoria:', e);
+    }
+    
+    await client.end();
+    
+    if (error.message.includes('Rate limit')) {
+      return res.status(429).json({
+        success: false,
+        error: 'Muitas requisições. Tente novamente em alguns minutos.'
+      });
+    }
+    
+    if (error.message.includes('bloqueado')) {
+      return res.status(403).json({
+        success: false,
+        error: 'Usuário bloqueado temporariamente.'
+      });
+    }
 
     return res.status(500).json({
       success: false,

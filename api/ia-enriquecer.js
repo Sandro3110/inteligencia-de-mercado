@@ -2,6 +2,7 @@
 import OpenAI from 'openai';
 import postgres from 'postgres';
 import { validarENormalizarEntidade } from './lib/validacao.js';
+import { verificarSeguranca, registrarAuditoria } from './lib/security.js';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -36,15 +37,21 @@ export default async function handler(req, res) {
   }
 
   const client = postgres(process.env.DATABASE_URL);
+  const startTime = Date.now();
+  let user;
 
   try {
+    // 🔒 MIDDLEWARE DE SEGURANÇA
+    user = await verificarSeguranca(req, client, {
+      rateLimit: 10,  // 10 chamadas
+      janela: 60      // por minuto
+    });
+    
     const { userId, entidadeId, nome, cnpj, cidade, uf } = req.body;
 
     if (!userId || !entidadeId || !nome) {
       return res.status(400).json({ error: 'Parâmetros obrigatórios: userId, entidadeId, nome' });
     }
-
-    const startTime = Date.now();
     
     // Gerar jobId único
     const jobId = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -466,6 +473,20 @@ Retorne APENAS JSON válido:
       WHERE id = ${jobId}
     `;
 
+    // ✅ REGISTRAR AUDITORIA DE SUCESSO
+    await registrarAuditoria({
+      userId: user.userId,
+      action: 'enriquecer_entidade',
+      endpoint: req.url,
+      metodo: 'POST',
+      parametros: { entidadeId, nome, cnpj },
+      resultado: 'sucesso',
+      duracao: Date.now() - startTime,
+      custo,
+      ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+      user_agent: req.headers['user-agent']
+    }, client);
+    
     await client.end();
 
     return res.json({
@@ -487,16 +508,31 @@ Retorne APENAS JSON válido:
   } catch (error) {
     console.error('[IA Enriquecer] Erro:', error);
 
-    // Registrar erro
+    // ❌ REGISTRAR AUDITORIA DE ERRO
     try {
+      await registrarAuditoria({
+        userId: user?.userId || req.body.userId || 'unknown',
+        action: 'enriquecer_entidade',
+        endpoint: req.url,
+        metodo: 'POST',
+        parametros: { entidadeId: req.body.entidadeId, nome: req.body.nome },
+        resultado: error.message.includes('Rate limit') ? 'bloqueado' : 'erro',
+        erro: error.message,
+        duracao: Date.now() - startTime,
+        custo: 0,
+        ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+        user_agent: req.headers['user-agent']
+      }, client);
+      
+      // Registrar erro no ia_usage também
       await client`
         INSERT INTO ia_usage (
           user_id, processo, plataforma, modelo,
           input_tokens, output_tokens, total_tokens,
           custo, duracao_ms, entidade_id, sucesso, erro
         ) VALUES (
-          ${req.body.userId || 'unknown'}, 'enriquecimento_completo', 'openai', 'gpt-4o-mini',
-          0, 0, 0, 0, 0, ${req.body.entidadeId || null}, false, ${error.message}
+          ${user?.userId || req.body.userId || 'unknown'}, 'enriquecimento_completo', 'openai', 'gpt-4o-mini',
+          0, 0, 0, 0, ${Date.now() - startTime}, ${req.body.entidadeId || null}, false, ${error.message}
         )
       `;
     } catch (e) {
@@ -504,6 +540,22 @@ Retorne APENAS JSON válido:
     }
 
     await client.end();
+    
+    // Retornar erro apropriado
+    if (error.message.includes('Rate limit')) {
+      return res.status(429).json({
+        success: false,
+        error: 'Muitas requisições. Tente novamente em alguns minutos.',
+        retryAfter: 60
+      });
+    }
+    
+    if (error.message.includes('bloqueado')) {
+      return res.status(403).json({
+        success: false,
+        error: 'Usuário bloqueado temporariamente por abuso.',
+      });
+    }
 
     return res.status(500).json({
       success: false,

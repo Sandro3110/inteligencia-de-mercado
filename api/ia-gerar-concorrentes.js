@@ -1,6 +1,7 @@
-// api/ia-gerar-concorrentes.js - FASE 5 ETAPA 4
+// api/ia-gerar-concorrentes.js - Gerar concorrentes com IA
 import OpenAI from 'openai';
 import postgres from 'postgres';
+import { verificarSeguranca, registrarAuditoria } from './lib/security.js';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -35,15 +36,21 @@ export default async function handler(req, res) {
   }
 
   const client = postgres(process.env.DATABASE_URL);
+  const startTime = Date.now();
+  let user;
 
   try {
+    // 🔒 MIDDLEWARE DE SEGURANÇA
+    user = await verificarSeguranca(req, client, {
+      rateLimit: 5,   // 5 chamadas
+      janela: 60      // por minuto
+    });
+    
     const { userId, entidadeId, nome, mercado, produtos, cidade, uf } = req.body;
 
     if (!userId || !entidadeId || !nome) {
       return res.status(400).json({ error: 'Parâmetros obrigatórios: userId, entidadeId, nome' });
     }
-
-    const startTime = Date.now();
 
     // Buscar name do usuário
     let [user] = await client`SELECT name, email FROM users WHERE id = ${userId}`;
@@ -203,6 +210,20 @@ Retorne APENAS JSON válido com 5 concorrentes:
       )
     `;
 
+    // ✅ REGISTRAR AUDITORIA DE SUCESSO
+    await registrarAuditoria({
+      userId: user.userId,
+      action: 'gerar_concorrentes',
+      endpoint: req.url,
+      metodo: 'POST',
+      parametros: { entidadeId, nome, total: data.concorrentes?.length || 0 },
+      resultado: 'sucesso',
+      duracao: Date.now() - startTime,
+      custo,
+      ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+      user_agent: req.headers['user-agent']
+    }, client);
+    
     await client.end();
 
     return res.json({
@@ -219,16 +240,31 @@ Retorne APENAS JSON válido com 5 concorrentes:
   } catch (error) {
     console.error('[IA Gerar Concorrentes] Erro:', error);
 
-    // Registrar erro
+    // ❌ REGISTRAR AUDITORIA DE ERRO
     try {
+      await registrarAuditoria({
+        userId: user?.userId || req.body.userId || 'unknown',
+        action: 'gerar_concorrentes',
+        endpoint: req.url,
+        metodo: 'POST',
+        parametros: { entidadeId: req.body.entidadeId, nome: req.body.nome },
+        resultado: error.message.includes('Rate limit') ? 'bloqueado' : 'erro',
+        erro: error.message,
+        duracao: Date.now() - startTime,
+        custo: 0,
+        ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+        user_agent: req.headers['user-agent']
+      }, client);
+      
+      // Registrar erro no ia_usage também
       await client`
         INSERT INTO ia_usage (
           user_id, processo, plataforma, modelo,
           input_tokens, output_tokens, total_tokens,
           custo, duracao_ms, entidade_id, sucesso, erro
         ) VALUES (
-          ${req.body.userId || 'unknown'}, 'gerar_concorrentes', 'openai', 'gpt-4o-mini',
-          0, 0, 0, 0, 0, ${req.body.entidadeId || null}, false, ${error.message}
+          ${user?.userId || req.body.userId || 'unknown'}, 'gerar_concorrentes', 'openai', 'gpt-4o-mini',
+          0, 0, 0, 0, ${Date.now() - startTime}, ${req.body.entidadeId || null}, false, ${error.message}
         )
       `;
     } catch (e) {
@@ -236,6 +272,22 @@ Retorne APENAS JSON válido com 5 concorrentes:
     }
 
     await client.end();
+    
+    // Retornar erro apropriado
+    if (error.message.includes('Rate limit')) {
+      return res.status(429).json({
+        success: false,
+        error: 'Muitas requisições. Tente novamente em alguns minutos.',
+        retryAfter: 60
+      });
+    }
+    
+    if (error.message.includes('bloqueado')) {
+      return res.status(403).json({
+        success: false,
+        error: 'Usuário bloqueado temporariamente por abuso.',
+      });
+    }
 
     return res.status(500).json({
       success: false,

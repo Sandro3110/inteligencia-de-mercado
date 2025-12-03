@@ -3,6 +3,7 @@
 import OpenAI from 'openai';
 import postgres from 'postgres';
 import { gerarCacheKey, getCache, saveCache } from './lib/cache.js';
+import { verificarSeguranca, registrarAuditoria } from './lib/security.js';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -37,8 +38,15 @@ export default async function handler(req, res) {
   }
 
   const client = postgres(process.env.DATABASE_URL);
+  const startTime = Date.now();
+  let user;
 
   try {
+    // 🔒 MIDDLEWARE DE SEGURANÇA
+    user = await verificarSeguranca(req, client, {
+      rateLimit: 5,   // 5 chamadas (mais restritivo - enriquecimento completo)
+      janela: 60      // por minuto
+    });
     const { userId, entidadeId, nome, cnpj, cidade, uf } = req.body;
 
     if (!userId || !entidadeId || !nome) {
