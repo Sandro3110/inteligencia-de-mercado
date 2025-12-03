@@ -202,7 +202,7 @@ const menuSections = [
       {
         icon: BookOpen,
         label: 'Documentação',
-        path: 'https://docs.intelmarket.app',
+        path: '/documentacao',
         color: 'text-blue-600',
         tooltip: 'Acesse a documentação completa'
       }

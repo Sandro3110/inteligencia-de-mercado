@@ -39,6 +39,7 @@ const DetalhesEntidade = lazy(() => import('./pages/DetalhesEntidade'));
 // Páginas Legais - Lazy loading
 const PrivacidadePage = lazy(() => import('./pages/PrivacidadePage'));
 const TermosPage = lazy(() => import('./pages/TermosPage'));
+const DocumentacaoPage = lazy(() => import('./pages/DocumentacaoPage'));
 
 function App() {
   const [location] = useLocation();
@@ -138,6 +139,11 @@ function App() {
             </Route>
             <Route path="/entidade/:id">
               <PrivateRoute><DetalhesEntidade /></PrivateRoute>
+            </Route>
+            
+            {/* Rotas de Ajuda */}
+            <Route path="/documentacao">
+              <PrivateRoute><DocumentacaoPage /></PrivateRoute>
             </Route>
             
             <Route component={NotFound} />
