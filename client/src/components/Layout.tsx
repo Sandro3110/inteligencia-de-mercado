@@ -50,7 +50,7 @@ const menuSections = [
     items: [
       {
         icon: Home,
-        label: 'Dashboard/Base de Dados',
+        label: 'Desktop',
         path: '/',
         color: 'text-blue-600',
         tooltip: 'Visão geral de métricas e consulta de entidades cadastradas'
