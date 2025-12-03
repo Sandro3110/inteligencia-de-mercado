@@ -70,6 +70,15 @@ export default function HomePage() {
         icon={Activity}
       />
 
+      {/* DEBUG: Mostrar dados brutos */}
+      <div className="bg-yellow-100 border-2 border-yellow-500 p-4 mb-4 rounded">
+        <h3 className="font-bold text-lg mb-2">🐛 DEBUG - Dados do Dashboard:</h3>
+        <pre className="text-xs overflow-auto">{JSON.stringify(dashboardData?.kpis, null, 2)}</pre>
+        <p className="mt-2">Loading: {loadingDashboard ? 'SIM' : 'NÃO'}</p>
+        <p>Total Clientes: {dashboardData?.kpis?.totalClientes || 'undefined'}</p>
+        <p>Total Mercados: {dashboardData?.kpis?.totalMercados || 'undefined'}</p>
+      </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4 mb-8">
         <StatCard
