@@ -1,4 +1,4 @@
-// api/ia-enriquecer.js
+// api/ia-enriquecer.js - FASE 5 Completa
 import OpenAI from 'openai';
 import postgres from 'postgres';
 
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   const client = postgres(process.env.DATABASE_URL);
 
   try {
-    const { userId, entidadeId, nome, cnpj, setor } = req.body;
+    const { userId, entidadeId, nome, cnpj, cidade, uf } = req.body;
 
     if (!userId || !entidadeId || !nome) {
       return res.status(400).json({ error: 'Parâmetros obrigatórios: userId, entidadeId, nome' });
@@ -45,44 +45,173 @@ export default async function handler(req, res) {
 
     const startTime = Date.now();
 
-    const prompt = `Você é um assistente especializado em análise de empresas brasileiras.
+    // ETAPA 1: ENRIQUECER CLIENTE (Temperatura 0.8)
+    const promptCliente = `Você é um analista de mercado B2B especializado em empresas brasileiras.
 
-Analise a empresa abaixo e retorne um JSON com as seguintes informações:
+EMPRESA: ${nome}
+${cnpj ? `CNPJ: ${cnpj}` : 'CNPJ: Desconhecido'}
+${cidade ? `CIDADE/UF: ${cidade}, ${uf}` : ''}
 
-Empresa: ${nome}
-${cnpj ? `CNPJ: ${cnpj}` : ''}
-${setor ? `Setor: ${setor}` : ''}
+TAREFA: Enriquecer dados da empresa com informações REAIS e VERIFICÁVEIS.
 
-Retorne APENAS um JSON válido com esta estrutura:
+CAMPOS OBRIGATÓRIOS:
+1. cnpj: CNPJ no formato XX.XXX.XXX/XXXX-XX - NULL se não souber COM CERTEZA
+2. email: Email corporativo - NULL se não souber
+3. telefone: Telefone (XX) XXXXX-XXXX - NULL se não souber
+4. site: Site oficial https://... - NULL se não souber
+5. cidade: Cidade completa (obrigatório)
+6. uf: Estado 2 letras maiúsculas (obrigatório)
+7. porte: Micro | Pequena | Média | Grande
+8. setor: Setor específico (ex: "Tecnologia - Software")
+9. produtoPrincipal: Principal produto/serviço (max 200 chars)
+10. segmentacaoB2bB2c: B2B | B2C | B2B2C
+
+REGRAS CRÍTICAS:
+- Se NÃO TEM CERTEZA do CNPJ: retorne NULL
+- NUNCA invente emails, telefones ou sites
+- Cidade e UF são OBRIGATÓRIOS
+- Seja conservador e preciso
+
+Retorne APENAS JSON válido:
 {
-  "descricao": "Descrição detalhada da empresa (2-3 frases)",
-  "setor": "Setor principal de atuação",
-  "porte": "Pequeno/Médio/Grande",
-  "produtos_servicos": ["Lista", "de", "produtos", "ou", "serviços"],
-  "diferenciais": ["Principais", "diferenciais", "competitivos"],
-  "score_qualidade": 85
-}
+  "cnpj": "string ou null",
+  "email": "string ou null",
+  "telefone": "string ou null",
+  "site": "string ou null",
+  "cidade": "string",
+  "uf": "string",
+  "porte": "string",
+  "setor": "string",
+  "produtoPrincipal": "string",
+  "segmentacaoB2bB2c": "string"
+}`;
 
-O score_qualidade deve ser de 0-100 baseado na qualidade e completude dos dados encontrados.`;
-
-    const response = await openai.chat.completions.create({
+    const responseCliente = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: 'Você é um assistente especializado em análise de empresas. Sempre responda em JSON válido.' },
-        { role: 'user', content: prompt }
+        { role: 'system', content: 'Você é um analista de mercado B2B. Sempre responda em JSON válido com dados precisos.' },
+        { role: 'user', content: promptCliente }
       ],
-      temperature: 0.3,
+      temperature: 0.8,
       max_tokens: 1000,
       response_format: { type: 'json_object' },
     });
 
-    const duration = Date.now() - startTime;
-    const inputTokens = response.usage?.prompt_tokens || 0;
-    const outputTokens = response.usage?.completion_tokens || 0;
-    const totalTokens = response.usage?.total_tokens || 0;
-    const custo = calculateCost('gpt-4o-mini', inputTokens, outputTokens);
+    const dadosCliente = JSON.parse(responseCliente.choices[0].message.content || '{}');
 
-    const data = JSON.parse(response.choices[0].message.content || '{}');
+    // ETAPA 2: IDENTIFICAR MERCADO (Temperatura 0.9)
+    const promptMercado = `Você é um analista de mercado especializado em inteligência competitiva do Brasil.
+
+EMPRESA: ${nome}
+PRODUTO PRINCIPAL: ${dadosCliente.produtoPrincipal}
+SETOR: ${dadosCliente.setor}
+CIDADE/UF: ${dadosCliente.cidade}, ${dadosCliente.uf}
+
+TAREFA: Identificar o MERCADO PRINCIPAL e enriquecê-lo com dados REAIS do Brasil.
+
+CAMPOS OBRIGATÓRIOS:
+1. nome: Nome específico do mercado (ex: "Software de Gestão Empresarial")
+2. categoria: Indústria | Comércio | Serviços | Tecnologia
+3. segmentacao: B2B | B2C | B2B2C
+4. tamanhoMercado: Tamanho no Brasil (ex: "R$ 15 bi/ano, 500 mil empresas")
+5. crescimentoAnual: Taxa (ex: "12% ao ano (2023-2028)")
+6. tendencias: 3-5 tendências atuais (max 500 chars)
+7. principaisPlayers: 5-10 empresas brasileiras (separadas por vírgula)
+
+REGRAS CRÍTICAS:
+- Seja ESPECÍFICO sobre o mercado brasileiro
+- Use dados REAIS e ATUALIZADOS (2024-2025)
+- Tendências devem ser CONCRETAS
+- Players devem ser empresas REAIS
+
+Retorne APENAS JSON válido:
+{
+  "nome": "string",
+  "categoria": "string",
+  "segmentacao": "string",
+  "tamanhoMercado": "string",
+  "crescimentoAnual": "string",
+  "tendencias": "string",
+  "principaisPlayers": "string"
+}`;
+
+    const responseMercado = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'Você é um analista de mercado. Sempre responda em JSON válido com dados do mercado brasileiro.' },
+        { role: 'user', content: promptMercado }
+      ],
+      temperature: 0.9,
+      max_tokens: 1500,
+      response_format: { type: 'json_object' },
+    });
+
+    const dadosMercado = JSON.parse(responseMercado.choices[0].message.content || '{}');
+
+    // ETAPA 3: PRODUTOS/SERVIÇOS (Temperatura 0.9)
+    const promptProdutos = `Você é um especialista em análise de produtos B2B.
+
+EMPRESA: ${nome}
+PRODUTO PRINCIPAL: ${dadosCliente.produtoPrincipal}
+MERCADO: ${dadosMercado.nome}
+${dadosCliente.site ? `SITE: ${dadosCliente.site}` : ''}
+
+TAREFA: Identificar os 3 PRINCIPAIS produtos/serviços.
+
+CAMPOS OBRIGATÓRIOS (para cada produto):
+1. nome: Nome do produto/serviço (max 255 chars)
+2. descricao: Descrição detalhada (max 500 chars)
+3. categoria: Categoria (ex: "Software", "Consultoria")
+
+REGRAS CRÍTICAS:
+- EXATAMENTE 3 produtos (não mais, não menos)
+- Produtos DIFERENTES entre si
+- Descrições ESPECÍFICAS e TÉCNICAS
+
+Retorne APENAS JSON válido:
+{
+  "produtos": [
+    {
+      "nome": "string",
+      "descricao": "string",
+      "categoria": "string"
+    },
+    {
+      "nome": "string",
+      "descricao": "string",
+      "categoria": "string"
+    },
+    {
+      "nome": "string",
+      "descricao": "string",
+      "categoria": "string"
+    }
+  ]
+}`;
+
+    const responseProdutos = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'Você é um especialista em produtos B2B. Sempre responda em JSON válido.' },
+        { role: 'user', content: promptProdutos }
+      ],
+      temperature: 0.9,
+      max_tokens: 1200,
+      response_format: { type: 'json_object' },
+    });
+
+    const dadosProdutos = JSON.parse(responseProdutos.choices[0].message.content || '{}');
+
+    // Calcular métricas totais
+    const duration = Date.now() - startTime;
+    const inputTokens = (responseCliente.usage?.prompt_tokens || 0) + 
+                       (responseMercado.usage?.prompt_tokens || 0) + 
+                       (responseProdutos.usage?.prompt_tokens || 0);
+    const outputTokens = (responseCliente.usage?.completion_tokens || 0) + 
+                        (responseMercado.usage?.completion_tokens || 0) + 
+                        (responseProdutos.usage?.completion_tokens || 0);
+    const totalTokens = inputTokens + outputTokens;
+    const custo = calculateCost('gpt-4o-mini', inputTokens, outputTokens);
 
     // Registrar uso
     await client`
@@ -91,7 +220,7 @@ O score_qualidade deve ser de 0-100 baseado na qualidade e completude dos dados 
         input_tokens, output_tokens, total_tokens,
         custo, duracao_ms, entidade_id, sucesso
       ) VALUES (
-        ${userId}, 'enriquecimento', 'openai', 'gpt-4o-mini',
+        ${userId}, 'enriquecimento_completo', 'openai', 'gpt-4o-mini',
         ${inputTokens}, ${outputTokens}, ${totalTokens},
         ${custo}, ${duration}, ${entidadeId}, true
       )
@@ -101,7 +230,11 @@ O score_qualidade deve ser de 0-100 baseado na qualidade e completude dos dados 
 
     return res.json({
       success: true,
-      data,
+      data: {
+        cliente: dadosCliente,
+        mercado: dadosMercado,
+        produtos: dadosProdutos.produtos || []
+      },
       usage: {
         inputTokens,
         outputTokens,
@@ -121,7 +254,7 @@ O score_qualidade deve ser de 0-100 baseado na qualidade e completude dos dados 
           input_tokens, output_tokens, total_tokens,
           custo, duracao_ms, entidade_id, sucesso, erro
         ) VALUES (
-          ${req.body.userId || 'unknown'}, 'enriquecimento', 'openai', 'gpt-4o-mini',
+          ${req.body.userId || 'unknown'}, 'enriquecimento_completo', 'openai', 'gpt-4o-mini',
           0, 0, 0, 0, 0, ${req.body.entidadeId || null}, false, ${error.message}
         )
       `;

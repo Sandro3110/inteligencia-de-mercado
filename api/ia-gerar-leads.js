@@ -1,4 +1,4 @@
-// api/ia-gerar-leads.js
+// api/ia-gerar-leads.js - FASE 5 ETAPA 5
 import OpenAI from 'openai';
 import postgres from 'postgres';
 
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   const client = postgres(process.env.DATABASE_URL);
 
   try {
-    const { userId, entidadeId, nome, setor, produtos, perfil_cliente_ideal, regiao } = req.body;
+    const { userId, entidadeId, nome, mercado, produtos, concorrentes, cidade, uf } = req.body;
 
     if (!userId || !entidadeId || !nome) {
       return res.status(400).json({ error: 'Parâmetros obrigatórios: userId, entidadeId, nome' });
@@ -45,58 +45,75 @@ export default async function handler(req, res) {
 
     const startTime = Date.now();
 
-    const prompt = `Você é um especialista em prospecção de vendas e geração de leads B2B.
+    // ETAPA 5: LEADS (Temperatura 1.0)
+    const produtosNomes = Array.isArray(produtos) 
+      ? produtos.map(p => p.nome || p).join(', ')
+      : (produtos || 'Produtos não especificados');
 
-Identifique potenciais clientes (leads) para esta empresa:
+    const concorrentesNomes = Array.isArray(concorrentes)
+      ? concorrentes.map(c => c.nome || c).join(', ')
+      : (concorrentes || '');
 
-Empresa: ${nome}
-${setor ? `Setor: ${setor}` : ''}
-${produtos ? `Produtos/Serviços oferecidos: ${produtos}` : ''}
-${perfil_cliente_ideal ? `Perfil de cliente ideal: ${perfil_cliente_ideal}` : ''}
-${regiao ? `Região de atuação: ${regiao}` : 'Brasil'}
+    const prompt = `Você é um especialista em prospecção B2B do Brasil.
 
-Retorne APENAS um JSON válido com esta estrutura:
+CLIENTE (FORNECEDOR): ${nome}
+PRODUTOS OFERECIDOS: ${produtosNomes}
+MERCADO: ${mercado || 'Não especificado'}
+REGIÃO: ${cidade || 'Brasil'}, ${uf || ''}
+
+${concorrentesNomes ? `CONCORRENTES (NÃO PODEM SER LEADS): ${concorrentesNomes}` : ''}
+
+TAREFA: Identificar 5 LEADS REAIS (empresas que COMPRAM os produtos do cliente).
+
+DEFINIÇÃO DE LEAD:
+- Empresa que COMPRA/CONSOME os produtos do cliente
+- NÃO é o próprio cliente
+- NÃO é concorrente
+- Pode ser de qualquer região do Brasil
+
+CAMPOS OBRIGATÓRIOS (para cada):
+1. nome: Razão social ou nome fantasia
+2. cidade: Cidade (obrigatório)
+3. uf: Estado 2 letras (obrigatório)
+4. produtoInteresse: Qual produto compraria
+5. setor: Setor de atuação
+
+CAMPOS OPCIONAIS:
+6. cnpj: XX.XXX.XXX/XXXX-XX - NULL se não souber
+7. site: https://... - NULL se não souber
+8. porte: Micro | Pequena | Média | Grande - NULL se não souber
+
+REGRAS CRÍTICAS:
+- EXATAMENTE 5 leads
+- NÃO inclua cliente: ${nome}
+- NÃO inclua concorrentes
+- NÃO invente CNPJs (use NULL)
+- Empresas REAIS que usariam os produtos
+
+Retorne APENAS JSON válido com 5 leads DIFERENTES:
 {
   "leads": [
     {
-      "nome": "Nome da empresa lead",
-      "cnpj": "CNPJ se conhecido (ou null)",
-      "setor": "Setor de atuação",
-      "porte": "Pequeno/Médio/Grande",
-      "score_qualificacao": 85,
-      "motivo_fit": "Por que é um bom lead",
-      "necessidades_identificadas": ["Necessidade 1", "Necessidade 2"],
-      "produtos_recomendados": ["Produto 1", "Produto 2"],
-      "abordagem_sugerida": "Como abordar este lead",
-      "prioridade": "Alta/Média/Baixa",
-      "potencial_receita": "R$ 50.000/mês",
-      "observacoes": "Informações adicionais"
+      "nome": "string",
+      "cidade": "string",
+      "uf": "string",
+      "produtoInteresse": "string",
+      "setor": "string",
+      "cnpj": "string ou null",
+      "site": "string ou null",
+      "porte": "string ou null"
     }
-  ],
-  "perfil_icp": {
-    "setores_prioritarios": ["Setor 1", "Setor 2"],
-    "portes_ideais": ["Médio", "Grande"],
-    "caracteristicas_chave": ["Característica 1", "Característica 2"],
-    "dores_principais": ["Dor 1", "Dor 2"]
-  },
-  "estrategia_prospeccao": {
-    "canais_recomendados": ["Canal 1", "Canal 2"],
-    "mensagens_chave": ["Mensagem 1", "Mensagem 2"],
-    "proximos_passos": ["Passo 1", "Passo 2"]
-  },
-  "total_leads": 8
-}
-
-Liste entre 8 a 15 leads qualificados e relevantes do mercado brasileiro.`;
+  ]
+}`;
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: 'Você é um especialista em prospecção B2B. Sempre responda em JSON válido com leads qualificados do mercado brasileiro.' },
+        { role: 'system', content: 'Você é um especialista em prospecção B2B. Sempre responda em JSON válido com empresas reais do Brasil.' },
         { role: 'user', content: prompt }
       ],
-      temperature: 0.7,
-      max_tokens: 2500,
+      temperature: 1.0,
+      max_tokens: 2000,
       response_format: { type: 'json_object' },
     });
 
@@ -107,6 +124,11 @@ Liste entre 8 a 15 leads qualificados e relevantes do mercado brasileiro.`;
     const custo = calculateCost('gpt-4o-mini', inputTokens, outputTokens);
 
     const data = JSON.parse(response.choices[0].message.content || '{}');
+
+    // Validar que tem exatamente 5 leads
+    if (!data.leads || data.leads.length !== 5) {
+      throw new Error(`Esperado 5 leads, recebeu ${data.leads?.length || 0}`);
+    }
 
     // Registrar uso
     await client`
@@ -125,7 +147,7 @@ Liste entre 8 a 15 leads qualificados e relevantes do mercado brasileiro.`;
 
     return res.json({
       success: true,
-      data,
+      data: data.leads,
       usage: {
         inputTokens,
         outputTokens,
