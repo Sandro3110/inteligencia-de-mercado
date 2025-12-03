@@ -46,11 +46,14 @@ export default async function handler(req, res) {
     const startTime = Date.now();
 
     // Buscar name do usuário
-    const [user] = await client`SELECT name FROM users WHERE id = ${userId}`;
+    let [user] = await client`SELECT name, email FROM users WHERE id = ${userId}`;
+    if (!user && userId.includes('@')) {
+      [user] = await client`SELECT name, email FROM users WHERE email = ${userId}`;
+    }
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
-    const userName = user.name;
+    const userName = user.name || user.email;
 
     // ETAPA 5: LEADS (Temperatura 1.0)
     const produtosNomes = Array.isArray(produtos) 

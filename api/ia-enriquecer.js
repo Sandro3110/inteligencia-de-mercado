@@ -56,7 +56,8 @@ export default async function handler(req, res) {
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
-    const userName = user.name;
+    // Usar email se name for NULL
+    const userName = user.name || user.email;
 
     // ETAPA 1: ENRIQUECER CLIENTE (Temperatura 0.8)
     const promptCliente = `Você é um analista de mercado B2B especializado em empresas brasileiras.
