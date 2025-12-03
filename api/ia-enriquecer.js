@@ -45,8 +45,14 @@ export default async function handler(req, res) {
 
     const startTime = Date.now();
 
-    // Buscar name do usuário
-    const [user] = await client`SELECT name FROM users WHERE id = ${userId}`;
+    // Buscar name do usuário (tentar por ID, depois por email)
+    let [user] = await client`SELECT name, email FROM users WHERE id = ${userId}`;
+    if (!user) {
+      // Fallback: buscar por email se userId for um email
+      if (userId.includes('@')) {
+        [user] = await client`SELECT name, email FROM users WHERE email = ${userId}`;
+      }
+    }
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
