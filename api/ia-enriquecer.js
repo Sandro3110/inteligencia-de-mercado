@@ -1,6 +1,7 @@
-// api/ia-enriquecer.js - FASE 5 Completa
+// api/ia-enriquecer.js - Enriquecimento de entidades com IA
 import OpenAI from 'openai';
 import postgres from 'postgres';
+import { validarENormalizarEntidade } from './lib/validacao.js';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -315,22 +316,44 @@ Retorne APENAS JSON válido:
     // ========================================================================
     // PERSISTIR DADOS NO BANCO
     // ========================================================================
+    
+    // Validar e normalizar dados do cliente
+    const validacao = validarENormalizarEntidade({
+      nome: dadosCliente.nome || nome,
+      cnpj: dadosCliente.cnpj,
+      email: dadosCliente.email,
+      telefone: dadosCliente.telefone,
+      site: dadosCliente.site,
+      cidade: dadosCliente.cidade,
+      uf: dadosCliente.uf,
+      porte: dadosCliente.porte,
+      setor: dadosCliente.setor,
+      produto_principal: dadosCliente.produtoPrincipal,
+      segmentacao_b2b_b2c: dadosCliente.segmentacaoB2bB2c,
+      enriquecido_em: new Date()
+    });
+    
+    const dadosValidados = validacao.dados;
 
-    // 1. Atualizar dim_entidade com dados enriquecidos
+    // 1. Atualizar dim_entidade com dados enriquecidos e validados
     await client`
       UPDATE dim_entidade
       SET 
-        cnpj = COALESCE(${dadosCliente.cnpj}, cnpj),
-        email = ${dadosCliente.email},
-        telefone = ${dadosCliente.telefone},
-        site = ${dadosCliente.site},
-        cidade = ${dadosCliente.cidade},
-        uf = ${dadosCliente.uf},
-        porte = ${dadosCliente.porte},
-        setor = ${dadosCliente.setor},
-        produto_principal = ${dadosCliente.produtoPrincipal},
-        segmentacao_b2b_b2c = ${dadosCliente.segmentacaoB2bB2c},
+        cnpj = COALESCE(${dadosValidados.cnpj}, cnpj),
+        email = ${dadosValidados.email},
+        telefone = ${dadosValidados.telefone},
+        site = ${dadosValidados.site},
+        cidade = ${dadosValidados.cidade},
+        uf = ${dadosValidados.uf},
+        porte = ${dadosValidados.porte},
+        setor = ${dadosValidados.setor},
+        produto_principal = ${dadosValidados.produto_principal},
+        segmentacao_b2b_b2c = ${dadosValidados.segmentacao_b2b_b2c},
         score_qualidade = 85,
+        validacao_cnpj = ${validacao.validacoes.cnpj},
+        validacao_email = ${validacao.validacoes.email},
+        validacao_telefone = ${validacao.validacoes.telefone},
+        campos_faltantes = ${dadosValidados.campos_faltantes},
         enriquecido_em = NOW(),
         enriquecido_por = ${userName},
         updated_at = NOW(),
