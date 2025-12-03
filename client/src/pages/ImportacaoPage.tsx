@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'react';
-import { trpc } from '../lib/trpc';
+import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
+import { toast } from 'sonner';
 
-type Step = 'upload' | 'preview' | 'mapping' | 'validating' | 'importing' | 'complete';
+type Step = 'upload' | 'preview' | 'importing' | 'complete';
 
 interface PreviewData {
   headers: string[];
@@ -16,6 +16,18 @@ interface Mapping {
   [key: string]: string;
 }
 
+interface Projeto {
+  id: number;
+  nome: string;
+  codigo: string;
+}
+
+interface Pesquisa {
+  id: number;
+  nome: string;
+  status: string;
+}
+
 export default function ImportacaoPage() {
   const [step, setStep] = useState<Step>('upload');
   const [file, setFile] = useState<File | null>(null);
@@ -25,15 +37,56 @@ export default function ImportacaoPage() {
   const [pesquisaId, setPesquisaId] = useState<number>(0);
   const [progress, setProgress] = useState(0);
   const [importacaoId, setImportacaoId] = useState<number | null>(null);
+  
+  const [projetos, setProjetos] = useState<Projeto[]>([]);
+  const [pesquisas, setPesquisas] = useState<Pesquisa[]>([]);
+  const [loadingProjetos, setLoadingProjetos] = useState(true);
+  const [loadingPesquisas, setLoadingPesquisas] = useState(false);
 
-  const projetos = trpc.projetos.list.useQuery({ limit: 100 });
-  console.log('DEBUG projetos:', projetos.data);
-  const pesquisas = trpc.pesquisas.list.useQuery(
-    { projetoId, limit: 100 },
-    { enabled: projetoId > 0 }
-  );
-  const createImportacao = trpc.importacao.create.useMutation();
-  const startImportacao = trpc.importacao.start.useMutation();
+  // Carregar projetos ao montar
+  useEffect(() => {
+    carregarProjetos();
+  }, []);
+
+  // Carregar pesquisas quando projeto mudar
+  useEffect(() => {
+    if (projetoId > 0) {
+      carregarPesquisas(projetoId);
+    } else {
+      setPesquisas([]);
+      setPesquisaId(0);
+    }
+  }, [projetoId]);
+
+  const carregarProjetos = async () => {
+    try {
+      setLoadingProjetos(true);
+      const response = await fetch('/api/projetos');
+      if (!response.ok) throw new Error('Erro ao carregar projetos');
+      const data = await response.json();
+      setProjetos(data.projetos || []);
+    } catch (error) {
+      console.error('Erro ao carregar projetos:', error);
+      toast.error('Erro ao carregar projetos');
+    } finally {
+      setLoadingProjetos(false);
+    }
+  };
+
+  const carregarPesquisas = async (projetoId: number) => {
+    try {
+      setLoadingPesquisas(true);
+      const response = await fetch(`/api/pesquisas?projetoId=${projetoId}`);
+      if (!response.ok) throw new Error('Erro ao carregar pesquisas');
+      const data = await response.json();
+      setPesquisas(data.pesquisas || []);
+    } catch (error) {
+      console.error('Erro ao carregar pesquisas:', error);
+      toast.error('Erro ao carregar pesquisas');
+    } finally {
+      setLoadingPesquisas(false);
+    }
+  };
 
   // Upload com drag-and-drop
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -102,18 +155,30 @@ export default function ImportacaoPage() {
     headers.forEach((h) => {
       const lower = h.toLowerCase();
       if (lower.includes('nome') || lower.includes('razao')) detected.nome = h;
-      if (lower.includes('status')) detected.status = h;
+      if (lower.includes('status') || lower.includes('tipo')) detected.status = h;
       if (lower.includes('cnpj')) detected.cnpj = h;
       if (lower.includes('email')) detected.email = h;
-      if (lower.includes('cidade')) detected.cidade = h;
-      if (lower === 'uf' || lower.includes('estado')) detected.uf = h;
+      if (lower.includes('telefone') || lower.includes('phone')) detected.telefone = h;
+      if (lower.includes('site') || lower.includes('website')) detected.site = h;
+      if (lower.includes('fantasia')) detected.nome_fantasia = h;
+      if (lower.includes('filiais')) detected.num_filiais = h;
+      if (lower.includes('lojas')) detected.num_lojas = h;
+      if (lower.includes('funcionarios') || lower.includes('employees')) detected.num_funcionarios = h;
     });
     setMapping(detected);
   };
 
   // Iniciar importação
   const handleImport = async () => {
-    if (!file || !projetoId || !pesquisaId) return;
+    if (!file || !projetoId || !pesquisaId) {
+      toast.error('Selecione projeto e pesquisa');
+      return;
+    }
+
+    if (!mapping.nome) {
+      toast.error('Campo "nome" é obrigatório');
+      return;
+    }
 
     setStep('importing');
     setProgress(0);
@@ -122,6 +187,8 @@ export default function ImportacaoPage() {
       // 1. Ler arquivo completo
       const csvData = await readFullFile(file);
       
+      setProgress(20);
+
       // 2. Aplicar mapeamento de colunas
       const mappedData = csvData.map((row: any) => ({
         nome: row[mapping.nome] || '',
@@ -131,12 +198,12 @@ export default function ImportacaoPage() {
         telefone: row[mapping.telefone] || '',
         site: row[mapping.site] || '',
         nome_fantasia: row[mapping.nome_fantasia] || '',
-        num_filiais: row[mapping.num_filiais] || 0,
-        num_lojas: row[mapping.num_lojas] || 0,
-        num_funcionarios: row[mapping.num_funcionarios] || null,
+        num_filiais: parseInt(row[mapping.num_filiais]) || 0,
+        num_lojas: parseInt(row[mapping.num_lojas]) || 0,
+        num_funcionarios: parseInt(row[mapping.num_funcionarios]) || null,
       }));
 
-      setProgress(20);
+      setProgress(40);
 
       // 3. Enviar para API de upload
       const response = await fetch('/api/upload', {
@@ -164,10 +231,11 @@ export default function ImportacaoPage() {
       setProgress(100);
       setStep('complete');
 
+      toast.success(`${result.totalImportadas} entidades importadas com sucesso!`);
       console.log('Importação concluída:', result);
     } catch (error: any) {
       console.error('Erro na importação:', error);
-      alert(`Erro ao importar arquivo: ${error.message}`);
+      toast.error(`Erro ao importar arquivo: ${error.message}`);
       setStep('preview');
     }
   };
@@ -214,10 +282,13 @@ export default function ImportacaoPage() {
             <select
               value={projetoId}
               onChange={(e) => setProjetoId(Number(e.target.value))}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 bg-white"
+              disabled={loadingProjetos}
             >
-              <option value={0}>Selecione um projeto</option>
-              {Array.isArray(projetos.data?.projetos) && projetos.data.projetos.map((p: any) => (
+              <option value={0}>
+                {loadingProjetos ? 'Carregando...' : 'Selecione um projeto'}
+              </option>
+              {projetos.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.nome}
                 </option>
@@ -231,10 +302,13 @@ export default function ImportacaoPage() {
               <select
                 value={pesquisaId}
                 onChange={(e) => setPesquisaId(Number(e.target.value))}
-                className="w-full border rounded px-3 py-2"
+                className="w-full border rounded px-3 py-2 bg-white"
+                disabled={loadingPesquisas}
               >
-                <option value={0}>Selecione uma pesquisa</option>
-                {Array.isArray(pesquisas.data?.pesquisas) && pesquisas.data.pesquisas.map((p: any) => (
+                <option value={0}>
+                  {loadingPesquisas ? 'Carregando...' : 'Selecione uma pesquisa'}
+                </option>
+                {pesquisas.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.nome}
                   </option>
@@ -278,16 +352,16 @@ export default function ImportacaoPage() {
         {/* Mapeamento */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Mapeamento de Colunas</h2>
-          <div className="grid grid-cols-2 gap-4 max-w-2xl">
-            {['nome', 'status', 'cnpj', 'email', 'cidade', 'uf'].map((field) => (
+          <div className="grid grid-cols-2 gap-4 max-w-3xl">
+            {['nome', 'status', 'cnpj', 'email', 'telefone', 'site', 'nome_fantasia', 'num_filiais', 'num_lojas', 'num_funcionarios'].map((field) => (
               <div key={field}>
-                <label className="block text-sm font-medium mb-2 capitalize">
-                  {field} {field === 'nome' || field === 'status' ? '*' : ''}
+                <label className="block text-sm font-medium mb-2">
+                  {field.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} {field === 'nome' ? '*' : ''}
                 </label>
                 <select
                   value={mapping[field] || ''}
                   onChange={(e) => setMapping({ ...mapping, [field]: e.target.value })}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border rounded px-3 py-2 bg-white"
                 >
                   <option value="">Não mapear</option>
                   {previewData?.headers.map((h) => (
@@ -337,8 +411,8 @@ export default function ImportacaoPage() {
           </button>
           <button
             onClick={handleImport}
-            disabled={!mapping.nome || !mapping.status}
-            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            disabled={!mapping.nome}
+            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Importar
           </button>
@@ -386,10 +460,10 @@ export default function ImportacaoPage() {
               Nova Importação
             </button>
             <button
-              onClick={() => (window.location.href = '/entidades')}
+              onClick={() => (window.location.href = '/enriquecimento')}
               className="px-6 py-2 border rounded hover:bg-gray-50"
             >
-              Ver Entidades
+              Enriquecer Entidades
             </button>
           </div>
         </div>
