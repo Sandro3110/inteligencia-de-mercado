@@ -116,6 +116,9 @@ Site: ${entidade.site || 'N/A'}
     offset: page * limit,
   });
 
+  // Garantir que data seja sempre um array
+  const entidadesList = Array.isArray(entidades.data) ? entidades.data : [];
+
   const getBadgeVariant = (tipo: string) => {
     switch (tipo) {
       case 'cliente':
@@ -264,7 +267,7 @@ Site: ${entidade.site || 'N/A'}
             <p className="text-destructive mb-2">Erro ao carregar entidades</p>
             <p className="text-sm text-muted-foreground">{entidades.error.message}</p>
           </div>
-        ) : !entidades.data || entidades.data.length === 0 ? (
+        ) : entidadesList.length === 0 ? (
           <div className="p-12 text-center">
             <Database className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Nenhuma entidade encontrada</h3>
@@ -295,7 +298,7 @@ Site: ${entidade.site || 'N/A'}
                   </tr>
                 </thead>
                 <tbody>
-                  {entidades.data.map((entidade: any) => (
+                  {entidadesList.map((entidade: any) => (
                     <tr
                       key={entidade.id}
                       className="border-b hover:bg-muted/30 transition-colors cursor-pointer"

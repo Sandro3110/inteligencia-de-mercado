@@ -836,12 +836,9 @@ export default async function handler(req, res) {
     }
 
     // Resposta no formato tRPC
-    // O tRPC usa data transformers que envolvem em { json: data }
     res.status(200).json({
       result: {
-        data: {
-          json: data
-        }
+        data: data
       }
     });
 
