@@ -18,11 +18,17 @@ import {
   Sun,
   Users,
   Shield,
-  Cpu
+  Cpu,
+  HelpCircle,
+  BookOpen,
+  Rocket,
+  BarChart3,
+  Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/hooks/useTheme';
+import { startTour } from './TourGuide';
 
 interface LayoutProps {
   children: ReactNode;
@@ -31,7 +37,8 @@ interface LayoutProps {
 interface MenuItem {
   icon: typeof Home;
   label: string;
-  path: string;
+  path?: string;
+  action?: string;
   color: string;
   tooltip: string;
   section?: string;
@@ -160,6 +167,46 @@ const menuSections = [
         tooltip: 'Monitorar uso, custos e segurança da inteligência artificial'
       }
     ]
+  },
+  {
+    title: 'Ajuda',
+    items: [
+      {
+        icon: HelpCircle,
+        label: 'Tour Completo',
+        action: 'tour:complete',
+        color: 'text-blue-600',
+        tooltip: 'Tour guiado por todas as funcionalidades (3-4 min)'
+      },
+      {
+        icon: Rocket,
+        label: 'Primeiros Passos',
+        action: 'tour:firstSteps',
+        color: 'text-blue-600',
+        tooltip: 'Fluxo básico para começar a usar (1-2 min)'
+      },
+      {
+        icon: BarChart3,
+        label: 'Tour: Análises',
+        action: 'tour:analytics',
+        color: 'text-blue-600',
+        tooltip: 'Conheça as ferramentas de inteligência (1 min)'
+      },
+      {
+        icon: Zap,
+        label: 'Tour: IA',
+        action: 'tour:aiEnrichment',
+        color: 'text-blue-600',
+        tooltip: 'Descubra o poder do enriquecimento com IA (1 min)'
+      },
+      {
+        icon: BookOpen,
+        label: 'Documentação',
+        path: 'https://docs.intelmarket.app',
+        color: 'text-blue-600',
+        tooltip: 'Acesse a documentação completa'
+      }
+    ]
   }
 ];
 
@@ -210,13 +257,55 @@ export default function Layout({ children }: LayoutProps) {
                 </h3>
               )}
               <div className="space-y-1">
-                {section.items.map((item) => {
+                {section.items.map((item, idx) => {
                   const Icon = item.icon;
-                  const isActive = location === item.path || 
-                    (item.path !== '/' && location.startsWith(item.path));
+                  const isActive = item.path && (location === item.path || 
+                    (item.path !== '/' && location.startsWith(item.path)));
 
+                  // Tour action
+                  if (item.action?.startsWith('tour:')) {
+                    const tourName = item.action.replace('tour:', '') as any;
+                    return (
+                      <button
+                        key={`${section.title}-${idx}`}
+                        onClick={() => startTour(tourName)}
+                        className={cn(
+                          'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all w-full text-left',
+                          'hover:bg-accent hover:text-accent-foreground',
+                          isCollapsed && 'justify-center'
+                        )}
+                        title={item.tooltip}
+                      >
+                        <Icon className={cn('h-5 w-5 flex-shrink-0', item.color)} />
+                        {!isCollapsed && <span>{item.label}</span>}
+                      </button>
+                    );
+                  }
+
+                  // Link externo
+                  if (item.path?.startsWith('http')) {
+                    return (
+                      <a
+                        key={`${section.title}-${idx}`}
+                        href={item.path}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                          'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all',
+                          'hover:bg-accent hover:text-accent-foreground',
+                          isCollapsed && 'justify-center'
+                        )}
+                        title={item.tooltip}
+                      >
+                        <Icon className={cn('h-5 w-5 flex-shrink-0', item.color)} />
+                        {!isCollapsed && <span>{item.label}</span>}
+                      </a>
+                    );
+                  }
+
+                  // Link interno
                   return (
-                    <Link key={item.path} href={item.path}>
+                    <Link key={`${section.title}-${idx}`} href={item.path!}>
                       <a
                         className={cn(
                           'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all',
