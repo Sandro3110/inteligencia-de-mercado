@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Database, Search, Filter, Plus, Building2, Mail, Phone, Globe, FileSpreadsheet, FileText, X, Copy, ArrowLeft } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Card } from '@/components/ui/card';
