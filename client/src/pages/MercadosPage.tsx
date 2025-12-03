@@ -1,74 +1,90 @@
-import { useState, useEffect } from 'react';
-import { Database, Search, Filter, Plus, Building2, Mail, Phone, Globe, FileSpreadsheet, FileText, X, Copy, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Filter, ArrowLeft, FileSpreadsheet, FileText, TrendingUp, TrendingDown, Minus, Target, Building2, Lightbulb, AlertTriangle, CheckCircle, X } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { trpc } from '@/lib/trpc';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 
-export default function EntidadesPage() {
+export default function MercadosPage() {
   const [, setLocation] = useLocation();
   const [busca, setBusca] = useState('');
-  const [tipoFiltro, setTipoFiltro] = useState<'cliente' | 'lead' | 'concorrente' | undefined>();
+  const [categoriaFiltro, setCategoriaFiltro] = useState<string | undefined>();
+  const [segmentacaoFiltro, setSegmentacaoFiltro] = useState<string | undefined>();
+  const [crescimentoFiltro, setCrescimentoFiltro] = useState<'positivo' | 'estavel' | 'negativo' | undefined>();
+  const [atratividadeFiltro, setAtratividadeFiltro] = useState<'alta' | 'media' | 'baixa' | undefined>();
+  const [saturacaoFiltro, setSaturacaoFiltro] = useState<'baixo' | 'medio' | 'alto' | undefined>();
   const [page, setPage] = useState(0);
-  const [entidadeSelecionada, setEntidadeSelecionada] = useState<any>(null);
+  const [mercadoSelecionado, setMercadoSelecionado] = useState<any>(null);
   const [modalAberto, setModalAberto] = useState(false);
   const limit = 20;
   const { toast } = useToast();
 
-  // Ler parâmetro tipo da URL ao carregar
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tipoUrl = urlParams.get('tipo') as 'cliente' | 'lead' | 'concorrente' | null;
-    if (tipoUrl) {
-      setTipoFiltro(tipoUrl);
-    }
-  }, []);
+  // Query para listar mercados
+  const mercados = trpc.mercado.list.useQuery({
+    busca: busca || undefined,
+    categoria: categoriaFiltro,
+    segmentacao: segmentacaoFiltro,
+    crescimento: crescimentoFiltro,
+    atratividade: atratividadeFiltro,
+    saturacao: saturacaoFiltro,
+    limit,
+    offset: page * limit,
+  });
 
-  // Função para copiar dados da entidade
-  const copiarEntidade = (entidade: any) => {
+  const mercadosList = Array.isArray(mercados.data?.data) ? mercados.data.data : [];
+
+  // Função para abrir modal com detalhes
+  const abrirDetalhes = (mercado: any) => {
+    setMercadoSelecionado(mercado);
+    setModalAberto(true);
+  };
+
+  // Função para copiar dados do mercado
+  const copiarMercado = (mercado: any) => {
     const texto = `
-Nome: ${entidade.nome}
-CNPJ: ${entidade.cnpj || 'N/A'}
-Tipo: ${formatTipo(entidade.tipo_entidade)}
-Email: ${entidade.email || 'N/A'}
-Telefone: ${entidade.telefone || 'N/A'}
-Site: ${entidade.site || 'N/A'}
+Nome: ${mercado.nome}
+Categoria: ${mercado.categoria}
+Segmentação: ${mercado.segmentacao}
+Tamanho: ${mercado.tamanho_mercado || 'N/A'}
+Crescimento: ${mercado.crescimento_anual || 'N/A'}
+Score de Atratividade: ${mercado.score_atratividade || 'N/A'}
+Nível de Saturação: ${mercado.nivel_saturacao || 'N/A'}
     `.trim();
     
     navigator.clipboard.writeText(texto);
     toast({
       title: 'Copiado!',
-      description: 'Dados da entidade copiados para a área de transferência',
+      description: 'Dados do mercado copiados para a área de transferência',
       duration: 2000
     });
   };
 
   // Função para exportar CSV
   const exportarCSV = () => {
-    if (!entidades.data || entidades.data.length === 0) return;
+    if (!mercadosList || mercadosList.length === 0) return;
     
-    const headers = ['Nome', 'CNPJ', 'Tipo', 'Email', 'Telefone', 'Site', 'Origem', 'Data'];
-    const rows = entidades.data.map((e: any) => [
-      e.nome,
-      e.cnpj || '',
-      formatTipo(e.tipo_entidade),
-      e.email || '',
-      e.telefone || '',
-      e.site || '',
-      e.origem_tipo || '',
-      new Date(e.created_at).toLocaleDateString('pt-BR')
+    const headers = ['Nome', 'Categoria', 'Segmentação', 'Tamanho', 'Crescimento', 'Score', 'Saturação'];
+    const rows = mercadosList.map((m: any) => [
+      m.nome,
+      m.categoria || '',
+      m.segmentacao || '',
+      m.tamanho_mercado || '',
+      m.crescimento_anual || '',
+      m.score_atratividade || '',
+      m.nivel_saturacao || ''
     ]);
     
     const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `entidades_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `mercados_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     
     toast({
@@ -78,86 +94,54 @@ Site: ${entidade.site || 'N/A'}
     });
   };
 
-  // Função para exportar Excel (via CSV)
-  const exportarExcel = () => {
-    if (!entidades.data || entidades.data.length === 0) return;
-    
-    const headers = ['Nome', 'CNPJ', 'Tipo', 'Email', 'Telefone', 'Site', 'Origem', 'Data'];
-    const rows = entidades.data.map((e: any) => [
-      e.nome,
-      e.cnpj || '',
-      formatTipo(e.tipo_entidade),
-      e.email || '',
-      e.telefone || '',
-      e.site || '',
-      e.origem_tipo || '',
-      new Date(e.created_at).toLocaleDateString('pt-BR')
-    ]);
-    
-    const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-    const blob = new Blob(['\uFEFF' + csv], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `entidades_${new Date().toISOString().split('T')[0]}.xlsx`;
-    link.click();
-    
-    toast({
-      title: 'Exportado!',
-      description: 'Arquivo Excel baixado com sucesso',
-      duration: 2000
-    });
+  // Helpers para badges
+  const getBadgeCategoria = (categoria: string) => {
+    const cores: Record<string, string> = {
+      'Comércio': 'bg-blue-100 text-blue-800',
+      'Saúde': 'bg-green-100 text-green-800',
+      'Tecnologia': 'bg-purple-100 text-purple-800',
+      'Serviços': 'bg-orange-100 text-orange-800',
+      'Indústria': 'bg-gray-100 text-gray-800',
+      'Agro': 'bg-yellow-100 text-yellow-800'
+    };
+    return cores[categoria] || 'bg-gray-100 text-gray-800';
   };
 
-  // Query para listar entidades
-  const entidades = trpc.entidades.list.useQuery({
-    busca: busca || undefined,
-    tipo: tipoFiltro,
-    limit,
-    offset: page * limit,
-  });
-
-  // Garantir que data seja sempre um array
-  const entidadesList = Array.isArray(entidades.data) ? entidades.data : [];
-
-  const getBadgeVariant = (tipo: string) => {
-    switch (tipo) {
-      case 'cliente':
-        return 'default';
-      case 'lead':
-        return 'secondary';
-      case 'concorrente':
-        return 'destructive';
-      default:
-        return 'outline';
-    }
+  const getIconeCrescimento = (crescimento: string) => {
+    if (!crescimento) return <Minus className="h-4 w-4 text-gray-400" />;
+    const valor = parseFloat(crescimento.replace(/[^0-9.-]/g, ''));
+    if (valor > 5) return <TrendingUp className="h-4 w-4 text-green-600" />;
+    if (valor < 0) return <TrendingDown className="h-4 w-4 text-red-600" />;
+    return <Minus className="h-4 w-4 text-yellow-600" />;
   };
 
-  const formatTipo = (tipo: string) => {
-    switch (tipo) {
-      case 'cliente':
-        return 'Cliente';
-      case 'lead':
-        return 'Lead';
-      case 'concorrente':
-        return 'Concorrente';
-      default:
-        return tipo;
-    }
+  const getCorScore = (score: number | null) => {
+    if (!score) return 'text-gray-400';
+    if (score >= 80) return 'text-green-600';
+    if (score >= 50) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const getBadgeSaturacao = (saturacao: string | null) => {
+    if (!saturacao) return 'bg-gray-100 text-gray-600';
+    if (saturacao.toLowerCase() === 'baixo') return 'bg-green-100 text-green-800';
+    if (saturacao.toLowerCase() === 'medio' || saturacao.toLowerCase() === 'médio') return 'bg-yellow-100 text-yellow-800';
+    return 'bg-red-100 text-red-800';
   };
 
   return (
     <div className="animate-fade-in">
       <PageHeader
-        title="Base de Entidades"
-        description="Gerencie as entidades (empresas/organizações) do sistema"
-        icon={Database}
+        title="Browse de Mercados"
+        description="Explore e analise mercados com filtros avançados"
+        icon={Target}
         breadcrumbs={[
           { label: 'Dashboard', path: '/' },
-          { label: 'Base de Entidades' }
+          { label: 'Mercados' }
         ]}
       />
 
-      {/* Filtros e Exportação */}
+      {/* Filtros */}
       <Card className="p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Filtros</h3>
@@ -173,17 +157,8 @@ Site: ${entidade.site || 'N/A'}
             <Button
               variant="outline"
               size="sm"
-              onClick={exportarExcel}
-              disabled={!entidades.data || entidades.data.length === 0}
-            >
-              <FileSpreadsheet className="h-4 w-4 mr-2" />
-              Exportar Excel
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
               onClick={exportarCSV}
-              disabled={!entidades.data || entidades.data.length === 0}
+              disabled={!mercadosList || mercadosList.length === 0}
             >
               <FileText className="h-4 w-4 mr-2" />
               Exportar CSV
@@ -191,13 +166,13 @@ Site: ${entidade.site || 'N/A'}
           </div>
         </div>
         
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           {/* Busca */}
-          <div className="flex-1">
+          <div className="lg:col-span-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por nome, CNPJ, email..."
+                placeholder="Buscar por nome, tendências, players..."
                 value={busca}
                 onChange={(e) => {
                   setBusca(e.target.value);
@@ -208,80 +183,140 @@ Site: ${entidade.site || 'N/A'}
             </div>
           </div>
 
-          {/* Filtro por tipo */}
-          <div className="flex gap-2">
-            <Button
-              variant={tipoFiltro === undefined ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => {
-                setTipoFiltro(undefined);
-                setPage(0);
-              }}
-            >
-              <Filter className="h-4 w-4 mr-2" />
-              Todos
-            </Button>
-            <Button
-              variant={tipoFiltro === 'cliente' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => {
-                setTipoFiltro('cliente');
-                setPage(0);
-              }}
-            >
-              Clientes
-            </Button>
-            <Button
-              variant={tipoFiltro === 'lead' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => {
-                setTipoFiltro('lead');
-                setPage(0);
-              }}
-            >
-              Leads
-            </Button>
-            <Button
-              variant={tipoFiltro === 'concorrente' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => {
-                setTipoFiltro('concorrente');
-                setPage(0);
-              }}
-            >
-              Concorrentes
-            </Button>
+          {/* Filtro por Categoria */}
+          <div>
+            <Select value={categoriaFiltro || 'todos'} onValueChange={(v) => {
+              setCategoriaFiltro(v === 'todos' ? undefined : v);
+              setPage(0);
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas Categorias</SelectItem>
+                <SelectItem value="Comércio">Comércio</SelectItem>
+                <SelectItem value="Saúde">Saúde</SelectItem>
+                <SelectItem value="Tecnologia">Tecnologia</SelectItem>
+                <SelectItem value="Serviços">Serviços</SelectItem>
+                <SelectItem value="Indústria">Indústria</SelectItem>
+                <SelectItem value="Agro">Agro</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filtro por Segmentação */}
+          <div>
+            <Select value={segmentacaoFiltro || 'todos'} onValueChange={(v) => {
+              setSegmentacaoFiltro(v === 'todos' ? undefined : v);
+              setPage(0);
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Segmentação" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas Segmentações</SelectItem>
+                <SelectItem value="B2B">B2B</SelectItem>
+                <SelectItem value="B2C">B2C</SelectItem>
+                <SelectItem value="B2G">B2G</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filtro por Crescimento */}
+          <div>
+            <Select value={crescimentoFiltro || 'todos'} onValueChange={(v) => {
+              setCrescimentoFiltro(v === 'todos' ? undefined : v as any);
+              setPage(0);
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Crescimento" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="positivo">Crescendo (&gt;5%)</SelectItem>
+                <SelectItem value="estavel">Estável (0-5%)</SelectItem>
+                <SelectItem value="negativo">Decrescendo (&lt;0%)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filtro por Atratividade */}
+          <div>
+            <Select value={atratividadeFiltro || 'todos'} onValueChange={(v) => {
+              setAtratividadeFiltro(v === 'todos' ? undefined : v as any);
+              setPage(0);
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Atratividade" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas</SelectItem>
+                <SelectItem value="alta">Alta (80+)</SelectItem>
+                <SelectItem value="media">Média (50-79)</SelectItem>
+                <SelectItem value="baixa">Baixa (&lt;50)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filtro por Saturação */}
+          <div>
+            <Select value={saturacaoFiltro || 'todos'} onValueChange={(v) => {
+              setSaturacaoFiltro(v === 'todos' ? undefined : v as any);
+              setPage(0);
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Saturação" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas</SelectItem>
+                <SelectItem value="baixo">Baixo</SelectItem>
+                <SelectItem value="medio">Médio</SelectItem>
+                <SelectItem value="alto">Alto</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
+
+        {/* Botão Limpar Filtros */}
+        {(busca || categoriaFiltro || segmentacaoFiltro || crescimentoFiltro || atratividadeFiltro || saturacaoFiltro) && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setBusca('');
+              setCategoriaFiltro(undefined);
+              setSegmentacaoFiltro(undefined);
+              setCrescimentoFiltro(undefined);
+              setAtratividadeFiltro(undefined);
+              setSaturacaoFiltro(undefined);
+              setPage(0);
+            }}
+          >
+            <X className="h-4 w-4 mr-2" />
+            Limpar Filtros
+          </Button>
+        )}
       </Card>
 
       {/* Tabela */}
       <Card className="overflow-hidden">
-        {entidades.isLoading ? (
+        {mercados.isLoading ? (
           <div className="p-12 text-center">
             <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Carregando entidades...</p>
+            <p className="text-muted-foreground">Carregando mercados...</p>
           </div>
-        ) : entidades.isError ? (
+        ) : mercados.isError ? (
           <div className="p-12 text-center">
-            <p className="text-destructive mb-2">Erro ao carregar entidades</p>
-            <p className="text-sm text-muted-foreground">{entidades.error.message}</p>
+            <p className="text-destructive mb-2">Erro ao carregar mercados</p>
+            <p className="text-sm text-muted-foreground">{mercados.error.message}</p>
           </div>
-        ) : entidadesList.length === 0 ? (
+        ) : mercadosList.length === 0 ? (
           <div className="p-12 text-center">
-            <Database className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Nenhuma entidade encontrada</h3>
+            <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Nenhum mercado encontrado</h3>
             <p className="text-muted-foreground mb-6">
-              {busca || tipoFiltro
-                ? 'Tente ajustar os filtros de busca'
-                : 'Comece importando dados ou criando uma nova entidade'}
+              Tente ajustar os filtros de busca
             </p>
-            <Button asChild>
-              <Link href="/importacao">
-                <Plus className="h-4 w-4 mr-2" />
-                Importar Dados
-              </Link>
-            </Button>
           </div>
         ) : (
           <>
@@ -289,81 +324,53 @@ Site: ${entidade.site || 'N/A'}
               <table className="w-full">
                 <thead className="bg-muted/50 border-b">
                   <tr>
-                    <th className="text-left p-4 font-medium">Nome</th>
-                    <th className="text-left p-4 font-medium">Tipo</th>
-                    <th className="text-left p-4 font-medium">CNPJ</th>
-                    <th className="text-left p-4 font-medium">Contato</th>
-                    <th className="text-left p-4 font-medium">Origem</th>
-                    <th className="text-left p-4 font-medium">Data</th>
+                    <th className="text-left p-4 font-medium">Nome do Mercado</th>
+                    <th className="text-left p-4 font-medium">Categoria</th>
+                    <th className="text-left p-4 font-medium">Seg.</th>
+                    <th className="text-left p-4 font-medium">Tamanho</th>
+                    <th className="text-left p-4 font-medium">Crescimento</th>
+                    <th className="text-left p-4 font-medium">Score</th>
+                    <th className="text-left p-4 font-medium">Saturação</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {entidadesList.map((entidade: any) => (
+                  {mercadosList.map((mercado: any) => (
                     <tr
-                      key={entidade.id}
-                      className="border-b hover:bg-muted/30 transition-colors cursor-pointer"
-                      onDoubleClick={() => {
-                        setEntidadeSelecionada(entidade);
-                        setModalAberto(true);
-                      }}
+                      key={mercado.id}
+                      className="border-b hover:bg-muted/50 cursor-pointer transition-colors"
+                      onDoubleClick={() => abrirDetalhes(mercado)}
                     >
                       <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <Building2 className="h-5 w-5 text-primary" />
-                          </div>
-                          <div>
-                            <div className="font-medium">{entidade.nome}</div>
-                            {entidade.nome_fantasia && (
-                              <div className="text-sm text-muted-foreground">
-                                {entidade.nome_fantasia}
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                        <div className="font-medium text-sm">{mercado.nome}</div>
                       </td>
                       <td className="p-4">
-                        <Badge variant={getBadgeVariant(entidade.tipo_entidade)}>
-                          {formatTipo(entidade.tipo_entidade)}
+                        <Badge className={getBadgeCategoria(mercado.categoria)}>
+                          {mercado.categoria}
                         </Badge>
                       </td>
                       <td className="p-4">
-                        <span className="text-sm text-muted-foreground">
-                          {entidade.cnpj || '—'}
-                        </span>
+                        <Badge variant="outline">{mercado.segmentacao}</Badge>
                       </td>
                       <td className="p-4">
-                        <div className="flex flex-col gap-1 text-sm">
-                          {entidade.email && (
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Mail className="h-3 w-3" />
-                              {entidade.email}
-                            </div>
-                          )}
-                          {entidade.telefone && (
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Phone className="h-3 w-3" />
-                              {entidade.telefone}
-                            </div>
-                          )}
-                          {entidade.site && (
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Globe className="h-3 w-3" />
-                              {entidade.site}
-                            </div>
-                          )}
-                          {!entidade.email && !entidade.telefone && !entidade.site && '—'}
+                        <div className="text-sm text-muted-foreground max-w-[200px] truncate">
+                          {mercado.tamanho_mercado || 'N/A'}
                         </div>
                       </td>
                       <td className="p-4">
-                        <Badge variant="outline">
-                          {entidade.origem_tipo}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          {getIconeCrescimento(mercado.crescimento_anual)}
+                          <span className="text-sm">{mercado.crescimento_anual || 'N/A'}</span>
+                        </div>
                       </td>
                       <td className="p-4">
-                        <span className="text-sm text-muted-foreground">
-                          {new Date(entidade.created_at).toLocaleDateString('pt-BR')}
-                        </span>
+                        <div className={`font-semibold ${getCorScore(mercado.score_atratividade)}`}>
+                          {mercado.score_atratividade ? `${mercado.score_atratividade}/100` : 'N/A'}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <Badge className={getBadgeSaturacao(mercado.nivel_saturacao)}>
+                          {mercado.nivel_saturacao || 'N/A'}
+                        </Badge>
                       </td>
                     </tr>
                   ))}
@@ -374,13 +381,13 @@ Site: ${entidade.site || 'N/A'}
             {/* Paginação */}
             <div className="p-4 border-t flex items-center justify-between">
               <div className="text-sm text-muted-foreground">
-                Página {page + 1}
+                Mostrando {page * limit + 1} - {Math.min((page + 1) * limit, mercados.data?.total || 0)} de {mercados.data?.total || 0} mercados
               </div>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage(Math.max(0, page - 1))}
+                  onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
                 >
                   Anterior
@@ -388,8 +395,8 @@ Site: ${entidade.site || 'N/A'}
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage(page + 1)}
-                  disabled={!entidades.data || entidades.data.length < limit}
+                  onClick={() => setPage(p => p + 1)}
+                  disabled={(page + 1) * limit >= (mercados.data?.total || 0)}
                 >
                   Próxima
                 </Button>
@@ -401,111 +408,139 @@ Site: ${entidade.site || 'N/A'}
 
       {/* Modal de Detalhes */}
       <Dialog open={modalAberto} onOpenChange={setModalAberto}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              <span>Detalhes da Entidade</span>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => entidadeSelecionada && copiarEntidade(entidadeSelecionada)}
-                >
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copiar
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setModalAberto(false)}
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Fechar
-                </Button>
-              </div>
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          {mercadoSelecionado && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3 text-2xl">
+                  <Target className="h-8 w-8 text-primary" />
+                  {mercadoSelecionado.nome}
+                </DialogTitle>
+                <div className="flex gap-2 mt-2">
+                  <Badge className={getBadgeCategoria(mercadoSelecionado.categoria)}>
+                    {mercadoSelecionado.categoria}
+                  </Badge>
+                  <Badge variant="outline">{mercadoSelecionado.segmentacao}</Badge>
+                </div>
+              </DialogHeader>
 
-          {entidadeSelecionada && (
-            <div className="space-y-6">
-              {/* Informações Básicas */}
-              <div>
-                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <Building2 className="h-5 w-5" />
-                  Informações Básicas
-                </h3>
-                <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-6 mt-4">
+                {/* Informações Básicas */}
+                <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg">
                   <div>
-                    <p className="text-sm text-muted-foreground">Nome</p>
-                    <p className="font-medium">{entidadeSelecionada.nome}</p>
+                    <div className="text-sm text-muted-foreground mb-1">Tamanho do Mercado</div>
+                    <div className="font-medium">{mercadoSelecionado.tamanho_mercado || 'N/A'}</div>
                   </div>
-                  {entidadeSelecionada.nome_fantasia && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">Nome Fantasia</p>
-                      <p className="font-medium">{entidadeSelecionada.nome_fantasia}</p>
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">Crescimento Anual</div>
+                    <div className="flex items-center gap-2">
+                      {getIconeCrescimento(mercadoSelecionado.crescimento_anual)}
+                      <span className="font-medium">{mercadoSelecionado.crescimento_anual || 'N/A'}</span>
                     </div>
-                  )}
-                  <div>
-                    <p className="text-sm text-muted-foreground">CNPJ</p>
-                    <p className="font-medium">{entidadeSelecionada.cnpj || '—'}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Tipo</p>
-                    <Badge variant={getBadgeVariant(entidadeSelecionada.tipo_entidade)}>
-                      {formatTipo(entidadeSelecionada.tipo_entidade)}
+                    <div className="text-sm text-muted-foreground mb-1">Score de Atratividade</div>
+                    <div className={`font-semibold text-lg ${getCorScore(mercadoSelecionado.score_atratividade)}`}>
+                      {mercadoSelecionado.score_atratividade ? `${mercadoSelecionado.score_atratividade}/100` : 'N/A'}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">Nível de Saturação</div>
+                    <Badge className={getBadgeSaturacao(mercadoSelecionado.nivel_saturacao)}>
+                      {mercadoSelecionado.nivel_saturacao || 'N/A'}
                     </Badge>
                   </div>
+                  {mercadoSelecionado.sentimento && (
+                    <div className="col-span-2">
+                      <div className="text-sm text-muted-foreground mb-1">Sentimento</div>
+                      <div className="font-medium">{mercadoSelecionado.sentimento}</div>
+                    </div>
+                  )}
                 </div>
-              </div>
 
-              {/* Contato */}
-              <div>
-                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <Mail className="h-5 w-5" />
-                  Contato
-                </h3>
-                <div className="grid grid-cols-1 gap-3">
-                  {entidadeSelecionada.email && (
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <span>{entidadeSelecionada.email}</span>
+                {/* Narrativa Completa */}
+                <div className="border rounded-lg p-4 bg-muted/10 max-h-[500px] overflow-y-auto space-y-6">
+                  {/* Tendências */}
+                  {mercadoSelecionado.tendencias && (
+                    <div>
+                      <h4 className="font-semibold flex items-center gap-2 mb-3 text-lg">
+                        <Lightbulb className="h-5 w-5 text-yellow-600" />
+                        Tendências
+                      </h4>
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{mercadoSelecionado.tendencias}</p>
                     </div>
                   )}
-                  {entidadeSelecionada.telefone && (
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span>{entidadeSelecionada.telefone}</span>
-                    </div>
-                  )}
-                  {entidadeSelecionada.site && (
-                    <div className="flex items-center gap-2">
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      <a href={entidadeSelecionada.site} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                        {entidadeSelecionada.site}
-                      </a>
-                    </div>
-                  )}
-                  {!entidadeSelecionada.email && !entidadeSelecionada.telefone && !entidadeSelecionada.site && (
-                    <p className="text-muted-foreground">Nenhuma informação de contato disponível</p>
-                  )}
-                </div>
-              </div>
 
-              {/* Origem */}
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Origem</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Tipo de Origem</p>
-                    <Badge variant="outline">{entidadeSelecionada.origem_tipo || '—'}</Badge>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Data de Criação</p>
-                    <p className="font-medium">{new Date(entidadeSelecionada.created_at).toLocaleDateString('pt-BR')}</p>
-                  </div>
+                  {/* Principais Players */}
+                  {mercadoSelecionado.principais_players && (
+                    <div>
+                      <h4 className="font-semibold flex items-center gap-2 mb-3 text-lg">
+                        <Building2 className="h-5 w-5 text-blue-600" />
+                        Principais Players
+                      </h4>
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{mercadoSelecionado.principais_players}</p>
+                    </div>
+                  )}
+
+                  {/* Oportunidades */}
+                  {mercadoSelecionado.oportunidades && (
+                    <div>
+                      <h4 className="font-semibold flex items-center gap-2 mb-3 text-lg">
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                        Oportunidades
+                      </h4>
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{mercadoSelecionado.oportunidades}</p>
+                    </div>
+                  )}
+
+                  {/* Riscos */}
+                  {mercadoSelecionado.riscos && (
+                    <div>
+                      <h4 className="font-semibold flex items-center gap-2 mb-3 text-lg">
+                        <AlertTriangle className="h-5 w-5 text-red-600" />
+                        Riscos
+                      </h4>
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{mercadoSelecionado.riscos}</p>
+                    </div>
+                  )}
+
+                  {/* Recomendação Estratégica */}
+                  {mercadoSelecionado.recomendacao_estrategica && (
+                    <div>
+                      <h4 className="font-semibold flex items-center gap-2 mb-3 text-lg">
+                        <Target className="h-5 w-5 text-purple-600" />
+                        Recomendação Estratégica
+                      </h4>
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{mercadoSelecionado.recomendacao_estrategica}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Metadados */}
+                <div className="text-xs text-muted-foreground border-t pt-4">
+                  <div>Criado em: {new Date(mercadoSelecionado.created_at).toLocaleString('pt-BR')} por {mercadoSelecionado.created_by}</div>
+                  {mercadoSelecionado.updated_at && (
+                    <div>Atualizado em: {new Date(mercadoSelecionado.updated_at).toLocaleString('pt-BR')}</div>
+                  )}
+                </div>
+
+                {/* Ações */}
+                <div className="flex gap-2 justify-end border-t pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => copiarMercado(mercadoSelecionado)}
+                  >
+                    Copiar Dados
+                  </Button>
+                  <Button
+                    variant="default"
+                    onClick={() => setModalAberto(false)}
+                  >
+                    Fechar
+                  </Button>
                 </div>
               </div>
-            </div>
+            </>
           )}
         </DialogContent>
       </Dialog>

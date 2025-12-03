@@ -26,6 +26,112 @@ const hierarquiaSchema = z.object({
 
 export const mercadoRouter = router({
   /**
+   * Listar mercados com filtros
+   */
+  list: publicProcedure
+    .input(z.object({
+      busca: z.string().optional(),
+      categoria: z.string().optional(),
+      segmentacao: z.string().optional(),
+      crescimento: z.enum(['positivo', 'estavel', 'negativo']).optional(),
+      atratividade: z.enum(['alta', 'media', 'baixa']).optional(),
+      saturacao: z.enum(['baixo', 'medio', 'alto']).optional(),
+      limit: z.number().min(1).max(100).optional(),
+      offset: z.number().min(0).optional()
+    }))
+    .query(async ({ input }) => {
+      const { busca, categoria, segmentacao, crescimento, atratividade, saturacao, limit = 20, offset = 0 } = input;
+
+      let whereConditions = [];
+      let params: any[] = [];
+
+      // Filtro de busca
+      if (busca) {
+        whereConditions.push(`(m.nome ILIKE $${params.length + 1} OR m.tendencias ILIKE $${params.length + 1} OR m.principais_players ILIKE $${params.length + 1})`);
+        params.push(`%${busca}%`);
+      }
+
+      // Filtro de categoria
+      if (categoria) {
+        whereConditions.push(`m.categoria = $${params.length + 1}`);
+        params.push(categoria);
+      }
+
+      // Filtro de segmentação
+      if (segmentacao) {
+        whereConditions.push(`m.segmentacao = $${params.length + 1}`);
+        params.push(segmentacao);
+      }
+
+      // Filtro de crescimento
+      if (crescimento) {
+        if (crescimento === 'positivo') {
+          whereConditions.push(`CAST(REGEXP_REPLACE(m.crescimento_anual, '[^0-9.-]', '', 'g') AS NUMERIC) > 5`);
+        } else if (crescimento === 'estavel') {
+          whereConditions.push(`CAST(REGEXP_REPLACE(m.crescimento_anual, '[^0-9.-]', '', 'g') AS NUMERIC) BETWEEN 0 AND 5`);
+        } else if (crescimento === 'negativo') {
+          whereConditions.push(`CAST(REGEXP_REPLACE(m.crescimento_anual, '[^0-9.-]', '', 'g') AS NUMERIC) < 0`);
+        }
+      }
+
+      // Filtro de atratividade
+      if (atratividade) {
+        if (atratividade === 'alta') {
+          whereConditions.push(`m.score_atratividade >= 80`);
+        } else if (atratividade === 'media') {
+          whereConditions.push(`m.score_atratividade BETWEEN 50 AND 79`);
+        } else if (atratividade === 'baixa') {
+          whereConditions.push(`m.score_atratividade < 50`);
+        }
+      }
+
+      // Filtro de saturação
+      if (saturacao) {
+        whereConditions.push(`m.nivel_saturacao = $${params.length + 1}`);
+        params.push(saturacao);
+      }
+
+      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+      params.push(limit, offset);
+
+      const query = `
+        SELECT 
+          m.*,
+          COUNT(*) OVER() as total_count
+        FROM dim_mercado m
+        ${whereClause}
+        ORDER BY m.created_at DESC
+        LIMIT $${params.length - 1} OFFSET $${params.length}
+      `;
+
+      const resultado = await db.execute(sql.raw(query, params));
+
+      return {
+        data: resultado.rows,
+        total: resultado.rows[0]?.total_count || 0
+      };
+    }),
+
+  /**
+   * Buscar mercado por ID
+   */
+  getById: publicProcedure
+    .input(z.object({
+      id: z.number()
+    }))
+    .query(async ({ input }) => {
+      const mercado = await db.query.dimMercado.findFirst({
+        where: eq(dimMercado.id, input.id)
+      });
+
+      if (!mercado) {
+        throw new Error('Mercado não encontrado');
+      }
+
+      return mercado;
+    }),
+  /**
    * Hierarquia completa de mercados
    */
   hierarquia: requirePermission(Permission.ANALISE_READ)
