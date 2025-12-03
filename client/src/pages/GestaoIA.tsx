@@ -7,6 +7,10 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Sparkles, TrendingUp, Users, Zap, DollarSign, Clock, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SecurityTab } from '@/components/security/SecurityTab';
+import { AuditTab } from '@/components/audit/AuditTab';
+import { ReportsTab } from '@/components/reports/ReportsTab';
 
 interface IAStats {
   config: {
@@ -131,6 +135,17 @@ export default function GestaoIA() {
           </p>
         </div>
       </div>
+      
+      {/* Tabs */}
+      <Tabs defaultValue="visao-geral" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="visao-geral">📊 Visão Geral</TabsTrigger>
+          <TabsTrigger value="seguranca">🔒 Segurança</TabsTrigger>
+          <TabsTrigger value="auditoria">📋 Auditoria</TabsTrigger>
+          <TabsTrigger value="relatorios">📈 Relatórios</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="visao-geral" className="space-y-6">
 
       {/* Configuração Atual */}
       <Card>
@@ -391,6 +406,20 @@ export default function GestaoIA() {
           </div>
         </CardContent>
       </Card>
+        </TabsContent>
+        
+        <TabsContent value="seguranca">
+          <SecurityTab />
+        </TabsContent>
+        
+        <TabsContent value="auditoria">
+          <AuditTab />
+        </TabsContent>
+        
+        <TabsContent value="relatorios">
+          <ReportsTab />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
