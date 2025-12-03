@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   const client = postgres(process.env.DATABASE_URL);
 
   try {
-    const { userId, acao, resultado, limite = '50', offset = '0' } = req.query;
+    const { userId, action, resultado, limite = '50', offset = '0' } = req.query;
 
     // Construir query dinamicamente
     let whereConditions = [];
@@ -28,8 +28,8 @@ export default async function handler(req, res) {
       whereConditions.push(`user_id = '${userId}'`);
     }
 
-    if (acao) {
-      whereConditions.push(`acao = '${acao}'`);
+    if (action) {
+      whereConditions.push(`action = '${action}'`);
     }
 
     if (resultado) {
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     // Buscar logs
     const logs = await client.unsafe(`
       SELECT 
-        id, user_id, acao, endpoint, metodo,
+        id, user_id, action, endpoint, metodo,
         parametros, resultado, erro,
         ip_address, user_agent,
         duracao_ms, custo, created_at

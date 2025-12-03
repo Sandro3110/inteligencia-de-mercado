@@ -78,7 +78,7 @@ export default async function handler(req, res) {
       dados = await client`
         SELECT 
           user_id,
-          acao,
+          action,
           endpoint,
           resultado,
           duracao_ms,
@@ -90,7 +90,7 @@ export default async function handler(req, res) {
         ORDER BY created_at DESC
       `;
       
-      colunas = ['user_id', 'acao', 'endpoint', 'resultado', 'duracao_ms', 'custo', 'ip_address', 'created_at'];
+      colunas = ['user_id', 'action', 'endpoint', 'resultado', 'duracao_ms', 'custo', 'ip_address', 'created_at'];
       nomeArquivo = `auditoria_${periodo}dias`;
     }
 

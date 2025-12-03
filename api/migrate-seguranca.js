@@ -40,7 +40,7 @@ export default async function handler(req, res) {
       CREATE TABLE IF NOT EXISTS audit_logs (
         id SERIAL PRIMARY KEY,
         user_id VARCHAR(255) NOT NULL,
-        acao VARCHAR(100) NOT NULL,
+        action VARCHAR(100) NOT NULL,
         endpoint VARCHAR(255) NOT NULL,
         metodo VARCHAR(10) NOT NULL,
         parametros JSONB,
@@ -55,7 +55,7 @@ export default async function handler(req, res) {
       
       CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_logs(user_id);
       CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at);
-      CREATE INDEX IF NOT EXISTS idx_audit_acao ON audit_logs(acao);
+      CREATE INDEX IF NOT EXISTS idx_audit_action ON audit_logs(action);
       CREATE INDEX IF NOT EXISTS idx_audit_resultado ON audit_logs(resultado);
     `);
 

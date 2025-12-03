@@ -88,11 +88,11 @@ export async function registrarAuditoria(dados, client) {
   try {
     await client`
       INSERT INTO audit_logs (
-        user_id, acao, endpoint, metodo, parametros,
+        user_id, action, endpoint, metodo, parametros,
         resultado, erro, ip_address, user_agent, duracao_ms, custo
       ) VALUES (
         ${dados.userId},
-        ${dados.acao},
+        ${dados.action || dados.acao},
         ${dados.endpoint},
         ${dados.metodo || 'POST'},
         ${dados.parametros ? JSON.stringify(dados.parametros) : null},
