@@ -146,7 +146,7 @@ CAMPOS OBRIGATÓRIOS (para cada):
 5. setor: Setor de atuação
 
 CAMPOS OPCIONAIS:
-6. cnpj: XX.XXX.XXX/XXXX-XX - NULL se não souber
+6. cnpj: CNPJ REAL no formato XX.XXX.XXX/XXXX-XX com dígitos verificadores VÁLIDOS - NULL se não souber COM CERTEZA
 7. site: https://... - NULL se não souber
 8. porte: Micro | Pequena | Média | Grande - NULL se não souber
 
@@ -154,7 +154,7 @@ REGRAS CRÍTICAS:
 - EXATAMENTE 5 leads
 - NÃO inclua cliente: ${nome}
 - NÃO inclua concorrentes
-- NÃO invente CNPJs (use NULL)
+- CNPJ: Se conhecer a empresa, forneça o CNPJ REAL com dígitos verificadores VÁLIDOS. Se não souber, use NULL.
 - Empresas REAIS que usariam os produtos
 
 Retorne APENAS JSON válido com 5 leads DIFERENTES:

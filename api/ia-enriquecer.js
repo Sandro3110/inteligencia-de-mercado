@@ -69,7 +69,7 @@ ${cidade ? `CIDADE/UF: ${cidade}, ${uf}` : ''}
 TAREFA: Enriquecer dados da empresa com informações REAIS e VERIFICÁVEIS.
 
 CAMPOS OBRIGATÓRIOS:
-1. cnpj: CNPJ no formato XX.XXX.XXX/XXXX-XX - NULL se não souber COM CERTEZA
+1. cnpj: CNPJ REAL no formato XX.XXX.XXX/XXXX-XX com dígitos verificadores VÁLIDOS - NULL se não souber COM CERTEZA
 2. email: Email corporativo - NULL se não souber
 3. telefone: Telefone (XX) XXXXX-XXXX - NULL se não souber
 4. site: Site oficial https://... - NULL se não souber
@@ -81,6 +81,7 @@ CAMPOS OBRIGATÓRIOS:
 10. segmentacaoB2bB2c: B2B | B2C | B2B2C
 
 REGRAS CRÍTICAS:
+- CNPJ: Se conhecer a empresa, forneça o CNPJ REAL com dígitos verificadores VÁLIDOS
 - Se NÃO TEM CERTEZA do CNPJ: retorne NULL
 - NUNCA invente emails, telefones ou sites
 - Cidade e UF são OBRIGATÓRIOS

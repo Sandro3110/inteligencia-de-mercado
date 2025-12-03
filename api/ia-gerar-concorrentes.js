@@ -82,14 +82,14 @@ CAMPOS OBRIGATÓRIOS (para cada):
 4. produtoPrincipal: Principal produto/serviço
 
 CAMPOS OPCIONAIS:
-5. cnpj: XX.XXX.XXX/XXXX-XX - NULL se não souber
+5. cnpj: CNPJ REAL no formato XX.XXX.XXX/XXXX-XX com dígitos verificadores VÁLIDOS - NULL se não souber COM CERTEZA
 6. site: https://... - NULL se não souber
 7. porte: Micro | Pequena | Média | Grande - NULL se não souber
 
 REGRAS CRÍTICAS:
 - EXATAMENTE 5 concorrentes
 - NÃO inclua o cliente: ${nome}
-- NÃO invente CNPJs (use NULL)
+- CNPJ: Se conhecer a empresa, forneça o CNPJ REAL com dígitos verificadores VÁLIDOS. Se não souber, use NULL.
 - Empresas REAIS e DIFERENTES
 
 Retorne APENAS JSON válido com 5 concorrentes:
