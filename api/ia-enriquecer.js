@@ -163,25 +163,35 @@ Retorne APENAS JSON válido:
 
     const dadosMercado = JSON.parse(responseMercado.choices[0].message.content || '{}');
 
-    // ETAPA 3: PRODUTOS/SERVIÇOS (Temperatura 0.9)
+    // ETAPA 3: PRODUTOS/SERVIÇOS DETALHADOS (Temperatura 0.7)
     const promptProdutos = `Você é um especialista em análise de produtos B2B.
 
 EMPRESA: ${nome}
 PRODUTO PRINCIPAL: ${dadosCliente.produtoPrincipal}
 MERCADO: ${dadosMercado.nome}
+PORTE: ${dadosCliente.porte}
 ${dadosCliente.site ? `SITE: ${dadosCliente.site}` : ''}
 
-TAREFA: Identificar os 3 PRINCIPAIS produtos/serviços.
+TAREFA: Identificar os 3 PRINCIPAIS produtos/serviços com DETALHES COMPLETOS.
 
 CAMPOS OBRIGATÓRIOS (para cada produto):
 1. nome: Nome do produto/serviço (max 255 chars)
-2. descricao: Descrição detalhada (max 500 chars)
+2. descricao: Descrição resumida (max 300 chars)
 3. categoria: Categoria (ex: "Software", "Consultoria")
+4. funcionalidades: Array com 3-5 funcionalidades principais
+5. publicoAlvo: Público-alvo específico (max 500 chars)
+6. diferenciais: Array com 2-3 diferenciais competitivos
+7. tecnologias: Tecnologias/metodologias (max 500 chars)
+8. precificacao: Modelo de preço e faixa de valores (max 500 chars)
 
 REGRAS CRÍTICAS:
 - EXATAMENTE 3 produtos (não mais, não menos)
 - Produtos DIFERENTES entre si
 - Descrições ESPECÍFICAS e TÉCNICAS
+- Funcionalidades devem ser CONCRETAS
+- Público-alvo deve ser BEM DEFINIDO
+- Diferenciais devem ser REAIS e VERIFICÁVEIS
+- Precificação: use NULL se não souber
 
 Retorne APENAS JSON válido:
 {
@@ -189,17 +199,12 @@ Retorne APENAS JSON válido:
     {
       "nome": "string",
       "descricao": "string",
-      "categoria": "string"
-    },
-    {
-      "nome": "string",
-      "descricao": "string",
-      "categoria": "string"
-    },
-    {
-      "nome": "string",
-      "descricao": "string",
-      "categoria": "string"
+      "categoria": "string",
+      "funcionalidades": ["string", "string", "string"],
+      "publicoAlvo": "string",
+      "diferenciais": ["string", "string"],
+      "tecnologias": "string",
+      "precificacao": "string ou null"
     }
   ]
 }`;
@@ -210,8 +215,8 @@ Retorne APENAS JSON válido:
         { role: 'system', content: 'Você é um especialista em produtos B2B. Sempre responda em JSON válido.' },
         { role: 'user', content: promptProdutos }
       ],
-      temperature: 0.9,
-      max_tokens: 1200,
+      temperature: 0.7,
+      max_tokens: 2500,
       response_format: { type: 'json_object' },
     });
 
@@ -284,12 +289,25 @@ Retorne APENAS JSON válido:
     if (dadosProdutos.produtos && Array.isArray(dadosProdutos.produtos)) {
       for (let i = 0; i < dadosProdutos.produtos.length; i++) {
         const produto = dadosProdutos.produtos[i];
+        
+        // Converter arrays para strings separadas por vírgula
+        const funcionalidadesStr = Array.isArray(produto.funcionalidades) 
+          ? produto.funcionalidades.join(', ') 
+          : produto.funcionalidades;
+        
+        const diferenciaisStr = Array.isArray(produto.diferenciais)
+          ? produto.diferenciais.join(', ')
+          : produto.diferenciais;
+        
         await client`
           INSERT INTO dim_produto (
-            entidade_id, nome, descricao, categoria, ordem, created_by
+            entidade_id, nome, descricao, categoria, ordem, created_by,
+            funcionalidades, publico_alvo, diferenciais, tecnologias, precificacao
           ) VALUES (
             ${entidadeId}, ${produto.nome}, ${produto.descricao},
-            ${produto.categoria}, ${i + 1}, ${userName}
+            ${produto.categoria}, ${i + 1}, ${userName},
+            ${funcionalidadesStr}, ${produto.publicoAlvo}, ${diferenciaisStr},
+            ${produto.tecnologias}, ${produto.precificacao}
           )
         `;
       }
