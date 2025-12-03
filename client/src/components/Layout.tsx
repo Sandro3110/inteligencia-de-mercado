@@ -50,17 +50,10 @@ const menuSections = [
     items: [
       {
         icon: Home,
-        label: 'Dashboard',
+        label: 'Dashboard/Base de Dados',
         path: '/',
         color: 'text-blue-600',
-        tooltip: 'Visão geral de métricas, projetos e atividades recentes'
-      },
-      {
-        icon: Database,
-        label: 'Base de Dados',
-        path: '/entidades',
-        color: 'text-blue-600',
-        tooltip: 'Consultar e gerenciar todas as entidades cadastradas'
+        tooltip: 'Visão geral de métricas e consulta de entidades cadastradas'
       }
     ]
   },
