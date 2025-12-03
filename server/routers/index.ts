@@ -9,6 +9,7 @@ import { temporalRouter } from './temporal';
 import { geografiaRouter } from './geografia';
 import { mercadoRouter } from './mercado';
 import { entidadeRouter } from './entidade';
+import { dashboardRouter } from './dashboard';
 
 const t = initTRPC.context<Context>().create();
 
@@ -28,6 +29,7 @@ export const appRouter = router({
   geografia: geografiaRouter,
   mercado: mercadoRouter,
   entidade: entidadeRouter,
+  dashboard: dashboardRouter,
 });
 
 export type AppRouter = typeof appRouter;
