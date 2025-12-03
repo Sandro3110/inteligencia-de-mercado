@@ -5,98 +5,38 @@ import { sql } from 'drizzle-orm';
 /**
  * Dashboard Router - KPIs e métricas gerais
  */
-
 export const dashboardRouter = router({
   /**
    * Buscar dados do dashboard (KPIs)
    */
   getDashboardData: publicProcedure
     .query(async () => {
-      // Buscar total de entidades por tipo
-      const queryEntidades = sql`
+      // Query única para buscar todos os KPIs
+      const query = sql`
         SELECT 
-          COUNT(*) FILTER (WHERE tipo_entidade = 'cliente') as total_clientes,
-          COUNT(*) FILTER (WHERE tipo_entidade = 'lead') as total_leads,
-          COUNT(*) FILTER (WHERE tipo_entidade = 'concorrente') as total_concorrentes,
-          COUNT(*) as total_entidades
-        FROM dim_entidade
-        WHERE deleted_at IS NULL
+          (SELECT COUNT(*) FROM dim_projeto) as total_projetos,
+          (SELECT COUNT(*) FROM dim_pesquisa) as total_pesquisas,
+          (SELECT COUNT(*) FROM dim_entidade) as total_entidades,
+          (SELECT COUNT(*) FROM dim_entidade WHERE tipo_entidade = 'cliente') as total_clientes,
+          (SELECT COUNT(*) FROM dim_entidade WHERE tipo_entidade = 'lead') as total_leads,
+          (SELECT COUNT(*) FROM dim_entidade WHERE tipo_entidade = 'concorrente') as total_concorrentes,
+          (SELECT COUNT(*) FROM dim_produto) as total_produtos,
+          (SELECT COUNT(*) FROM dim_mercado) as total_mercados
       `;
 
-      const resultadoEntidades = await db.execute(queryEntidades);
-      const entidades = resultadoEntidades.rows[0] || {
-        total_clientes: 0,
-        total_leads: 0,
-        total_concorrentes: 0,
-        total_entidades: 0
-      };
-
-      // Buscar total de mercados
-      const queryMercados = sql`
-        SELECT COUNT(*) as total
-        FROM dim_mercado
-        WHERE deleted_at IS NULL
-      `;
-
-      const resultadoMercados = await db.execute(queryMercados);
-      const totalMercados = resultadoMercados.rows[0]?.total || 0;
-
-      // Buscar total de produtos (assumindo que existe dim_produto)
-      const queryProdutos = sql`
-        SELECT COUNT(*) as total
-        FROM dim_produto
-        WHERE deleted_at IS NULL
-      `;
-
-      let totalProdutos = 0;
-      try {
-        const resultadoProdutos = await db.execute(queryProdutos);
-        totalProdutos = resultadoProdutos.rows[0]?.total || 0;
-      } catch (error) {
-        // Tabela dim_produto pode não existir ainda
-        totalProdutos = 0;
-      }
-
-      // Buscar total de projetos
-      const queryProjetos = sql`
-        SELECT COUNT(*) as total
-        FROM dim_projeto
-        WHERE deleted_at IS NULL
-      `;
-
-      let totalProjetos = 0;
-      try {
-        const resultadoProjetos = await db.execute(queryProjetos);
-        totalProjetos = resultadoProjetos.rows[0]?.total || 0;
-      } catch (error) {
-        totalProjetos = 0;
-      }
-
-      // Buscar total de pesquisas
-      const queryPesquisas = sql`
-        SELECT COUNT(*) as total
-        FROM dim_pesquisa
-        WHERE deleted_at IS NULL
-      `;
-
-      let totalPesquisas = 0;
-      try {
-        const resultadoPesquisas = await db.execute(queryPesquisas);
-        totalPesquisas = resultadoPesquisas.rows[0]?.total || 0;
-      } catch (error) {
-        totalPesquisas = 0;
-      }
+      const resultado = await db.execute(query);
+      const kpis = resultado.rows[0] || {};
 
       return {
         kpis: {
-          totalProjetos: Number(totalProjetos) || 0,
-          totalPesquisas: Number(totalPesquisas) || 0,
-          totalEntidades: Number(entidades.total_entidades) || 0,
-          totalClientes: Number(entidades.total_clientes) || 0,
-          totalLeads: Number(entidades.total_leads) || 0,
-          totalConcorrentes: Number(entidades.total_concorrentes) || 0,
-          totalProdutos: Number(totalProdutos) || 0,
-          totalMercados: Number(totalMercados) || 0,
+          totalProjetos: Number(kpis.total_projetos) || 0,
+          totalPesquisas: Number(kpis.total_pesquisas) || 0,
+          totalEntidades: Number(kpis.total_entidades) || 0,
+          totalClientes: Number(kpis.total_clientes) || 0,
+          totalLeads: Number(kpis.total_leads) || 0,
+          totalConcorrentes: Number(kpis.total_concorrentes) || 0,
+          totalProdutos: Number(kpis.total_produtos) || 0,
+          totalMercados: Number(kpis.total_mercados) || 0,
           receitaPotencial: 0,
           scoreMedioFit: 0,
           taxaConversao: 0,
