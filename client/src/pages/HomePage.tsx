@@ -65,7 +65,7 @@ export default function HomePage() {
   return (
     <div className="animate-fade-in">
       <PageHeader
-        title="Dashboard"
+        title="Dashboard/Base de Dados"
         description="Visão geral do sistema de inteligência de mercado"
         icon={Activity}
       />
@@ -79,6 +79,7 @@ export default function HomePage() {
           color="primary"
           change={12}
           trend="up"
+          onClick={() => setLocation('/projetos')}
         />
 
         <StatCard
@@ -88,6 +89,7 @@ export default function HomePage() {
           color="secondary"
           change={8}
           trend="up"
+          onClick={() => setLocation('/pesquisas')}
         />
 
         <StatCard

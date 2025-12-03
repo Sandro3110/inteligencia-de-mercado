@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Database, Search, Filter, Plus, Building2, Mail, Phone, Globe, FileSpreadsheet, FileText, X, Copy } from 'lucide-react';
+import { Database, Search, Filter, Plus, Building2, Mail, Phone, Globe, FileSpreadsheet, FileText, X, Copy, ArrowLeft } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,21 +7,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { trpc } from '@/lib/trpc';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 
 export default function EntidadesPage() {
-  // Ler parâmetro tipo da URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const tipoUrl = urlParams.get('tipo') as 'cliente' | 'lead' | 'concorrente' | null;
-  
+  const [, setLocation] = useLocation();
   const [busca, setBusca] = useState('');
-  const [tipoFiltro, setTipoFiltro] = useState<'cliente' | 'lead' | 'concorrente' | undefined>(tipoUrl || undefined);
+  const [tipoFiltro, setTipoFiltro] = useState<'cliente' | 'lead' | 'concorrente' | undefined>();
   const [page, setPage] = useState(0);
   const [entidadeSelecionada, setEntidadeSelecionada] = useState<any>(null);
   const [modalAberto, setModalAberto] = useState(false);
   const limit = 20;
   const { toast } = useToast();
+
+  // Ler parâmetro tipo da URL ao carregar
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tipoUrl = urlParams.get('tipo') as 'cliente' | 'lead' | 'concorrente' | null;
+    if (tipoUrl) {
+      setTipoFiltro(tipoUrl);
+    }
+  }, []);
 
   // Função para copiar dados da entidade
   const copiarEntidade = (entidade: any) => {
@@ -153,6 +159,14 @@ Site: ${entidade.site || 'N/A'}
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Filtros</h3>
           <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLocation('/')}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar
+            </Button>
             <Button
               variant="outline"
               size="sm"
