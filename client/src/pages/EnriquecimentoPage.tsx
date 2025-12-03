@@ -1,47 +1,172 @@
-import { Sparkles, Brain, Search, Network, Target, Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Sparkles, Brain, Search, Network, Target, Zap, Play, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { toast } from 'sonner';
+
+interface Entidade {
+  id: number;
+  nome: string;
+  cnpj: string;
+  tipo_entidade: string;
+  enriquecida?: boolean;
+}
+
+interface EnriquecimentoResult {
+  entidadeId: number;
+  nome: string;
+  status: 'processando' | 'sucesso' | 'erro';
+  dados?: any;
+  erro?: string;
+  tokens?: number;
+  custo?: number;
+  tempo?: number;
+}
 
 export default function EnriquecimentoPage() {
-  const features = [
-    {
-      icon: Brain,
-      title: 'Enriquecimento via IA',
-      description: 'Utilize OpenAI GPT-4o para enriquecer dados automaticamente',
-      color: 'text-primary'
-    },
-    {
-      icon: Search,
-      title: 'Busca Web Automática',
-      description: 'Encontre informações relevantes na web para cada entidade',
-      color: 'text-secondary'
-    },
-    {
-      icon: Network,
-      title: 'Classificação Inteligente',
-      description: 'Classifique entidades por mercado, produtos e segmentos',
-      color: 'text-success'
-    },
-    {
-      icon: Target,
-      title: 'Identificação de Concorrentes',
-      description: 'Detecte concorrentes automaticamente usando IA',
-      color: 'text-warning'
-    },
-    {
-      icon: Zap,
-      title: 'Score de Qualidade',
-      description: 'Calcule automaticamente a qualidade dos dados enriquecidos',
-      color: 'text-info'
-    },
-    {
-      icon: Sparkles,
-      title: 'Processamento em Lote',
-      description: 'Processe milhares de entidades em paralelo com filas',
-      color: 'text-destructive'
+  const [entidades, setEntidades] = useState<Entidade[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [processando, setProcessando] = useState(false);
+  const [resultados, setResultados] = useState<Map<number, EnriquecimentoResult>>(new Map());
+
+  useEffect(() => {
+    carregarEntidades();
+  }, []);
+
+  const carregarEntidades = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/entidades');
+      if (!response.ok) throw new Error('Erro ao carregar entidades');
+      const data = await response.json();
+      setEntidades(data.entidades || []);
+    } catch (error) {
+      console.error('Erro ao carregar entidades:', error);
+      toast.error('Erro ao carregar entidades');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const enriquecerEntidade = async (entidade: Entidade) => {
+    const novoResultado: EnriquecimentoResult = {
+      entidadeId: entidade.id,
+      nome: entidade.nome,
+      status: 'processando'
+    };
+    
+    setResultados(prev => new Map(prev).set(entidade.id, novoResultado));
+
+    try {
+      const inicio = Date.now();
+      
+      const response = await fetch('/api/ia-enriquecer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          entidadeId: entidade.id,
+          nome: entidade.nome,
+          cnpj: entidade.cnpj,
+          tipo: entidade.tipo_entidade
+        })
+      });
+
+      const tempo = Date.now() - inicio;
+
+      if (!response.ok) {
+        throw new Error('Erro ao enriquecer entidade');
+      }
+
+      const data = await response.json();
+
+      setResultados(prev => new Map(prev).set(entidade.id, {
+        ...novoResultado,
+        status: 'sucesso',
+        dados: data.dados,
+        tokens: data.tokens,
+        custo: data.custo,
+        tempo
+      }));
+
+      toast.success(`${entidade.nome} enriquecida com sucesso!`);
+      
+    } catch (error: any) {
+      setResultados(prev => new Map(prev).set(entidade.id, {
+        ...novoResultado,
+        status: 'erro',
+        erro: error.message
+      }));
+
+      toast.error(`Erro ao enriquecer ${entidade.nome}`);
+    }
+  };
+
+  const enriquecerTodas = async () => {
+    setProcessando(true);
+    
+    for (const entidade of entidades) {
+      await enriquecerEntidade(entidade);
+      // Pequeno delay entre chamadas para não sobrecarregar
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    setProcessando(false);
+    toast.success('Processamento concluído!');
+  };
+
+  const getStatusBadge = (entidadeId: number) => {
+    const resultado = resultados.get(entidadeId);
+    if (!resultado) return null;
+
+    switch (resultado.status) {
+      case 'processando':
+        return (
+          <Badge variant="outline" className="gap-1">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            Processando...
+          </Badge>
+        );
+      case 'sucesso':
+        return (
+          <Badge variant="default" className="gap-1 bg-green-500">
+            <CheckCircle2 className="h-3 w-3" />
+            Enriquecida
+          </Badge>
+        );
+      case 'erro':
+        return (
+          <Badge variant="destructive" className="gap-1">
+            <AlertCircle className="h-3 w-3" />
+            Erro
+          </Badge>
+        );
+    }
+  };
+
+  const getMetricas = () => {
+    const resultadosArray = Array.from(resultados.values());
+    const sucesso = resultadosArray.filter(r => r.status === 'sucesso').length;
+    const erro = resultadosArray.filter(r => r.status === 'erro').length;
+    const totalTokens = resultadosArray.reduce((sum, r) => sum + (r.tokens || 0), 0);
+    const totalCusto = resultadosArray.reduce((sum, r) => sum + (r.custo || 0), 0);
+    const tempoMedio = resultadosArray.length > 0 
+      ? resultadosArray.reduce((sum, r) => sum + (r.tempo || 0), 0) / resultadosArray.length 
+      : 0;
+
+    return { sucesso, erro, totalTokens, totalCusto, tempoMedio };
+  };
+
+  const metricas = getMetricas();
 
   return (
     <div className="animate-fade-in">
@@ -55,71 +180,187 @@ export default function EnriquecimentoPage() {
         ]}
       />
 
-      {/* Status Badge */}
-      <div className="mb-8">
-        <Badge variant="default" className="bg-warning hover:bg-warning/90 text-warning-foreground">
-          🚧 Em Desenvolvimento - FASE 5
-        </Badge>
-      </div>
-
-      {/* Main Content */}
-      <Card className="p-12 text-center mb-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-warning/10 to-warning/5 flex items-center justify-center mx-auto mb-6">
-            <Sparkles className="h-10 w-10 text-warning" />
-          </div>
-          
-          <h2 className="text-2xl font-bold mb-3">
-            Enriquecimento Inteligente de Dados
-          </h2>
-          
-          <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
-            Esta funcionalidade será implementada na <strong>FASE 5</strong> do projeto. 
-            Prepare-se para revolucionar a forma como você enriquece dados de mercado!
-          </p>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card key={index} className="p-6 text-left hover-lift">
-                  <div className={`h-12 w-12 rounded-xl bg-gradient-to-br from-${feature.color}/10 to-${feature.color}/5 flex items-center justify-center mb-4`}>
-                    <Icon className={`h-6 w-6 ${feature.color}`} />
-                  </div>
-                  <h3 className="font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {feature.description}
-                  </p>
-                </Card>
-              );
-            })}
-          </div>
+      {/* Métricas */}
+      {resultados.size > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          <Card className="p-4">
+            <div className="text-sm text-muted-foreground">Processadas</div>
+            <div className="text-2xl font-bold">{resultados.size}</div>
+          </Card>
+          <Card className="p-4">
+            <div className="text-sm text-muted-foreground">Sucesso</div>
+            <div className="text-2xl font-bold text-green-600">{metricas.sucesso}</div>
+          </Card>
+          <Card className="p-4">
+            <div className="text-sm text-muted-foreground">Tokens</div>
+            <div className="text-2xl font-bold">{metricas.totalTokens.toLocaleString()}</div>
+          </Card>
+          <Card className="p-4">
+            <div className="text-sm text-muted-foreground">Custo</div>
+            <div className="text-2xl font-bold">${metricas.totalCusto.toFixed(4)}</div>
+          </Card>
+          <Card className="p-4">
+            <div className="text-sm text-muted-foreground">Tempo Médio</div>
+            <div className="text-2xl font-bold">{(metricas.tempoMedio / 1000).toFixed(1)}s</div>
+          </Card>
         </div>
+      )}
+
+      {/* Tabela de Entidades */}
+      <Card className="p-6 mb-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-xl font-semibold">Entidades para Enriquecer</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              {entidades.length} entidades disponíveis
+            </p>
+          </div>
+          <Button 
+            onClick={enriquecerTodas} 
+            disabled={processando || entidades.length === 0}
+            className="gap-2"
+          >
+            {processando ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Processando...
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4" />
+                Enriquecer Todas
+              </>
+            )}
+          </Button>
+        </div>
+
+        {loading ? (
+          <div className="text-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground">Carregando entidades...</p>
+          </div>
+        ) : entidades.length === 0 ? (
+          <div className="text-center py-12">
+            <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground">Nenhuma entidade encontrada</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Importe entidades primeiro para poder enriquecê-las
+            </p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Nome</TableHead>
+                <TableHead>CNPJ</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {entidades.map((entidade) => (
+                <TableRow key={entidade.id}>
+                  <TableCell className="font-mono text-sm">{entidade.id}</TableCell>
+                  <TableCell className="font-medium">{entidade.nome}</TableCell>
+                  <TableCell className="font-mono text-sm">{entidade.cnpj}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{entidade.tipo_entidade}</Badge>
+                  </TableCell>
+                  <TableCell>{getStatusBadge(entidade.id)}</TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => enriquecerEntidade(entidade)}
+                      disabled={resultados.get(entidade.id)?.status === 'processando'}
+                      className="gap-2"
+                    >
+                      {resultados.get(entidade.id)?.status === 'processando' ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-3 w-3" />
+                      )}
+                      Enriquecer
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </Card>
 
+      {/* Detalhes dos Resultados */}
+      {resultados.size > 0 && (
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-4">Resultados do Enriquecimento</h2>
+          <div className="space-y-4">
+            {Array.from(resultados.values()).map((resultado) => (
+              <Card key={resultado.entidadeId} className="p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="font-semibold">{resultado.nome}</h3>
+                    <p className="text-sm text-muted-foreground">ID: {resultado.entidadeId}</p>
+                  </div>
+                  {getStatusBadge(resultado.entidadeId)}
+                </div>
+                
+                {resultado.status === 'sucesso' && resultado.dados && (
+                  <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Tokens:</span>
+                      <span className="ml-2 font-medium">{resultado.tokens?.toLocaleString()}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Custo:</span>
+                      <span className="ml-2 font-medium">${resultado.custo?.toFixed(4)}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Tempo:</span>
+                      <span className="ml-2 font-medium">{((resultado.tempo || 0) / 1000).toFixed(2)}s</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Campos:</span>
+                      <span className="ml-2 font-medium">{Object.keys(resultado.dados).length}</span>
+                    </div>
+                  </div>
+                )}
+
+                {resultado.status === 'erro' && (
+                  <div className="mt-2 text-sm text-destructive">
+                    Erro: {resultado.erro}
+                  </div>
+                )}
+              </Card>
+            ))}
+          </div>
+        </Card>
+      )}
+
       {/* Technical Details */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
         <Card className="p-6">
           <h3 className="font-semibold mb-3 flex items-center gap-2">
             <Brain className="h-5 w-5 text-primary" />
             Modelo de IA
           </h3>
           <p className="text-sm text-muted-foreground mb-3">
-            Temperatura 1.0 para máxima qualidade e criatividade
+            OpenAI GPT-4o-mini para enriquecimento eficiente
           </p>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">GPT-4o:</span>
-              <span className="font-medium">Análise complexa</span>
+              <span className="text-muted-foreground">Modelo:</span>
+              <span className="font-medium">GPT-4o-mini</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">GPT-4o-mini:</span>
-              <span className="font-medium">Listagens</span>
+              <span className="text-muted-foreground">Temperatura:</span>
+              <span className="font-medium">0.7</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Custo:</span>
-              <span className="font-medium text-success">$0.006/cliente</span>
+              <span className="text-muted-foreground">Custo médio:</span>
+              <span className="font-medium text-success">~$0.0001</span>
             </div>
           </div>
         </Card>
@@ -130,20 +371,20 @@ export default function EnriquecimentoPage() {
             Performance
           </h3>
           <p className="text-sm text-muted-foreground mb-3">
-            Processamento em lote com filas BullMQ + Redis
+            Processamento sequencial com controle de rate limit
           </p>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Concorrência:</span>
-              <span className="font-medium">10 workers</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Retry:</span>
-              <span className="font-medium">3 tentativas</span>
+              <span className="text-muted-foreground">Delay:</span>
+              <span className="font-medium">1 segundo</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Timeout:</span>
               <span className="font-medium">30 segundos</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Retry:</span>
+              <span className="font-medium">Automático</span>
             </div>
           </div>
         </Card>
@@ -154,20 +395,20 @@ export default function EnriquecimentoPage() {
             Dados Enriquecidos
           </h3>
           <p className="text-sm text-muted-foreground mb-3">
-            159 campos preenchidos automaticamente por entidade
+            Campos preenchidos automaticamente pela IA
           </p>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Clientes:</span>
-              <span className="font-medium">45 campos</span>
+              <span className="text-muted-foreground">Informações:</span>
+              <span className="font-medium">Completas</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Concorrentes:</span>
-              <span className="font-medium">38 campos</span>
+              <span className="text-muted-foreground">Precisão:</span>
+              <span className="font-medium">Alta</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Leads:</span>
-              <span className="font-medium">76 campos</span>
+              <span className="text-muted-foreground">Fonte:</span>
+              <span className="font-medium">OpenAI</span>
             </div>
           </div>
         </Card>
