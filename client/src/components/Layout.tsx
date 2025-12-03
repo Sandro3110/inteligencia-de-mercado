@@ -33,6 +33,7 @@ interface MenuItem {
   label: string;
   path: string;
   color: string;
+  tooltip: string;
   section?: string;
 }
 
@@ -44,13 +45,15 @@ const menuSections = [
         icon: Home,
         label: 'Dashboard',
         path: '/',
-        color: 'text-blue-600'
+        color: 'text-blue-600',
+        tooltip: 'Visão geral de métricas, projetos e atividades recentes'
       },
       {
         icon: Database,
         label: 'Base de Dados',
         path: '/entidades',
-        color: 'text-blue-600'
+        color: 'text-blue-600',
+        tooltip: 'Consultar e gerenciar todas as entidades cadastradas'
       }
     ]
   },
@@ -61,25 +64,29 @@ const menuSections = [
         icon: FolderKanban,
         label: 'Projetos',
         path: '/projetos',
-        color: 'text-indigo-600'
+        color: 'text-indigo-600',
+        tooltip: 'Criar e gerenciar projetos de inteligência de mercado'
       },
       {
         icon: Search,
         label: 'Pesquisas',
         path: '/pesquisas',
-        color: 'text-indigo-600'
+        color: 'text-indigo-600',
+        tooltip: 'Configurar pesquisas de mercado e segmentação'
       },
       {
         icon: Upload,
         label: 'Importar Dados',
         path: '/importacao',
-        color: 'text-indigo-600'
+        color: 'text-indigo-600',
+        tooltip: 'Importar dados de clientes, leads e empresas (CSV, Excel)'
       },
       {
         icon: FileText,
         label: 'Histórico de Importações',
         path: '/importacoes',
-        color: 'text-indigo-600'
+        color: 'text-indigo-600',
+        tooltip: 'Visualizar histórico e status de importações anteriores'
       }
     ]
   },
@@ -90,13 +97,15 @@ const menuSections = [
         icon: Sparkles,
         label: 'Enriquecer com IA',
         path: '/enriquecimento',
-        color: 'text-amber-600'
+        color: 'text-amber-600',
+        tooltip: 'Enriquecer dados de empresas com inteligência artificial'
       },
       {
         icon: Cpu,
         label: 'Processamento Avançado',
         path: '/processamento-ia',
-        color: 'text-amber-600'
+        color: 'text-amber-600',
+        tooltip: 'Processar lotes de dados e gerar insights automatizados'
       }
     ]
   },
@@ -107,25 +116,29 @@ const menuSections = [
         icon: Layers,
         label: 'Explorador Multidimensional',
         path: '/cubo',
-        color: 'text-emerald-600'
+        color: 'text-emerald-600',
+        tooltip: 'Análise interativa por múltiplas dimensões (setor, porte, região)'
       },
       {
         icon: TrendingUp,
         label: 'Análise Temporal',
         path: '/analise/temporal',
-        color: 'text-emerald-600'
+        color: 'text-emerald-600',
+        tooltip: 'Identificar tendências e padrões ao longo do tempo'
       },
       {
         icon: MapPin,
         label: 'Análise Geográfica',
         path: '/analise/geografica',
-        color: 'text-emerald-600'
+        color: 'text-emerald-600',
+        tooltip: 'Visualizar distribuição geográfica e oportunidades por região'
       },
       {
         icon: Network,
         label: 'Análise de Mercado',
         path: '/analise/mercado',
-        color: 'text-emerald-600'
+        color: 'text-emerald-600',
+        tooltip: 'Explorar hierarquia de mercados e segmentos de atuação'
       }
     ]
   },
@@ -136,13 +149,15 @@ const menuSections = [
         icon: Users,
         label: 'Usuários',
         path: '/usuarios',
-        color: 'text-purple-600'
+        color: 'text-purple-600',
+        tooltip: 'Gerenciar usuários, permissões e controle de acesso'
       },
       {
         icon: Shield,
         label: 'Gestão de IA',
         path: '/gestao-ia',
-        color: 'text-purple-600'
+        color: 'text-purple-600',
+        tooltip: 'Monitorar uso, custos e segurança da inteligência artificial'
       }
     ]
   }
@@ -209,7 +224,7 @@ export default function Layout({ children }: LayoutProps) {
                           isActive && 'bg-primary text-primary-foreground hover:bg-primary/90',
                           isCollapsed && 'justify-center'
                         )}
-                        title={isCollapsed ? item.label : undefined}
+                        title={item.tooltip}
                       >
                         <Icon className={cn('h-5 w-5 flex-shrink-0', !isActive && item.color)} />
                         {!isCollapsed && <span>{item.label}</span>}
