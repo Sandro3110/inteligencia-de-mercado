@@ -20,6 +20,63 @@ function calculateCost(model, inputTokens, outputTokens) {
   return inputCost + outputCost;
 }
 
+// Função para calcular score inteligente de qualificação
+function calculateLeadScore(lead, clienteData) {
+  let score = 50; // Score base
+
+  // +20 pontos por porte da empresa
+  const porteScores = {
+    'Micro': 5,
+    'Pequena': 10,
+    'Média': 15,
+    'Grande': 20
+  };
+  if (lead.porte && porteScores[lead.porte]) {
+    score += porteScores[lead.porte];
+  }
+
+  // +15 pontos por localização
+  if (clienteData.cidade && lead.cidade) {
+    if (lead.cidade.toLowerCase() === clienteData.cidade.toLowerCase()) {
+      score += 15; // Mesma cidade
+    } else if (clienteData.uf && lead.uf === clienteData.uf) {
+      score += 10; // Mesmo estado
+    } else {
+      score += 5; // Outro estado
+    }
+  }
+
+  // +15 pontos por match de produto
+  if (clienteData.produtos && Array.isArray(clienteData.produtos) && lead.produtoInteresse) {
+    const produtoLead = lead.produtoInteresse.toLowerCase();
+    // Verifica se o produto de interesse está na lista de produtos do cliente
+    const hasMatch = clienteData.produtos.some(p => {
+      const produtoCliente = (typeof p === 'string' ? p : p.nome || p).toLowerCase();
+      return produtoLead.includes(produtoCliente) || produtoCliente.includes(produtoLead);
+    });
+    if (hasMatch) {
+      score += 15; // Match direto
+    } else {
+      score += 5; // Produto relacionado
+    }
+  }
+
+  // Garantir que score está entre 0-100
+  score = Math.max(0, Math.min(100, score));
+
+  // Determinar prioridade
+  let prioridade;
+  if (score >= 80) {
+    prioridade = 'Alta';
+  } else if (score >= 60) {
+    prioridade = 'Média';
+  } else {
+    prioridade = 'Baixa';
+  }
+
+  return { score, prioridade };
+}
+
 export default async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -194,9 +251,16 @@ Retorne APENAS JSON válido com 5 leads DIFERENTES:
     // Deletar leads antigos
     await client`DELETE FROM dim_lead WHERE entidade_id = ${entidadeId}`;
 
-    // Inserir novos leads
-    for (let i = 0; i < data.leads.length; i++) {
-      const lead = data.leads[i];
+    // Calcular score inteligente para cada lead
+    const clienteData = { cidade, uf, produtos };
+    const leadsComScore = data.leads.map(lead => {
+      const { score, prioridade } = calculateLeadScore(lead, clienteData);
+      return { ...lead, scoreQualificacao: score, prioridade };
+    });
+
+    // Inserir novos leads com score calculado
+    for (let i = 0; i < leadsComScore.length; i++) {
+      const lead = leadsComScore[i];
       await client`
         INSERT INTO dim_lead (
           entidade_id, nome, cnpj, cidade, uf,
@@ -207,7 +271,7 @@ Retorne APENAS JSON válido com 5 leads DIFERENTES:
           ${entidadeId}, ${lead.nome}, ${lead.cnpj}, ${lead.cidade},
           ${lead.uf}, ${lead.produtoInteresse}, ${lead.setor},
           ${lead.site}, ${lead.porte},
-          ${lead.scoreQualificacao || 70}, ${lead.prioridade || 'Média'}, 'novo',
+          ${lead.scoreQualificacao}, ${lead.prioridade}, 'novo',
           ${i + 1}, ${userName}, ${userName}
         )
       `;
@@ -234,7 +298,7 @@ Retorne APENAS JSON válido com 5 leads DIFERENTES:
 
     return res.json({
       success: true,
-      data: data.leads,
+      data: leadsComScore,
       usage: {
         inputTokens,
         outputTokens,
