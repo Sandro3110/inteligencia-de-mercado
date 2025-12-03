@@ -12,14 +12,13 @@ import {
   TrendingUp,
   MapPin,
   Network,
-  Eye,
   ChevronLeft,
   ChevronRight,
   Moon,
   Sun,
-  Plus,
   Users,
-  Shield
+  Shield,
+  Cpu
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -39,59 +38,48 @@ interface MenuItem {
 
 const menuSections = [
   {
-    title: 'Início',
+    title: 'Visão Geral',
     items: [
       {
         icon: Home,
         label: 'Dashboard',
         path: '/',
-        color: 'text-primary'
+        color: 'text-blue-600'
+      },
+      {
+        icon: Database,
+        label: 'Base de Dados',
+        path: '/entidades',
+        color: 'text-blue-600'
       }
     ]
   },
   {
-    title: 'Configuração',
+    title: 'Preparação',
     items: [
       {
         icon: FolderKanban,
         label: 'Projetos',
         path: '/projetos',
-        color: 'text-secondary'
-      },
-      {
-        icon: Plus,
-        label: 'Novo Projeto',
-        path: '/projetos/novo',
-        color: 'text-secondary'
+        color: 'text-indigo-600'
       },
       {
         icon: Search,
         label: 'Pesquisas',
         path: '/pesquisas',
-        color: 'text-secondary'
+        color: 'text-indigo-600'
       },
-      {
-        icon: Plus,
-        label: 'Nova Pesquisa',
-        path: '/pesquisas/novo',
-        color: 'text-secondary'
-      }
-    ]
-  },
-  {
-    title: 'Coleta de Dados',
-    items: [
       {
         icon: Upload,
         label: 'Importar Dados',
         path: '/importacao',
-        color: 'text-info'
+        color: 'text-indigo-600'
       },
       {
         icon: FileText,
-        label: 'Histórico',
+        label: 'Histórico de Importações',
         path: '/importacoes',
-        color: 'text-info'
+        color: 'text-indigo-600'
       }
     ]
   },
@@ -100,50 +88,44 @@ const menuSections = [
     items: [
       {
         icon: Sparkles,
-        label: 'Processar com IA',
+        label: 'Enriquecer com IA',
         path: '/enriquecimento',
-        color: 'text-warning'
+        color: 'text-amber-600'
       },
       {
-        icon: Database,
-        label: 'Base de Entidades',
-        path: '/entidades',
-        color: 'text-warning'
+        icon: Cpu,
+        label: 'Processamento Avançado',
+        path: '/processamento-ia',
+        color: 'text-amber-600'
       }
     ]
   },
   {
-    title: 'Análise',
+    title: 'Inteligência',
     items: [
       {
         icon: Layers,
-        label: 'Explorador Inteligente',
+        label: 'Explorador Multidimensional',
         path: '/cubo',
-        color: 'text-success'
+        color: 'text-emerald-600'
       },
       {
         icon: TrendingUp,
-        label: 'Tendências no Tempo',
+        label: 'Análise Temporal',
         path: '/analise/temporal',
-        color: 'text-success'
+        color: 'text-emerald-600'
       },
       {
         icon: MapPin,
-        label: 'Mapa de Oportunidades',
+        label: 'Análise Geográfica',
         path: '/analise/geografica',
-        color: 'text-success'
+        color: 'text-emerald-600'
       },
       {
         icon: Network,
-        label: 'Hierarquia de Mercados',
+        label: 'Análise de Mercado',
         path: '/analise/mercado',
-        color: 'text-success'
-      },
-      {
-        icon: Eye,
-        label: 'Visão 360°',
-        path: '/entidade/:id',
-        color: 'text-success'
+        color: 'text-emerald-600'
       }
     ]
   },
@@ -152,12 +134,12 @@ const menuSections = [
     items: [
       {
         icon: Users,
-        label: 'Gestão de Usuários',
+        label: 'Usuários',
         path: '/usuarios',
         color: 'text-purple-600'
       },
       {
-        icon: Sparkles,
+        icon: Shield,
         label: 'Gestão de IA',
         path: '/gestao-ia',
         color: 'text-purple-600'
