@@ -57,15 +57,58 @@ export const dashboardRouter = router({
         totalProdutos = 0;
       }
 
+      // Buscar total de projetos
+      const queryProjetos = sql`
+        SELECT COUNT(*) as total
+        FROM dim_projeto
+        WHERE deleted_at IS NULL
+      `;
+
+      let totalProjetos = 0;
+      try {
+        const resultadoProjetos = await db.execute(queryProjetos);
+        totalProjetos = resultadoProjetos.rows[0]?.total || 0;
+      } catch (error) {
+        totalProjetos = 0;
+      }
+
+      // Buscar total de pesquisas
+      const queryPesquisas = sql`
+        SELECT COUNT(*) as total
+        FROM dim_pesquisa
+        WHERE deleted_at IS NULL
+      `;
+
+      let totalPesquisas = 0;
+      try {
+        const resultadoPesquisas = await db.execute(queryPesquisas);
+        totalPesquisas = resultadoPesquisas.rows[0]?.total || 0;
+      } catch (error) {
+        totalPesquisas = 0;
+      }
+
       return {
         kpis: {
+          totalProjetos: Number(totalProjetos) || 0,
+          totalPesquisas: Number(totalPesquisas) || 0,
+          totalEntidades: Number(entidades.total_entidades) || 0,
           totalClientes: Number(entidades.total_clientes) || 0,
           totalLeads: Number(entidades.total_leads) || 0,
           totalConcorrentes: Number(entidades.total_concorrentes) || 0,
-          totalEntidades: Number(entidades.total_entidades) || 0,
+          totalProdutos: Number(totalProdutos) || 0,
           totalMercados: Number(totalMercados) || 0,
-          totalProdutos: Number(totalProdutos) || 0
-        }
+          receitaPotencial: 0,
+          scoreMedioFit: 0,
+          taxaConversao: 0,
+          crescimentoMensal: 0
+        },
+        distribuicao: {
+          porTipo: [],
+          porSegmento: []
+        },
+        topMercados: [],
+        topRegioes: [],
+        atividadesRecentes: []
       };
     })
 });
