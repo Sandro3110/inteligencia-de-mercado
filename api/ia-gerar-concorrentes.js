@@ -45,6 +45,13 @@ export default async function handler(req, res) {
 
     const startTime = Date.now();
 
+    // Buscar name do usuário
+    const [user] = await client`SELECT name FROM users WHERE id = ${userId}`;
+    if (!user) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+    const userName = user.name;
+
     // ETAPA 4: CONCORRENTES (Temperatura 1.0)
     const produtosNomes = Array.isArray(produtos) 
       ? produtos.map(p => p.nome || p).join(', ')
@@ -171,7 +178,7 @@ Retorne APENAS JSON válido com 5 concorrentes:
         ) VALUES (
           ${entidadeId}, ${conc.nome}, ${conc.cnpj}, ${conc.cidade},
           ${conc.uf}, ${conc.produtoPrincipal}, ${conc.site},
-          ${conc.porte}, ${i + 1}, ${userId}
+          ${conc.porte}, ${i + 1}, ${userName}
         )
       `;
     }

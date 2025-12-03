@@ -45,6 +45,13 @@ export default async function handler(req, res) {
 
     const startTime = Date.now();
 
+    // Buscar name do usuário
+    const [user] = await client`SELECT name FROM users WHERE id = ${userId}`;
+    if (!user) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+    const userName = user.name;
+
     // ETAPA 5: LEADS (Temperatura 1.0)
     const produtosNomes = Array.isArray(produtos) 
       ? produtos.map(p => p.nome || p).join(', ')
@@ -198,7 +205,7 @@ Retorne APENAS JSON válido com 5 leads DIFERENTES:
           ${lead.uf}, ${lead.produtoInteresse}, ${lead.setor},
           ${lead.site}, ${lead.porte},
           ${lead.scoreQualificacao || 70}, ${lead.prioridade || 'Média'}, 'novo',
-          ${i + 1}, ${userId}, ${userId}
+          ${i + 1}, ${userName}, ${userName}
         )
       `;
     }

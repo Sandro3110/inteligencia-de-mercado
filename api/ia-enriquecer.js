@@ -45,6 +45,13 @@ export default async function handler(req, res) {
 
     const startTime = Date.now();
 
+    // Buscar name do usuário
+    const [user] = await client`SELECT name FROM users WHERE id = ${userId}`;
+    if (!user) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+    const userName = user.name;
+
     // ETAPA 1: ENRIQUECER CLIENTE (Temperatura 0.8)
     const promptCliente = `Você é um analista de mercado B2B especializado em empresas brasileiras.
 
@@ -233,9 +240,9 @@ Retorne APENAS JSON válido:
         segmentacao_b2b_b2c = ${dadosCliente.segmentacaoB2bB2c},
         score_qualidade = 85,
         enriquecido_em = NOW(),
-        enriquecido_por = ${userId},
+        enriquecido_por = ${userName},
         updated_at = NOW(),
-        updated_by = ${userId}
+        updated_by = ${userName}
       WHERE id = ${entidadeId}
     `;
 
@@ -249,7 +256,7 @@ Retorne APENAS JSON válido:
         ${entidadeId}, ${dadosMercado.nome}, ${dadosMercado.categoria},
         ${dadosMercado.segmentacao}, ${dadosMercado.tamanhoMercado},
         ${dadosMercado.crescimentoAnual}, ${dadosMercado.tendencias},
-        ${dadosMercado.principaisPlayers}, ${userId}, ${userId}
+        ${dadosMercado.principaisPlayers}, ${userName}, ${userName}
       )
       ON CONFLICT (entidade_id) DO UPDATE SET
         nome = EXCLUDED.nome,
@@ -260,7 +267,7 @@ Retorne APENAS JSON válido:
         tendencias = EXCLUDED.tendencias,
         principais_players = EXCLUDED.principais_players,
         updated_at = NOW(),
-        updated_by = ${userId}
+        updated_by = ${userName}
     `;
 
     // 3. Salvar produtos (deletar antigos e inserir novos)
@@ -274,7 +281,7 @@ Retorne APENAS JSON válido:
             entidade_id, nome, descricao, categoria, ordem, created_by
           ) VALUES (
             ${entidadeId}, ${produto.nome}, ${produto.descricao},
-            ${produto.categoria}, ${i + 1}, ${userId}
+            ${produto.categoria}, ${i + 1}, ${userName}
           )
         `;
       }
