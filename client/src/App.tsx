@@ -21,6 +21,8 @@ const PesquisasPage = lazy(() => import('./pages/pesquisas/PesquisasPage'));
 const PesquisaNovaPage = lazy(() => import('./pages/pesquisas/PesquisaNovaPage'));
 const PesquisaDetalhesPage = lazy(() => import('./pages/pesquisas/PesquisaDetalhesPage'));
 const EntidadesPage = lazy(() => import('./pages/EntidadesPage'));
+const ProdutosPage = lazy(() => import('./pages/ProdutosPage'));
+const MercadosPage = lazy(() => import('./pages/MercadosPage'));
 const ImportacaoPage = lazy(() => import('./pages/ImportacaoPage'));
 const ImportacoesListPage = lazy(() => import('./pages/ImportacoesListPage'));
 const EnriquecimentoPage = lazy(() => import('./pages/EnriquecimentoPage'));
@@ -98,6 +100,12 @@ function App() {
             </Route>
             <Route path="/entidades">
               <PrivateRoute><EntidadesPage /></PrivateRoute>
+            </Route>
+            <Route path="/produtos">
+              <PrivateRoute><ProdutosPage /></PrivateRoute>
+            </Route>
+            <Route path="/mercados">
+              <PrivateRoute><MercadosPage /></PrivateRoute>
             </Route>
             <Route path="/importacao">
               <PrivateRoute><ImportacaoPage /></PrivateRoute>

@@ -121,6 +121,7 @@ export default function HomePage() {
           value={dashboardData?.kpis?.totalProdutos || 0}
           icon={Package}
           color="info"
+          onClick={() => setLocation('/produtos')}
         />
 
         <StatCard
@@ -128,6 +129,7 @@ export default function HomePage() {
           value={dashboardData?.kpis?.totalMercados || 0}
           icon={Target}
           color="warning"
+          onClick={() => setLocation('/mercados')}
         />
       </div>
 
