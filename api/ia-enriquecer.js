@@ -114,7 +114,7 @@ Retorne APENAS JSON válido:
 
     const dadosCliente = JSON.parse(responseCliente.choices[0].message.content || '{}');
 
-    // ETAPA 2: IDENTIFICAR MERCADO (Temperatura 0.9)
+    // ETAPA 2: ANÁLISE COMPLETA DE MERCADO (Temperatura 0.5)
     const promptMercado = `Você é um analista de mercado especializado em inteligência competitiva do Brasil.
 
 EMPRESA: ${nome}
@@ -122,9 +122,9 @@ PRODUTO PRINCIPAL: ${dadosCliente.produtoPrincipal}
 SETOR: ${dadosCliente.setor}
 CIDADE/UF: ${dadosCliente.cidade}, ${dadosCliente.uf}
 
-TAREFA: Identificar o MERCADO PRINCIPAL e enriquecê-lo com dados REAIS do Brasil.
+TAREFA: Identificar o MERCADO PRINCIPAL e fazer ANÁLISE COMPLETA com dados REAIS do Brasil.
 
-CAMPOS OBRIGATÓRIOS:
+PARTE 1 - DADOS BÁSICOS:
 1. nome: Nome específico do mercado (ex: "Software de Gestão Empresarial")
 2. categoria: Indústria | Comércio | Serviços | Tecnologia
 3. segmentacao: B2B | B2C | B2B2C
@@ -133,11 +133,35 @@ CAMPOS OBRIGATÓRIOS:
 6. tendencias: 3-5 tendências atuais (max 500 chars)
 7. principaisPlayers: 5-10 empresas brasileiras (separadas por vírgula)
 
+PARTE 2 - ANÁLISE DE SENTIMENTO:
+8. sentimento: Positivo | Neutro | Negativo
+   - Considere: crescimento, investimentos, regulação, concorrência
+
+9. scoreAtratividade: 0-100 (inteiro)
+   - Tamanho do mercado (0-25)
+   - Taxa de crescimento (0-25)
+   - Nível de saturação (0-25)
+   - Barreiras de entrada (0-25)
+
+10. nivelSaturacao: Baixo | Médio | Alto
+    - Quantidade de players, concentração, facilidade de entrada
+
+11. oportunidades: Array com 3-5 oportunidades concretas
+    - Tendências favoráveis, gaps não atendidos, mudanças regulatórias
+
+12. riscos: Array com 2-3 riscos principais
+    - Ameaças competitivas, mudanças tecnológicas, riscos econômicos
+
+13. recomendacaoEstrategica: Texto (max 500 chars)
+    - Ação sugerida (Investir/Monitorar/Evitar)
+    - Segmento prioritário
+    - Diferenciação recomendada
+
 REGRAS CRÍTICAS:
 - Seja ESPECÍFICO sobre o mercado brasileiro
 - Use dados REAIS e ATUALIZADOS (2024-2025)
-- Tendências devem ser CONCRETAS
-- Players devem ser empresas REAIS
+- Análise deve ser OBJETIVA e FUNDAMENTADA
+- Score deve refletir REALIDADE do mercado
 
 Retorne APENAS JSON válido:
 {
@@ -147,7 +171,13 @@ Retorne APENAS JSON válido:
   "tamanhoMercado": "string",
   "crescimentoAnual": "string",
   "tendencias": "string",
-  "principaisPlayers": "string"
+  "principaisPlayers": "string",
+  "sentimento": "string",
+  "scoreAtratividade": 85,
+  "nivelSaturacao": "string",
+  "oportunidades": ["string", "string", "string"],
+  "riscos": ["string", "string"],
+  "recomendacaoEstrategica": "string"
 }`;
 
     const responseMercado = await openai.chat.completions.create({
@@ -156,8 +186,8 @@ Retorne APENAS JSON válido:
         { role: 'system', content: 'Você é um analista de mercado. Sempre responda em JSON válido com dados do mercado brasileiro.' },
         { role: 'user', content: promptMercado }
       ],
-      temperature: 0.9,
-      max_tokens: 1500,
+      temperature: 0.5,
+      max_tokens: 2500,
       response_format: { type: 'json_object' },
     });
 
@@ -259,17 +289,32 @@ Retorne APENAS JSON válido:
       WHERE id = ${entidadeId}
     `;
 
-    // 2. Salvar mercado (INSERT ou UPDATE)
+    // 2. Salvar mercado com análise de sentimento (INSERT ou UPDATE)
+    
+    // Converter arrays para strings
+    const oportunidadesStr = Array.isArray(dadosMercado.oportunidades)
+      ? dadosMercado.oportunidades.join('; ')
+      : dadosMercado.oportunidades;
+    
+    const riscosStr = Array.isArray(dadosMercado.riscos)
+      ? dadosMercado.riscos.join('; ')
+      : dadosMercado.riscos;
+    
     await client`
       INSERT INTO dim_mercado (
         entidade_id, nome, categoria, segmentacao,
         tamanho_mercado, crescimento_anual, tendencias,
-        principais_players, created_by, updated_by
+        principais_players, sentimento, score_atratividade,
+        nivel_saturacao, oportunidades, riscos,
+        recomendacao_estrategica, created_by, updated_by
       ) VALUES (
         ${entidadeId}, ${dadosMercado.nome}, ${dadosMercado.categoria},
         ${dadosMercado.segmentacao}, ${dadosMercado.tamanhoMercado},
         ${dadosMercado.crescimentoAnual}, ${dadosMercado.tendencias},
-        ${dadosMercado.principaisPlayers}, ${userName}, ${userName}
+        ${dadosMercado.principaisPlayers}, ${dadosMercado.sentimento},
+        ${dadosMercado.scoreAtratividade}, ${dadosMercado.nivelSaturacao},
+        ${oportunidadesStr}, ${riscosStr},
+        ${dadosMercado.recomendacaoEstrategica}, ${userName}, ${userName}
       )
       ON CONFLICT (entidade_id) DO UPDATE SET
         nome = EXCLUDED.nome,
@@ -279,6 +324,12 @@ Retorne APENAS JSON válido:
         crescimento_anual = EXCLUDED.crescimento_anual,
         tendencias = EXCLUDED.tendencias,
         principais_players = EXCLUDED.principais_players,
+        sentimento = EXCLUDED.sentimento,
+        score_atratividade = EXCLUDED.score_atratividade,
+        nivel_saturacao = EXCLUDED.nivel_saturacao,
+        oportunidades = EXCLUDED.oportunidades,
+        riscos = EXCLUDED.riscos,
+        recomendacao_estrategica = EXCLUDED.recomendacao_estrategica,
         updated_at = NOW(),
         updated_by = ${userName}
     `;
