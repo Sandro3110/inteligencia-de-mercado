@@ -62,6 +62,9 @@ export interface EntidadeFilters {
   origemTipo?: OrigemTipo | OrigemTipo[];
   busca?: string;
   cnpj?: string;
+  statusQualificacaoId?: number;
+  projetoId?: number;
+  pesquisaId?: number;
   orderBy?: 'nome' | 'created_at';
   orderDirection?: 'asc' | 'desc';
   page?: number;
@@ -173,6 +176,9 @@ export async function getEntidades(
     origemTipo,
     busca,
     cnpj,
+    statusQualificacaoId,
+    projetoId,
+    pesquisaId,
     orderBy = 'created_at',
     orderDirection = 'desc',
     page = 1,
@@ -217,6 +223,12 @@ export async function getEntidades(
       )
     );
   }
+
+  if (statusQualificacaoId) {
+    conditions.push(eq(dimEntidade.statusQualificacaoId, statusQualificacaoId));
+  }
+
+  // TODO: Adicionar filtros por projeto e pesquisa quando houver relacionamento
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 

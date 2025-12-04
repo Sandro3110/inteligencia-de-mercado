@@ -9,8 +9,9 @@ import { temporalRouter } from './temporal';
 import { geografiaRouter } from './geografia';
 import { mercadoRouter } from './mercado';
 import { entidadeRouter } from './entidade';
-import { dashboardRouter } from './dashboard';
+import { statusQualificacaoRouter } from './statusQualificacao';
 import { produtoRouter } from './produto';
+import { dashboardRouter } from './dashboard';
 
 const t = initTRPC.context<Context>().create();
 
@@ -30,8 +31,9 @@ export const appRouter = router({
   geografia: geografiaRouter,
   mercado: mercadoRouter,
   entidade: entidadeRouter,
-  dashboard: dashboardRouter,
+  statusQualificacao: statusQualificacaoRouter,
   produto: produtoRouter,
+  dashboard: dashboardRouter,
 });
 
 export type AppRouter = typeof appRouter;

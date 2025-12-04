@@ -37,11 +37,14 @@ const AnaliseTemporal = lazy(() => import('./pages/AnaliseTemporal'));
 const AnaliseGeografica = lazy(() => import('./pages/AnaliseGeografica'));
 const AnaliseMercado = lazy(() => import('./pages/AnaliseMercado'));
 const DetalhesEntidade = lazy(() => import('./pages/DetalhesEntidade'));
+const DesktopTurboPage = lazy(() => import('./pages/DesktopTurboPage'));
 
 // Páginas Legais - Lazy loading
 const PrivacidadePage = lazy(() => import('./pages/PrivacidadePage'));
 const TermosPage = lazy(() => import('./pages/TermosPage'));
 const DocumentacaoPage = lazy(() => import('./pages/DocumentacaoPage'));
+const MercadosPage = lazy(() => import('./pages/MercadosPage'));
+const ProdutosPage = lazy(() => import('./pages/ProdutosPage'));
 
 function App() {
   const [location] = useLocation();
@@ -82,6 +85,9 @@ function App() {
             {/* Rotas Protegidas */}
             <Route path="/">
               <PrivateRoute><HomePage /></PrivateRoute>
+            </Route>
+            <Route path="/desktop-turbo">
+              <PrivateRoute><DesktopTurboPage /></PrivateRoute>
             </Route>
             <Route path="/projetos">
               <PrivateRoute><ProjetosPage /></PrivateRoute>

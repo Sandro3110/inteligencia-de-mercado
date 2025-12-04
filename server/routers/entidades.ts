@@ -16,6 +16,9 @@ export const entidadesRouter = router({
       z.object({
         busca: z.string().optional(),
         tipo: z.enum(['cliente', 'lead', 'concorrente']).optional(),
+        status_qualificacao_id: z.number().optional(),
+        projeto_id: z.number().optional(),
+        pesquisa_id: z.number().optional(),
         limit: z.number().default(20),
         offset: z.number().default(0),
       })
@@ -26,6 +29,9 @@ export const entidadesRouter = router({
       return await entidadeDAL.getEntidades({
         busca: input.busca,
         tipoEntidade: input.tipo,
+        statusQualificacaoId: input.status_qualificacao_id,
+        projetoId: input.projeto_id,
+        pesquisaId: input.pesquisa_id,
         limit: input.limit,
         page: page,
       });
