@@ -49,49 +49,42 @@ const colorClasses = {
     text: 'text-green-700 dark:text-green-400',
     border: 'border-green-500/20',
     hover: 'hover:bg-green-500/20 dark:hover:bg-green-500/30',
-    gradient: 'from-green-500/20 to-transparent',
   },
   yellow: {
     bg: 'bg-yellow-500/10 dark:bg-yellow-500/20',
     text: 'text-yellow-700 dark:text-yellow-400',
     border: 'border-yellow-500/20',
     hover: 'hover:bg-yellow-500/20 dark:hover:bg-yellow-500/30',
-    gradient: 'from-yellow-500/20 to-transparent',
   },
   red: {
     bg: 'bg-red-500/10 dark:bg-red-500/20',
     text: 'text-red-700 dark:text-red-400',
     border: 'border-red-500/20',
     hover: 'hover:bg-red-500/20 dark:hover:bg-red-500/30',
-    gradient: 'from-red-500/20 to-transparent',
   },
   blue: {
     bg: 'bg-blue-500/10 dark:bg-blue-500/20',
     text: 'text-blue-700 dark:text-blue-400',
     border: 'border-blue-500/20',
     hover: 'hover:bg-blue-500/20 dark:hover:bg-blue-500/30',
-    gradient: 'from-blue-500/20 to-transparent',
   },
   purple: {
     bg: 'bg-purple-500/10 dark:bg-purple-500/20',
     text: 'text-purple-700 dark:text-purple-400',
     border: 'border-purple-500/20',
     hover: 'hover:bg-purple-500/20 dark:hover:bg-purple-500/30',
-    gradient: 'from-purple-500/20 to-transparent',
   },
   indigo: {
     bg: 'bg-indigo-500/10 dark:bg-indigo-500/20',
     text: 'text-indigo-700 dark:text-indigo-400',
     border: 'border-indigo-500/20',
     hover: 'hover:bg-indigo-500/20 dark:hover:bg-indigo-500/30',
-    gradient: 'from-indigo-500/20 to-transparent',
   },
   pink: {
     bg: 'bg-pink-500/10 dark:bg-pink-500/20',
     text: 'text-pink-700 dark:text-pink-400',
     border: 'border-pink-500/20',
     hover: 'hover:bg-pink-500/20 dark:hover:bg-pink-500/30',
-    gradient: 'from-pink-500/20 to-transparent',
   },
 };
 
@@ -152,64 +145,62 @@ export default function DesktopTurboPage() {
 
   return (
     <div className="flex h-screen flex-col bg-background">
-      {/* Header */}
+      {/* Header - Compacto */}
       <div className="flex-shrink-0 border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-6 py-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/')}
-                className="gap-2"
+                className="gap-2 h-8"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-3.5 w-3.5" />
                 Voltar
               </Button>
               <div>
-                <h1 className="text-2xl font-bold flex items-center gap-2">
-                  <Activity className="h-6 w-6 text-primary" />
+                <h1 className="text-xl font-bold flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-primary" />
                   Desktop Turbo
                 </h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Visão consolidada de todas as entidades do sistema
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="gap-1">
-                <TrendingUp className="h-3 w-3" />
-                Atualizado em tempo real
-              </Badge>
-            </div>
+            <Badge variant="outline" className="gap-1 text-xs h-6">
+              <TrendingUp className="h-3 w-3" />
+              Atualizado em tempo real
+            </Badge>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
-        <div className="container mx-auto px-6 py-6">
+        <div className="container mx-auto px-6 py-3">
           <Card className="border-border/50 shadow-lg">
-            <CardHeader className="border-b border-border/50 bg-gradient-to-r from-primary/5 to-transparent">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <Sparkles className="h-5 w-5 text-primary" />
+            <CardHeader className="border-b border-border/50 bg-gradient-to-r from-primary/5 to-transparent py-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Sparkles className="h-4 w-4 text-primary" />
                 Totalizador de Entidades
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {isLoading && (
-                <div className="flex items-center justify-center py-16">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <span className="ml-3 text-muted-foreground">
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="ml-3 text-sm text-muted-foreground">
                     Carregando totalizadores...
                   </span>
                 </div>
               )}
 
               {error && (
-                <div className="m-6 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-red-700 dark:text-red-400">
+                <div className="m-4 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-400">
                   <p className="font-semibold">Erro ao carregar totalizadores</p>
-                  <p className="text-sm">{(error as Error).message}</p>
+                  <p className="text-xs">{(error as Error).message}</p>
                 </div>
               )}
 
@@ -217,10 +208,10 @@ export default function DesktopTurboPage() {
                 <Table>
                   <TableHeader>
                     <TableRow className="hover:bg-transparent border-border/50">
-                      <TableHead className="w-[45%] font-semibold">Tipo de Entidade</TableHead>
-                      <TableHead className="text-center font-semibold">Total</TableHead>
-                      <TableHead className="text-center font-semibold">Status</TableHead>
-                      <TableHead className="text-right font-semibold">Ações</TableHead>
+                      <TableHead className="w-[45%] font-semibold text-xs h-8">Tipo de Entidade</TableHead>
+                      <TableHead className="text-center font-semibold text-xs h-8">Total</TableHead>
+                      <TableHead className="text-center font-semibold text-xs h-8">Status</TableHead>
+                      <TableHead className="text-right font-semibold text-xs h-8">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -232,37 +223,37 @@ export default function DesktopTurboPage() {
                       return (
                         <TableRow
                           key={totalizador.tipo}
-                          className={`cursor-pointer transition-all duration-200 ${colors.hover} border-border/30`}
+                          className={`cursor-pointer transition-all duration-200 ${colors.hover} border-border/30 h-14`}
                           onClick={() => handleRowClick(totalizador)}
                         >
-                          <TableCell>
-                            <div className={`flex items-center gap-3 rounded-lg border px-4 py-3 ${colors.bg} ${colors.border} transition-all duration-200 hover:scale-[1.02] hover:shadow-md`}>
-                              {Icon && <Icon className={`h-5 w-5 ${colors.text}`} />}
-                              <span className={`font-semibold ${colors.text}`}>
+                          <TableCell className="py-2">
+                            <div className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 ${colors.bg} ${colors.border} transition-all duration-200 hover:scale-[1.01] hover:shadow-md`}>
+                              {Icon && <Icon className={`h-4 w-4 ${colors.text}`} />}
+                              <span className={`font-semibold text-sm ${colors.text}`}>
                                 {totalizador.label}
                               </span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-center">
+                          <TableCell className="text-center py-2">
                             <div className="flex flex-col items-center">
-                              <span className="text-3xl font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+                              <span className="text-2xl font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
                                 {totalizador.total}
                               </span>
-                              <span className="text-xs text-muted-foreground">registros</span>
+                              <span className="text-[10px] text-muted-foreground">registros</span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-center">
-                            <Badge variant="outline" className={`${statusColor} font-medium`}>
+                          <TableCell className="text-center py-2">
+                            <Badge variant="outline" className={`${statusColor} font-medium text-xs h-5`}>
                               {totalizador.status}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-right py-2">
                             <Button 
                               variant="ghost" 
                               size="sm"
-                              className="hover:bg-primary/10"
+                              className="hover:bg-primary/10 h-7 w-7 p-0"
                             >
-                              <ChevronRight className="h-4 w-4" />
+                              <ChevronRight className="h-3.5 w-3.5" />
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -273,9 +264,9 @@ export default function DesktopTurboPage() {
               )}
 
               {data?.totalizadores && data.totalizadores.length === 0 && (
-                <div className="py-16 text-center text-muted-foreground">
-                  <Search className="mx-auto h-12 w-12 opacity-20 mb-4" />
-                  <p>Nenhuma entidade encontrada</p>
+                <div className="py-12 text-center text-muted-foreground">
+                  <Search className="mx-auto h-10 w-10 opacity-20 mb-3" />
+                  <p className="text-sm">Nenhuma entidade encontrada</p>
                 </div>
               )}
             </CardContent>
@@ -283,12 +274,12 @@ export default function DesktopTurboPage() {
         </div>
       </div>
 
-      {/* Footer - Ações Rápidas */}
+      {/* Footer - Ações Rápidas - Compacto */}
       <div className="flex-shrink-0 border-t border-border bg-card/80 backdrop-blur-sm">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-6 py-2.5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Activity className="h-4 w-4" />
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Activity className="h-3.5 w-3.5" />
               <span>Clique em uma linha para ver detalhes</span>
             </div>
             <div className="flex items-center gap-2">
@@ -296,27 +287,27 @@ export default function DesktopTurboPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuickAction('importar')}
-                className="gap-2"
+                className="gap-1.5 h-8 text-xs"
               >
-                <Upload className="h-4 w-4" />
+                <Upload className="h-3.5 w-3.5" />
                 Importar Dados
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuickAction('enriquecer')}
-                className="gap-2"
+                className="gap-1.5 h-8 text-xs"
               >
-                <Sparkles className="h-4 w-4" />
+                <Sparkles className="h-3.5 w-3.5" />
                 Enriquecer com IA
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuickAction('exportar')}
-                className="gap-2"
+                className="gap-1.5 h-8 text-xs"
               >
-                <FileText className="h-4 w-4" />
+                <FileText className="h-3.5 w-3.5" />
                 Exportar Relatório
               </Button>
             </div>
