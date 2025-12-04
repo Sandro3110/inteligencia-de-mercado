@@ -37,7 +37,7 @@ import {
   Upload,
   Sparkles,
 } from 'lucide-react';
-import { trpc } from '@/lib/trpc';
+import { useDashboard } from '@/hooks/useDashboard';
 import { BrowseInline, BrowseColumn, BrowseFilter } from '@/components/BrowseInline';
 import { useToast } from '@/hooks/use-toast';
 import { exportToExcel, exportToCSV, copyToClipboard, generateShareMessage, shareToWhatsApp, shareToTelegram, ExportData } from '@/components/ExportUtils';
@@ -97,10 +97,13 @@ export default function DesktopTurboPage() {
   const [activeBrowse, setActiveBrowse] = useState<string | null>(null);
   
   // Queries
-  const { data: dashboardData, isLoading: loadingDashboard } = trpc.dashboard.getDashboardData.useQuery();
-  const { data: projetos } = trpc.projetos.listAtivos.useQuery();
-  const { data: pesquisas } = trpc.pesquisas.listEmProgresso.useQuery();
-  const { data: statusQualificacao } = trpc.statusQualificacao.list.useQuery();
+  // Usar REST API ao invés de tRPC
+  const { data: dashboardData, isLoading: loadingDashboard, error: dashboardError } = useDashboard();
+  
+  // TODO: Migrar estas queries para REST API também
+  // const { data: projetos } = trpc.projetos.listAtivos.useQuery();
+  // const { data: pesquisas } = trpc.pesquisas.listEmProgresso.useQuery();
+  // const { data: statusQualificacao } = trpc.statusQualificacao.list.useQuery();
 
   // KPIs
   const kpis = dashboardData?.kpis || {
