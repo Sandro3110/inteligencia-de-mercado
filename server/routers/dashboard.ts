@@ -12,14 +12,15 @@ export const dashboardRouter = router({
   getDashboardData: publicProcedure
     .query(async () => {
       // Query única para buscar todos os KPIs
+      // Query SQL direta com filtro de deleted_at onde aplicável
       const query = sql`
         SELECT 
-          (SELECT COUNT(*) FROM dim_projeto) as total_projetos,
-          (SELECT COUNT(*) FROM dim_pesquisa) as total_pesquisas,
-          (SELECT COUNT(*) FROM dim_entidade) as total_entidades,
-          (SELECT COUNT(*) FROM dim_entidade WHERE tipo_entidade = 'cliente') as total_clientes,
-          (SELECT COUNT(*) FROM dim_entidade WHERE tipo_entidade = 'lead') as total_leads,
-          (SELECT COUNT(*) FROM dim_entidade WHERE tipo_entidade = 'concorrente') as total_concorrentes,
+          (SELECT COUNT(*) FROM dim_projeto WHERE deleted_at IS NULL) as total_projetos,
+          (SELECT COUNT(*) FROM dim_pesquisa WHERE deleted_at IS NULL) as total_pesquisas,
+          (SELECT COUNT(*) FROM dim_entidade WHERE deleted_at IS NULL) as total_entidades,
+          (SELECT COUNT(*) FROM dim_entidade WHERE tipo_entidade = 'cliente' AND deleted_at IS NULL) as total_clientes,
+          (SELECT COUNT(*) FROM dim_entidade WHERE tipo_entidade = 'lead' AND deleted_at IS NULL) as total_leads,
+          (SELECT COUNT(*) FROM dim_entidade WHERE tipo_entidade = 'concorrente' AND deleted_at IS NULL) as total_concorrentes,
           (SELECT COUNT(*) FROM dim_produto) as total_produtos,
           (SELECT COUNT(*) FROM dim_mercado) as total_mercados
       `;
