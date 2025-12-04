@@ -1,5 +1,9 @@
-import { initTRPC } from '@trpc/server';
-import { Context } from '../context';
+import { router, publicProcedure } from '../trpc';
+
+// Re-export para retrocompatibilidade
+export { router, publicProcedure };
+
+// Imports de routers
 import { projetosRouter } from './projetos';
 import { pesquisasRouter } from './pesquisas';
 import { entidadesRouter } from './entidades';
@@ -12,11 +16,6 @@ import { entidadeRouter } from './entidade';
 import { statusQualificacaoRouter } from './statusQualificacao';
 import { produtoRouter } from './produto';
 import { dashboardRouter } from './dashboard';
-
-const t = initTRPC.context<Context>().create();
-
-export const router = t.router;
-export const publicProcedure = t.procedure;
 
 export const appRouter = router({
   health: publicProcedure.query(() => {

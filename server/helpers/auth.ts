@@ -12,7 +12,23 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Cliente Supabase lazy (só cria se variáveis estiverem configuradas)
+let supabaseClient: ReturnType<typeof createClient> | null = null;
+
+function getSupabaseClient() {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    return null;
+  }
+  
+  if (!supabaseClient) {
+    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+  
+  return supabaseClient;
+}
+
+// Export para retrocompatibilidade (pode ser null em desenvolvimento)
+export const supabase = getSupabaseClient();
 
 // ============================================================================
 // TIPOS
@@ -34,6 +50,11 @@ export interface Usuario {
  */
 export async function obterUsuarioDoToken(token: string): Promise<Usuario | null> {
   try {
+    // Se Supabase não estiver configurado, retorna null (modo desenvolvimento)
+    if (!supabase) {
+      return null;
+    }
+    
     const { data, error } = await supabase.auth.getUser(token);
     
     if (error || !data.user) {

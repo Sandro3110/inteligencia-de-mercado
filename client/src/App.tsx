@@ -43,8 +43,6 @@ const DesktopTurboPage = lazy(() => import('./pages/DesktopTurboPage'));
 const PrivacidadePage = lazy(() => import('./pages/PrivacidadePage'));
 const TermosPage = lazy(() => import('./pages/TermosPage'));
 const DocumentacaoPage = lazy(() => import('./pages/DocumentacaoPage'));
-const MercadosPage = lazy(() => import('./pages/MercadosPage'));
-const ProdutosPage = lazy(() => import('./pages/ProdutosPage'));
 
 function App() {
   const [location] = useLocation();

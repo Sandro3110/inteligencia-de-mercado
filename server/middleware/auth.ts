@@ -4,7 +4,7 @@
  */
 
 import { TRPCError } from '@trpc/server';
-import { publicProcedure } from '../routers/index';
+import { publicProcedure } from '../trpc';
 import { Permission, Role } from '@shared/types/permissions';
 import { hasPermission, hasAnyPermission } from '../helpers/permissions';
 import { db } from '../db';

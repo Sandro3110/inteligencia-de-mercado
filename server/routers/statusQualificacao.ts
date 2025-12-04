@@ -1,19 +1,21 @@
-import { router, publicProcedure } from '../trpc';
-import { getSupabaseClient } from '../helpers/supabase';
+import { router, publicProcedure } from './index';
+import { db } from '../db';
+import { dimStatusQualificacao } from '../../drizzle/schema';
+import { asc } from 'drizzle-orm';
 
+/**
+ * Status Qualificação Router - Gerenciamento de status de qualificação de entidades
+ */
 export const statusQualificacaoRouter = router({
+  /**
+   * Listar todos os status de qualificação ordenados por ordem
+   */
   list: publicProcedure.query(async () => {
-    const supabase = getSupabaseClient();
-    
-    const { data, error } = await supabase
-      .from('dim_status_qualificacao')
-      .select('*')
-      .order('ordem', { ascending: true });
+    const statusList = await db
+      .select()
+      .from(dimStatusQualificacao)
+      .orderBy(asc(dimStatusQualificacao.ordem));
 
-    if (error) {
-      throw new Error(`Erro ao buscar status de qualificação: ${error.message}`);
-    }
-
-    return data || [];
+    return statusList;
   }),
 });

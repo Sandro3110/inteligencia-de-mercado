@@ -230,6 +230,11 @@ export async function getEntidades(
 
   // TODO: Adicionar filtros por projeto e pesquisa quando houver relacionamento
 
+  // Filtrar registros deletados (soft delete)
+  if (!incluirDeletados) {
+    conditions.push(isNull(dimEntidade.deletedAt));
+  }
+
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
   // Contar total
