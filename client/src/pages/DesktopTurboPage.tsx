@@ -4,6 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Table,
   TableBody,
   TableCell,
@@ -28,9 +35,13 @@ import {
   TrendingUp,
   Activity,
   Shield,
-  Mail
+  Mail,
+  Filter,
+  X
 } from 'lucide-react';
 import { useTotalizadores, Totalizador } from '@/hooks/useTotalizadores';
+import { useProjetos } from '@/hooks/useProjetos';
+import { usePesquisas } from '@/hooks/usePesquisas';
 import { useToast } from '@/hooks/use-toast';
 
 // Mapeamento de ícones do lucide-react
@@ -127,10 +138,15 @@ const quickActions = [
 export default function DesktopTurboPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const [selectedTipo, setSelectedTipo] = useState<string | null>(null);
+  
+  // Estados dos filtros
+  const [projetoId, setProjetoId] = useState<number | null>(null);
+  const [pesquisaId, setPesquisaId] = useState<number | null>(null);
 
-  // Buscar totalizadores
-  const { data, isLoading, error } = useTotalizadores();
+  // Buscar dados
+  const { data: totalizadoresData, isLoading, error } = useTotalizadores({ projetoId, pesquisaId });
+  const { data: projetosData } = useProjetos();
+  const { data: pesquisasData } = usePesquisas({ projetoId });
 
   const handleRowClick = (totalizador: Totalizador) => {
     toast({
@@ -162,6 +178,28 @@ export default function DesktopTurboPage() {
     });
     navigate(action.route);
   };
+
+  const handleLimparFiltros = () => {
+    setProjetoId(null);
+    setPesquisaId(null);
+    toast({
+      title: 'Filtros limpos',
+      description: 'Exibindo todos os dados',
+    });
+  };
+
+  const handleProjetoChange = (value: string) => {
+    const id = value === 'todos' ? null : parseInt(value);
+    setProjetoId(id);
+    setPesquisaId(null); // Limpar pesquisa ao trocar projeto
+  };
+
+  const handlePesquisaChange = (value: string) => {
+    const id = value === 'todos' ? null : parseInt(value);
+    setPesquisaId(id);
+  };
+
+  const filtrosAtivos = projetoId !== null || pesquisaId !== null;
 
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -200,12 +238,88 @@ export default function DesktopTurboPage() {
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <div className="container mx-auto px-6 py-3">
+          {/* Filtros */}
+          <Card className="border-border/50 shadow-sm mb-3">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-3">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-semibold">Filtros:</span>
+                
+                {/* Select Projeto */}
+                <Select 
+                  value={projetoId?.toString() || 'todos'} 
+                  onValueChange={handleProjetoChange}
+                >
+                  <SelectTrigger className="w-[200px] h-8 text-xs">
+                    <SelectValue placeholder="Selecione projeto..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos os projetos</SelectItem>
+                    {projetosData?.projetos.map((projeto) => (
+                      <SelectItem key={projeto.id} value={projeto.id.toString()}>
+                        {projeto.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {/* Select Pesquisa */}
+                <Select 
+                  value={pesquisaId?.toString() || 'todos'} 
+                  onValueChange={handlePesquisaChange}
+                  disabled={!projetoId}
+                >
+                  <SelectTrigger className="w-[200px] h-8 text-xs">
+                    <SelectValue placeholder="Selecione pesquisa..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todas as pesquisas</SelectItem>
+                    {pesquisasData?.pesquisas
+                      .filter(p => !projetoId || p.projeto_id === projetoId)
+                      .map((pesquisa) => (
+                        <SelectItem key={pesquisa.id} value={pesquisa.id.toString()}>
+                          {pesquisa.nome}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+
+                {/* Botão Limpar */}
+                {filtrosAtivos && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleLimparFiltros}
+                    className="h-8 gap-1 text-xs"
+                  >
+                    <X className="h-3 w-3" />
+                    Limpar
+                  </Button>
+                )}
+
+                {/* Badge de filtros ativos */}
+                {filtrosAtivos && (
+                  <Badge variant="secondary" className="text-xs h-6">
+                    {projetoId && totalizadoresData?.filtros.projeto_nome}
+                    {projetoId && pesquisaId && ' → '}
+                    {pesquisaId && totalizadoresData?.filtros.pesquisa_nome}
+                  </Badge>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Totalizador */}
           <Card className="border-border/50 shadow-lg mb-3">
             <CardHeader className="border-b border-border/50 bg-gradient-to-r from-primary/5 to-transparent py-2">
               <CardTitle className="flex items-center gap-2 text-base">
                 <Sparkles className="h-4 w-4 text-primary" />
                 Totalizador de Entidades
+                {filtrosAtivos && (
+                  <span className="text-xs text-muted-foreground font-normal">
+                    (Filtrado / Total Geral)
+                  </span>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
@@ -225,18 +339,18 @@ export default function DesktopTurboPage() {
                 </div>
               )}
 
-              {data?.totalizadores && (
+              {totalizadoresData?.totalizadores && (
                 <Table>
                   <TableHeader>
                     <TableRow className="hover:bg-transparent border-border/50">
-                      <TableHead className="w-[45%] font-semibold text-xs h-7">Tipo de Entidade</TableHead>
+                      <TableHead className="w-[40%] font-semibold text-xs h-7">Tipo de Entidade</TableHead>
                       <TableHead className="text-center font-semibold text-xs h-7">Total</TableHead>
                       <TableHead className="text-center font-semibold text-xs h-7">Status</TableHead>
                       <TableHead className="text-right font-semibold text-xs h-7">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data.totalizadores.map((totalizador) => {
+                    {totalizadoresData.totalizadores.map((totalizador) => {
                       const colors = colorClasses[totalizador.color as keyof typeof colorClasses];
                       const statusColor = statusBadgeColors[totalizador.statusColor as keyof typeof statusBadgeColors];
                       const Icon = iconMap[totalizador.tipo as keyof typeof iconMap];
@@ -257,10 +371,23 @@ export default function DesktopTurboPage() {
                           </TableCell>
                           <TableCell className="text-center py-1.5">
                             <div className="flex flex-col items-center">
-                              <span className="text-xl font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
-                                {totalizador.total}
-                              </span>
-                              <span className="text-[9px] text-muted-foreground">registros</span>
+                              {filtrosAtivos ? (
+                                <>
+                                  <span className="text-lg font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+                                    {totalizador.total_filtrado} / {totalizador.total_geral}
+                                  </span>
+                                  <span className="text-[9px] text-muted-foreground">
+                                    ({totalizador.percentual}%)
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-xl font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+                                    {totalizador.total_geral}
+                                  </span>
+                                  <span className="text-[9px] text-muted-foreground">registros</span>
+                                </>
+                              )}
                             </div>
                           </TableCell>
                           <TableCell className="text-center py-1.5">
@@ -284,7 +411,7 @@ export default function DesktopTurboPage() {
                 </Table>
               )}
 
-              {data?.totalizadores && data.totalizadores.length === 0 && (
+              {totalizadoresData?.totalizadores && totalizadoresData.totalizadores.length === 0 && (
                 <div className="py-8 text-center text-muted-foreground">
                   <Search className="mx-auto h-8 w-8 opacity-20 mb-2" />
                   <p className="text-xs">Nenhuma entidade encontrada</p>
