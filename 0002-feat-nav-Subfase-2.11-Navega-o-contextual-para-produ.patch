@@ -1,0 +1,29 @@
+From ced48a84d6ed1e1c265547692491ff366c2c27e7 Mon Sep 17 00:00:00 2001
+From: Manus Sandbox <sandbox@manus.ai>
+Date: Thu, 4 Dec 2025 18:41:59 -0500
+Subject: [PATCH 2/2] =?UTF-8?q?feat(nav):=20Subfase=202.11=20-=20Navega?=
+ =?UTF-8?q?=C3=A7=C3=A3o=20contextual=20para=20produtos?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ client/src/pages/DesktopTurboPage.tsx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client/src/pages/DesktopTurboPage.tsx b/client/src/pages/DesktopTurboPage.tsx
+index c37f7d0..19395da 100644
+--- a/client/src/pages/DesktopTurboPage.tsx
++++ b/client/src/pages/DesktopTurboPage.tsx
+@@ -162,7 +162,7 @@ export default function DesktopTurboPage() {
+       clientes: '/entidades/list',
+       leads: '/entidades/list',
+       concorrentes: '/entidades/list',
+-      produtos: '/produtos',
++      produtos: '/produtos/list',
+       mercados: '/mercados',
+       projetos: '/projetos',
+       pesquisas: '/pesquisas',
+-- 
+2.34.1
+

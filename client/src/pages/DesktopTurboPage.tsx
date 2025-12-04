@@ -162,7 +162,7 @@ export default function DesktopTurboPage() {
       clientes: '/entidades/list',
       leads: '/entidades/list',
       concorrentes: '/entidades/list',
-      produtos: '/produtos',
+      produtos: '/produtos/list',
       mercados: '/mercados',
       projetos: '/projetos',
       pesquisas: '/pesquisas',
