@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+const { sql } = require('@vercel/postgres');
 
 /**
  * REST API Endpoint para Dashboard
@@ -6,7 +6,7 @@ import { sql } from '@vercel/postgres';
  * 
  * Retorna KPIs e estatísticas do dashboard
  */
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Permitir apenas GET
   if (req.method !== 'GET') {
     return res.status(405).json({ 
@@ -57,4 +57,4 @@ export default async function handler(req, res) {
       timestamp: new Date().toISOString()
     });
   }
-}
+};
