@@ -159,9 +159,9 @@ export default function DesktopTurboPage() {
     
     // Rotas base
     const routesBase: Record<string, string> = {
-      clientes: '/entidades',
-      leads: '/entidades',
-      concorrentes: '/entidades',
+      clientes: '/entidades/list',
+      leads: '/entidades/list',
+      concorrentes: '/entidades/list',
       produtos: '/produtos',
       mercados: '/mercados',
       projetos: '/projetos',

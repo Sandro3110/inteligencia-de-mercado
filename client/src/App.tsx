@@ -38,6 +38,7 @@ const AnaliseGeografica = lazy(() => import('./pages/AnaliseGeografica'));
 const AnaliseMercado = lazy(() => import('./pages/AnaliseMercado'));
 const DetalhesEntidade = lazy(() => import('./pages/DetalhesEntidade'));
 const DesktopTurboPage = lazy(() => import('./pages/DesktopTurboPage'));
+const EntidadesListPage = lazy(() => import('./pages/EntidadesListPage'));
 
 // Páginas Legais - Lazy loading
 const PrivacidadePage = lazy(() => import('./pages/PrivacidadePage'));
@@ -104,6 +105,9 @@ function App() {
             </Route>
             <Route path="/entidades">
               <PrivateRoute><EntidadesPage /></PrivateRoute>
+            </Route>
+            <Route path="/entidades/list">
+              <PrivateRoute><EntidadesListPage /></PrivateRoute>
             </Route>
             <Route path="/produtos">
               <PrivateRoute><ProdutosPage /></PrivateRoute>
