@@ -26,7 +26,9 @@ import {
   Sparkles,
   FileText,
   TrendingUp,
-  Activity
+  Activity,
+  Shield,
+  Mail
 } from 'lucide-react';
 import { useTotalizadores, Totalizador } from '@/hooks/useTotalizadores';
 import { useToast } from '@/hooks/use-toast';
@@ -292,7 +294,7 @@ export default function DesktopTurboPage() {
           </Card>
 
           {/* Ações Rápidas - Cards */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 mb-3">
             {quickActions.map((action) => {
               const Icon = action.icon;
               return (
@@ -331,12 +333,29 @@ export default function DesktopTurboPage() {
         </div>
       </div>
 
-      {/* Footer - Minimalista */}
+      {/* Footer - LGPD e Contato */}
       <div className="flex-shrink-0 border-t border-border bg-card/80 backdrop-blur-sm">
-        <div className="container mx-auto px-6 py-1.5">
-          <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
-            <Activity className="h-3 w-3" />
-            <span>Clique em uma linha para ver detalhes</span>
+        <div className="container mx-auto px-6 py-2">
+          <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1">
+                <Shield className="h-3 w-3" />
+                <span>Conforme LGPD (Lei 13.709/2018)</span>
+              </div>
+              <a href="/privacidade" className="hover:text-primary transition-colors">
+                Política de Privacidade
+              </a>
+              <a href="/termos" className="hover:text-primary transition-colors">
+                Termos de Uso
+              </a>
+            </div>
+            <div className="flex items-center gap-1">
+              <Mail className="h-3 w-3" />
+              <span>DPO: </span>
+              <a href="mailto:dpo@intelmarket.app" className="hover:text-primary transition-colors">
+                dpo@intelmarket.app
+              </a>
+            </div>
           </div>
         </div>
       </div>
