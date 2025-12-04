@@ -767,44 +767,48 @@ export default async function handler(req, res) {
     // DASHBOARD (agregações)
     else if (router === 'dashboard') {
       if (procedure === 'getDashboardData') {
-        // Contar projetos ativos
+        // Contar projetos (todos não deletados)
         const [{ count: totalProjetos }] = await client`
           SELECT COUNT(*)::int as count FROM dim_projeto 
-          WHERE status = 'ativo' AND deleted_at IS NULL
+          WHERE deleted_at IS NULL
         `;
 
-        // Contar pesquisas em progresso
+        // Contar pesquisas (todas não deletadas)
         const [{ count: totalPesquisas }] = await client`
           SELECT COUNT(*)::int as count FROM dim_pesquisa 
-          WHERE status = 'em_progresso' AND deleted_at IS NULL
+          WHERE deleted_at IS NULL
         `;
 
-        // Contar entidades
+        // Contar entidades (todas não deletadas)
         const [{ count: totalEntidades }] = await client`
           SELECT COUNT(*)::int as count FROM dim_entidade
+          WHERE deleted_at IS NULL
         `;
 
-        // Contar clientes
+        // Contar clientes (todos não deletados)
         const [{ count: totalClientes }] = await client`
-          SELECT COUNT(*)::int as count FROM dim_entidade WHERE tipo_entidade = 'cliente'
+          SELECT COUNT(*)::int as count FROM dim_entidade 
+          WHERE tipo_entidade = 'cliente' AND deleted_at IS NULL
         `;
 
-        // Contar leads
+        // Contar leads (todos não deletados)
         const [{ count: totalLeads }] = await client`
-          SELECT COUNT(*)::int as count FROM dim_entidade WHERE tipo_entidade = 'lead'
+          SELECT COUNT(*)::int as count FROM dim_entidade 
+          WHERE tipo_entidade = 'lead' AND deleted_at IS NULL
         `;
 
-        // Contar concorrentes
+        // Contar concorrentes (todos não deletados)
         const [{ count: totalConcorrentes }] = await client`
-          SELECT COUNT(*)::int as count FROM dim_entidade WHERE tipo_entidade = 'concorrente'
+          SELECT COUNT(*)::int as count FROM dim_entidade 
+          WHERE tipo_entidade = 'concorrente' AND deleted_at IS NULL
         `;
 
-        // Contar produtos
+        // Contar produtos (tabela sem deleted_at)
         const [{ count: totalProdutos }] = await client`
           SELECT COUNT(*)::int as count FROM dim_produto
         `;
 
-        // Contar mercados
+        // Contar mercados (tabela sem deleted_at)
         const [{ count: totalMercados }] = await client`
           SELECT COUNT(*)::int as count FROM dim_mercado
         `;
