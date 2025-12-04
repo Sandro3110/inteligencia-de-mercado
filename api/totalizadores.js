@@ -1,4 +1,4 @@
-const { sql } = require('@vercel/postgres');
+const { createClient } = require('@supabase/supabase-js');
 
 /**
  * REST API Endpoint para Totalizadores
@@ -15,26 +15,37 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    // Query única para buscar todos os totais
-    const { rows } = await sql`
-      SELECT 
-        (SELECT COUNT(*)::int FROM dim_entidade WHERE tipo_entidade = 'cliente' AND deleted_at IS NULL) as total_clientes,
-        (SELECT COUNT(*)::int FROM dim_entidade WHERE tipo_entidade = 'lead' AND deleted_at IS NULL) as total_leads,
-        (SELECT COUNT(*)::int FROM dim_entidade WHERE tipo_entidade = 'concorrente' AND deleted_at IS NULL) as total_concorrentes,
-        (SELECT COUNT(*)::int FROM dim_produto WHERE deleted_at IS NULL) as total_produtos,
-        (SELECT COUNT(*)::int FROM dim_mercado WHERE deleted_at IS NULL) as total_mercados,
-        (SELECT COUNT(*)::int FROM dim_projeto WHERE deleted_at IS NULL) as total_projetos,
-        (SELECT COUNT(*)::int FROM dim_pesquisa WHERE deleted_at IS NULL) as total_pesquisas
-    `;
+    // Criar cliente Supabase
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ecnzlynmuerbmqingyfl.supabase.co';
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjbnpseW5tdWVyYm1xaW5neWZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4NTU2NDUsImV4cCI6MjA3OTQzMTY0NX0.gYeMFlU7ls361wR72vza-nDBikcwy-SB_W9BIOpjRRY';
+    
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const totais = rows[0];
+    // Buscar totais de cada entidade
+    const [
+      { count: totalClientes },
+      { count: totalLeads },
+      { count: totalConcorrentes },
+      { count: totalProdutos },
+      { count: totalMercados },
+      { count: totalProjetos },
+      { count: totalPesquisas }
+    ] = await Promise.all([
+      supabase.from('dim_entidade').select('*', { count: 'exact', head: true }).eq('tipo_entidade', 'cliente').is('deleted_at', null),
+      supabase.from('dim_entidade').select('*', { count: 'exact', head: true }).eq('tipo_entidade', 'lead').is('deleted_at', null),
+      supabase.from('dim_entidade').select('*', { count: 'exact', head: true }).eq('tipo_entidade', 'concorrente').is('deleted_at', null),
+      supabase.from('dim_produto').select('*', { count: 'exact', head: true }).is('deleted_at', null),
+      supabase.from('dim_mercado').select('*', { count: 'exact', head: true }).is('deleted_at', null),
+      supabase.from('dim_projeto').select('*', { count: 'exact', head: true }).is('deleted_at', null),
+      supabase.from('dim_pesquisa').select('*', { count: 'exact', head: true }).is('deleted_at', null)
+    ]);
 
     // Montar array de totalizadores com metadados
     const totalizadores = [
       {
         tipo: 'clientes',
         label: 'Clientes',
-        total: totais.total_clientes || 0,
+        total: totalClientes || 0,
         icon: '👥',
         color: 'green',
         status: 'Ativo',
@@ -44,7 +55,7 @@ module.exports = async function handler(req, res) {
       {
         tipo: 'leads',
         label: 'Leads',
-        total: totais.total_leads || 0,
+        total: totalLeads || 0,
         icon: '➕',
         color: 'yellow',
         status: 'Em prospecção',
@@ -54,7 +65,7 @@ module.exports = async function handler(req, res) {
       {
         tipo: 'concorrentes',
         label: 'Concorrentes',
-        total: totais.total_concorrentes || 0,
+        total: totalConcorrentes || 0,
         icon: '🏢',
         color: 'red',
         status: 'Monitoramento',
@@ -64,7 +75,7 @@ module.exports = async function handler(req, res) {
       {
         tipo: 'produtos',
         label: 'Produtos',
-        total: totais.total_produtos || 0,
+        total: totalProdutos || 0,
         icon: '📦',
         color: 'blue',
         status: 'Ativo',
@@ -74,7 +85,7 @@ module.exports = async function handler(req, res) {
       {
         tipo: 'mercados',
         label: 'Mercados',
-        total: totais.total_mercados || 0,
+        total: totalMercados || 0,
         icon: '🎯',
         color: 'purple',
         status: 'Ativo',
@@ -84,7 +95,7 @@ module.exports = async function handler(req, res) {
       {
         tipo: 'projetos',
         label: 'Projetos',
-        total: totais.total_projetos || 0,
+        total: totalProjetos || 0,
         icon: '📁',
         color: 'indigo',
         status: 'Em andamento',
@@ -94,7 +105,7 @@ module.exports = async function handler(req, res) {
       {
         tipo: 'pesquisas',
         label: 'Pesquisas',
-        total: totais.total_pesquisas || 0,
+        total: totalPesquisas || 0,
         icon: '🔍',
         color: 'pink',
         status: 'Processando',
