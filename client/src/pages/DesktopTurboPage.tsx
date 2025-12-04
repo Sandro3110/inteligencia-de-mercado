@@ -260,11 +260,12 @@ export default function DesktopTurboPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os projetos</SelectItem>
-                {projetos?.map((projeto) => (
+                {/* TODO: Migrar API de projetos para REST */}
+                {/* {projetos?.map((projeto) => (
                   <SelectItem key={projeto.id} value={projeto.id.toString()}>
                     {projeto.nome}
                   </SelectItem>
-                ))}
+                ))} */}
               </SelectContent>
             </Select>
           </div>
@@ -277,11 +278,12 @@ export default function DesktopTurboPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas as pesquisas</SelectItem>
-                {pesquisas?.map((pesquisa) => (
+                {/* TODO: Migrar API de pesquisas para REST */}
+                {/* {pesquisas?.map((pesquisa) => (
                   <SelectItem key={pesquisa.id} value={pesquisa.id.toString()}>
                     {pesquisa.nome}
                   </SelectItem>
-                ))}
+                ))} */}
               </SelectContent>
             </Select>
           </div>
