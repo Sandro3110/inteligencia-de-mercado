@@ -68,10 +68,10 @@ export default function EntidadesListPage() {
   const [cidade, setCidade] = useState<string>('');
   const [uf, setUf] = useState<string>('');
   const [setor, setSetor] = useState<string>('');
-  const [porte, setPorte] = useState<string>('');
+  const [porte, setPorte] = useState<string>('todos');
   const [scoreMin, setScoreMin] = useState<number | undefined>();
   const [scoreMax, setScoreMax] = useState<number | undefined>();
-  const [enriquecido, setEnriquecido] = useState<'true' | 'false' | ''>('');
+  const [enriquecido, setEnriquecido] = useState<'true' | 'false' | 'todos'>('todos');
 
   // Paginação
   const [offset, setOffset] = useState(0);
@@ -86,10 +86,10 @@ export default function EntidadesListPage() {
     cidade: cidade || undefined,
     uf: uf || undefined,
     setor: setor || undefined,
-    porte: porte || undefined,
+    porte: porte && porte !== 'todos' ? porte : undefined,
     score_min: scoreMin,
     score_max: scoreMax,
-    enriquecido: enriquecido || undefined,
+    enriquecido: enriquecido && enriquecido !== 'todos' ? enriquecido : undefined,
     limit,
     offset,
   };
@@ -259,7 +259,7 @@ export default function EntidadesListPage() {
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="todos">Todos</SelectItem>
                   <SelectItem value="Micro">Micro</SelectItem>
                   <SelectItem value="Pequeno">Pequeno</SelectItem>
                   <SelectItem value="Médio">Médio</SelectItem>
@@ -302,7 +302,7 @@ export default function EntidadesListPage() {
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="todos">Todos</SelectItem>
                   <SelectItem value="true">Sim</SelectItem>
                   <SelectItem value="false">Não</SelectItem>
                 </SelectContent>
