@@ -94,6 +94,34 @@ const statusBadgeColors = {
   red: 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20',
 };
 
+// Ações rápidas
+const quickActions = [
+  {
+    id: 'importar',
+    title: 'Importar Dados',
+    description: 'Importar CSV, Excel ou JSON',
+    icon: Upload,
+    color: 'blue',
+    route: '/importacao',
+  },
+  {
+    id: 'enriquecer',
+    title: 'Enriquecer com IA',
+    description: 'Análise inteligente de dados',
+    icon: Sparkles,
+    color: 'purple',
+    route: '/enriquecimento',
+  },
+  {
+    id: 'exportar',
+    title: 'Exportar Relatório',
+    description: 'PDF, Excel ou Dashboard',
+    icon: FileText,
+    color: 'green',
+    route: '/relatorios',
+  },
+];
+
 export default function DesktopTurboPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
@@ -125,22 +153,12 @@ export default function DesktopTurboPage() {
     }
   };
 
-  const handleQuickAction = (action: string) => {
-    const routes: Record<string, string> = {
-      importar: '/importacao',
-      enriquecer: '/enriquecimento',
-      exportar: '/relatorios',
-    };
-    
+  const handleQuickAction = (action: typeof quickActions[0]) => {
     toast({
-      title: 'Ação rápida',
-      description: `Abrindo ${action}...`,
+      title: action.title,
+      description: action.description,
     });
-    
-    const route = routes[action];
-    if (route) {
-      navigate(route);
-    }
+    navigate(action.route);
   };
 
   return (
@@ -180,16 +198,17 @@ export default function DesktopTurboPage() {
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <div className="container mx-auto px-6 py-3">
-          <Card className="border-border/50 shadow-lg">
-            <CardHeader className="border-b border-border/50 bg-gradient-to-r from-primary/5 to-transparent py-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
+          {/* Totalizador */}
+          <Card className="border-border/50 shadow-lg mb-3">
+            <CardHeader className="border-b border-border/50 bg-gradient-to-r from-primary/5 to-transparent py-2">
+              <CardTitle className="flex items-center gap-2 text-base">
                 <Sparkles className="h-4 w-4 text-primary" />
                 Totalizador de Entidades
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {isLoading && (
-                <div className="flex items-center justify-center py-12">
+                <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
                   <span className="ml-3 text-sm text-muted-foreground">
                     Carregando totalizadores...
@@ -198,8 +217,8 @@ export default function DesktopTurboPage() {
               )}
 
               {error && (
-                <div className="m-4 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-400">
-                  <p className="font-semibold">Erro ao carregar totalizadores</p>
+                <div className="m-3 rounded-lg border border-red-500/20 bg-red-500/10 p-2 text-sm text-red-700 dark:text-red-400">
+                  <p className="font-semibold text-xs">Erro ao carregar totalizadores</p>
                   <p className="text-xs">{(error as Error).message}</p>
                 </div>
               )}
@@ -208,10 +227,10 @@ export default function DesktopTurboPage() {
                 <Table>
                   <TableHeader>
                     <TableRow className="hover:bg-transparent border-border/50">
-                      <TableHead className="w-[45%] font-semibold text-xs h-8">Tipo de Entidade</TableHead>
-                      <TableHead className="text-center font-semibold text-xs h-8">Total</TableHead>
-                      <TableHead className="text-center font-semibold text-xs h-8">Status</TableHead>
-                      <TableHead className="text-right font-semibold text-xs h-8">Ações</TableHead>
+                      <TableHead className="w-[45%] font-semibold text-xs h-7">Tipo de Entidade</TableHead>
+                      <TableHead className="text-center font-semibold text-xs h-7">Total</TableHead>
+                      <TableHead className="text-center font-semibold text-xs h-7">Status</TableHead>
+                      <TableHead className="text-right font-semibold text-xs h-7">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -223,37 +242,37 @@ export default function DesktopTurboPage() {
                       return (
                         <TableRow
                           key={totalizador.tipo}
-                          className={`cursor-pointer transition-all duration-200 ${colors.hover} border-border/30 h-14`}
+                          className={`cursor-pointer transition-all duration-200 ${colors.hover} border-border/30 h-11`}
                           onClick={() => handleRowClick(totalizador)}
                         >
-                          <TableCell className="py-2">
-                            <div className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 ${colors.bg} ${colors.border} transition-all duration-200 hover:scale-[1.01] hover:shadow-md`}>
-                              {Icon && <Icon className={`h-4 w-4 ${colors.text}`} />}
-                              <span className={`font-semibold text-sm ${colors.text}`}>
+                          <TableCell className="py-1.5">
+                            <div className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 ${colors.bg} ${colors.border} transition-all duration-200 hover:scale-[1.01]`}>
+                              {Icon && <Icon className={`h-3.5 w-3.5 ${colors.text}`} />}
+                              <span className={`font-semibold text-xs ${colors.text}`}>
                                 {totalizador.label}
                               </span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-center py-2">
+                          <TableCell className="text-center py-1.5">
                             <div className="flex flex-col items-center">
-                              <span className="text-2xl font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+                              <span className="text-xl font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
                                 {totalizador.total}
                               </span>
-                              <span className="text-[10px] text-muted-foreground">registros</span>
+                              <span className="text-[9px] text-muted-foreground">registros</span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-center py-2">
-                            <Badge variant="outline" className={`${statusColor} font-medium text-xs h-5`}>
+                          <TableCell className="text-center py-1.5">
+                            <Badge variant="outline" className={`${statusColor} font-medium text-[10px] h-5 px-2`}>
                               {totalizador.status}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-right py-2">
+                          <TableCell className="text-right py-1.5">
                             <Button 
                               variant="ghost" 
                               size="sm"
-                              className="hover:bg-primary/10 h-7 w-7 p-0"
+                              className="hover:bg-primary/10 h-6 w-6 p-0"
                             >
-                              <ChevronRight className="h-3.5 w-3.5" />
+                              <ChevronRight className="h-3 w-3" />
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -264,53 +283,60 @@ export default function DesktopTurboPage() {
               )}
 
               {data?.totalizadores && data.totalizadores.length === 0 && (
-                <div className="py-12 text-center text-muted-foreground">
-                  <Search className="mx-auto h-10 w-10 opacity-20 mb-3" />
-                  <p className="text-sm">Nenhuma entidade encontrada</p>
+                <div className="py-8 text-center text-muted-foreground">
+                  <Search className="mx-auto h-8 w-8 opacity-20 mb-2" />
+                  <p className="text-xs">Nenhuma entidade encontrada</p>
                 </div>
               )}
             </CardContent>
           </Card>
+
+          {/* Ações Rápidas - Cards */}
+          <div className="grid grid-cols-3 gap-3">
+            {quickActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Card
+                  key={action.id}
+                  className={`cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg border-border/50 bg-gradient-to-br ${
+                    action.color === 'blue' ? 'from-blue-500/5 to-blue-500/10' :
+                    action.color === 'purple' ? 'from-purple-500/5 to-purple-500/10' :
+                    'from-green-500/5 to-green-500/10'
+                  }`}
+                  onClick={() => handleQuickAction(action)}
+                >
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-2">
+                    <div className={`rounded-lg p-2 ${
+                      action.color === 'blue' ? 'bg-blue-500/10' :
+                      action.color === 'purple' ? 'bg-purple-500/10' :
+                      'bg-green-500/10'
+                    }`}>
+                      <Icon className={`h-6 w-6 ${
+                        action.color === 'blue' ? 'text-blue-600 dark:text-blue-400' :
+                        action.color === 'purple' ? 'text-purple-600 dark:text-purple-400' :
+                        'text-green-600 dark:text-green-400'
+                      }`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-sm">{action.title}</h3>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        {action.description}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Footer - Ações Rápidas - Compacto */}
+      {/* Footer - Minimalista */}
       <div className="flex-shrink-0 border-t border-border bg-card/80 backdrop-blur-sm">
-        <div className="container mx-auto px-6 py-2.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Activity className="h-3.5 w-3.5" />
-              <span>Clique em uma linha para ver detalhes</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleQuickAction('importar')}
-                className="gap-1.5 h-8 text-xs"
-              >
-                <Upload className="h-3.5 w-3.5" />
-                Importar Dados
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleQuickAction('enriquecer')}
-                className="gap-1.5 h-8 text-xs"
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                Enriquecer com IA
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleQuickAction('exportar')}
-                className="gap-1.5 h-8 text-xs"
-              >
-                <FileText className="h-3.5 w-3.5" />
-                Exportar Relatório
-              </Button>
-            </div>
+        <div className="container mx-auto px-6 py-1.5">
+          <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
+            <Activity className="h-3 w-3" />
+            <span>Clique em uma linha para ver detalhes</span>
           </div>
         </div>
       </div>
