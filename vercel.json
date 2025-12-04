@@ -1,6 +1,5 @@
 {
   "buildCommand": "pnpm run build",
-  "outputDirectory": "dist/client",
   "installCommand": "pnpm install",
   "framework": null,
   "rewrites": [
@@ -48,5 +47,12 @@
         }
       ]
     }
-  ]
+  ],
+  "outputDirectory": "dist/client",
+  "functions": {
+    "api/**/*.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
 }
