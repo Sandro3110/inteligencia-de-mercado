@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'wouter';
+import { useLocation } from 'wouter';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -115,7 +115,8 @@ function KPICard({ title, value, icon, color, trend, onDoubleClick, onExport, on
 }
 
 export default function DesktopTurboPage() {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
+  const navigate = (path: string) => setLocation(path);
   const { toast } = useToast();
   
   // Filtros centrais
