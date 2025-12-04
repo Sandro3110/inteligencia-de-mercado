@@ -803,14 +803,16 @@ export default async function handler(req, res) {
           WHERE tipo_entidade = 'concorrente' AND deleted_at IS NULL
         `;
 
-        // Contar produtos (tabela sem deleted_at)
+        // Contar produtos (todos não deletados)
         const [{ count: totalProdutos }] = await client`
           SELECT COUNT(*)::int as count FROM dim_produto
+          WHERE deleted_at IS NULL
         `;
 
-        // Contar mercados (tabela sem deleted_at)
+        // Contar mercados (todos não deletados)
         const [{ count: totalMercados }] = await client`
           SELECT COUNT(*)::int as count FROM dim_mercado
+          WHERE deleted_at IS NULL
         `;
 
         data = {
