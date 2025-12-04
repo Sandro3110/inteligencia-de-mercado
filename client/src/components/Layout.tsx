@@ -49,18 +49,11 @@ const menuSections = [
     title: 'Visão Geral',
     items: [
       {
-        icon: Home,
-        label: 'Desktop',
-        path: '/',
-        color: 'text-blue-600',
-        tooltip: 'Visão geral de métricas e consulta de entidades cadastradas'
-      },
-      {
         icon: Zap,
-        label: 'Desktop Turbo',
+        label: 'Gestão de Conteúdo',
         path: '/desktop-turbo',
         color: 'text-purple-600',
-        tooltip: 'Dashboard avançado com KPIs, gráficos, filtros e exportação de dados'
+        tooltip: 'Visão consolidada de todas as entidades do sistema'
       }
     ]
   },

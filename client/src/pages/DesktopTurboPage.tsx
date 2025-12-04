@@ -220,7 +220,7 @@ export default function DesktopTurboPage() {
               <div>
                 <h1 className="text-xl font-bold flex items-center gap-2">
                   <Activity className="h-5 w-5 text-primary" />
-                  Desktop Turbo
+                  Gestão de Conteúdo
                 </h1>
                 <p className="text-xs text-muted-foreground">
                   Visão consolidada de todas as entidades do sistema
