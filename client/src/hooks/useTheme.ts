@@ -13,7 +13,8 @@ export function useTheme() {
       return 'dark';
     }
 
-    return 'light';
+    // Default to dark mode
+    return 'dark';
   });
 
   useEffect(() => {
