@@ -133,13 +133,7 @@ export default function EntidadesListPage() {
     });
   };
 
-  // Duplo click para abrir detalhes
-  const handleRowDoubleClick = (entidadeId: number) => {
-    toast({
-      title: 'Detalhes',
-      description: `Abrindo detalhes da entidade ${entidadeId}...`,
-    });
-  };
+
 
   // Contar filtros ativos
   const filtrosAtivos = [
