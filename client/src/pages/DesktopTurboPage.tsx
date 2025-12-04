@@ -241,16 +241,16 @@ export default function DesktopTurboPage() {
           {/* Filtros */}
           <Card className="border-border/50 shadow-sm mb-3">
             <CardContent className="p-3">
-              <div className="flex items-center gap-3">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-semibold">Filtros:</span>
+              <div className="flex items-center gap-4">
+                <Filter className="h-5 w-5 text-muted-foreground" />
+                <span className="text-base font-bold">Filtros:</span>
                 
                 {/* Select Projeto */}
                 <Select 
                   value={projetoId?.toString() || 'todos'} 
                   onValueChange={handleProjetoChange}
                 >
-                  <SelectTrigger className="w-[200px] h-8 text-xs">
+                  <SelectTrigger className="w-[240px] h-11 text-sm font-medium">
                     <SelectValue placeholder="Selecione projeto..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -269,7 +269,7 @@ export default function DesktopTurboPage() {
                   onValueChange={handlePesquisaChange}
                   disabled={!projetoId}
                 >
-                  <SelectTrigger className="w-[200px] h-8 text-xs">
+                  <SelectTrigger className="w-[240px] h-11 text-sm font-medium">
                     <SelectValue placeholder="Selecione pesquisa..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -290,16 +290,16 @@ export default function DesktopTurboPage() {
                     variant="ghost"
                     size="sm"
                     onClick={handleLimparFiltros}
-                    className="h-8 gap-1 text-xs"
+                    className="h-11 gap-2 text-sm font-medium"
                   >
-                    <X className="h-3 w-3" />
+                    <X className="h-4 w-4" />
                     Limpar
                   </Button>
                 )}
 
                 {/* Badge de filtros ativos */}
                 {filtrosAtivos && (
-                  <Badge variant="secondary" className="text-xs h-6">
+                  <Badge variant="secondary" className="text-sm h-9 px-4 font-medium">
                     {projetoId && totalizadoresData?.filtros.projeto_nome}
                     {projetoId && pesquisaId && ' → '}
                     {pesquisaId && totalizadoresData?.filtros.pesquisa_nome}
@@ -358,40 +358,40 @@ export default function DesktopTurboPage() {
                       return (
                         <TableRow
                           key={totalizador.tipo}
-                          className={`cursor-pointer transition-all duration-200 ${colors.hover} border-border/30 h-11`}
+                          className={`cursor-pointer transition-all duration-200 ${colors.hover} border-border/30 h-16`}
                           onClick={() => handleRowClick(totalizador)}
                         >
-                          <TableCell className="py-1.5">
-                            <div className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 ${colors.bg} ${colors.border} transition-all duration-200 hover:scale-[1.01]`}>
-                              {Icon && <Icon className={`h-3.5 w-3.5 ${colors.text}`} />}
-                              <span className={`font-semibold text-xs ${colors.text}`}>
+                          <TableCell className="py-2.5">
+                            <div className={`flex items-center gap-3 rounded-lg border px-4 py-2.5 ${colors.bg} ${colors.border} transition-all duration-200 hover:scale-[1.01]`}>
+                              {Icon && <Icon className={`h-5 w-5 ${colors.text}`} />}
+                              <span className={`font-bold text-base ${colors.text}`}>
                                 {totalizador.label}
                               </span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-center py-1.5">
-                            <div className="flex flex-col items-center">
+                          <TableCell className="text-center py-2.5">
+                            <div className="flex flex-col items-center gap-0.5">
                               {filtrosAtivos ? (
                                 <>
-                                  <span className="text-lg font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+                                  <span className="text-2xl font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
                                     {totalizador.total_filtrado} / {totalizador.total_geral}
                                   </span>
-                                  <span className="text-[9px] text-muted-foreground">
+                                  <span className="text-xs text-muted-foreground font-medium">
                                     ({totalizador.percentual}%)
                                   </span>
                                 </>
                               ) : (
                                 <>
-                                  <span className="text-xl font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+                                  <span className="text-2xl font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
                                     {totalizador.total_geral}
                                   </span>
-                                  <span className="text-[9px] text-muted-foreground">registros</span>
+                                  <span className="text-xs text-muted-foreground font-medium">registros</span>
                                 </>
                               )}
                             </div>
                           </TableCell>
-                          <TableCell className="text-center py-1.5">
-                            <Badge variant="outline" className={`${statusColor} font-medium text-[10px] h-5 px-2`}>
+                          <TableCell className="text-center py-2.5">
+                            <Badge variant="outline" className={`${statusColor} font-semibold text-xs h-6 px-3`}>
                               {totalizador.status}
                             </Badge>
                           </TableCell>
