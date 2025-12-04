@@ -154,21 +154,48 @@ export default function DesktopTurboPage() {
       description: `Abrindo lista de ${totalizador.label.toLowerCase()}...`,
     });
     
-    // Navega para a página correspondente
-    const routes: Record<string, string> = {
-      clientes: '/entidades?tipo=cliente',
-      leads: '/entidades?tipo=lead',
-      concorrentes: '/entidades?tipo=concorrente',
+    // Construir query params com filtros herdados
+    const params = new URLSearchParams();
+    
+    // Rotas base
+    const routesBase: Record<string, string> = {
+      clientes: '/entidades',
+      leads: '/entidades',
+      concorrentes: '/entidades',
       produtos: '/produtos',
       mercados: '/mercados',
       projetos: '/projetos',
       pesquisas: '/pesquisas',
     };
     
-    const route = routes[totalizador.tipo];
-    if (route) {
-      navigate(route);
+    // Tipos para entidades
+    const tipos: Record<string, string> = {
+      clientes: 'cliente',
+      leads: 'lead',
+      concorrentes: 'concorrente',
+    };
+    
+    const baseRoute = routesBase[totalizador.tipo];
+    if (!baseRoute) return;
+    
+    // Adicionar tipo se for entidade
+    if (tipos[totalizador.tipo]) {
+      params.set('tipo', tipos[totalizador.tipo]);
     }
+    
+    // Passar filtros herdados (projeto_id e pesquisa_id)
+    if (projetoId) {
+      params.set('projeto_id', projetoId.toString());
+    }
+    
+    if (pesquisaId) {
+      params.set('pesquisa_id', pesquisaId.toString());
+    }
+    
+    // Navegar com query params
+    const queryString = params.toString();
+    const fullRoute = queryString ? `${baseRoute}?${queryString}` : baseRoute;
+    navigate(fullRoute);
   };
 
   const handleQuickAction = (action: typeof quickActions[0]) => {
