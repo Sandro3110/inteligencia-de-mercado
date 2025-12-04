@@ -54,6 +54,13 @@ const menuSections = [
         path: '/',
         color: 'text-blue-600',
         tooltip: 'Visão geral de métricas e consulta de entidades cadastradas'
+      },
+      {
+        icon: Zap,
+        label: 'Desktop Turbo',
+        path: '/desktop-turbo',
+        color: 'text-purple-600',
+        tooltip: 'Dashboard avançado com KPIs, gráficos, filtros e exportação de dados'
       }
     ]
   },
