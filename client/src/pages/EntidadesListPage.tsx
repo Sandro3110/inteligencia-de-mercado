@@ -36,8 +36,9 @@ import {
   AlertCircle,
   Shield,
 } from 'lucide-react';
-import { useEntidades, type EntidadesFilters } from '@/hooks/useEntidades';
+import { useEntidades, type EntidadesFilters, type Entidade } from '@/hooks/useEntidades';
 import { useToast } from '@/hooks/use-toast';
+import EntidadeDetailsSheet from '@/components/EntidadeDetailsSheet';
 
 // Mapeamento de tipos para labels e ícones
 const tipoConfig = {
@@ -77,6 +78,10 @@ export default function EntidadesListPage() {
   const [offset, setOffset] = useState(0);
   const limit = 50;
 
+  // Sheet de detalhes
+  const [selectedEntidade, setSelectedEntidade] = useState<Entidade | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
   // Construir filtros para a query
   const filters: EntidadesFilters = {
     tipo: tipo || undefined,
@@ -96,6 +101,15 @@ export default function EntidadesListPage() {
 
   // Buscar dados
   const { data, isLoading, error } = useEntidades(filters);
+
+  // Handler para duplo click na linha
+  const handleRowDoubleClick = (id: number) => {
+    const entidade = data?.data.find((e) => e.id === id);
+    if (entidade) {
+      setSelectedEntidade(entidade);
+      setSheetOpen(true);
+    }
+  };
 
   // Título da página baseado no tipo
   const config = tipo ? tipoConfig[tipo as keyof typeof tipoConfig] : null;
@@ -528,6 +542,13 @@ export default function EntidadesListPage() {
           </div>
         </div>
       </div>
+
+      {/* Sheet de Detalhes */}
+      <EntidadeDetailsSheet
+        entidade={selectedEntidade}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+      />
     </div>
   );
 }
