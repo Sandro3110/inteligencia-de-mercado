@@ -84,16 +84,16 @@ export function EditEntidadeDialog({ entidade, open, onOpenChange, onSuccess }: 
     atualizarMutation.mutate({
       id: entidade.id,
       ...formData,
-      email: formData.email || null,
-      telefone: formData.telefone || null,
-      celular: formData.celular || null,
-      website: formData.website || null,
-      endereco: formData.endereco || null,
-      cidade: formData.cidade || null,
-      estado: formData.estado || null,
-      cep: formData.cep || null,
-      setor: formData.setor || null,
-      porte: formData.porte || null,
+      email: formData.email || undefined,
+      telefone: formData.telefone || undefined,
+      celular: formData.celular || undefined,
+      website: formData.website || undefined,
+      endereco: formData.endereco || undefined,
+      cidade: formData.cidade || undefined,
+      estado: formData.estado || undefined,
+      cep: formData.cep || undefined,
+      setor: formData.setor || undefined,
+      porte: formData.porte || undefined,
     });
   };
 
