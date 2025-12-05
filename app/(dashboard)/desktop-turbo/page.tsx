@@ -161,8 +161,15 @@ export default function DesktopTurboPage() {
     projetoId, 
     pesquisaId 
   });
-  const { data: projetosData } = trpc.projetos.list.useQuery();
-  const { data: pesquisasData } = trpc.pesquisas.list.useQuery({ projetoId });
+  const { data: projetosData } = trpc.projetos.list.useQuery({ 
+    page: 1, 
+    limit: 100 
+  });
+  const { data: pesquisasData } = trpc.pesquisas.list.useQuery({ 
+    page: 1, 
+    limit: 100,
+    projetoId: projetoId || undefined 
+  });
 
   const handleRowClick = (totalizador: Totalizador) => {
     toast({
