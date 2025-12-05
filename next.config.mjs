@@ -32,26 +32,8 @@ const nextConfig = {
   },
   
   // Configuração de webpack
-  webpack: (config, { isServer }) => {
+  webpack: (config) => {
     config.externals = [...(config.externals || []), { canvas: 'canvas' }];
-    
-    // Ignorar código antigo do Vite em client/
-    config.module.rules.push({
-      test: /\.tsx?$/,
-      exclude: /client\/src/,
-    });
-    
-    // Suprimir warnings de imports não resolvidos no código do servidor
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        crypto: false,
-      };
-    }
-    
     return config;
   },
   
@@ -60,6 +42,14 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '10mb',
     },
+  },
+  
+  // Desabilitar telemetria
+  telemetry: false,
+  
+  // Otimizações de build
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
 };
 

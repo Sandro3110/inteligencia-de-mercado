@@ -1,3 +1,4 @@
+import 'server-only';
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import { appRouter } from '../../../../server/routers/index';
 import { createFetchContext } from '../../../../server/context';

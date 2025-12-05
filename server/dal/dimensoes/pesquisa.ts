@@ -26,7 +26,7 @@ export interface CreatePesquisaInput {
   descricao?: string;
   objetivo?: string;
   status?: StatusPesquisa;
-  createdBy: number;
+  createdBy?: string;
 }
 
 export interface UpdatePesquisaInput {

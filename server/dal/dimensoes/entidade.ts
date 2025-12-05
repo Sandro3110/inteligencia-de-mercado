@@ -133,13 +133,10 @@ export async function createEntidade(input: CreateEntidadeInput) {
     throw new Error('Já existe uma entidade com os mesmos dados');
   }
 
-  // Remover createdBy e updatedBy do input (são integers no schema)
-  const { createdBy, updatedBy, ...inputSemUserIds } = input as any;
-  
   const [novaEntidade] = await db
     .insert(dimEntidade)
     .values({
-      ...inputSemUserIds,
+      ...input,
       entidadeHash,
       origemData: new Date(),
       createdAt: new Date(),
@@ -311,13 +308,10 @@ export async function updateEntidade(id: number, input: UpdateEntidadeInput) {
     input.cnpj = cnpjLimpo;
   }
 
-  // Remover updatedBy do input (é integer no schema)
-  const { updatedBy, ...inputSemUserId } = input as any;
-  
   const [entidadeAtualizada] = await db
     .update(dimEntidade)
     .set({
-      ...inputSemUserId,
+      ...input,
       updatedAt: new Date(),
     })
     .where(eq(dimEntidade.id, id))
@@ -330,12 +324,11 @@ export async function updateEntidade(id: number, input: UpdateEntidadeInput) {
  * Deletar entidade (soft delete)
  */
 export async function deleteEntidade(id: number, deletedBy?: string) {
-  // deletedBy é integer no schema, não string - ignorando por enquanto
   const [entidadeDeletada] = await db
     .update(dimEntidade)
     .set({
       deletedAt: new Date(),
-      // deletedBy, // TODO: converter userId string para integer
+      deletedBy,
       updatedAt: new Date(),
     })
     .where(eq(dimEntidade.id, id))

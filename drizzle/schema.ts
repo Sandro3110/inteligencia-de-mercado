@@ -61,9 +61,9 @@ export const dimCanal = pgTable('dim_canal', {
   taxaConversaoMedia: decimal('taxa_conversao_media', { precision: 5, scale: 2 }),
   ativo: boolean('ativo').default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  createdBy: integer('created_by'),
+  createdBy: varchar('created_by', { length: 255 }),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-  updatedBy: integer('updated_by'),
+  updatedBy: varchar('updated_by', { length: 255 }),
 });
 
 // ============================================================================
@@ -82,11 +82,11 @@ export const dimProjeto = pgTable(
     centroCusto: varchar('centro_custo', { length: 50 }),
     orcamentoTotal: decimal('orcamento_total', { precision: 15, scale: 2 }),
     createdAt: timestamp('created_at').notNull().defaultNow(),
-    createdBy: integer('created_by').notNull(),
+    createdBy: varchar('created_by', { length: 255 }).notNull(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
-    updatedBy: integer('updated_by'),
+    updatedBy: varchar('updated_by', { length: 255 }),
     deletedAt: timestamp('deleted_at'),
-    deletedBy: integer('deleted_by'),
+    deletedBy: varchar('deleted_by', { length: 255 }),
   },
   (table) => ({
     uniqueNomeOwner: unique().on(table.nome, table.ownerId),
@@ -117,11 +117,11 @@ export const dimPesquisa = pgTable(
     durationSeconds: integer('duration_seconds'),
     errorMessage: text('error_message'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
-    createdBy: integer('created_by').notNull(),
+    createdBy: varchar('created_by', { length: 255 }).notNull(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
-    updatedBy: integer('updated_by'),
+    updatedBy: varchar('updated_by', { length: 255 }),
     deletedAt: timestamp('deleted_at'),
-    deletedBy: integer('deleted_by'),
+    deletedBy: varchar('deleted_by', { length: 255 }),
   },
   (table) => ({
     uniqueNomeProjeto: unique().on(table.nome, table.projetoId),
@@ -151,17 +151,17 @@ export const dimEntidade = pgTable('dim_entidade', {
   origemPrompt: text('origem_prompt'),
   origemConfianca: integer('origem_confianca'),
   origemData: timestamp('origem_data').notNull().defaultNow(),
-  origemUsuarioId: integer('origem_usuario_id'),
+  origemUsuarioId: varchar('origem_usuario_id', { length: 255 }),
   // Enriquecimento IA
   enriquecido: boolean('enriquecido').default(false),
   enriquecidoEm: timestamp('enriquecido_em'),
   enriquecidoPor: varchar('enriquecido_por', { length: 50 }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  createdBy: integer('created_by'),
+  createdBy: varchar('created_by', { length: 255 }),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-  updatedBy: integer('updated_by'),
+  updatedBy: varchar('updated_by', { length: 255 }),
   deletedAt: timestamp('deleted_at'),
-  deletedBy: integer('deleted_by'),
+  deletedBy: varchar('deleted_by', { length: 255 }),
 });
 
 // ============================================================================
@@ -185,9 +185,9 @@ export const dimGeografia = pgTable(
     mesorregiao: varchar('mesorregiao', { length: 100 }),
     microrregiao: varchar('microrregiao', { length: 100 }),
     createdAt: timestamp('created_at').notNull().defaultNow(),
-    createdBy: integer('created_by'),
+    createdBy: varchar('created_by', { length: 255 }),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
-    updatedBy: integer('updated_by'),
+    updatedBy: varchar('updated_by', { length: 255 }),
   },
   (table) => ({
     uniqueCidadeUf: unique().on(table.cidade, table.uf),
@@ -215,9 +215,9 @@ export const dimMercado = pgTable('dim_mercado', {
   subsetor: varchar('subsetor', { length: 100 }),
   nicho: varchar('nicho', { length: 100 }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  createdBy: integer('created_by'),
+  createdBy: varchar('created_by', { length: 255 }),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-  updatedBy: integer('updated_by'),
+  updatedBy: varchar('updated_by', { length: 255 }),
 });
 
 // ============================================================================
@@ -236,9 +236,9 @@ export const dimProduto = pgTable('dim_produto', {
   enriquecidoEm: timestamp('enriquecido_em'),
   enriquecidoPor: varchar('enriquecido_por', { length: 50 }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  createdBy: integer('created_by'),
+  createdBy: varchar('created_by', { length: 255 }),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-  updatedBy: integer('updated_by'),
+  updatedBy: varchar('updated_by', { length: 255 }),
 });
 
 // ============================================================================
@@ -257,11 +257,11 @@ export const dimProdutoCatalogo = pgTable('dim_produto_catalogo', {
   unidade: varchar('unidade', { length: 20 }),
   ativo: boolean('ativo').default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  createdBy: integer('created_by'),
+  createdBy: varchar('created_by', { length: 255 }),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-  updatedBy: integer('updated_by'),
+  updatedBy: varchar('updated_by', { length: 255 }),
   deletedAt: timestamp('deleted_at'),
-  deletedBy: integer('deleted_by'),
+  deletedBy: varchar('deleted_by', { length: 255 }),
 });
 
 // ============================================================================
@@ -275,9 +275,9 @@ export const dimStatusQualificacao = pgTable('dim_status_qualificacao', {
   cor: varchar('cor', { length: 7 }),
   ordem: integer('ordem'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  createdBy: integer('created_by'),
+  createdBy: varchar('created_by', { length: 255 }),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-  updatedBy: integer('updated_by'),
+  updatedBy: varchar('updated_by', { length: 255 }),
 });
 
 // ============================================================================
@@ -338,11 +338,11 @@ export const fatoEntidadeContexto = pgTable(
     // Canal
     canalId: integer('canal_id').references(() => dimCanal.id),
     createdAt: timestamp('created_at').notNull().defaultNow(),
-    createdBy: integer('created_by'),
+    createdBy: varchar('created_by', { length: 255 }),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
-    updatedBy: integer('updated_by'),
+    updatedBy: varchar('updated_by', { length: 255 }),
     deletedAt: timestamp('deleted_at'),
-    deletedBy: integer('deleted_by'),
+    deletedBy: varchar('deleted_by', { length: 255 }),
   },
   (table) => ({
     uniqueEntidadeProjetoPesquisa: unique().on(table.entidadeId, table.projetoId, table.pesquisaId),
@@ -371,7 +371,7 @@ export const fatoEntidadeProduto = pgTable(
     penetracaoMercado: decimal('penetracao_mercado', { precision: 5, scale: 2 }),
     ehProdutoPrincipal: boolean('eh_produto_principal').default(false),
     createdAt: timestamp('created_at').notNull().defaultNow(),
-    createdBy: integer('created_by'),
+    createdBy: varchar('created_by', { length: 255 }),
   },
   (table) => ({
     uniqueContextoProduto: unique().on(table.contextoId, table.produtoId),
@@ -399,7 +399,7 @@ export const fatoEntidadeCompetidor = pgTable(
     vantagemCompetitivaScore: integer('vantagem_competitiva_score'),
     ameacaNivel: varchar('ameaca_nivel', { length: 20 }),
     createdAt: timestamp('created_at').notNull().defaultNow(),
-    createdBy: integer('created_by'),
+    createdBy: varchar('created_by', { length: 255 }),
   },
   (table) => ({
     uniqueContextoCompetidor: unique().on(table.contextoId, table.competidorEntidadeId),
