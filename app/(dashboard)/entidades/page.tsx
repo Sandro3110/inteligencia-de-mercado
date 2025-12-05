@@ -352,7 +352,7 @@ export default function EntidadesListPage() {
                 <CardTitle className="flex items-center justify-between">
                   <span>Resultados ({data.total})</span>
                   <span className="text-sm font-normal text-muted-foreground">
-                    Exibindo {data.offset + 1}-{Math.min(data.offset + data.limit, data.total)} de {data.total}
+                    Exibindo {(data.page - 1) * limit + 1}-{Math.min(data.page * limit, data.total)} de {data.total}
                   </span>
                 </CardTitle>
               </CardHeader>
