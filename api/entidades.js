@@ -1,45 +1,24 @@
+const { sql } = require('@vercel/postgres');
+
 /**
- * Vercel Serverless Function - Endpoint /api/entidades
+ * REST API Endpoint para Entidades Não Enriquecidas
+ * GET /api/entidades
  * 
- * Retorna lista de entidades não enriquecidas para página de enriquecimento IA
- * 
- * Solução pragmática: Mantém arquitetura atual (api/*.js) e adiciona
- * apenas este endpoint para resolver bug específico
+ * Retorna lista de entidades que precisam ser enriquecidas com IA
  */
 
-const postgres = require('postgres');
-
 module.exports = async function handler(req, res) {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  // Handle preflight
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  // Only allow GET
+  // Permitir apenas GET
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ 
+      error: 'Method not allowed',
+      message: 'Este endpoint aceita apenas requisições GET' 
+    });
   }
-
-  let client = null;
 
   try {
-    // Conectar ao banco
-    const connectionString = process.env.DATABASE_URL;
-    if (!connectionString) {
-      throw new Error('DATABASE_URL não configurada');
-    }
-
-    client = postgres(connectionString, {
-      max: 1, // Serverless: 1 conexão por function
-    });
-
     // Buscar entidades não enriquecidas
-    const entidades = await client`
+    const { rows } = await sql`
       SELECT 
         id,
         nome,
@@ -55,6 +34,7 @@ module.exports = async function handler(req, res) {
         END as enriquecida
       FROM dim_entidade
       WHERE enriquecido_em IS NULL
+        AND deleted_at IS NULL
       ORDER BY created_at DESC
       LIMIT 100
     `;
@@ -62,8 +42,8 @@ module.exports = async function handler(req, res) {
     // Retornar resultado
     return res.status(200).json({
       success: true,
-      count: entidades.length,
-      entidades: entidades,
+      count: rows.length,
+      entidades: rows,
     });
 
   } catch (error) {
@@ -72,13 +52,7 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({
       success: false,
       error: 'Erro ao buscar entidades',
-      message: error instanceof Error ? error.message : 'Erro desconhecido',
+      message: error.message || 'Erro desconhecido',
     });
-
-  } finally {
-    // Fechar conexão
-    if (client) {
-      await client.end();
-    }
   }
 };
