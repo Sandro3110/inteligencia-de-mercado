@@ -336,13 +336,15 @@ export default function EntidadeDetailsSheet({
                       />
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {entidade.score_qualidade >= 80
-                        ? 'Excelente qualidade'
-                        : entidade.score_qualidade >= 60
-                        ? 'Boa qualidade'
-                        : entidade.score_qualidade >= 40
-                        ? 'Qualidade média'
-                        : 'Qualidade baixa'}
+                      {entidade.score_qualidade != null
+                        ? entidade.score_qualidade >= 80
+                          ? 'Excelente qualidade'
+                          : entidade.score_qualidade >= 60
+                          ? 'Boa qualidade'
+                          : entidade.score_qualidade >= 40
+                          ? 'Qualidade média'
+                          : 'Qualidade baixa'
+                        : 'Sem avaliação'}
                     </p>
                   </div>
                 </div>
