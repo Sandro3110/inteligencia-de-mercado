@@ -8,7 +8,7 @@
 -- 1. CRIAR TABELA audit_logs
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS audit_logs (
+CREATE TABLE IF NOT EXISTS data_audit_logs (
   id BIGSERIAL PRIMARY KEY,
   
   -- Identificação da operação
@@ -34,34 +34,33 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     'dim_entidade',
     'dim_produto',
     'dim_mercado',
-    'dim_produto_catalogo',
     'fato_entidade_produto',
-    'fato_produto_mercado',
     'fato_entidade_contexto',
+    'fato_entidade_competidor',
     'dim_importacao'
   ))
 );
 
 -- Índices para consultas rápidas
-CREATE INDEX IF NOT EXISTS idx_audit_logs_tabela_registro 
-  ON audit_logs(tabela, registro_id);
+CREATE INDEX IF NOT EXISTS idx_data_audit_logs_tabela_registro 
+  ON data_audit_logs(tabela, registro_id);
 
-CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at 
-  ON audit_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_data_audit_logs_created_at 
+  ON data_audit_logs(created_at DESC);
 
-CREATE INDEX IF NOT EXISTS idx_audit_logs_usuario 
-  ON audit_logs(usuario_id) WHERE usuario_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_data_audit_logs_usuario 
+  ON data_audit_logs(usuario_id) WHERE usuario_id IS NOT NULL;
 
-CREATE INDEX IF NOT EXISTS idx_audit_logs_operacao 
-  ON audit_logs(operacao);
+CREATE INDEX IF NOT EXISTS idx_data_audit_logs_operacao 
+  ON data_audit_logs(operacao);
 
-COMMENT ON TABLE audit_logs IS 'Histórico completo de alterações em todas as tabelas';
-COMMENT ON COLUMN audit_logs.tabela IS 'Nome da tabela auditada';
-COMMENT ON COLUMN audit_logs.operacao IS 'Tipo de operação: INSERT, UPDATE, DELETE';
-COMMENT ON COLUMN audit_logs.registro_id IS 'ID do registro alterado';
-COMMENT ON COLUMN audit_logs.dados_anteriores IS 'Estado anterior do registro (JSON)';
-COMMENT ON COLUMN audit_logs.dados_novos IS 'Estado novo do registro (JSON)';
-COMMENT ON COLUMN audit_logs.campos_alterados IS 'Lista de campos que foram alterados';
+COMMENT ON TABLE data_audit_logs IS 'Histórico completo de alterações em todas as tabelas';
+COMMENT ON COLUMN data_audit_logs.tabela IS 'Nome da tabela auditada';
+COMMENT ON COLUMN data_audit_logs.operacao IS 'Tipo de operação: INSERT, UPDATE, DELETE';
+COMMENT ON COLUMN data_audit_logs.registro_id IS 'ID do registro alterado';
+COMMENT ON COLUMN data_audit_logs.dados_anteriores IS 'Estado anterior do registro (JSON)';
+COMMENT ON COLUMN data_audit_logs.dados_novos IS 'Estado novo do registro (JSON)';
+COMMENT ON COLUMN data_audit_logs.campos_alterados IS 'Lista de campos que foram alterados';
 
 -- ============================================================================
 -- 2. FUNÇÃO GENÉRICA DE AUDITORIA
@@ -95,7 +94,7 @@ BEGIN
   END IF;
 
   -- Inserir log de auditoria
-  INSERT INTO audit_logs (
+  INSERT INTO data_audit_logs (
     tabela,
     operacao,
     registro_id,
@@ -148,28 +147,22 @@ CREATE TRIGGER audit_dim_mercado
   AFTER INSERT OR UPDATE OR DELETE ON dim_mercado
   FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
 
--- dim_produto_catalogo
-DROP TRIGGER IF EXISTS audit_dim_produto_catalogo ON dim_produto_catalogo;
-CREATE TRIGGER audit_dim_produto_catalogo
-  AFTER INSERT OR UPDATE OR DELETE ON dim_produto_catalogo
-  FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
-
 -- fato_entidade_produto
 DROP TRIGGER IF EXISTS audit_fato_entidade_produto ON fato_entidade_produto;
 CREATE TRIGGER audit_fato_entidade_produto
   AFTER INSERT OR UPDATE OR DELETE ON fato_entidade_produto
   FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
 
--- fato_produto_mercado
-DROP TRIGGER IF EXISTS audit_fato_produto_mercado ON fato_produto_mercado;
-CREATE TRIGGER audit_fato_produto_mercado
-  AFTER INSERT OR UPDATE OR DELETE ON fato_produto_mercado
-  FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
-
 -- fato_entidade_contexto
 DROP TRIGGER IF EXISTS audit_fato_entidade_contexto ON fato_entidade_contexto;
 CREATE TRIGGER audit_fato_entidade_contexto
   AFTER INSERT OR UPDATE OR DELETE ON fato_entidade_contexto
+  FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+
+-- fato_entidade_competidor
+DROP TRIGGER IF EXISTS audit_fato_entidade_competidor ON fato_entidade_competidor;
+CREATE TRIGGER audit_fato_entidade_competidor
+  AFTER INSERT OR UPDATE OR DELETE ON fato_entidade_competidor
   FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
 
 -- dim_importacao
@@ -198,7 +191,7 @@ SELECT
     WHEN al.tabela = 'dim_mercado' THEN (al.dados_novos->>'nome')
     ELSE NULL
   END as nome_registro
-FROM audit_logs al
+FROM data_audit_logs al
 WHERE al.created_at >= NOW() - INTERVAL '24 hours'
 ORDER BY al.created_at DESC;
 
@@ -215,7 +208,7 @@ SELECT
   al.dados_novos,
   al.usuario_id,
   al.created_at
-FROM audit_logs al
+FROM data_audit_logs al
 WHERE al.tabela = 'dim_entidade'
 ORDER BY al.registro_id, al.created_at DESC;
 
@@ -230,7 +223,7 @@ SELECT
   COUNT(DISTINCT al.usuario_id) as usuarios_distintos,
   MIN(al.created_at) as primeira_operacao,
   MAX(al.created_at) as ultima_operacao
-FROM audit_logs al
+FROM data_audit_logs al
 GROUP BY al.tabela, al.operacao
 ORDER BY al.tabela, al.operacao;
 
@@ -265,7 +258,7 @@ BEGIN
     al.dados_novos,
     al.usuario_id,
     al.created_at
-  FROM audit_logs al
+  FROM data_audit_logs al
   WHERE al.tabela = p_tabela
     AND al.registro_id = p_registro_id
   ORDER BY al.created_at DESC
@@ -293,7 +286,7 @@ BEGIN
     SELECT 
       al.id,
       al.dados_novos
-    FROM audit_logs al
+    FROM data_audit_logs al
     WHERE al.tabela = p_tabela
       AND al.registro_id = p_registro_id
       AND al.id IN (p_version1_id, p_version2_id)
@@ -323,7 +316,7 @@ RETURNS INTEGER AS $$
 DECLARE
   deleted_count INTEGER;
 BEGIN
-  DELETE FROM audit_logs
+  DELETE FROM data_audit_logs
   WHERE created_at < NOW() - (p_retention_days || ' days')::INTERVAL;
   
   GET DIAGNOSTICS deleted_count = ROW_COUNT;
@@ -338,5 +331,5 @@ COMMENT ON FUNCTION cleanup_old_audit_logs IS 'Remove logs de auditoria mais ant
 -- ============================================================================
 
 SELECT 'Sistema de Audit Logs criado com sucesso!' as resultado;
-SELECT 'Triggers automáticos ativados para 8 tabelas' as info;
+SELECT 'Triggers automáticos ativados para 6 tabelas' as info;
 SELECT 'Views e funções utilitárias disponíveis' as info2;

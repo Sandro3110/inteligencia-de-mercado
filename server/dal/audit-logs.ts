@@ -1,5 +1,5 @@
 /**
- * DAL para audit_logs
+ * DAL para data_audit_logs
  * Gerencia histórico de alterações em todas as tabelas
  * 
  * Business Rules:
@@ -128,7 +128,7 @@ export async function getLogsByUsuario(
   limite: number = 100
 ): Promise<AuditLog[]> {
   const result = await db.execute(sql`
-    SELECT * FROM audit_logs
+    SELECT * FROM data_audit_logs
     WHERE usuario_id = ${usuarioId}
     ORDER BY created_at DESC
     LIMIT ${limite}
@@ -145,7 +145,7 @@ export async function getLogsByTabela(
   limite: number = 100
 ): Promise<AuditLog[]> {
   const result = await db.execute(sql`
-    SELECT * FROM audit_logs
+    SELECT * FROM data_audit_logs
     WHERE tabela = ${tabela}
     ORDER BY created_at DESC
     LIMIT ${limite}
@@ -162,7 +162,7 @@ export async function getLogsByOperacao(
   limite: number = 100
 ): Promise<AuditLog[]> {
   const result = await db.execute(sql`
-    SELECT * FROM audit_logs
+    SELECT * FROM data_audit_logs
     WHERE operacao = ${operacao}
     ORDER BY created_at DESC
     LIMIT ${limite}
@@ -211,7 +211,7 @@ export async function compareVersions(
  */
 export async function getLogById(id: number): Promise<AuditLog | null> {
   const result = await db.execute(sql`
-    SELECT * FROM audit_logs
+    SELECT * FROM data_audit_logs
     WHERE id = ${id}
   `);
 
@@ -227,7 +227,7 @@ export async function getLogsByPeriodo(
   limite: number = 1000
 ): Promise<AuditLog[]> {
   const result = await db.execute(sql`
-    SELECT * FROM audit_logs
+    SELECT * FROM data_audit_logs
     WHERE created_at BETWEEN ${dataInicio} AND ${dataFim}
     ORDER BY created_at DESC
     LIMIT ${limite}
@@ -253,7 +253,7 @@ export async function getLogsComFiltros(filtros: FiltrosAuditLog): Promise<Audit
   const { tabela, operacao, usuarioId, registroId, dataInicio, dataFim, limite = 100 } =
     filtros;
 
-  let query = sql`SELECT * FROM audit_logs WHERE 1=1`;
+  let query = sql`SELECT * FROM data_audit_logs WHERE 1=1`;
 
   if (tabela) {
     query = sql`${query} AND tabela = ${tabela}`;
@@ -307,7 +307,7 @@ export async function cleanupOldLogs(retentionDays: number = 365): Promise<numbe
  */
 export async function countLogs(): Promise<number> {
   const result = await db.execute(sql`
-    SELECT COUNT(*) as total FROM audit_logs
+    SELECT COUNT(*) as total FROM data_audit_logs
   `);
 
   return (result.rows[0] as any).total;
@@ -318,7 +318,7 @@ export async function countLogs(): Promise<number> {
  */
 export async function countLogsByTabela(tabela: TabelaAuditada): Promise<number> {
   const result = await db.execute(sql`
-    SELECT COUNT(*) as total FROM audit_logs
+    SELECT COUNT(*) as total FROM data_audit_logs
     WHERE tabela = ${tabela}
   `);
 
@@ -339,7 +339,7 @@ export async function getUsuariosMaisAtivos(
     SELECT 
       usuario_id,
       COUNT(*) as total_operacoes
-    FROM audit_logs
+    FROM data_audit_logs
     WHERE usuario_id IS NOT NULL
     GROUP BY usuario_id
     ORDER BY total_operacoes DESC
@@ -359,7 +359,7 @@ export async function getTabelasMaisAlteradas(
     SELECT 
       tabela,
       COUNT(*) as total_operacoes
-    FROM audit_logs
+    FROM data_audit_logs
     GROUP BY tabela
     ORDER BY total_operacoes DESC
     LIMIT ${limite}
@@ -378,7 +378,7 @@ export async function getAtividadePorHora(): Promise<
     SELECT 
       EXTRACT(HOUR FROM created_at) as hora,
       COUNT(*) as total_operacoes
-    FROM audit_logs
+    FROM data_audit_logs
     GROUP BY hora
     ORDER BY hora
   `);
