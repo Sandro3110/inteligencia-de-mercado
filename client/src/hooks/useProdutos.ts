@@ -92,7 +92,7 @@ export function useProdutoEntidades(produtoId: number, pagina = 1, porPagina = 2
   const query = trpc.produto.getEntidades.useQuery(
     { produtoId, pagina, porPagina },
     {
-      enabled: !!produto_id,
+      enabled: !!produtoId,
       staleTime: 5 * 60 * 1000,
     }
   );
@@ -114,7 +114,7 @@ export function useProdutoMercados(produtoId: number, pagina = 1, porPagina = 20
   const query = trpc.produto.getMercados.useQuery(
     { produtoId, pagina, porPagina },
     {
-      enabled: !!produto_id,
+      enabled: !!produtoId,
       staleTime: 5 * 60 * 1000,
     }
   );
