@@ -1,13 +1,11 @@
 import { requirePermission } from "../middleware/auth";
 import { Permission } from "@shared/types/permissions";
-
 import { z } from 'zod';
 import { router } from './index';
 import { db } from '../db';
-import { sql } from 'drizzle-orm';
 
 // ============================================================================
-// PRODUTO ROUTER - Copiado de entidade.ts (funcionando)
+// PRODUTO ROUTER - SQL DIRETO (sem depender de schema)
 // ============================================================================
 
 export const produtoRouter = router({
@@ -50,120 +48,118 @@ export const produtoRouter = router({
 
       const offset = (pagina - 1) * porPagina;
 
-      // Query principal - COPIADO DE ENTIDADE.TS
-      let query = sql`
-        SELECT 
-          p.*
-        FROM dim_produto_catalogo p
-        WHERE p.deleted_at IS NULL
-      `;
+      // Construir WHERE clauses
+      const whereClauses: string[] = ['p.deleted_at IS NULL'];
+      const params: any[] = [];
+      let paramIndex = 1;
 
-      // Filtros
       if (search) {
-        query = sql`${query} AND (p.nome ILIKE ${'%' + search + '%'} OR p.descricao ILIKE ${'%' + search + '%'})`;
+        whereClauses.push(`(p.nome ILIKE $${paramIndex} OR p.descricao ILIKE $${paramIndex})`);
+        params.push(`%${search}%`);
+        paramIndex++;
       }
 
       if (categoria) {
-        query = sql`${query} AND p.categoria = ${categoria}`;
+        whereClauses.push(`p.categoria = $${paramIndex}`);
+        params.push(categoria);
+        paramIndex++;
       }
 
       if (subcategoria) {
-        query = sql`${query} AND p.subcategoria = ${subcategoria}`;
+        whereClauses.push(`p.subcategoria = $${paramIndex}`);
+        params.push(subcategoria);
+        paramIndex++;
       }
 
       if (sku) {
-        query = sql`${query} AND p.sku ILIKE ${'%' + sku + '%'}`;
+        whereClauses.push(`p.sku ILIKE $${paramIndex}`);
+        params.push(`%${sku}%`);
+        paramIndex++;
       }
 
       if (ean) {
-        query = sql`${query} AND p.ean = ${ean}`;
+        whereClauses.push(`p.ean = $${paramIndex}`);
+        params.push(ean);
+        paramIndex++;
       }
 
       if (ncm) {
-        query = sql`${query} AND p.ncm = ${ncm}`;
+        whereClauses.push(`p.ncm = $${paramIndex}`);
+        params.push(ncm);
+        paramIndex++;
       }
 
       if (precoMin !== undefined) {
-        query = sql`${query} AND p.preco >= ${precoMin}`;
+        whereClauses.push(`p.preco >= $${paramIndex}`);
+        params.push(precoMin);
+        paramIndex++;
       }
 
       if (precoMax !== undefined) {
-        query = sql`${query} AND p.preco <= ${precoMax}`;
+        whereClauses.push(`p.preco <= $${paramIndex}`);
+        params.push(precoMax);
+        paramIndex++;
       }
 
       if (ativo !== undefined) {
-        query = sql`${query} AND p.ativo = ${ativo}`;
+        whereClauses.push(`p.ativo = $${paramIndex}`);
+        params.push(ativo);
+        paramIndex++;
       }
+
+      const whereClause = whereClauses.join(' AND ');
 
       // Ordenação
+      let orderByClause = 'p.created_at DESC';
       if (ordenacao) {
-        const campo = ordenacao.campo.includes('.') 
-          ? ordenacao.campo 
-          : `p.${ordenacao.campo}`;
-        query = sql`${query} ORDER BY ${sql.raw(campo)} ${sql.raw(ordenacao.direcao)}`;
-      } else {
-        query = sql`${query} ORDER BY p.created_at DESC`;
+        const campo = ordenacao.campo.includes('.') ? ordenacao.campo : `p.${ordenacao.campo}`;
+        orderByClause = `${campo} ${ordenacao.direcao}`;
       }
 
-      query = sql`${query} LIMIT ${porPagina} OFFSET ${offset}`;
-
-      const resultado = await db.execute(query);
-
-      // Contar total - COPIADO DE ENTIDADE.TS
-      let queryCount = sql`
-        SELECT COUNT(*) as total
+      // Query principal
+      const queryText = `
+        SELECT p.*
         FROM dim_produto_catalogo p
-        WHERE p.deleted_at IS NULL
+        WHERE ${whereClause}
+        ORDER BY ${orderByClause}
+        LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
       `;
 
-      if (search) {
-        queryCount = sql`${queryCount} AND (p.nome ILIKE ${'%' + search + '%'} OR p.descricao ILIKE ${'%' + search + '%'})`;
+      params.push(porPagina, offset);
+
+      try {
+        const resultado = await db.execute({
+          sql: queryText,
+          args: params
+        });
+
+        // Contar total
+        const countQueryText = `
+          SELECT COUNT(*) as total
+          FROM dim_produto_catalogo p
+          WHERE ${whereClause}
+        `;
+
+        const resultadoCount = await db.execute({
+          sql: countQueryText,
+          args: params.slice(0, paramIndex - 1) // Remover limit e offset
+        });
+
+        const total = Number(resultadoCount.rows[0]?.total || 0);
+
+        return {
+          dados: resultado.rows,
+          paginacao: {
+            pagina,
+            porPagina,
+            total,
+            totalPaginas: Math.ceil(total / porPagina)
+          }
+        };
+      } catch (error) {
+        console.error('Erro ao listar produtos:', error);
+        throw new Error(`Falha ao listar produtos: ${error.message}`);
       }
-
-      if (categoria) {
-        queryCount = sql`${queryCount} AND p.categoria = ${categoria}`;
-      }
-
-      if (subcategoria) {
-        queryCount = sql`${queryCount} AND p.subcategoria = ${subcategoria}`;
-      }
-
-      if (sku) {
-        queryCount = sql`${queryCount} AND p.sku ILIKE ${'%' + sku + '%'}`;
-      }
-
-      if (ean) {
-        queryCount = sql`${queryCount} AND p.ean = ${ean}`;
-      }
-
-      if (ncm) {
-        queryCount = sql`${queryCount} AND p.ncm = ${ncm}`;
-      }
-
-      if (precoMin !== undefined) {
-        queryCount = sql`${queryCount} AND p.preco >= ${precoMin}`;
-      }
-
-      if (precoMax !== undefined) {
-        queryCount = sql`${queryCount} AND p.preco <= ${precoMax}`;
-      }
-
-      if (ativo !== undefined) {
-        queryCount = sql`${queryCount} AND p.ativo = ${ativo}`;
-      }
-
-      const resultadoCount = await db.execute(queryCount);
-      const total = Number(resultadoCount.rows[0]?.total || 0);
-
-      return {
-        dados: resultado.rows,
-        paginacao: {
-          pagina,
-          porPagina,
-          total,
-          totalPaginas: Math.ceil(total / porPagina)
-        }
-      };
     }),
 
   /**
@@ -176,20 +172,26 @@ export const produtoRouter = router({
     .query(async ({ input }) => {
       const { produtoId } = input;
 
-      const query = sql`
-        SELECT p.*
-        FROM dim_produto_catalogo p
-        WHERE p.id = ${produtoId}
-          AND p.deleted_at IS NULL
-      `;
+      try {
+        const resultado = await db.execute({
+          sql: `
+            SELECT p.*
+            FROM dim_produto_catalogo p
+            WHERE p.id = $1
+              AND p.deleted_at IS NULL
+          `,
+          args: [produtoId]
+        });
 
-      const resultado = await db.execute(query);
+        if (resultado.rows.length === 0) {
+          throw new Error('Produto não encontrado');
+        }
 
-      if (resultado.rows.length === 0) {
-        throw new Error('Produto não encontrado');
+        return resultado.rows[0];
+      } catch (error) {
+        console.error('Erro ao buscar produto:', error);
+        throw new Error(`Falha ao buscar produto: ${error.message}`);
       }
-
-      return resultado.rows[0];
     }),
 
   /**
@@ -197,16 +199,23 @@ export const produtoRouter = router({
    */
   getCategorias: requirePermission(Permission.ANALISE_READ)
     .query(async () => {
-      const query = sql`
-        SELECT DISTINCT categoria
-        FROM dim_produto_catalogo
-        WHERE deleted_at IS NULL
-          AND categoria IS NOT NULL
-        ORDER BY categoria
-      `;
+      try {
+        const resultado = await db.execute({
+          sql: `
+            SELECT DISTINCT categoria
+            FROM dim_produto_catalogo
+            WHERE deleted_at IS NULL
+              AND categoria IS NOT NULL
+            ORDER BY categoria
+          `,
+          args: []
+        });
 
-      const resultado = await db.execute(query);
-      return resultado.rows.map((r: any) => r.categoria);
+        return resultado.rows.map((r: any) => r.categoria);
+      } catch (error) {
+        console.error('Erro ao listar categorias:', error);
+        return [];
+      }
     }),
 
   /**
@@ -219,21 +228,30 @@ export const produtoRouter = router({
     .query(async ({ input }) => {
       const { categoria } = input;
 
-      let query = sql`
-        SELECT DISTINCT subcategoria
-        FROM dim_produto_catalogo
-        WHERE deleted_at IS NULL
-          AND subcategoria IS NOT NULL
-      `;
+      try {
+        const whereClauses = ['deleted_at IS NULL', 'subcategoria IS NOT NULL'];
+        const params: any[] = [];
 
-      if (categoria) {
-        query = sql`${query} AND categoria = ${categoria}`;
+        if (categoria) {
+          whereClauses.push('categoria = $1');
+          params.push(categoria);
+        }
+
+        const resultado = await db.execute({
+          sql: `
+            SELECT DISTINCT subcategoria
+            FROM dim_produto_catalogo
+            WHERE ${whereClauses.join(' AND ')}
+            ORDER BY subcategoria
+          `,
+          args: params
+        });
+
+        return resultado.rows.map((r: any) => r.subcategoria);
+      } catch (error) {
+        console.error('Erro ao listar subcategorias:', error);
+        return [];
       }
-
-      query = sql`${query} ORDER BY subcategoria`;
-
-      const resultado = await db.execute(query);
-      return resultado.rows.map((r: any) => r.subcategoria);
     }),
 
   /**
@@ -241,21 +259,36 @@ export const produtoRouter = router({
    */
   getStats: requirePermission(Permission.ANALISE_READ)
     .query(async () => {
-      const query = sql`
-        SELECT 
-          COUNT(*) as total,
-          COUNT(CASE WHEN ativo = true THEN 1 END) as ativos,
-          COUNT(CASE WHEN ativo = false THEN 1 END) as inativos,
-          COUNT(DISTINCT categoria) as categorias,
-          AVG(preco) as preco_medio,
-          MIN(preco) as preco_min,
-          MAX(preco) as preco_max
-        FROM dim_produto_catalogo
-        WHERE deleted_at IS NULL
-      `;
+      try {
+        const resultado = await db.execute({
+          sql: `
+            SELECT 
+              COUNT(*) as total,
+              COUNT(CASE WHEN ativo = true THEN 1 END) as ativos,
+              COUNT(CASE WHEN ativo = false THEN 1 END) as inativos,
+              COUNT(DISTINCT categoria) as categorias,
+              AVG(preco) as preco_medio,
+              MIN(preco) as preco_min,
+              MAX(preco) as preco_max
+            FROM dim_produto_catalogo
+            WHERE deleted_at IS NULL
+          `,
+          args: []
+        });
 
-      const resultado = await db.execute(query);
-      return resultado.rows[0];
+        return resultado.rows[0];
+      } catch (error) {
+        console.error('Erro ao buscar estatísticas:', error);
+        return {
+          total: 0,
+          ativos: 0,
+          inativos: 0,
+          categorias: 0,
+          preco_medio: 0,
+          preco_min: 0,
+          preco_max: 0
+        };
+      }
     }),
 
   /**
@@ -271,45 +304,56 @@ export const produtoRouter = router({
       const { produtoId, pagina = 1, porPagina = 20 } = input;
       const offset = (pagina - 1) * porPagina;
 
-      const query = sql`
-        SELECT 
-          e.*,
-          ep.quantidade,
-          ep.valor_unitario,
-          ep.valor_total
-        FROM fato_entidade_produto ep
-        INNER JOIN dim_entidade e ON ep.entidade_id = e.id
-        WHERE ep.produto_id = ${produtoId}
-          AND ep.deleted_at IS NULL
-          AND e.deleted_at IS NULL
-        ORDER BY ep.created_at DESC
-        LIMIT ${porPagina} OFFSET ${offset}
-      `;
+      try {
+        const resultado = await db.execute({
+          sql: `
+            SELECT 
+              e.*,
+              ep.quantidade,
+              ep.valor_unitario,
+              ep.valor_total
+            FROM fato_entidade_produto ep
+            INNER JOIN dim_entidade e ON ep.entidade_id = e.id
+            WHERE ep.produto_id = $1
+              AND ep.deleted_at IS NULL
+              AND e.deleted_at IS NULL
+            ORDER BY ep.created_at DESC
+            LIMIT $2 OFFSET $3
+          `,
+          args: [produtoId, porPagina, offset]
+        });
 
-      const resultado = await db.execute(query);
+        // Contar total
+        const resultadoCount = await db.execute({
+          sql: `
+            SELECT COUNT(*) as total
+            FROM fato_entidade_produto ep
+            INNER JOIN dim_entidade e ON ep.entidade_id = e.id
+            WHERE ep.produto_id = $1
+              AND ep.deleted_at IS NULL
+              AND e.deleted_at IS NULL
+          `,
+          args: [produtoId]
+        });
 
-      // Contar total
-      const queryCount = sql`
-        SELECT COUNT(*) as total
-        FROM fato_entidade_produto ep
-        INNER JOIN dim_entidade e ON ep.entidade_id = e.id
-        WHERE ep.produto_id = ${produtoId}
-          AND ep.deleted_at IS NULL
-          AND e.deleted_at IS NULL
-      `;
+        const total = Number(resultadoCount.rows[0]?.total || 0);
 
-      const resultadoCount = await db.execute(queryCount);
-      const total = Number(resultadoCount.rows[0]?.total || 0);
-
-      return {
-        dados: resultado.rows,
-        paginacao: {
-          pagina,
-          porPagina,
-          total,
-          totalPaginas: Math.ceil(total / porPagina)
-        }
-      };
+        return {
+          dados: resultado.rows,
+          paginacao: {
+            pagina,
+            porPagina,
+            total,
+            totalPaginas: Math.ceil(total / porPagina)
+          }
+        };
+      } catch (error) {
+        console.error('Erro ao listar entidades do produto:', error);
+        return {
+          dados: [],
+          paginacao: { pagina, porPagina, total: 0, totalPaginas: 0 }
+        };
+      }
     }),
 
   /**
@@ -325,43 +369,54 @@ export const produtoRouter = router({
       const { produtoId, pagina = 1, porPagina = 20 } = input;
       const offset = (pagina - 1) * porPagina;
 
-      const query = sql`
-        SELECT 
-          m.*,
-          pm.share_of_market,
-          pm.volume_vendas
-        FROM fato_produto_mercado pm
-        INNER JOIN dim_mercado m ON pm.mercado_id = m.id
-        WHERE pm.produto_id = ${produtoId}
-          AND pm.deleted_at IS NULL
-          AND m.deleted_at IS NULL
-        ORDER BY pm.share_of_market DESC
-        LIMIT ${porPagina} OFFSET ${offset}
-      `;
+      try {
+        const resultado = await db.execute({
+          sql: `
+            SELECT 
+              m.*,
+              pm.share_of_market,
+              pm.volume_vendas
+            FROM fato_produto_mercado pm
+            INNER JOIN dim_mercado m ON pm.mercado_id = m.id
+            WHERE pm.produto_id = $1
+              AND pm.deleted_at IS NULL
+              AND m.deleted_at IS NULL
+            ORDER BY pm.share_of_market DESC
+            LIMIT $2 OFFSET $3
+          `,
+          args: [produtoId, porPagina, offset]
+        });
 
-      const resultado = await db.execute(query);
+        // Contar total
+        const resultadoCount = await db.execute({
+          sql: `
+            SELECT COUNT(*) as total
+            FROM fato_produto_mercado pm
+            INNER JOIN dim_mercado m ON pm.mercado_id = m.id
+            WHERE pm.produto_id = $1
+              AND pm.deleted_at IS NULL
+              AND m.deleted_at IS NULL
+          `,
+          args: [produtoId]
+        });
 
-      // Contar total
-      const queryCount = sql`
-        SELECT COUNT(*) as total
-        FROM fato_produto_mercado pm
-        INNER JOIN dim_mercado m ON pm.mercado_id = m.id
-        WHERE pm.produto_id = ${produtoId}
-          AND pm.deleted_at IS NULL
-          AND m.deleted_at IS NULL
-      `;
+        const total = Number(resultadoCount.rows[0]?.total || 0);
 
-      const resultadoCount = await db.execute(queryCount);
-      const total = Number(resultadoCount.rows[0]?.total || 0);
-
-      return {
-        dados: resultado.rows,
-        paginacao: {
-          pagina,
-          porPagina,
-          total,
-          totalPaginas: Math.ceil(total / porPagina)
-        }
-      };
+        return {
+          dados: resultado.rows,
+          paginacao: {
+            pagina,
+            porPagina,
+            total,
+            totalPaginas: Math.ceil(total / porPagina)
+          }
+        };
+      } catch (error) {
+        console.error('Erro ao listar mercados do produto:', error);
+        return {
+          dados: [],
+          paginacao: { pagina, porPagina, total: 0, totalPaginas: 0 }
+        };
+      }
     })
 });
