@@ -91,7 +91,7 @@ export default function EntidadesListPage() {
     pesquisa_id: pesquisaId,
     busca: busca || undefined,
     // Campos não suportados pelo schema atual: cidade, uf, setor, porte, score_min, score_max
-    enriquecido: enriquecido && enriquecido !== 'todos' ? (enriquecido === 'sim') : undefined,
+    enriquecido: enriquecido && enriquecido !== 'todos' ? (enriquecido === 'true') : undefined,
     limit,
     offset,
   };
