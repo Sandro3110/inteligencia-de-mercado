@@ -18,7 +18,6 @@ import { createContext } from '../../server/context';
 // Configuração do Edge Runtime
 export const config = {
   runtime: 'edge',
-  regions: ['gru1'], // São Paulo, Brazil
 };
 
 /**
