@@ -45,14 +45,14 @@ interface Entidade {
   cnpj: string | null;
   email: string | null;
   telefone: string | null;
-  celular?: string | null;
-  website?: string | null;
-  endereco?: string | null;
+  celular: string | null;
+  website: string | null;
+  endereco: string | null;
   cidade: string | null;
   uf: string | null;
   estado: string | null; // Alias para uf
-  cep?: string | null;
-  pais?: string | null;
+  cep: string | null;
+  pais: string | null;
   setor: string | null;
   porte: string | null;
   faturamento?: string | null;
