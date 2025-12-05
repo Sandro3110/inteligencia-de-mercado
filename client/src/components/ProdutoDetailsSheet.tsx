@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { useProduto, useProdutoEntidades, useProdutoMercados, type Produto } from '@/hooks/useProdutos';
 import { useToast } from '@/hooks/use-toast';
+import EditProdutoDialog from './EditProdutoDialog';
 
 interface ProdutoDetailsSheetProps {
   produto: Produto | null;
@@ -44,6 +45,7 @@ export default function ProdutoDetailsSheet({
   onOpenChange,
 }: ProdutoDetailsSheetProps) {
   const [activeTab, setActiveTab] = useState('geral');
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { toast } = useToast();
 
   // Buscar dados relacionados
@@ -75,7 +77,7 @@ export default function ProdutoDetailsSheet({
 
   // Handlers de ações
   const handleEditar = () => {
-    toast({ title: 'Em desenvolvimento', description: 'Função de edição será implementada em breve' });
+    setEditDialogOpen(true);
   };
 
   const handleExportar = () => {
@@ -87,6 +89,7 @@ export default function ProdutoDetailsSheet({
   };
 
   return (
+    <>
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
         <SheetHeader>
@@ -410,5 +413,18 @@ export default function ProdutoDetailsSheet({
         </Tabs>
       </SheetContent>
     </Sheet>
-  );
+
+    {produto && (
+      <EditProdutoDialog
+        produto={produto}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onSuccess={() => {
+          // Refresh produto data
+          onOpenChange(false);
+          setTimeout(() => onOpenChange(true), 100);
+        }}
+      />
+    )}
+  </>;
 }
