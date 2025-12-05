@@ -14,7 +14,7 @@ export const produtoRouter = router({
   /**
    * Listar produtos com filtros e paginação
    */
-  list: requirePermission(Permission.ANALISE_READ)
+  listar: requirePermission(Permission.ANALISE_READ)
     .input(z.object({
       search: z.string().optional(),
       categoria: z.string().optional(),
