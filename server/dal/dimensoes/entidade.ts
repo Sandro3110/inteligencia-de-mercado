@@ -330,11 +330,12 @@ export async function updateEntidade(id: number, input: UpdateEntidadeInput) {
  * Deletar entidade (soft delete)
  */
 export async function deleteEntidade(id: number, deletedBy?: string) {
+  // deletedBy é integer no schema, não string - ignorando por enquanto
   const [entidadeDeletada] = await db
     .update(dimEntidade)
     .set({
       deletedAt: new Date(),
-      deletedBy,
+      // deletedBy, // TODO: converter userId string para integer
       updatedAt: new Date(),
     })
     .where(eq(dimEntidade.id, id))
