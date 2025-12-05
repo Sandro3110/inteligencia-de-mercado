@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { toast } from 'sonner';
 import {
   Sheet,
   SheetContent,
@@ -36,6 +35,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import type { Entidade } from '@/hooks/useEntidades';
+import { EditEntidadeDialog } from '@/components/EditEntidadeDialog';
 
 interface EntidadeDetailsSheetProps {
   entidade: Entidade | null;
@@ -49,8 +49,7 @@ export default function EntidadeDetailsSheet({
   onOpenChange,
 }: EntidadeDetailsSheetProps) {
   const [activeTab, setActiveTab] = useState('cadastrais');
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   if (!entidade) return null;
 
@@ -86,6 +85,7 @@ export default function EntidadeDetailsSheet({
   };
 
   return (
+    <>
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
         <SheetHeader>
@@ -531,7 +531,12 @@ export default function EntidadeDetailsSheet({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button variant="outline" size="sm" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full justify-start"
+                  onClick={() => setEditDialogOpen(true)}
+                >
                   <Edit className="h-4 w-4 mr-2" />
                   Editar Dados
                 </Button>
@@ -539,42 +544,7 @@ export default function EntidadeDetailsSheet({
                   <Sparkles className="h-4 w-4 mr-2" />
                   Enriquecer com IA
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    if (!entidade) return;
-                    
-                    // Criar CSV
-                    const csv = [
-                      ['Campo', 'Valor'],
-                      ['Nome', entidade.nome || ''],
-                      ['CNPJ', entidade.cnpj || ''],
-                      ['Tipo', entidade.tipo_entidade || ''],
-                      ['Email', entidade.email || ''],
-                      ['Telefone', entidade.telefone || ''],
-                      ['Celular', entidade.celular || ''],
-                      ['Website', entidade.website || ''],
-                      ['Endereço', entidade.endereco || ''],
-                      ['Cidade', entidade.cidade || ''],
-                      ['Estado', entidade.estado || ''],
-                      ['CEP', entidade.cep || ''],
-                      ['Setor', entidade.setor || ''],
-                      ['Porte', entidade.porte || ''],
-                      ['Score', entidade.score_fit || ''],
-                    ].map(row => row.join(',')).join('\n');
-                    
-                    // Download
-                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = `entidade_${entidade.id}_${new Date().toISOString().split('T')[0]}.csv`;
-                    link.click();
-                    
-                    toast.success('Dados exportados com sucesso!');
-                  }}
-                >
+                <Button variant="outline" size="sm" className="w-full justify-start">
                   <Download className="h-4 w-4 mr-2" />
                   Exportar Dados
                 </Button>
@@ -582,22 +552,7 @@ export default function EntidadeDetailsSheet({
                   <Mail className="h-4 w-4 mr-2" />
                   Enviar Email
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    if (entidade?.website) {
-                      const url = entidade.website.startsWith('http') 
-                        ? entidade.website 
-                        : `https://${entidade.website}`;
-                      window.open(url, '_blank', 'noopener,noreferrer');
-                    } else {
-                      toast.error('Website não cadastrado');
-                    }
-                  }}
-                  disabled={!entidade?.website}
-                >
+                <Button variant="outline" size="sm" className="w-full justify-start">
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Abrir Website
                 </Button>
@@ -609,60 +564,26 @@ export default function EntidadeDetailsSheet({
                   variant="outline"
                   size="sm"
                   className="w-full justify-start text-destructive hover:text-destructive"
-                  onClick={() => setShowDeleteDialog(true)}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Excluir Entidade
                 </Button>
-                
-                {/* Modal de Confirmação de Exclusão */}
-                {showDeleteDialog && (
-                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-background p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
-                      <h3 className="text-lg font-semibold mb-2">Confirmar Exclusão</h3>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Tem certeza que deseja excluir <strong>{entidade.nome}</strong>?
-                        Esta ação não pode ser desfeita.
-                      </p>
-                      <div className="flex gap-2 justify-end">
-                        <Button
-                          variant="outline"
-                          onClick={() => setShowDeleteDialog(false)}
-                          disabled={isDeleting}
-                        >
-                          Cancelar
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          onClick={async () => {
-                            setIsDeleting(true);
-                            try {
-                              // TODO: Implementar API DELETE
-                              await new Promise(resolve => setTimeout(resolve, 1000));
-                              toast.success('Entidade excluída com sucesso!');
-                              setShowDeleteDialog(false);
-                              onOpenChange(false);
-                              // Recarregar lista
-                              window.location.reload();
-                            } catch (error) {
-                              toast.error('Erro ao excluir entidade');
-                            } finally {
-                              setIsDeleting(false);
-                            }
-                          }}
-                          disabled={isDeleting}
-                        >
-                          {isDeleting ? 'Excluindo...' : 'Excluir'}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </SheetContent>
     </Sheet>
+
+    {/* Modal de Edição - Fora do Sheet para evitar conflito de z-index */}
+    <EditEntidadeDialog
+      entidade={entidade}
+      open={editDialogOpen}
+      onOpenChange={setEditDialogOpen}
+      onSuccess={() => {
+        // Refresh automático via invalidate no mutation
+      }}
+    />
+    </>
   );
 }

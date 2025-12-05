@@ -441,5 +441,81 @@ export const entidadeRouter = router({
           atualizadoPor: contexto.updatedBy
         } : null
       };
+    }),
+
+  /**
+   * Atualizar dados de uma entidade
+   */
+  atualizar: requirePermission(Permission.ANALISE_WRITE)
+    .input(z.object({
+      id: z.number(),
+      nome: z.string().optional(),
+      cnpj: z.string().optional(),
+      email: z.string().email().optional().nullable(),
+      telefone: z.string().optional().nullable(),
+      celular: z.string().optional().nullable(),
+      website: z.string().optional().nullable(),
+      endereco: z.string().optional().nullable(),
+      cidade: z.string().optional().nullable(),
+      estado: z.string().optional().nullable(),
+      cep: z.string().optional().nullable(),
+      setor: z.string().optional().nullable(),
+      porte: z.string().optional().nullable(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const { id, ...dados } = input;
+
+      // Verificar se entidade existe
+      const entidadeExistente = await db.query.dimEntidade.findFirst({
+        where: eq(dimEntidade.id, id)
+      });
+
+      if (!entidadeExistente) {
+        throw new Error('Entidade não encontrada');
+      }
+
+      // Atualizar entidade
+      const resultado = await db
+        .update(dimEntidade)
+        .set({
+          ...dados,
+          updatedAt: new Date(),
+          updatedBy: ctx.user?.email || 'sistema'
+        })
+        .where(eq(dimEntidade.id, id))
+        .returning();
+
+      return resultado[0];
+    }),
+
+  /**
+   * Excluir entidade (soft delete)
+   */
+  excluir: requirePermission(Permission.ANALISE_WRITE)
+    .input(z.object({
+      id: z.number()
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const { id } = input;
+
+      // Verificar se entidade existe
+      const entidadeExistente = await db.query.dimEntidade.findFirst({
+        where: eq(dimEntidade.id, id)
+      });
+
+      if (!entidadeExistente) {
+        throw new Error('Entidade não encontrada');
+      }
+
+      // Soft delete
+      await db
+        .update(dimEntidade)
+        .set({
+          deletedAt: new Date(),
+          updatedBy: ctx.user?.email || 'sistema'
+        })
+        .where(eq(dimEntidade.id, id));
+
+      return { success: true };
     })
 });
