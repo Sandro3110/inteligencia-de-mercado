@@ -48,7 +48,44 @@
 
 ---
 
-### **PENDÊNCIA #2: API de Produtos Bloqueada**
+### **PENDÊNCIA #2: Deploy Vercel - Ações Editar/Excluir (Mercados)**
+
+**Status:** ⏳ Aguardando deploy  
+**Prioridade:** ALTA  
+**Commit:** `829a228` (GitHub ✅)
+
+**✅ Implementado (100%):**
+- Backend completo:
+  - Router `mercado.ts` já existia (completo)
+  - Endpoints: `list`, `getById`, `atualizar`, `excluir`
+- Frontend completo:
+  - Componente `MercadoDetailsSheet.tsx` (6 abas: Dados, Análise, Mercado, Players, Estratégia, Ações)
+  - Componente `EditMercadoDialog.tsx` (13 campos editáveis)
+  - Integração com `MercadosPage.tsx`
+  - Substituição de Dialog simples por Sheet completo
+  - Ações: Editar Dados, Exportar JSON, Excluir
+
+**❌ Bloqueio:**
+- Código commitado no GitHub: ✅
+- Bundle em produção: ❌ (ainda não contém MercadoDetailsSheet)
+- Página /mercados mostra "Nenhum resultado encontrado" (query não retorna dados)
+- SQL funciona via MCP (1 mercado existe: "Varejo de Eletrônicos e Móveis Online")
+
+**🔧 Ações necessárias:**
+1. [ ] Verificar painel do Vercel
+2. [ ] Checar status do deployment do commit `829a228`
+3. [ ] Forçar redeploy se necessário
+4. [ ] Aguardar 5-10 min para build completar
+5. [ ] Testar em produção: /mercados → clicar em mercado
+6. [ ] Validar que MercadoDetailsSheet abre com 6 abas
+7. [ ] Testar ação "Editar Dados"
+8. [ ] Testar ação "Excluir Mercado"
+
+**Tempo estimado:** 10-15 minutos (após deploy completar)
+
+---
+
+### **PENDÊNCIA #3: API de Produtos Bloqueada**
 
 **Status:** ❌ Bloqueado  
 **Prioridade:** MÉDIA  
