@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Loader2, Save } from 'lucide-react';
 import type { Produto } from '@/hooks/useProdutos';
 
@@ -28,7 +28,7 @@ export default function EditProdutoDialog({
   onOpenChange,
   onSuccess,
 }: EditProdutoDialogProps) {
-  const { toast } = useToast();
+  
   const [loading, setLoading] = useState(false);
 
   // Estados do formulário (15 campos editáveis)
@@ -127,11 +127,11 @@ export default function EditProdutoDialog({
       const dadosAtualizados = {
         nome: nome.trim(),
         categoria: categoria.trim(),
-        subcategoria: subcategoria.trim() || null,
-        descricao: descricao.trim() || null,
-        sku: sku.trim() || null,
-        ean: ean.trim() || null,
-        ncm: ncm.trim() || null,
+        subcategoria: subcategoria.trim() || undefined,
+        descricao: descricao.trim() || undefined,
+        sku: sku.trim() || undefined,
+        ean: ean.trim() || undefined,
+        ncm: ncm.trim() || undefined,
         unidade: unidade.trim() || 'UN',
         preco_base: precoBaseNum,
         preco_venda: precoVendaNum,
@@ -143,7 +143,7 @@ export default function EditProdutoDialog({
       };
 
       // Chamar API de atualização (TODO: implementar quando router estiver pronto)
-      // await trpc.produto.atualizar.mutate({ id: produto.id, ...dadosAtualizados });
+      // await trpc.produtos.atualizar.mutate({ id: produto.id, ...dadosAtualizados });
 
       // Simulação temporária
       console.log('Atualizando produto:', produto.id, dadosAtualizados);

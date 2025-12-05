@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { BookOpen, Copy, FileDown, Check, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export default function DocumentacaoPage() {
   const [copiado, setCopiado] = useState(false);
   const [gerando, setGerando] = useState(false);
   const [sidebarAberta, setSidebarAberta] = useState(false);
-  const { toast } = useToast();
+  
 
   // Seções da documentação
   const secoes = [

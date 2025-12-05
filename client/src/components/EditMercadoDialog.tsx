@@ -116,7 +116,7 @@ export function EditMercadoDialog({
       };
       
       // TODO: Implementar chamada TRPC mercado.atualizar
-      // await trpc.mercado.atualizar.mutate(dados);
+      // await trpc.mercados.atualizar.mutate(dados);
       
       toast.success('Mercado atualizado com sucesso!');
       onSuccess?.();

@@ -42,7 +42,7 @@ import {
 import { useTotalizadores, Totalizador } from '@/hooks/useTotalizadores';
 import { useProjetos } from '@/hooks/useProjetos';
 import { usePesquisas } from '@/hooks/usePesquisas';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 // Mapeamento de ícones do lucide-react
 const iconMap = {
@@ -137,7 +137,7 @@ const quickActions = [
 
 export default function DesktopTurboPage() {
   const [, navigate] = useLocation();
-  const { toast } = useToast();
+  
   
   // Estados dos filtros
   const [projetoId, setProjetoId] = useState<number | null>(null);
@@ -282,7 +282,7 @@ export default function DesktopTurboPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todos">Todos os projetos</SelectItem>
-                    {projetosData?.projetos.map((projeto) => (
+                    {projetosData?.data.map((projeto) => (
                       <SelectItem key={projeto.id} value={projeto.id.toString()}>
                         {projeto.nome}
                       </SelectItem>
@@ -301,7 +301,7 @@ export default function DesktopTurboPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todos">Todas as pesquisas</SelectItem>
-                    {pesquisasData?.pesquisas
+                    {pesquisasData?.data
                       .filter(p => !projetoId || p.projeto_id === projetoId)
                       .map((pesquisa) => (
                         <SelectItem key={pesquisa.id} value={pesquisa.id.toString()}>

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { trpc } from '@/lib/trpc';
 import { Link, useLocation } from 'wouter';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export default function EntidadesPage() {
   const [, setLocation] = useLocation();
@@ -18,7 +18,7 @@ export default function EntidadesPage() {
   const [entidadeSelecionada, setEntidadeSelecionada] = useState<any>(null);
   const [modalAberto, setModalAberto] = useState(false);
   const limit = 20;
-  const { toast } = useToast();
+  
 
   // Ler parâmetro tipo da URL ao carregar
   useEffect(() => {

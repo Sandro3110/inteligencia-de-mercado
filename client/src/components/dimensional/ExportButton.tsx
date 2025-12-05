@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import type { FormatoExportacao } from '@shared/types/dimensional';
 
 interface ExportButtonProps {
@@ -48,7 +48,7 @@ export function ExportButton({
   className
 }: ExportButtonProps) {
   const [exportando, setExportando] = useState(false);
-  const { toast } = useToast();
+  
 
   const exportar = async (formato: FormatoExportacao) => {
     setExportando(true);

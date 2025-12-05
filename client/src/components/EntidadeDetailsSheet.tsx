@@ -404,7 +404,7 @@ export default function EntidadeDetailsSheet({
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-2">
-                  {entidade.enriquecido ? (
+                  {entidade.enriquecido_em ? (
                     <>
                       <CheckCircle2 className="h-5 w-5 text-green-600" />
                       <span className="font-medium">Enriquecido com IA</span>
@@ -416,9 +416,9 @@ export default function EntidadeDetailsSheet({
                     </>
                   )}
                 </div>
-                {entidade.data_enriquecimento && (
+                {entidade.enriquecido_em && (
                   <p className="text-xs text-muted-foreground mt-2">
-                    Última atualização: {formatDate(entidade.data_enriquecimento)}
+                    Última atualização: {formatDate(entidade.enriquecido_em)}
                   </p>
                 )}
               </CardContent>
@@ -488,7 +488,7 @@ export default function EntidadeDetailsSheet({
               <CardContent className="space-y-2 text-sm">
                 <div>
                   <label className="text-xs text-muted-foreground">Fonte</label>
-                  <p className="font-medium">{formatValue(entidade.origem_dados)}</p>
+                  <p className="font-medium">{formatValue(entidade.origem_data)}</p>
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Data de Importação</label>

@@ -29,7 +29,7 @@ import {
   MessageCircle,
   Send,
 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { exportToExcel, exportToCSV, copyToClipboard, generateShareMessage, shareToWhatsApp, shareToTelegram, ExportData } from './ExportUtils';
 
 export interface BrowseColumn {
@@ -64,7 +64,7 @@ export function BrowseInline({
   onRowClick,
   loading = false,
 }: BrowseInlineProps) {
-  const { toast } = useToast();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -109,16 +109,16 @@ export function BrowseInline({
     switch (format) {
       case 'excel':
         exportToExcel(exportData, title.toLowerCase().replace(/\s+/g, '_'));
-        toast({ title: 'Exportado!', description: 'Arquivo Excel gerado com sucesso.' });
+        toast.success('Exportado!');
         break;
       case 'csv':
         exportToCSV(exportData, title.toLowerCase().replace(/\s+/g, '_'));
-        toast({ title: 'Exportado!', description: 'Arquivo CSV gerado com sucesso.' });
+        toast.success('Exportado!');
         break;
       case 'copy':
         copyToClipboard(exportData).then((success) => {
           if (success) {
-            toast({ title: 'Copiado!', description: 'Dados copiados para a área de transferência.' });
+            toast.success('Copiado!');
           } else {
             toast({ title: 'Erro', description: 'Falha ao copiar dados.', variant: 'destructive' });
           }

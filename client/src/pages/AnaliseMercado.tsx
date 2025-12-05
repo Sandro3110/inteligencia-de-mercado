@@ -37,14 +37,14 @@ export function AnaliseMercado() {
   const [selecionado, setSelecionado] = useState<string | null>(null);
 
   // Buscar dados via tRPC
-  const { data: hierarquia, isLoading: loadingHierarquia } = trpc.mercado.hierarquia.useQuery({
+  const { data: hierarquia, isLoading: loadingHierarquia } = trpc.mercados.hierarquia.useQuery({
     nivel: nivelAtual,
     selecionado
   });
 
-  const { data: concorrentes, isLoading: loadingConcorrentes } = trpc.mercado.concorrencia.useQuery({});
+  const { data: concorrentes, isLoading: loadingConcorrentes } = trpc.mercados.concorrencia.useQuery({});
 
-  const { data: oportunidades, isLoading: loadingOportunidades } = trpc.mercado.oportunidades.useQuery({});
+  const { data: oportunidades, isLoading: loadingOportunidades } = trpc.mercados.oportunidades.useQuery({});
 
   const loading = loadingHierarquia || loadingConcorrentes || loadingOportunidades;
 

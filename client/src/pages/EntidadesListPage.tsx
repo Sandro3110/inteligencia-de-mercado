@@ -37,7 +37,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { useEntidades, type EntidadesFilters, type Entidade } from '@/hooks/useEntidades';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import EntidadeDetailsSheet from '@/components/EntidadeDetailsSheet';
 
 // Mapeamento de tipos para labels e ícones
@@ -50,7 +50,7 @@ const tipoConfig = {
 export default function EntidadesListPage() {
   const [, navigate] = useLocation();
   const searchParams = new URLSearchParams(useSearch());
-  const { toast } = useToast();
+  
 
   // Ler filtros herdados da URL
   const tipoInicial = searchParams.get('tipo') || '';

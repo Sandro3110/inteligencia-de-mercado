@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import type { FormatoCopia } from '@shared/types/dimensional';
 
 interface CopyButtonProps {
@@ -36,7 +36,7 @@ export function CopyButton({
   className
 }: CopyButtonProps) {
   const [copiado, setCopiado] = useState(false);
-  const { toast } = useToast();
+  
 
   const copiar = async (formato: FormatoCopia) => {
     try {

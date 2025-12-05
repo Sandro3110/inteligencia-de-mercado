@@ -30,7 +30,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useProduto, useProdutoEntidades, useProdutoMercados, type Produto } from '@/hooks/useProdutos';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import EditProdutoDialog from './EditProdutoDialog';
 
 interface ProdutoDetailsSheetProps {
@@ -46,7 +46,7 @@ export default function ProdutoDetailsSheet({
 }: ProdutoDetailsSheetProps) {
   const [activeTab, setActiveTab] = useState('geral');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const { toast } = useToast();
+  
 
   // Buscar dados relacionados
   const { entidades, isLoading: loadingEntidades } = useProdutoEntidades(produto?.produto_id || 0);
@@ -81,11 +81,11 @@ export default function ProdutoDetailsSheet({
   };
 
   const handleExportar = () => {
-    toast({ title: 'Em desenvolvimento', description: 'Função de exportação será implementada em breve' });
+    toast.success('Em desenvolvimento');
   };
 
   const handleExcluir = () => {
-    toast({ title: 'Em desenvolvimento', description: 'Função de exclusão será implementada em breve' });
+    toast.success('Em desenvolvimento');
   };
 
   return (

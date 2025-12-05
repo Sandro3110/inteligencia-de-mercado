@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { trpc } from '@/lib/trpc';
 import { useLocation } from 'wouter';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import MercadoDetailsSheet from '@/components/MercadoDetailsSheet';
 
 export default function MercadosPage() {
@@ -24,10 +24,10 @@ export default function MercadosPage() {
   const [mercadoSelecionado, setMercadoSelecionado] = useState<any>(null);
   const [modalAberto, setModalAberto] = useState(false);
   const limit = 20;
-  const { toast } = useToast();
+  
 
   // Query para listar mercados
-  const mercados = trpc.mercado.list.useQuery({
+  const mercados = trpc.mercados.list.useQuery({
     busca: busca || undefined,
     categoria: categoriaFiltro,
     segmentacao: segmentacaoFiltro,

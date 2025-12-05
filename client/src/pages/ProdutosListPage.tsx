@@ -33,13 +33,13 @@ import {
   Barcode,
 } from 'lucide-react';
 import { useProdutos, useCategorias, useSubcategorias, type ProdutoFiltros, type Produto } from '@/hooks/useProdutos';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import ProdutoDetailsSheet from '@/components/ProdutoDetailsSheet';
 
 export default function ProdutosListPage() {
   const [, navigate] = useLocation();
   const searchParams = new URLSearchParams(useSearch());
-  const { toast } = useToast();
+  
 
   // Estados dos filtros
   const [search, setSearch] = useState<string>('');

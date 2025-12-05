@@ -200,7 +200,7 @@ export default function ImportacaoPage() {
         nome_fantasia: row[mapping.nome_fantasia] || '',
         num_filiais: parseInt(row[mapping.num_filiais]) || 0,
         num_lojas: parseInt(row[mapping.num_lojas]) || 0,
-        num_funcionarios: parseInt(row[mapping.num_funcionarios]) || null,
+        num_funcionarios: parseInt(row[mapping.num_funcionarios]) || undefined,
       }));
 
       setProgress(40);

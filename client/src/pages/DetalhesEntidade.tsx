@@ -51,15 +51,15 @@ export function DetalhesEntidade() {
   const entidadeId = Number(params.id);
 
   // Buscar dados via tRPC
-  const { data: entidade, isLoading: loading } = trpc.entidade.detalhes.useQuery({ 
+  const { data: entidade, isLoading: loading } = trpc.entidades.detalhes.useQuery({ 
     id: entidadeId 
   });
 
-  const { data: similares } = trpc.entidade.similares.useQuery({ 
+  const { data: similares } = trpc.entidades.similares.useQuery({ 
     id: entidadeId 
   });
 
-  const { data: recomendacoes } = trpc.entidade.recomendacoes.useQuery({ 
+  const { data: recomendacoes } = trpc.entidades.recomendacoes.useQuery({ 
     id: entidadeId 
   });
 
