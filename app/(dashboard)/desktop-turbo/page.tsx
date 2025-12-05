@@ -295,7 +295,7 @@ export default function DesktopTurboPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todos">Todos os projetos</SelectItem>
-                    {projetosData?.projetos.map((projeto: any) => (
+                    {projetosData?.data.map((projeto: any) => (
                       <SelectItem key={projeto.id} value={projeto.id.toString()}>
                         {projeto.nome}
                       </SelectItem>
@@ -314,7 +314,7 @@ export default function DesktopTurboPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todos">Todas as pesquisas</SelectItem>
-                    {pesquisasData?.pesquisas
+                    {pesquisasData?.data
                       ?.filter((p: any) => !projetoId || p.projeto_id === projetoId)
                       .map((pesquisa: any) => (
                         <SelectItem key={pesquisa.id} value={pesquisa.id.toString()}>
