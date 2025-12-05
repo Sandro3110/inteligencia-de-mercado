@@ -87,6 +87,15 @@ export const entidadesRouter = router({
         nome: z.string().optional(),
         cnpj: z.string().optional(),
         email: z.string().email().optional(),
+        telefone: z.string().optional(),
+        celular: z.string().optional(),
+        website: z.string().optional(),
+        endereco: z.string().optional(),
+        cidade: z.string().optional(),
+        estado: z.string().optional(),
+        cep: z.string().optional(),
+        setor: z.string().optional(),
+        porte: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {

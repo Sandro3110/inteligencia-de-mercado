@@ -48,11 +48,11 @@ export function EditEntidadeDialog({ entidade, open, onOpenChange, onSuccess }: 
   });
 
   const utils = trpc.useUtils();
-  const atualizarMutation = trpc.entidade.atualizar.useMutation({
+  const atualizarMutation = trpc.entidades.update.useMutation({
     onSuccess: () => {
       toast.success('Entidade atualizada com sucesso!');
-      utils.entidade.listar.invalidate();
-      utils.entidade.obterPorId.invalidate({ id: entidade.id });
+      utils.entidades.list.invalidate();
+      utils.entidades.getById.invalidate(entidade.id);
       onOpenChange(false);
       onSuccess?.();
     },
