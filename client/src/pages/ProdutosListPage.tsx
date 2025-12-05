@@ -49,11 +49,11 @@ export default function ProdutosListPage() {
   const [precoMax, setPrecoMax] = useState<string>('');
   const [ativo, setAtivo] = useState<'true' | 'false' | 'todos'>('todos');
   const [ordem, setOrdem] = useState<'nome' | 'preco' | 'data_cadastro' | 'categoria'>('data_cadastro');
-  const [direcao, setDirecao] = useState<'asc' | 'desc'>('desc');
+  const [direcao, setDirecao] = useState<'ASC' | 'DESC'>('DESC');
 
   // Paginação
-  const [offset, setOffset] = useState(0);
-  const limit = 20;
+  const [pagina, setPagina] = useState(1);
+  const porPagina = 20;
 
   // Sheet de detalhes (preparação)
   const [selectedProduto, setSelectedProduto] = useState<Produto | null>(null);
@@ -71,14 +71,16 @@ export default function ProdutosListPage() {
     preco_min: precoMin ? parseFloat(precoMin) : undefined,
     preco_max: precoMax ? parseFloat(precoMax) : undefined,
     ativo: ativo && ativo !== 'todos' ? ativo === 'true' : undefined,
-    ordem,
-    direcao,
-    limit,
-    offset,
+    ordenacao: {
+      campo: ordem,
+      direcao: direcao,
+    },
+    pagina,
+    porPagina,
   };
 
   // Buscar produtos
-  const { produtos, total, isLoading, isError, error } = useProdutos(filters);
+  const { produtos, total, pagina: paginaAtual, totalPaginas, isLoading, isError, error } = useProdutos(filters);
 
   // Handlers
   const handleLimparFiltros = () => {
@@ -89,19 +91,19 @@ export default function ProdutosListPage() {
     setPrecoMax('');
     setAtivo('todos');
     setOrdem('data_cadastro');
-    setDirecao('desc');
-    setOffset(0);
+    setDirecao('DESC');
+    setPagina(1);
   };
 
   const handlePaginaAnterior = () => {
-    if (offset > 0) {
-      setOffset(Math.max(0, offset - limit));
+    if (pagina > 1) {
+      setPagina(pagina - 1);
     }
   };
 
   const handleProximaPagina = () => {
-    if (offset + limit < total) {
-      setOffset(offset + limit);
+    if (pagina < totalPaginas) {
+      setPagina(pagina + 1);
     }
   };
 

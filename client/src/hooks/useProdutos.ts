@@ -14,10 +14,12 @@ export interface ProdutoFiltros {
   preco_min?: number;
   preco_max?: number;
   ativo?: boolean;
-  ordem?: 'nome' | 'preco' | 'data_cadastro' | 'categoria';
-  direcao?: 'asc' | 'desc';
-  limit?: number;
-  offset?: number;
+  ordenacao?: {
+    campo: 'nome' | 'preco' | 'data_cadastro' | 'categoria';
+    direcao: 'ASC' | 'DESC';
+  };
+  pagina?: number;
+  porPagina?: number;
 }
 
 export interface Produto {
@@ -50,8 +52,11 @@ export function useProdutos(filtros: ProdutoFiltros = {}) {
   });
 
   return {
-    produtos: query.data?.data as Produto[] | undefined,
-    total: query.data?.total || 0,
+    produtos: query.data?.dados as Produto[] | undefined,
+    total: query.data?.paginacao?.total || 0,
+    pagina: query.data?.paginacao?.pagina || 1,
+    porPagina: query.data?.paginacao?.porPagina || 20,
+    totalPaginas: query.data?.paginacao?.totalPaginas || 0,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
@@ -83,9 +88,9 @@ export function useProduto(id: number) {
 /**
  * Hook para listar entidades vinculadas a um produto
  */
-export function useProdutoEntidades(produto_id: number, limit = 20, offset = 0) {
+export function useProdutoEntidades(produtoId: number, pagina = 1, porPagina = 20) {
   const query = trpc.produto.getEntidades.useQuery(
-    { produto_id, limit, offset },
+    { produtoId, pagina, porPagina },
     {
       enabled: !!produto_id,
       staleTime: 5 * 60 * 1000,
@@ -93,8 +98,8 @@ export function useProdutoEntidades(produto_id: number, limit = 20, offset = 0) 
   );
 
   return {
-    entidades: query.data?.data || [],
-    total: query.data?.total || 0,
+    entidades: query.data?.dados || [],
+    total: query.data?.paginacao?.total || 0,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
@@ -105,9 +110,9 @@ export function useProdutoEntidades(produto_id: number, limit = 20, offset = 0) 
 /**
  * Hook para listar mercados vinculados a um produto
  */
-export function useProdutoMercados(produto_id: number, limit = 20, offset = 0) {
+export function useProdutoMercados(produtoId: number, pagina = 1, porPagina = 20) {
   const query = trpc.produto.getMercados.useQuery(
-    { produto_id, limit, offset },
+    { produtoId, pagina, porPagina },
     {
       enabled: !!produto_id,
       staleTime: 5 * 60 * 1000,
@@ -115,8 +120,8 @@ export function useProdutoMercados(produto_id: number, limit = 20, offset = 0) {
   );
 
   return {
-    mercados: query.data?.data || [],
-    total: query.data?.total || 0,
+    mercados: query.data?.dados || [],
+    total: query.data?.paginacao?.total || 0,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
