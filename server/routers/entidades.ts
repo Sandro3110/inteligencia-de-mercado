@@ -20,6 +20,7 @@ export const entidadesRouter = router({
         status_qualificacao_id: z.number().optional(),
         projeto_id: z.number().optional(),
         pesquisa_id: z.number().optional(),
+        enriquecido: z.boolean().optional(), // Filtrar por status de enriquecimento
         limit: z.number().default(20),
         offset: z.number().default(0),
       })
@@ -33,6 +34,7 @@ export const entidadesRouter = router({
         statusQualificacaoId: input.status_qualificacao_id,
         projetoId: input.projeto_id,
         pesquisaId: input.pesquisa_id,
+        enriquecido: input.enriquecido,
         limit: input.limit,
         page: page,
       });

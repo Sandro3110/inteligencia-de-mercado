@@ -65,6 +65,7 @@ export interface EntidadeFilters {
   statusQualificacaoId?: number;
   projetoId?: number;
   pesquisaId?: number;
+  enriquecido?: boolean; // Filtrar por status de enriquecimento IA
   orderBy?: 'nome' | 'created_at';
   orderDirection?: 'asc' | 'desc';
   page?: number;
@@ -179,6 +180,7 @@ export async function getEntidades(
     statusQualificacaoId,
     projetoId,
     pesquisaId,
+    enriquecido,
     orderBy = 'created_at',
     orderDirection = 'desc',
     page = 1,
@@ -226,6 +228,17 @@ export async function getEntidades(
 
   if (statusQualificacaoId) {
     conditions.push(eq(dimEntidade.statusQualificacaoId, statusQualificacaoId));
+  }
+
+  // Filtrar por status de enriquecimento IA
+  if (enriquecido !== undefined) {
+    if (enriquecido) {
+      // Enriquecidas: enriquecido_em IS NOT NULL
+      conditions.push(sql`${dimEntidade.enriquecidoEm} IS NOT NULL`);
+    } else {
+      // Não enriquecidas: enriquecido_em IS NULL
+      conditions.push(isNull(dimEntidade.enriquecidoEm));
+    }
   }
 
   // TODO: Adicionar filtros por projeto e pesquisa quando houver relacionamento

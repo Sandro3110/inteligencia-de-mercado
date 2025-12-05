@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { trpc } from '@/lib/trpc';
 import { Sparkles, Brain, Search, Network, Target, Zap, Play, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Card } from '@/components/ui/card';
@@ -35,8 +36,6 @@ interface EnriquecimentoResult {
 }
 
 export default function EnriquecimentoPage() {
-  const [entidades, setEntidades] = useState<Entidade[]>([]);
-  const [loading, setLoading] = useState(true);
   const [processando, setProcessando] = useState(false);
   const [resultados, setResultados] = useState<Map<number, EnriquecimentoResult>>(new Map());
   
@@ -44,24 +43,14 @@ export default function EnriquecimentoPage() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [showProgress, setShowProgress] = useState(false);
 
-  useEffect(() => {
-    carregarEntidades();
-  }, []);
+  // Buscar entidades não enriquecidas via tRPC
+  const { data, isLoading: loading, refetch: carregarEntidades } = trpc.entidades.list.useQuery({
+    enriquecido: false, // Apenas entidades não enriquecidas
+    limit: 100,
+    offset: 0
+  });
 
-  const carregarEntidades = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/entidades');
-      if (!response.ok) throw new Error('Erro ao carregar entidades');
-      const data = await response.json();
-      setEntidades(data.entidades || []);
-    } catch (error) {
-      console.error('Erro ao carregar entidades:', error);
-      toast.error('Erro ao carregar entidades');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const entidades = data?.data || [];
 
   const enriquecerEntidade = async (entidade: Entidade) => {
     const novoResultado: EnriquecimentoResult = {
