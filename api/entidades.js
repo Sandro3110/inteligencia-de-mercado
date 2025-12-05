@@ -5,6 +5,9 @@ const { sql } = require('@vercel/postgres');
  * GET /api/entidades
  * 
  * Retorna lista de entidades que precisam ser enriquecidas com IA
+ * 
+ * @version 1.0.1
+ * @updated 2025-12-05
  */
 
 module.exports = async function handler(req, res) {
