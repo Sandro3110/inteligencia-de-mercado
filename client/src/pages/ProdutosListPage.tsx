@@ -48,7 +48,7 @@ export default function ProdutosListPage() {
   const [precoMin, setPrecoMin] = useState<string>('');
   const [precoMax, setPrecoMax] = useState<string>('');
   const [ativo, setAtivo] = useState<'true' | 'false' | 'todos'>('todos');
-  const [ordem, setOrdem] = useState<'nome' | 'preco' | 'data_cadastro' | 'categoria'>('data_cadastro');
+  const [ordem, setOrdem] = useState<'nome' | 'preco' | 'created_at' | 'categoria'>('created_at');
   const [direcao, setDirecao] = useState<'ASC' | 'DESC'>('DESC');
 
   // Paginação
@@ -90,7 +90,7 @@ export default function ProdutosListPage() {
     setPrecoMin('');
     setPrecoMax('');
     setAtivo('todos');
-    setOrdem('data_cadastro');
+    setOrdem('created_at');
     setDirecao('DESC');
     setPagina(1);
   };
@@ -294,7 +294,7 @@ export default function ProdutosListPage() {
                   <SelectContent>
                     <SelectItem value="nome">Nome</SelectItem>
                     <SelectItem value="preco">Preço</SelectItem>
-                    <SelectItem value="data_cadastro">Data</SelectItem>
+                    <SelectItem value="created_at">Data</SelectItem>
                     <SelectItem value="categoria">Categoria</SelectItem>
                   </SelectContent>
                 </Select>
@@ -411,7 +411,7 @@ export default function ProdutosListPage() {
                         )}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {formatarData(produto.data_cadastro)}
+                        {formatarData(produto.created_at)}
                       </TableCell>
                     </TableRow>
                   ))}
