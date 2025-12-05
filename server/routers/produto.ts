@@ -57,71 +57,8 @@ export const produtoRouter = router({
         offset = 0 
       } = input;
 
-      // Construir query SQL dinamicamente
-      let whereConditions: string[] = [];
-
-      // Filtro de busca (nome ou descrição)
-      if (search) {
-        whereConditions.push(`(nome ILIKE '%${search}%' OR descricao ILIKE '%${search}%')`);
-      }
-
-      // Filtro de categoria
-      if (categoria) {
-        whereConditions.push(`categoria = '${categoria}'`);
-      }
-
-      // Filtro de subcategoria
-      if (subcategoria) {
-        whereConditions.push(`subcategoria = '${subcategoria}'`);
-      }
-
-      // Filtro de SKU
-      if (sku) {
-        whereConditions.push(`sku = '${sku}'`);
-      }
-
-      // Filtro de EAN
-      if (ean) {
-        whereConditions.push(`ean = '${ean}'`);
-      }
-
-      // Filtro de NCM
-      if (ncm) {
-        whereConditions.push(`ncm = '${ncm}'`);
-      }
-
-      // Filtro de preço mínimo
-      if (preco_min !== undefined) {
-        whereConditions.push(`preco >= ${preco_min}`);
-      }
-
-      // Filtro de preço máximo
-      if (preco_max !== undefined) {
-        whereConditions.push(`preco <= ${preco_max}`);
-      }
-
-      // Filtro de status ativo
-      if (ativo !== undefined) {
-        whereConditions.push(`ativo = ${ativo}`);
-      }
-
-      const whereClause = whereConditions.length > 0 
-        ? `WHERE ${whereConditions.join(' AND ')}` 
-        : '';
-
-      // Mapeamento de ordenação
-      const orderByMap: Record<string, string> = {
-        nome: 'nome',
-        preco: 'preco',
-        data_cadastro: 'data_cadastro',
-        categoria: 'categoria'
-      };
-
-      const orderByColumn = orderByMap[ordem] || 'data_cadastro';
-      const orderByDirection = direcao.toUpperCase();
-
-      // Query SQL completa
-      const queryText = `
+      // Construir query base
+      let query = sql`
         SELECT 
           produto_id,
           nome,
@@ -142,12 +79,62 @@ export const produtoRouter = router({
           fonte,
           COUNT(*) OVER() as total_count
         FROM dim_produto_catalogo
-        ${whereClause}
-        ORDER BY ${orderByColumn} ${orderByDirection}
-        LIMIT ${limit} OFFSET ${offset}
+        WHERE 1=1
       `;
 
-      const resultado = await db.execute(sql.raw(queryText));
+      // Aplicar filtros dinamicamente
+      if (search) {
+        query = sql`${query} AND (nome ILIKE ${`%${search}%`} OR descricao ILIKE ${`%${search}%`})`;
+      }
+
+      if (categoria) {
+        query = sql`${query} AND categoria = ${categoria}`;
+      }
+
+      if (subcategoria) {
+        query = sql`${query} AND subcategoria = ${subcategoria}`;
+      }
+
+      if (sku) {
+        query = sql`${query} AND sku = ${sku}`;
+      }
+
+      if (ean) {
+        query = sql`${query} AND ean = ${ean}`;
+      }
+
+      if (ncm) {
+        query = sql`${query} AND ncm = ${ncm}`;
+      }
+
+      if (preco_min !== undefined) {
+        query = sql`${query} AND preco >= ${preco_min}`;
+      }
+
+      if (preco_max !== undefined) {
+        query = sql`${query} AND preco <= ${preco_max}`;
+      }
+
+      if (ativo !== undefined) {
+        query = sql`${query} AND ativo = ${ativo}`;
+      }
+
+      // Ordenação
+      const orderByColumn = ordem === 'nome' ? sql`nome` :
+                           ordem === 'preco' ? sql`preco` :
+                           ordem === 'categoria' ? sql`categoria` :
+                           sql`data_cadastro`;
+
+      if (direcao === 'asc') {
+        query = sql`${query} ORDER BY ${orderByColumn} ASC`;
+      } else {
+        query = sql`${query} ORDER BY ${orderByColumn} DESC`;
+      }
+
+      // Paginação
+      query = sql`${query} LIMIT ${limit} OFFSET ${offset}`;
+
+      const resultado = await db.execute(query);
 
       return {
         data: resultado.rows,
@@ -165,7 +152,7 @@ export const produtoRouter = router({
       id: z.number()
     }))
     .query(async ({ input }) => {
-      const queryText = `
+      const query = sql`
         SELECT 
           produto_id,
           nome,
@@ -188,7 +175,7 @@ export const produtoRouter = router({
         WHERE produto_id = ${input.id}
       `;
 
-      const resultado = await db.execute(sql.raw(queryText));
+      const resultado = await db.execute(query);
 
       if (resultado.rows.length === 0) {
         throw new Error('Produto não encontrado');
@@ -209,7 +196,7 @@ export const produtoRouter = router({
     .query(async ({ input }) => {
       const { produtoId, limit = 20, offset = 0 } = input;
 
-      const queryText = `
+      const query = sql`
         SELECT 
           e.id,
           e.nome,
@@ -228,7 +215,7 @@ export const produtoRouter = router({
         LIMIT ${limit} OFFSET ${offset}
       `;
 
-      const resultado = await db.execute(sql.raw(queryText));
+      const resultado = await db.execute(query);
 
       return {
         data: resultado.rows,
@@ -250,7 +237,7 @@ export const produtoRouter = router({
     .query(async ({ input }) => {
       const { produtoId, limit = 20, offset = 0 } = input;
 
-      const queryText = `
+      const query = sql`
         SELECT 
           m.mercado_id,
           m.nome,
@@ -267,7 +254,7 @@ export const produtoRouter = router({
         LIMIT ${limit} OFFSET ${offset}
       `;
 
-      const resultado = await db.execute(sql.raw(queryText));
+      const resultado = await db.execute(query);
 
       return {
         data: resultado.rows,
@@ -282,7 +269,7 @@ export const produtoRouter = router({
    */
   getStats: publicProcedure
     .query(async () => {
-      const queryText = `
+      const query = sql`
         SELECT 
           COUNT(*) as total_produtos,
           COUNT(*) FILTER (WHERE ativo = true) as produtos_ativos,
@@ -295,7 +282,7 @@ export const produtoRouter = router({
         FROM dim_produto_catalogo
       `;
 
-      const resultado = await db.execute(sql.raw(queryText));
+      const resultado = await db.execute(query);
 
       return resultado.rows[0];
     }),
@@ -305,7 +292,7 @@ export const produtoRouter = router({
    */
   getCategorias: publicProcedure
     .query(async () => {
-      const queryText = `
+      const query = sql`
         SELECT 
           categoria,
           COUNT(*) as total_produtos
@@ -315,7 +302,7 @@ export const produtoRouter = router({
         ORDER BY categoria
       `;
 
-      const resultado = await db.execute(sql.raw(queryText));
+      const resultado = await db.execute(query);
 
       return resultado.rows;
     }),
@@ -328,18 +315,18 @@ export const produtoRouter = router({
       categoria: z.string()
     }))
     .query(async ({ input }) => {
-      const queryText = `
+      const query = sql`
         SELECT 
           subcategoria,
           COUNT(*) as total_produtos
         FROM dim_produto_catalogo
-        WHERE categoria = '${input.categoria}'
+        WHERE categoria = ${input.categoria}
           AND subcategoria IS NOT NULL
         GROUP BY subcategoria
         ORDER BY subcategoria
       `;
 
-      const resultado = await db.execute(sql.raw(queryText));
+      const resultado = await db.execute(query);
 
       return resultado.rows;
     })
