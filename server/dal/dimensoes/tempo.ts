@@ -2,7 +2,7 @@
  * DAL para dim_tempo
  */
 
-import { db } from '../db';
+import { db } from '../../db';
 import { dimTempo } from '../../../drizzle/schema';
 import { eq, and, gte, lte, sql } from 'drizzle-orm';
 

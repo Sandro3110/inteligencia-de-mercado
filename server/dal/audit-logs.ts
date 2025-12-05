@@ -82,7 +82,7 @@ export async function getLogsRecentes(limite: number = 100): Promise<AuditLogRec
     LIMIT ${limite}
   `);
 
-  return result.rows as AuditLogRecente[];
+  return result as unknown as AuditLogRecente[];
 }
 
 /**
@@ -101,7 +101,7 @@ export async function getHistoricoRegistro(
     )
   `);
 
-  return result.rows as AuditLog[];
+  return result as unknown as AuditLog[];
 }
 
 /**
@@ -117,7 +117,7 @@ export async function getHistoricoEntidade(
     LIMIT ${limite}
   `);
 
-  return result.rows as AuditLog[];
+  return result as unknown as AuditLog[];
 }
 
 /**
@@ -134,7 +134,7 @@ export async function getLogsByUsuario(
     LIMIT ${limite}
   `);
 
-  return result.rows as AuditLog[];
+  return result as unknown as AuditLog[];
 }
 
 /**
@@ -151,7 +151,7 @@ export async function getLogsByTabela(
     LIMIT ${limite}
   `);
 
-  return result.rows as AuditLog[];
+  return result as unknown as AuditLog[];
 }
 
 /**
@@ -168,7 +168,7 @@ export async function getLogsByOperacao(
     LIMIT ${limite}
   `);
 
-  return result.rows as AuditLog[];
+  return result as unknown as AuditLog[];
 }
 
 /**
@@ -179,7 +179,7 @@ export async function getAuditStats(): Promise<AuditStats[]> {
     SELECT * FROM v_audit_stats
   `);
 
-  return result.rows as AuditStats[];
+  return result as unknown as AuditStats[];
 }
 
 /**
@@ -199,7 +199,7 @@ export async function compareVersions(
     )
   `);
 
-  return result.rows as Array<{
+  return result as unknown as Array<{
     campo: string;
     valor_version1: string;
     valor_version2: string;
@@ -215,7 +215,7 @@ export async function getLogById(id: number): Promise<AuditLog | null> {
     WHERE id = ${id}
   `);
 
-  return result.rows[0] as AuditLog | null;
+  return (result as any)[0] as AuditLog | null;
 }
 
 /**
@@ -233,7 +233,7 @@ export async function getLogsByPeriodo(
     LIMIT ${limite}
   `);
 
-  return result.rows as AuditLog[];
+  return result as unknown as AuditLog[];
 }
 
 /**
@@ -282,7 +282,7 @@ export async function getLogsComFiltros(filtros: FiltrosAuditLog): Promise<Audit
   query = sql`${query} ORDER BY created_at DESC LIMIT ${limite}`;
 
   const result = await db.execute(query);
-  return result.rows as AuditLog[];
+  return result as unknown as AuditLog[];
 }
 
 // ============================================================================
@@ -299,7 +299,7 @@ export async function cleanupOldLogs(retentionDays: number = 365): Promise<numbe
     SELECT cleanup_old_audit_logs(${retentionDays})
   `);
 
-  return (result.rows[0] as any).cleanup_old_audit_logs;
+  return ((result as any)[0] as any).cleanup_old_audit_logs;
 }
 
 /**
@@ -310,7 +310,7 @@ export async function countLogs(): Promise<number> {
     SELECT COUNT(*) as total FROM data_audit_logs
   `);
 
-  return (result.rows[0] as any).total;
+  return ((result as any)[0] as any).total;
 }
 
 /**
@@ -322,7 +322,7 @@ export async function countLogsByTabela(tabela: TabelaAuditada): Promise<number>
     WHERE tabela = ${tabela}
   `);
 
-  return (result.rows[0] as any).total;
+  return ((result as any)[0] as any).total;
 }
 
 // ============================================================================
@@ -346,7 +346,7 @@ export async function getUsuariosMaisAtivos(
     LIMIT ${limite}
   `);
 
-  return result.rows as Array<{ usuario_id: string; total_operacoes: number }>;
+  return result as unknown as Array<{ usuario_id: string; total_operacoes: number }>;
 }
 
 /**
@@ -365,7 +365,7 @@ export async function getTabelasMaisAlteradas(
     LIMIT ${limite}
   `);
 
-  return result.rows as Array<{ tabela: TabelaAuditada; total_operacoes: number }>;
+  return result as unknown as Array<{ tabela: TabelaAuditada; total_operacoes: number }>;
 }
 
 /**
@@ -383,5 +383,5 @@ export async function getAtividadePorHora(): Promise<
     ORDER BY hora
   `);
 
-  return result.rows as Array<{ hora: number; total_operacoes: number }>;
+  return result as unknown as Array<{ hora: number; total_operacoes: number }>;
 }

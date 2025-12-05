@@ -133,10 +133,13 @@ export async function createEntidade(input: CreateEntidadeInput) {
     throw new Error('Já existe uma entidade com os mesmos dados');
   }
 
+  // Remover createdBy e updatedBy do input (são integers no schema)
+  const { createdBy, updatedBy, ...inputSemUserIds } = input as any;
+  
   const [novaEntidade] = await db
     .insert(dimEntidade)
     .values({
-      ...input,
+      ...inputSemUserIds,
       entidadeHash,
       origemData: new Date(),
       createdAt: new Date(),
@@ -226,9 +229,10 @@ export async function getEntidades(
     );
   }
 
-  if (statusQualificacaoId) {
-    conditions.push(eq(dimEntidade.statusQualificacaoId, statusQualificacaoId));
-  }
+  // TODO: statusQualificacaoId não existe no schema atual
+  // if (statusQualificacaoId) {
+  //   conditions.push(eq(dimEntidade.statusQualificacaoId, statusQualificacaoId));
+  // }
 
   // Filtrar por status de enriquecimento IA
   if (enriquecido !== undefined) {
@@ -307,10 +311,13 @@ export async function updateEntidade(id: number, input: UpdateEntidadeInput) {
     input.cnpj = cnpjLimpo;
   }
 
+  // Remover updatedBy do input (é integer no schema)
+  const { updatedBy, ...inputSemUserId } = input as any;
+  
   const [entidadeAtualizada] = await db
     .update(dimEntidade)
     .set({
-      ...input,
+      ...inputSemUserId,
       updatedAt: new Date(),
     })
     .where(eq(dimEntidade.id, id))

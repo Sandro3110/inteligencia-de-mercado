@@ -6,7 +6,7 @@
    - Environments: .env.production
 
    Creating an optimized production build ...
-(node:35775) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(node:41647) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
  ⚠ Compiled with warnings
 
@@ -3725,16 +3725,15 @@ Import trace for requested module:
    Linting and checking validity of types ...
 Failed to compile.
 
-./client/src/App.tsx:37:38
-Type error: Type 'Promise<typeof import("/home/ubuntu/inteligencia-de-mercado/client/src/pages/AnaliseGeografica")>' is not assignable to type 'Promise<{ default: ComponentType<any>; }>'.
-  Property 'default' is missing in type 'typeof import("/home/ubuntu/inteligencia-de-mercado/client/src/pages/AnaliseGeografica")' but required in type '{ default: ComponentType<any>; }'.
+./server/dal/dimensoes/canal.ts:5:20
+Type error: Cannot find module '../db' or its corresponding type declarations.
 
-[0m [90m 35 |[39m [36mconst[39m [33mCuboExplorador[39m [33m=[39m lazy(() [33m=>[39m [36mimport[39m([32m'./pages/CuboExplorador'[39m))[33m;[39m[0m
-[0m [90m 36 |[39m [36mconst[39m [33mAnaliseTemporal[39m [33m=[39m lazy(() [33m=>[39m [36mimport[39m([32m'./pages/AnaliseTemporal'[39m))[33m;[39m[0m
-[0m[31m[1m>[22m[39m[90m 37 |[39m [36mconst[39m [33mAnaliseGeografica[39m [33m=[39m lazy(() [33m=>[39m [36mimport[39m([32m'./pages/AnaliseGeografica'[39m))[33m;[39m[0m
-[0m [90m    |[39m                                      [31m[1m^[22m[39m[0m
-[0m [90m 38 |[39m [36mconst[39m [33mAnaliseMercado[39m [33m=[39m lazy(() [33m=>[39m [36mimport[39m([32m'./pages/AnaliseMercado'[39m))[33m;[39m[0m
-[0m [90m 39 |[39m [36mconst[39m [33mDetalhesEntidade[39m [33m=[39m lazy(() [33m=>[39m [36mimport[39m([32m'./pages/DetalhesEntidade'[39m))[33m;[39m[0m
-[0m [90m 40 |[39m [36mconst[39m [33mDesktopTurboPage[39m [33m=[39m lazy(() [33m=>[39m [36mimport[39m([32m'./pages/DesktopTurboPage'[39m))[33m;[39m[0m
+[0m [90m 3 |[39m [90m */[39m[0m
+[0m [90m 4 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { db } [36mfrom[39m [32m'../db'[39m[33m;[39m[0m
+[0m [90m   |[39m                    [31m[1m^[22m[39m[0m
+[0m [90m 6 |[39m [36mimport[39m { dimCanal } [36mfrom[39m [32m'../../../drizzle/schema'[39m[33m;[39m[0m
+[0m [90m 7 |[39m [36mimport[39m { eq[33m,[39m and[33m,[39m sql } [36mfrom[39m [32m'drizzle-orm'[39m[33m;[39m[0m
+[0m [90m 8 |[39m[0m
 Next.js build worker exited with code: 1 and signal: null
  ELIFECYCLE  Command failed with exit code 1.

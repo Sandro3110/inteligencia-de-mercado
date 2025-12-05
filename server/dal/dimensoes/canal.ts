@@ -2,7 +2,7 @@
  * DAL para dim_canal
  */
 
-import { db } from '../db';
+import { db } from '../../db';
 import { dimCanal } from '../../../drizzle/schema';
 import { eq, and, sql } from 'drizzle-orm';
 

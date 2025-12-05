@@ -5,7 +5,7 @@
  * VERSÃO CORRIGIDA - Usando nomes corretos do schema
  */
 
-import { db } from '../db';
+import { db } from '../../db';
 import {
   fatoEntidadeContexto,    // ✅ CORRETO (era fatoEntidades)
   dimEntidade,             // ✅ CORRETO
