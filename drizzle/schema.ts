@@ -152,6 +152,10 @@ export const dimEntidade = pgTable('dim_entidade', {
   origemConfianca: integer('origem_confianca'),
   origemData: timestamp('origem_data').notNull().defaultNow(),
   origemUsuarioId: integer('origem_usuario_id'),
+  // Enriquecimento IA
+  enriquecido: boolean('enriquecido').default(false),
+  enriquecidoEm: timestamp('enriquecido_em'),
+  enriquecidoPor: varchar('enriquecido_por', { length: 50 }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   createdBy: integer('created_by'),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
