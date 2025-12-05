@@ -1,0 +1,43 @@
+{
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-5f5d3e427acc4739.js",
+      "static/chunks/1d916cef-0dc7f8b9deca2b8d.js",
+      "static/chunks/297-9285e30fcdd1b419.js",
+      "static/chunks/main-app-9aa7206b65debb5d.js",
+      "static/chunks/app/_not-found/page-7b14659ad562d8bd.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-5f5d3e427acc4739.js",
+      "static/chunks/1d916cef-0dc7f8b9deca2b8d.js",
+      "static/chunks/297-9285e30fcdd1b419.js",
+      "static/chunks/main-app-9aa7206b65debb5d.js",
+      "static/css/7e49a7f509a53dc1.css",
+      "static/chunks/139-4d0f5174d9cf169c.js",
+      "static/chunks/app/layout-75754a64d0d037b6.js"
+    ],
+    "/api/trpc/[trpc]/route": [
+      "static/chunks/webpack-5f5d3e427acc4739.js",
+      "static/chunks/1d916cef-0dc7f8b9deca2b8d.js",
+      "static/chunks/297-9285e30fcdd1b419.js",
+      "static/chunks/main-app-9aa7206b65debb5d.js",
+      "static/chunks/app/api/trpc/[trpc]/route-9e651cc56d2de257.js"
+    ],
+    "/(dashboard)/entidades/page": [
+      "static/chunks/webpack-5f5d3e427acc4739.js",
+      "static/chunks/1d916cef-0dc7f8b9deca2b8d.js",
+      "static/chunks/297-9285e30fcdd1b419.js",
+      "static/chunks/main-app-9aa7206b65debb5d.js",
+      "static/chunks/139-4d0f5174d9cf169c.js",
+      "static/chunks/898-0d1d84821dc18d12.js",
+      "static/chunks/app/(dashboard)/entidades/page-8eb96b1a1ee0985b.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-5f5d3e427acc4739.js",
+      "static/chunks/1d916cef-0dc7f8b9deca2b8d.js",
+      "static/chunks/297-9285e30fcdd1b419.js",
+      "static/chunks/main-app-9aa7206b65debb5d.js",
+      "static/chunks/app/page-d380871b987caaee.js"
+    ]
+  }
+}
