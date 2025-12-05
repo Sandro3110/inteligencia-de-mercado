@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { router, publicProcedure } from './index';
 import { db } from '../db';
-import { sql, eq, and, or, like, gte, lte, desc, asc } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 
 /**
  * Produto Router - Gerenciamento de produtos do catálogo
@@ -57,9 +57,8 @@ export const produtoRouter = router({
         offset = 0 
       } = input;
 
-      // Construir query SQL com template literals
+      // Construir query SQL dinamicamente
       let whereConditions: string[] = [];
-      let params: any[] = [];
 
       // Filtro de busca (nome ou descrição)
       if (search) {
@@ -121,7 +120,8 @@ export const produtoRouter = router({
       const orderByColumn = orderByMap[ordem] || 'data_cadastro';
       const orderByDirection = direcao.toUpperCase();
 
-      const query = sql.raw(`
+      // Query SQL completa
+      const queryText = `
         SELECT 
           produto_id,
           nome,
@@ -145,9 +145,9 @@ export const produtoRouter = router({
         ${whereClause}
         ORDER BY ${orderByColumn} ${orderByDirection}
         LIMIT ${limit} OFFSET ${offset}
-      `);
+      `;
 
-      const resultado = await db.execute(query);
+      const resultado = await db.execute(sql.raw(queryText));
 
       return {
         data: resultado.rows,
@@ -165,7 +165,7 @@ export const produtoRouter = router({
       id: z.number()
     }))
     .query(async ({ input }) => {
-      const query = sql.raw(`
+      const queryText = `
         SELECT 
           produto_id,
           nome,
@@ -186,9 +186,9 @@ export const produtoRouter = router({
           fonte
         FROM dim_produto_catalogo
         WHERE produto_id = ${input.id}
-      `);
+      `;
 
-      const resultado = await db.execute(query);
+      const resultado = await db.execute(sql.raw(queryText));
 
       if (resultado.rows.length === 0) {
         throw new Error('Produto não encontrado');
@@ -209,7 +209,7 @@ export const produtoRouter = router({
     .query(async ({ input }) => {
       const { produtoId, limit = 20, offset = 0 } = input;
 
-      const query = sql.raw(`
+      const queryText = `
         SELECT 
           e.id,
           e.nome,
@@ -226,9 +226,9 @@ export const produtoRouter = router({
           AND e.deleted_at IS NULL
         ORDER BY ep.data_inicio DESC
         LIMIT ${limit} OFFSET ${offset}
-      `);
+      `;
 
-      const resultado = await db.execute(query);
+      const resultado = await db.execute(sql.raw(queryText));
 
       return {
         data: resultado.rows,
@@ -250,7 +250,7 @@ export const produtoRouter = router({
     .query(async ({ input }) => {
       const { produtoId, limit = 20, offset = 0 } = input;
 
-      const query = sql.raw(`
+      const queryText = `
         SELECT 
           m.mercado_id,
           m.nome,
@@ -265,9 +265,9 @@ export const produtoRouter = router({
         WHERE pm.produto_id = ${produtoId}
         ORDER BY pm.participacao DESC
         LIMIT ${limit} OFFSET ${offset}
-      `);
+      `;
 
-      const resultado = await db.execute(query);
+      const resultado = await db.execute(sql.raw(queryText));
 
       return {
         data: resultado.rows,
@@ -282,7 +282,7 @@ export const produtoRouter = router({
    */
   getStats: publicProcedure
     .query(async () => {
-      const query = sql.raw(`
+      const queryText = `
         SELECT 
           COUNT(*) as total_produtos,
           COUNT(*) FILTER (WHERE ativo = true) as produtos_ativos,
@@ -293,9 +293,9 @@ export const produtoRouter = router({
           MIN(preco) as preco_minimo,
           MAX(preco) as preco_maximo
         FROM dim_produto_catalogo
-      `);
+      `;
 
-      const resultado = await db.execute(query);
+      const resultado = await db.execute(sql.raw(queryText));
 
       return resultado.rows[0];
     }),
@@ -305,7 +305,7 @@ export const produtoRouter = router({
    */
   getCategorias: publicProcedure
     .query(async () => {
-      const query = sql.raw(`
+      const queryText = `
         SELECT 
           categoria,
           COUNT(*) as total_produtos
@@ -313,9 +313,9 @@ export const produtoRouter = router({
         WHERE categoria IS NOT NULL
         GROUP BY categoria
         ORDER BY categoria
-      `);
+      `;
 
-      const resultado = await db.execute(query);
+      const resultado = await db.execute(sql.raw(queryText));
 
       return resultado.rows;
     }),
@@ -328,7 +328,7 @@ export const produtoRouter = router({
       categoria: z.string()
     }))
     .query(async ({ input }) => {
-      const query = sql.raw(`
+      const queryText = `
         SELECT 
           subcategoria,
           COUNT(*) as total_produtos
@@ -337,9 +337,9 @@ export const produtoRouter = router({
           AND subcategoria IS NOT NULL
         GROUP BY subcategoria
         ORDER BY subcategoria
-      `);
+      `;
 
-      const resultado = await db.execute(query);
+      const resultado = await db.execute(sql.raw(queryText));
 
       return resultado.rows;
     })
