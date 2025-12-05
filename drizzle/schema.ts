@@ -238,6 +238,29 @@ export const dimProduto = pgTable('dim_produto', {
 });
 
 // ============================================================================
+// DIMENSÃO: Produto Catálogo (Nova tabela independente)
+// ============================================================================
+export const dimProdutoCatalogo = pgTable('dim_produto_catalogo', {
+  id: serial('id').primaryKey(),
+  nome: varchar('nome', { length: 255 }).notNull(),
+  descricao: text('descricao'),
+  categoria: varchar('categoria', { length: 100 }),
+  subcategoria: varchar('subcategoria', { length: 100 }),
+  sku: varchar('sku', { length: 100 }),
+  ean: varchar('ean', { length: 20 }),
+  ncm: varchar('ncm', { length: 10 }),
+  preco: decimal('preco', { precision: 12, scale: 2 }),
+  unidade: varchar('unidade', { length: 20 }),
+  ativo: boolean('ativo').default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdBy: integer('created_by'),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  updatedBy: integer('updated_by'),
+  deletedAt: timestamp('deleted_at'),
+  deletedBy: integer('deleted_by'),
+});
+
+// ============================================================================
 // DIMENSÃO: Status Qualificação
 // ============================================================================
 export const dimStatusQualificacao = pgTable('dim_status_qualificacao', {

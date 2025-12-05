@@ -3,9 +3,11 @@ import { Permission } from "@shared/types/permissions";
 import { z } from 'zod';
 import { router } from './index';
 import { db } from '../db';
+import { dimProdutoCatalogo } from '../../drizzle/schema';
+import { eq, and, or, gte, lte, ilike, isNull, desc, asc, count, sql } from 'drizzle-orm';
 
 // ============================================================================
-// PRODUTO ROUTER - SQL DIRETO (sem depender de schema)
+// PRODUTO ROUTER - Usando Drizzle ORM com schema
 // ============================================================================
 
 export const produtoRouter = router({
@@ -48,112 +50,80 @@ export const produtoRouter = router({
 
       const offset = (pagina - 1) * porPagina;
 
-      // Construir WHERE clauses
-      const whereClauses: string[] = ['p.deleted_at IS NULL'];
-      const params: any[] = [];
-      let paramIndex = 1;
-
-      if (search) {
-        whereClauses.push(`(p.nome ILIKE $${paramIndex} OR p.descricao ILIKE $${paramIndex})`);
-        params.push(`%${search}%`);
-        paramIndex++;
-      }
-
-      if (categoria) {
-        whereClauses.push(`p.categoria = $${paramIndex}`);
-        params.push(categoria);
-        paramIndex++;
-      }
-
-      if (subcategoria) {
-        whereClauses.push(`p.subcategoria = $${paramIndex}`);
-        params.push(subcategoria);
-        paramIndex++;
-      }
-
-      if (sku) {
-        whereClauses.push(`p.sku ILIKE $${paramIndex}`);
-        params.push(`%${sku}%`);
-        paramIndex++;
-      }
-
-      if (ean) {
-        whereClauses.push(`p.ean = $${paramIndex}`);
-        params.push(ean);
-        paramIndex++;
-      }
-
-      if (ncm) {
-        whereClauses.push(`p.ncm = $${paramIndex}`);
-        params.push(ncm);
-        paramIndex++;
-      }
-
-      if (precoMin !== undefined) {
-        whereClauses.push(`p.preco >= $${paramIndex}`);
-        params.push(precoMin);
-        paramIndex++;
-      }
-
-      if (precoMax !== undefined) {
-        whereClauses.push(`p.preco <= $${paramIndex}`);
-        params.push(precoMax);
-        paramIndex++;
-      }
-
-      if (ativo !== undefined) {
-        whereClauses.push(`p.ativo = $${paramIndex}`);
-        params.push(ativo);
-        paramIndex++;
-      }
-
-      const whereClause = whereClauses.join(' AND ');
-
-      // Ordenação
-      let orderByClause = 'p.created_at DESC';
-      if (ordenacao) {
-        const campo = ordenacao.campo.includes('.') ? ordenacao.campo : `p.${ordenacao.campo}`;
-        orderByClause = `${campo} ${ordenacao.direcao}`;
-      }
-
-      // Query principal
-      const queryText = `
-        SELECT p.*
-        FROM dim_produto_catalogo p
-        WHERE ${whereClause}
-        ORDER BY ${orderByClause}
-        LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-      `;
-
-      params.push(porPagina, offset);
-
       try {
-        const resultado = await db.execute({
-          sql: queryText,
-          args: params
-        });
+        // Construir filtros
+        const filters: any[] = [isNull(dimProdutoCatalogo.deletedAt)];
+
+        if (search) {
+          filters.push(
+            or(
+              ilike(dimProdutoCatalogo.nome, `%${search}%`),
+              ilike(dimProdutoCatalogo.descricao, `%${search}%`)
+            )
+          );
+        }
+
+        if (categoria) {
+          filters.push(eq(dimProdutoCatalogo.categoria, categoria));
+        }
+
+        if (subcategoria) {
+          filters.push(eq(dimProdutoCatalogo.subcategoria, subcategoria));
+        }
+
+        if (sku) {
+          filters.push(ilike(dimProdutoCatalogo.sku, `%${sku}%`));
+        }
+
+        if (ean) {
+          filters.push(eq(dimProdutoCatalogo.ean, ean));
+        }
+
+        if (ncm) {
+          filters.push(eq(dimProdutoCatalogo.ncm, ncm));
+        }
+
+        if (precoMin !== undefined) {
+          filters.push(gte(dimProdutoCatalogo.preco, precoMin.toString()));
+        }
+
+        if (precoMax !== undefined) {
+          filters.push(lte(dimProdutoCatalogo.preco, precoMax.toString()));
+        }
+
+        if (ativo !== undefined) {
+          filters.push(eq(dimProdutoCatalogo.ativo, ativo));
+        }
+
+        // Ordenação
+        let orderBy: any = desc(dimProdutoCatalogo.createdAt);
+        if (ordenacao) {
+          const campo = dimProdutoCatalogo[ordenacao.campo as keyof typeof dimProdutoCatalogo];
+          orderBy = ordenacao.direcao === 'ASC' ? asc(campo) : desc(campo);
+        }
+
+        // Query principal
+        const dados = await db
+          .select()
+          .from(dimProdutoCatalogo)
+          .where(and(...filters))
+          .orderBy(orderBy)
+          .limit(porPagina)
+          .offset(offset);
 
         // Contar total
-        const countQueryText = `
-          SELECT COUNT(*) as total
-          FROM dim_produto_catalogo p
-          WHERE ${whereClause}
-        `;
-
-        const resultadoCount = await db.execute({
-          sql: countQueryText,
-          args: params.slice(0, paramIndex - 1) // Remover limit e offset
-        });
-
-        const total = Number(resultadoCount.rows[0]?.total || 0);
+        const [{ total }] = await db
+          .select({ total: count() })
+          .from(dimProdutoCatalogo)
+          .where(and(...filters));
 
         return {
-          dados: resultado.rows,
+          dados,
           paginacao: {
             pagina,
             porPagina,
-            total,
-            totalPaginas: Math.ceil(total / porPagina)
+            total: Number(total),
+            totalPaginas: Math.ceil(Number(total) / porPagina)
           }
         };
       } catch (error) {
@@ -173,21 +143,22 @@ export const produtoRouter = router({
       const { produtoId } = input;
 
       try {
-        const resultado = await db.execute({
-          sql: `
-            SELECT p.*
-            FROM dim_produto_catalogo p
-            WHERE p.id = $1
-              AND p.deleted_at IS NULL
-          `,
-          args: [produtoId]
-        });
+        const produto = await db
+          .select()
+          .from(dimProdutoCatalogo)
+          .where(
+            and(
+              eq(dimProdutoCatalogo.id, produtoId),
+              isNull(dimProdutoCatalogo.deletedAt)
+            )
+          )
+          .limit(1);
 
-        if (resultado.rows.length === 0) {
+        if (produto.length === 0) {
           throw new Error('Produto não encontrado');
         }
 
-        return resultado.rows[0];
+        return produto[0];
       } catch (error) {
         console.error('Erro ao buscar produto:', error);
         throw new Error(`Falha ao buscar produto: ${error.message}`);
@@ -200,18 +171,18 @@ export const produtoRouter = router({
   getCategorias: requirePermission(Permission.ANALISE_READ)
     .query(async () => {
       try {
-        const resultado = await db.execute({
-          sql: `
-            SELECT DISTINCT categoria
-            FROM dim_produto_catalogo
-            WHERE deleted_at IS NULL
-              AND categoria IS NOT NULL
-            ORDER BY categoria
-          `,
-          args: []
-        });
+        const resultado = await db
+          .selectDistinct({ categoria: dimProdutoCatalogo.categoria })
+          .from(dimProdutoCatalogo)
+          .where(
+            and(
+              isNull(dimProdutoCatalogo.deletedAt),
+              sql`${dimProdutoCatalogo.categoria} IS NOT NULL`
+            )
+          )
+          .orderBy(asc(dimProdutoCatalogo.categoria));
 
-        return resultado.rows.map((r: any) => r.categoria);
+        return resultado.map(r => r.categoria);
       } catch (error) {
         console.error('Erro ao listar categorias:', error);
         return [];
@@ -229,25 +200,22 @@ export const produtoRouter = router({
       const { categoria } = input;
 
       try {
-        const whereClauses = ['deleted_at IS NULL', 'subcategoria IS NOT NULL'];
-        const params: any[] = [];
+        const filters: any[] = [
+          isNull(dimProdutoCatalogo.deletedAt),
+          sql`${dimProdutoCatalogo.subcategoria} IS NOT NULL`
+        ];
 
         if (categoria) {
-          whereClauses.push('categoria = $1');
-          params.push(categoria);
+          filters.push(eq(dimProdutoCatalogo.categoria, categoria));
         }
 
-        const resultado = await db.execute({
-          sql: `
-            SELECT DISTINCT subcategoria
-            FROM dim_produto_catalogo
-            WHERE ${whereClauses.join(' AND ')}
-            ORDER BY subcategoria
-          `,
-          args: params
-        });
+        const resultado = await db
+          .selectDistinct({ subcategoria: dimProdutoCatalogo.subcategoria })
+          .from(dimProdutoCatalogo)
+          .where(and(...filters))
+          .orderBy(asc(dimProdutoCatalogo.subcategoria));
 
-        return resultado.rows.map((r: any) => r.subcategoria);
+        return resultado.map(r => r.subcategoria);
       } catch (error) {
         console.error('Erro ao listar subcategorias:', error);
         return [];
@@ -260,23 +228,20 @@ export const produtoRouter = router({
   getStats: requirePermission(Permission.ANALISE_READ)
     .query(async () => {
       try {
-        const resultado = await db.execute({
-          sql: `
-            SELECT 
-              COUNT(*) as total,
-              COUNT(CASE WHEN ativo = true THEN 1 END) as ativos,
-              COUNT(CASE WHEN ativo = false THEN 1 END) as inativos,
-              COUNT(DISTINCT categoria) as categorias,
-              AVG(preco) as preco_medio,
-              MIN(preco) as preco_min,
-              MAX(preco) as preco_max
-            FROM dim_produto_catalogo
-            WHERE deleted_at IS NULL
-          `,
-          args: []
-        });
+        const resultado = await db
+          .select({
+            total: count(),
+            ativos: sql<number>`COUNT(CASE WHEN ${dimProdutoCatalogo.ativo} = true THEN 1 END)`,
+            inativos: sql<number>`COUNT(CASE WHEN ${dimProdutoCatalogo.ativo} = false THEN 1 END)`,
+            categorias: sql<number>`COUNT(DISTINCT ${dimProdutoCatalogo.categoria})`,
+            preco_medio: sql<number>`AVG(${dimProdutoCatalogo.preco})`,
+            preco_min: sql<number>`MIN(${dimProdutoCatalogo.preco})`,
+            preco_max: sql<number>`MAX(${dimProdutoCatalogo.preco})`
+          })
+          .from(dimProdutoCatalogo)
+          .where(isNull(dimProdutoCatalogo.deletedAt));
 
-        return resultado.rows[0];
+        return resultado[0];
       } catch (error) {
         console.error('Erro ao buscar estatísticas:', error);
         return {
@@ -323,7 +288,6 @@ export const produtoRouter = router({
           args: [produtoId, porPagina, offset]
         });
 
-        // Contar total
         const resultadoCount = await db.execute({
           sql: `
             SELECT COUNT(*) as total
@@ -387,7 +351,6 @@ export const produtoRouter = router({
           args: [produtoId, porPagina, offset]
         });
 
-        // Contar total
         const resultadoCount = await db.execute({
           sql: `
             SELECT COUNT(*) as total
