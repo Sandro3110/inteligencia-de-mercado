@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { trpc } from '@/lib/trpc';
 import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
+import MercadoDetailsSheet from '@/components/MercadoDetailsSheet';
 
 export default function MercadosPage() {
   const [, setLocation] = useLocation();
@@ -406,144 +407,30 @@ Nível de Saturação: ${mercado.nivel_saturacao || 'N/A'}
         )}
       </Card>
 
-      {/* Modal de Detalhes */}
-      <Dialog open={modalAberto} onOpenChange={setModalAberto}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          {mercadoSelecionado && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-3 text-2xl">
-                  <Target className="h-8 w-8 text-primary" />
-                  {mercadoSelecionado.nome}
-                </DialogTitle>
-                <div className="flex gap-2 mt-2">
-                  <Badge className={getBadgeCategoria(mercadoSelecionado.categoria)}>
-                    {mercadoSelecionado.categoria}
-                  </Badge>
-                  <Badge variant="outline">{mercadoSelecionado.segmentacao}</Badge>
-                </div>
-              </DialogHeader>
-
-              <div className="space-y-6 mt-4">
-                {/* Informações Básicas */}
-                <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg">
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">Tamanho do Mercado</div>
-                    <div className="font-medium">{mercadoSelecionado.tamanho_mercado || 'N/A'}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">Crescimento Anual</div>
-                    <div className="flex items-center gap-2">
-                      {getIconeCrescimento(mercadoSelecionado.crescimento_anual)}
-                      <span className="font-medium">{mercadoSelecionado.crescimento_anual || 'N/A'}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">Score de Atratividade</div>
-                    <div className={`font-semibold text-lg ${getCorScore(mercadoSelecionado.score_atratividade)}`}>
-                      {mercadoSelecionado.score_atratividade ? `${mercadoSelecionado.score_atratividade}/100` : 'N/A'}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">Nível de Saturação</div>
-                    <Badge className={getBadgeSaturacao(mercadoSelecionado.nivel_saturacao)}>
-                      {mercadoSelecionado.nivel_saturacao || 'N/A'}
-                    </Badge>
-                  </div>
-                  {mercadoSelecionado.sentimento && (
-                    <div className="col-span-2">
-                      <div className="text-sm text-muted-foreground mb-1">Sentimento</div>
-                      <div className="font-medium">{mercadoSelecionado.sentimento}</div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Narrativa Completa */}
-                <div className="border rounded-lg p-4 bg-muted/10 max-h-[500px] overflow-y-auto space-y-6">
-                  {/* Tendências */}
-                  {mercadoSelecionado.tendencias && (
-                    <div>
-                      <h4 className="font-semibold flex items-center gap-2 mb-3 text-lg">
-                        <Lightbulb className="h-5 w-5 text-yellow-600" />
-                        Tendências
-                      </h4>
-                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{mercadoSelecionado.tendencias}</p>
-                    </div>
-                  )}
-
-                  {/* Principais Players */}
-                  {mercadoSelecionado.principais_players && (
-                    <div>
-                      <h4 className="font-semibold flex items-center gap-2 mb-3 text-lg">
-                        <Building2 className="h-5 w-5 text-blue-600" />
-                        Principais Players
-                      </h4>
-                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{mercadoSelecionado.principais_players}</p>
-                    </div>
-                  )}
-
-                  {/* Oportunidades */}
-                  {mercadoSelecionado.oportunidades && (
-                    <div>
-                      <h4 className="font-semibold flex items-center gap-2 mb-3 text-lg">
-                        <CheckCircle className="h-5 w-5 text-green-600" />
-                        Oportunidades
-                      </h4>
-                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{mercadoSelecionado.oportunidades}</p>
-                    </div>
-                  )}
-
-                  {/* Riscos */}
-                  {mercadoSelecionado.riscos && (
-                    <div>
-                      <h4 className="font-semibold flex items-center gap-2 mb-3 text-lg">
-                        <AlertTriangle className="h-5 w-5 text-red-600" />
-                        Riscos
-                      </h4>
-                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{mercadoSelecionado.riscos}</p>
-                    </div>
-                  )}
-
-                  {/* Recomendação Estratégica */}
-                  {mercadoSelecionado.recomendacao_estrategica && (
-                    <div>
-                      <h4 className="font-semibold flex items-center gap-2 mb-3 text-lg">
-                        <Target className="h-5 w-5 text-purple-600" />
-                        Recomendação Estratégica
-                      </h4>
-                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{mercadoSelecionado.recomendacao_estrategica}</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Metadados */}
-                <div className="text-xs text-muted-foreground border-t pt-4">
-                  <div>Criado em: {new Date(mercadoSelecionado.created_at).toLocaleString('pt-BR')} por {mercadoSelecionado.created_by}</div>
-                  {mercadoSelecionado.updated_at && (
-                    <div>Atualizado em: {new Date(mercadoSelecionado.updated_at).toLocaleString('pt-BR')}</div>
-                  )}
-                </div>
-
-                {/* Ações */}
-                <div className="flex gap-2 justify-end border-t pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => copiarMercado(mercadoSelecionado)}
-                  >
-                    Copiar Dados
-                  </Button>
-                  <Button
-                    variant="default"
-                    onClick={() => setModalAberto(false)}
-                  >
-                    Fechar
-                  </Button>
-                </div>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Sheet de Detalhes */}
+      <MercadoDetailsSheet
+        mercado={mercadoSelecionado ? {
+          id: mercadoSelecionado.id,
+          nome: mercadoSelecionado.nome,
+          categoria: mercadoSelecionado.categoria,
+          segmentacao: mercadoSelecionado.segmentacao,
+          tamanhoMercado: mercadoSelecionado.tamanho_mercado,
+          crescimentoAnual: mercadoSelecionado.crescimento_anual,
+          tendencias: mercadoSelecionado.tendencias,
+          principaisPlayers: mercadoSelecionado.principais_players,
+          sentimento: mercadoSelecionado.sentimento,
+          scoreAtratividade: mercadoSelecionado.score_atratividade,
+          nivelSaturacao: mercadoSelecionado.nivel_saturacao,
+          oportunidades: mercadoSelecionado.oportunidades,
+          riscos: mercadoSelecionado.riscos,
+          recomendacaoEstrategica: mercadoSelecionado.recomendacao_estrategica,
+          createdAt: mercadoSelecionado.created_at,
+          updatedAt: mercadoSelecionado.updated_at,
+        } : null}
+        open={modalAberto}
+        onOpenChange={setModalAberto}
+        onUpdate={() => mercados.refetch()}
+      />
     </div>
   );
 }
