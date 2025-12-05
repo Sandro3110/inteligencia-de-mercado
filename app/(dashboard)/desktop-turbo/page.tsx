@@ -375,7 +375,7 @@ export default function DesktopTurboPage() {
               {error && (
                 <div className="m-3 rounded-lg border border-red-500/20 bg-red-500/10 p-2 text-sm text-red-700 dark:text-red-400">
                   <p className="font-semibold text-xs">Erro ao carregar totalizadores</p>
-                  <p className="text-xs">{(error as Error).message}</p>
+                  <p className="text-xs">{error.message}</p>
                 </div>
               )}
 
