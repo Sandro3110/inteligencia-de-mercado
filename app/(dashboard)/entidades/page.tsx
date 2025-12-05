@@ -456,16 +456,16 @@ export default function EntidadesListPage() {
                           <TableCell className="text-center">
                             <div className="flex items-center justify-center gap-1">
                               {entidade.validacao_cnpj && (
-                                <CheckCircle2 className="h-4 w-4 text-green-500" title="CNPJ válido" />
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
                               )}
                               {entidade.validacao_email && (
-                                <CheckCircle2 className="h-4 w-4 text-blue-500" title="Email válido" />
+                                <CheckCircle2 className="h-4 w-4 text-blue-500" />
                               )}
                               {entidade.validacao_telefone && (
-                                <CheckCircle2 className="h-4 w-4 text-purple-500" title="Telefone válido" />
+                                <CheckCircle2 className="h-4 w-4 text-purple-500" />
                               )}
                               {!entidade.validacao_cnpj && !entidade.validacao_email && !entidade.validacao_telefone && (
-                                <XCircle className="h-4 w-4 text-muted-foreground" title="Sem validações" />
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
                               )}
                             </div>
                           </TableCell>

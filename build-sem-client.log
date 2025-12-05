@@ -1,0 +1,40 @@
+
+> inteligencia-de-mercado@3.0.0 build /home/ubuntu/inteligencia-de-mercado
+> next build
+
+   ▲ Next.js 15.1.9
+   - Environments: .env.production
+
+   Creating an optimized production build ...
+(node:36990) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Failed to compile.
+
+./app/(dashboard)/desktop-turbo/page.tsx
+Module not found: Can't resolve '@/components/ui/card'
+
+https://nextjs.org/docs/messages/module-not-found
+
+./app/(dashboard)/desktop-turbo/page.tsx
+Module not found: Can't resolve '@/components/ui/button'
+
+https://nextjs.org/docs/messages/module-not-found
+
+./app/(dashboard)/desktop-turbo/page.tsx
+Module not found: Can't resolve '@/components/ui/badge'
+
+https://nextjs.org/docs/messages/module-not-found
+
+./app/(dashboard)/desktop-turbo/page.tsx
+Module not found: Can't resolve '@/components/ui/select'
+
+https://nextjs.org/docs/messages/module-not-found
+
+./app/(dashboard)/desktop-turbo/page.tsx
+Module not found: Can't resolve '@/components/ui/table'
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+> Build failed because of webpack errors
+ ELIFECYCLE  Command failed with exit code 1.

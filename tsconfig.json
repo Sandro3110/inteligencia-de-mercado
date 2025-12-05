@@ -20,7 +20,7 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./client/src/*"],
+      "@/*": ["./app/*"],
       "@server/*": ["./server/*"],
       "@shared/*": ["./shared/*"]
     }
@@ -30,7 +30,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "client/src",
     "server",
     "shared",
     "app"

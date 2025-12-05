@@ -1,0 +1,3740 @@
+
+> inteligencia-de-mercado@3.0.0 build /home/ubuntu/inteligencia-de-mercado
+> next build
+
+   ▲ Next.js 15.1.9
+   - Environments: .env.production
+
+   Creating an optimized production build ...
+(node:34594) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ⚠ Compiled with warnings
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/dimensoes/entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/geografia.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/dimensoes/geografia.ts
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/dimensoes/mercado.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/pesquisa.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/dimensoes/pesquisa.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/produto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/dimensoes/produto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/projeto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/dimensoes/projeto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/statusQualificacao.ts
+Attempted import error: 'dimStatusQualificacao' is not exported from '../../../drizzle/schema' (imported as 'dimStatusQualificacao').
+
+Import trace for requested module:
+./server/dal/dimensoes/statusQualificacao.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/statusQualificacao.ts
+Attempted import error: 'dimStatusQualificacao' is not exported from '../../../drizzle/schema' (imported as 'dimStatusQualificacao').
+
+Import trace for requested module:
+./server/dal/dimensoes/statusQualificacao.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/statusQualificacao.ts
+Attempted import error: 'dimStatusQualificacao' is not exported from '../../../drizzle/schema' (imported as 'dimStatusQualificacao').
+
+Import trace for requested module:
+./server/dal/dimensoes/statusQualificacao.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/statusQualificacao.ts
+Attempted import error: 'dimStatusQualificacao' is not exported from '../../../drizzle/schema' (imported as 'dimStatusQualificacao').
+
+Import trace for requested module:
+./server/dal/dimensoes/statusQualificacao.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/statusQualificacao.ts
+Attempted import error: 'dimStatusQualificacao' is not exported from '../../../drizzle/schema' (imported as 'dimStatusQualificacao').
+
+Import trace for requested module:
+./server/dal/dimensoes/statusQualificacao.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/dimensoes/statusQualificacao.ts
+Attempted import error: 'dimStatusQualificacao' is not exported from '../../../drizzle/schema' (imported as 'dimStatusQualificacao').
+
+Import trace for requested module:
+./server/dal/dimensoes/statusQualificacao.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeCompetidor.ts
+Attempted import error: 'fatoEntidadeCompetidor' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeCompetidor').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeCompetidor.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimStatusQualificacao' is not exported from '../../../drizzle/schema' (imported as 'dimStatusQualificacao').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimEntidade' is not exported from '../../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimProjeto' is not exported from '../../../drizzle/schema' (imported as 'dimProjeto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimPesquisa' is not exported from '../../../drizzle/schema' (imported as 'dimPesquisa').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimGeografia' is not exported from '../../../drizzle/schema' (imported as 'dimGeografia').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimMercado' is not exported from '../../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimStatusQualificacao' is not exported from '../../../drizzle/schema' (imported as 'dimStatusQualificacao').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'dimStatusQualificacao' is not exported from '../../../drizzle/schema' (imported as 'dimStatusQualificacao').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeContexto.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeContexto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'dimProduto' is not exported from '../../../drizzle/schema' (imported as 'dimProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/fatos/entidadeProduto.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/dal/fatos/entidadeProduto.ts
+./server/dal/index.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'dimImportacao' is not exported from '../../drizzle/schema' (imported as 'dimImportacao').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'dimImportacao' is not exported from '../../drizzle/schema' (imported as 'dimImportacao').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'dimImportacao' is not exported from '../../drizzle/schema' (imported as 'dimImportacao').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'dimImportacao' is not exported from '../../drizzle/schema' (imported as 'dimImportacao').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'dimImportacao' is not exported from '../../drizzle/schema' (imported as 'dimImportacao').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'dimImportacao' is not exported from '../../drizzle/schema' (imported as 'dimImportacao').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'dimImportacao' is not exported from '../../drizzle/schema' (imported as 'dimImportacao').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'dimImportacao' is not exported from '../../drizzle/schema' (imported as 'dimImportacao').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'dimImportacao' is not exported from '../../drizzle/schema' (imported as 'dimImportacao').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'dimImportacao' is not exported from '../../drizzle/schema' (imported as 'dimImportacao').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'importacaoErros' is not exported from '../../drizzle/schema' (imported as 'importacaoErros').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'importacaoErros' is not exported from '../../drizzle/schema' (imported as 'importacaoErros').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'importacaoErros' is not exported from '../../drizzle/schema' (imported as 'importacaoErros').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'importacaoErros' is not exported from '../../drizzle/schema' (imported as 'importacaoErros').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'importacaoErros' is not exported from '../../drizzle/schema' (imported as 'importacaoErros').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'importacaoErros' is not exported from '../../drizzle/schema' (imported as 'importacaoErros').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/dal/importacao.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/dal/importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/lib/enriquecer-entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/lib/enriquecer-entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/lib/enriquecer-entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/lib/enriquecer-entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/lib/enriquecer-entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/lib/enriquecer-entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/lib/enriquecer-entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/lib/enriquecer-entidade.ts
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/lib/processar-importacao.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/lib/processar-importacao.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/lib/processar-importacao.ts
+./server/routers/importacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/middleware/auth.ts
+Attempted import error: 'users' is not exported from '../../drizzle/schema' (imported as 'users').
+
+Import trace for requested module:
+./server/middleware/auth.ts
+./server/routers/pesquisas.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'fatoEntidadeProduto' is not exported from '../../drizzle/schema' (imported as 'fatoEntidadeProduto').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'fatoEntidadeContexto' is not exported from '../../drizzle/schema' (imported as 'fatoEntidadeContexto').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidade.ts
+Attempted import error: 'dimEntidade' is not exported from '../../drizzle/schema' (imported as 'dimEntidade').
+
+Import trace for requested module:
+./server/routers/entidade.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/entidades.ts
+Attempted import error: 'sugerirMerge' is not exported from '../dal/dimensoes/entidade' (imported as 'entidadeDAL').
+
+Import trace for requested module:
+./server/routers/entidades.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/routers/mercado.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/routers/mercado.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/mercado.ts
+Attempted import error: 'dimMercado' is not exported from '../../drizzle/schema' (imported as 'dimMercado').
+
+Import trace for requested module:
+./server/routers/mercado.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/produto.ts
+Attempted import error: 'dimProdutoCatalogo' is not exported from '../../drizzle/schema' (imported as 'dimProdutoCatalogo').
+
+Import trace for requested module:
+./server/routers/produto.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/statusQualificacao.ts
+Attempted import error: 'dimStatusQualificacao' is not exported from '../../drizzle/schema' (imported as 'dimStatusQualificacao').
+
+Import trace for requested module:
+./server/routers/statusQualificacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+./server/routers/statusQualificacao.ts
+Attempted import error: 'dimStatusQualificacao' is not exported from '../../drizzle/schema' (imported as 'dimStatusQualificacao').
+
+Import trace for requested module:
+./server/routers/statusQualificacao.ts
+./server/routers/index.ts
+./app/api/trpc/[trpc]/route.ts
+
+   Linting and checking validity of types ...
+Failed to compile.
+
+./app/(dashboard)/entidades/page.tsx:459:82
+Type error: Type '{ className: string; title: string; }' is not assignable to type 'IntrinsicAttributes & Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>'.
+  Property 'title' does not exist on type 'IntrinsicAttributes & Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>'.
+
+[0m [90m 457 |[39m                             [33m<[39m[33mdiv[39m className[33m=[39m[32m"flex items-center justify-center gap-1"[39m[33m>[39m[0m
+[0m [90m 458 |[39m                               {entidade[33m.[39mvalidacao_cnpj [33m&&[39m ([0m
+[0m[31m[1m>[22m[39m[90m 459 |[39m                                 [33m<[39m[33mCheckCircle2[39m className[33m=[39m[32m"h-4 w-4 text-green-500"[39m title[33m=[39m[32m"CNPJ válido"[39m [33m/[39m[33m>[39m[0m
+[0m [90m     |[39m                                                                                  [31m[1m^[22m[39m[0m
+[0m [90m 460 |[39m                               )}[0m
+[0m [90m 461 |[39m                               {entidade[33m.[39mvalidacao_email [33m&&[39m ([0m
+[0m [90m 462 |[39m                                 [33m<[39m[33mCheckCircle2[39m className[33m=[39m[32m"h-4 w-4 text-blue-500"[39m title[33m=[39m[32m"Email válido"[39m [33m/[39m[33m>[39m[0m
+Next.js build worker exited with code: 1 and signal: null
+ ELIFECYCLE  Command failed with exit code 1.

@@ -35,6 +35,12 @@ const nextConfig = {
   webpack: (config, { isServer }) => {
     config.externals = [...(config.externals || []), { canvas: 'canvas' }];
     
+    // Ignorar código antigo do Vite em client/
+    config.module.rules.push({
+      test: /\.tsx?$/,
+      exclude: /client\/src/,
+    });
+    
     // Suprimir warnings de imports não resolvidos no código do servidor
     if (!isServer) {
       config.resolve.fallback = {

@@ -6,7 +6,7 @@
 import express from 'express';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './routers';
-import { createContext } from './context';
+import { createExpressContext } from './context';
 import { connectRedis, disconnectRedis } from './lib/redis';
 import { generalRateLimiter } from './middleware/rateLimit';
 
@@ -25,7 +25,7 @@ app.use(
   '/api/trpc',
   createExpressMiddleware({
     router: appRouter,
-    createContext,
+    createContext: createExpressContext,
   })
 );
 
