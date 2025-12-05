@@ -4,12 +4,12 @@
  * Retorna lista de entidades não enriquecidas para página de enriquecimento IA
  * 
  * Solução pragmática: Mantém arquitetura atual (api/*.js) e adiciona
- * apenas este endpoint TypeScript para resolver bug específico
+ * apenas este endpoint para resolver bug específico
  */
 
-import postgres from 'postgres';
+const postgres = require('postgres');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -81,4 +81,4 @@ export default async function handler(req, res) {
       await client.end();
     }
   }
-}
+};
