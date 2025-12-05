@@ -4,14 +4,6 @@
   "framework": null,
   "outputDirectory": "dist/client",
   
-  "functions": {
-    "api/trpc/[trpc].ts": {
-      "runtime": "edge",
-      "memory": 512,
-      "maxDuration": 30
-    }
-  },
-  
   "rewrites": [
     {
       "source": "/api/trpc/:path*",
