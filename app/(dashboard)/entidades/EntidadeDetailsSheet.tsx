@@ -68,6 +68,8 @@ interface Entidade {
   origem_data: string;
   created_at: string;
   updated_at: string;
+  created_by?: number | null;
+  updated_by?: number | null;
 }
 
 interface EntidadeDetailsSheetProps {
