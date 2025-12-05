@@ -1,0 +1,16 @@
+nome,descricao,categoria,subcategoria,preco_custo,preco_venda,unidade_medida,estoque_atual,estoque_minimo,ativo
+Notebook Dell Inspiron 15,Notebook com processador Intel Core i7 11ª geração 16GB RAM 512GB SSD,Eletrônicos,Informática,2500.00,3999.00,unidade,50,10,true
+Mouse Logitech MX Master 3,Mouse ergonômico sem fio com sensor de alta precisão,Eletrônicos,Periféricos,250.00,449.00,unidade,100,20,true
+Teclado Mecânico Keychron K2,Teclado mecânico wireless com switches Gateron Brown,Eletrônicos,Periféricos,350.00,599.00,unidade,75,15,true
+Monitor LG UltraWide 34,Monitor ultrawide 34 polegadas resolução 2560x1080,Eletrônicos,Monitores,1200.00,1999.00,unidade,30,5,true
+Webcam Logitech C920,Webcam Full HD 1080p com microfone embutido,Eletrônicos,Periféricos,180.00,349.00,unidade,120,25,true
+Cadeira Gamer DXRacer,Cadeira ergonômica para jogos com ajuste de altura e reclinação,Móveis,Escritório,800.00,1499.00,unidade,40,8,true
+Mesa para Computador,Mesa em MDF com suporte para monitor e teclado,Móveis,Escritório,250.00,499.00,unidade,60,12,true
+Fone de Ouvido Sony WH-1000XM4,Fone bluetooth com cancelamento de ruído ativo,Eletrônicos,Áudio,900.00,1599.00,unidade,80,15,true
+SSD Samsung 1TB,SSD NVMe M.2 velocidade de leitura 3500MB/s,Eletrônicos,Armazenamento,350.00,599.00,unidade,150,30,true
+Memória RAM Corsair 16GB,Memória DDR4 3200MHz CL16,Eletrônicos,Componentes,200.00,399.00,unidade,200,40,true
+Placa de Vídeo RTX 3060,GPU NVIDIA GeForce RTX 3060 12GB GDDR6,Eletrônicos,Componentes,1800.00,2999.00,unidade,25,5,true
+Processador AMD Ryzen 7,Processador AMD Ryzen 7 5800X 8 núcleos 16 threads,Eletrônicos,Componentes,1200.00,1999.00,unidade,40,8,true
+Fonte Corsair 750W,Fonte modular 80 Plus Gold certificada,Eletrônicos,Componentes,350.00,649.00,unidade,90,18,true
+Gabinete NZXT H510,Gabinete mid-tower com painel de vidro temperado,Eletrônicos,Componentes,250.00,499.00,unidade,70,14,true
+Cooler CPU Noctua NH-D15,Cooler de ar de alto desempenho para processadores,Eletrônicos,Componentes,280.00,549.00,unidade,60,12,true
