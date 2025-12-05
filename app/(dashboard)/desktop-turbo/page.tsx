@@ -171,10 +171,7 @@ export default function DesktopTurboPage() {
   });
 
   const handleRowClick = (totalizador: Totalizador) => {
-    toast({
-      title: `${totalizador.label}`,
-      description: `Abrindo lista de ${totalizador.label.toLowerCase()}...`,
-    });
+    toast.success(`Abrindo lista de ${totalizador.label.toLowerCase()}...`);
     
     // Construir query params com filtros herdados
     const params = new URLSearchParams();
@@ -221,20 +218,14 @@ export default function DesktopTurboPage() {
   };
 
   const handleQuickAction = (action: typeof quickActions[0]) => {
-    toast({
-      title: action.title,
-      description: action.description,
-    });
+    toast.success(action.description);
     router.push(action.route);
   };
 
   const handleLimparFiltros = () => {
     setProjetoId(null);
     setPesquisaId(null);
-    toast({
-      title: 'Filtros limpos',
-      description: 'Exibindo todos os dados',
-    });
+    toast.success('Filtros limpos - Exibindo todos os dados');
   };
 
   const handleProjetoChange = (value: string) => {

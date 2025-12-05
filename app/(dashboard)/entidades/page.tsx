@@ -39,7 +39,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import EntidadeDetailsSheet from './EntidadeDetailsSheet';
 
 // Mapeamento de tipos para labels e ícones
@@ -52,7 +52,7 @@ const tipoConfig = {
 export default function EntidadesListPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { toast } = useToast();
+
 
   // Ler filtros herdados da URL
   const tipoInicial = searchParams.get('tipo') || '';
@@ -129,10 +129,7 @@ export default function EntidadesListPage() {
     setScoreMax(undefined);
     setEnriquecido('todos');
     setOffset(0);
-    toast({
-      title: 'Filtros limpos',
-      description: 'Filtros específicos foram removidos',
-    });
+    toast.success('Filtros limpos - Filtros específicos foram removidos');
   };
 
   // Contar filtros ativos
