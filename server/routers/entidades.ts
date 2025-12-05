@@ -3,6 +3,7 @@ import { router } from './index';
 import { requirePermission } from '../middleware/auth';
 import { Permission } from '@shared/types/permissions';
 import * as entidadeDAL from '../dal/dimensoes/entidade';
+import { enriquecerEntidade, enriquecerLote, enriquecerTodasPendentes } from '../lib/enriquecer-entidade';
 
 /**
  * Router de Entidades (Lista)
@@ -108,5 +109,29 @@ export const entidadesRouter = router({
       const entidade = await entidadeDAL.getEntidadeById(input);
       if (!entidade) throw new Error('Entidade não encontrada');
       return await entidadeDAL.sugerirMerge(entidade);
+    }),
+
+  // Enriquecer entidade com IA
+  // Permissão: ENTIDADE_UPDATE
+  enriquecer: requirePermission(Permission.ENTIDADE_UPDATE)
+    .input(z.number())
+    .mutation(async ({ input, ctx }) => {
+      return await enriquecerEntidade(input, ctx.userId);
+    }),
+
+  // Enriquecer lote de entidades
+  // Permissão: ENTIDADE_UPDATE
+  enriquecerLote: requirePermission(Permission.ENTIDADE_UPDATE)
+    .input(z.array(z.number()))
+    .mutation(async ({ input, ctx }) => {
+      return await enriquecerLote(input, ctx.userId);
+    }),
+
+  // Enriquecer todas as entidades pendentes
+  // Permissão: ENTIDADE_UPDATE
+  enriquecerTodasPendentes: requirePermission(Permission.ENTIDADE_UPDATE)
+    .input(z.object({ limite: z.number().default(100) }))
+    .mutation(async ({ input, ctx }) => {
+      return await enriquecerTodasPendentes(ctx.userId, input.limite);
     }),
 });

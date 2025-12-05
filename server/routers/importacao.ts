@@ -3,6 +3,7 @@ import { router } from './index';
 import { requirePermission } from '../middleware/auth';
 import { Permission } from '@shared/types/permissions';
 import * as importacaoDAL from '../dal/importacao';
+import { processarImportacaoCompleta, DadosEntidade } from '../lib/processar-importacao';
 
 /**
  * Router de Importação
@@ -130,5 +131,40 @@ export const importacaoRouter = router({
     .input(z.object({ importacaoId: z.number(), limit: z.number().default(100) }))
     .query(async ({ input }) => {
       return await importacaoDAL.getEntidadesByImportacao(input.importacaoId, input.limit);
+    }),
+
+  // Processar importação (INSERT de entidades)
+  // Permissão: IMPORTACAO_CREATE
+  processar: requirePermission(Permission.IMPORTACAO_CREATE)
+    .input(
+      z.object({
+        importacaoId: z.number(),
+        linhas: z.array(
+          z.object({
+            nome: z.string(),
+            tipo_entidade: z.enum(['cliente', 'lead', 'concorrente']),
+            cnpj: z.string().optional(),
+            cpf: z.string().optional(),
+            email: z.string().optional(),
+            telefone: z.string().optional(),
+            cidade: z.string().optional(),
+            uf: z.string().optional(),
+            endereco: z.string().optional(),
+            website: z.string().optional(),
+            porte: z.string().optional(),
+            setor: z.string().optional(),
+            faturamento_estimado: z.number().optional(),
+            num_funcionarios: z.number().optional(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const resultado = await processarImportacaoCompleta(
+        input.importacaoId,
+        input.linhas as DadosEntidade[],
+        ctx.userId
+      );
+      return resultado;
     }),
 });
