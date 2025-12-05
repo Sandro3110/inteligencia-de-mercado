@@ -50,6 +50,7 @@ interface Entidade {
   endereco?: string | null;
   cidade: string | null;
   uf: string | null;
+  estado: string | null; // Alias para uf
   cep?: string | null;
   pais?: string | null;
   setor: string | null;
