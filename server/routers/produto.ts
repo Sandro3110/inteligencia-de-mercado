@@ -50,10 +50,9 @@ export const produtoRouter = router({
 
       const offset = (pagina - 1) * porPagina;
 
-      try {
-        console.log('[PRODUTO API] Iniciando list com input:', JSON.stringify(input));
-        // Construir filtros
-        const filters: any[] = [isNull(dimProdutoCatalogo.deletedAt)];
+      console.log('[PRODUTO API] Iniciando list com input:', JSON.stringify(input));
+      // Construir filtros
+      const filters: any[] = [isNull(dimProdutoCatalogo.deletedAt)];
 
         if (search) {
           filters.push(
@@ -127,11 +126,7 @@ export const produtoRouter = router({
             totalPaginas: Math.ceil(Number(total) / porPagina)
           }
         };
-      } catch (error) {
-        console.error('[PRODUTO API] ERRO ao listar produtos:', error);
-        console.error('[PRODUTO API] Stack:', error.stack);
-        throw new Error(`Falha ao listar produtos: ${error.message}`);
-      }
+
     }),
 
   /**
