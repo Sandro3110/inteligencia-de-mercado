@@ -42,7 +42,7 @@ import {
   X
 } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 // Mapeamento de ícones do lucide-react
 const iconMap = {
@@ -150,7 +150,6 @@ interface Totalizador {
 
 export default function DesktopTurboPage() {
   const router = useRouter();
-  const { toast } = useToast();
   
   // Estados dos filtros
   const [projetoId, setProjetoId] = useState<number | null>(null);
