@@ -86,17 +86,12 @@ export default function EntidadesListPage() {
 
   // Construir filtros para a query
   const filters = {
-    tipo: tipo || undefined,
+    tipo: (tipo as 'cliente' | 'lead' | 'concorrente' | undefined) || undefined,
     projeto_id: projetoId,
     pesquisa_id: pesquisaId,
     busca: busca || undefined,
-    cidade: cidade || undefined,
-    uf: uf || undefined,
-    setor: setor || undefined,
-    porte: porte && porte !== 'todos' ? porte : undefined,
-    score_min: scoreMin,
-    score_max: scoreMax,
-    enriquecido: enriquecido && enriquecido !== 'todos' ? enriquecido : undefined,
+    // Campos não suportados pelo schema atual: cidade, uf, setor, porte, score_min, score_max
+    enriquecido: enriquecido && enriquecido !== 'todos' ? (enriquecido === 'sim') : undefined,
     limit,
     offset,
   };
