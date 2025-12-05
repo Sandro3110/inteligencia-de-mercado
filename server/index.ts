@@ -38,6 +38,33 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Endpoint REST para página de enriquecimento
+// Retorna entidades não enriquecidas
+app.get('/api/entidades', async (req, res) => {
+  try {
+    const { db } = await import('./db');
+    const { sql } = await import('drizzle-orm');
+    
+    const result = await db.execute(sql`
+      SELECT 
+        id,
+        nome,
+        cnpj,
+        tipo_entidade,
+        CASE WHEN enriquecido_em IS NOT NULL THEN true ELSE false END as enriquecida
+      FROM dim_entidade
+      WHERE enriquecido_em IS NULL
+      ORDER BY created_at DESC
+      LIMIT 100
+    `);
+    
+    res.json({ entidades: result.rows });
+  } catch (error) {
+    console.error('Erro ao buscar entidades:', error);
+    res.status(500).json({ error: 'Erro ao buscar entidades' });
+  }
+});
+
 // Conectar ao Redis antes de iniciar o servidor
 connectRedis()
   .then(() => {
