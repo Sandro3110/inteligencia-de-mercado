@@ -523,7 +523,7 @@ export default function EntidadeDetailsSheet({
               <CardContent className="space-y-2 text-sm">
                 <div>
                   <label className="text-xs text-muted-foreground">Fonte</label>
-                  <p className="font-medium">{formatValue(entidade.origem_dados)}</p>
+                  <p className="font-medium">{formatValue(entidade.origem_data)}</p>
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Data de Importação</label>
