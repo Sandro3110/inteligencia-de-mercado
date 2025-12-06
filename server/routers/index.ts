@@ -27,28 +27,28 @@ import { entidadeContextoRouter } from "./entidade-contexto";
 
 // IA (5)
 import { iaAlertasRouter } from "./ia-alertas";
-import { cacheRouter } from "./cache";
-import { configRouter } from "./config";
-import { config_historicoRouter } from "./config-historico";
-import { usageRouter } from "./usage";
+import { iaCacheRouter } from "./ia-cache";
+import { iaConfigRouter } from "./ia-config";
+import { iaConfigHistoricoRouter } from "./ia-config-historico";
+import { iaUsageRouter } from "./ia-usage";
 
 // Sistema (9)
 import { usersRouter } from "./users";
-import { user_profilesRouter } from "./user-profiles";
+import { userProfilesRouter } from "./user-profiles";
 import { rolesRouter } from "./roles";
-import { system_settingsRouter } from "./system-settings";
-import { rate_limitsRouter } from "./rate-limits";
-import { alertas_segurancaRouter } from "./alertas-seguranca";
-import { usuarios_bloqueadosRouter } from "./usuarios-bloqueados";
-import { importacao_errosRouter } from "./importacao-erros";
-import { cidades_brasilRouter } from "./cidades-brasil";
+import { systemSettingsRouter } from "./system-settings";
+import { rateLimitsRouter } from "./rate-limits";
+import { alertasSegurancaRouter } from "./alertas-seguranca";
+import { usuariosBloqueadosRouter } from "./usuarios-bloqueados";
+import { importacaoErrosRouter } from "./importacao-erros";
+import { cidadesBrasilRouter } from "./cidades-brasil";
 
 // Audit (2)
-import { audit_logsRouter } from "./audit-logs";
-import { data_audit_logsRouter } from "./data-audit-logs";
+import { auditLogsRouter } from "./audit-logs";
+import { dataAuditLogsRouter } from "./data-audit-logs";
 
 // Backup (1)
-import { produto_old_backupRouter } from "./produto-old-backup";
+import { produtoOldBackupRouter } from "./produto-old-backup";
 
 export const appRouter = router({
   // Dimensões
@@ -73,28 +73,28 @@ export const appRouter = router({
   
   // IA
   iaAlertas: iaAlertasRouter,
-  iaCache: cacheRouter,
-  iaConfig: configRouter,
-  iaConfigHistorico: config_historicoRouter,
-  iaUsage: usageRouter,
+  iaCache: iaCacheRouter,
+  iaConfig: iaConfigRouter,
+  iaConfigHistorico: iaConfigHistoricoRouter,
+  iaUsage: iaUsageRouter,
   
   // Sistema
   users: usersRouter,
-  userProfiles: user_profilesRouter,
+  userProfiles: userProfilesRouter,
   roles: rolesRouter,
-  systemSettings: system_settingsRouter,
-  rateLimits: rate_limitsRouter,
-  alertasSeguranca: alertas_segurancaRouter,
-  usuariosBloqueados: usuarios_bloqueadosRouter,
-  importacaoErros: importacao_errosRouter,
-  cidadesBrasil: cidades_brasilRouter,
+  systemSettings: systemSettingsRouter,
+  rateLimits: rateLimitsRouter,
+  alertasSeguranca: alertasSegurancaRouter,
+  usuariosBloqueados: usuariosBloqueadosRouter,
+  importacaoErros: importacaoErrosRouter,
+  cidadesBrasil: cidadesBrasilRouter,
   
   // Audit
-  auditLogs: audit_logsRouter,
-  dataAuditLogs: data_audit_logsRouter,
+  auditLogs: auditLogsRouter,
+  dataAuditLogs: dataAuditLogsRouter,
   
   // Backup
-  produtoOldBackup: produto_old_backupRouter,
+  produtoOldBackup: produtoOldBackupRouter,
 });
 
 export type AppRouter = typeof appRouter;

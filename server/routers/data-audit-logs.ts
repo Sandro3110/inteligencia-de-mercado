@@ -1,17 +1,19 @@
 /**
  * Router para data_audit_logs
- * Sincronizado 100% com DAL e Schema PostgreSQL
+ * Sincronizado 100% com DAL e Schema PostgreSQL (9 campos)
+ * 
+ * Nota: Tabela de auditoria de dados - apenas create e read
  */
 
 import { z } from "zod";
 import { router, publicProcedure } from "./trpc";
-import * as dal from "../dal/audit/data-audit-logs";
+import * as dataAuditLogsDAL from "../dal/audit/data-audit-logs";
 
-export const data_audit_logsRouter = router({
+export const dataAuditLogsRouter = router({
   getById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
-      return await dal.getDataAuditLogsById(input.id);
+      return await dataAuditLogsDAL.getDataAuditLogById(input.id);
     }),
 
   getAll: publicProcedure
@@ -19,13 +21,32 @@ export const data_audit_logsRouter = router({
       z.object({
         limit: z.number().min(1).max(1000).optional(),
         offset: z.number().min(0).optional(),
-        incluirInativos: z.boolean().optional(),
+        id: z.number().optional(),
+        tabela: z.string().optional(),
+        campo: z.string().optional(),
+        tipo_alteracao: z.string().optional(),
+        dataInicio: z.date().optional(),
+        dataFim: z.date().optional(),
         orderBy: z.string().optional(),
         orderDirection: z.enum(['asc', 'desc']).optional(),
       }).optional()
     )
     .query(async ({ input }) => {
-      return await dal.getDataAuditLogss(input || {});
+      return await dataAuditLogsDAL.getDataAuditLogs(input || {});
+    }),
+
+  count: publicProcedure
+    .input(
+      z.object({
+        tabela: z.string().optional(),
+        campo: z.string().optional(),
+        tipo_alteracao: z.string().optional(),
+        dataInicio: z.date().optional(),
+        dataFim: z.date().optional(),
+      }).optional()
+    )
+    .query(async ({ input }) => {
+      return await dataAuditLogsDAL.countDataAuditLogs(input || {});
     }),
 
   create: publicProcedure
@@ -41,30 +62,6 @@ export const data_audit_logsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.createDataAuditLogs(input);
-    }),
-
-  update: publicProcedure
-    .input(
-      z.object({
-        id: z.number(),
-        data: z.object({
-
-        }),
-      })
-    )
-    .mutation(async ({ input }) => {
-      return await dal.updateDataAuditLogs(input.id, input.data);
-    }),
-
-  delete: publicProcedure
-    .input(
-      z.object({
-        id: z.number(),
-        deleted_by: z.string().optional(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      return await dal.deleteDataAuditLogs(input.id, input.deleted_by);
+      return await dataAuditLogsDAL.createDataAuditLog(input);
     }),
 });

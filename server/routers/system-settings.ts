@@ -1,17 +1,23 @@
 /**
  * Router para system_settings
- * Sincronizado 100% com DAL e Schema PostgreSQL
+ * Sincronizado 100% com DAL e Schema PostgreSQL (9 campos)
  */
 
 import { z } from "zod";
 import { router, publicProcedure } from "./trpc";
-import * as dal from "../dal/sistema/system-settings";
+import * as systemSettingsDAL from "../dal/sistema/system-settings";
 
-export const system_settingsRouter = router({
+export const systemSettingsRouter = router({
   getById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
-      return await dal.getSystemSettingsById(input.id);
+      return await systemSettingsDAL.getSystemSettingById(input.id);
+    }),
+
+  getByChave: publicProcedure
+    .input(z.object({ chave: z.string() }))
+    .query(async ({ input }) => {
+      return await systemSettingsDAL.getSystemSettingByChave(input.chave);
     }),
 
   getAll: publicProcedure
@@ -19,13 +25,27 @@ export const system_settingsRouter = router({
       z.object({
         limit: z.number().min(1).max(1000).optional(),
         offset: z.number().min(0).optional(),
+        id: z.number().optional(),
+        chave: z.string().optional(),
+        categoria: z.string().optional(),
         incluirInativos: z.boolean().optional(),
         orderBy: z.string().optional(),
         orderDirection: z.enum(['asc', 'desc']).optional(),
       }).optional()
     )
     .query(async ({ input }) => {
-      return await dal.getSystemSettingss(input || {});
+      return await systemSettingsDAL.getSystemSettings(input || {});
+    }),
+
+  count: publicProcedure
+    .input(
+      z.object({
+        categoria: z.string().optional(),
+        incluirInativos: z.boolean().optional(),
+      }).optional()
+    )
+    .query(async ({ input }) => {
+      return await systemSettingsDAL.countSystemSettings(input || {});
     }),
 
   create: publicProcedure
@@ -39,7 +59,7 @@ export const system_settingsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.createSystemSettings(input);
+      return await systemSettingsDAL.createSystemSetting(input);
     }),
 
   update: publicProcedure
@@ -47,16 +67,16 @@ export const system_settingsRouter = router({
       z.object({
         id: z.number(),
         data: z.object({
-        chave: z.string().optional(),
-        valor: z.string().optional(),
-        descricao: z.string().optional(),
-        categoria: z.string().optional(),
-        updated_by: z.string().optional(),
+          chave: z.string().optional(),
+          valor: z.string().optional(),
+          descricao: z.string().optional(),
+          categoria: z.string().optional(),
+          updated_by: z.string().optional(),
         }),
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.updateSystemSettings(input.id, input.data);
+      return await systemSettingsDAL.updateSystemSetting(input.id, input.data);
     }),
 
   delete: publicProcedure
@@ -67,6 +87,6 @@ export const system_settingsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.deleteSystemSettings(input.id, input.deleted_by);
+      return await systemSettingsDAL.deleteSystemSetting(input.id, input.deleted_by);
     }),
 });

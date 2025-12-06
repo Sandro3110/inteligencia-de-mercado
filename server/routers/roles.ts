@@ -1,17 +1,32 @@
 /**
  * Router para roles
- * Sincronizado 100% com DAL e Schema PostgreSQL
+ * Sincronizado 100% com DAL e Schema PostgreSQL (9 campos)
+ * 
+ * Funções DAL:
+ * - getRoles(filters)
+ * - getRoleById(id)
+ * - getRoleByNome(nome)
+ * - createRole(data)
+ * - updateRole(id, data)
+ * - deleteRole(id, deleted_by?)
+ * - countRoles(filters)
  */
 
 import { z } from "zod";
 import { router, publicProcedure } from "./trpc";
-import * as dal from "../dal/sistema/roles";
+import * as rolesDAL from "../dal/sistema/roles";
 
 export const rolesRouter = router({
   getById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
-      return await dal.getRolesById(input.id);
+      return await rolesDAL.getRoleById(input.id);
+    }),
+
+  getByNome: publicProcedure
+    .input(z.object({ nome: z.string() }))
+    .query(async ({ input }) => {
+      return await rolesDAL.getRoleByNome(input.nome);
     }),
 
   getAll: publicProcedure
@@ -19,13 +34,25 @@ export const rolesRouter = router({
       z.object({
         limit: z.number().min(1).max(1000).optional(),
         offset: z.number().min(0).optional(),
+        id: z.number().optional(),
+        nome: z.string().optional(),
         incluirInativos: z.boolean().optional(),
         orderBy: z.string().optional(),
         orderDirection: z.enum(['asc', 'desc']).optional(),
       }).optional()
     )
     .query(async ({ input }) => {
-      return await dal.getRoless(input || {});
+      return await rolesDAL.getRoles(input || {});
+    }),
+
+  count: publicProcedure
+    .input(
+      z.object({
+        incluirInativos: z.boolean().optional(),
+      }).optional()
+    )
+    .query(async ({ input }) => {
+      return await rolesDAL.countRoles(input || {});
     }),
 
   create: publicProcedure
@@ -39,7 +66,7 @@ export const rolesRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.createRoles(input);
+      return await rolesDAL.createRole(input);
     }),
 
   update: publicProcedure
@@ -47,16 +74,16 @@ export const rolesRouter = router({
       z.object({
         id: z.number(),
         data: z.object({
-        nome: z.string().optional(),
-        descricao: z.string().optional(),
-        permissoes: z.string().optional(),
-        nivel_acesso: z.number().optional(),
-        updated_by: z.string().optional(),
+          nome: z.string().optional(),
+          descricao: z.string().optional(),
+          permissoes: z.string().optional(),
+          nivel_acesso: z.number().optional(),
+          updated_by: z.string().optional(),
         }),
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.updateRoles(input.id, input.data);
+      return await rolesDAL.updateRole(input.id, input.data);
     }),
 
   delete: publicProcedure
@@ -67,6 +94,6 @@ export const rolesRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.deleteRoles(input.id, input.deleted_by);
+      return await rolesDAL.deleteRole(input.id, input.deleted_by);
     }),
 });
