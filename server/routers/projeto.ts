@@ -1,21 +1,21 @@
 /**
- * Router para dim_produto
- * Sincronizado 100% com DAL e Schema PostgreSQL (22 campos)
+ * Router para dim_projeto
+ * Sincronizado 100% com DAL e Schema PostgreSQL (19 campos)
  * 
  * Funções DAL:
- * - getProdutos(filters)
- * - getProdutoById(id)
- * - createProduto(data)
- * - updateProduto(id, data)
- * - deleteProduto(id, deleted_by?)
- * - countProdutos(filters)
+ * - getProjetos(filters)
+ * - getProjetoById(id)
+ * - createProjeto(data)
+ * - updateProjeto(id, data)
+ * - deleteProjeto(id, deleted_by?)
+ * - countProjetos(filters)
  */
 
 import { z } from "zod";
 import { router, publicProcedure } from "./trpc";
-import * as produtoDAL from "../dal/dimensoes/produto";
+import * as projetoDAL from "../dal/dimensoes/projeto";
 
-export const produtoRouter = router({
+export const projetoRouter = router({
   // ============================================================================
   // READ
   // ============================================================================
@@ -23,7 +23,7 @@ export const produtoRouter = router({
   getById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
-      return await produtoDAL.getProdutoById(input.id);
+      return await projetoDAL.getProjetoById(input.id);
     }),
 
   getAll: publicProcedure
@@ -33,11 +33,10 @@ export const produtoRouter = router({
         limit: z.number().min(1).max(1000).optional(),
         offset: z.number().min(0).optional(),
         
-        // Filtros (ProdutoFilters - 5 campos)
+        // Filtros (ProjetoFilters - 4 campos)
         id: z.number().optional(),
         entidade_id: z.number().optional(),
         nome: z.string().optional(),
-        categoria: z.string().optional(),
         status: z.string().optional(),
         incluirInativos: z.boolean().optional(),
         
@@ -47,7 +46,7 @@ export const produtoRouter = router({
       }).optional()
     )
     .query(async ({ input }) => {
-      return await produtoDAL.getProdutos(input || {});
+      return await projetoDAL.getProjetos(input || {});
     }),
 
   count: publicProcedure
@@ -58,7 +57,7 @@ export const produtoRouter = router({
       }).optional()
     )
     .query(async ({ input }) => {
-      return await produtoDAL.countProdutos(input || {});
+      return await projetoDAL.countProjetos(input || {});
     }),
 
   // ============================================================================
@@ -73,24 +72,21 @@ export const produtoRouter = router({
         nome: z.string(),
         created_by: z.string(),
         
-        // Campos opcionais (CreateProdutoData - 13 campos)
-        categoria: z.string().optional(),
+        // Campos opcionais (CreateProjetoData - 10 campos)
         descricao: z.string().optional(),
-        preco: z.string().optional(),
-        moeda: z.string().optional(),
-        disponibilidade: z.string().optional(),
-        especificacoes_tecnicas: z.string().optional(),
-        diferenciais_competitivos: z.string().optional(),
-        publico_alvo: z.string().optional(),
-        canais_distribuicao: z.string().optional(),
         status: z.string().optional(),
-        data_lancamento: z.date().optional(),
-        ciclo_vida: z.string().optional(),
-        margem_lucro: z.string().optional(),
+        data_inicio: z.date().optional(),
+        data_fim: z.date().optional(),
+        orcamento: z.string().optional(),
+        equipe: z.string().optional(),
+        objetivos: z.string().optional(),
+        resultados_esperados: z.string().optional(),
+        prioridade: z.string().optional(),
+        progresso_percentual: z.number().optional(),
       })
     )
     .mutation(async ({ input }) => {
-      return await produtoDAL.createProduto(input);
+      return await projetoDAL.createProjeto(input);
     }),
 
   // ============================================================================
@@ -102,27 +98,24 @@ export const produtoRouter = router({
       z.object({
         id: z.number(),
         data: z.object({
-          // UpdateProdutoData (todos opcionais - 15 campos)
+          // UpdateProjetoData (todos opcionais - 11 campos)
           nome: z.string().optional(),
-          categoria: z.string().optional(),
           descricao: z.string().optional(),
-          preco: z.string().optional(),
-          moeda: z.string().optional(),
-          disponibilidade: z.string().optional(),
-          especificacoes_tecnicas: z.string().optional(),
-          diferenciais_competitivos: z.string().optional(),
-          updated_by: z.string().optional(),
-          publico_alvo: z.string().optional(),
-          canais_distribuicao: z.string().optional(),
           status: z.string().optional(),
-          data_lancamento: z.date().optional(),
-          ciclo_vida: z.string().optional(),
-          margem_lucro: z.string().optional(),
+          data_inicio: z.date().optional(),
+          data_fim: z.date().optional(),
+          orcamento: z.string().optional(),
+          equipe: z.string().optional(),
+          objetivos: z.string().optional(),
+          resultados_esperados: z.string().optional(),
+          updated_by: z.string().optional(),
+          prioridade: z.string().optional(),
+          progresso_percentual: z.number().optional(),
         }),
       })
     )
     .mutation(async ({ input }) => {
-      return await produtoDAL.updateProduto(input.id, input.data);
+      return await projetoDAL.updateProjeto(input.id, input.data);
     }),
 
   // ============================================================================
@@ -137,6 +130,6 @@ export const produtoRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await produtoDAL.deleteProduto(input.id, input.deleted_by);
+      return await projetoDAL.deleteProjeto(input.id, input.deleted_by);
     }),
 });
