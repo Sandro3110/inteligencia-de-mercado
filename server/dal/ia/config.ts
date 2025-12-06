@@ -46,6 +46,6 @@ export async function createIAConfig(data: CreateIAConfigData) {
 }
 
 export async function updateIAConfig(id: number, data: UpdateIAConfigData) {
-  const result = await db.update(ia_config).set({ ...data, updated_at: sql\`now()\` }).where(eq(ia_config.id, id)).returning();
+  const result = await db.update(ia_config).set({ ...data, updated_at: sql`now()\` }).where(eq(ia_config.id, id)).returning();
   return result[0] || null;
 }
