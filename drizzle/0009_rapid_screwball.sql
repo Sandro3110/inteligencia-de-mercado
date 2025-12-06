@@ -1,1 +1,0 @@
-ALTER TABLE `leads` MODIFY COLUMN `leadHash` varchar(255);

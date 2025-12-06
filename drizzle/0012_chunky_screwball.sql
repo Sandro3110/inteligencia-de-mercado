@@ -1,1 +1,0 @@
-ALTER TABLE `mercados_unicos` MODIFY COLUMN `mercadoHash` varchar(255);

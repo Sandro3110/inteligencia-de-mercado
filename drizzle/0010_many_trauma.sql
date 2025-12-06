@@ -1,1 +1,0 @@
-ALTER TABLE `concorrentes` MODIFY COLUMN `concorrenteHash` varchar(255);

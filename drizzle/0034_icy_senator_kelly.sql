@@ -1,1 +1,0 @@
-ALTER TABLE `pesquisas` MODIFY COLUMN `status` enum('importado','enriquecendo','em_andamento','concluido','erro') DEFAULT 'importado';
