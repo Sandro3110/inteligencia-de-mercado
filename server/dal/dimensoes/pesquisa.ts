@@ -82,6 +82,15 @@ export async function getPesquisaById(id: number) {
   return result[0] || null;
 }
 
+export async function getPesquisasByProjeto(projetoId: number) {
+  const result = await db
+    .select()
+    .from(dim_pesquisa)
+    .where(and(eq(dim_pesquisa.projeto_id, projetoId), isNull(dim_pesquisa.deleted_at)))
+    .orderBy(desc(dim_pesquisa.created_at));
+  return result;
+}
+
 export async function createPesquisa(data: CreatePesquisaData) {
   const result = await db.insert(dim_pesquisa).values({ ...data, created_at: sql`now()`, updated_at: sql`now()` }).returning();
   return result[0];
