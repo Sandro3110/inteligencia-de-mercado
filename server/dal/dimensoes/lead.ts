@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { dim_lead } from '../../../drizzle/schema';
+import { dim_lead } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface LeadFilters {
