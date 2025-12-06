@@ -6,7 +6,7 @@
  */
 
 import { db } from '../db';
-import { auditLogs } from '../../drizzle/audit_logs.schema';
+import { audit_logs } from '../../drizzle';
 
 /**
  * Tipos de ação auditáveis
@@ -114,7 +114,7 @@ export interface AuditLogData {
  */
 export async function logAudit(data: AuditLogData): Promise<number> {
   try {
-    const [log] = await db.insert(auditLogs).values({
+    const [log] = await db.insert(audit_logs).values({
       user_id: data.userId,
       user_name: data.userName,
       user_email: data.userEmail,
@@ -133,7 +133,7 @@ export async function logAudit(data: AuditLogData): Promise<number> {
       
       ip_address: data.ipAddress,
       user_agent: data.userAgent,
-    }).returning({ id: auditLogs.id });
+    }).returning({ id: audit_logs.id });
     
     return log.id;
   } catch (error) {
