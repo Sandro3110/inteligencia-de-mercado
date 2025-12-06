@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { user_profiles } from '../../../drizzle/schema';
+import { user_profiles } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql } from 'drizzle-orm';
 
 export interface UserProfileFilters {

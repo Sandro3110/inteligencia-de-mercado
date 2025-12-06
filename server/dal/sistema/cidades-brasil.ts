@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { cidades_brasil } from '../../../drizzle/schema';
+import { cidades_brasil } from '../../../drizzle';
 import { eq, and, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface CidadeBrasilFilters {

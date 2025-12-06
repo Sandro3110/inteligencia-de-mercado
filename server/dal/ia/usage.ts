@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { ia_usage } from '../../../drizzle/schema';
+import { ia_usage } from '../../../drizzle';
 import { eq, and, desc, asc, sql, gte, lte } from 'drizzle-orm';
 
 export interface IAUsageFilters {

@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { alertas_seguranca } from '../../../drizzle/schema';
+import { alertas_seguranca } from '../../../drizzle';
 import { eq, and, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface AlertaSegurancaFilters {

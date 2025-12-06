@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { rate_limits } from '../../../drizzle/schema';
+import { rate_limits } from '../../../drizzle';
 import { eq, and, desc, asc, sql, gte } from 'drizzle-orm';
 
 export interface RateLimitFilters {

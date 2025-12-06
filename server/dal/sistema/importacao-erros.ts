@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { importacao_erros } from '../../../drizzle/schema';
+import { importacao_erros } from '../../../drizzle';
 import { eq, and, desc, asc, sql } from 'drizzle-orm';
 
 export interface ImportacaoErroFilters {

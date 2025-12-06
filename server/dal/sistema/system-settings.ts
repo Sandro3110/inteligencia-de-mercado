@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { system_settings } from '../../../drizzle/schema';
+import { system_settings } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface SystemSettingFilters {

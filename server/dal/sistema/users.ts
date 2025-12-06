@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { users } from '../../../drizzle/schema';
+import { users } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface UserFilters {

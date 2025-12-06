@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { usuarios_bloqueados } from '../../../drizzle/schema';
+import { usuarios_bloqueados } from '../../../drizzle';
 import { eq, and, desc, asc, sql } from 'drizzle-orm';
 
 export interface UsuarioBloqueadoFilters {

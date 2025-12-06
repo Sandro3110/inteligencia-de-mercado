@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { roles } from '../../../drizzle/schema';
+import { roles } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface RoleFilters {
