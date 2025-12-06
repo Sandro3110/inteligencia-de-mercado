@@ -45,9 +45,11 @@ export async function getDataAuditLogs(filters: DataAuditLogFilters = {}) {
 
   let query = db.select().from(data_audit_logs).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = data_audit_logs[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in data_audit_logs) {
+    const orderColumn = data_audit_logs[filters.orderBy as keyof typeof data_audit_logs];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
     query = query.orderBy(desc(data_audit_logs.created_at)) as any;
   }
