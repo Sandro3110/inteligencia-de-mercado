@@ -49,9 +49,11 @@ export async function getAuditLogs(filters: AuditLogFilters = {}) {
 
   let query = db.select().from(audit_logs).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = audit_logs[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in audit_logs) {
+    const orderColumn = audit_logs[filters.orderBy as keyof typeof audit_logs];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
     query = query.orderBy(desc(audit_logs.created_at)) as any;
   }

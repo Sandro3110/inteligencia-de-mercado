@@ -108,3 +108,13 @@ export async function countIACaches(filters: IACacheFilters = {}) {
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(ia_cache).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;
 }
+
+export async function getIACacheByChave(cache_key: string) {
+  const result = await db.select().from(ia_cache).where(
+    and(
+      eq(ia_cache.cache_key, cache_key),
+      sql`${ia_cache.expires_at} > now()`
+    )
+  ).limit(1);
+  return result[0] || null;
+}

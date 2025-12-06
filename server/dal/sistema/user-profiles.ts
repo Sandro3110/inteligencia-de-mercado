@@ -66,3 +66,8 @@ export async function countUserProfiles(filters: UserProfileFilters = {}) {
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(user_profiles).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;
 }
+
+export async function deleteUserProfile(id: string) {
+  const result = await db.delete(user_profiles).where(eq(user_profiles.id, id)).returning();
+  return result[0] || null;
+}

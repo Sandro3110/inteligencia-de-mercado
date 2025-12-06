@@ -45,3 +45,20 @@ export async function updateUsuarioBloqueado(id: number, data: UpdateUsuarioBloq
   const result = await db.update(usuarios_bloqueados).set(data).where(eq(usuarios_bloqueados.id, id)).returning();
   return result[0] || null;
 }
+
+export async function getUsuarioBloqueadoByUserId(user_id: string) {
+  const result = await db.select().from(usuarios_bloqueados).where(eq(usuarios_bloqueados.user_id, user_id)).limit(1);
+  return result[0] || null;
+}
+
+export async function desbloquearUsuario(id: number) {
+  const result = await db.delete(usuarios_bloqueados).where(eq(usuarios_bloqueados.id, id)).returning();
+  return result[0] || null;
+}
+
+export async function countUsuariosBloqueados(filters: UsuarioBloqueadoFilters = {}) {
+  const conditions: any[] = [];
+  if (filters.user_id) conditions.push(eq(usuarios_bloqueados.user_id, filters.user_id));
+  const result = await db.select({ count: sql<number>`count(*)::int` }).from(usuarios_bloqueados).where(conditions.length > 0 ? and(...conditions) : undefined);
+  return result[0]?.count || 0;
+}
