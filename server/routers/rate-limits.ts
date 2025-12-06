@@ -1,17 +1,17 @@
 /**
- * Router para audit_logs
+ * Router para rate_limits
  * Sincronizado 100% com DAL e Schema PostgreSQL
  */
 
 import { z } from "zod";
 import { router, publicProcedure } from "./trpc";
-import * as dal from "../dal/audit/audit-logs";
+import * as dal from "../dal/sistema/rate-limits";
 
-export const audit_logsRouter = router({
+export const rate_limitsRouter = router({
   getById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
-      return await dal.getAuditLogsById(input.id);
+      return await dal.getRateLimitsById(input.id);
     }),
 
   getAll: publicProcedure
@@ -25,24 +25,21 @@ export const audit_logsRouter = router({
       }).optional()
     )
     .query(async ({ input }) => {
-      return await dal.getAuditLogss(input || {});
+      return await dal.getRateLimitss(input || {});
     }),
 
   create: publicProcedure
     .input(
       z.object({
-        user_id: z.string().optional(),
-        tabela: z.string(),
-        operacao: z.string(),
-        registro_id: z.number().optional(),
-        dados_anteriores: z.string().optional(),
-        dados_novos: z.string().optional(),
-        ip_origem: z.string().optional(),
-        user_agent: z.string().optional(),
+        user_id: z.string(),
+        endpoint: z.string(),
+        requests_count: z.number(),
+        window_start: z.date(),
+        window_end: z.date(),
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.createAuditLogs(input);
+      return await dal.createRateLimits(input);
     }),
 
   update: publicProcedure
@@ -50,12 +47,14 @@ export const audit_logsRouter = router({
       z.object({
         id: z.number(),
         data: z.object({
-
+        requests_count: z.number().optional(),
+        window_start: z.date().optional(),
+        window_end: z.date().optional(),
         }),
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.updateAuditLogs(input.id, input.data);
+      return await dal.updateRateLimits(input.id, input.data);
     }),
 
   delete: publicProcedure
@@ -66,6 +65,6 @@ export const audit_logsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.deleteAuditLogs(input.id, input.deleted_by);
+      return await dal.deleteRateLimits(input.id, input.deleted_by);
     }),
 });

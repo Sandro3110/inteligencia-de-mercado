@@ -1,17 +1,17 @@
 /**
- * Router para audit_logs
+ * Router para user_profiles
  * Sincronizado 100% com DAL e Schema PostgreSQL
  */
 
 import { z } from "zod";
 import { router, publicProcedure } from "./trpc";
-import * as dal from "../dal/audit/audit-logs";
+import * as dal from "../dal/sistema/user-profiles";
 
-export const audit_logsRouter = router({
+export const user_profilesRouter = router({
   getById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
-      return await dal.getAuditLogsById(input.id);
+      return await dal.getUserProfilesById(input.id);
     }),
 
   getAll: publicProcedure
@@ -25,24 +25,23 @@ export const audit_logsRouter = router({
       }).optional()
     )
     .query(async ({ input }) => {
-      return await dal.getAuditLogss(input || {});
+      return await dal.getUserProfiless(input || {});
     }),
 
   create: publicProcedure
     .input(
       z.object({
-        user_id: z.string().optional(),
-        tabela: z.string(),
-        operacao: z.string(),
-        registro_id: z.number().optional(),
-        dados_anteriores: z.string().optional(),
-        dados_novos: z.string().optional(),
-        ip_origem: z.string().optional(),
-        user_agent: z.string().optional(),
+        user_id: z.string(),
+        avatar_url: z.string().optional(),
+        bio: z.string().optional(),
+        telefone: z.string().optional(),
+        empresa: z.string().optional(),
+        cargo: z.string().optional(),
+        created_by: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.createAuditLogs(input);
+      return await dal.createUserProfiles(input);
     }),
 
   update: publicProcedure
@@ -50,12 +49,17 @@ export const audit_logsRouter = router({
       z.object({
         id: z.number(),
         data: z.object({
-
+        avatar_url: z.string().optional(),
+        bio: z.string().optional(),
+        telefone: z.string().optional(),
+        empresa: z.string().optional(),
+        cargo: z.string().optional(),
+        updated_by: z.string().optional(),
         }),
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.updateAuditLogs(input.id, input.data);
+      return await dal.updateUserProfiles(input.id, input.data);
     }),
 
   delete: publicProcedure
@@ -66,6 +70,6 @@ export const audit_logsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.deleteAuditLogs(input.id, input.deleted_by);
+      return await dal.deleteUserProfiles(input.id, input.deleted_by);
     }),
 });

@@ -1,17 +1,17 @@
 /**
- * Router para audit_logs
+ * Router para importacao_erros
  * Sincronizado 100% com DAL e Schema PostgreSQL
  */
 
 import { z } from "zod";
 import { router, publicProcedure } from "./trpc";
-import * as dal from "../dal/audit/audit-logs";
+import * as dal from "../dal/sistema/importacao-erros";
 
-export const audit_logsRouter = router({
+export const importacao_errosRouter = router({
   getById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
-      return await dal.getAuditLogsById(input.id);
+      return await dal.getImportacaoErrosById(input.id);
     }),
 
   getAll: publicProcedure
@@ -25,24 +25,22 @@ export const audit_logsRouter = router({
       }).optional()
     )
     .query(async ({ input }) => {
-      return await dal.getAuditLogss(input || {});
+      return await dal.getImportacaoErross(input || {});
     }),
 
   create: publicProcedure
     .input(
       z.object({
-        user_id: z.string().optional(),
-        tabela: z.string(),
-        operacao: z.string(),
-        registro_id: z.number().optional(),
-        dados_anteriores: z.string().optional(),
-        dados_novos: z.string().optional(),
-        ip_origem: z.string().optional(),
-        user_agent: z.string().optional(),
+        importacao_id: z.number(),
+        linha: z.number().optional(),
+        coluna: z.string().optional(),
+        tipo_erro: z.string().optional(),
+        mensagem_erro: z.string().optional(),
+        dados_linha: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.createAuditLogs(input);
+      return await dal.createImportacaoErros(input);
     }),
 
   update: publicProcedure
@@ -55,7 +53,7 @@ export const audit_logsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.updateAuditLogs(input.id, input.data);
+      return await dal.updateImportacaoErros(input.id, input.data);
     }),
 
   delete: publicProcedure
@@ -66,6 +64,6 @@ export const audit_logsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.deleteAuditLogs(input.id, input.deleted_by);
+      return await dal.deleteImportacaoErros(input.id, input.deleted_by);
     }),
 });

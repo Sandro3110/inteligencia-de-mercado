@@ -1,17 +1,17 @@
 /**
- * Router para audit_logs
+ * Router para usuarios_bloqueados
  * Sincronizado 100% com DAL e Schema PostgreSQL
  */
 
 import { z } from "zod";
 import { router, publicProcedure } from "./trpc";
-import * as dal from "../dal/audit/audit-logs";
+import * as dal from "../dal/sistema/usuarios-bloqueados";
 
-export const audit_logsRouter = router({
+export const usuarios_bloqueadosRouter = router({
   getById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
-      return await dal.getAuditLogsById(input.id);
+      return await dal.getUsuariosBloqueadosById(input.id);
     }),
 
   getAll: publicProcedure
@@ -25,24 +25,21 @@ export const audit_logsRouter = router({
       }).optional()
     )
     .query(async ({ input }) => {
-      return await dal.getAuditLogss(input || {});
+      return await dal.getUsuariosBloqueadoss(input || {});
     }),
 
   create: publicProcedure
     .input(
       z.object({
-        user_id: z.string().optional(),
-        tabela: z.string(),
-        operacao: z.string(),
-        registro_id: z.number().optional(),
-        dados_anteriores: z.string().optional(),
-        dados_novos: z.string().optional(),
-        ip_origem: z.string().optional(),
-        user_agent: z.string().optional(),
+        user_id: z.string(),
+        motivo: z.string().optional(),
+        data_bloqueio: z.date(),
+        data_desbloqueio: z.date().optional(),
+        ativo: z.boolean().optional(),
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.createAuditLogs(input);
+      return await dal.createUsuariosBloqueados(input);
     }),
 
   update: publicProcedure
@@ -50,12 +47,15 @@ export const audit_logsRouter = router({
       z.object({
         id: z.number(),
         data: z.object({
-
+        motivo: z.string().optional(),
+        data_bloqueio: z.date().optional(),
+        data_desbloqueio: z.date().optional(),
+        ativo: z.boolean().optional(),
         }),
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.updateAuditLogs(input.id, input.data);
+      return await dal.updateUsuariosBloqueados(input.id, input.data);
     }),
 
   delete: publicProcedure
@@ -66,6 +66,6 @@ export const audit_logsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await dal.deleteAuditLogs(input.id, input.deleted_by);
+      return await dal.deleteUsuariosBloqueados(input.id, input.deleted_by);
     }),
 });
