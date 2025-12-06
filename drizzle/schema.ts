@@ -54,7 +54,7 @@ export const cidades_brasil = pgTable('cidades_brasil', {
 
 // Tabela: data_audit_logs (11 campos)
 export const data_audit_logs = pgTable('data_audit_logs', {
-  id: bigint('id', { mode: 'number' }).notNull(),
+  id: serial('id').primaryKey(),
   tabela: varchar('tabela', { length: 100 }).notNull(),
   operacao: varchar('operacao', { length: 10 }).notNull(),
   registro_id: integer('registro_id').notNull(),
