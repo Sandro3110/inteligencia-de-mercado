@@ -1,4 +1,4 @@
-import { router, publicProcedure } from './index';
+import { router, publicProcedure } from './trpc';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';

@@ -1,4 +1,4 @@
-import { router, publicProcedure } from './index';
+import { router, publicProcedure } from './trpc';
 import { db } from '../db';
 import { dim_status_qualificacao } from '../../drizzle/schema';
 import { asc } from 'drizzle-orm';

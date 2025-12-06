@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { router } from './index';
+import { router } from './trpc';
 import { requirePermission } from '../middleware/auth';
 import { Permission } from '@shared/types/permissions';
 import * as DAL from '../dal';
