@@ -5,7 +5,8 @@
  * VERSÃO CORRIGIDA - Usando nomes corretos do schema
  */
 
-import { db } from '../../db';
+iimport { db } from '../db';
+import { getOrderColumn } from '../helpers/order-by';';
 import {
   fatoEntidadeContexto,    // ✅ CORRETO (era fatoEntidades)
   dimEntidade,             // ✅ CORRETO
@@ -144,7 +145,7 @@ export async function getContextosEntidades(
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = (fatoEntidadeContexto as any)[orderBy] || fatoEntidadeContexto.createdAt;
+  const orderColumn = getOrderColumn(fatoEntidadeContexto, orderBy, fatoEntidadeContexto.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db

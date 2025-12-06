@@ -10,6 +10,7 @@
  */
 
 import { db } from '../../db';
+import { getOrderColumn } from '../../helpers/order-by';
 import { dimProjeto } from '../../../drizzle/schema';
 import { eq, and, or, like, desc, asc, count, isNull } from 'drizzle-orm';
 
@@ -178,7 +179,7 @@ export async function getProjetos(
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = (dimProjeto as any)[orderBy] || dimProjeto.createdAt;
+  const orderColumn = getOrderColumn(dimProjeto, orderBy, dimProjeto.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db

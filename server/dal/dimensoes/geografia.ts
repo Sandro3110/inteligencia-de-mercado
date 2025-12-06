@@ -9,6 +9,7 @@
  */
 
 import { db } from '../../db';
+import { getOrderColumn } from '../../helpers/order-by';
 import { dimGeografia } from '../../../drizzle/schema';
 import { eq, and, like, desc, asc, count, sql } from 'drizzle-orm';
 
@@ -122,7 +123,7 @@ export async function getGeografias(
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = (dimGeografia as any)[orderBy] || dimGeografia.cidade;
+  const orderColumn = getOrderColumn(dimGeografia, orderBy, dimGeografia.cidade);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db

@@ -11,6 +11,7 @@
  */
 
 import { db } from '../../db';
+import { getOrderColumn } from '../../helpers/order-by';
 import { dimEntidade } from '../../../drizzle/schema';
 import { eq, and, or, like, desc, asc, count, isNull, sql } from 'drizzle-orm';
 import { createHash } from 'crypto';
@@ -259,7 +260,7 @@ export async function getEntidades(
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = (dimEntidade as any)[orderBy] || dimEntidade.createdAt;
+  const orderColumn = getOrderColumn(dimEntidade, orderBy, dimEntidade.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db

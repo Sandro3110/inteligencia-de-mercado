@@ -8,6 +8,7 @@
  */
 
 import { db } from '../../db';
+import { getOrderColumn } from '../../helpers/order-by';
 import { fatoEntidadeProduto, dimProduto, fatoEntidadeContexto } from '../../../drizzle/schema';
 import { eq, and, desc, asc, count } from 'drizzle-orm';
 
@@ -159,7 +160,7 @@ export async function getRelacoes(
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
   const orderColumn =
-    (fatoEntidadeProduto as any)[orderBy] || fatoEntidadeProduto.createdAt;
+    getOrderColumn(fatoEntidadeProduto, orderBy, fatoEntidadeProduto.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db

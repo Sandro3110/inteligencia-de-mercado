@@ -10,6 +10,7 @@
  */
 
 import { db } from '../../db';
+import { getOrderColumn } from '../../helpers/order-by';
 import {
   fatoEntidadeContexto,
   dimEntidade,
@@ -278,7 +279,7 @@ export async function getContextos(
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
   const orderColumn =
-    (fatoEntidadeContexto as any)[orderBy] || fatoEntidadeContexto.createdAt;
+    getOrderColumn(fatoEntidadeContexto, orderBy, fatoEntidadeContexto.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db

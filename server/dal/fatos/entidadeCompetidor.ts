@@ -8,6 +8,7 @@
  */
 
 import { db } from '../../db';
+import { getOrderColumn } from '../../helpers/order-by';
 import { fatoEntidadeCompetidor, dimEntidade } from '../../../drizzle/schema';
 import { eq, and, desc, asc, count } from 'drizzle-orm';
 
@@ -153,7 +154,7 @@ export async function getRelacoes(
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
   const orderColumn =
-    (fatoEntidadeCompetidor as any)[orderBy] || fatoEntidadeCompetidor.createdAt;
+    getOrderColumn(fatoEntidadeCompetidor, orderBy, fatoEntidadeCompetidor.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db

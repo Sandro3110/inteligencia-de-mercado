@@ -10,6 +10,7 @@
  */
 
 import { db } from '../../db';
+import { getOrderColumn } from '../../helpers/order-by';
 import { dimMercado } from '../../../drizzle/schema';
 import { eq, and, or, like, desc, asc, count, isNull } from 'drizzle-orm';
 import { createHash } from 'crypto';
@@ -160,7 +161,7 @@ export async function getMercados(
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = (dimMercado as any)[orderBy] || dimMercado.nome;
+  const orderColumn = getOrderColumn(dimMercado, orderBy, dimMercado.nome);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db

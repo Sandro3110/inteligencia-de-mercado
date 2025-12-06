@@ -8,6 +8,7 @@
  */
 
 import { db } from '../../db';
+import { getOrderColumn } from '../../helpers/order-by';
 import { dimProduto } from '../../../drizzle/schema';
 import { eq, and, or, like, desc, asc, count, isNull } from 'drizzle-orm';
 import { createHash } from 'crypto';
@@ -152,7 +153,7 @@ export async function getProdutos(
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = (dimProduto as any)[orderBy] || dimProduto.nome;
+  const orderColumn = getOrderColumn(dimProduto, orderBy, dimProduto.nome);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db
