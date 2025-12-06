@@ -1,6 +1,6 @@
 /**
  * DAL para audit_logs
- * Sincronizado 100% com schema (10 campos)
+ * Sincronizado 100% com schema PostgreSQL (13 campos)
  */
 
 import { db } from '../../db';
@@ -10,8 +10,10 @@ import { eq, and, desc, asc, sql, gte, lte } from 'drizzle-orm';
 export interface AuditLogFilters {
   id?: number;
   user_id?: string;
-  tabela?: string;
-  operacao?: string;
+  action?: string;
+  endpoint?: string;
+  metodo?: string;
+  resultado?: string;
   dataInicio?: Date;
   dataFim?: Date;
   orderBy?: keyof typeof audit_logs;
@@ -21,24 +23,29 @@ export interface AuditLogFilters {
 }
 
 export interface CreateAuditLogData {
-  user_id?: string;
-  tabela: string;
-  operacao: string;
-  registro_id?: number;
-  dados_anteriores?: string;
-  dados_novos?: string;
-  ip_origem?: string;
+  user_id: string;
+  action: string;
+  endpoint: string;
+  metodo: string;
+  parametros?: any;
+  resultado?: string;
+  erro?: string;
+  ip_address?: string;
   user_agent?: string;
+  duracao_ms?: number;
+  custo?: string;
 }
 
 export async function getAuditLogs(filters: AuditLogFilters = {}) {
   const conditions: any[] = [];
   if (filters.id) conditions.push(eq(audit_logs.id, filters.id));
   if (filters.user_id) conditions.push(eq(audit_logs.user_id, filters.user_id));
-  if (filters.tabela) conditions.push(eq(audit_logs.tabela, filters.tabela));
-  if (filters.operacao) conditions.push(eq(audit_logs.operacao, filters.operacao));
-  if (filters.dataInicio) conditions.push(gte(audit_logs.timestamp, filters.dataInicio));
-  if (filters.dataFim) conditions.push(lte(audit_logs.timestamp, filters.dataFim));
+  if (filters.action) conditions.push(eq(audit_logs.action, filters.action));
+  if (filters.endpoint) conditions.push(eq(audit_logs.endpoint, filters.endpoint));
+  if (filters.metodo) conditions.push(eq(audit_logs.metodo, filters.metodo));
+  if (filters.resultado) conditions.push(eq(audit_logs.resultado, filters.resultado));
+  if (filters.dataInicio) conditions.push(gte(audit_logs.created_at, filters.dataInicio));
+  if (filters.dataFim) conditions.push(lte(audit_logs.created_at, filters.dataFim));
 
   let query = db.select().from(audit_logs).where(conditions.length > 0 ? and(...conditions) : undefined);
 
@@ -46,7 +53,7 @@ export async function getAuditLogs(filters: AuditLogFilters = {}) {
     const orderColumn = audit_logs[filters.orderBy];
     if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
   } else {
-    query = query.orderBy(desc(audit_logs.timestamp)) as any;
+    query = query.orderBy(desc(audit_logs.created_at)) as any;
   }
 
   if (filters.limit) query = query.limit(filters.limit) as any;
@@ -61,17 +68,16 @@ export async function getAuditLogById(id: number) {
 }
 
 export async function createAuditLog(data: CreateAuditLogData) {
-  const result = await db.insert(audit_logs).values({ ...data, timestamp: sql`now()` }).returning();
+  const result = await db.insert(audit_logs).values(data).returning();
   return result[0];
 }
 
 export async function countAuditLogs(filters: AuditLogFilters = {}) {
   const conditions: any[] = [];
   if (filters.user_id) conditions.push(eq(audit_logs.user_id, filters.user_id));
-  if (filters.tabela) conditions.push(eq(audit_logs.tabela, filters.tabela));
-  if (filters.operacao) conditions.push(eq(audit_logs.operacao, filters.operacao));
-  if (filters.dataInicio) conditions.push(gte(audit_logs.timestamp, filters.dataInicio));
-  if (filters.dataFim) conditions.push(lte(audit_logs.timestamp, filters.dataFim));
+  if (filters.action) conditions.push(eq(audit_logs.action, filters.action));
+  if (filters.dataInicio) conditions.push(gte(audit_logs.created_at, filters.dataInicio));
+  if (filters.dataFim) conditions.push(lte(audit_logs.created_at, filters.dataFim));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(audit_logs).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;
 }
