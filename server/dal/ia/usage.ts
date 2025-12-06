@@ -36,9 +36,11 @@ export async function getIAUsages(filters: IAUsageFilters = {}) {
 
   let query = db.select().from(ia_usage).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = ia_usage[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in ia_usage) {
+    const orderColumn = ia_usage[filters.orderBy as keyof typeof ia_usage];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
   }
 

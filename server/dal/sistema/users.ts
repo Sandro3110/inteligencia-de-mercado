@@ -43,9 +43,11 @@ export async function getUsers(filters: UserFilters = {}) {
 
   let query = db.select().from(users).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = users[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in users) {
+    const orderColumn = users[filters.orderBy as keyof typeof users];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
     query = query.orderBy(desc(users.created_at)) as any;
   }

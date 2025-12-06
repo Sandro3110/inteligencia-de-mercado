@@ -37,9 +37,11 @@ export async function getCidadesBrasil(filters: CidadeBrasilFilters = {}) {
 
   let query = db.select().from(cidades_brasil).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = cidades_brasil[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in cidades_brasil) {
+    const orderColumn = cidades_brasil[filters.orderBy as keyof typeof cidades_brasil];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
     query = query.orderBy(asc(cidades_brasil.nome)) as any;
   }

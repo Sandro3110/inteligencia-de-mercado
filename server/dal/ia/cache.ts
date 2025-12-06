@@ -43,9 +43,11 @@ export async function getIACaches(filters: IACacheFilters = {}) {
 
   let query = db.select().from(ia_cache).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = ia_cache[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in ia_cache) {
+    const orderColumn = ia_cache[filters.orderBy as keyof typeof ia_cache];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
     query = query.orderBy(desc(ia_cache.created_at)) as any;
   }

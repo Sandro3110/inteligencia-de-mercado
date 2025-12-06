@@ -65,9 +65,11 @@ export async function getProdutosOldBackup(filters: ProdutoOldBackupFilters = {}
 
   let query = db.select().from(dim_produto_old_backup).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = dim_produto_old_backup[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in dim_produto_old_backup) {
+    const orderColumn = dim_produto_old_backup[filters.orderBy as keyof typeof dim_produto_old_backup];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
     query = query.orderBy(desc(dim_produto_old_backup.created_at)) as any;
   }

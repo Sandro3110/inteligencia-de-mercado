@@ -48,9 +48,11 @@ export async function getAlertasSeguranca(filters: AlertaSegurancaFilters = {}) 
 
   let query = db.select().from(alertas_seguranca).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = alertas_seguranca[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in alertas_seguranca) {
+    const orderColumn = alertas_seguranca[filters.orderBy as keyof typeof alertas_seguranca];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
     query = query.orderBy(desc(alertas_seguranca.created_at)) as any;
   }

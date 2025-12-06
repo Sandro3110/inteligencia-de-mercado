@@ -34,9 +34,11 @@ export async function getImportacaoErros(filters: ImportacaoErroFilters = {}) {
 
   let query = db.select().from(importacao_erros).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = importacao_erros[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in importacao_erros) {
+    const orderColumn = importacao_erros[filters.orderBy as keyof typeof importacao_erros];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
     query = query.orderBy(desc(importacao_erros.created_at)) as any;
   }

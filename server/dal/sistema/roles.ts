@@ -39,9 +39,11 @@ export async function getRoles(filters: RoleFilters = {}) {
 
   let query = db.select().from(roles).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = roles[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in roles) {
+    const orderColumn = roles[filters.orderBy as keyof typeof roles];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
     query = query.orderBy(asc(roles.nome)) as any;
   }

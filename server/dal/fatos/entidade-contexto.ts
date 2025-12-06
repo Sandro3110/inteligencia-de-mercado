@@ -42,9 +42,11 @@ export async function getEntidadeContextos(filters: EntidadeContextoFilters = {}
 
   let query = db.select().from(fato_entidade_contexto).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = fato_entidade_contexto[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in fato_entidade_contexto) {
+    const orderColumn = fato_entidade_contexto[filters.orderBy as keyof typeof fato_entidade_contexto];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
     query = query.orderBy(desc(fato_entidade_contexto.created_at)) as any;
   }

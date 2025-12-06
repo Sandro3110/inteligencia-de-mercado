@@ -67,8 +67,8 @@ export async function getMercados(filters: MercadoFilters = {}) {
 
   let query = db.select().from(dim_mercado).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = dim_mercado[filters.orderBy];
+  if (filters.orderBy && filters.orderBy in dim_mercado) {
+    const orderColumn = dim_mercado[filters.orderBy as keyof typeof dim_mercado];
     if (orderColumn) {
       query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
     }

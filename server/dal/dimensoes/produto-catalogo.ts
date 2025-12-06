@@ -53,9 +53,11 @@ export async function getProdutosCatalogo(filters: ProdutoCatalogoFilters = {}) 
 
   let query = db.select().from(dim_produto_catalogo).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = dim_produto_catalogo[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in dim_produto_catalogo) {
+    const orderColumn = dim_produto_catalogo[filters.orderBy as keyof typeof dim_produto_catalogo];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
     query = query.orderBy(asc(dim_produto_catalogo.nome)) as any;
   }

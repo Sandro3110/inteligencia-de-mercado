@@ -56,9 +56,11 @@ export async function getCanais(filters: CanalFilters = {}) {
 
   let query = db.select().from(dim_canal).where(conditions.length > 0 ? and(...conditions) : undefined);
 
-  if (filters.orderBy) {
-    const orderColumn = dim_canal[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
+  if (filters.orderBy && filters.orderBy in dim_canal) {
+    const orderColumn = dim_canal[filters.orderBy as keyof typeof dim_canal];
+    if (orderColumn && typeof orderColumn !== 'function') {
+      query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn as any) : asc(orderColumn as any)) as any;
+    }
   } else {
     query = query.orderBy(desc(dim_canal.created_at)) as any;
   }

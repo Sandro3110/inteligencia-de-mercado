@@ -172,8 +172,8 @@ export async function getEntidades(filters: EntidadeFilters = {}) {
     .where(conditions.length > 0 ? and(...conditions) : undefined);
 
   // Ordenação
-  if (filters.orderBy) {
-    const orderColumn = dim_entidade[filters.orderBy];
+  if (filters.orderBy && filters.orderBy in dim_entidade) {
+    const orderColumn = dim_entidade[filters.orderBy as keyof typeof dim_entidade];
     if (orderColumn) {
       query = query.orderBy(
         filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)

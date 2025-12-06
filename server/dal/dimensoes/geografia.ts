@@ -106,8 +106,8 @@ export async function getGeografias(filters: GeografiaFilters = {}) {
     .where(conditions.length > 0 ? and(...conditions) : undefined);
 
   // Ordenação
-  if (filters.orderBy) {
-    const orderColumn = dim_geografia[filters.orderBy];
+  if (filters.orderBy && filters.orderBy in dim_geografia) {
+    const orderColumn = dim_geografia[filters.orderBy as keyof typeof dim_geografia];
     if (orderColumn) {
       query = query.orderBy(
         filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)
