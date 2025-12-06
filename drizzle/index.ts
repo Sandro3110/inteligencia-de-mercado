@@ -1,5 +1,3 @@
-'use server';
-
 /**
  * Re-export all tables from schema with explicit named exports
  * This ensures proper module resolution in Next.js/Webpack builds
@@ -7,6 +5,8 @@
  * Note: Using explicit exports instead of export * to avoid
  * Webpack module resolution issues in Vercel builds
  */
+
+import 'server-only';
 
 export {
   // Audit tables (2)

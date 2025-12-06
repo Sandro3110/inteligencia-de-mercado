@@ -1,5 +1,3 @@
-'use server';
-
 // ============================================================================
 // DRIZZLE SCHEMA - GERADO AUTOMATICAMENTE A PARTIR DO BANCO REAL
 // Data: 2024-12-06
