@@ -125,8 +125,8 @@ export async function logAudit(data: AuditLogData): Promise<number> {
       resource_id: data.resourceId,
       
       description: data.description,
-      changes: data.changes as any,
-      metadata: data.metadata as any,
+      changes: data.changes,
+      metadata: data.metadata,
       
       status: data.status,
       error_message: data.errorMessage,

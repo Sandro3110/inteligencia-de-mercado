@@ -188,7 +188,7 @@ export async function buscarCidadesFuzzy(
     .orderBy(sql`levenshtein(${dimGeografia.cidade}, ${termo})`)
     .limit(limit);
 
-  return resultados as any;
+  return resultados;
 }
 
 /**
