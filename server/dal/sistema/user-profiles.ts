@@ -53,3 +53,16 @@ export async function updateUserProfile(id: string, data: UpdateUserProfileData)
   const result = await db.update(user_profiles).set(data).where(eq(user_profiles.id, id)).returning();
   return result[0] || null;
 }
+
+export async function getUserProfileByUserId(user_id: string) {
+  const result = await db.select().from(user_profiles).where(eq(user_profiles.id, user_id)).limit(1);
+  return result[0] || null;
+}
+
+export async function countUserProfiles(filters: UserProfileFilters = {}) {
+  const conditions: any[] = [];
+  if (filters.email) conditions.push(eq(user_profiles.email, filters.email));
+  if (filters.ativo !== undefined) conditions.push(eq(user_profiles.ativo, filters.ativo));
+  const result = await db.select({ count: sql<number>`count(*)::int` }).from(user_profiles).where(conditions.length > 0 ? and(...conditions) : undefined);
+  return result[0]?.count || 0;
+}

@@ -44,3 +44,20 @@ export async function updateSystemSetting(id: number, data: UpdateSystemSettingD
   const result = await db.update(system_settings).set({ ...data, updatedAt: sql`now()` }).where(eq(system_settings.id, id)).returning();
   return result[0] || null;
 }
+
+export async function getSystemSettingByChave(chave: string) {
+  const result = await db.select().from(system_settings).where(eq(system_settings.settingKey, chave)).limit(1);
+  return result[0] || null;
+}
+
+export async function deleteSystemSetting(id: number) {
+  const result = await db.delete(system_settings).where(eq(system_settings.id, id)).returning();
+  return result[0] || null;
+}
+
+export async function countSystemSettings(filters: SystemSettingFilters = {}) {
+  const conditions: any[] = [];
+  if (filters.settingKey) conditions.push(eq(system_settings.settingKey, filters.settingKey));
+  const result = await db.select({ count: sql<number>`count(*)::int` }).from(system_settings).where(conditions.length > 0 ? and(...conditions) : undefined);
+  return result[0]?.count || 0;
+}

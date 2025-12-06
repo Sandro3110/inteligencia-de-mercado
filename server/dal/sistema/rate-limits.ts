@@ -48,3 +48,58 @@ export async function updateRateLimit(id: number, data: UpdateRateLimitData) {
   const result = await db.update(rate_limits).set(data).where(eq(rate_limits.id, id)).returning();
   return result[0] || null;
 }
+
+export async function getCurrentRateLimit(user_id: string, endpoint: string) {
+  const result = await db.select().from(rate_limits).where(
+    and(
+      eq(rate_limits.user_id, user_id),
+      eq(rate_limits.endpoint, endpoint)
+    )
+  ).limit(1);
+  return result[0] || null;
+}
+
+export async function incrementRateLimit(id: number) {
+  const result = await db.update(rate_limits).set({
+    chamadas: sql`${rate_limits.chamadas} + 1`
+  }).where(eq(rate_limits.id, id)).returning();
+  return result[0] || null;
+}
+
+export async function deleteExpiredRateLimits() {
+  const result = await db.delete(rate_limits).where(
+    sql`${rate_limits.bloqueado_ate} < now()`
+  ).returning();
+  return result.length;
+}
+
+export async function countRateLimits(filters: RateLimitFilters = {}) {
+  const conditions: any[] = [];
+  if (filters.user_id) conditions.push(eq(rate_limits.user_id, filters.user_id));
+  if (filters.endpoint) conditions.push(eq(rate_limits.endpoint, filters.endpoint));
+  const result = await db.select({ count: sql<number>`count(*)::int` }).from(rate_limits).where(conditions.length > 0 ? and(...conditions) : undefined);
+  return result[0]?.count || 0;
+}
+
+export async function getCurrentRateLimit(user_id: string, endpoint: string) {
+  const result = await db.select().from(rate_limits).where(and(eq(rate_limits.user_id, user_id), eq(rate_limits.endpoint, endpoint))).limit(1);
+  return result[0] || null;
+}
+
+export async function incrementRateLimit(id: number) {
+  const result = await db.update(rate_limits).set({ chamadas: sql`${rate_limits.chamadas} + 1` }).where(eq(rate_limits.id, id)).returning();
+  return result[0] || null;
+}
+
+export async function deleteExpiredRateLimits() {
+  const result = await db.delete(rate_limits).where(sql`${rate_limits.bloqueado_ate} < now()`).returning();
+  return result.length;
+}
+
+export async function countRateLimits(filters: RateLimitFilters = {}) {
+  const conditions: any[] = [];
+  if (filters.user_id) conditions.push(eq(rate_limits.user_id, filters.user_id));
+  if (filters.endpoint) conditions.push(eq(rate_limits.endpoint, filters.endpoint));
+  const result = await db.select({ count: sql<number>`count(*)::int` }).from(rate_limits).where(conditions.length > 0 ? and(...conditions) : undefined);
+  return result[0]?.count || 0;
+}
