@@ -34,6 +34,8 @@ const nextConfig = {
   // Configuração de webpack
   webpack: (config) => {
     config.externals = [...(config.externals || []), { canvas: 'canvas' }];
+    // Fix para Drizzle ORM - externalizar módulos não usados
+    config.externals.push('bun:sqlite', '@libsql/client', '@neondatabase/serverless');
     return config;
   },
   

@@ -6,8 +6,6 @@
  * Webpack module resolution issues in Vercel builds
  */
 
-import 'server-only';
-
 export {
   // Audit tables (2)
   audit_logs,
