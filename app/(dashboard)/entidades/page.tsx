@@ -101,7 +101,7 @@ export default function EntidadesListPage() {
 
   // Handler para duplo click na linha
   const handleRowDoubleClick = (id: number) => {
-    const entidade = data?.data.find((e: any) => e.id === id);
+    const entidade = data.find((e: any) => e.id === id);
     if (entidade) {
       setSelectedEntidade(entidade);
       setSheetOpen(true);
@@ -332,7 +332,7 @@ export default function EntidadesListPage() {
             </Card>
           )}
 
-          {!isLoading && !error && data && data.data.length === 0 && (
+          {!isLoading && !error && data && data.length === 0 && (
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center py-12">
@@ -346,7 +346,7 @@ export default function EntidadesListPage() {
             </Card>
           )}
 
-          {!isLoading && !error && data && data.data.length > 0 && (
+          {!isLoading && !error && data && data.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -372,7 +372,7 @@ export default function EntidadesListPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {data.data.map((entidade: any) => (
+                      {data.map((entidade: any) => (
                         <TableRow
                           key={entidade.id}
                           className="cursor-pointer hover:bg-muted/50"
