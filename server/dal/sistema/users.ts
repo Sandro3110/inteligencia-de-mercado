@@ -11,7 +11,6 @@ export interface UserFilters {
   id?: string;
   email?: string;
   role?: string;
-  incluirInativos?: boolean;
   orderBy?: keyof typeof users;
   orderDirection?: 'asc' | 'desc';
   limit?: number;
@@ -41,7 +40,6 @@ export async function getUsers(filters: UserFilters = {}) {
   if (filters.id) conditions.push(eq(users.id, filters.id));
   if (filters.email) conditions.push(like(users.email, `%${filters.email}%`));
   if (filters.role) conditions.push(eq(users.role, filters.role));
-  if (!filters.incluirInativos) conditions.push(isNull(users.deleted_at));
 
   let query = db.select().from(users).where(conditions.length > 0 ? and(...conditions) : undefined);
 
@@ -59,12 +57,10 @@ export async function getUsers(filters: UserFilters = {}) {
 }
 
 export async function getUserById(id: string) {
-  const result = await db.select().from(users).where(and(eq(users.id, id), isNull(users.deleted_at))).limit(1);
   return result[0] || null;
 }
 
 export async function getUserByEmail(email: string) {
-  const result = await db.select().from(users).where(and(eq(users.email, email), isNull(users.deleted_at))).limit(1);
   return result[0] || null;
 }
 
@@ -79,14 +75,12 @@ export async function updateUser(id: string, data: UpdateUserData) {
 }
 
 export async function deleteUser(id: string, deleted_by?: string) {
-  const result = await db.update(users).set({ deleted_at: sql`now()`, deleted_by }).where(eq(users.id, id)).returning();
   return result[0] || null;
 }
 
 export async function countUsers(filters: UserFilters = {}) {
   const conditions: any[] = [];
   if (filters.role) conditions.push(eq(users.role, filters.role));
-  if (!filters.incluirInativos) conditions.push(isNull(users.deleted_at));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(users).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;
 }

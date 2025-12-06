@@ -9,7 +9,6 @@ import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface CanalFilters {
   id?: number;
-  entidade_id?: number;
   nome?: string;
   tipo?: string;
   incluirInativos?: boolean;
@@ -51,7 +50,6 @@ export interface UpdateCanalData {
 export async function getCanais(filters: CanalFilters = {}) {
   const conditions: any[] = [];
   if (filters.id) conditions.push(eq(dim_canal.id, filters.id));
-  if (filters.entidade_id) conditions.push(eq(dim_canal.entidade_id, filters.entidade_id));
   if (filters.nome) conditions.push(like(dim_canal.nome, `%${filters.nome}%`));
   if (filters.tipo) conditions.push(eq(dim_canal.tipo, filters.tipo));
   if (!filters.incluirInativos) conditions.push(isNull(dim_canal.deleted_at));
@@ -93,7 +91,6 @@ export async function deleteCanal(id: number, deleted_by?: string) {
 
 export async function countCanais(filters: CanalFilters = {}) {
   const conditions: any[] = [];
-  if (filters.entidade_id) conditions.push(eq(dim_canal.entidade_id, filters.entidade_id));
   if (!filters.incluirInativos) conditions.push(isNull(dim_canal.deleted_at));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(dim_canal).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;

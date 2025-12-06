@@ -11,7 +11,6 @@ export interface ConcorrenteFilters {
   id?: number;
   entidade_id?: number;
   nome?: string;
-  tipo?: string;
   incluirInativos?: boolean;
   orderBy?: keyof typeof dim_concorrente;
   orderDirection?: 'asc' | 'desc';
@@ -22,7 +21,6 @@ export interface ConcorrenteFilters {
 export interface CreateConcorrenteData {
   entidade_id: number;
   nome: string;
-  tipo?: string;
   descricao?: string;
   site?: string;
   produtos_servicos?: string;
@@ -45,7 +43,6 @@ export interface CreateConcorrenteData {
 
 export interface UpdateConcorrenteData {
   nome?: string;
-  tipo?: string;
   descricao?: string;
   site?: string;
   produtos_servicos?: string;
@@ -71,8 +68,6 @@ export async function getConcorrentes(filters: ConcorrenteFilters = {}) {
   if (filters.id) conditions.push(eq(dim_concorrente.id, filters.id));
   if (filters.entidade_id) conditions.push(eq(dim_concorrente.entidade_id, filters.entidade_id));
   if (filters.nome) conditions.push(like(dim_concorrente.nome, `%${filters.nome}%`));
-  if (filters.tipo) conditions.push(eq(dim_concorrente.tipo, filters.tipo));
-  if (!filters.incluirInativos) conditions.push(isNull(dim_concorrente.deleted_at));
 
   let query = db.select().from(dim_concorrente).where(conditions.length > 0 ? and(...conditions) : undefined);
 
@@ -90,7 +85,6 @@ export async function getConcorrentes(filters: ConcorrenteFilters = {}) {
 }
 
 export async function getConcorrenteById(id: number) {
-  const result = await db.select().from(dim_concorrente).where(and(eq(dim_concorrente.id, id), isNull(dim_concorrente.deleted_at))).limit(1);
   return result[0] || null;
 }
 
@@ -105,14 +99,12 @@ export async function updateConcorrente(id: number, data: UpdateConcorrenteData)
 }
 
 export async function deleteConcorrente(id: number, deleted_by?: string) {
-  const result = await db.update(dim_concorrente).set({ deleted_at: sql`now()`, deleted_by }).where(eq(dim_concorrente.id, id)).returning();
   return result[0] || null;
 }
 
 export async function countConcorrentes(filters: ConcorrenteFilters = {}) {
   const conditions: any[] = [];
   if (filters.entidade_id) conditions.push(eq(dim_concorrente.entidade_id, filters.entidade_id));
-  if (!filters.incluirInativos) conditions.push(isNull(dim_concorrente.deleted_at));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(dim_concorrente).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;
 }

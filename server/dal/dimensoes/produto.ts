@@ -9,10 +9,8 @@ import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface ProdutoFilters {
   id?: number;
-  entidade_id?: number;
   nome?: string;
   categoria?: string;
-  status?: string;
   incluirInativos?: boolean;
   orderBy?: keyof typeof dim_produto;
   orderDirection?: 'asc' | 'desc';
@@ -33,7 +31,6 @@ export interface CreateProdutoData {
   created_by: string;
   publico_alvo?: string;
   canais_distribuicao?: string;
-  status?: string;
   data_lancamento?: Date;
   ciclo_vida?: string;
   margem_lucro?: string;
@@ -51,7 +48,6 @@ export interface UpdateProdutoData {
   updated_by?: string;
   publico_alvo?: string;
   canais_distribuicao?: string;
-  status?: string;
   data_lancamento?: Date;
   ciclo_vida?: string;
   margem_lucro?: string;
@@ -60,10 +56,8 @@ export interface UpdateProdutoData {
 export async function getProdutos(filters: ProdutoFilters = {}) {
   const conditions: any[] = [];
   if (filters.id) conditions.push(eq(dim_produto.id, filters.id));
-  if (filters.entidade_id) conditions.push(eq(dim_produto.entidade_id, filters.entidade_id));
   if (filters.nome) conditions.push(like(dim_produto.nome, `%${filters.nome}%`));
   if (filters.categoria) conditions.push(eq(dim_produto.categoria, filters.categoria));
-  if (filters.status) conditions.push(eq(dim_produto.status, filters.status));
   if (!filters.incluirInativos) conditions.push(isNull(dim_produto.deleted_at));
 
   let query = db.select().from(dim_produto).where(conditions.length > 0 ? and(...conditions) : undefined);
@@ -103,7 +97,6 @@ export async function deleteProduto(id: number, deleted_by?: string) {
 
 export async function countProdutos(filters: ProdutoFilters = {}) {
   const conditions: any[] = [];
-  if (filters.entidade_id) conditions.push(eq(dim_produto.entidade_id, filters.entidade_id));
   if (!filters.incluirInativos) conditions.push(isNull(dim_produto.deleted_at));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(dim_produto).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;

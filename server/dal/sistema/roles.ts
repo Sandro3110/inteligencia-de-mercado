@@ -10,7 +10,6 @@ import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 export interface RoleFilters {
   id?: number;
   nome?: string;
-  incluirInativos?: boolean;
   orderBy?: keyof typeof roles;
   orderDirection?: 'asc' | 'desc';
   limit?: number;
@@ -37,7 +36,6 @@ export async function getRoles(filters: RoleFilters = {}) {
   const conditions: any[] = [];
   if (filters.id) conditions.push(eq(roles.id, filters.id));
   if (filters.nome) conditions.push(like(roles.nome, `%${filters.nome}%`));
-  if (!filters.incluirInativos) conditions.push(isNull(roles.deleted_at));
 
   let query = db.select().from(roles).where(conditions.length > 0 ? and(...conditions) : undefined);
 
@@ -55,12 +53,10 @@ export async function getRoles(filters: RoleFilters = {}) {
 }
 
 export async function getRoleById(id: number) {
-  const result = await db.select().from(roles).where(and(eq(roles.id, id), isNull(roles.deleted_at))).limit(1);
   return result[0] || null;
 }
 
 export async function getRoleByNome(nome: string) {
-  const result = await db.select().from(roles).where(and(eq(roles.nome, nome), isNull(roles.deleted_at))).limit(1);
   return result[0] || null;
 }
 
@@ -75,13 +71,11 @@ export async function updateRole(id: number, data: UpdateRoleData) {
 }
 
 export async function deleteRole(id: number, deleted_by?: string) {
-  const result = await db.update(roles).set({ deleted_at: sql`now()`, deleted_by }).where(eq(roles.id, id)).returning();
   return result[0] || null;
 }
 
 export async function countRoles(filters: RoleFilters = {}) {
   const conditions: any[] = [];
-  if (!filters.incluirInativos) conditions.push(isNull(roles.deleted_at));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(roles).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;
 }

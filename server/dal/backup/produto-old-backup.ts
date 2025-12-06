@@ -13,7 +13,6 @@ export interface ProdutoOldBackupFilters {
   entidade_id?: number;
   nome?: string;
   categoria?: string;
-  status?: string;
   incluirInativos?: boolean;
   orderBy?: keyof typeof dim_produto_old_backup;
   orderDirection?: 'asc' | 'desc';
@@ -34,7 +33,6 @@ export interface CreateProdutoOldBackupData {
   created_by: string;
   publico_alvo?: string;
   canais_distribuicao?: string;
-  status?: string;
   data_lancamento?: Date;
   ciclo_vida?: string;
   margem_lucro?: string;
@@ -52,7 +50,6 @@ export interface UpdateProdutoOldBackupData {
   updated_by?: string;
   publico_alvo?: string;
   canais_distribuicao?: string;
-  status?: string;
   data_lancamento?: Date;
   ciclo_vida?: string;
   margem_lucro?: string;
@@ -64,7 +61,6 @@ export async function getProdutosOldBackup(filters: ProdutoOldBackupFilters = {}
   if (filters.entidade_id) conditions.push(eq(dim_produto_old_backup.entidade_id, filters.entidade_id));
   if (filters.nome) conditions.push(like(dim_produto_old_backup.nome, `%${filters.nome}%`));
   if (filters.categoria) conditions.push(eq(dim_produto_old_backup.categoria, filters.categoria));
-  if (filters.status) conditions.push(eq(dim_produto_old_backup.status, filters.status));
   if (!filters.incluirInativos) conditions.push(isNull(dim_produto_old_backup.deleted_at));
 
   let query = db.select().from(dim_produto_old_backup).where(conditions.length > 0 ? and(...conditions) : undefined);

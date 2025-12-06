@@ -9,8 +9,6 @@ import { eq, and, isNull, desc, asc, sql } from 'drizzle-orm';
 
 export interface EntidadeContextoFilters {
   id?: number;
-  entidade_id?: number;
-  tipo_contexto?: string;
   incluirInativos?: boolean;
   orderBy?: keyof typeof fato_entidade_contexto;
   orderDirection?: 'asc' | 'desc';
@@ -19,8 +17,6 @@ export interface EntidadeContextoFilters {
 }
 
 export interface CreateEntidadeContextoData {
-  entidade_id: number;
-  tipo_contexto: string;
   descricao?: string;
   data_registro: Date;
   relevancia?: string;
@@ -31,7 +27,6 @@ export interface CreateEntidadeContextoData {
 }
 
 export interface UpdateEntidadeContextoData {
-  tipo_contexto?: string;
   descricao?: string;
   data_registro?: Date;
   relevancia?: string;
@@ -44,9 +39,6 @@ export interface UpdateEntidadeContextoData {
 export async function getEntidadeContextos(filters: EntidadeContextoFilters = {}) {
   const conditions: any[] = [];
   if (filters.id) conditions.push(eq(fato_entidade_contexto.id, filters.id));
-  if (filters.entidade_id) conditions.push(eq(fato_entidade_contexto.entidade_id, filters.entidade_id));
-  if (filters.tipo_contexto) conditions.push(eq(fato_entidade_contexto.tipo_contexto, filters.tipo_contexto));
-  if (!filters.incluirInativos) conditions.push(isNull(fato_entidade_contexto.deleted_at));
 
   let query = db.select().from(fato_entidade_contexto).where(conditions.length > 0 ? and(...conditions) : undefined);
 
@@ -64,7 +56,6 @@ export async function getEntidadeContextos(filters: EntidadeContextoFilters = {}
 }
 
 export async function getEntidadeContextoById(id: number) {
-  const result = await db.select().from(fato_entidade_contexto).where(and(eq(fato_entidade_contexto.id, id), isNull(fato_entidade_contexto.deleted_at))).limit(1);
   return result[0] || null;
 }
 
@@ -79,15 +70,11 @@ export async function updateEntidadeContexto(id: number, data: UpdateEntidadeCon
 }
 
 export async function deleteEntidadeContexto(id: number, deleted_by?: string) {
-  const result = await db.update(fato_entidade_contexto).set({ deleted_at: sql`now()`, deleted_by }).where(eq(fato_entidade_contexto.id, id)).returning();
   return result[0] || null;
 }
 
 export async function countEntidadeContextos(filters: EntidadeContextoFilters = {}) {
   const conditions: any[] = [];
-  if (filters.entidade_id) conditions.push(eq(fato_entidade_contexto.entidade_id, filters.entidade_id));
-  if (filters.tipo_contexto) conditions.push(eq(fato_entidade_contexto.tipo_contexto, filters.tipo_contexto));
-  if (!filters.incluirInativos) conditions.push(isNull(fato_entidade_contexto.deleted_at));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(fato_entidade_contexto).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;
 }

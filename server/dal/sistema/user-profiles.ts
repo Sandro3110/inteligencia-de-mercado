@@ -9,8 +9,6 @@ import { eq, and, isNull, desc, asc, sql } from 'drizzle-orm';
 
 export interface UserProfileFilters {
   id?: number;
-  user_id?: string;
-  incluirInativos?: boolean;
   orderBy?: keyof typeof user_profiles;
   orderDirection?: 'asc' | 'desc';
   limit?: number;
@@ -18,7 +16,6 @@ export interface UserProfileFilters {
 }
 
 export interface CreateUserProfileData {
-  user_id: string;
   avatar_url?: string;
   bio?: string;
   telefone?: string;
@@ -39,8 +36,6 @@ export interface UpdateUserProfileData {
 export async function getUserProfiles(filters: UserProfileFilters = {}) {
   const conditions: any[] = [];
   if (filters.id) conditions.push(eq(user_profiles.id, filters.id));
-  if (filters.user_id) conditions.push(eq(user_profiles.user_id, filters.user_id));
-  if (!filters.incluirInativos) conditions.push(isNull(user_profiles.deleted_at));
 
   let query = db.select().from(user_profiles).where(conditions.length > 0 ? and(...conditions) : undefined);
 
@@ -58,12 +53,9 @@ export async function getUserProfiles(filters: UserProfileFilters = {}) {
 }
 
 export async function getUserProfileById(id: number) {
-  const result = await db.select().from(user_profiles).where(and(eq(user_profiles.id, id), isNull(user_profiles.deleted_at))).limit(1);
   return result[0] || null;
 }
 
-export async function getUserProfileByUserId(user_id: string) {
-  const result = await db.select().from(user_profiles).where(and(eq(user_profiles.user_id, user_id), isNull(user_profiles.deleted_at))).limit(1);
   return result[0] || null;
 }
 
@@ -78,14 +70,11 @@ export async function updateUserProfile(id: number, data: UpdateUserProfileData)
 }
 
 export async function deleteUserProfile(id: number, deleted_by?: string) {
-  const result = await db.update(user_profiles).set({ deleted_at: sql`now()`, deleted_by }).where(eq(user_profiles.id, id)).returning();
   return result[0] || null;
 }
 
 export async function countUserProfiles(filters: UserProfileFilters = {}) {
   const conditions: any[] = [];
-  if (filters.user_id) conditions.push(eq(user_profiles.user_id, filters.user_id));
-  if (!filters.incluirInativos) conditions.push(isNull(user_profiles.deleted_at));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(user_profiles).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;
 }

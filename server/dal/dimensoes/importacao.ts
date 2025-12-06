@@ -11,7 +11,6 @@ export interface ImportacaoFilters {
   id?: number;
   nome_arquivo?: string;
   status?: string;
-  tipo?: string;
   incluirInativos?: boolean;
   orderBy?: keyof typeof dim_importacao;
   orderDirection?: 'asc' | 'desc';
@@ -36,7 +35,6 @@ export interface CreateImportacaoData {
 
 export interface UpdateImportacaoData {
   nome_arquivo?: string;
-  tipo?: string;
   status?: string;
   data_importacao?: Date;
   total_registros?: number;
@@ -54,7 +52,6 @@ export async function getImportacoes(filters: ImportacaoFilters = {}) {
   if (filters.id) conditions.push(eq(dim_importacao.id, filters.id));
   if (filters.nome_arquivo) conditions.push(like(dim_importacao.nome_arquivo, `%${filters.nome_arquivo}%`));
   if (filters.status) conditions.push(eq(dim_importacao.status, filters.status));
-  if (filters.tipo) conditions.push(eq(dim_importacao.tipo, filters.tipo));
   if (!filters.incluirInativos) conditions.push(isNull(dim_importacao.deleted_at));
 
   let query = db.select().from(dim_importacao).where(conditions.length > 0 ? and(...conditions) : undefined);

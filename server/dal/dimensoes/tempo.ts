@@ -13,7 +13,6 @@ export interface TempoFilters {
   ano?: number;
   mes?: number;
   trimestre?: number;
-  semestre?: number;
   dia_semana?: string;
   incluirInativos?: boolean;
   orderBy?: keyof typeof dim_tempo;
@@ -46,7 +45,6 @@ export interface UpdateTempoData {
   mes?: number;
   dia?: number;
   trimestre?: number;
-  semestre?: number;
   dia_semana?: string;
   semana_ano?: number;
   dia_ano?: number;
@@ -63,11 +61,9 @@ export async function getTempos(filters: TempoFilters = {}) {
   if (filters.ano) conditions.push(eq(dim_tempo.ano, filters.ano));
   if (filters.mes) conditions.push(eq(dim_tempo.mes, filters.mes));
   if (filters.trimestre) conditions.push(eq(dim_tempo.trimestre, filters.trimestre));
-  if (filters.semestre) conditions.push(eq(dim_tempo.semestre, filters.semestre));
   if (filters.dia_semana) conditions.push(eq(dim_tempo.dia_semana, filters.dia_semana));
   if (filters.dataInicio) conditions.push(gte(dim_tempo.data, filters.dataInicio));
   if (filters.dataFim) conditions.push(lte(dim_tempo.data, filters.dataFim));
-  if (!filters.incluirInativos) conditions.push(isNull(dim_tempo.deleted_at));
 
   let query = db.select().from(dim_tempo).where(conditions.length > 0 ? and(...conditions) : undefined);
 
@@ -85,7 +81,6 @@ export async function getTempos(filters: TempoFilters = {}) {
 }
 
 export async function getTempoById(id: number) {
-  const result = await db.select().from(dim_tempo).where(and(eq(dim_tempo.id, id), isNull(dim_tempo.deleted_at))).limit(1);
   return result[0] || null;
 }
 
@@ -100,14 +95,12 @@ export async function updateTempo(id: number, data: UpdateTempoData) {
 }
 
 export async function deleteTempo(id: number, deleted_by?: string) {
-  const result = await db.update(dim_tempo).set({ deleted_at: sql`now()`, deleted_by }).where(eq(dim_tempo.id, id)).returning();
   return result[0] || null;
 }
 
 export async function countTempos(filters: TempoFilters = {}) {
   const conditions: any[] = [];
   if (filters.ano) conditions.push(eq(dim_tempo.ano, filters.ano));
-  if (!filters.incluirInativos) conditions.push(isNull(dim_tempo.deleted_at));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(dim_tempo).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;
 }

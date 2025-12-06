@@ -9,8 +9,6 @@ import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface PesquisaFilters {
   id?: number;
-  entidade_id?: number;
-  tipo?: string;
   status?: string;
   incluirInativos?: boolean;
   orderBy?: keyof typeof dim_pesquisa;
@@ -38,7 +36,6 @@ export interface CreatePesquisaData {
 }
 
 export interface UpdatePesquisaData {
-  tipo?: string;
   descricao?: string;
   data_realizacao?: Date;
   metodologia?: string;
@@ -57,8 +54,6 @@ export interface UpdatePesquisaData {
 export async function getPesquisas(filters: PesquisaFilters = {}) {
   const conditions: any[] = [];
   if (filters.id) conditions.push(eq(dim_pesquisa.id, filters.id));
-  if (filters.entidade_id) conditions.push(eq(dim_pesquisa.entidade_id, filters.entidade_id));
-  if (filters.tipo) conditions.push(eq(dim_pesquisa.tipo, filters.tipo));
   if (filters.status) conditions.push(eq(dim_pesquisa.status, filters.status));
   if (!filters.incluirInativos) conditions.push(isNull(dim_pesquisa.deleted_at));
 
@@ -108,7 +103,6 @@ export async function deletePesquisa(id: number, deleted_by?: string) {
 
 export async function countPesquisas(filters: PesquisaFilters = {}) {
   const conditions: any[] = [];
-  if (filters.entidade_id) conditions.push(eq(dim_pesquisa.entidade_id, filters.entidade_id));
   if (!filters.incluirInativos) conditions.push(isNull(dim_pesquisa.deleted_at));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(dim_pesquisa).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;

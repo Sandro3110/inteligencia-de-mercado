@@ -10,8 +10,6 @@ import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 export interface IAAlertaFilters {
   id?: number;
   tipo?: string;
-  severidade?: string;
-  status?: string;
   incluirInativos?: boolean;
   orderBy?: keyof typeof ia_alertas;
   orderDirection?: 'asc' | 'desc';
@@ -23,7 +21,6 @@ export interface CreateIAAlertaData {
   tipo: string;
   titulo: string;
   descricao?: string;
-  severidade: string;
   status: string;
   entidade_relacionada?: number;
   data_deteccao: Date;
@@ -36,8 +33,6 @@ export interface UpdateIAAlertaData {
   tipo?: string;
   titulo?: string;
   descricao?: string;
-  severidade?: string;
-  status?: string;
   entidade_relacionada?: number;
   data_deteccao?: Date;
   updated_by?: string;
@@ -49,9 +44,7 @@ export async function getIAAlertas(filters: IAAlertaFilters = {}) {
   const conditions: any[] = [];
   if (filters.id) conditions.push(eq(ia_alertas.id, filters.id));
   if (filters.tipo) conditions.push(eq(ia_alertas.tipo, filters.tipo));
-  if (filters.severidade) conditions.push(eq(ia_alertas.severidade, filters.severidade));
   if (filters.status) conditions.push(eq(ia_alertas.status, filters.status));
-  if (!filters.incluirInativos) conditions.push(isNull(ia_alertas.deleted_at));
 
   let query = db.select().from(ia_alertas).where(conditions.length > 0 ? and(...conditions) : undefined);
 
@@ -69,7 +62,6 @@ export async function getIAAlertas(filters: IAAlertaFilters = {}) {
 }
 
 export async function getIAAlertaById(id: number) {
-  const result = await db.select().from(ia_alertas).where(and(eq(ia_alertas.id, id), isNull(ia_alertas.deleted_at))).limit(1);
   return result[0] || null;
 }
 
@@ -84,7 +76,6 @@ export async function updateIAAlerta(id: number, data: UpdateIAAlertaData) {
 }
 
 export async function deleteIAAlerta(id: number, deleted_by?: string) {
-  const result = await db.update(ia_alertas).set({ deleted_at: sql`now()`, deleted_by }).where(eq(ia_alertas.id, id)).returning();
   return result[0] || null;
 }
 
@@ -92,7 +83,6 @@ export async function countIAAlertas(filters: IAAlertaFilters = {}) {
   const conditions: any[] = [];
   if (filters.tipo) conditions.push(eq(ia_alertas.tipo, filters.tipo));
   if (filters.status) conditions.push(eq(ia_alertas.status, filters.status));
-  if (!filters.incluirInativos) conditions.push(isNull(ia_alertas.deleted_at));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(ia_alertas).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;
 }

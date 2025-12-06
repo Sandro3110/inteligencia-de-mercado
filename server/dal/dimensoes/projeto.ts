@@ -9,7 +9,6 @@ import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface ProjetoFilters {
   id?: number;
-  entidade_id?: number;
   nome?: string;
   status?: string;
   incluirInativos?: boolean;
@@ -53,7 +52,6 @@ export interface UpdateProjetoData {
 export async function getProjetos(filters: ProjetoFilters = {}) {
   const conditions: any[] = [];
   if (filters.id) conditions.push(eq(dim_projeto.id, filters.id));
-  if (filters.entidade_id) conditions.push(eq(dim_projeto.entidade_id, filters.entidade_id));
   if (filters.nome) conditions.push(like(dim_projeto.nome, `%${filters.nome}%`));
   if (filters.status) conditions.push(eq(dim_projeto.status, filters.status));
   if (!filters.incluirInativos) conditions.push(isNull(dim_projeto.deleted_at));
@@ -95,7 +93,6 @@ export async function deleteProjeto(id: number, deleted_by?: string) {
 
 export async function countProjetos(filters: ProjetoFilters = {}) {
   const conditions: any[] = [];
-  if (filters.entidade_id) conditions.push(eq(dim_projeto.entidade_id, filters.entidade_id));
   if (!filters.incluirInativos) conditions.push(isNull(dim_projeto.deleted_at));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(dim_projeto).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;

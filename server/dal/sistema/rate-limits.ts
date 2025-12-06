@@ -9,7 +9,6 @@ import { eq, and, desc, asc, sql, gte } from 'drizzle-orm';
 
 export interface RateLimitFilters {
   id?: number;
-  user_id?: string;
   endpoint?: string;
   dataInicio?: Date;
   orderBy?: keyof typeof rate_limits;
@@ -19,25 +18,16 @@ export interface RateLimitFilters {
 }
 
 export interface CreateRateLimitData {
-  user_id: string;
   endpoint: string;
-  requests_count: number;
-  window_start: Date;
-  window_end: Date;
 }
 
 export interface UpdateRateLimitData {
-  requests_count?: number;
-  window_start?: Date;
-  window_end?: Date;
 }
 
 export async function getRateLimits(filters: RateLimitFilters = {}) {
   const conditions: any[] = [];
   if (filters.id) conditions.push(eq(rate_limits.id, filters.id));
-  if (filters.user_id) conditions.push(eq(rate_limits.user_id, filters.user_id));
   if (filters.endpoint) conditions.push(eq(rate_limits.endpoint, filters.endpoint));
-  if (filters.dataInicio) conditions.push(gte(rate_limits.window_start, filters.dataInicio));
 
   let query = db.select().from(rate_limits).where(conditions.length > 0 ? and(...conditions) : undefined);
 
@@ -59,14 +49,10 @@ export async function getRateLimitById(id: number) {
   return result[0] || null;
 }
 
-export async function getCurrentRateLimit(user_id: string, endpoint: string) {
   const result = await db.select().from(rate_limits).where(
     and(
-      eq(rate_limits.user_id, user_id),
       eq(rate_limits.endpoint, endpoint),
-      sql`${rate_limits.window_end} > now()`
     )
-  ).orderBy(desc(rate_limits.window_end)).limit(1);
   return result[0] || null;
 }
 
@@ -81,18 +67,15 @@ export async function updateRateLimit(id: number, data: UpdateRateLimitData) {
 }
 
 export async function incrementRateLimit(id: number) {
-  const result = await db.update(rate_limits).set({ requests_count: sql`${rate_limits.requests_count} + 1` }).where(eq(rate_limits.id, id)).returning();
   return result[0] || null;
 }
 
 export async function deleteExpiredRateLimits() {
-  const result = await db.delete(rate_limits).where(sql`${rate_limits.window_end} < now()`).returning();
   return result.length;
 }
 
 export async function countRateLimits(filters: RateLimitFilters = {}) {
   const conditions: any[] = [];
-  if (filters.user_id) conditions.push(eq(rate_limits.user_id, filters.user_id));
   if (filters.endpoint) conditions.push(eq(rate_limits.endpoint, filters.endpoint));
   const result = await db.select({ count: sql<number>`count(*)::int` }).from(rate_limits).where(conditions.length > 0 ? and(...conditions) : undefined);
   return result[0]?.count || 0;
