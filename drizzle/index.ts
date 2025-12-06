@@ -1,3 +1,5 @@
+'use server';
+
 /**
  * Re-export all tables from schema with explicit named exports
  * This ensures proper module resolution in Next.js/Webpack builds
