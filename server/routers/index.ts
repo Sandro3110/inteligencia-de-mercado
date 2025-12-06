@@ -21,6 +21,11 @@ import { router } from "./trpc";
 // ========== DASHBOARD ==========
 import { dashboardRouter } from "./dashboard";
 
+// ========== ROUTERS PLURAIS (legados) ==========
+import { projetosRouter } from "./projetos";
+import { pesquisasRouter } from "./pesquisas";
+import { entidadesRouter } from "./entidades";
+
 // ========== DIMENSÕES (13) ==========
 import { entidadeRouter } from "./entidade";
 import { geografiaRouter } from "./geografia";
@@ -73,6 +78,11 @@ import { produtoOldBackupRouter } from "./produto-old-backup";
 export const appRouter = router({
   // Dashboard
   dashboard: dashboardRouter,
+
+  // Routers plurais (legados - manter compatibilidade)
+  projetos: projetosRouter,
+  pesquisas: pesquisasRouter,
+  entidades: entidadesRouter,
 
   // Dimensões (13)
   entidade: entidadeRouter,
