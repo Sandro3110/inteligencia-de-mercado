@@ -12,19 +12,19 @@
  */
 
 // ========== DIMENSÕES (13) ==========
-export * as entidade from './dimensoes/entidade';
-export * as geografia from './dimensoes/geografia';
-export * as mercado from './dimensoes/mercado';
-export * as produto from './dimensoes/produto';
-export * as projeto from './dimensoes/projeto';
-export * as pesquisa from './dimensoes/pesquisa';
-export * as concorrente from './dimensoes/concorrente';
-export * as canal from './dimensoes/canal';
-export * as lead from './dimensoes/lead';
-export * as tempo from './dimensoes/tempo';
-export * as importacao from './dimensoes/importacao';
-export * as statusQualificacao from './dimensoes/status-qualificacao';
-export * as produtoCatalogo from './dimensoes/produto-catalogo';
+export * as Entidade from './dimensoes/entidade';
+export * as Geografia from './dimensoes/geografia';
+export * as Mercado from './dimensoes/mercado';
+export * as Produto from './dimensoes/produto';
+export * as Projeto from './dimensoes/projeto';
+export * as Pesquisa from './dimensoes/pesquisa';
+export * as Concorrente from './dimensoes/concorrente';
+export * as Canal from './dimensoes/canal';
+export * as Lead from './dimensoes/lead';
+export * as Tempo from './dimensoes/tempo';
+export * as Importacao from './dimensoes/importacao';
+export * as StatusQualificacao from './dimensoes/status-qualificacao';
+export * as ProdutoCatalogo from './dimensoes/produto-catalogo';
 
 // ========== FATOS (3) ==========
 export * as entidadeProduto from './fatos/entidade-produto';
