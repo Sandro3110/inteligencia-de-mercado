@@ -290,3 +290,68 @@ export async function countEntidades(filters: EntidadeFilters = {}) {
 
   return result[0]?.count || 0;
 }
+
+/**
+ * Sugerir entidades duplicadas para merge
+ * Busca entidades similares baseado em CNPJ, nome ou email
+ */
+export async function sugerirMerge(entidade: any) {
+  const conditions = [];
+
+  // Buscar por CNPJ igual (se existir)
+  if (entidade.cnpj) {
+    const porCNPJ = await db
+      .select()
+      .from(dim_entidade)
+      .where(
+        and(
+          eq(dim_entidade.cnpj, entidade.cnpj),
+          isNull(dim_entidade.deleted_at)
+        )
+      )
+      .limit(10);
+    
+    if (porCNPJ.length > 1) {
+      return porCNPJ.filter(e => e.id !== entidade.id);
+    }
+  }
+
+  // Buscar por nome similar (se não encontrou por CNPJ)
+  if (entidade.nome) {
+    const porNome = await db
+      .select()
+      .from(dim_entidade)
+      .where(
+        and(
+          like(dim_entidade.nome, `%${entidade.nome}%`),
+          isNull(dim_entidade.deleted_at)
+        )
+      )
+      .limit(10);
+    
+    if (porNome.length > 1) {
+      return porNome.filter(e => e.id !== entidade.id);
+    }
+  }
+
+  // Buscar por email igual (se não encontrou por nome)
+  if (entidade.email) {
+    const porEmail = await db
+      .select()
+      .from(dim_entidade)
+      .where(
+        and(
+          eq(dim_entidade.email, entidade.email),
+          isNull(dim_entidade.deleted_at)
+        )
+      )
+      .limit(10);
+    
+    if (porEmail.length > 1) {
+      return porEmail.filter(e => e.id !== entidade.id);
+    }
+  }
+
+  // Não encontrou duplicatas
+  return [];
+}
