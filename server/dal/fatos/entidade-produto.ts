@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { fato_entidade_produto } from '../../../drizzle/schema';
+import { fato_entidade_produto } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql } from 'drizzle-orm';
 
 export interface EntidadeProdutoFilters {

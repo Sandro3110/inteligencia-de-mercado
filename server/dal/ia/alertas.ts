@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { ia_alertas } from '../../../drizzle/schema';
+import { ia_alertas } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface IAAlertaFilters {

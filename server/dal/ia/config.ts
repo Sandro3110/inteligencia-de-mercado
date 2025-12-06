@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { ia_config } from '../../../drizzle/schema';
+import { ia_config } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface IAConfigFilters {

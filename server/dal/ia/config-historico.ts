@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { ia_config_historico } from '../../../drizzle/schema';
+import { ia_config_historico } from '../../../drizzle';
 import { eq, and, desc, asc, sql } from 'drizzle-orm';
 
 export interface IAConfigHistoricoFilters {

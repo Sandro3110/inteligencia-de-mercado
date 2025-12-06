@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { ia_cache } from '../../../drizzle/schema';
+import { ia_cache } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql, like, lt } from 'drizzle-orm';
 
 export interface IACacheFilters {
