@@ -18,6 +18,9 @@
 
 import { router } from "./trpc";
 
+// ========== DASHBOARD ==========
+import { dashboardRouter } from "./dashboard";
+
 // ========== DIMENSÕES (13) ==========
 import { entidadeRouter } from "./entidade";
 import { geografiaRouter } from "./geografia";
@@ -68,6 +71,9 @@ import { produtoOldBackupRouter } from "./produto-old-backup";
  * Agrega todos os 33 routers em uma única interface tRPC
  */
 export const appRouter = router({
+  // Dashboard
+  dashboard: dashboardRouter,
+
   // Dimensões (13)
   entidade: entidadeRouter,
   geografia: geografiaRouter,
