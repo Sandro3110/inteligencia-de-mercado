@@ -1,80 +1,55 @@
 /**
  * DAL para user_profiles
- * Sincronizado 100% com schema (11 campos)
+ * Sincronizado 100% com schema PostgreSQL (8 campos)
  */
 
 import { db } from '../../db';
 import { user_profiles } from '../../../drizzle';
-import { eq, and, isNull, desc, asc, sql } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 
 export interface UserProfileFilters {
-  id?: number;
-  orderBy?: keyof typeof user_profiles;
-  orderDirection?: 'asc' | 'desc';
-  limit?: number;
-  offset?: number;
+  id?: string;
+  email?: string;
+  ativo?: boolean;
 }
 
 export interface CreateUserProfileData {
-  avatar_url?: string;
-  bio?: string;
-  telefone?: string;
-  empresa?: string;
-  cargo?: string;
-  created_by?: string;
+  id: string;
+  nome: string;
+  email: string;
+  senha_hash: string;
+  role_id?: number;
+  ativo?: boolean;
 }
 
 export interface UpdateUserProfileData {
-  avatar_url?: string;
-  bio?: string;
-  telefone?: string;
-  empresa?: string;
-  cargo?: string;
-  updated_by?: string;
+  nome?: string;
+  email?: string;
+  senha_hash?: string;
+  role_id?: number;
+  ativo?: boolean;
+  ultimo_acesso?: Date;
 }
 
 export async function getUserProfiles(filters: UserProfileFilters = {}) {
   const conditions: any[] = [];
   if (filters.id) conditions.push(eq(user_profiles.id, filters.id));
-
-  let query = db.select().from(user_profiles).where(conditions.length > 0 ? and(...conditions) : undefined);
-
-  if (filters.orderBy) {
-    const orderColumn = user_profiles[filters.orderBy];
-    if (orderColumn) query = query.orderBy(filters.orderDirection === 'desc' ? desc(orderColumn) : asc(orderColumn)) as any;
-  } else {
-    query = query.orderBy(desc(user_profiles.created_at)) as any;
-  }
-
-  if (filters.limit) query = query.limit(filters.limit) as any;
-  if (filters.offset) query = query.offset(filters.offset) as any;
-
-  return query;
+  if (filters.email) conditions.push(eq(user_profiles.email, filters.email));
+  if (filters.ativo !== undefined) conditions.push(eq(user_profiles.ativo, filters.ativo));
+  return db.select().from(user_profiles).where(conditions.length > 0 ? and(...conditions) : undefined);
 }
 
-export async function getUserProfileById(id: number) {
-  return result[0] || null;
-}
-
+export async function getUserProfileById(id: string) {
+  const result = await db.select().from(user_profiles).where(eq(user_profiles.id, id)).limit(1);
   return result[0] || null;
 }
 
 export async function createUserProfile(data: CreateUserProfileData) {
-  const result = await db.insert(user_profiles).values({ ...data, created_at: sql`now()`, updated_at: sql`now()` }).returning();
+  const result = await db.insert(user_profiles).values(data).returning();
   return result[0];
 }
 
-export async function updateUserProfile(id: number, data: UpdateUserProfileData) {
-  const result = await db.update(user_profiles).set({ ...data, updated_at: sql`now()` }).where(eq(user_profiles.id, id)).returning();
+export async function updateUserProfile(id: string, data: UpdateUserProfileData) {
+  const result = await db.update(user_profiles).set(data).where(eq(user_profiles.id, id)).returning();
   return result[0] || null;
-}
-
-export async function deleteUserProfile(id: number, deleted_by?: string) {
-  return result[0] || null;
-}
-
-export async function countUserProfiles(filters: UserProfileFilters = {}) {
-  const conditions: any[] = [];
-  const result = await db.select({ count: sql<number>`count(*)::int` }).from(user_profiles).where(conditions.length > 0 ? and(...conditions) : undefined);
-  return result[0]?.count || 0;
 }
