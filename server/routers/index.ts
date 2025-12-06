@@ -1,11 +1,24 @@
 /**
- * Index principal dos routers tRPC
- * 33 routers sincronizados 100% com PostgreSQL, Schema Drizzle e DALs
+ * Index principal de routers tRPC
+ * Criado do zero - 100% sincronizado com:
+ * - PostgreSQL (33 tabelas, 477 campos)
+ * - Schema Drizzle ORM
+ * - 33 DALs reconstruídos
+ * - Índices otimizados
+ * - 33 Routers criados manualmente
+ * 
+ * Estrutura:
+ * - Dimensões: 13 routers
+ * - Fatos: 3 routers
+ * - IA: 5 routers
+ * - Sistema: 9 routers
+ * - Audit: 2 routers
+ * - Backup: 1 router
  */
 
 import { router } from "./trpc";
 
-// Dimensões (13)
+// ========== DIMENSÕES (13) ==========
 import { entidadeRouter } from "./entidade";
 import { geografiaRouter } from "./geografia";
 import { mercadoRouter } from "./mercado";
@@ -20,19 +33,19 @@ import { importacaoRouter } from "./importacao";
 import { statusQualificacaoRouter } from "./status-qualificacao";
 import { produtoCatalogoRouter } from "./produto-catalogo";
 
-// Fatos (3)
+// ========== FATOS (3) ==========
 import { entidadeProdutoRouter } from "./entidade-produto";
 import { entidadeCompetidorRouter } from "./entidade-competidor";
 import { entidadeContextoRouter } from "./entidade-contexto";
 
-// IA (5)
+// ========== IA (5) ==========
 import { iaAlertasRouter } from "./ia-alertas";
 import { iaCacheRouter } from "./ia-cache";
 import { iaConfigRouter } from "./ia-config";
 import { iaConfigHistoricoRouter } from "./ia-config-historico";
 import { iaUsageRouter } from "./ia-usage";
 
-// Sistema (9)
+// ========== SISTEMA (9) ==========
 import { usersRouter } from "./users";
 import { userProfilesRouter } from "./user-profiles";
 import { rolesRouter } from "./roles";
@@ -43,15 +56,19 @@ import { usuariosBloqueadosRouter } from "./usuarios-bloqueados";
 import { importacaoErrosRouter } from "./importacao-erros";
 import { cidadesBrasilRouter } from "./cidades-brasil";
 
-// Audit (2)
+// ========== AUDIT (2) ==========
 import { auditLogsRouter } from "./audit-logs";
 import { dataAuditLogsRouter } from "./data-audit-logs";
 
-// Backup (1)
+// ========== BACKUP (1) ==========
 import { produtoOldBackupRouter } from "./produto-old-backup";
 
+/**
+ * Router principal da aplicação
+ * Agrega todos os 33 routers em uma única interface tRPC
+ */
 export const appRouter = router({
-  // Dimensões
+  // Dimensões (13)
   entidade: entidadeRouter,
   geografia: geografiaRouter,
   mercado: mercadoRouter,
@@ -65,20 +82,20 @@ export const appRouter = router({
   importacao: importacaoRouter,
   statusQualificacao: statusQualificacaoRouter,
   produtoCatalogo: produtoCatalogoRouter,
-  
-  // Fatos
+
+  // Fatos (3)
   entidadeProduto: entidadeProdutoRouter,
   entidadeCompetidor: entidadeCompetidorRouter,
   entidadeContexto: entidadeContextoRouter,
-  
-  // IA
+
+  // IA (5)
   iaAlertas: iaAlertasRouter,
   iaCache: iaCacheRouter,
   iaConfig: iaConfigRouter,
   iaConfigHistorico: iaConfigHistoricoRouter,
   iaUsage: iaUsageRouter,
-  
-  // Sistema
+
+  // Sistema (9)
   users: usersRouter,
   userProfiles: userProfilesRouter,
   roles: rolesRouter,
@@ -88,13 +105,16 @@ export const appRouter = router({
   usuariosBloqueados: usuariosBloqueadosRouter,
   importacaoErros: importacaoErrosRouter,
   cidadesBrasil: cidadesBrasilRouter,
-  
-  // Audit
+
+  // Audit (2)
   auditLogs: auditLogsRouter,
   dataAuditLogs: dataAuditLogsRouter,
-  
-  // Backup
+
+  // Backup (1)
   produtoOldBackup: produtoOldBackupRouter,
 });
 
+/**
+ * Tipo exportado para uso no cliente tRPC
+ */
 export type AppRouter = typeof appRouter;
