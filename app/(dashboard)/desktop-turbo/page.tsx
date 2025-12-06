@@ -295,7 +295,7 @@ export default function DesktopTurboPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todos">Todos os projetos</SelectItem>
-                    {projetosData?.data.map((projeto: any) => (
+                    {projetosData?.map((projeto: any) => (
                       <SelectItem key={projeto.id} value={projeto.id.toString()}>
                         {projeto.nome}
                       </SelectItem>
