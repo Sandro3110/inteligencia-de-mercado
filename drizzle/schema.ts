@@ -4,7 +4,7 @@
 // Fonte: PostgreSQL Supabase (33 tabelas, 100% sincronizado)
 // ============================================================================
 
-import { pgTable, integer, bigint, varchar, text, boolean, numeric, timestamp, jsonb, json } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, bigint, varchar, text, boolean, numeric, timestamp, jsonb, json } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 // Tabela: alertas_seguranca (7 campos)
@@ -20,7 +20,7 @@ export const alertas_seguranca = pgTable('alertas_seguranca', {
 
 // Tabela: audit_logs (13 campos)
 export const audit_logs = pgTable('audit_logs', {
-  id: integer('id').notNull(),
+  id: serial('id').primaryKey(),
   user_id: varchar('user_id', { length: 255 }).notNull(),
   action: varchar('action', { length: 100 }).notNull(),
   endpoint: varchar('endpoint', { length: 255 }).notNull(),
