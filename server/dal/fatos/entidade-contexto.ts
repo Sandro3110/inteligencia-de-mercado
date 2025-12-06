@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { fato_entidade_contexto } from '../../../drizzle/schema';
+import { fato_entidade_contexto } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql } from 'drizzle-orm';
 
 export interface EntidadeContextoFilters {

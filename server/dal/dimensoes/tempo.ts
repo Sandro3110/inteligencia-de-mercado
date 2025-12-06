@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { dim_tempo } from '../../../drizzle/schema';
+import { dim_tempo } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql, gte, lte } from 'drizzle-orm';
 
 export interface TempoFilters {
