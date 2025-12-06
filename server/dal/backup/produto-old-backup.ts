@@ -86,12 +86,12 @@ export async function getProdutoOldBackupById(id: number) {
 }
 
 export async function createProdutoOldBackup(data: CreateProdutoOldBackupData) {
-  const result = await db.insert(dim_produto_old_backup).values({ ...data, created_at: sql`now()`, updated_at: sql`now()` }).returning();
+  const result = await db.insert(dim_produto_old_backup).values({ ...data, created_at: sql`now()` }).returning();
   return result[0];
 }
 
 export async function updateProdutoOldBackup(id: number, data: UpdateProdutoOldBackupData) {
-  const result = await db.update(dim_produto_old_backup).set({ ...data, updated_at: sql`now()` }).where(eq(dim_produto_old_backup.id, id)).returning();
+  const result = await db.update(dim_produto_old_backup).set(data).where(eq(dim_produto_old_backup.id, id)).returning();
   return result[0] || null;
 }
 
