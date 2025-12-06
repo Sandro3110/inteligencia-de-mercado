@@ -160,7 +160,7 @@ export default function EntidadesListPage() {
                 <div>
                   <h1 className="text-2xl font-bold">{titulo}</h1>
                   <p className="text-sm text-muted-foreground">
-                    {data ? `${data.total} registros encontrados` : 'Carregando...'}
+                    {data ? `${data.length} registros encontrados` : 'Carregando...'}
                   </p>
                 </div>
               </div>
@@ -350,9 +350,9 @@ export default function EntidadesListPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span>Resultados ({data.total})</span>
+                  <span>Resultados ({data.length})</span>
                   <span className="text-sm font-normal text-muted-foreground">
-                    Exibindo {(data.page - 1) * limit + 1}-{Math.min(data.page * limit, data.total)} de {data.total}
+                    Exibindo {(data.page - 1) * limit + 1}-{Math.min(data.page * limit, data.length)} de {data.length}
                   </span>
                 </CardTitle>
               </CardHeader>
@@ -476,7 +476,7 @@ export default function EntidadesListPage() {
                 </div>
 
                 {/* Paginação */}
-                {data.total > limit && (
+                {data.length > limit && (
                   <div className="flex items-center justify-between mt-4">
                     <Button
                       variant="outline"
@@ -487,13 +487,13 @@ export default function EntidadesListPage() {
                       Anterior
                     </Button>
                     <span className="text-sm text-muted-foreground">
-                      Página {Math.floor(offset / limit) + 1} de {Math.ceil(data.total / limit)}
+                      Página {Math.floor(offset / limit) + 1} de {Math.ceil(data.length / limit)}
                     </span>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setOffset(offset + limit)}
-                      disabled={offset + limit >= data.total}
+                      disabled={offset + limit >= data.length}
                     >
                       Próxima
                     </Button>
