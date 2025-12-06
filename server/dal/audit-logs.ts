@@ -215,7 +215,8 @@ export async function getLogById(id: number): Promise<AuditLog | null> {
     WHERE id = ${id}
   `);
 
-  return (result as any)[0] as AuditLog | null;
+  const rows = result as unknown as AuditLog[];
+  return rows[0] || null;
 }
 
 /**
@@ -299,7 +300,8 @@ export async function cleanupOldLogs(retentionDays: number = 365): Promise<numbe
     SELECT cleanup_old_audit_logs(${retentionDays})
   `);
 
-  return ((result as any)[0] as any).cleanup_old_audit_logs;
+  const rows = result as unknown as Array<{ cleanup_old_audit_logs: number }>;
+  return rows[0]?.cleanup_old_audit_logs || 0;
 }
 
 /**
@@ -310,7 +312,8 @@ export async function countLogs(): Promise<number> {
     SELECT COUNT(*) as total FROM data_audit_logs
   `);
 
-  return ((result as any)[0] as any).total;
+  const rows = result as unknown as Array<{ total: number }>;
+  return rows[0]?.total || 0;
 }
 
 /**
@@ -322,7 +325,8 @@ export async function countLogsByTabela(tabela: TabelaAuditada): Promise<number>
     WHERE tabela = ${tabela}
   `);
 
-  return ((result as any)[0] as any).total;
+  const rows = result as unknown as Array<{ total: number }>;
+  return rows[0]?.total || 0;
 }
 
 // ============================================================================
