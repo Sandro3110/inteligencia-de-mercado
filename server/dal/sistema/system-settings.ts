@@ -41,6 +41,6 @@ export async function createSystemSetting(data: CreateSystemSettingData) {
 }
 
 export async function updateSystemSetting(id: number, data: UpdateSystemSettingData) {
-  const result = await db.update(system_settings).set({ ...data, updatedAt: sql`now()\` }).where(eq(system_settings.id, id)).returning();
+  const result = await db.update(system_settings).set({ ...data, updatedAt: sql`now()` }).where(eq(system_settings.id, id)).returning();
   return result[0] || null;
 }
