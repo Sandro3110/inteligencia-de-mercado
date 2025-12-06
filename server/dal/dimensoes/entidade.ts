@@ -214,6 +214,16 @@ export async function getEntidadeByHash(hash: string) {
   return result[0] || null;
 }
 
+export async function getEntidadeByCNPJ(cnpj: string) {
+  const result = await db
+    .select()
+    .from(dim_entidade)
+    .where(and(eq(dim_entidade.cnpj, cnpj), isNull(dim_entidade.deleted_at)))
+    .limit(1);
+
+  return result[0] || null;
+}
+
 export async function createEntidade(data: CreateEntidadeData) {
   const result = await db
     .insert(dim_entidade)
