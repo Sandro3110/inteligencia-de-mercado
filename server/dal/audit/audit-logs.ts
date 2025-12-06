@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { audit_logs } from '../../../drizzle/schema';
+import { audit_logs } from '../../../drizzle';
 import { eq, and, desc, asc, sql, gte, lte } from 'drizzle-orm';
 
 export interface AuditLogFilters {

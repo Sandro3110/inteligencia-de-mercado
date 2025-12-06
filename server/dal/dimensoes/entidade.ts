@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { dim_entidade } from '../../../drizzle/schema';
+import { dim_entidade } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 
 // ============================================================================

@@ -4,7 +4,7 @@
  */
 
 import { db } from '../../db';
-import { dim_concorrente } from '../../../drizzle/schema';
+import { dim_concorrente } from '../../../drizzle';
 import { eq, and, isNull, desc, asc, sql, like } from 'drizzle-orm';
 
 export interface ConcorrenteFilters {
