@@ -3,7 +3,7 @@
  */
 
 import { db } from '../../db';
-import { dimTempo } from '../../../drizzle/schema';
+import { dim_tempo } from '../../../drizzle/schema';
 import { eq, and, gte, lte, sql } from 'drizzle-orm';
 
 /**
@@ -14,8 +14,8 @@ export async function getTempoByData(data: Date) {
   
   const result = await db
     .select()
-    .from(dimTempo)
-    .where(eq(dimTempo.data, dataStr))
+    .from(dim_tempo)
+    .where(eq(dim_tempo.data, dataStr))
     .limit(1);
   
   return result[0] || null;
@@ -27,8 +27,8 @@ export async function getTempoByData(data: Date) {
 export async function getTempoById(id: number) {
   const result = await db
     .select()
-    .from(dimTempo)
-    .where(eq(dimTempo.id, id))
+    .from(dim_tempo)
+    .where(eq(dim_tempo.id, id))
     .limit(1);
   
   return result[0] || null;
@@ -43,14 +43,14 @@ export async function getTemposByPeriodo(dataInicio: Date, dataFim: Date) {
   
   return await db
     .select()
-    .from(dimTempo)
+    .from(dim_tempo)
     .where(
       and(
-        gte(dimTempo.data, dataInicioStr),
-        lte(dimTempo.data, dataFimStr)
+        gte(dim_tempo.data, dataInicioStr),
+        lte(dim_tempo.data, dataFimStr)
       )
     )
-    .orderBy(dimTempo.data);
+    .orderBy(dim_tempo.data);
 }
 
 /**
@@ -59,14 +59,14 @@ export async function getTemposByPeriodo(dataInicio: Date, dataFim: Date) {
 export async function getTemposByAnoMes(ano: number, mes: number) {
   return await db
     .select()
-    .from(dimTempo)
+    .from(dim_tempo)
     .where(
       and(
-        eq(dimTempo.ano, ano),
-        eq(dimTempo.mes, mes)
+        eq(dim_tempo.ano, ano),
+        eq(dim_tempo.mes, mes)
       )
     )
-    .orderBy(dimTempo.data);
+    .orderBy(dim_tempo.data);
 }
 
 /**
@@ -75,14 +75,14 @@ export async function getTemposByAnoMes(ano: number, mes: number) {
 export async function getTemposByAnoTrimestre(ano: number, trimestre: number) {
   return await db
     .select()
-    .from(dimTempo)
+    .from(dim_tempo)
     .where(
       and(
-        eq(dimTempo.ano, ano),
-        eq(dimTempo.trimestre, trimestre)
+        eq(dim_tempo.ano, ano),
+        eq(dim_tempo.trimestre, trimestre)
       )
     )
-    .orderBy(dimTempo.data);
+    .orderBy(dim_tempo.data);
 }
 
 /**
@@ -94,15 +94,15 @@ export async function getDiasUteis(dataInicio: Date, dataFim: Date) {
   
   return await db
     .select()
-    .from(dimTempo)
+    .from(dim_tempo)
     .where(
       and(
-        gte(dimTempo.data, dataInicioStr),
-        lte(dimTempo.data, dataFimStr),
-        eq(dimTempo.ehDiaUtil, true)
+        gte(dim_tempo.data, dataInicioStr),
+        lte(dim_tempo.data, dataFimStr),
+        eq(dim_tempo.ehDiaUtil, true)
       )
     )
-    .orderBy(dimTempo.data);
+    .orderBy(dim_tempo.data);
 }
 
 /**
@@ -111,14 +111,14 @@ export async function getDiasUteis(dataInicio: Date, dataFim: Date) {
 export async function getFeriados(ano: number) {
   return await db
     .select()
-    .from(dimTempo)
+    .from(dim_tempo)
     .where(
       and(
-        eq(dimTempo.ano, ano),
-        eq(dimTempo.ehFeriado, true)
+        eq(dim_tempo.ano, ano),
+        eq(dim_tempo.ehFeriado, true)
       )
     )
-    .orderBy(dimTempo.data);
+    .orderBy(dim_tempo.data);
 }
 
 /**
@@ -143,13 +143,13 @@ export async function getTempoStats() {
   const stats = await db
     .select({
       totalDias: sql<number>`COUNT(*)`,
-      diasUteis: sql<number>`SUM(CASE WHEN ${dimTempo.ehDiaUtil} THEN 1 ELSE 0 END)`,
-      feriados: sql<number>`SUM(CASE WHEN ${dimTempo.ehFeriado} THEN 1 ELSE 0 END)`,
-      fimSemana: sql<number>`SUM(CASE WHEN ${dimTempo.ehFimSemana} THEN 1 ELSE 0 END)`,
-      anoMin: sql<number>`MIN(${dimTempo.ano})`,
-      anoMax: sql<number>`MAX(${dimTempo.ano})`,
+      diasUteis: sql<number>`SUM(CASE WHEN ${dim_tempo.ehDiaUtil} THEN 1 ELSE 0 END)`,
+      feriados: sql<number>`SUM(CASE WHEN ${dim_tempo.ehFeriado} THEN 1 ELSE 0 END)`,
+      fimSemana: sql<number>`SUM(CASE WHEN ${dim_tempo.ehFimSemana} THEN 1 ELSE 0 END)`,
+      anoMin: sql<number>`MIN(${dim_tempo.ano})`,
+      anoMax: sql<number>`MAX(${dim_tempo.ano})`,
     })
-    .from(dimTempo);
+    .from(dim_tempo);
   
   return stats[0];
 }

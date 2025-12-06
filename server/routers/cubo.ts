@@ -11,7 +11,7 @@ import { interpretarBuscaSemantica } from '../helpers/busca-semantica';
 import { exportar } from '../helpers/exportacao';
 import { copiar } from '../helpers/copia';
 import { db } from '../db';
-import { dimEntidade, dimGeografia, dimMercado, fatoEntidadeContexto } from '../../drizzle/schema';
+import { dim_entidade, dim_geografia, dim_mercado, fato_entidade_contexto } from '../../drizzle/schema';
 import { eq, and, or, gte, lte, like, inArray, sql } from 'drizzle-orm';
 import type {
   BuscaSemanticaInput,

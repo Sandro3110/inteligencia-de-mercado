@@ -4,7 +4,7 @@
  */
 
 import { db } from '../db';
-import { dimEntidade, fatoEntidadeContexto, dimImportacao } from '../../drizzle/schema';
+import { dim_entidade, fato_entidade_contexto, dim_importacao } from '../../drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { validarCNPJ } from '../dal/helpers/validators';
 import { buscarGeografiaFuzzy } from '../dal/dimensoes/geografia';
@@ -106,8 +106,8 @@ export async function processarLinhaImportacao(
       }
       
       // Verificar duplicata
-      const existente = await db.query.dimEntidade.findFirst({
-        where: eq(dimEntidade.cnpj, cnpjLimpo)
+      const existente = await db.query.dim_entidade.findFirst({
+        where: eq(dim_entidade.cnpj, cnpjLimpo)
       });
       
       if (existente) {
@@ -136,7 +136,7 @@ export async function processarLinhaImportacao(
 
     // 5. Inserir entidade
     const [entidade] = await db
-      .insert(dimEntidade)
+      .insert(dim_entidade)
       .values({
         // Dados básicos
         nome: dados.nome,

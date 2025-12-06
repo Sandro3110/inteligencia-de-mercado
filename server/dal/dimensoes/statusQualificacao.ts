@@ -9,7 +9,7 @@
  */
 
 import { db } from '../../db';
-import { dimStatusQualificacao } from '../../../drizzle/schema';
+import { dim_status_qualificacao } from '../../../drizzle/schema';
 import { eq, asc } from 'drizzle-orm';
 
 // ============================================================================
@@ -33,8 +33,8 @@ export type CodigoStatus =
 export async function getStatusQualificacaoById(id: number) {
   const [status] = await db
     .select()
-    .from(dimStatusQualificacao)
-    .where(eq(dimStatusQualificacao.id, id))
+    .from(dim_status_qualificacao)
+    .where(eq(dim_status_qualificacao.id, id))
     .limit(1);
 
   return status || null;
@@ -46,8 +46,8 @@ export async function getStatusQualificacaoById(id: number) {
 export async function getStatusQualificacoes() {
   return db
     .select()
-    .from(dimStatusQualificacao)
-    .orderBy(asc(dimStatusQualificacao.ordem));
+    .from(dim_status_qualificacao)
+    .orderBy(asc(dim_status_qualificacao.ordem));
 }
 
 /**
@@ -56,8 +56,8 @@ export async function getStatusQualificacoes() {
 export async function getStatusQualificacaoByCodigo(codigo: CodigoStatus) {
   const [status] = await db
     .select()
-    .from(dimStatusQualificacao)
-    .where(eq(dimStatusQualificacao.codigo, codigo))
+    .from(dim_status_qualificacao)
+    .where(eq(dim_status_qualificacao.codigo, codigo))
     .limit(1);
 
   return status || null;

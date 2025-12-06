@@ -9,13 +9,13 @@ import { z } from 'zod';
 import { router } from './index';
 import { db } from '../db';
 import {
-  dimEntidade,
-  dimGeografia,
-  dimMercado,
-  dimProduto,
-  fatoEntidadeContexto,
-  fatoEntidadeProduto,
-  fatoEntidadeCompetidor
+  dim_entidade,
+  dim_geografia,
+  dim_mercado,
+  dim_produto,
+  fato_entidade_contexto,
+  fato_entidade_produto,
+  fato_entidade_competidor
 } from '../../drizzle/schema';
 import { eq, and, sql } from 'drizzle-orm';
 
@@ -35,8 +35,8 @@ export const entidadeRouter = router({
       const { entidadeId } = input;
 
       // Buscar entidade com relacionamentos
-      const entidade = await db.query.dimEntidade.findFirst({
-        where: eq(dimEntidade.id, entidadeId),
+      const entidade = await db.query.dim_entidade.findFirst({
+        where: eq(dim_entidade.id, entidadeId),
         with: {
           geografia: true,
           mercado: true
@@ -48,13 +48,13 @@ export const entidadeRouter = router({
       }
 
       // Buscar contexto
-      const contexto = await db.query.fatoEntidadeContexto.findFirst({
-        where: eq(fatoEntidadeContexto.entidadeId, entidadeId)
+      const contexto = await db.query.fato_entidade_contexto.findFirst({
+        where: eq(fato_entidade_contexto.entidadeId, entidadeId)
       });
 
       // Buscar produtos
-      const produtos = await db.query.fatoEntidadeProduto.findMany({
-        where: eq(fatoEntidadeProduto.entidadeId, entidadeId),
+      const produtos = await db.query.fato_entidade_produto.findMany({
+        where: eq(fato_entidade_produto.entidadeId, entidadeId),
         with: {
           produto: true
         }
@@ -251,8 +251,8 @@ export const entidadeRouter = router({
       const { entidadeId, limite = 10 } = input;
 
       // Buscar entidade de referência
-      const entidade = await db.query.dimEntidade.findFirst({
-        where: eq(dimEntidade.id, entidadeId)
+      const entidade = await db.query.dim_entidade.findFirst({
+        where: eq(dim_entidade.id, entidadeId)
       });
 
       if (!entidade) {
@@ -313,8 +313,8 @@ export const entidadeRouter = router({
       const { entidadeId } = input;
 
       // Buscar contexto
-      const contexto = await db.query.fatoEntidadeContexto.findFirst({
-        where: eq(fatoEntidadeContexto.entidadeId, entidadeId)
+      const contexto = await db.query.fato_entidade_contexto.findFirst({
+        where: eq(fato_entidade_contexto.entidadeId, entidadeId)
       });
 
       if (!contexto) {
@@ -412,8 +412,8 @@ export const entidadeRouter = router({
       const { entidadeId } = input;
 
       // Buscar entidade
-      const entidade = await db.query.dimEntidade.findFirst({
-        where: eq(dimEntidade.id, entidadeId)
+      const entidade = await db.query.dim_entidade.findFirst({
+        where: eq(dim_entidade.id, entidadeId)
       });
 
       if (!entidade) {
@@ -421,8 +421,8 @@ export const entidadeRouter = router({
       }
 
       // Buscar contexto
-      const contexto = await db.query.fatoEntidadeContexto.findFirst({
-        where: eq(fatoEntidadeContexto.entidadeId, entidadeId)
+      const contexto = await db.query.fato_entidade_contexto.findFirst({
+        where: eq(fato_entidade_contexto.entidadeId, entidadeId)
       });
 
       return {
@@ -466,8 +466,8 @@ export const entidadeRouter = router({
       const { id, ...dados } = input;
 
       // Verificar se entidade existe
-      const entidadeExistente = await db.query.dimEntidade.findFirst({
-        where: eq(dimEntidade.id, id)
+      const entidadeExistente = await db.query.dim_entidade.findFirst({
+        where: eq(dim_entidade.id, id)
       });
 
       if (!entidadeExistente) {
@@ -476,13 +476,13 @@ export const entidadeRouter = router({
 
       // Atualizar entidade
       const resultado = await db
-        .update(dimEntidade)
+        .update(dim_entidade)
         .set({
           ...dados,
           updatedAt: new Date(),
           updatedBy: ctx.user?.email || 'sistema'
         })
-        .where(eq(dimEntidade.id, id))
+        .where(eq(dim_entidade.id, id))
         .returning();
 
       return resultado[0];
@@ -499,8 +499,8 @@ export const entidadeRouter = router({
       const { id } = input;
 
       // Verificar se entidade existe
-      const entidadeExistente = await db.query.dimEntidade.findFirst({
-        where: eq(dimEntidade.id, id)
+      const entidadeExistente = await db.query.dim_entidade.findFirst({
+        where: eq(dim_entidade.id, id)
       });
 
       if (!entidadeExistente) {
@@ -509,12 +509,12 @@ export const entidadeRouter = router({
 
       // Soft delete
       await db
-        .update(dimEntidade)
+        .update(dim_entidade)
         .set({
           deletedAt: new Date(),
           updatedBy: ctx.user?.email || 'sistema'
         })
-        .where(eq(dimEntidade.id, id));
+        .where(eq(dim_entidade.id, id));
 
       return { success: true };
     })

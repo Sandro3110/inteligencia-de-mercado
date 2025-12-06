@@ -12,7 +12,7 @@
 
 import { db } from '../../db';
 import { getOrderColumn } from '../../helpers/order-by';
-import { dimPesquisa, dimProjeto } from '../../../drizzle/schema';
+import { dim_pesquisa, dim_projeto } from '../../../drizzle/schema';
 import { eq, and, or, like, desc, asc, count, isNull } from 'drizzle-orm';
 
 // ============================================================================
@@ -91,8 +91,8 @@ export async function createPesquisa(input: CreatePesquisaInput) {
   // Verificar se projeto existe
   const [projeto] = await db
     .select()
-    .from(dimProjeto)
-    .where(eq(dimProjeto.id, input.projetoId))
+    .from(dim_projeto)
+    .where(eq(dim_projeto.id, input.projetoId))
     .limit(1);
 
   if (!projeto) {
@@ -105,7 +105,7 @@ export async function createPesquisa(input: CreatePesquisaInput) {
   }
 
   const [novaPesquisa] = await db
-    .insert(dimPesquisa)
+    .insert(dim_pesquisa)
     .values({
       projetoId: input.projetoId,
       nome: input.nome,
@@ -128,15 +128,15 @@ export async function createPesquisa(input: CreatePesquisaInput) {
  * Buscar pesquisa por ID
  */
 export async function getPesquisaById(id: number, incluirDeletados = false) {
-  const conditions = [eq(dimPesquisa.id, id)];
+  const conditions = [eq(dim_pesquisa.id, id)];
 
   if (!incluirDeletados) {
-    conditions.push(isNull(dimPesquisa.deletedAt));
+    conditions.push(isNull(dim_pesquisa.deletedAt));
   }
 
   const [pesquisa] = await db
     .select()
-    .from(dimPesquisa)
+    .from(dim_pesquisa)
     .where(and(...conditions))
     .limit(1);
 
@@ -148,7 +148,7 @@ export async function getPesquisaById(id: number, incluirDeletados = false) {
  */
 export async function getPesquisas(
   filters: PesquisaFilters = {}
-): Promise<ResultadoPaginado<typeof dimPesquisa.$inferSelect>> {
+): Promise<ResultadoPaginado<typeof dim_pesquisa.$inferSelect>> {
   const {
     projetoId,
     status,
@@ -164,29 +164,29 @@ export async function getPesquisas(
   const conditions = [];
 
   if (!incluirDeletados) {
-    conditions.push(isNull(dimPesquisa.deletedAt));
+    conditions.push(isNull(dim_pesquisa.deletedAt));
   }
 
   if (projetoId) {
-    conditions.push(eq(dimPesquisa.projetoId, projetoId));
+    conditions.push(eq(dim_pesquisa.projetoId, projetoId));
   }
 
   if (status) {
     if (Array.isArray(status)) {
       conditions.push(
-        or(...status.map((s) => eq(dimPesquisa.status, s)))
+        or(...status.map((s) => eq(dim_pesquisa.status, s)))
       );
     } else {
-      conditions.push(eq(dimPesquisa.status, status));
+      conditions.push(eq(dim_pesquisa.status, status));
     }
   }
 
   if (busca) {
     conditions.push(
       or(
-        like(dimPesquisa.nome, `%${busca}%`),
-        like(dimPesquisa.descricao, `%${busca}%`),
-        like(dimPesquisa.objetivo, `%${busca}%`)
+        like(dim_pesquisa.nome, `%${busca}%`),
+        like(dim_pesquisa.descricao, `%${busca}%`),
+        like(dim_pesquisa.objetivo, `%${busca}%`)
       )
     );
   }
@@ -196,17 +196,17 @@ export async function getPesquisas(
   // Contar total
   const [{ total }] = await db
     .select({ total: count() })
-    .from(dimPesquisa)
+    .from(dim_pesquisa)
     .where(whereClause);
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = getOrderColumn(dimPesquisa, orderBy, dimPesquisa.createdAt);
+  const orderColumn = getOrderColumn(dim_pesquisa, orderBy, dim_pesquisa.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db
     .select()
-    .from(dimPesquisa)
+    .from(dim_pesquisa)
     .where(whereClause)
     .orderBy(orderFn(orderColumn))
     .limit(limit)
@@ -243,12 +243,12 @@ export async function updatePesquisa(id: number, input: UpdatePesquisaInput) {
   }
 
   const [pesquisaAtualizada] = await db
-    .update(dimPesquisa)
+    .update(dim_pesquisa)
     .set({
       ...input,
       updatedAt: new Date(),
     })
-    .where(eq(dimPesquisa.id, id))
+    .where(eq(dim_pesquisa.id, id))
     .returning();
 
   return pesquisaAtualizada;
@@ -259,13 +259,13 @@ export async function updatePesquisa(id: number, input: UpdatePesquisaInput) {
  */
 export async function deletePesquisa(id: number, deletedBy?: string) {
   const [pesquisaDeletada] = await db
-    .update(dimPesquisa)
+    .update(dim_pesquisa)
     .set({
       deletedAt: new Date(),
       deletedBy,
       updatedAt: new Date(),
     })
-    .where(eq(dimPesquisa.id, id))
+    .where(eq(dim_pesquisa.id, id))
     .returning();
 
   return pesquisaDeletada;
@@ -289,14 +289,14 @@ export async function iniciarPesquisa(id: number, startedBy: string) {
   }
 
   const [pesquisaIniciada] = await db
-    .update(dimPesquisa)
+    .update(dim_pesquisa)
     .set({
       status: 'em_progresso',
       startedAt: new Date(),
       startedBy,
       updatedAt: new Date(),
     })
-    .where(eq(dimPesquisa.id, id))
+    .where(eq(dim_pesquisa.id, id))
     .returning();
 
   return pesquisaIniciada;
@@ -320,7 +320,7 @@ export async function concluirPesquisa(id: number, stats: EstatisticasExecucao) 
   const durationSeconds = Math.floor((completedAt.getTime() - startedAt.getTime()) / 1000);
 
   const [pesquisaConcluida] = await db
-    .update(dimPesquisa)
+    .update(dim_pesquisa)
     .set({
       status: 'concluida',
       completedAt,
@@ -331,7 +331,7 @@ export async function concluirPesquisa(id: number, stats: EstatisticasExecucao) 
       qualidadeMedia: stats.qualidadeMedia,
       updatedAt: new Date(),
     })
-    .where(eq(dimPesquisa.id, id))
+    .where(eq(dim_pesquisa.id, id))
     .returning();
 
   return pesquisaConcluida;
@@ -355,7 +355,7 @@ export async function falharPesquisa(id: number, errorMessage: string) {
   const durationSeconds = Math.floor((completedAt.getTime() - startedAt.getTime()) / 1000);
 
   const [pesquisaFalhada] = await db
-    .update(dimPesquisa)
+    .update(dim_pesquisa)
     .set({
       status: 'falhou',
       completedAt,
@@ -363,7 +363,7 @@ export async function falharPesquisa(id: number, errorMessage: string) {
       errorMessage,
       updatedAt: new Date(),
     })
-    .where(eq(dimPesquisa.id, id))
+    .where(eq(dim_pesquisa.id, id))
     .returning();
 
   return pesquisaFalhada;
@@ -374,13 +374,13 @@ export async function falharPesquisa(id: number, errorMessage: string) {
  */
 export async function cancelarPesquisa(id: number, updatedBy?: string) {
   const [pesquisaCancelada] = await db
-    .update(dimPesquisa)
+    .update(dim_pesquisa)
     .set({
       status: 'cancelada',
       updatedAt: new Date(),
       updatedBy,
     })
-    .where(eq(dimPesquisa.id, id))
+    .where(eq(dim_pesquisa.id, id))
     .returning();
 
   return pesquisaCancelada;
@@ -427,18 +427,18 @@ async function existePesquisaComNome(
   excludeId?: number
 ): Promise<boolean> {
   const conditions = [
-    eq(dimPesquisa.nome, nome),
-    eq(dimPesquisa.projetoId, projetoId),
-    isNull(dimPesquisa.deletedAt),
+    eq(dim_pesquisa.nome, nome),
+    eq(dim_pesquisa.projetoId, projetoId),
+    isNull(dim_pesquisa.deletedAt),
   ];
 
   if (excludeId) {
-    conditions.push(eq(dimPesquisa.id, excludeId));
+    conditions.push(eq(dim_pesquisa.id, excludeId));
   }
 
   const [resultado] = await db
     .select({ count: count() })
-    .from(dimPesquisa)
+    .from(dim_pesquisa)
     .where(excludeId ? and(...conditions.slice(0, -1)) : and(...conditions));
 
   return resultado.count > 0;

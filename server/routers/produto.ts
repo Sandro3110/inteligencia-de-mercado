@@ -3,7 +3,7 @@ import { Permission } from "@shared/types/permissions";
 import { z } from 'zod';
 import { router } from './index';
 import { db } from '../db';
-import { dimProdutoCatalogo } from '../../drizzle/schema';
+import { dim_produto_catalogo } from '../../drizzle/schema';
 import { eq, and, or, gte, lte, ilike, isNull, desc, asc, count, sql } from 'drizzle-orm';
 
 // ============================================================================
@@ -52,60 +52,60 @@ export const produtoRouter = router({
 
       console.log('[PRODUTO API] Iniciando list com input:', JSON.stringify(input));
       // Construir filtros
-      const filters: any[] = [isNull(dimProdutoCatalogo.deletedAt)];
+      const filters: any[] = [isNull(dim_produto_catalogo.deletedAt)];
 
         if (search) {
           filters.push(
             or(
-              ilike(dimProdutoCatalogo.nome, `%${search}%`),
-              ilike(dimProdutoCatalogo.descricao, `%${search}%`)
+              ilike(dim_produto_catalogo.nome, `%${search}%`),
+              ilike(dim_produto_catalogo.descricao, `%${search}%`)
             )
           );
         }
 
         if (categoria) {
-          filters.push(eq(dimProdutoCatalogo.categoria, categoria));
+          filters.push(eq(dim_produto_catalogo.categoria, categoria));
         }
 
         if (subcategoria) {
-          filters.push(eq(dimProdutoCatalogo.subcategoria, subcategoria));
+          filters.push(eq(dim_produto_catalogo.subcategoria, subcategoria));
         }
 
         if (sku) {
-          filters.push(ilike(dimProdutoCatalogo.sku, `%${sku}%`));
+          filters.push(ilike(dim_produto_catalogo.sku, `%${sku}%`));
         }
 
         if (ean) {
-          filters.push(eq(dimProdutoCatalogo.ean, ean));
+          filters.push(eq(dim_produto_catalogo.ean, ean));
         }
 
         if (ncm) {
-          filters.push(eq(dimProdutoCatalogo.ncm, ncm));
+          filters.push(eq(dim_produto_catalogo.ncm, ncm));
         }
 
         if (precoMin !== undefined) {
-          filters.push(gte(dimProdutoCatalogo.preco, precoMin.toString()));
+          filters.push(gte(dim_produto_catalogo.preco, precoMin.toString()));
         }
 
         if (precoMax !== undefined) {
-          filters.push(lte(dimProdutoCatalogo.preco, precoMax.toString()));
+          filters.push(lte(dim_produto_catalogo.preco, precoMax.toString()));
         }
 
         if (ativo !== undefined) {
-          filters.push(eq(dimProdutoCatalogo.ativo, ativo));
+          filters.push(eq(dim_produto_catalogo.ativo, ativo));
         }
 
         // Ordenação
-        let orderBy: any = desc(dimProdutoCatalogo.createdAt);
+        let orderBy: any = desc(dim_produto_catalogo.createdAt);
         if (ordenacao) {
-          const campo = dimProdutoCatalogo[ordenacao.campo as keyof typeof dimProdutoCatalogo];
+          const campo = dim_produto_catalogo[ordenacao.campo as keyof typeof dim_produto_catalogo];
           orderBy = ordenacao.direcao === 'ASC' ? asc(campo) : desc(campo);
         }
 
         // Query principal
         const dados = await db
           .select()
-          .from(dimProdutoCatalogo)
+          .from(dim_produto_catalogo)
           .where(and(...filters))
           .orderBy(orderBy)
           .limit(porPagina)
@@ -114,7 +114,7 @@ export const produtoRouter = router({
         // Contar total
         const [{ total }] = await db
           .select({ total: count() })
-          .from(dimProdutoCatalogo)
+          .from(dim_produto_catalogo)
           .where(and(...filters));
 
         return {
@@ -142,11 +142,11 @@ export const produtoRouter = router({
       try {
         const produto = await db
           .select()
-          .from(dimProdutoCatalogo)
+          .from(dim_produto_catalogo)
           .where(
             and(
-              eq(dimProdutoCatalogo.id, produtoId),
-              isNull(dimProdutoCatalogo.deletedAt)
+              eq(dim_produto_catalogo.id, produtoId),
+              isNull(dim_produto_catalogo.deletedAt)
             )
           )
           .limit(1);
@@ -169,15 +169,15 @@ export const produtoRouter = router({
     .query(async () => {
       try {
         const resultado = await db
-          .selectDistinct({ categoria: dimProdutoCatalogo.categoria })
-          .from(dimProdutoCatalogo)
+          .selectDistinct({ categoria: dim_produto_catalogo.categoria })
+          .from(dim_produto_catalogo)
           .where(
             and(
-              isNull(dimProdutoCatalogo.deletedAt),
-              sql`${dimProdutoCatalogo.categoria} IS NOT NULL`
+              isNull(dim_produto_catalogo.deletedAt),
+              sql`${dim_produto_catalogo.categoria} IS NOT NULL`
             )
           )
-          .orderBy(asc(dimProdutoCatalogo.categoria));
+          .orderBy(asc(dim_produto_catalogo.categoria));
 
         return resultado.map(r => r.categoria);
       } catch (error) {
@@ -198,19 +198,19 @@ export const produtoRouter = router({
 
       try {
         const filters: any[] = [
-          isNull(dimProdutoCatalogo.deletedAt),
-          sql`${dimProdutoCatalogo.subcategoria} IS NOT NULL`
+          isNull(dim_produto_catalogo.deletedAt),
+          sql`${dim_produto_catalogo.subcategoria} IS NOT NULL`
         ];
 
         if (categoria) {
-          filters.push(eq(dimProdutoCatalogo.categoria, categoria));
+          filters.push(eq(dim_produto_catalogo.categoria, categoria));
         }
 
         const resultado = await db
-          .selectDistinct({ subcategoria: dimProdutoCatalogo.subcategoria })
-          .from(dimProdutoCatalogo)
+          .selectDistinct({ subcategoria: dim_produto_catalogo.subcategoria })
+          .from(dim_produto_catalogo)
           .where(and(...filters))
-          .orderBy(asc(dimProdutoCatalogo.subcategoria));
+          .orderBy(asc(dim_produto_catalogo.subcategoria));
 
         return resultado.map(r => r.subcategoria);
       } catch (error) {
@@ -228,15 +228,15 @@ export const produtoRouter = router({
         const resultado = await db
           .select({
             total: count(),
-            ativos: sql<number>`COUNT(CASE WHEN ${dimProdutoCatalogo.ativo} = true THEN 1 END)`,
-            inativos: sql<number>`COUNT(CASE WHEN ${dimProdutoCatalogo.ativo} = false THEN 1 END)`,
-            categorias: sql<number>`COUNT(DISTINCT ${dimProdutoCatalogo.categoria})`,
-            preco_medio: sql<number>`AVG(${dimProdutoCatalogo.preco})`,
-            preco_min: sql<number>`MIN(${dimProdutoCatalogo.preco})`,
-            preco_max: sql<number>`MAX(${dimProdutoCatalogo.preco})`
+            ativos: sql<number>`COUNT(CASE WHEN ${dim_produto_catalogo.ativo} = true THEN 1 END)`,
+            inativos: sql<number>`COUNT(CASE WHEN ${dim_produto_catalogo.ativo} = false THEN 1 END)`,
+            categorias: sql<number>`COUNT(DISTINCT ${dim_produto_catalogo.categoria})`,
+            preco_medio: sql<number>`AVG(${dim_produto_catalogo.preco})`,
+            preco_min: sql<number>`MIN(${dim_produto_catalogo.preco})`,
+            preco_max: sql<number>`MAX(${dim_produto_catalogo.preco})`
           })
-          .from(dimProdutoCatalogo)
-          .where(isNull(dimProdutoCatalogo.deletedAt));
+          .from(dim_produto_catalogo)
+          .where(isNull(dim_produto_catalogo.deletedAt));
 
         return resultado[0];
       } catch (error) {

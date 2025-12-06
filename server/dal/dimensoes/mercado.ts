@@ -11,7 +11,7 @@
 
 import { db } from '../../db';
 import { getOrderColumn } from '../../helpers/order-by';
-import { dimMercado } from '../../../drizzle/schema';
+import { dim_mercado } from '../../../drizzle/schema';
 import { eq, and, or, like, desc, asc, count, isNull } from 'drizzle-orm';
 import { createHash } from 'crypto';
 
@@ -84,7 +84,7 @@ export async function createMercado(input: CreateMercadoInput) {
   }
 
   const [novoMercado] = await db
-    .insert(dimMercado)
+    .insert(dim_mercado)
     .values({
       ...input,
       mercadoHash,
@@ -103,8 +103,8 @@ export async function createMercado(input: CreateMercadoInput) {
 export async function getMercadoById(id: number) {
   const [mercado] = await db
     .select()
-    .from(dimMercado)
-    .where(eq(dimMercado.id, id))
+    .from(dim_mercado)
+    .where(eq(dim_mercado.id, id))
     .limit(1);
 
   return mercado || null;
@@ -115,7 +115,7 @@ export async function getMercadoById(id: number) {
  */
 export async function getMercados(
   filters: MercadoFilters = {}
-): Promise<ResultadoPaginado<typeof dimMercado.$inferSelect>> {
+): Promise<ResultadoPaginado<typeof dim_mercado.$inferSelect>> {
   const {
     ativo,
     categoria,
@@ -130,23 +130,23 @@ export async function getMercados(
   const conditions = [];
 
   if (ativo !== undefined) {
-    conditions.push(eq(dimMercado.ativo, ativo));
+    conditions.push(eq(dim_mercado.ativo, ativo));
   }
 
   if (categoria) {
     if (Array.isArray(categoria)) {
-      conditions.push(or(...categoria.map((c) => eq(dimMercado.categoria, c))));
+      conditions.push(or(...categoria.map((c) => eq(dim_mercado.categoria, c))));
     } else {
-      conditions.push(eq(dimMercado.categoria, categoria));
+      conditions.push(eq(dim_mercado.categoria, categoria));
     }
   }
 
   if (busca) {
     conditions.push(
       or(
-        like(dimMercado.nome, `%${busca}%`),
-        like(dimMercado.categoria, `%${busca}%`),
-        like(dimMercado.descricao, `%${busca}%`)
+        like(dim_mercado.nome, `%${busca}%`),
+        like(dim_mercado.categoria, `%${busca}%`),
+        like(dim_mercado.descricao, `%${busca}%`)
       )
     );
   }
@@ -156,17 +156,17 @@ export async function getMercados(
   // Contar total
   const [{ total }] = await db
     .select({ total: count() })
-    .from(dimMercado)
+    .from(dim_mercado)
     .where(whereClause);
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = getOrderColumn(dimMercado, orderBy, dimMercado.nome);
+  const orderColumn = getOrderColumn(dim_mercado, orderBy, dim_mercado.nome);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db
     .select()
-    .from(dimMercado)
+    .from(dim_mercado)
     .where(whereClause)
     .orderBy(orderFn(orderColumn))
     .limit(limit)
@@ -215,12 +215,12 @@ export async function updateMercado(id: number, input: UpdateMercadoInput) {
   }
 
   const [mercadoAtualizado] = await db
-    .update(dimMercado)
+    .update(dim_mercado)
     .set({
       ...input,
       updatedAt: new Date(),
     })
-    .where(eq(dimMercado.id, id))
+    .where(eq(dim_mercado.id, id))
     .returning();
 
   return mercadoAtualizado;
@@ -239,7 +239,7 @@ export async function deleteMercado(id: number) {
   // TODO: Verificar se mercado está sendo usado em fato_entidade_contexto
   // Por enquanto, apenas deletar
 
-  await db.delete(dimMercado).where(eq(dimMercado.id, id));
+  await db.delete(dim_mercado).where(eq(dim_mercado.id, id));
 
   return { success: true };
 }
@@ -254,8 +254,8 @@ export async function deleteMercado(id: number) {
 export async function getMercadoByHash(hash: string) {
   const [mercado] = await db
     .select()
-    .from(dimMercado)
-    .where(eq(dimMercado.mercadoHash, hash))
+    .from(dim_mercado)
+    .where(eq(dim_mercado.mercadoHash, hash))
     .limit(1);
 
   return mercado || null;
@@ -272,7 +272,7 @@ export async function getMercadoPadrao() {
  * Buscar ou criar mercado (upsert)
  */
 export async function buscarOuCriarMercado(input: CreateMercadoInput): Promise<{
-  mercado: typeof dimMercado.$inferSelect;
+  mercado: typeof dim_mercado.$inferSelect;
   criado: boolean;
 }> {
   const hash = gerarHashMercado(input.nome, input.categoria || '');
@@ -296,7 +296,7 @@ export async function enriquecerMercado(id: number, dados: EnriquecerMercadoInpu
   }
 
   const [mercadoEnriquecido] = await db
-    .update(dimMercado)
+    .update(dim_mercado)
     .set({
       descricao: dados.descricao || mercado.descricao,
       categoria: dados.categoria || mercado.categoria,
@@ -304,7 +304,7 @@ export async function enriquecerMercado(id: number, dados: EnriquecerMercadoInpu
       enriquecidoPor: dados.enriquecidoPor,
       updatedAt: new Date(),
     })
-    .where(eq(dimMercado.id, id))
+    .where(eq(dim_mercado.id, id))
     .returning();
 
   return mercadoEnriquecido;
@@ -322,10 +322,10 @@ export async function getMercadosAtivos() {
  */
 export async function getCategorias(): Promise<string[]> {
   const resultados = await db
-    .selectDistinct({ categoria: dimMercado.categoria })
-    .from(dimMercado)
-    .where(isNull(dimMercado.categoria))
-    .orderBy(asc(dimMercado.categoria));
+    .selectDistinct({ categoria: dim_mercado.categoria })
+    .from(dim_mercado)
+    .where(isNull(dim_mercado.categoria))
+    .orderBy(asc(dim_mercado.categoria));
 
   return resultados.map((r) => r.categoria).filter((c) => c !== null) as string[];
 }

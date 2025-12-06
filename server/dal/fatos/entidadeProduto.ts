@@ -9,7 +9,7 @@
 
 import { db } from '../../db';
 import { getOrderColumn } from '../../helpers/order-by';
-import { fatoEntidadeProduto, dimProduto, fatoEntidadeContexto } from '../../../drizzle/schema';
+import { fato_entidade_produto, dim_produto, fato_entidade_contexto } from '../../../drizzle/schema';
 import { eq, and, desc, asc, count } from 'drizzle-orm';
 
 // ============================================================================
@@ -89,7 +89,7 @@ export async function createRelacao(input: CreateRelacaoInput) {
   }
 
   const [novaRelacao] = await db
-    .insert(fatoEntidadeProduto)
+    .insert(fato_entidade_produto)
     .values({
       ...input,
       createdAt: new Date(),
@@ -105,8 +105,8 @@ export async function createRelacao(input: CreateRelacaoInput) {
 export async function getRelacaoById(id: number) {
   const [relacao] = await db
     .select()
-    .from(fatoEntidadeProduto)
-    .where(eq(fatoEntidadeProduto.id, id))
+    .from(fato_entidade_produto)
+    .where(eq(fato_entidade_produto.id, id))
     .limit(1);
 
   return relacao || null;
@@ -117,7 +117,7 @@ export async function getRelacaoById(id: number) {
  */
 export async function getRelacoes(
   filters: RelacaoFilters = {}
-): Promise<ResultadoPaginado<typeof fatoEntidadeProduto.$inferSelect>> {
+): Promise<ResultadoPaginado<typeof fato_entidade_produto.$inferSelect>> {
   const {
     contextoId,
     produtoId,
@@ -132,20 +132,20 @@ export async function getRelacoes(
   const conditions = [];
 
   if (contextoId) {
-    conditions.push(eq(fatoEntidadeProduto.contextoId, contextoId));
+    conditions.push(eq(fato_entidade_produto.contextoId, contextoId));
   }
 
   if (produtoId) {
-    conditions.push(eq(fatoEntidadeProduto.produtoId, produtoId));
+    conditions.push(eq(fato_entidade_produto.produtoId, produtoId));
   }
 
   if (tipoRelacao) {
     if (Array.isArray(tipoRelacao)) {
       conditions.push(
-        and(...tipoRelacao.map((t) => eq(fatoEntidadeProduto.tipoRelacao, t)))
+        and(...tipoRelacao.map((t) => eq(fato_entidade_produto.tipoRelacao, t)))
       );
     } else {
-      conditions.push(eq(fatoEntidadeProduto.tipoRelacao, tipoRelacao));
+      conditions.push(eq(fato_entidade_produto.tipoRelacao, tipoRelacao));
     }
   }
 
@@ -154,18 +154,18 @@ export async function getRelacoes(
   // Contar total
   const [{ total }] = await db
     .select({ total: count() })
-    .from(fatoEntidadeProduto)
+    .from(fato_entidade_produto)
     .where(whereClause);
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
   const orderColumn =
-    getOrderColumn(fatoEntidadeProduto, orderBy, fatoEntidadeProduto.createdAt);
+    getOrderColumn(fato_entidade_produto, orderBy, fato_entidade_produto.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db
     .select()
-    .from(fatoEntidadeProduto)
+    .from(fato_entidade_produto)
     .where(whereClause)
     .orderBy(orderFn(orderColumn))
     .limit(limit)
@@ -195,9 +195,9 @@ export async function updateRelacao(id: number, input: UpdateRelacaoInput) {
   }
 
   const [relacaoAtualizada] = await db
-    .update(fatoEntidadeProduto)
+    .update(fato_entidade_produto)
     .set(input)
-    .where(eq(fatoEntidadeProduto.id, id))
+    .where(eq(fato_entidade_produto.id, id))
     .returning();
 
   return relacaoAtualizada;
@@ -207,7 +207,7 @@ export async function updateRelacao(id: number, input: UpdateRelacaoInput) {
  * Deletar relação (hard delete)
  */
 export async function deleteRelacao(id: number) {
-  await db.delete(fatoEntidadeProduto).where(eq(fatoEntidadeProduto.id, id));
+  await db.delete(fato_entidade_produto).where(eq(fato_entidade_produto.id, id));
 
   return { success: true };
 }
@@ -222,11 +222,11 @@ export async function deleteRelacao(id: number) {
 async function getRelacaoByContextoProduto(contextoId: number, produtoId: number) {
   const [relacao] = await db
     .select()
-    .from(fatoEntidadeProduto)
+    .from(fato_entidade_produto)
     .where(
       and(
-        eq(fatoEntidadeProduto.contextoId, contextoId),
-        eq(fatoEntidadeProduto.produtoId, produtoId)
+        eq(fato_entidade_produto.contextoId, contextoId),
+        eq(fato_entidade_produto.produtoId, produtoId)
       )
     )
     .limit(1);
@@ -254,12 +254,12 @@ export async function getRelacoesByProduto(produtoId: number) {
 export async function getProdutosDeContexto(contextoId: number) {
   const resultados = await db
     .select({
-      relacao: fatoEntidadeProduto,
-      produto: dimProduto,
+      relacao: fato_entidade_produto,
+      produto: dim_produto,
     })
-    .from(fatoEntidadeProduto)
-    .innerJoin(dimProduto, eq(fatoEntidadeProduto.produtoId, dimProduto.id))
-    .where(eq(fatoEntidadeProduto.contextoId, contextoId));
+    .from(fato_entidade_produto)
+    .innerJoin(dim_produto, eq(fato_entidade_produto.produtoId, dim_produto.id))
+    .where(eq(fato_entidade_produto.contextoId, contextoId));
 
   return resultados;
 }
@@ -306,19 +306,19 @@ export async function contarProdutosPorTipoRelacao(contextoId?: number) {
   const conditions = [];
 
   if (contextoId) {
-    conditions.push(eq(fatoEntidadeProduto.contextoId, contextoId));
+    conditions.push(eq(fato_entidade_produto.contextoId, contextoId));
   }
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
   const resultados = await db
     .select({
-      tipoRelacao: fatoEntidadeProduto.tipoRelacao,
+      tipoRelacao: fato_entidade_produto.tipoRelacao,
       total: count(),
     })
-    .from(fatoEntidadeProduto)
+    .from(fato_entidade_produto)
     .where(whereClause)
-    .groupBy(fatoEntidadeProduto.tipoRelacao);
+    .groupBy(fato_entidade_produto.tipoRelacao);
 
   return resultados;
 }

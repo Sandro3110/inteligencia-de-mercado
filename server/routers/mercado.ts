@@ -8,7 +8,7 @@ import { Permission } from "@shared/types/permissions";
 import { z } from 'zod';
 import { router, publicProcedure } from './index';
 import { db } from '../db';
-import { dimMercado, dimEntidade, fatoEntidadeContexto, fatoEntidadeCompetidor } from '../../drizzle/schema';
+import { dim_mercado, dim_entidade, fato_entidade_contexto, fato_entidade_competidor } from '../../drizzle/schema';
 import { eq, and, sql } from 'drizzle-orm';
 
 // ============================================================================
@@ -121,8 +121,8 @@ export const mercadoRouter = router({
       id: z.number()
     }))
     .query(async ({ input }) => {
-      const mercado = await db.query.dimMercado.findFirst({
-        where: eq(dimMercado.id, input.id)
+      const mercado = await db.query.dim_mercado.findFirst({
+        where: eq(dim_mercado.id, input.id)
       });
 
       if (!mercado) {
@@ -246,8 +246,8 @@ export const mercadoRouter = router({
       const { mercadoId, incluirMetricas = true } = input;
 
       // Buscar mercado
-      const mercado = await db.query.dimMercado.findFirst({
-        where: eq(dimMercado.id, mercadoId)
+      const mercado = await db.query.dim_mercado.findFirst({
+        where: eq(dim_mercado.id, mercadoId)
       });
 
       if (!mercado) {
@@ -355,8 +355,8 @@ export const mercadoRouter = router({
 
       const resultados = await Promise.all(
         mercadoIds.map(async (mercadoId) => {
-          const mercado = await db.query.dimMercado.findFirst({
-            where: eq(dimMercado.id, mercadoId)
+          const mercado = await db.query.dim_mercado.findFirst({
+            where: eq(dim_mercado.id, mercadoId)
           });
 
           const metricasSQL = metricas.map(m => 

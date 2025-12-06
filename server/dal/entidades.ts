@@ -5,17 +5,17 @@
  * VERSÃO CORRIGIDA - Usando nomes corretos do schema
  */
 
-iimport { db } from '../db';
-import { getOrderColumn } from '../helpers/order-by';';
+import { db } from '../db';
+import { getOrderColumn } from '../helpers/order-by';
 import {
-  fatoEntidadeContexto,    // ✅ CORRETO (era fatoEntidades)
-  dimEntidade,             // ✅ CORRETO
-  dimGeografia,            // ✅ CORRETO (sem maiúscula)
-  dimMercado,              // ✅ CORRETO (singular, era dimMercados)
-  dimProduto,              // ✅ CORRETO (singular, era dimProdutos)
-  dimStatusQualificacao,   // ✅ CORRETO
-  fatoEntidadeProduto,     // ✅ CORRETO (era entidadeProdutos)
-  fatoEntidadeCompetidor,  // ✅ CORRETO (era entidadeCompetidores)
+  fato_entidade_contexto,    // ✅ CORRETO (era fatoEntidades)
+  dim_entidade,             // ✅ CORRETO
+  dim_geografia,            // ✅ CORRETO (sem maiúscula)
+  dim_mercado,              // ✅ CORRETO (singular, era dimMercados)
+  dim_produto,              // ✅ CORRETO (singular, era dimProdutos)
+  dim_status_qualificacao,   // ✅ CORRETO
+  fato_entidade_produto,     // ✅ CORRETO (era entidadeProdutos)
+  fato_entidade_competidor,  // ✅ CORRETO (era entidadeCompetidores)
 } from '../../drizzle/schema';
 import { eq, and, or, inArray, gte, lte, like, sql, desc, asc, count } from 'drizzle-orm';
 
@@ -87,45 +87,45 @@ export async function getContextosEntidades(
 
   if (tipo_entidade) {
     if (Array.isArray(tipo_entidade)) {
-      conditions.push(inArray(fatoEntidadeContexto.tipoEntidade, tipo_entidade));
+      conditions.push(inArray(fato_entidade_contexto.tipoEntidade, tipo_entidade));
     } else {
-      conditions.push(eq(fatoEntidadeContexto.tipoEntidade, tipo_entidade));
+      conditions.push(eq(fato_entidade_contexto.tipoEntidade, tipo_entidade));
     }
   }
 
   if (pesquisa_id) {
-    conditions.push(eq(fatoEntidadeContexto.pesquisaId, pesquisa_id));
+    conditions.push(eq(fato_entidade_contexto.pesquisaId, pesquisa_id));
   }
 
   if (projeto_id) {
-    conditions.push(eq(fatoEntidadeContexto.projetoId, projeto_id));
+    conditions.push(eq(fato_entidade_contexto.projetoId, projeto_id));
   }
 
   if (status_qualificacao_id) {
-    conditions.push(eq(fatoEntidadeContexto.statusQualificacaoId, status_qualificacao_id));
+    conditions.push(eq(fato_entidade_contexto.statusQualificacaoId, status_qualificacao_id));
   }
 
   if (geografia_id) {
-    conditions.push(eq(fatoEntidadeContexto.geografiaId, geografia_id));
+    conditions.push(eq(fato_entidade_contexto.geografiaId, geografia_id));
   }
 
   if (mercado_id) {
-    conditions.push(eq(fatoEntidadeContexto.mercadoId, mercado_id));
+    conditions.push(eq(fato_entidade_contexto.mercadoId, mercado_id));
   }
 
   if (qualidade_min !== undefined) {
-    conditions.push(gte(fatoEntidadeContexto.qualidadeScore, qualidade_min));
+    conditions.push(gte(fato_entidade_contexto.qualidadeScore, qualidade_min));
   }
 
   if (qualidade_max !== undefined) {
-    conditions.push(lte(fatoEntidadeContexto.qualidadeScore, qualidade_max));
+    conditions.push(lte(fato_entidade_contexto.qualidadeScore, qualidade_max));
   }
 
   if (qualidade_classificacao) {
     if (Array.isArray(qualidade_classificacao)) {
-      conditions.push(inArray(fatoEntidadeContexto.qualidadeClassificacao, qualidade_classificacao));
+      conditions.push(inArray(fato_entidade_contexto.qualidadeClassificacao, qualidade_classificacao));
     } else {
-      conditions.push(eq(fatoEntidadeContexto.qualidadeClassificacao, qualidade_classificacao));
+      conditions.push(eq(fato_entidade_contexto.qualidadeClassificacao, qualidade_classificacao));
     }
   }
 
@@ -140,17 +140,17 @@ export async function getContextosEntidades(
   // Contar total
   const [{ total }] = await db
     .select({ total: count() })
-    .from(fatoEntidadeContexto)
+    .from(fato_entidade_contexto)
     .where(whereClause);
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = getOrderColumn(fatoEntidadeContexto, orderBy, fatoEntidadeContexto.createdAt);
+  const orderColumn = getOrderColumn(fato_entidade_contexto, orderBy, fato_entidade_contexto.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db
     .select()
-    .from(fatoEntidadeContexto)
+    .from(fato_entidade_contexto)
     .where(whereClause)
     .orderBy(orderFn(orderColumn))
     .limit(limit)
@@ -219,8 +219,8 @@ export async function getConcorrentes(
 export async function getContextoById(id: number): Promise<any | null> {
   const [contexto] = await db
     .select()
-    .from(fatoEntidadeContexto)
-    .where(eq(fatoEntidadeContexto.id, id))
+    .from(fato_entidade_contexto)
+    .where(eq(fato_entidade_contexto.id, id))
     .limit(1);
 
   return contexto || null;
@@ -236,16 +236,16 @@ export async function getContextoCompleto(id: number): Promise<any | null> {
   // Buscar entidade
   const [entidade] = await db
     .select()
-    .from(dimEntidade)
-    .where(eq(dimEntidade.id, contexto.entidadeId))
+    .from(dim_entidade)
+    .where(eq(dim_entidade.id, contexto.entidadeId))
     .limit(1);
 
   // Buscar geografia
   const [geografia] = contexto.geografiaId
     ? await db
         .select()
-        .from(dimGeografia)
-        .where(eq(dimGeografia.id, contexto.geografiaId))
+        .from(dim_geografia)
+        .where(eq(dim_geografia.id, contexto.geografiaId))
         .limit(1)
     : [null];
 
@@ -253,8 +253,8 @@ export async function getContextoCompleto(id: number): Promise<any | null> {
   const [mercado] = contexto.mercadoId
     ? await db
         .select()
-        .from(dimMercado)
-        .where(eq(dimMercado.id, contexto.mercadoId))
+        .from(dim_mercado)
+        .where(eq(dim_mercado.id, contexto.mercadoId))
         .limit(1)
     : [null];
 
@@ -262,30 +262,30 @@ export async function getContextoCompleto(id: number): Promise<any | null> {
   const [statusQualificacao] = contexto.statusQualificacaoId
     ? await db
         .select()
-        .from(dimStatusQualificacao)
-        .where(eq(dimStatusQualificacao.id, contexto.statusQualificacaoId))
+        .from(dim_status_qualificacao)
+        .where(eq(dim_status_qualificacao.id, contexto.statusQualificacaoId))
         .limit(1)
     : [null];
 
   // Buscar produtos relacionados
   const produtosRelacionados = await db
     .select({
-      produto: dimProduto,
-      relacao: fatoEntidadeProduto,
+      produto: dim_produto,
+      relacao: fato_entidade_produto,
     })
-    .from(fatoEntidadeProduto)
-    .innerJoin(dimProduto, eq(dimProduto.id, fatoEntidadeProduto.produtoId))
-    .where(eq(fatoEntidadeProduto.contextoId, id));
+    .from(fato_entidade_produto)
+    .innerJoin(dim_produto, eq(dim_produto.id, fato_entidade_produto.produtoId))
+    .where(eq(fato_entidade_produto.contextoId, id));
 
   // Buscar concorrentes relacionados
   const concorrentesRelacionados = await db
     .select({
-      entidade: dimEntidade,
-      relacao: fatoEntidadeCompetidor,
+      entidade: dim_entidade,
+      relacao: fato_entidade_competidor,
     })
-    .from(fatoEntidadeCompetidor)
-    .innerJoin(dimEntidade, eq(dimEntidade.id, fatoEntidadeCompetidor.competidorEntidadeId))
-    .where(eq(fatoEntidadeCompetidor.contextoId, id));
+    .from(fato_entidade_competidor)
+    .innerJoin(dim_entidade, eq(dim_entidade.id, fato_entidade_competidor.competidorEntidadeId))
+    .where(eq(fato_entidade_competidor.contextoId, id));
 
   return {
     ...contexto,
@@ -316,7 +316,7 @@ export async function getContextoCompleto(id: number): Promise<any | null> {
  */
 export async function criarContexto(input: any): Promise<any> {
   const [novoContexto] = await db
-    .insert(fatoEntidadeContexto)
+    .insert(fato_entidade_contexto)
     .values({
       ...input,
       createdAt: new Date(),
@@ -332,12 +332,12 @@ export async function criarContexto(input: any): Promise<any> {
  */
 export async function atualizarContexto(id: number, input: any): Promise<any | null> {
   const [contextoAtualizado] = await db
-    .update(fatoEntidadeContexto)
+    .update(fato_entidade_contexto)
     .set({
       ...input,
       updatedAt: new Date(),
     })
-    .where(eq(fatoEntidadeContexto.id, id))
+    .where(eq(fato_entidade_contexto.id, id))
     .returning();
 
   return contextoAtualizado || null;
@@ -364,22 +364,22 @@ export async function deletarContexto(id: number, deletedBy?: number): Promise<b
  */
 export async function getEstatisticasContextos(pesquisa_id?: number): Promise<any> {
   const whereClause = pesquisa_id
-    ? eq(fatoEntidadeContexto.pesquisaId, pesquisa_id)
+    ? eq(fato_entidade_contexto.pesquisaId, pesquisa_id)
     : undefined;
 
   const [stats] = await db
     .select({
       total: count(),
-      clientes: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.tipoEntidade} = 'cliente')`,
-      leads: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.tipoEntidade} = 'lead')`,
-      concorrentes: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.tipoEntidade} = 'concorrente')`,
-      qualidade_a: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.qualidadeClassificacao} = 'A')`,
-      qualidade_b: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.qualidadeClassificacao} = 'B')`,
-      qualidade_c: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.qualidadeClassificacao} = 'C')`,
-      qualidade_d: sql<number>`COUNT(*) FILTER (WHERE ${fatoEntidadeContexto.qualidadeClassificacao} = 'D')`,
-      qualidade_media: sql<number>`AVG(${fatoEntidadeContexto.qualidadeScore})`,
+      clientes: sql<number>`COUNT(*) FILTER (WHERE ${fato_entidade_contexto.tipoEntidade} = 'cliente')`,
+      leads: sql<number>`COUNT(*) FILTER (WHERE ${fato_entidade_contexto.tipoEntidade} = 'lead')`,
+      concorrentes: sql<number>`COUNT(*) FILTER (WHERE ${fato_entidade_contexto.tipoEntidade} = 'concorrente')`,
+      qualidade_a: sql<number>`COUNT(*) FILTER (WHERE ${fato_entidade_contexto.qualidadeClassificacao} = 'A')`,
+      qualidade_b: sql<number>`COUNT(*) FILTER (WHERE ${fato_entidade_contexto.qualidadeClassificacao} = 'B')`,
+      qualidade_c: sql<number>`COUNT(*) FILTER (WHERE ${fato_entidade_contexto.qualidadeClassificacao} = 'C')`,
+      qualidade_d: sql<number>`COUNT(*) FILTER (WHERE ${fato_entidade_contexto.qualidadeClassificacao} = 'D')`,
+      qualidade_media: sql<number>`AVG(${fato_entidade_contexto.qualidadeScore})`,
     })
-    .from(fatoEntidadeContexto)
+    .from(fato_entidade_contexto)
     .where(whereClause);
 
   return {
@@ -409,8 +409,8 @@ export async function getEstatisticasContextos(pesquisa_id?: number): Promise<an
 export async function buscarEntidadePorCNPJ(cnpj: string): Promise<any | null> {
   const [entidade] = await db
     .select()
-    .from(dimEntidade)
-    .where(eq(dimEntidade.cnpj, cnpj))
+    .from(dim_entidade)
+    .where(eq(dim_entidade.cnpj, cnpj))
     .limit(1);
 
   return entidade || null;
@@ -429,6 +429,6 @@ export async function buscarOuCriarEntidade(input: any): Promise<{ entidade: any
   }
 
   // Se não encontrou, criar nova
-  const [nova] = await db.insert(dimEntidade).values(input).returning();
+  const [nova] = await db.insert(dim_entidade).values(input).returning();
   return { entidade: nova, criada: true };
 }

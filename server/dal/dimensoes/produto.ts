@@ -9,7 +9,7 @@
 
 import { db } from '../../db';
 import { getOrderColumn } from '../../helpers/order-by';
-import { dimProduto } from '../../../drizzle/schema';
+import { dim_produto } from '../../../drizzle/schema';
 import { eq, and, or, like, desc, asc, count, isNull } from 'drizzle-orm';
 import { createHash } from 'crypto';
 
@@ -76,7 +76,7 @@ export async function createProduto(input: CreateProdutoInput) {
   }
 
   const [novoProduto] = await db
-    .insert(dimProduto)
+    .insert(dim_produto)
     .values({
       ...input,
       produtoHash,
@@ -95,8 +95,8 @@ export async function createProduto(input: CreateProdutoInput) {
 export async function getProdutoById(id: number) {
   const [produto] = await db
     .select()
-    .from(dimProduto)
-    .where(eq(dimProduto.id, id))
+    .from(dim_produto)
+    .where(eq(dim_produto.id, id))
     .limit(1);
 
   return produto || null;
@@ -107,7 +107,7 @@ export async function getProdutoById(id: number) {
  */
 export async function getProdutos(
   filters: ProdutoFilters = {}
-): Promise<ResultadoPaginado<typeof dimProduto.$inferSelect>> {
+): Promise<ResultadoPaginado<typeof dim_produto.$inferSelect>> {
   const {
     ativo,
     categoria,
@@ -122,23 +122,23 @@ export async function getProdutos(
   const conditions = [];
 
   if (ativo !== undefined) {
-    conditions.push(eq(dimProduto.ativo, ativo));
+    conditions.push(eq(dim_produto.ativo, ativo));
   }
 
   if (categoria) {
     if (Array.isArray(categoria)) {
-      conditions.push(or(...categoria.map((c) => eq(dimProduto.categoria, c))));
+      conditions.push(or(...categoria.map((c) => eq(dim_produto.categoria, c))));
     } else {
-      conditions.push(eq(dimProduto.categoria, categoria));
+      conditions.push(eq(dim_produto.categoria, categoria));
     }
   }
 
   if (busca) {
     conditions.push(
       or(
-        like(dimProduto.nome, `%${busca}%`),
-        like(dimProduto.categoria, `%${busca}%`),
-        like(dimProduto.descricao, `%${busca}%`)
+        like(dim_produto.nome, `%${busca}%`),
+        like(dim_produto.categoria, `%${busca}%`),
+        like(dim_produto.descricao, `%${busca}%`)
       )
     );
   }
@@ -148,17 +148,17 @@ export async function getProdutos(
   // Contar total
   const [{ total }] = await db
     .select({ total: count() })
-    .from(dimProduto)
+    .from(dim_produto)
     .where(whereClause);
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = getOrderColumn(dimProduto, orderBy, dimProduto.nome);
+  const orderColumn = getOrderColumn(dim_produto, orderBy, dim_produto.nome);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db
     .select()
-    .from(dimProduto)
+    .from(dim_produto)
     .where(whereClause)
     .orderBy(orderFn(orderColumn))
     .limit(limit)
@@ -202,12 +202,12 @@ export async function updateProduto(id: number, input: UpdateProdutoInput) {
   }
 
   const [produtoAtualizado] = await db
-    .update(dimProduto)
+    .update(dim_produto)
     .set({
       ...input,
       updatedAt: new Date(),
     })
-    .where(eq(dimProduto.id, id))
+    .where(eq(dim_produto.id, id))
     .returning();
 
   return produtoAtualizado;
@@ -221,7 +221,7 @@ export async function deleteProduto(id: number) {
   // TODO: Verificar se produto está sendo usado em fato_entidade_produto
   // Por enquanto, apenas deletar
 
-  await db.delete(dimProduto).where(eq(dimProduto.id, id));
+  await db.delete(dim_produto).where(eq(dim_produto.id, id));
 
   return { success: true };
 }
@@ -236,8 +236,8 @@ export async function deleteProduto(id: number) {
 export async function getProdutoByHash(hash: string) {
   const [produto] = await db
     .select()
-    .from(dimProduto)
-    .where(eq(dimProduto.produtoHash, hash))
+    .from(dim_produto)
+    .where(eq(dim_produto.produtoHash, hash))
     .limit(1);
 
   return produto || null;
@@ -247,7 +247,7 @@ export async function getProdutoByHash(hash: string) {
  * Buscar ou criar produto (upsert)
  */
 export async function buscarOuCriarProduto(input: CreateProdutoInput): Promise<{
-  produto: typeof dimProduto.$inferSelect;
+  produto: typeof dim_produto.$inferSelect;
   criado: boolean;
 }> {
   const hash = gerarHashProduto(input.nome, input.categoria || '');
@@ -280,10 +280,10 @@ export async function getProdutosByCategoria(categoria: string) {
  */
 export async function getCategorias(): Promise<string[]> {
   const resultados = await db
-    .selectDistinct({ categoria: dimProduto.categoria })
-    .from(dimProduto)
-    .where(isNull(dimProduto.categoria))
-    .orderBy(asc(dimProduto.categoria));
+    .selectDistinct({ categoria: dim_produto.categoria })
+    .from(dim_produto)
+    .where(isNull(dim_produto.categoria))
+    .orderBy(asc(dim_produto.categoria));
 
   return resultados.map((r) => r.categoria).filter((c) => c !== null) as string[];
 }

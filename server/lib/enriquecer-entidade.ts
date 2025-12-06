@@ -4,7 +4,7 @@
  */
 
 import { db } from '../db';
-import { dimEntidade } from '../../drizzle/schema';
+import { dim_entidade } from '../../drizzle/schema';
 import { eq } from 'drizzle-orm';
 import OpenAI from 'openai';
 
@@ -94,8 +94,8 @@ export async function enriquecerEntidade(
 ): Promise<ResultadoEnriquecimento> {
   try {
     // 1. Buscar entidade
-    const entidade = await db.query.dimEntidade.findFirst({
-      where: eq(dimEntidade.id, entidadeId)
+    const entidade = await db.query.dim_entidade.findFirst({
+      where: eq(dim_entidade.id, entidadeId)
     });
 
     if (!entidade) {
@@ -152,7 +152,7 @@ export async function enriquecerEntidade(
 
     // 7. Atualizar entidade no banco
     await db
-      .update(dimEntidade)
+      .update(dim_entidade)
       .set({
         // Dados enriquecidos
         cidade: dadosEnriquecidos.cidade || entidade.cidade,
@@ -175,7 +175,7 @@ export async function enriquecerEntidade(
         updated_at: new Date(),
         updated_by: userId,
       })
-      .where(eq(dimEntidade.id, entidadeId));
+      .where(eq(dim_entidade.id, entidadeId));
 
     return {
       sucesso: true,
@@ -224,8 +224,8 @@ export async function enriquecerTodasPendentes(
   limite: number = 100
 ): Promise<ResultadoEnriquecimento[]> {
   // Buscar entidades não enriquecidas
-  const entidades = await db.query.dimEntidade.findMany({
-    where: eq(dimEntidade.enriquecido, false),
+  const entidades = await db.query.dim_entidade.findMany({
+    where: eq(dim_entidade.enriquecido, false),
     limit: limite
   });
 

@@ -12,7 +12,7 @@
 
 import { db } from '../../db';
 import { getOrderColumn } from '../../helpers/order-by';
-import { dimEntidade } from '../../../drizzle/schema';
+import { dim_entidade } from '../../../drizzle/schema';
 import { eq, and, or, like, desc, asc, count, isNull, sql } from 'drizzle-orm';
 import { createHash } from 'crypto';
 
@@ -135,7 +135,7 @@ export async function createEntidade(input: CreateEntidadeInput) {
   }
 
   const [novaEntidade] = await db
-    .insert(dimEntidade)
+    .insert(dim_entidade)
     .values({
       ...input,
       entidadeHash,
@@ -152,15 +152,15 @@ export async function createEntidade(input: CreateEntidadeInput) {
  * Buscar entidade por ID
  */
 export async function getEntidadeById(id: number, incluirDeletados = false) {
-  const conditions = [eq(dimEntidade.id, id)];
+  const conditions = [eq(dim_entidade.id, id)];
 
   if (!incluirDeletados) {
-    conditions.push(isNull(dimEntidade.deletedAt));
+    conditions.push(isNull(dim_entidade.deletedAt));
   }
 
   const [entidade] = await db
     .select()
-    .from(dimEntidade)
+    .from(dim_entidade)
     .where(and(...conditions))
     .limit(1);
 
@@ -172,7 +172,7 @@ export async function getEntidadeById(id: number, incluirDeletados = false) {
  */
 export async function getEntidades(
   filters: EntidadeFilters = {}
-): Promise<ResultadoPaginado<typeof dimEntidade.$inferSelect>> {
+): Promise<ResultadoPaginado<typeof dim_entidade.$inferSelect>> {
   const {
     tipoEntidade,
     origemTipo,
@@ -193,53 +193,53 @@ export async function getEntidades(
   const conditions = [];
 
   if (!incluirDeletados) {
-    conditions.push(isNull(dimEntidade.deletedAt));
+    conditions.push(isNull(dim_entidade.deletedAt));
   }
 
   if (tipoEntidade) {
     if (Array.isArray(tipoEntidade)) {
-      conditions.push(or(...tipoEntidade.map((t) => eq(dimEntidade.tipoEntidade, t))));
+      conditions.push(or(...tipoEntidade.map((t) => eq(dim_entidade.tipoEntidade, t))));
     } else {
-      conditions.push(eq(dimEntidade.tipoEntidade, tipoEntidade));
+      conditions.push(eq(dim_entidade.tipoEntidade, tipoEntidade));
     }
   }
 
   if (origemTipo) {
     if (Array.isArray(origemTipo)) {
-      conditions.push(or(...origemTipo.map((o) => eq(dimEntidade.origemTipo, o))));
+      conditions.push(or(...origemTipo.map((o) => eq(dim_entidade.origemTipo, o))));
     } else {
-      conditions.push(eq(dimEntidade.origemTipo, origemTipo));
+      conditions.push(eq(dim_entidade.origemTipo, origemTipo));
     }
   }
 
   if (cnpj) {
-    conditions.push(eq(dimEntidade.cnpj, limparCNPJ(cnpj)));
+    conditions.push(eq(dim_entidade.cnpj, limparCNPJ(cnpj)));
   }
 
   if (busca) {
     conditions.push(
       or(
-        like(dimEntidade.nome, `%${busca}%`),
-        like(dimEntidade.nomeFantasia, `%${busca}%`),
-        like(dimEntidade.cnpj, `%${busca}%`),
-        like(dimEntidade.email, `%${busca}%`)
+        like(dim_entidade.nome, `%${busca}%`),
+        like(dim_entidade.nomeFantasia, `%${busca}%`),
+        like(dim_entidade.cnpj, `%${busca}%`),
+        like(dim_entidade.email, `%${busca}%`)
       )
     );
   }
 
   // TODO: statusQualificacaoId não existe no schema atual
   // if (statusQualificacaoId) {
-  //   conditions.push(eq(dimEntidade.statusQualificacaoId, statusQualificacaoId));
+  //   conditions.push(eq(dim_entidade.statusQualificacaoId, statusQualificacaoId));
   // }
 
   // Filtrar por status de enriquecimento IA
   if (enriquecido !== undefined) {
     if (enriquecido) {
       // Enriquecidas: enriquecido_em IS NOT NULL
-      conditions.push(sql`${dimEntidade.enriquecidoEm} IS NOT NULL`);
+      conditions.push(sql`${dim_entidade.enriquecidoEm} IS NOT NULL`);
     } else {
       // Não enriquecidas: enriquecido_em IS NULL
-      conditions.push(isNull(dimEntidade.enriquecidoEm));
+      conditions.push(isNull(dim_entidade.enriquecidoEm));
     }
   }
 
@@ -247,7 +247,7 @@ export async function getEntidades(
 
   // Filtrar registros deletados (soft delete)
   if (!incluirDeletados) {
-    conditions.push(isNull(dimEntidade.deletedAt));
+    conditions.push(isNull(dim_entidade.deletedAt));
   }
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -255,17 +255,17 @@ export async function getEntidades(
   // Contar total
   const [{ total }] = await db
     .select({ total: count() })
-    .from(dimEntidade)
+    .from(dim_entidade)
     .where(whereClause);
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = getOrderColumn(dimEntidade, orderBy, dimEntidade.createdAt);
+  const orderColumn = getOrderColumn(dim_entidade, orderBy, dim_entidade.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db
     .select()
-    .from(dimEntidade)
+    .from(dim_entidade)
     .where(whereClause)
     .orderBy(orderFn(orderColumn))
     .limit(limit)
@@ -310,12 +310,12 @@ export async function updateEntidade(id: number, input: UpdateEntidadeInput) {
   }
 
   const [entidadeAtualizada] = await db
-    .update(dimEntidade)
+    .update(dim_entidade)
     .set({
       ...input,
       updatedAt: new Date(),
     })
-    .where(eq(dimEntidade.id, id))
+    .where(eq(dim_entidade.id, id))
     .returning();
 
   return entidadeAtualizada;
@@ -326,13 +326,13 @@ export async function updateEntidade(id: number, input: UpdateEntidadeInput) {
  */
 export async function deleteEntidade(id: number, deletedBy?: string) {
   const [entidadeDeletada] = await db
-    .update(dimEntidade)
+    .update(dim_entidade)
     .set({
       deletedAt: new Date(),
       deletedBy,
       updatedAt: new Date(),
     })
-    .where(eq(dimEntidade.id, id))
+    .where(eq(dim_entidade.id, id))
     .returning();
 
   return entidadeDeletada;
@@ -347,15 +347,15 @@ export async function deleteEntidade(id: number, deletedBy?: string) {
  */
 export async function getEntidadeByCNPJ(cnpj: string, incluirDeletados = false) {
   const cnpjLimpo = limparCNPJ(cnpj);
-  const conditions = [eq(dimEntidade.cnpj, cnpjLimpo)];
+  const conditions = [eq(dim_entidade.cnpj, cnpjLimpo)];
 
   if (!incluirDeletados) {
-    conditions.push(isNull(dimEntidade.deletedAt));
+    conditions.push(isNull(dim_entidade.deletedAt));
   }
 
   const [entidade] = await db
     .select()
-    .from(dimEntidade)
+    .from(dim_entidade)
     .where(and(...conditions))
     .limit(1);
 
@@ -366,15 +366,15 @@ export async function getEntidadeByCNPJ(cnpj: string, incluirDeletados = false) 
  * Buscar entidade por hash
  */
 export async function getEntidadeByHash(hash: string, incluirDeletados = false) {
-  const conditions = [eq(dimEntidade.entidadeHash, hash)];
+  const conditions = [eq(dim_entidade.entidadeHash, hash)];
 
   if (!incluirDeletados) {
-    conditions.push(isNull(dimEntidade.deletedAt));
+    conditions.push(isNull(dim_entidade.deletedAt));
   }
 
   const [entidade] = await db
     .select()
-    .from(dimEntidade)
+    .from(dim_entidade)
     .where(and(...conditions))
     .limit(1);
 
@@ -385,7 +385,7 @@ export async function getEntidadeByHash(hash: string, incluirDeletados = false) 
  * Buscar ou criar entidade (upsert)
  */
 export async function buscarOuCriarEntidade(input: CreateEntidadeInput): Promise<{
-  entidade: typeof dimEntidade.$inferSelect;
+  entidade: typeof dim_entidade.$inferSelect;
   criada: boolean;
 }> {
   // Se tem CNPJ, buscar por CNPJ
@@ -415,7 +415,7 @@ export async function buscarOuCriarEntidade(input: CreateEntidadeInput): Promise
 export async function sugerirMergeEntidades(
   entidadeId: number,
   threshold = 60
-): Promise<Array<{ entidade: typeof dimEntidade.$inferSelect; similaridade: number }>> {
+): Promise<Array<{ entidade: typeof dim_entidade.$inferSelect; similaridade: number }>> {
   const entidade = await getEntidadeById(entidadeId);
   if (!entidade) {
     throw new Error(`Entidade com ID ${entidadeId} não encontrada`);
@@ -423,7 +423,7 @@ export async function sugerirMergeEntidades(
 
   // Buscar entidades do mesmo tipo
   const { data: candidatos } = await getEntidades({
-    tipoEntidade: entidade.tipoEntidade,
+    tipoEntidade: entidade.tipoEntidade as TipoEntidade,
     limit: 100,
   });
 
@@ -523,8 +523,8 @@ function validarCNPJ(cnpj: string): boolean {
  * Calcular similaridade entre duas entidades (0-100)
  */
 function calcularSimilaridadeEntidades(
-  e1: typeof dimEntidade.$inferSelect,
-  e2: typeof dimEntidade.$inferSelect
+  e1: typeof dim_entidade.$inferSelect,
+  e2: typeof dim_entidade.$inferSelect
 ): number {
   let score = 0;
   let checks = 0;

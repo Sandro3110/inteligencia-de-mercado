@@ -1,6 +1,6 @@
 import { router, publicProcedure } from './index';
 import { db } from '../db';
-import { dimStatusQualificacao } from '../../drizzle/schema';
+import { dim_status_qualificacao } from '../../drizzle/schema';
 import { asc } from 'drizzle-orm';
 
 /**
@@ -13,8 +13,8 @@ export const statusQualificacaoRouter = router({
   list: publicProcedure.query(async () => {
     const statusList = await db
       .select()
-      .from(dimStatusQualificacao)
-      .orderBy(asc(dimStatusQualificacao.ordem));
+      .from(dim_status_qualificacao)
+      .orderBy(asc(dim_status_qualificacao.ordem));
 
     return statusList;
   }),

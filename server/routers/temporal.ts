@@ -8,7 +8,7 @@ import { Permission } from "@shared/types/permissions";
 import { z } from 'zod';
 import { router, publicProcedure } from './index';
 import { db } from '../db';
-import { dimTempo, fatoEntidadeContexto } from '../../drizzle/schema';
+import { dim_tempo, fato_entidade_contexto } from '../../drizzle/schema';
 import { eq, and, gte, lte, sql } from 'drizzle-orm';
 import type { Filtro } from '../../shared/types/dimensional';
 

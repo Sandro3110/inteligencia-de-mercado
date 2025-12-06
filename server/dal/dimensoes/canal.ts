@@ -3,7 +3,7 @@
  */
 
 import { db } from '../../db';
-import { dimCanal } from '../../../drizzle/schema';
+import { dim_canal } from '../../../drizzle/schema';
 import { eq, and, sql } from 'drizzle-orm';
 
 /**
@@ -12,8 +12,8 @@ import { eq, and, sql } from 'drizzle-orm';
 export async function getCanalById(id: number) {
   const result = await db
     .select()
-    .from(dimCanal)
-    .where(eq(dimCanal.id, id))
+    .from(dim_canal)
+    .where(eq(dim_canal.id, id))
     .limit(1);
   
   return result[0] || null;
@@ -25,8 +25,8 @@ export async function getCanalById(id: number) {
 export async function getCanalByCodigo(codigo: string) {
   const result = await db
     .select()
-    .from(dimCanal)
-    .where(eq(dimCanal.codigo, codigo))
+    .from(dim_canal)
+    .where(eq(dim_canal.codigo, codigo))
     .limit(1);
   
   return result[0] || null;
@@ -38,9 +38,9 @@ export async function getCanalByCodigo(codigo: string) {
 export async function listCanaisAtivos() {
   return await db
     .select()
-    .from(dimCanal)
-    .where(eq(dimCanal.ativo, true))
-    .orderBy(dimCanal.nome);
+    .from(dim_canal)
+    .where(eq(dim_canal.ativo, true))
+    .orderBy(dim_canal.nome);
 }
 
 /**
@@ -49,8 +49,8 @@ export async function listCanaisAtivos() {
 export async function listCanais() {
   return await db
     .select()
-    .from(dimCanal)
-    .orderBy(dimCanal.nome);
+    .from(dim_canal)
+    .orderBy(dim_canal.nome);
 }
 
 /**
@@ -59,14 +59,14 @@ export async function listCanais() {
 export async function listCanaisByTipo(tipo: string) {
   return await db
     .select()
-    .from(dimCanal)
+    .from(dim_canal)
     .where(
       and(
-        eq(dimCanal.tipo, tipo),
-        eq(dimCanal.ativo, true)
+        eq(dim_canal.tipo, tipo),
+        eq(dim_canal.ativo, true)
       )
     )
-    .orderBy(dimCanal.nome);
+    .orderBy(dim_canal.nome);
 }
 
 /**
@@ -79,10 +79,10 @@ export async function createCanal(data: {
   descricao?: string;
   custoMedio?: number;
   taxaConversaoMedia?: number;
-  createdBy?: number;
+  createdBy?: string;
 }) {
   const result = await db
-    .insert(dimCanal)
+    .insert(dim_canal)
     .values({
       codigo: data.codigo,
       nome: data.nome,
@@ -108,7 +108,7 @@ export async function updateCanal(
     custoMedio?: number;
     taxaConversaoMedia?: number;
     ativo?: boolean;
-    updatedBy?: number;
+    updatedBy?: string;
   }
 ) {
   const updateData: any = {
@@ -123,9 +123,9 @@ export async function updateCanal(
   if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
   
   const result = await db
-    .update(dimCanal)
+    .update(dim_canal)
     .set(updateData)
-    .where(eq(dimCanal.id, id))
+    .where(eq(dim_canal.id, id))
     .returning();
   
   return result[0];
@@ -134,14 +134,14 @@ export async function updateCanal(
 /**
  * Desativar canal
  */
-export async function desativarCanal(id: number, updatedBy?: number) {
+export async function desativarCanal(id: number, updatedBy?: string) {
   return await updateCanal(id, { ativo: false, updatedBy });
 }
 
 /**
  * Ativar canal
  */
-export async function ativarCanal(id: number, updatedBy?: number) {
+export async function ativarCanal(id: number, updatedBy?: string) {
   return await updateCanal(id, { ativo: true, updatedBy });
 }
 
@@ -166,11 +166,11 @@ export async function getCanalStats() {
   const stats = await db
     .select({
       totalCanais: sql<number>`COUNT(*)`,
-      canaisAtivos: sql<number>`SUM(CASE WHEN ${dimCanal.ativo} THEN 1 ELSE 0 END)`,
-      custoMedioGeral: sql<number>`AVG(${dimCanal.custoMedio})`,
-      taxaConversaoMediaGeral: sql<number>`AVG(${dimCanal.taxaConversaoMedia})`,
+      canaisAtivos: sql<number>`SUM(CASE WHEN ${dim_canal.ativo} THEN 1 ELSE 0 END)`,
+      custoMedioGeral: sql<number>`AVG(${dim_canal.custoMedio})`,
+      taxaConversaoMediaGeral: sql<number>`AVG(${dim_canal.taxaConversaoMedia})`,
     })
-    .from(dimCanal);
+    .from(dim_canal);
   
   return stats[0];
 }

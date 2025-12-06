@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { dimImportacao, importacaoErros, dimEntidade } from '../../drizzle/schema';
+import { dim_importacao, importacao_erros, dim_entidade } from '../../drizzle/schema';
 import { eq, desc, and, sql, count } from 'drizzle-orm';
 
 // ============================================================================
@@ -49,7 +49,7 @@ export interface CreateErroInput {
 
 export async function createImportacao(input: CreateImportacaoInput) {
   const [importacao] = await db
-    .insert(dimImportacao)
+    .insert(dim_importacao)
     .values({
       ...input,
       mapeamentoColunas: input.mapeamentoColunas ? JSON.stringify(input.mapeamentoColunas) : null,
@@ -61,8 +61,8 @@ export async function createImportacao(input: CreateImportacaoInput) {
 }
 
 export async function getImportacaoById(id: number) {
-  const importacao = await db.query.dimImportacao.findFirst({
-    where: eq(dimImportacao.id, id),
+  const importacao = await db.query.dim_importacao.findFirst({
+    where: eq(dim_importacao.id, id),
   });
 
   if (!importacao) return null;
@@ -86,22 +86,22 @@ export async function getImportacoes(filters?: {
   const conditions = [];
 
   if (filters?.projetoId) {
-    conditions.push(eq(dimImportacao.projetoId, filters.projetoId));
+    conditions.push(eq(dim_importacao.projetoId, filters.projetoId));
   }
 
   if (filters?.pesquisaId) {
-    conditions.push(eq(dimImportacao.pesquisaId, filters.pesquisaId));
+    conditions.push(eq(dim_importacao.pesquisaId, filters.pesquisaId));
   }
 
   if (filters?.status) {
-    conditions.push(eq(dimImportacao.status, filters.status));
+    conditions.push(eq(dim_importacao.status, filters.status));
   }
 
   const where = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const importacoes = await db.query.dimImportacao.findMany({
+  const importacoes = await db.query.dim_importacao.findMany({
     where,
-    orderBy: [desc(dimImportacao.createdAt)],
+    orderBy: [desc(dim_importacao.createdAt)],
     limit: filters?.limit || 20,
     offset: filters?.offset || 0,
   });
@@ -115,19 +115,19 @@ export async function getImportacoes(filters?: {
 
 export async function updateImportacao(id: number, input: UpdateImportacaoInput) {
   const [updated] = await db
-    .update(dimImportacao)
+    .update(dim_importacao)
     .set({
       ...input,
       updatedAt: new Date(),
     })
-    .where(eq(dimImportacao.id, id))
+    .where(eq(dim_importacao.id, id))
     .returning();
 
   return updated;
 }
 
 export async function deleteImportacao(id: number) {
-  await db.delete(dimImportacao).where(eq(dimImportacao.id, id));
+  await db.delete(dim_importacao).where(eq(dim_importacao.id, id));
 }
 
 // ============================================================================
@@ -204,7 +204,7 @@ export async function atualizarProgresso(
 
 export async function createErro(input: CreateErroInput) {
   const [erro] = await db
-    .insert(importacaoErros)
+    .insert(importacao_erros)
     .values({
       ...input,
       linhaDados: JSON.stringify(input.linhaDados),
@@ -216,8 +216,8 @@ export async function createErro(input: CreateErroInput) {
 }
 
 export async function getErrosByImportacao(importacaoId: number, limit = 100) {
-  const erros = await db.query.importacaoErros.findMany({
-    where: eq(importacaoErros.importacaoId, importacaoId),
+  const erros = await db.query.importacao_erros.findMany({
+    where: eq(importacao_erros.importacaoId, importacaoId),
     limit,
   });
 
@@ -231,12 +231,12 @@ export async function getErrosByImportacao(importacaoId: number, limit = 100) {
 export async function countErrosByTipo(importacaoId: number) {
   const result = await db
     .select({
-      tipoErro: importacaoErros.tipoErro,
+      tipoErro: importacao_erros.tipoErro,
       total: count(),
     })
-    .from(importacaoErros)
-    .where(eq(importacaoErros.importacaoId, importacaoId))
-    .groupBy(importacaoErros.tipoErro);
+    .from(importacao_erros)
+    .where(eq(importacao_erros.importacaoId, importacaoId))
+    .groupBy(importacao_erros.tipoErro);
 
   return result;
 }
@@ -266,8 +266,8 @@ export async function getEstatisticasImportacao(id: number) {
 }
 
 export async function getEntidadesByImportacao(importacaoId: number, limit = 100) {
-  const entidades = await db.query.dimEntidade.findMany({
-    where: eq(dimEntidade.importacaoId, importacaoId),
+  const entidades = await db.query.dim_entidade.findMany({
+    where: eq(dim_entidade.importacaoId, importacaoId),
     limit,
   });
 

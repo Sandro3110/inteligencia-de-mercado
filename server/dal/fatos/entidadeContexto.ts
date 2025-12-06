@@ -12,13 +12,13 @@
 import { db } from '../../db';
 import { getOrderColumn } from '../../helpers/order-by';
 import {
-  fatoEntidadeContexto,
-  dimEntidade,
-  dimProjeto,
-  dimPesquisa,
-  dimGeografia,
-  dimMercado,
-  dimStatusQualificacao,
+  fato_entidade_contexto,
+  dim_entidade,
+  dim_projeto,
+  dim_pesquisa,
+  dim_geografia,
+  dim_mercado,
+  dim_status_qualificacao,
 } from '../../../drizzle/schema';
 import { eq, and, or, desc, asc, count, isNull, sql } from 'drizzle-orm';
 
@@ -177,7 +177,7 @@ export async function createContexto(input: CreateContextoInput) {
   }
 
   const [novoContexto] = await db
-    .insert(fatoEntidadeContexto)
+    .insert(fato_entidade_contexto)
     .values({
       ...input,
       createdAt: new Date(),
@@ -192,15 +192,15 @@ export async function createContexto(input: CreateContextoInput) {
  * Buscar contexto por ID
  */
 export async function getContextoById(id: number, incluirDeletados = false) {
-  const conditions = [eq(fatoEntidadeContexto.id, id)];
+  const conditions = [eq(fato_entidade_contexto.id, id)];
 
   if (!incluirDeletados) {
-    conditions.push(isNull(fatoEntidadeContexto.deletedAt));
+    conditions.push(isNull(fato_entidade_contexto.deletedAt));
   }
 
   const [contexto] = await db
     .select()
-    .from(fatoEntidadeContexto)
+    .from(fato_entidade_contexto)
     .where(and(...conditions))
     .limit(1);
 
@@ -212,7 +212,7 @@ export async function getContextoById(id: number, incluirDeletados = false) {
  */
 export async function getContextos(
   filters: ContextoFilters = {}
-): Promise<ResultadoPaginado<typeof fatoEntidadeContexto.$inferSelect>> {
+): Promise<ResultadoPaginado<typeof fato_entidade_contexto.$inferSelect>> {
   const {
     entidadeId,
     projetoId,
@@ -233,39 +233,39 @@ export async function getContextos(
   const conditions = [];
 
   if (!incluirDeletados) {
-    conditions.push(isNull(fatoEntidadeContexto.deletedAt));
+    conditions.push(isNull(fato_entidade_contexto.deletedAt));
   }
 
   if (entidadeId) {
-    conditions.push(eq(fatoEntidadeContexto.entidadeId, entidadeId));
+    conditions.push(eq(fato_entidade_contexto.entidadeId, entidadeId));
   }
 
   if (projetoId) {
-    conditions.push(eq(fatoEntidadeContexto.projetoId, projetoId));
+    conditions.push(eq(fato_entidade_contexto.projetoId, projetoId));
   }
 
   if (pesquisaId) {
-    conditions.push(eq(fatoEntidadeContexto.pesquisaId, pesquisaId));
+    conditions.push(eq(fato_entidade_contexto.pesquisaId, pesquisaId));
   }
 
   if (geografiaId) {
-    conditions.push(eq(fatoEntidadeContexto.geografiaId, geografiaId));
+    conditions.push(eq(fato_entidade_contexto.geografiaId, geografiaId));
   }
 
   if (mercadoId) {
-    conditions.push(eq(fatoEntidadeContexto.mercadoId, mercadoId));
+    conditions.push(eq(fato_entidade_contexto.mercadoId, mercadoId));
   }
 
   if (statusQualificacaoId) {
-    conditions.push(eq(fatoEntidadeContexto.statusQualificacaoId, statusQualificacaoId));
+    conditions.push(eq(fato_entidade_contexto.statusQualificacaoId, statusQualificacaoId));
   }
 
   if (qualidadeScoreMin !== undefined) {
-    conditions.push(sql`${fatoEntidadeContexto.qualidadeScore} >= ${qualidadeScoreMin}`);
+    conditions.push(sql`${fato_entidade_contexto.qualidadeScore} >= ${qualidadeScoreMin}`);
   }
 
   if (qualidadeScoreMax !== undefined) {
-    conditions.push(sql`${fatoEntidadeContexto.qualidadeScore} <= ${qualidadeScoreMax}`);
+    conditions.push(sql`${fato_entidade_contexto.qualidadeScore} <= ${qualidadeScoreMax}`);
   }
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -273,18 +273,18 @@ export async function getContextos(
   // Contar total
   const [{ total }] = await db
     .select({ total: count() })
-    .from(fatoEntidadeContexto)
+    .from(fato_entidade_contexto)
     .where(whereClause);
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
   const orderColumn =
-    getOrderColumn(fatoEntidadeContexto, orderBy, fatoEntidadeContexto.createdAt);
+    getOrderColumn(fato_entidade_contexto, orderBy, fato_entidade_contexto.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db
     .select()
-    .from(fatoEntidadeContexto)
+    .from(fato_entidade_contexto)
     .where(whereClause)
     .orderBy(orderFn(orderColumn))
     .limit(limit)
@@ -321,12 +321,12 @@ export async function updateContexto(id: number, input: UpdateContextoInput) {
   }
 
   const [contextoAtualizado] = await db
-    .update(fatoEntidadeContexto)
+    .update(fato_entidade_contexto)
     .set({
       ...input,
       updatedAt: new Date(),
     })
-    .where(eq(fatoEntidadeContexto.id, id))
+    .where(eq(fato_entidade_contexto.id, id))
     .returning();
 
   return contextoAtualizado;
@@ -337,13 +337,13 @@ export async function updateContexto(id: number, input: UpdateContextoInput) {
  */
 export async function deleteContexto(id: number, deletedBy?: string) {
   const [contextoDeletado] = await db
-    .update(fatoEntidadeContexto)
+    .update(fato_entidade_contexto)
     .set({
       deletedAt: new Date(),
       deletedBy,
       updatedAt: new Date(),
     })
-    .where(eq(fatoEntidadeContexto.id, id))
+    .where(eq(fato_entidade_contexto.id, id))
     .returning();
 
   return contextoDeletado;
@@ -359,25 +359,25 @@ export async function deleteContexto(id: number, deletedBy?: string) {
 export async function getContextoCompleto(id: number) {
   const [resultado] = await db
     .select({
-      contexto: fatoEntidadeContexto,
-      entidade: dimEntidade,
-      projeto: dimProjeto,
-      pesquisa: dimPesquisa,
-      geografia: dimGeografia,
-      mercado: dimMercado,
-      statusQualificacao: dimStatusQualificacao,
+      contexto: fato_entidade_contexto,
+      entidade: dim_entidade,
+      projeto: dim_projeto,
+      pesquisa: dim_pesquisa,
+      geografia: dim_geografia,
+      mercado: dim_mercado,
+      statusQualificacao: dim_status_qualificacao,
     })
-    .from(fatoEntidadeContexto)
-    .leftJoin(dimEntidade, eq(fatoEntidadeContexto.entidadeId, dimEntidade.id))
-    .leftJoin(dimProjeto, eq(fatoEntidadeContexto.projetoId, dimProjeto.id))
-    .leftJoin(dimPesquisa, eq(fatoEntidadeContexto.pesquisaId, dimPesquisa.id))
-    .leftJoin(dimGeografia, eq(fatoEntidadeContexto.geografiaId, dimGeografia.id))
-    .leftJoin(dimMercado, eq(fatoEntidadeContexto.mercadoId, dimMercado.id))
+    .from(fato_entidade_contexto)
+    .leftJoin(dim_entidade, eq(fato_entidade_contexto.entidadeId, dim_entidade.id))
+    .leftJoin(dim_projeto, eq(fato_entidade_contexto.projetoId, dim_projeto.id))
+    .leftJoin(dim_pesquisa, eq(fato_entidade_contexto.pesquisaId, dim_pesquisa.id))
+    .leftJoin(dim_geografia, eq(fato_entidade_contexto.geografiaId, dim_geografia.id))
+    .leftJoin(dim_mercado, eq(fato_entidade_contexto.mercadoId, dim_mercado.id))
     .leftJoin(
-      dimStatusQualificacao,
-      eq(fatoEntidadeContexto.statusQualificacaoId, dimStatusQualificacao.id)
+      dim_status_qualificacao,
+      eq(fato_entidade_contexto.statusQualificacaoId, dim_status_qualificacao.id)
     )
-    .where(eq(fatoEntidadeContexto.id, id))
+    .where(eq(fato_entidade_contexto.id, id))
     .limit(1);
 
   return resultado || null;
@@ -407,13 +407,13 @@ async function getContextoByEntidadeProjetoPesquisa(
 ) {
   const [contexto] = await db
     .select()
-    .from(fatoEntidadeContexto)
+    .from(fato_entidade_contexto)
     .where(
       and(
-        eq(fatoEntidadeContexto.entidadeId, entidadeId),
-        eq(fatoEntidadeContexto.projetoId, projetoId),
-        eq(fatoEntidadeContexto.pesquisaId, pesquisaId),
-        isNull(fatoEntidadeContexto.deletedAt)
+        eq(fato_entidade_contexto.entidadeId, entidadeId),
+        eq(fato_entidade_contexto.projetoId, projetoId),
+        eq(fato_entidade_contexto.pesquisaId, pesquisaId),
+        isNull(fato_entidade_contexto.deletedAt)
       )
     )
     .limit(1);
@@ -424,7 +424,7 @@ async function getContextoByEntidadeProjetoPesquisa(
 /**
  * Calcular qualidade score baseado nos dados do contexto
  */
-export function calcularQualidadeScore(contexto: typeof fatoEntidadeContexto.$inferSelect): number {
+export function calcularQualidadeScore(contexto: typeof fato_entidade_contexto.$inferSelect): number {
   let score = 0;
   let checks = 0;
 
@@ -496,20 +496,20 @@ export async function atualizarQualidadeScore(id: number, updatedBy?: string) {
  * Contar contextos por status de qualificação
  */
 export async function contarContextosPorStatus(pesquisaId?: number) {
-  const conditions = [isNull(fatoEntidadeContexto.deletedAt)];
+  const conditions = [isNull(fato_entidade_contexto.deletedAt)];
 
   if (pesquisaId) {
-    conditions.push(eq(fatoEntidadeContexto.pesquisaId, pesquisaId));
+    conditions.push(eq(fato_entidade_contexto.pesquisaId, pesquisaId));
   }
 
   const resultados = await db
     .select({
-      statusQualificacaoId: fatoEntidadeContexto.statusQualificacaoId,
+      statusQualificacaoId: fato_entidade_contexto.statusQualificacaoId,
       total: count(),
     })
-    .from(fatoEntidadeContexto)
+    .from(fato_entidade_contexto)
     .where(and(...conditions))
-    .groupBy(fatoEntidadeContexto.statusQualificacaoId);
+    .groupBy(fato_entidade_contexto.statusQualificacaoId);
 
   return resultados;
 }
@@ -520,13 +520,13 @@ export async function contarContextosPorStatus(pesquisaId?: number) {
 export async function calcularQualidadeMediaPesquisa(pesquisaId: number): Promise<number> {
   const [resultado] = await db
     .select({
-      media: sql<number>`AVG(${fatoEntidadeContexto.qualidadeScore})`,
+      media: sql<number>`AVG(${fato_entidade_contexto.qualidadeScore})`,
     })
-    .from(fatoEntidadeContexto)
+    .from(fato_entidade_contexto)
     .where(
       and(
-        eq(fatoEntidadeContexto.pesquisaId, pesquisaId),
-        isNull(fatoEntidadeContexto.deletedAt)
+        eq(fato_entidade_contexto.pesquisaId, pesquisaId),
+        isNull(fato_entidade_contexto.deletedAt)
       )
     );
 

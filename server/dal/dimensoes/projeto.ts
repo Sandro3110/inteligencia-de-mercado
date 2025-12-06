@@ -11,7 +11,7 @@
 
 import { db } from '../../db';
 import { getOrderColumn } from '../../helpers/order-by';
-import { dimProjeto } from '../../../drizzle/schema';
+import { dim_projeto } from '../../../drizzle/schema';
 import { eq, and, or, like, desc, asc, count, isNull } from 'drizzle-orm';
 
 // ============================================================================
@@ -90,7 +90,7 @@ export async function createProjeto(input: CreateProjetoInput) {
   }
 
   const [novoProjeto] = await db
-    .insert(dimProjeto)
+    .insert(dim_projeto)
     .values({
       ...input,
       status: input.status || 'ativo',
@@ -106,15 +106,15 @@ export async function createProjeto(input: CreateProjetoInput) {
  * Buscar projeto por ID
  */
 export async function getProjetoById(id: number, incluirDeletados = false) {
-  const conditions = [eq(dimProjeto.id, id)];
+  const conditions = [eq(dim_projeto.id, id)];
 
   if (!incluirDeletados) {
-    conditions.push(isNull(dimProjeto.deletedAt));
+    conditions.push(isNull(dim_projeto.deletedAt));
   }
 
   const [projeto] = await db
     .select()
-    .from(dimProjeto)
+    .from(dim_projeto)
     .where(and(...conditions))
     .limit(1);
 
@@ -126,7 +126,7 @@ export async function getProjetoById(id: number, incluirDeletados = false) {
  */
 export async function getProjetos(
   filters: ProjetoFilters = {}
-): Promise<ResultadoPaginado<typeof dimProjeto.$inferSelect>> {
+): Promise<ResultadoPaginado<typeof dim_projeto.$inferSelect>> {
   const {
     ownerId,
     status,
@@ -142,29 +142,29 @@ export async function getProjetos(
   const conditions = [];
 
   if (!incluirDeletados) {
-    conditions.push(isNull(dimProjeto.deletedAt));
+    conditions.push(isNull(dim_projeto.deletedAt));
   }
 
   if (ownerId) {
-    conditions.push(eq(dimProjeto.ownerId, ownerId));
+    conditions.push(eq(dim_projeto.ownerId, ownerId));
   }
 
   if (status) {
     if (Array.isArray(status)) {
       conditions.push(
-        or(...status.map((s) => eq(dimProjeto.status, s)))
+        or(...status.map((s) => eq(dim_projeto.status, s)))
       );
     } else {
-      conditions.push(eq(dimProjeto.status, status));
+      conditions.push(eq(dim_projeto.status, status));
     }
   }
 
   if (busca) {
     conditions.push(
       or(
-        like(dimProjeto.nome, `%${busca}%`),
-        like(dimProjeto.codigo, `%${busca}%`),
-        like(dimProjeto.descricao, `%${busca}%`)
+        like(dim_projeto.nome, `%${busca}%`),
+        like(dim_projeto.codigo, `%${busca}%`),
+        like(dim_projeto.descricao, `%${busca}%`)
       )
     );
   }
@@ -174,17 +174,17 @@ export async function getProjetos(
   // Contar total
   const [{ total }] = await db
     .select({ total: count() })
-    .from(dimProjeto)
+    .from(dim_projeto)
     .where(whereClause);
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = getOrderColumn(dimProjeto, orderBy, dimProjeto.createdAt);
+  const orderColumn = getOrderColumn(dim_projeto, orderBy, dim_projeto.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db
     .select()
-    .from(dimProjeto)
+    .from(dim_projeto)
     .where(whereClause)
     .orderBy(orderFn(orderColumn))
     .limit(limit)
@@ -228,12 +228,12 @@ export async function updateProjeto(id: number, input: UpdateProjetoInput) {
   }
 
   const [projetoAtualizado] = await db
-    .update(dimProjeto)
+    .update(dim_projeto)
     .set({
       ...input,
       updatedAt: new Date(),
     })
-    .where(eq(dimProjeto.id, id))
+    .where(eq(dim_projeto.id, id))
     .returning();
 
   return projetoAtualizado;
@@ -244,13 +244,13 @@ export async function updateProjeto(id: number, input: UpdateProjetoInput) {
  */
 export async function deleteProjeto(id: number, deletedBy?: string) {
   const [projetoDeletado] = await db
-    .update(dimProjeto)
+    .update(dim_projeto)
     .set({
       deletedAt: new Date(),
       deletedBy,
       updatedAt: new Date(),
     })
-    .where(eq(dimProjeto.id, id))
+    .where(eq(dim_projeto.id, id))
     .returning();
 
   return projetoDeletado;
@@ -268,15 +268,15 @@ export async function getProjetoByCodigoAndOwner(
   ownerId: number,
   incluirDeletados = false
 ) {
-  const conditions = [eq(dimProjeto.codigo, codigo), eq(dimProjeto.ownerId, ownerId)];
+  const conditions = [eq(dim_projeto.codigo, codigo), eq(dim_projeto.ownerId, ownerId)];
 
   if (!incluirDeletados) {
-    conditions.push(isNull(dimProjeto.deletedAt));
+    conditions.push(isNull(dim_projeto.deletedAt));
   }
 
   const [projeto] = await db
     .select()
-    .from(dimProjeto)
+    .from(dim_projeto)
     .where(and(...conditions))
     .limit(1);
 
@@ -336,18 +336,18 @@ async function existeProjetoComNome(
   excludeId?: number
 ): Promise<boolean> {
   const conditions = [
-    eq(dimProjeto.nome, nome),
-    eq(dimProjeto.ownerId, ownerId),
-    isNull(dimProjeto.deletedAt),
+    eq(dim_projeto.nome, nome),
+    eq(dim_projeto.ownerId, ownerId),
+    isNull(dim_projeto.deletedAt),
   ];
 
   if (excludeId) {
-    conditions.push(eq(dimProjeto.id, excludeId));
+    conditions.push(eq(dim_projeto.id, excludeId));
   }
 
   const [resultado] = await db
     .select({ count: count() })
-    .from(dimProjeto)
+    .from(dim_projeto)
     .where(excludeId ? and(...conditions.slice(0, -1)) : and(...conditions));
 
   return resultado.count > 0;
@@ -362,18 +362,18 @@ async function existeProjetoComCodigo(
   excludeId?: number
 ): Promise<boolean> {
   const conditions = [
-    eq(dimProjeto.codigo, codigo),
-    eq(dimProjeto.ownerId, ownerId),
-    isNull(dimProjeto.deletedAt),
+    eq(dim_projeto.codigo, codigo),
+    eq(dim_projeto.ownerId, ownerId),
+    isNull(dim_projeto.deletedAt),
   ];
 
   if (excludeId) {
-    conditions.push(eq(dimProjeto.id, excludeId));
+    conditions.push(eq(dim_projeto.id, excludeId));
   }
 
   const [resultado] = await db
     .select({ count: count() })
-    .from(dimProjeto)
+    .from(dim_projeto)
     .where(excludeId ? and(...conditions.slice(0, -1)) : and(...conditions));
 
   return resultado.count > 0;

@@ -9,7 +9,7 @@
 
 import { db } from '../../db';
 import { getOrderColumn } from '../../helpers/order-by';
-import { fatoEntidadeCompetidor, dimEntidade } from '../../../drizzle/schema';
+import { fato_entidade_competidor, dim_entidade } from '../../../drizzle/schema';
 import { eq, and, desc, asc, count } from 'drizzle-orm';
 
 // ============================================================================
@@ -81,7 +81,7 @@ export async function createRelacao(input: CreateRelacaoInput) {
   }
 
   const [novaRelacao] = await db
-    .insert(fatoEntidadeCompetidor)
+    .insert(fato_entidade_competidor)
     .values({
       ...input,
       createdAt: new Date(),
@@ -97,8 +97,8 @@ export async function createRelacao(input: CreateRelacaoInput) {
 export async function getRelacaoById(id: number) {
   const [relacao] = await db
     .select()
-    .from(fatoEntidadeCompetidor)
-    .where(eq(fatoEntidadeCompetidor.id, id))
+    .from(fato_entidade_competidor)
+    .where(eq(fato_entidade_competidor.id, id))
     .limit(1);
 
   return relacao || null;
@@ -109,7 +109,7 @@ export async function getRelacaoById(id: number) {
  */
 export async function getRelacoes(
   filters: RelacaoFilters = {}
-): Promise<ResultadoPaginado<typeof fatoEntidadeCompetidor.$inferSelect>> {
+): Promise<ResultadoPaginado<typeof fato_entidade_competidor.$inferSelect>> {
   const {
     contextoId,
     competidorEntidadeId,
@@ -124,22 +124,22 @@ export async function getRelacoes(
   const conditions = [];
 
   if (contextoId) {
-    conditions.push(eq(fatoEntidadeCompetidor.contextoId, contextoId));
+    conditions.push(eq(fato_entidade_competidor.contextoId, contextoId));
   }
 
   if (competidorEntidadeId) {
     conditions.push(
-      eq(fatoEntidadeCompetidor.competidorEntidadeId, competidorEntidadeId)
+      eq(fato_entidade_competidor.competidorEntidadeId, competidorEntidadeId)
     );
   }
 
   if (nivelCompeticao) {
     if (Array.isArray(nivelCompeticao)) {
       conditions.push(
-        and(...nivelCompeticao.map((n) => eq(fatoEntidadeCompetidor.nivelCompeticao, n)))
+        and(...nivelCompeticao.map((n) => eq(fato_entidade_competidor.nivelCompeticao, n)))
       );
     } else {
-      conditions.push(eq(fatoEntidadeCompetidor.nivelCompeticao, nivelCompeticao));
+      conditions.push(eq(fato_entidade_competidor.nivelCompeticao, nivelCompeticao));
     }
   }
 
@@ -148,18 +148,18 @@ export async function getRelacoes(
   // Contar total
   const [{ total }] = await db
     .select({ total: count() })
-    .from(fatoEntidadeCompetidor)
+    .from(fato_entidade_competidor)
     .where(whereClause);
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
   const orderColumn =
-    getOrderColumn(fatoEntidadeCompetidor, orderBy, fatoEntidadeCompetidor.createdAt);
+    getOrderColumn(fato_entidade_competidor, orderBy, fato_entidade_competidor.createdAt);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db
     .select()
-    .from(fatoEntidadeCompetidor)
+    .from(fato_entidade_competidor)
     .where(whereClause)
     .orderBy(orderFn(orderColumn))
     .limit(limit)
@@ -189,9 +189,9 @@ export async function updateRelacao(id: number, input: UpdateRelacaoInput) {
   }
 
   const [relacaoAtualizada] = await db
-    .update(fatoEntidadeCompetidor)
+    .update(fato_entidade_competidor)
     .set(input)
-    .where(eq(fatoEntidadeCompetidor.id, id))
+    .where(eq(fato_entidade_competidor.id, id))
     .returning();
 
   return relacaoAtualizada;
@@ -201,7 +201,7 @@ export async function updateRelacao(id: number, input: UpdateRelacaoInput) {
  * Deletar relação (hard delete)
  */
 export async function deleteRelacao(id: number) {
-  await db.delete(fatoEntidadeCompetidor).where(eq(fatoEntidadeCompetidor.id, id));
+  await db.delete(fato_entidade_competidor).where(eq(fato_entidade_competidor.id, id));
 
   return { success: true };
 }
@@ -219,11 +219,11 @@ async function getRelacaoByContextoCompetidor(
 ) {
   const [relacao] = await db
     .select()
-    .from(fatoEntidadeCompetidor)
+    .from(fato_entidade_competidor)
     .where(
       and(
-        eq(fatoEntidadeCompetidor.contextoId, contextoId),
-        eq(fatoEntidadeCompetidor.competidorEntidadeId, competidorEntidadeId)
+        eq(fato_entidade_competidor.contextoId, contextoId),
+        eq(fato_entidade_competidor.competidorEntidadeId, competidorEntidadeId)
       )
     )
     .limit(1);
@@ -244,15 +244,15 @@ export async function getRelacoesByContexto(contextoId: number) {
 export async function getConcorrentesDeContexto(contextoId: number) {
   const resultados = await db
     .select({
-      relacao: fatoEntidadeCompetidor,
-      competidor: dimEntidade,
+      relacao: fato_entidade_competidor,
+      competidor: dim_entidade,
     })
-    .from(fatoEntidadeCompetidor)
+    .from(fato_entidade_competidor)
     .innerJoin(
-      dimEntidade,
-      eq(fatoEntidadeCompetidor.competidorEntidadeId, dimEntidade.id)
+      dim_entidade,
+      eq(fato_entidade_competidor.competidorEntidadeId, dim_entidade.id)
     )
-    .where(eq(fatoEntidadeCompetidor.contextoId, contextoId));
+    .where(eq(fato_entidade_competidor.contextoId, contextoId));
 
   return resultados;
 }
@@ -299,19 +299,19 @@ export async function contarConcorrentesPorNivel(contextoId?: number) {
   const conditions = [];
 
   if (contextoId) {
-    conditions.push(eq(fatoEntidadeCompetidor.contextoId, contextoId));
+    conditions.push(eq(fato_entidade_competidor.contextoId, contextoId));
   }
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
   const resultados = await db
     .select({
-      nivelCompeticao: fatoEntidadeCompetidor.nivelCompeticao,
+      nivelCompeticao: fato_entidade_competidor.nivelCompeticao,
       total: count(),
     })
-    .from(fatoEntidadeCompetidor)
+    .from(fato_entidade_competidor)
     .where(whereClause)
-    .groupBy(fatoEntidadeCompetidor.nivelCompeticao);
+    .groupBy(fato_entidade_competidor.nivelCompeticao);
 
   return resultados;
 }

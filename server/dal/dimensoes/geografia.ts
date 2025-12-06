@@ -10,7 +10,7 @@
 
 import { db } from '../../db';
 import { getOrderColumn } from '../../helpers/order-by';
-import { dimGeografia } from '../../../drizzle/schema';
+import { dim_geografia } from '../../../drizzle/schema';
 import { eq, and, like, desc, asc, count, sql } from 'drizzle-orm';
 
 // ============================================================================
@@ -50,8 +50,8 @@ export interface ResultadoPaginado<T> {
 export async function getGeografiaById(id: number) {
   const [geografia] = await db
     .select()
-    .from(dimGeografia)
-    .where(eq(dimGeografia.id, id))
+    .from(dim_geografia)
+    .where(eq(dim_geografia.id, id))
     .limit(1);
 
   return geografia || null;
@@ -62,7 +62,7 @@ export async function getGeografiaById(id: number) {
  */
 export async function getGeografias(
   filters: GeografiaFilters = {}
-): Promise<ResultadoPaginado<typeof dimGeografia.$inferSelect>> {
+): Promise<ResultadoPaginado<typeof dim_geografia.$inferSelect>> {
   const {
     regiao,
     uf,
@@ -80,36 +80,36 @@ export async function getGeografias(
   if (regiao) {
     if (Array.isArray(regiao)) {
       conditions.push(
-        sql`${dimGeografia.regiao} IN (${sql.join(
+        sql`${dim_geografia.regiao} IN (${sql.join(
           regiao.map((r) => sql`${r}`),
           sql`, `
         )})`
       );
     } else {
-      conditions.push(eq(dimGeografia.regiao, regiao));
+      conditions.push(eq(dim_geografia.regiao, regiao));
     }
   }
 
   if (uf) {
     if (Array.isArray(uf)) {
       conditions.push(
-        sql`${dimGeografia.uf} IN (${sql.join(
+        sql`${dim_geografia.uf} IN (${sql.join(
           uf.map((u) => sql`${u}`),
           sql`, `
         )})`
       );
     } else {
-      conditions.push(eq(dimGeografia.uf, uf));
+      conditions.push(eq(dim_geografia.uf, uf));
     }
   }
 
   if (cidade) {
-    conditions.push(like(dimGeografia.cidade, `%${cidade}%`));
+    conditions.push(like(dim_geografia.cidade, `%${cidade}%`));
   }
 
   if (busca) {
     conditions.push(
-      sql`(${dimGeografia.cidade} ILIKE ${`%${busca}%`} OR ${dimGeografia.uf} ILIKE ${`%${busca}%`})`
+      sql`(${dim_geografia.cidade} ILIKE ${`%${busca}%`} OR ${dim_geografia.uf} ILIKE ${`%${busca}%`})`
     );
   }
 
@@ -118,17 +118,17 @@ export async function getGeografias(
   // Contar total
   const [{ total }] = await db
     .select({ total: count() })
-    .from(dimGeografia)
+    .from(dim_geografia)
     .where(whereClause);
 
   // Buscar dados com paginação
   const offset = (page - 1) * limit;
-  const orderColumn = getOrderColumn(dimGeografia, orderBy, dimGeografia.cidade);
+  const orderColumn = getOrderColumn(dim_geografia, orderBy, dim_geografia.cidade);
   const orderFn = orderDirection === 'asc' ? asc : desc;
 
   const data = await db
     .select()
-    .from(dimGeografia)
+    .from(dim_geografia)
     .where(whereClause)
     .orderBy(orderFn(orderColumn))
     .limit(limit)
@@ -153,8 +153,8 @@ export async function getGeografias(
 export async function getGeografiaByCidadeUF(cidade: string, uf: string) {
   const [geografia] = await db
     .select()
-    .from(dimGeografia)
-    .where(and(eq(dimGeografia.cidade, cidade), eq(dimGeografia.uf, uf)))
+    .from(dim_geografia)
+    .where(and(eq(dim_geografia.cidade, cidade), eq(dim_geografia.uf, uf)))
     .limit(1);
 
   return geografia || null;
@@ -168,11 +168,11 @@ export async function buscarCidadesFuzzy(
   termo: string,
   uf?: string,
   limit = 10
-): Promise<Array<{ geografia: typeof dimGeografia.$inferSelect; distancia: number }>> {
+): Promise<Array<{ geografia: typeof dim_geografia.$inferSelect; distancia: number }>> {
   const conditions = [];
 
   if (uf) {
-    conditions.push(eq(dimGeografia.uf, uf));
+    conditions.push(eq(dim_geografia.uf, uf));
   }
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -180,12 +180,12 @@ export async function buscarCidadesFuzzy(
   // Buscar com Levenshtein distance
   const resultados = await db
     .select({
-      geografia: dimGeografia,
-      distancia: sql<number>`levenshtein(${dimGeografia.cidade}, ${termo})`,
+      geografia: dim_geografia,
+      distancia: sql<number>`levenshtein(${dim_geografia.cidade}, ${termo})`,
     })
-    .from(dimGeografia)
+    .from(dim_geografia)
     .where(whereClause)
-    .orderBy(sql`levenshtein(${dimGeografia.cidade}, ${termo})`)
+    .orderBy(sql`levenshtein(${dim_geografia.cidade}, ${termo})`)
     .limit(limit);
 
   return resultados;
@@ -210,9 +210,9 @@ export async function getGeografiasByUF(uf: string) {
  */
 export async function getRegioes(): Promise<Regiao[]> {
   const resultados = await db
-    .selectDistinct({ regiao: dimGeografia.regiao })
-    .from(dimGeografia)
-    .orderBy(asc(dimGeografia.regiao));
+    .selectDistinct({ regiao: dim_geografia.regiao })
+    .from(dim_geografia)
+    .orderBy(asc(dim_geografia.regiao));
 
   return resultados.map((r) => r.regiao as Regiao);
 }
@@ -222,9 +222,9 @@ export async function getRegioes(): Promise<Regiao[]> {
  */
 export async function getUFs(): Promise<string[]> {
   const resultados = await db
-    .selectDistinct({ uf: dimGeografia.uf })
-    .from(dimGeografia)
-    .orderBy(asc(dimGeografia.uf));
+    .selectDistinct({ uf: dim_geografia.uf })
+    .from(dim_geografia)
+    .orderBy(asc(dim_geografia.uf));
 
   return resultados.map((r) => r.uf);
 }
@@ -237,11 +237,11 @@ export async function contarCidadesPorRegiao(): Promise<
 > {
   const resultados = await db
     .select({
-      regiao: dimGeografia.regiao,
+      regiao: dim_geografia.regiao,
       total: count(),
     })
-    .from(dimGeografia)
-    .groupBy(dimGeografia.regiao)
+    .from(dim_geografia)
+    .groupBy(dim_geografia.regiao)
     .orderBy(desc(count()));
 
   return resultados;
@@ -253,11 +253,11 @@ export async function contarCidadesPorRegiao(): Promise<
 export async function contarCidadesPorUF(): Promise<Array<{ uf: string; total: number }>> {
   const resultados = await db
     .select({
-      uf: dimGeografia.uf,
+      uf: dim_geografia.uf,
       total: count(),
     })
-    .from(dimGeografia)
-    .groupBy(dimGeografia.uf)
+    .from(dim_geografia)
+    .groupBy(dim_geografia.uf)
     .orderBy(desc(count()));
 
   return resultados;
@@ -341,8 +341,8 @@ export async function buscarGeografiaFuzzy(
   // Buscar todas as cidades da UF
   const cidadesDaUF = await db
     .select()
-    .from(dimGeografia)
-    .where(eq(dimGeografia.uf, ufNorm));
+    .from(dim_geografia)
+    .where(eq(dim_geografia.uf, ufNorm));
 
   if (cidadesDaUF.length === 0) {
     return null;
