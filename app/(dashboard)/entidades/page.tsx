@@ -101,7 +101,7 @@ export default function EntidadesListPage() {
 
   // Handler para duplo click na linha
   const handleRowDoubleClick = (id: number) => {
-    const entidade = data.find((e: any) => e.id === id);
+    const entidade = data?.find((e: any) => e.id === id);
     if (entidade) {
       setSelectedEntidade(entidade);
       setSheetOpen(true);
